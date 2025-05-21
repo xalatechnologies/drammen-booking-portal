@@ -11,7 +11,7 @@ import {
   Theater,
   Music,
   Waves,
-  Tennis
+  CircleDot
 } from "lucide-react";
 
 interface FacilityType {
@@ -48,7 +48,7 @@ const FacilityTypeGrid = () => {
       key: "sports-field"
     },
     {
-      icon: <Tennis className="h-6 w-6 text-purple-500" />,
+      icon: <CircleDot className="h-6 w-6 text-purple-500" />,
       name: "Tennis court",
       location: "Halleren",
       key: "tennis-court"
