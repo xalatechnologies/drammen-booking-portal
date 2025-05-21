@@ -5,7 +5,7 @@ import {
   Home, 
   Users, 
   School, 
-  BadmintonIcon, 
+  Badminton, 
   Waves,
   Activity,
   UtensilsCrossed,
@@ -48,7 +48,7 @@ const FacilityTypeGrid = () => {
       key: "sports-field"
     },
     {
-      icon: <BadmintonIcon className="h-8 w-8 text-blue-500" />,
+      icon: <Badminton className="h-8 w-8 text-blue-500" />,
       name: "Tennis court",
       location: "Halleren",
       key: "tennis-court"
