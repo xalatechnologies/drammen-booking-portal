@@ -42,27 +42,34 @@ const Index = () => {
       </header>
 
       <div className="container mx-auto px-4 py-6 max-w-7xl flex-grow">
-        {/* Hero Section with proper spacing and contrast */}
-        <div className="bg-gradient-to-r from-blue-100 to-blue-50 rounded-xl p-6 mb-8 shadow-sm">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="md:w-2/3">
-              <h1 className="text-2xl md:text-3xl font-bold text-blue-900 mb-3">Find and book facilities in Drammen</h1>
-              <p className="text-blue-800 max-w-2xl text-base">Browse our wide range of facilities in Drammen Kommune for your next event or activity. From sports halls to meeting rooms, we have everything you need.</p>
-              <div className="mt-4 flex flex-wrap gap-3">
-                <Button className="bg-[#0B3D91] hover:bg-[#092d6e] text-white font-medium py-2">
-                  Browse All Facilities
-                </Button>
-                <Button variant="outline" className="border-blue-300 text-blue-700 hover:bg-blue-50">
-                  Learn More
-                </Button>
+        {/* Enhanced Hero Section with professional image */}
+        <div className="mb-8 rounded-xl overflow-hidden shadow-lg">
+          <div className="relative">
+            <img 
+              src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" 
+              alt="Drammen Kommune Facilities" 
+              className="w-full h-[360px] object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-900/80 to-blue-900/30 flex items-center">
+              <div className="container mx-auto px-6">
+                <div className="max-w-xl">
+                  <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-3 leading-tight">
+                    Find and Book Municipal Facilities
+                  </h1>
+                  <p className="text-lg text-blue-100 mb-6 max-w-lg">
+                    Access Drammen Kommune's extensive network of facilities for your events, 
+                    sports activities, and community gatherings.
+                  </p>
+                  <div className="flex flex-wrap gap-3">
+                    <Button className="bg-[#F9CB40] hover:bg-[#E6B92E] text-black font-medium py-2 px-6 text-base">
+                      Browse All Facilities
+                    </Button>
+                    <Button variant="outline" className="border-white text-white hover:bg-white/10 font-medium">
+                      Learn More
+                    </Button>
+                  </div>
+                </div>
               </div>
-            </div>
-            <div className="md:w-1/3">
-              <img 
-                src="https://images.unsplash.com/photo-1517940001007-0d4db70910b0?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
-                alt="Facility booking" 
-                className="rounded-lg shadow-md object-cover w-full h-48 md:h-56"
-              />
             </div>
           </div>
         </div>
