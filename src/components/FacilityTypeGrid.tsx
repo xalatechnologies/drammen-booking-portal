@@ -98,21 +98,21 @@ const FacilityTypeGrid = () => {
   ];
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
       {facilityTypes.map((facility) => (
         <Card 
           key={facility.key} 
-          className="border cursor-pointer hover:shadow-md transition-all hover:translate-y-[-2px] bg-white h-auto"
+          className="border border-gray-200 rounded-lg cursor-pointer hover:shadow-md transition-all hover:translate-y-[-2px] bg-white"
           onClick={() => window.location.href = `/facilities/${facility.key}`}
         >
-          <CardContent className="p-3 flex flex-col justify-center h-full">
-            <div className="flex items-center gap-2">
-              <div className="p-1.5 rounded-full bg-gray-50 flex items-center justify-center">
+          <CardContent className="p-4 flex flex-col justify-center h-full">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-full bg-gray-50 flex items-center justify-center shadow-sm">
                 {facility.icon}
               </div>
-              <div>
-                <h3 className="font-semibold text-sm truncate">{facility.name}</h3>
-                <p className="text-blue-600 text-xs truncate">{facility.location}</p>
+              <div className="flex-1">
+                <h3 className="font-semibold text-gray-800 truncate">{facility.name}</h3>
+                <p className="text-blue-600 text-xs font-medium truncate">{facility.location}</p>
               </div>
             </div>
           </CardContent>
