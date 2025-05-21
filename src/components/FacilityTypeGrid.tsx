@@ -2,14 +2,14 @@
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { 
-  Gymnasium, 
-  MeetingRoom, 
-  Auditorium, 
-  TennisCourt, 
-  SwimmingPool,
+  Home, 
+  Users, 
+  School, 
+  BadmintonIcon, 
+  Waves,
   Activity,
-  Kitchen,
-  Classroom,
+  UtensilsCrossed,
+  GraduationCap,
   Theater,
   Music
 } from "lucide-react";
@@ -24,19 +24,19 @@ interface FacilityType {
 const FacilityTypeGrid = () => {
   const facilityTypes: FacilityType[] = [
     {
-      icon: <Gymnasium className="h-8 w-8 text-orange-500" />,
+      icon: <Home className="h-8 w-8 text-orange-500" />,
       name: "Gymnasium",
       location: "Halleren",
       key: "gymnasium"
     },
     {
-      icon: <MeetingRoom className="h-8 w-8 text-blue-500" />,
+      icon: <Users className="h-8 w-8 text-blue-500" />,
       name: "Meeting room",
       location: "City",
       key: "meeting-room"
     },
     {
-      icon: <Auditorium className="h-8 w-8 text-yellow-500" />,
+      icon: <School className="h-8 w-8 text-yellow-500" />,
       name: "Auditorium",
       location: "Plant",
       key: "auditorium"
@@ -48,13 +48,13 @@ const FacilityTypeGrid = () => {
       key: "sports-field"
     },
     {
-      icon: <TennisCourt className="h-8 w-8 text-blue-500" />,
+      icon: <BadmintonIcon className="h-8 w-8 text-blue-500" />,
       name: "Tennis court",
       location: "Halleren",
       key: "tennis-court"
     },
     {
-      icon: <SwimmingPool className="h-8 w-8 text-blue-500" />,
+      icon: <Waves className="h-8 w-8 text-blue-500" />,
       name: "Swimming pool",
       location: "Gym",
       key: "swimming-pool"
@@ -66,7 +66,7 @@ const FacilityTypeGrid = () => {
       key: "banquet-hall"
     },
     {
-      icon: <Kitchen className="h-8 w-8 text-blue-500" />,
+      icon: <UtensilsCrossed className="h-8 w-8 text-blue-500" />,
       name: "Kitchen",
       location: "Kitchen",
       key: "kitchen"
@@ -78,7 +78,7 @@ const FacilityTypeGrid = () => {
       key: "activity-hall"
     },
     {
-      icon: <Classroom className="h-8 w-8 text-orange-500" />,
+      icon: <GraduationCap className="h-8 w-8 text-orange-500" />,
       name: "Classroom",
       location: "Halleren",
       key: "classroom"
