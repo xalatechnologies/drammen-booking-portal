@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -130,84 +131,88 @@ const OverviewPage = () => {
         </Card>
       </div>
       
-      {/* Analytics Section that matches other cards style */}
-      <Card className="col-span-full">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Rapporter & Analytikk</CardTitle>
-          <ChartBarIcon className="h-4 w-4 text-muted-foreground" />
+      {/* Rapporter & Analytikk Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Rapporter & Analytikk</CardTitle>
         </CardHeader>
-        <CardContent className="p-4">
-          <div className="flex items-center space-x-4">
-            <div className="space-y-1">
-              <p className="text-xs text-muted-foreground">Siste måneders aktivitet</p>
-              <div className="text-2xl font-bold">215</div>
-              <p className="text-xs text-green-600">+5.2% fra forrige periode</p>
+        <CardContent>
+          <div className="flex flex-col space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Siste måneders aktivitet</p>
+                <div className="text-2xl font-bold">215</div>
+                <p className="text-xs text-green-600">+5.2% fra forrige periode</p>
+              </div>
             </div>
-            <div className="h-16 flex-1">
-              <ChartContainer config={chartConfig}>
-                <BarChart 
-                  data={chartData.slice(0, 3)} 
-                  margin={{ top: 0, right: 0, left: 0, bottom: 0 }}
-                  barGap={2}
-                >
-                  <Bar dataKey="bookings" fill="#4f46e5" barSize={4} />
-                  <Bar dataKey="approvals" fill="#10b981" barSize={4} />
+            <div className="h-64 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={chartData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="month" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="bookings" name="Bookinger" fill="#4f46e5" />
+                  <Bar dataKey="approvals" name="Godkjenninger" fill="#10b981" />
                 </BarChart>
-              </ChartContainer>
+              </ResponsiveContainer>
             </div>
           </div>
         </CardContent>
       </Card>
       
       {/* Additional Section for Notification Settings */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Varslingsinnstillinger</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground mb-4">
-            Konfigurer hvilke varsler du ønsker å motta
-          </p>
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">E-postvarsler</span>
-              <span className="text-sm text-green-600">Aktivert</span>
+      <div className="grid gap-6 md:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>Varslingsinnstillinger</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground mb-4">
+              Konfigurer hvilke varsler du ønsker å motta
+            </p>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">E-postvarsler</span>
+                <span className="text-sm text-green-600">Aktivert</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">SMS-varsler</span>
+                <span className="text-sm text-red-600">Deaktivert</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">Nettleservarsler</span>
+                <span className="text-sm text-green-600">Aktivert</span>
+              </div>
             </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">SMS-varsler</span>
-              <span className="text-sm text-red-600">Deaktivert</span>
+          </CardContent>
+        </Card>
+        
+        {/* Admin Profile & Settings Section */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Adminprofil & Innstillinger</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-start gap-4">
+              <div className="flex-shrink-0">
+                <img
+                  src="/placeholder.svg"
+                  alt="Admin profil"
+                  className="h-16 w-16 rounded-full"
+                />
+              </div>
+              <div className="space-y-1">
+                <h3 className="font-semibold">Adminbruker</h3>
+                <p className="text-sm text-muted-foreground">admin@drammen.kommune.no</p>
+                <p className="text-sm text-muted-foreground">Siste innlogging: 22. mai 2025 09:15</p>
+                <p className="text-sm text-muted-foreground">Rolle: Systemadministrator</p>
+              </div>
             </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">Nettleservarsler</span>
-              <span className="text-sm text-green-600">Aktivert</span>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-      
-      {/* Admin Profile & Settings Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Adminprofil & Innstillinger</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col md:flex-row gap-6">
-            <div className="flex-shrink-0">
-              <img
-                src="/placeholder.svg"
-                alt="Admin profil"
-                className="h-24 w-24 rounded-full"
-              />
-            </div>
-            <div className="space-y-2">
-              <h3 className="font-semibold text-lg">Adminbruker</h3>
-              <p className="text-sm text-muted-foreground">admin@drammen.kommune.no</p>
-              <p className="text-sm">Siste innlogging: 22. mai 2025 09:15</p>
-              <p className="text-sm">Rolle: Systemadministrator</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };
