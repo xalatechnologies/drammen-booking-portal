@@ -52,7 +52,7 @@ const FacilityGrid = () => {
       name: "Fjell Skole - Aktivitetshall",
       address: "Lauritz Grønlands vei 40, 3035 Drammen",
       type: "Aktivitetshall",
-      image: "https://images.unsplash.com/photo-1525361147853-4bf9f54a0e98?w=600&auto=format&fit=crop",
+      image: "https://www.strandbuen.no/var/strandbuen/storage/images/strandbuen/nyheter/fjelltun-larere-er-bekymret-har-ikke-rad-til-kvalifiserte-vikarer/1405338-1-nor-NO/fjelltun-larere-er-bekymret-har-ikke-rad-til-kvalifiserte-vikarer.jpg",
       nextAvailable: "Fredag, 17:00"
     },
     {
