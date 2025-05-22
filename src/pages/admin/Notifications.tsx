@@ -167,31 +167,61 @@ const NotificationsPage = () => {
               <CardContent>
                 <TabsContent value="all" className="space-y-4 mt-0">
                   {getFilteredNotifications("all").map((notification) => (
-                    <NotificationItem key={notification.id} notification={notification} />
+                    <NotificationItem 
+                      key={notification.id} 
+                      notification={notification} 
+                      getNotificationIcon={getNotificationIcon}
+                      getNotificationTypeIcon={getNotificationTypeIcon}
+                      getPriorityClass={getPriorityClass}
+                    />
                   ))}
                 </TabsContent>
                 
                 <TabsContent value="bookings" className="space-y-4 mt-0">
                   {getFilteredNotifications("bookings").map((notification) => (
-                    <NotificationItem key={notification.id} notification={notification} />
+                    <NotificationItem 
+                      key={notification.id} 
+                      notification={notification} 
+                      getNotificationIcon={getNotificationIcon}
+                      getNotificationTypeIcon={getNotificationTypeIcon}
+                      getPriorityClass={getPriorityClass}
+                    />
                   ))}
                 </TabsContent>
                 
                 <TabsContent value="approvals" className="space-y-4 mt-0">
                   {getFilteredNotifications("approvals").map((notification) => (
-                    <NotificationItem key={notification.id} notification={notification} />
+                    <NotificationItem 
+                      key={notification.id} 
+                      notification={notification} 
+                      getNotificationIcon={getNotificationIcon}
+                      getNotificationTypeIcon={getNotificationTypeIcon}
+                      getPriorityClass={getPriorityClass}
+                    />
                   ))}
                 </TabsContent>
                 
                 <TabsContent value="system" className="space-y-4 mt-0">
                   {getFilteredNotifications("system").map((notification) => (
-                    <NotificationItem key={notification.id} notification={notification} />
+                    <NotificationItem 
+                      key={notification.id} 
+                      notification={notification} 
+                      getNotificationIcon={getNotificationIcon}
+                      getNotificationTypeIcon={getNotificationTypeIcon}
+                      getPriorityClass={getPriorityClass}
+                    />
                   ))}
                 </TabsContent>
                 
                 <TabsContent value="users" className="space-y-4 mt-0">
                   {getFilteredNotifications("users").map((notification) => (
-                    <NotificationItem key={notification.id} notification={notification} />
+                    <NotificationItem 
+                      key={notification.id} 
+                      notification={notification} 
+                      getNotificationIcon={getNotificationIcon}
+                      getNotificationTypeIcon={getNotificationTypeIcon}
+                      getPriorityClass={getPriorityClass}
+                    />
                   ))}
                 </TabsContent>
               </CardContent>
@@ -263,9 +293,17 @@ const NotificationsPage = () => {
 
 interface NotificationItemProps {
   notification: Notification;
+  getNotificationIcon: (category: NotificationCategory) => JSX.Element;
+  getNotificationTypeIcon: (type: NotificationType) => JSX.Element | null;
+  getPriorityClass: (priority: NotificationPriority) => string;
 }
 
-const NotificationItem = ({ notification }: NotificationItemProps) => {
+const NotificationItem = ({ 
+  notification, 
+  getNotificationIcon, 
+  getNotificationTypeIcon, 
+  getPriorityClass 
+}: NotificationItemProps) => {
   return (
     <div className={`p-4 rounded-md border ${notification.status === "unread" ? "bg-blue-50" : "bg-white"}`}>
       <div className="flex items-start gap-3">
