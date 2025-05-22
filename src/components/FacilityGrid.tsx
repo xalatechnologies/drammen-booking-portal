@@ -44,7 +44,7 @@ const FacilityGrid = () => {
       name: "Danvik Folkehøgskole - Møterom",
       address: "Gjerpenkollen 3, 3022 Drammen",
       type: "Møterom",
-      image: "https://images.unsplash.com/photo-1517502884422-41eaead166d4?w=600&auto=format&fit=crop",
+      image: "/lovable-uploads/1d336434-5d93-4af7-8f92-32867c579c2a.png",
       nextAvailable: "I dag, 15:00"
     },
     {
