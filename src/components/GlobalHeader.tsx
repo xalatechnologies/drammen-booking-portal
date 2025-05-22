@@ -24,8 +24,28 @@ const GlobalHeader = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  // Add state to track if user is logged in (we'll use localStorage to persist this between refreshes)
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    // Check localStorage for login status on component mount
+    return localStorage.getItem("isLoggedIn") === "true";
+  });
 
   const isActive = (path: string) => location.pathname === path;
+
+  // Function to handle login
+  const handleLogin = () => {
+    // For demo purposes, we'll just toggle the login state
+    // In a real app, this would redirect to the login page
+    localStorage.setItem("isLoggedIn", "true");
+    setIsLoggedIn(true);
+    navigate("/login");
+  };
+
+  // Function to handle logout
+  const handleLogout = () => {
+    localStorage.setItem("isLoggedIn", "false");
+    setIsLoggedIn(false);
+  };
 
   return (
     <header className="bg-white py-2 px-4 shadow-md sticky top-0 z-10">
@@ -175,21 +195,35 @@ const GlobalHeader = () => {
                 Mine reservasjoner
               </Button>
               
-              {/* Add Login button to mobile menu */}
-              <Button 
-                variant="ghost" 
-                className={cn(
-                  "w-full justify-start text-lg font-medium py-3",
-                  isActive("/login") && "bg-blue-100 text-blue-700"
-                )}
-                onClick={() => {
-                  navigate("/login");
-                  setMobileMenuOpen(false);
-                }}
-              >
-                <LogIn className="mr-2 h-5 w-5" />
-                Logg inn
-              </Button>
+              {/* Show different buttons based on login state in mobile menu */}
+              {!isLoggedIn ? (
+                <Button 
+                  variant="ghost" 
+                  className={cn(
+                    "w-full justify-start text-lg font-medium py-3",
+                    isActive("/login") && "bg-blue-100 text-blue-700"
+                  )}
+                  onClick={() => {
+                    handleLogin();
+                    setMobileMenuOpen(false);
+                  }}
+                >
+                  <LogIn className="mr-2 h-5 w-5" />
+                  Logg inn
+                </Button>
+              ) : (
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-start text-lg font-medium py-3"
+                  onClick={() => {
+                    handleLogout();
+                    setMobileMenuOpen(false);
+                  }}
+                >
+                  <LogIn className="mr-2 h-5 w-5" />
+                  Logg ut
+                </Button>
+              )}
               
               <div className="border-t my-2"></div>
               <div className="text-lg font-medium px-3 py-2">Hjelp</div>
@@ -227,15 +261,17 @@ const GlobalHeader = () => {
 
         {/* Language & Profile (right) */}
         <div className="hidden lg:flex items-center space-x-4">
-          {/* Login button moved here, next to language selector */}
-          <Button 
-            variant="outline" 
-            className="flex items-center gap-1 h-9 px-4 border-blue-200 text-blue-700 hover:bg-blue-50"
-            onClick={() => navigate("/login")}
-          >
-            <LogIn className="w-4 h-4" />
-            <span>Logg inn</span>
-          </Button>
+          {/* Conditionally show login button or profile based on login status */}
+          {!isLoggedIn ? (
+            <Button 
+              variant="outline" 
+              className="flex items-center gap-1 h-9 px-4 border-blue-200 text-blue-700 hover:bg-blue-50"
+              onClick={handleLogin}
+            >
+              <LogIn className="w-4 h-4" />
+              <span>Logg inn</span>
+            </Button>
+          ) : null}
           
           <div className="flex items-center space-x-2 border rounded-md px-2 py-1">
             <Button variant="ghost" className="h-8 p-1">NO</Button>
@@ -243,25 +279,28 @@ const GlobalHeader = () => {
             <Button variant="ghost" className="h-8 p-1">EN</Button>
           </div>
           
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="rounded-full p-2 h-10 w-10 bg-blue-50 hover:bg-blue-100">
-                <span className="sr-only">User profile</span>
-                <User className="h-5 w-5 text-blue-700" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuItem onClick={() => navigate("/profile")}>
-                Min profil
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate("/settings")}>
-                Innstillinger
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                Logg ut
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {/* Only show profile dropdown when logged in */}
+          {isLoggedIn && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="rounded-full p-2 h-10 w-10 bg-blue-50 hover:bg-blue-100">
+                  <span className="sr-only">User profile</span>
+                  <User className="h-5 w-5 text-blue-700" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuItem onClick={() => navigate("/profile")}>
+                  Min profil
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate("/settings")}>
+                  Innstillinger
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleLogout}>
+                  Logg ut
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </div>
       </div>
     </header>
