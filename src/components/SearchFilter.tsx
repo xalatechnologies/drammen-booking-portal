@@ -18,10 +18,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Calendar as CalendarIcon, Map, List, Search } from "lucide-react";
-import { format } from "date-fns";
+import { Calendar as CalendarIcon, Map, List, Search, CalendarDays } from "lucide-react";
+import { format, addDays } from "date-fns";
 import { cn } from "@/lib/utils";
 import MapView from "./MapView";
+import { DateRange } from "react-day-picker";
 
 interface SearchFilterProps {
   date: Date | undefined;
@@ -44,53 +45,45 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
   viewMode,
   setViewMode,
 }) => {
+  const [dateRange, setDateRange] = React.useState<DateRange | undefined>({
+    from: date || new Date(),
+    to: date ? addDays(date, 7) : addDays(new Date(), 7)
+  });
+
   return (
     <Card className="mb-8 overflow-hidden border-none shadow-md bg-white">
       <CardContent className="p-5">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold text-gray-800">Søk etter lokaler</h2>
-          <div className="flex gap-2">
-            <Button 
-              variant={viewMode === "grid" ? "default" : "outline"} 
-              size="sm" 
-              onClick={() => setViewMode("grid")}
-              className={viewMode === "grid" ? "bg-blue-600" : ""}
-            >
-              <List className="mr-1 h-4 w-4" />
-              <span>Liste</span>
-            </Button>
-            <Button 
-              variant={viewMode === "map" ? "default" : "outline"} 
-              size="sm" 
-              onClick={() => setViewMode("map")}
-              className={viewMode === "map" ? "bg-blue-600" : ""}
-            >
-              <Map className="mr-1 h-4 w-4" />
-              <span>Kart</span>
-            </Button>
-          </div>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-          <div className="md:col-span-1">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Dato</label>
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
+          <div className="md:col-span-3">
+            <label className="block text-sm font-medium text-gray-700 mb-1">Datoperiode</label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
                   className={cn(
                     "w-full justify-start text-left font-normal bg-white border-gray-300 h-11",
-                    !date && "text-muted-foreground"
+                    !dateRange && "text-muted-foreground"
                   )}
                 >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {date ? format(date, "dd.MM.yyyy") : <span>dd.mm.åååå</span>}
+                  <CalendarDays className="mr-2 h-4 w-4" />
+                  {dateRange?.from ? (
+                    dateRange.to ? (
+                      <>
+                        {format(dateRange.from, "dd.MM.yyyy")} - {format(dateRange.to, "dd.MM.yyyy")}
+                      </>
+                    ) : (
+                      format(dateRange.from, "dd.MM.yyyy")
+                    )
+                  ) : (
+                    <span>Velg periode</span>
+                  )}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0">
                 <Calendar
-                  mode="single"
-                  selected={date}
-                  onSelect={setDate}
+                  mode="range"
+                  selected={dateRange}
+                  onSelect={setDateRange}
                   initialFocus
                   className="bg-white pointer-events-auto"
                 />
@@ -98,22 +91,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
             </Popover>
           </div>
 
-          <div className="md:col-span-1">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Klokkeslett</label>
-            <Select>
-              <SelectTrigger className="bg-white h-11 border-gray-300 w-full">
-                <SelectValue placeholder="Velg tid" />
-              </SelectTrigger>
-              <SelectContent className="bg-white">
-                <SelectItem value="morning">08:00 - 12:00</SelectItem>
-                <SelectItem value="afternoon">12:00 - 16:00</SelectItem>
-                <SelectItem value="evening">16:00 - 20:00</SelectItem>
-                <SelectItem value="night">20:00 - 23:00</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="md:col-span-1">
+          <div className="md:col-span-3">
             <label className="block text-sm font-medium text-gray-700 mb-1">Type lokale</label>
             <Select value={facilityType} onValueChange={setFacilityType}>
               <SelectTrigger className="bg-white h-11 border-gray-300 w-full">
@@ -130,7 +108,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
             </Select>
           </div>
 
-          <div className="md:col-span-1">
+          <div className="md:col-span-3">
             <label className="block text-sm font-medium text-gray-700 mb-1">By / Bydel</label>
             <Select value={location} onValueChange={setLocation}>
               <SelectTrigger className="bg-white h-11 border-gray-300 w-full">
@@ -147,14 +125,40 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
             </Select>
           </div>
 
-          <div className="md:col-span-1">
-            <label className="block text-sm font-medium text-gray-700 mb-1">&nbsp;</label>
+          <div className="md:col-span-2">
             <Button 
               className="w-full h-11 bg-[#0B3D91] hover:bg-blue-700 text-white font-medium shadow-sm"
             >
               <Search className="mr-2 h-4 w-4" />
               <span>Søk</span>
             </Button>
+          </div>
+          
+          <div className="md:col-span-1">
+            <div className="flex gap-2 h-11">
+              <Button 
+                variant={viewMode === "grid" ? "default" : "outline"} 
+                size="sm" 
+                onClick={() => setViewMode("grid")}
+                className={cn(
+                  "flex-1 h-full",
+                  viewMode === "grid" ? "bg-blue-600" : ""
+                )}
+              >
+                <List className="h-4 w-4" />
+              </Button>
+              <Button 
+                variant={viewMode === "map" ? "default" : "outline"} 
+                size="sm" 
+                onClick={() => setViewMode("map")}
+                className={cn(
+                  "flex-1 h-full",
+                  viewMode === "map" ? "bg-blue-600" : ""
+                )}
+              >
+                <Map className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         </div>
         
