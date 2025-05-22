@@ -2,6 +2,17 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  navigationMenuTriggerStyle,
+} from "@/components/ui/navigation-menu";
+import { cn } from "@/lib/utils";
+import { ChevronDown, User } from "lucide-react";
 
 const GlobalHeader = () => {
   const navigate = useNavigate();
@@ -11,17 +22,71 @@ const GlobalHeader = () => {
       <div className="container mx-auto flex justify-between items-center">
         {/* Logo (left) */}
         <div className="flex items-center">
-          <a href="/">
+          <a href="/" className="flex items-center">
             <img src="https://www.drammen.kommune.no/Logos/logo-drammen-new.svg" alt="Drammen Kommune Logo" className="h-20 w-auto" />
           </a>
         </div>
 
         {/* Navigation (center) */}
-        <nav className="hidden md:flex space-x-8">
-          <Button variant="link" className="text-blue-700 font-medium" onClick={() => navigate("/")}>Reserver lokaler</Button>
-          <Button variant="link" className="text-blue-700 font-medium" onClick={() => navigate("/bookings")}>Mine reservasjoner</Button>
-          <Button variant="link" className="text-blue-700 font-medium">Hjelp</Button>
-        </nav>
+        <NavigationMenu className="hidden md:flex">
+          <NavigationMenuList>
+            <NavigationMenuItem>
+              <NavigationMenuLink 
+                className={cn(navigationMenuTriggerStyle(), "text-blue-700 font-medium")}
+                onClick={() => navigate("/")}
+              >
+                Reserver lokaler
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+            
+            <NavigationMenuItem>
+              <NavigationMenuLink 
+                className={cn(navigationMenuTriggerStyle(), "text-blue-700 font-medium")}
+                onClick={() => navigate("/bookings")}
+              >
+                Mine reservasjoner
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+            
+            <NavigationMenuItem>
+              <NavigationMenuTrigger className="text-blue-700 font-medium">Hjelp</NavigationMenuTrigger>
+              <NavigationMenuContent>
+                <ul className="grid gap-3 p-4 w-[200px]">
+                  <li>
+                    <NavigationMenuLink
+                      className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                    >
+                      <div className="text-sm font-medium">Ofte stilte spørsmål</div>
+                      <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                        Få svar på vanlige spørsmål
+                      </p>
+                    </NavigationMenuLink>
+                  </li>
+                  <li>
+                    <NavigationMenuLink
+                      className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                    >
+                      <div className="text-sm font-medium">Bruksvilkår</div>
+                      <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                        Les våre bruksvilkår for booking
+                      </p>
+                    </NavigationMenuLink>
+                  </li>
+                  <li>
+                    <NavigationMenuLink
+                      className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                    >
+                      <div className="text-sm font-medium">Kontakt oss</div>
+                      <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                        Få hjelp fra vårt kundesenter
+                      </p>
+                    </NavigationMenuLink>
+                  </li>
+                </ul>
+              </NavigationMenuContent>
+            </NavigationMenuItem>
+          </NavigationMenuList>
+        </NavigationMenu>
 
         {/* Language & Profile (right) */}
         <div className="flex items-center space-x-4">
@@ -32,9 +97,7 @@ const GlobalHeader = () => {
           </div>
           <Button variant="ghost" className="rounded-full p-2 h-10 w-10 bg-gray-100">
             <span className="sr-only">User profile</span>
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
-              <path fillRule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z" clipRule="evenodd" />
-            </svg>
+            <User className="h-5 w-5" />
           </Button>
         </div>
       </div>
