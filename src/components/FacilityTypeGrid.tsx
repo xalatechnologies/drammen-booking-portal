@@ -44,7 +44,7 @@ const FacilityTypeGrid = () => {
       name: "Sports field",
       location: "Halleren",
       key: "sports-field",
-      image: "https://images.unsplash.com/photo-1525361147853-4bf9f54a0e98?w=600&auto=format&fit=crop"
+      image: "https://img8.custompublish.com/getfile.php/4858135.2928.i7jbbupwjptlwn/750x0/6390879_4858135.jpg"
     },
     {
       icon: <MapPin className="h-5 w-5 text-purple-500" />,
@@ -109,9 +109,16 @@ const FacilityTypeGrid = () => {
       {facilityTypes.map((facility) => (
         <Card 
           key={facility.key} 
-          className="border border-gray-200 rounded-lg cursor-pointer hover:shadow-md transition-all hover:translate-y-[-2px] bg-white"
+          className="border border-gray-200 rounded-lg cursor-pointer hover:shadow-md transition-all hover:translate-y-[-2px] bg-white overflow-hidden"
           onClick={() => window.location.href = `/facilities/${facility.key}`}
         >
+          <div className="h-24 w-full">
+            <img 
+              src={facility.image} 
+              alt={facility.name} 
+              className="w-full h-full object-cover"
+            />
+          </div>
           <CardContent className="p-4 flex flex-col justify-center h-full">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-full bg-gray-50 flex items-center justify-center shadow-sm">
