@@ -82,7 +82,7 @@ const FacilityGrid = () => {
     {
       id: 8,
       name: "Åssiden Fotballhall",
-      address: "Kleiveneveien 23, 3038 Drammen",
+      address: "Buskerudveien 54, 3024 Drammen",
       type: "Fotballhall",
       image: "/lovable-uploads/a72ba2e2-f0a3-4561-bff6-17fa721a0c02.png",
       nextAvailable: "Lørdag, 18:30"
