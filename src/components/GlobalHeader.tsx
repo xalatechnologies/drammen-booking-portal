@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -19,6 +18,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { ChevronDown, Menu, User, HelpCircle, Book, MessageCircle, LogIn } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
 
 const GlobalHeader = () => {
   const navigate = useNavigate();
@@ -141,23 +141,6 @@ const GlobalHeader = () => {
                 </ul>
               </NavigationMenuContent>
             </NavigationMenuItem>
-            
-            {/* New Login Navigation Item */}
-            <NavigationMenuItem>
-              <NavigationMenuLink 
-                className={cn(
-                  navigationMenuTriggerStyle(), 
-                  "text-blue-700 font-medium transition-all duration-200 hover:bg-blue-50",
-                  isActive("/login") && "bg-blue-100"
-                )}
-                onClick={() => navigate("/login")}
-              >
-                <div className="flex items-center gap-1">
-                  <LogIn className="w-4 h-4" />
-                  <span>Logg inn</span>
-                </div>
-              </NavigationMenuLink>
-            </NavigationMenuItem>
           </NavigationMenuList>
         </NavigationMenu>
 
@@ -244,11 +227,22 @@ const GlobalHeader = () => {
 
         {/* Language & Profile (right) */}
         <div className="hidden lg:flex items-center space-x-4">
+          {/* Login button moved here, next to language selector */}
+          <Button 
+            variant="outline" 
+            className="flex items-center gap-1 h-9 px-4 border-blue-200 text-blue-700 hover:bg-blue-50"
+            onClick={() => navigate("/login")}
+          >
+            <LogIn className="w-4 h-4" />
+            <span>Logg inn</span>
+          </Button>
+          
           <div className="flex items-center space-x-2 border rounded-md px-2 py-1">
             <Button variant="ghost" className="h-8 p-1">NO</Button>
             <span className="text-gray-300">|</span>
             <Button variant="ghost" className="h-8 p-1">EN</Button>
           </div>
+          
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="rounded-full p-2 h-10 w-10 bg-blue-50 hover:bg-blue-100">
