@@ -16,6 +16,7 @@ import {
   Tooltip, 
   Legend 
 } from "recharts";
+import { ChartBarIcon } from "lucide-react";
 
 const OverviewPage = () => {
   // Sample data for the overview page
@@ -36,8 +37,8 @@ const OverviewPage = () => {
 
   // Fixed chart config to match expected type
   const chartConfig = {
-    bookings: { label: "Bookinger" },
-    approvals: { label: "Godkjenninger" },
+    bookings: { label: "Bookinger", color: "#4f46e5" },
+    approvals: { label: "Godkjenninger", color: "#10b981" },
   };
 
   return (
@@ -130,23 +131,27 @@ const OverviewPage = () => {
         </Card>
       </div>
       
-      {/* Minimized Analytics Section */}
-      <Card className="h-48">
-        <CardHeader className="py-1 px-4">
-          <CardTitle className="text-xs font-medium">Rapporter & Analytikk</CardTitle>
+      {/* Improved Analytics Section to match the style of other cards */}
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">Rapporter & Analytikk</CardTitle>
+          <ChartBarIcon className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
-        <CardContent className="p-1">
-          <div className="h-36">
-            <ChartContainer config={chartConfig}>
-              <BarChart data={chartData.slice(0, 3)} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis dataKey="month" tick={{fontSize: 10}} />
-                <YAxis tick={{fontSize: 10}} width={20} />
-                <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar dataKey="bookings" fill="#4f46e5" name="Bookinger" barSize={15} />
-                <Bar dataKey="approvals" fill="#10b981" name="Godkjenninger" barSize={15} />
-              </BarChart>
-            </ChartContainer>
+        <CardContent>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <p className="text-xs text-muted-foreground">Siste måneders aktivitet</p>
+              <div className="text-2xl font-bold">215</div>
+              <p className="text-xs text-green-600">+5.2% fra forrige periode</p>
+            </div>
+            <div className="h-20">
+              <ChartContainer config={chartConfig}>
+                <BarChart data={chartData.slice(0, 3)} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
+                  <Bar dataKey="bookings" fill="#4f46e5" barSize={6} />
+                  <Bar dataKey="approvals" fill="#10b981" barSize={6} />
+                </BarChart>
+              </ChartContainer>
+            </div>
           </div>
         </CardContent>
       </Card>
