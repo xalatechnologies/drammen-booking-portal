@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -29,13 +30,12 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex flex-col">
-      {/* Header - Updated with larger Drammen Kommune logo */}
-      <header className="bg-gradient-to-r from-[#0B3D91] to-[#0F4CA7] py-2 px-4 shadow-md sticky top-0 z-10">
-        <div className="container mx-auto flex justify-between items-center">
+      {/* Header - Updated with white background and larger logo */}
+      <header className="bg-white py-2 px-4 shadow-md sticky top-0 z-10">
+        <div className="container mx-auto flex justify-center items-center">
           <div className="flex items-center">
-            <img src="https://www.drammen.kommune.no/Logos/logo-drammen-new.svg" alt="Drammen Kommune Logo" className="h-10 w-auto" />
+            <img src="https://www.drammen.kommune.no/Logos/logo-drammen-new.svg" alt="Drammen Kommune Logo" className="h-20 w-auto" />
           </div>
-          <div className="text-white text-base font-medium">Facility Booking System</div>
         </div>
       </header>
 
