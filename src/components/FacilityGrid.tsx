@@ -52,7 +52,7 @@ const FacilityGrid = () => {
       name: "Fjell Skole - Aktivitetshall",
       address: "Lauritz Grønlands vei 40, 3035 Drammen",
       type: "Aktivitetshall",
-      image: "https://images.unsplash.com/photo-1525361147853-4bf9f54a0e98?w=600&auto=format&fit=crop",
+      image: "/lovable-uploads/b12bcda3-d611-4e9e-bbcc-d53d2db38af9.png",
       nextAvailable: "Fredag, 17:00"
     },
     {
