@@ -130,21 +130,21 @@ const OverviewPage = () => {
         </Card>
       </div>
       
-      {/* Smaller Charts Section */}
-      <Card className="h-64">
-        <CardHeader className="py-2">
-          <CardTitle className="text-sm">Rapporter & Analytikk</CardTitle>
+      {/* Minimized Analytics Section */}
+      <Card className="h-48">
+        <CardHeader className="py-1 px-4">
+          <CardTitle className="text-xs font-medium">Rapporter & Analytikk</CardTitle>
         </CardHeader>
-        <CardContent className="p-2">
-          <div className="h-44">
+        <CardContent className="p-1">
+          <div className="h-36">
             <ChartContainer config={chartConfig}>
-              <BarChart data={chartData.slice(0, 4)} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
-                <YAxis />
+              <BarChart data={chartData.slice(0, 3)} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                <XAxis dataKey="month" tick={{fontSize: 10}} />
+                <YAxis tick={{fontSize: 10}} width={20} />
                 <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar dataKey="bookings" fill="#4f46e5" name="Bookinger" />
-                <Bar dataKey="approvals" fill="#10b981" name="Godkjenninger" />
+                <Bar dataKey="bookings" fill="#4f46e5" name="Bookinger" barSize={15} />
+                <Bar dataKey="approvals" fill="#10b981" name="Godkjenninger" barSize={15} />
               </BarChart>
             </ChartContainer>
           </div>
