@@ -92,7 +92,7 @@ const FacilityGrid = () => {
       name: "Strømsø Skole - Klasserom",
       address: "Knoffs gate 30, 3044 Drammen",
       type: "Klasserom",
-      image: "https://images.unsplash.com/photo-1487958449943-2429e8be8625?w=600&auto=format&fit=crop",
+      image: "/lovable-uploads/bda6906f-cc9a-4d78-9e9e-84c342947fae.png",
       nextAvailable: "Mandag, 16:00"
     }
   ];
