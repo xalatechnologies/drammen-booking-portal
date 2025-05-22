@@ -23,7 +23,7 @@ const FacilityTypeGrid = () => {
       name: "Gymnasium",
       location: "Halleren",
       key: "gymnasium",
-      image: "https://www.drammen.kommune.no/globalassets/tjenester/skole/bilder/brandengen-skole.jpg?quality=80&width=900"
+      image: "/lovable-uploads/13aee1f6-e9d9-474b-9ed7-c656d703d19b.png"
     },
     {
       icon: <Building className="h-5 w-5 text-blue-500" />,
