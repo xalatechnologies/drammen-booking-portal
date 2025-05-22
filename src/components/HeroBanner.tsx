@@ -6,8 +6,8 @@ const HeroBanner = () => {
     <div className="mb-8 rounded-xl overflow-hidden shadow-lg">
       <div className="relative">
         <img 
-          src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" 
-          alt="Drammen Kommune Facilities" 
+          src="/lovable-uploads/5a43abf2-1c2e-44cb-96a6-6509c7fe3281.png" 
+          alt="Drammen by med elv og broer" 
           className="w-full h-[360px] object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-blue-900/80 to-blue-900/30 flex items-center">
