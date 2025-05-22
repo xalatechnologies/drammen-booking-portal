@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -131,24 +130,28 @@ const OverviewPage = () => {
         </Card>
       </div>
       
-      {/* Improved Analytics Section to match the style of other cards */}
-      <Card>
+      {/* Analytics Section that matches other cards style */}
+      <Card className="col-span-full">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Rapporter & Analytikk</CardTitle>
           <ChartBarIcon className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
+        <CardContent className="p-4">
+          <div className="flex items-center space-x-4">
+            <div className="space-y-1">
               <p className="text-xs text-muted-foreground">Siste måneders aktivitet</p>
               <div className="text-2xl font-bold">215</div>
               <p className="text-xs text-green-600">+5.2% fra forrige periode</p>
             </div>
-            <div className="h-20">
+            <div className="h-16 flex-1">
               <ChartContainer config={chartConfig}>
-                <BarChart data={chartData.slice(0, 3)} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
-                  <Bar dataKey="bookings" fill="#4f46e5" barSize={6} />
-                  <Bar dataKey="approvals" fill="#10b981" barSize={6} />
+                <BarChart 
+                  data={chartData.slice(0, 3)} 
+                  margin={{ top: 0, right: 0, left: 0, bottom: 0 }}
+                  barGap={2}
+                >
+                  <Bar dataKey="bookings" fill="#4f46e5" barSize={4} />
+                  <Bar dataKey="approvals" fill="#10b981" barSize={4} />
                 </BarChart>
               </ChartContainer>
             </div>
