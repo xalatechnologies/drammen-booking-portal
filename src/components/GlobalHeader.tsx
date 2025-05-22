@@ -18,7 +18,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-import { ChevronDown, Menu, User, HelpCircle, Book, MessageCircle } from "lucide-react";
+import { ChevronDown, Menu, User, HelpCircle, Book, MessageCircle, LogIn } from "lucide-react";
 
 const GlobalHeader = () => {
   const navigate = useNavigate();
@@ -141,6 +141,23 @@ const GlobalHeader = () => {
                 </ul>
               </NavigationMenuContent>
             </NavigationMenuItem>
+            
+            {/* New Login Navigation Item */}
+            <NavigationMenuItem>
+              <NavigationMenuLink 
+                className={cn(
+                  navigationMenuTriggerStyle(), 
+                  "text-blue-700 font-medium transition-all duration-200 hover:bg-blue-50",
+                  isActive("/login") && "bg-blue-100"
+                )}
+                onClick={() => navigate("/login")}
+              >
+                <div className="flex items-center gap-1">
+                  <LogIn className="w-4 h-4" />
+                  <span>Logg inn</span>
+                </div>
+              </NavigationMenuLink>
+            </NavigationMenuItem>
           </NavigationMenuList>
         </NavigationMenu>
 
@@ -174,6 +191,23 @@ const GlobalHeader = () => {
               >
                 Mine reservasjoner
               </Button>
+              
+              {/* Add Login button to mobile menu */}
+              <Button 
+                variant="ghost" 
+                className={cn(
+                  "w-full justify-start text-lg font-medium py-3",
+                  isActive("/login") && "bg-blue-100 text-blue-700"
+                )}
+                onClick={() => {
+                  navigate("/login");
+                  setMobileMenuOpen(false);
+                }}
+              >
+                <LogIn className="mr-2 h-5 w-5" />
+                Logg inn
+              </Button>
+              
               <div className="border-t my-2"></div>
               <div className="text-lg font-medium px-3 py-2">Hjelp</div>
               <Button 
