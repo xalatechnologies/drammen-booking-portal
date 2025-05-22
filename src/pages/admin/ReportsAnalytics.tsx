@@ -4,7 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer, ChartTooltipContent, ChartTooltip, ChartLegend } from "@/components/ui/chart";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Cell, PieChart, Pie } from "recharts";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { BarChart3 } from "lucide-react";
+import { BarChart3, RefreshCw } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 // Simplified data
 const bookingData = [
@@ -29,20 +31,35 @@ const ReportsAnalyticsPage = () => {
     verdi: { label: "Bookinger", color: "#0088FE" }
   };
 
+  const handleRefresh = () => {
+    toast.success("Rapporter oppdatert");
+  };
+
   return (
     <div className="space-y-4 pb-4">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold tracking-tight">Rapporter & Analytikk</h2>
-        <Select value={timeRange} onValueChange={setTimeRange}>
-          <SelectTrigger className="w-[140px]">
-            <SelectValue placeholder="Velg periode" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="30d">Siste 30 dager</SelectItem>
-            <SelectItem value="6m">Siste 6 måneder</SelectItem>
-            <SelectItem value="1y">Siste år</SelectItem>
-          </SelectContent>
-        </Select>
+        <div className="flex items-center gap-2">
+          <Select value={timeRange} onValueChange={setTimeRange}>
+            <SelectTrigger className="w-[140px]">
+              <SelectValue placeholder="Velg periode" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="30d">Siste 30 dager</SelectItem>
+              <SelectItem value="6m">Siste 6 måneder</SelectItem>
+              <SelectItem value="1y">Siste år</SelectItem>
+              <SelectItem value="all">Hele perioden</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button 
+            variant="outline" 
+            size="icon"
+            onClick={handleRefresh}
+            title="Oppdater rapporter"
+          >
+            <RefreshCw className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
