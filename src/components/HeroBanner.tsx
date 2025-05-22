@@ -17,7 +17,7 @@ const HeroBanner = () => {
                 Finn ledige lokaler i Drammen Kommune
               </h1>
               <p className="text-lg text-blue-100 mb-6 max-w-lg">
-                Søk og book kommunale lokaler til møter, arrangementer og aktiviteter.
+                Søk og reserver kommunale lokaler til møter, arrangementer og aktiviteter.
               </p>
             </div>
           </div>

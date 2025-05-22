@@ -53,13 +53,13 @@ const BookingsPage = () => {
       <div className="container mx-auto px-4 py-8 max-w-7xl flex-grow">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-4 md:mb-0">
-            Mine bookinger
+            Mine reservasjoner
           </h1>
           <Button 
             className="bg-[#0B3D91] hover:bg-blue-700 text-white"
             onClick={() => window.location.href = "/"}
           >
-            + Ny booking
+            + Ny reservasjon
           </Button>
         </div>
 

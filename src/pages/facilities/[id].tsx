@@ -112,12 +112,12 @@ const FacilityDetail = () => {
             <Drawer>
               <DrawerTrigger asChild>
                 <Button className="w-full bg-[#0B3D91] hover:bg-blue-700 text-white font-medium shadow-sm h-12">
-                  Bestill nå
+                  Reserver nå
                 </Button>
               </DrawerTrigger>
               <DrawerContent>
                 <DrawerHeader>
-                  <DrawerTitle>Book {facility.name}</DrawerTitle>
+                  <DrawerTitle>Reserver {facility.name}</DrawerTitle>
                   <DrawerDescription>Trinn 1/3: Velg tid og dato</DrawerDescription>
                 </DrawerHeader>
                 <div className="px-4">
@@ -149,7 +149,7 @@ const FacilityDetail = () => {
                       <label className="text-sm font-medium">Formål</label>
                       <textarea 
                         className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2" 
-                        placeholder="Beskriv formålet med bookningen"
+                        placeholder="Beskriv formålet med reservasjonen"
                       />
                     </div>
                   </div>

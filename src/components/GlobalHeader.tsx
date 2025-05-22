@@ -18,8 +18,8 @@ const GlobalHeader = () => {
 
         {/* Navigation (center) */}
         <nav className="hidden md:flex space-x-8">
-          <Button variant="link" className="text-blue-700 font-medium" onClick={() => navigate("/")}>Book lokaler</Button>
-          <Button variant="link" className="text-blue-700 font-medium" onClick={() => navigate("/bookings")}>Mine bookinger</Button>
+          <Button variant="link" className="text-blue-700 font-medium" onClick={() => navigate("/")}>Reserver lokaler</Button>
+          <Button variant="link" className="text-blue-700 font-medium" onClick={() => navigate("/bookings")}>Mine reservasjoner</Button>
           <Button variant="link" className="text-blue-700 font-medium">Hjelp</Button>
         </nav>
 
