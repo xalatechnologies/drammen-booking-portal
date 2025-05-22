@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,7 +28,7 @@ const FacilityGrid = () => {
       name: "Brandengen Skole - Gymsal",
       address: "Knoffs gate 8, 3044 Drammen",
       type: "Gymsal",
-      image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&auto=format&fit=crop",
+      image: "https://scontent.fosl3-1.fna.fbcdn.net/v/t39.30808-6/310558649_2982037632038258_5388301097931219324_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=3d9321&_nc_ohc=wv-0jbxGnD0AX8rZsZN&_nc_ht=scontent.fosl3-1.fna&oh=00_AfA73Pe7e1SRrkqeZa69K8uXs9ByGhACQ-eOo-IEjteTew&oe=65748690",
       nextAvailable: "I dag, 18:00"
     },
     {
