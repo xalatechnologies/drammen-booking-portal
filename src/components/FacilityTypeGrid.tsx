@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { 
@@ -37,7 +36,7 @@ const FacilityTypeGrid = () => {
       name: "Auditorium",
       location: "Plant",
       key: "auditorium",
-      image: "https://images.unsplash.com/photo-1596194081696-4bab3a813b63?w=600&auto=format&fit=crop"
+      image: "https://www.drammen.kommune.no/globalassets/tjenester/skole/bilder/bragernes-skole.jpg?quality=80&width=900"
     },
     {
       icon: <Home className="h-5 w-5 text-green-500" />,
