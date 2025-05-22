@@ -46,8 +46,8 @@ const UsersRolesPage = () => {
   });
 
   const onSubmit = (data: z.infer<typeof formSchema>) => {
-    console.log("Form submitted:", data);
-    // In a real app, you would call an API to add the user
+    console.log("Skjema sendt inn:", data);
+    // I en reell app ville du kalt et API for å legge til brukeren
   };
 
   const filteredUsers = users.filter(user => 
@@ -127,7 +127,8 @@ const UsersRolesPage = () => {
                         <td className="py-3 px-4">
                           <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium border ${getRoleBadgeClass(user.role)}`}>
                             {getRoleIcon(user.role)}
-                            {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+                            {user.role === "admin" ? "Administrator" : 
+                             user.role === "manager" ? "Manager" : "Vanlig bruker"}
                           </span>
                         </td>
                         <td className="py-3 px-4">

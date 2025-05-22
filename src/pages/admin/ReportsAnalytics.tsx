@@ -48,12 +48,13 @@ const facilitiesData = [
 const ReportsAnalyticsPage = () => {
   const [timeRange, setTimeRange] = useState<string>("6m");
 
+  // Fixed chart config structure to match the expected ChartConfig type
   const chartConfig = {
-    idretts: { color: "#0088FE", theme: { light: "#0088FE", dark: "#36A2EB" }, label: "Idrettshaller" },
-    kultur: { color: "#00C49F", theme: { light: "#00C49F", dark: "#4BC0C0" }, label: "Kulturrom" },
-    møterom: { color: "#FFBB28", theme: { light: "#FFBB28", dark: "#FFCE56" }, label: "Møterom" },
-    annet: { color: "#FF8042", theme: { light: "#FF8042", dark: "#FF6384" }, label: "Annet" },
-    trend: { color: "#8884d8", theme: { light: "#8884d8", dark: "#B042FF" }, label: "Trend" }
+    Idretts: { label: "Idrettshaller", color: "#0088FE" },
+    Kultur: { label: "Kulturrom", color: "#00C49F" },
+    Møterom: { label: "Møterom", color: "#FFBB28" },
+    Annet: { label: "Annet", color: "#FF8042" },
+    verdi: { label: "Bookingverdi", color: "#8884d8" }
   };
 
   return (
@@ -135,10 +136,10 @@ const ReportsAnalyticsPage = () => {
                   <YAxis />
                   <ChartTooltip content={<ChartTooltipContent />} />
                   <ChartLegend content={<ChartLegendContent />} />
-                  <Bar dataKey="Idretts" name="Idrettshaller" fill="var(--color-idretts, #0088FE)" />
-                  <Bar dataKey="Kultur" name="Kulturrom" fill="var(--color-kultur, #00C49F)" />
-                  <Bar dataKey="Møterom" name="Møterom" fill="var(--color-møterom, #FFBB28)" />
-                  <Bar dataKey="Annet" name="Annet" fill="var(--color-annet, #FF8042)" />
+                  <Bar dataKey="Idretts" name="Idrettshaller" fill="#0088FE" />
+                  <Bar dataKey="Kultur" name="Kulturrom" fill="#00C49F" />
+                  <Bar dataKey="Møterom" name="Møterom" fill="#FFBB28" />
+                  <Bar dataKey="Annet" name="Annet" fill="#FF8042" />
                 </BarChart>
               </ChartContainer>
             </CardContent>
@@ -156,7 +157,7 @@ const ReportsAnalyticsPage = () => {
                     <XAxis dataKey="måned" />
                     <YAxis />
                     <ChartTooltip content={<ChartTooltipContent />} />
-                    <Line type="monotone" dataKey="verdi" name="Bookingverdi" stroke="var(--color-trend, #8884d8)" activeDot={{ r: 8 }} />
+                    <Line type="monotone" dataKey="verdi" name="Bookingverdi" stroke="#8884d8" activeDot={{ r: 8 }} />
                   </LineChart>
                 </ChartContainer>
               </CardContent>

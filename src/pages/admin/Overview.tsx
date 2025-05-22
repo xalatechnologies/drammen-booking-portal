@@ -20,9 +20,9 @@ import {
 const OverviewPage = () => {
   // Sample data for the overview page
   const statsData = [
-    { name: "Total Facilities", value: 124 },
-    { name: "Pending Approvals", value: 18 },
-    { name: "Active Users", value: 543 },
+    { name: "Totalt Antall Fasiliteter", value: 124 },
+    { name: "Ventende Godkjenninger", value: 18 },
+    { name: "Aktive Brukere", value: 543 },
   ];
 
   const chartData = [
@@ -34,9 +34,15 @@ const OverviewPage = () => {
     { month: "Jun", bookings: 55, approvals: 20 },
   ];
 
+  // Fixed chart config to match expected type
+  const chartConfig = {
+    bookings: { label: "Bookinger" },
+    approvals: { label: "Godkjenninger" },
+  };
+
   return (
     <div className="space-y-6">
-      <h2 className="text-3xl font-bold tracking-tight">Dashboard Overview</h2>
+      <h2 className="text-3xl font-bold tracking-tight">Dashbord Oversikt</h2>
       
       {/* Stats Cards */}
       <div className="grid gap-6 md:grid-cols-3">
@@ -56,23 +62,23 @@ const OverviewPage = () => {
       <div className="grid gap-6 md:grid-cols-3">
         <Card className="col-span-1">
           <CardHeader>
-            <CardTitle>Overview Stats</CardTitle>
+            <CardTitle>Oversiktsstatistikk</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground">
-              Key performance indicators and metrics for facility management
+              Nøkkelindikatorer og målinger for fasilitetsstyring
             </p>
             <ul className="mt-4 space-y-2">
               <li className="flex justify-between">
-                <span className="text-sm">Avg. Approval Time:</span>
-                <span className="font-medium">2.4 days</span>
+                <span className="text-sm">Gj.snitt godkjenningstid:</span>
+                <span className="font-medium">2,4 dager</span>
               </li>
               <li className="flex justify-between">
-                <span className="text-sm">Utilization Rate:</span>
+                <span className="text-sm">Utnyttelsesgrad:</span>
                 <span className="font-medium">76%</span>
               </li>
               <li className="flex justify-between">
-                <span className="text-sm">Monthly Bookings:</span>
+                <span className="text-sm">Månedlige bookinger:</span>
                 <span className="font-medium">342</span>
               </li>
             </ul>
@@ -81,21 +87,21 @@ const OverviewPage = () => {
         
         <Card className="col-span-1">
           <CardHeader>
-            <CardTitle>Facility Management</CardTitle>
+            <CardTitle>Fasilitetsstyring</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground">
-              Recent facility updates and pending actions
+              Nylige fasilitetoppdateringer og ventende handlinger
             </p>
             <ul className="mt-4 space-y-2">
               <li className="text-sm">
-                <span className="font-medium">3</span> new facilities added
+                <span className="font-medium">3</span> nye fasiliteter lagt til
               </li>
               <li className="text-sm">
-                <span className="font-medium">7</span> facilities need maintenance
+                <span className="font-medium">7</span> fasiliteter trenger vedlikehold
               </li>
               <li className="text-sm">
-                <span className="font-medium">12</span> pending verification
+                <span className="font-medium">12</span> venter på verifisering
               </li>
             </ul>
           </CardContent>
@@ -103,21 +109,21 @@ const OverviewPage = () => {
         
         <Card className="col-span-1">
           <CardHeader>
-            <CardTitle>Approval Workflows</CardTitle>
+            <CardTitle>Godkjenningsprosesser</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground">
-              Status of current approval processes
+              Status for nåværende godkjenningsprosesser
             </p>
             <ul className="mt-4 space-y-2">
               <li className="text-sm">
-                <span className="font-medium">8</span> awaiting first review
+                <span className="font-medium">8</span> venter på første gjennomgang
               </li>
               <li className="text-sm">
-                <span className="font-medium">5</span> pending final approval
+                <span className="font-medium">5</span> venter på endelig godkjenning
               </li>
               <li className="text-sm">
-                <span className="font-medium">3</span> rejected this month
+                <span className="font-medium">3</span> avvist denne måneden
               </li>
             </ul>
           </CardContent>
@@ -127,23 +133,18 @@ const OverviewPage = () => {
       {/* Charts Section */}
       <Card>
         <CardHeader>
-          <CardTitle>Reports & Analytics</CardTitle>
+          <CardTitle>Rapporter & Analytikk</CardTitle>
         </CardHeader>
         <CardContent>
-          <ChartContainer 
-            config={{
-              bookings: { label: "Bookings" },
-              approvals: { label: "Approvals" },
-            }}
-          >
+          <ChartContainer config={chartConfig}>
             <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="month" />
               <YAxis />
               <ChartTooltip content={<ChartTooltipContent />} />
               <Legend />
-              <Bar dataKey="bookings" fill="#4f46e5" name="Bookings" />
-              <Bar dataKey="approvals" fill="#10b981" name="Approvals" />
+              <Bar dataKey="bookings" fill="#4f46e5" name="Bookinger" />
+              <Bar dataKey="approvals" fill="#10b981" name="Godkjenninger" />
             </BarChart>
           </ChartContainer>
         </CardContent>
@@ -152,24 +153,24 @@ const OverviewPage = () => {
       {/* Additional Section for Notification Settings */}
       <Card>
         <CardHeader>
-          <CardTitle>Notification Settings</CardTitle>
+          <CardTitle>Varslingsinnstillinger</CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground mb-4">
-            Configure which notifications you want to receive
+            Konfigurer hvilke varsler du ønsker å motta
           </p>
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">Email notifications</span>
-              <span className="text-sm text-green-600">Enabled</span>
+              <span className="text-sm font-medium">E-postvarsler</span>
+              <span className="text-sm text-green-600">Aktivert</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">SMS alerts</span>
-              <span className="text-sm text-red-600">Disabled</span>
+              <span className="text-sm font-medium">SMS-varsler</span>
+              <span className="text-sm text-red-600">Deaktivert</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">Browser notifications</span>
-              <span className="text-sm text-green-600">Enabled</span>
+              <span className="text-sm font-medium">Nettleservarsler</span>
+              <span className="text-sm text-green-600">Aktivert</span>
             </div>
           </div>
         </CardContent>
@@ -178,22 +179,22 @@ const OverviewPage = () => {
       {/* Admin Profile & Settings Section */}
       <Card>
         <CardHeader>
-          <CardTitle>Admin Profile & Settings</CardTitle>
+          <CardTitle>Adminprofil & Innstillinger</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col md:flex-row gap-6">
             <div className="flex-shrink-0">
               <img
                 src="/placeholder.svg"
-                alt="Admin profile"
+                alt="Admin profil"
                 className="h-24 w-24 rounded-full"
               />
             </div>
             <div className="space-y-2">
-              <h3 className="font-semibold text-lg">Admin User</h3>
+              <h3 className="font-semibold text-lg">Adminbruker</h3>
               <p className="text-sm text-muted-foreground">admin@drammen.kommune.no</p>
-              <p className="text-sm">Last login: May 22, 2025 09:15</p>
-              <p className="text-sm">Role: System Administrator</p>
+              <p className="text-sm">Siste innlogging: 22. mai 2025 09:15</p>
+              <p className="text-sm">Rolle: Systemadministrator</p>
             </div>
           </div>
         </CardContent>

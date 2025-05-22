@@ -5,13 +5,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 const ProfileSettingsPage = () => {
   return (
     <div className="space-y-6">
-      <h2 className="text-3xl font-bold tracking-tight">Profile & Settings</h2>
+      <h2 className="text-3xl font-bold tracking-tight">Profil & Innstillinger</h2>
       <Card>
         <CardHeader>
-          <CardTitle>Account Settings</CardTitle>
+          <CardTitle>Kontoinnstillinger</CardTitle>
         </CardHeader>
         <CardContent>
-          <p>Profile and account settings content will be displayed here.</p>
+          <p>Profil og kontoinnstillinger vil vises her.</p>
         </CardContent>
       </Card>
     </div>

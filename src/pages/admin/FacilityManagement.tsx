@@ -5,13 +5,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 const FacilityManagementPage = () => {
   return (
     <div className="space-y-6">
-      <h2 className="text-3xl font-bold tracking-tight">Facility Management</h2>
+      <h2 className="text-3xl font-bold tracking-tight">Fasilitetsstyring</h2>
       <Card>
         <CardHeader>
-          <CardTitle>Facility Search & Filters</CardTitle>
+          <CardTitle>Fasilitetsøk & Filtre</CardTitle>
         </CardHeader>
         <CardContent>
-          <p>Facility management content will be displayed here.</p>
+          <p>Fasilitetsstyringsinnhold vil vises her.</p>
         </CardContent>
       </Card>
     </div>

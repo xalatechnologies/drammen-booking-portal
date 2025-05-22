@@ -28,37 +28,37 @@ const AdminSidebar = () => {
 
   const menuItems = [
     {
-      title: "Overview",
+      title: "Oversikt",
       icon: LayoutDashboard,
       path: "/admin",
     },
     {
-      title: "Facility Management",
+      title: "Fasilitetsstyring",
       icon: FileText,
       path: "/admin/facilities",
     },
     {
-      title: "Approval Workflows",
+      title: "Godkjenningsprosesser",
       icon: Activity,
       path: "/admin/approvals",
     },
     {
-      title: "Users & Roles",
+      title: "Brukere & Roller",
       icon: Users,
       path: "/admin/users",
     },
     {
-      title: "Reports & Analytics",
+      title: "Rapporter & Analytikk",
       icon: BarChart3,
       path: "/admin/reports",
     },
     {
-      title: "Notifications",
+      title: "Varsler",
       icon: Bell,
       path: "/admin/notifications",
     },
     {
-      title: "Profile & Settings",
+      title: "Profil & Innstillinger",
       icon: Settings,
       path: "/admin/profile",
     },
