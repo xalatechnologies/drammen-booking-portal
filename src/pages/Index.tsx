@@ -6,6 +6,7 @@ import HeroBanner from "@/components/HeroBanner";
 import SearchFilter from "@/components/SearchFilter";
 import FacilityGrid from "@/components/FacilityGrid";
 import PaginationControls from "@/components/PaginationControls";
+import MapView from "@/components/MapView";
 
 const Index = () => {
   const [date, setDate] = useState<Date>();
@@ -30,6 +31,7 @@ const Index = () => {
           setViewMode={setViewMode}
         />
         {viewMode === "grid" && <FacilityGrid />}
+        {viewMode === "map" && <MapView facilityType={facilityType} location={location} />}
         {viewMode === "grid" && <PaginationControls />}
       </div>
 
