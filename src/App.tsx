@@ -24,7 +24,13 @@ const App = () => (
           <Route path="/login" element={<LoginSelection />} />
           <Route path="/facilities/:id" element={<FacilityDetail />} />
           <Route path="/bookings" element={<BookingsPage />} />
-          <Route path="/admin/*" element={<AdminDashboard />} />
+          
+          {/* Endret admin-ruteoppsett for å støtte nested routes riktig */}
+          <Route path="/admin" element={<AdminDashboard />}>
+            <Route index element={<AdminDashboard />} />
+            <Route path="*" element={<AdminDashboard />} />
+          </Route>
+          
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

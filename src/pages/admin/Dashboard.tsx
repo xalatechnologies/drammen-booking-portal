@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Outlet } from "react-router-dom";
 import AdminLayout from "@/components/admin/AdminLayout";
 import OverviewPage from "@/pages/admin/Overview";
 import FacilityManagementPage from "@/pages/admin/FacilityManagement";
@@ -24,6 +24,7 @@ const AdminDashboard = () => {
         <Route path="/profile" element={<ProfileSettingsPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
+      <Outlet />
     </AdminLayout>
   );
 };
