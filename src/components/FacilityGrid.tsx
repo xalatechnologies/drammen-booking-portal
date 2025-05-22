@@ -76,7 +76,7 @@ const FacilityGrid = () => {
       name: "Drammensbadet - Svømmehall",
       address: "Ormåsen 1, 3048 Drammen",
       type: "Svømmehall",
-      image: "https://images.unsplash.com/photo-1527576539890-dfa815648363?w=600&auto=format&fit=crop",
+      image: "/lovable-uploads/740258a0-d4f7-49b6-a8a6-9c994e75baae.png",
       nextAvailable: "Søndag, 12:00"
     },
     {
