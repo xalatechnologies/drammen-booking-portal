@@ -60,7 +60,7 @@ const FacilityGrid = () => {
       name: "Gulskogen Skole - Auditorium",
       address: "Smithestrømsveien 13, 3048 Drammen",
       type: "Auditorium",
-      image: "https://images.unsplash.com/photo-1488972685288-c3fd157d7c7a?w=600&auto=format&fit=crop",
+      image: "/lovable-uploads/b692664c-737a-4a20-8673-25a401789f82.png",
       nextAvailable: "Torsdag, 19:00"
     },
     {
