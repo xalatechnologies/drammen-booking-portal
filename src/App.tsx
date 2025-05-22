@@ -25,11 +25,8 @@ const App = () => (
           <Route path="/facilities/:id" element={<FacilityDetail />} />
           <Route path="/bookings" element={<BookingsPage />} />
           
-          {/* Endret admin-ruteoppsett for å støtte nested routes riktig */}
-          <Route path="/admin" element={<AdminDashboard />}>
-            <Route index element={<AdminDashboard />} />
-            <Route path="*" element={<AdminDashboard />} />
-          </Route>
+          {/* Riktig oppsett for admin ruter med wildcard */}
+          <Route path="/admin/*" element={<AdminDashboard />} />
           
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
