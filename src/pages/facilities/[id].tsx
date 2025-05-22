@@ -1,205 +1,232 @@
 
-import React from "react";
-import { useParams } from "react-router-dom";
+import React, { useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Calendar as CalendarIcon, ArrowLeft } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Calendar } from "@/components/ui/calendar";
-
-// This would typically come from Supabase
-const mockFacilities = [
-  {
-    id: "1",
-    name: "Drammen Sports Hall",
-    description: "A large sports facility with multiple courts. Ideal for basketball, volleyball, handball, and other indoor sports. The facility includes changing rooms, showers, and basic equipment storage.",
-    type: "sports-hall",
-    location: "central",
-    images: [
-      "https://images.unsplash.com/photo-1525361147853-4bf9f54a0e98?w=800&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1542652735873-fb2825bac6e2?w=800&auto=format&fit=crop",
-    ],
-    amenities: ["Changing Rooms", "Showers", "Equipment Storage", "WiFi", "Parking"],
-    capacity: 200,
-  },
-  {
-    id: "2",
-    name: "Konnerud Community Center",
-    description: "Modern meeting facilities for local groups and organizations. Perfect for workshops, seminars, and community gatherings with modern AV equipment and flexible seating arrangements.",
-    type: "meeting-room",
-    location: "konnerud",
-    images: [
-      "https://images.unsplash.com/photo-1517502884422-41eaead166d4?w=800&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1572025442646-866d16c84a54?w=800&auto=format&fit=crop",
-    ],
-    amenities: ["Projector", "Sound System", "Whiteboard", "Coffee Machine", "WiFi"],
-    capacity: 30,
-  },
-  {
-    id: "3",
-    name: "Åssiden School Auditorium",
-    description: "Perfect for presentations and performances with professional lighting and sound systems. The auditorium features comfortable seating and excellent acoustics for concerts and theatrical productions.",
-    type: "auditorium",
-    location: "aassiden",
-    images: [
-      "https://images.unsplash.com/photo-1596194081696-4bab3a813b63?w=800&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1503095396549-807759245b35?w=800&auto=format&fit=crop",
-    ],
-    amenities: ["Stage", "Professional Lighting", "Sound System", "Backstage Area", "Seating for 150"],
-    capacity: 150,
-  },
-  {
-    id: "4",
-    name: "Gulskogen Gymnasium",
-    description: "Fully equipped sports facility for multiple activities including gymnastics, fitness classes, and sports training. Includes various equipment for different sports activities.",
-    type: "gym",
-    location: "gulskogen",
-    images: [
-      "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=800&auto=format&fit=crop",
-    ],
-    amenities: ["Exercise Equipment", "Changing Rooms", "Showers", "Drinking Fountains", "First Aid Kit"],
-    capacity: 100,
-  },
-];
+import { Drawer, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
+import { ArrowLeft } from "lucide-react";
+import { format } from "date-fns";
+import GlobalHeader from "@/components/GlobalHeader";
+import GlobalFooter from "@/components/GlobalFooter";
 
 const FacilityDetail = () => {
   const { id } = useParams();
-  const facility = mockFacilities.find((f) => f.id === id);
-  const [selectedImage, setSelectedImage] = React.useState(0);
-  const [selectedDate, setSelectedDate] = React.useState<Date | undefined>(new Date());
-
-  if (!facility) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="text-center py-12">
-          <h2 className="text-2xl font-semibold mb-2">Facility Not Found</h2>
-          <p className="mb-6">The facility you're looking for doesn't exist.</p>
-          <Button onClick={() => window.history.back()}>
-            <ArrowLeft className="mr-2 h-4 w-4" /> Back to Search
-          </Button>
-        </div>
-      </div>
-    );
-  }
+  const navigate = useNavigate();
+  const [date, setDate] = useState<Date>(new Date());
+  const [calendarView, setCalendarView] = useState<"day" | "week" | "month">("week");
+  
+  // Mock facility data - in a real app this would be fetched based on id
+  const facility = {
+    id,
+    name: `Gymsal ${id} - Brandengen skole`,
+    address: "Knoffs gate 8, Drammen",
+    capacity: "30 personer",
+    equipment: ["Projektor", "Lydanlegg", "Whiteboard", "Wi-Fi"],
+    description: "Dette er en moderne gymsal på Brandengen skole, perfekt for idrettsaktiviteter, trening og mindre arrangementer. Salen er utstyrt med standard sportsutstyr og har god ventilasjon.",
+    images: [
+      "https://images.unsplash.com/photo-1577301886662-26e1b2e2a00b?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1580237072617-771c3ecc4a24?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1516205651411-aef33a44f7c2?auto=format&fit=crop&w=1200&q=80"
+    ]
+  };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <Button
-        variant="outline"
-        className="mb-6"
-        onClick={() => window.history.back()}
-      >
-        <ArrowLeft className="mr-2 h-4 w-4" /> Back to Search
-      </Button>
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex flex-col">
+      <GlobalHeader />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Left column: Facility details */}
-        <div className="lg:col-span-2">
-          <h1 className="text-3xl font-bold mb-6">{facility.name}</h1>
+      <div className="container mx-auto px-4 py-6 max-w-7xl flex-grow">
+        <Button 
+          variant="outline" 
+          className="mb-6"
+          onClick={() => navigate("/")}
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Tilbake til søk
+        </Button>
 
-          {/* Image gallery */}
-          <div className="mb-6">
-            <div className="rounded-lg overflow-hidden mb-4">
-              <img
-                src={facility.images[selectedImage]}
-                alt={`${facility.name} - view ${selectedImage + 1}`}
-                className="w-full h-96 object-cover"
+        <h1 className="text-3xl font-bold mb-6">{facility.name}</h1>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+          {/* Images and Description */}
+          <div className="lg:col-span-2">
+            {/* Main Image */}
+            <div className="rounded-lg overflow-hidden mb-4 h-80">
+              <img 
+                src={facility.images[0]} 
+                alt={facility.name}
+                className="w-full h-full object-cover"
               />
             </div>
-            <div className="flex space-x-2">
-              {facility.images.map((img, i) => (
-                <div
-                  key={i}
-                  className={`cursor-pointer h-20 w-20 rounded-md overflow-hidden border-2 ${
-                    selectedImage === i
-                      ? "border-primary"
-                      : "border-transparent"
-                  }`}
-                  onClick={() => setSelectedImage(i)}
-                >
-                  <img
-                    src={img}
-                    alt={`${facility.name} thumbnail ${i + 1}`}
-                    className="h-full w-full object-cover"
+            
+            {/* Thumbnail Gallery */}
+            <div className="grid grid-cols-3 gap-2 mb-6">
+              {facility.images.slice(1).map((img, i) => (
+                <div key={i} className="rounded-md overflow-hidden h-24">
+                  <img 
+                    src={img} 
+                    alt={`${facility.name} - bilde ${i+2}`}
+                    className="w-full h-full object-cover"
                   />
                 </div>
               ))}
             </div>
+
+            {/* Description */}
+            <div className="bg-white rounded-lg p-6 shadow-sm mb-6">
+              <h2 className="text-xl font-bold mb-4">Beskrivelse</h2>
+              <p className="text-gray-700">{facility.description}</p>
+            </div>
           </div>
 
-          {/* Description */}
-          <Card className="mb-6">
-            <CardHeader>
-              <CardTitle>About this Facility</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p>{facility.description}</p>
-              
-              <div className="mt-6">
-                <h3 className="font-semibold mb-2">Details</h3>
-                <div className="grid grid-cols-2 gap-2">
+          {/* Details and Booking Button */}
+          <div>
+            <Card className="mb-6">
+              <CardContent className="p-6">
+                <h2 className="text-xl font-bold mb-4">Detaljer</h2>
+                
+                <div className="space-y-3">
                   <div>
-                    <span className="text-muted-foreground">Type:</span>{" "}
-                    <span className="capitalize">{facility.type.replace('-', ' ')}</span>
+                    <p className="text-sm font-medium text-gray-500">Adresse</p>
+                    <p>{facility.address}</p>
                   </div>
+                  
                   <div>
-                    <span className="text-muted-foreground">Location:</span>{" "}
-                    <span className="capitalize">{facility.location}</span>
+                    <p className="text-sm font-medium text-gray-500">Kapasitet</p>
+                    <p>{facility.capacity}</p>
                   </div>
+                  
                   <div>
-                    <span className="text-muted-foreground">Capacity:</span>{" "}
-                    <span>{facility.capacity} people</span>
+                    <p className="text-sm font-medium text-gray-500">Utstyr</p>
+                    <ul className="list-disc pl-5 text-gray-700">
+                      {facility.equipment.map((item, i) => (
+                        <li key={i}>{item}</li>
+                      ))}
+                    </ul>
                   </div>
                 </div>
-              </div>
-              
-              <div className="mt-6">
-                <h3 className="font-semibold mb-2">Amenities</h3>
-                <ul className="grid grid-cols-2 gap-2">
-                  {facility.amenities.map((amenity, index) => (
-                    <li key={index} className="flex items-center">
-                      <span className="h-1.5 w-1.5 rounded-full bg-primary mr-2"></span>
-                      {amenity}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+
+            <Drawer>
+              <DrawerTrigger asChild>
+                <Button className="w-full bg-[#0B3D91] hover:bg-blue-700 text-white font-medium shadow-sm h-12">
+                  Bestill nå
+                </Button>
+              </DrawerTrigger>
+              <DrawerContent>
+                <DrawerHeader>
+                  <DrawerTitle>Book {facility.name}</DrawerTitle>
+                  <DrawerDescription>Trinn 1/3: Velg tid og dato</DrawerDescription>
+                </DrawerHeader>
+                <div className="px-4">
+                  <div className="grid gap-6 py-4">
+                    <div className="grid gap-2">
+                      <label className="text-sm font-medium">Dato</label>
+                      <Calendar
+                        mode="single"
+                        selected={date}
+                        onSelect={(d) => d && setDate(d)}
+                        className="rounded border shadow-sm p-3 pointer-events-auto"
+                      />
+                    </div>
+                    
+                    <div className="grid gap-2">
+                      <label className="text-sm font-medium">Tidsintervall</label>
+                      <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2">
+                        <option>08:00 - 10:00</option>
+                        <option>10:00 - 12:00</option>
+                        <option>12:00 - 14:00</option>
+                        <option>14:00 - 16:00</option>
+                        <option>16:00 - 18:00</option>
+                        <option>18:00 - 20:00</option>
+                        <option>20:00 - 22:00</option>
+                      </select>
+                    </div>
+                    
+                    <div className="grid gap-2">
+                      <label className="text-sm font-medium">Formål</label>
+                      <textarea 
+                        className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2" 
+                        placeholder="Beskriv formålet med bookningen"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <DrawerFooter>
+                  <Button className="bg-[#0B3D91] hover:bg-blue-700">Neste →</Button>
+                </DrawerFooter>
+              </DrawerContent>
+            </Drawer>
+          </div>
         </div>
 
-        {/* Right column: Booking calendar */}
-        <div>
-          <Card>
-            <CardHeader>
-              <CardTitle>Check Availability</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="mb-6">
-                <Calendar
-                  mode="single"
-                  selected={selectedDate}
-                  onSelect={setSelectedDate}
-                  className="rounded-md border"
-                />
-              </div>
-              
-              <Button className="w-full">
-                <CalendarIcon className="mr-2 h-4 w-4" /> Book This Facility
-              </Button>
-              
-              <p className="text-xs text-muted-foreground mt-2 text-center">
-                Select a date and time to proceed with booking
-              </p>
-            </CardContent>
-          </Card>
+        {/* Calendar View */}
+        <div className="bg-white rounded-lg p-6 shadow-sm mb-8">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-bold">Tilgjengelighet</h2>
+            <div className="flex rounded-md overflow-hidden border">
+              <button 
+                className={`px-4 py-2 text-sm ${calendarView === "day" ? "bg-blue-600 text-white" : "bg-white"}`} 
+                onClick={() => setCalendarView("day")}
+              >
+                Dag
+              </button>
+              <button 
+                className={`px-4 py-2 text-sm ${calendarView === "week" ? "bg-blue-600 text-white" : "bg-white"}`} 
+                onClick={() => setCalendarView("week")}
+              >
+                Uke
+              </button>
+              <button 
+                className={`px-4 py-2 text-sm ${calendarView === "month" ? "bg-blue-600 text-white" : "bg-white"}`} 
+                onClick={() => setCalendarView("month")}
+              >
+                Måned
+              </button>
+            </div>
+          </div>
+          
+          <div className="border rounded-lg overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr>
+                  <th className="p-2 border-b border-r text-left">Tid</th>
+                  {[0, 1, 2, 3, 4].map(day => (
+                    <th key={day} className="p-2 border-b border-r text-center">
+                      {format(new Date(date.getTime() + day * 24 * 60 * 60 * 1000), "EEE d.MMM")}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {["08:00", "10:00", "12:00", "14:00", "16:00", "18:00", "20:00"].map((time, i) => (
+                  <tr key={i} className={i % 2 === 0 ? "bg-gray-50" : ""}>
+                    <td className="p-2 border-b border-r">{time}</td>
+                    {[0, 1, 2, 3, 4].map(day => {
+                      // Mock availability - in a real app this would be based on actual bookings
+                      const isAvailable = Math.random() > 0.3;
+                      return (
+                        <td 
+                          key={day} 
+                          className={`p-2 border-b border-r text-center ${isAvailable ? "bg-green-100" : "bg-red-100"}`}
+                        >
+                          <span className={isAvailable ? "text-green-600" : "text-red-600"}>
+                            {isAvailable ? "Ledig" : "Opptatt"}
+                          </span>
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
+
+      <GlobalFooter />
     </div>
   );
 };

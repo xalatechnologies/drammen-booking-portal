@@ -18,29 +18,27 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Calendar as CalendarIcon, BellRing, BookOpen, ChevronRight, Search } from "lucide-react";
+import { Calendar as CalendarIcon, Map, List, Search } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import FacilityTypeGrid from "@/components/FacilityTypeGrid";
+import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
+import GlobalHeader from "@/components/GlobalHeader";
+import GlobalFooter from "@/components/GlobalFooter";
+import { useNavigate } from "react-router-dom";
 
 const Index = () => {
+  const navigate = useNavigate();
   const [date, setDate] = useState<Date>();
   const [facilityType, setFacilityType] = useState<string>("");
   const [location, setLocation] = useState<string>("");
+  const [viewMode, setViewMode] = useState<"grid" | "map">("grid");
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex flex-col">
-      {/* Header - Updated with white background and larger logo */}
-      <header className="bg-white py-2 px-4 shadow-md sticky top-0 z-10">
-        <div className="container mx-auto flex justify-center items-center">
-          <div className="flex items-center">
-            <img src="https://www.drammen.kommune.no/Logos/logo-drammen-new.svg" alt="Drammen Kommune Logo" className="h-20 w-auto" />
-          </div>
-        </div>
-      </header>
+      <GlobalHeader />
 
       <div className="container mx-auto px-4 py-6 max-w-7xl flex-grow">
-        {/* Enhanced Hero Section with professional image */}
+        {/* Hero Banner */}
         <div className="mb-8 rounded-xl overflow-hidden shadow-lg">
           <div className="relative">
             <img 
@@ -52,234 +50,196 @@ const Index = () => {
               <div className="container mx-auto px-6">
                 <div className="max-w-xl">
                   <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-3 leading-tight">
-                    Find and Book Municipal Facilities
+                    Finn ledige lokaler i Drammen Kommune
                   </h1>
                   <p className="text-lg text-blue-100 mb-6 max-w-lg">
-                    Access Drammen Kommune's extensive network of facilities for your events, 
-                    sports activities, and community gatherings.
+                    Søk og book kommunale lokaler til møter, arrangementer og aktiviteter.
                   </p>
-                  <div className="flex flex-wrap gap-3">
-                    <Button className="bg-[#F9CB40] hover:bg-[#E6B92E] text-black font-medium py-2 px-6 text-base">
-                      Browse All Facilities
-                    </Button>
-                    <Button variant="outline" className="border-white text-white hover:bg-white/10 font-medium">
-                      Learn More
-                    </Button>
-                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column - Search and Facility Types */}
-          <div className="lg:col-span-2">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
-              <h2 className="text-xl font-bold text-gray-800">Find a facility to book</h2>
-              <Button 
-                variant="outline" 
-                className="w-auto sm:w-auto h-10 bg-white border-blue-300 hover:bg-blue-50 text-blue-700 self-start"
-                onClick={() => window.location.href = "/bookings"}
-              >
-                <BookOpen className="mr-1 h-4 w-4" />
-                <span className="text-sm">My bookings</span>
-              </Button>
-            </div>
-            
-            {/* Search Form with improved styling */}
-            <Card className="mb-6 overflow-hidden border-none shadow-md bg-white">
-              <CardContent className="p-5">
-                <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
-                  <div className="md:col-span-2">
-                    <Select value={facilityType} onValueChange={setFacilityType}>
-                      <SelectTrigger className="bg-white h-11 border-gray-300 w-full">
-                        <SelectValue placeholder="Facility type" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-white">
-                        <SelectItem value="sports-hall">Sports Hall</SelectItem>
-                        <SelectItem value="meeting-room">Meeting Room</SelectItem>
-                        <SelectItem value="auditorium">Auditorium</SelectItem>
-                        <SelectItem value="gymnasium">Gymnasium</SelectItem>
-                        <SelectItem value="tennis-court">Tennis Court</SelectItem>
-                        <SelectItem value="swimming-pool">Swimming Pool</SelectItem>
-                        <SelectItem value="banquet-hall">Banquet Hall</SelectItem>
-                        <SelectItem value="kitchen">Kitchen</SelectItem>
-                        <SelectItem value="classroom">Classroom</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="md:col-span-2">
-                    <Select value={location} onValueChange={setLocation}>
-                      <SelectTrigger className="bg-white h-11 border-gray-300 w-full">
-                        <SelectValue placeholder="Location" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-white">
-                        <SelectItem value="halleren">Halleren</SelectItem>
-                        <SelectItem value="city">City</SelectItem>
-                        <SelectItem value="plant">Plant</SelectItem>
-                        <SelectItem value="gym">Gym</SelectItem>
-                        <SelectItem value="kitchen">Kitchen</SelectItem>
-                        <SelectItem value="hall">Hall</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="md:col-span-2">
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          className={cn(
-                            "w-full justify-start text-left font-normal bg-white border-gray-300 h-11",
-                            !date && "text-muted-foreground"
-                          )}
-                        >
-                          <CalendarIcon className="mr-2 h-4 w-4" />
-                          {date ? format(date, "PPP") : <span>Select date</span>}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0">
-                        <Calendar
-                          mode="single"
-                          selected={date}
-                          onSelect={setDate}
-                          initialFocus
-                          className="bg-white"
-                        />
-                      </PopoverContent>
-                    </Popover>
-                  </div>
-
-                  <div className="md:col-span-6">
-                    <Button 
-                      className="w-full h-11 bg-[#F9CB40] hover:bg-[#E6B92E] text-black font-medium shadow-sm"
-                    >
-                      <Search className="mr-2 h-4 w-4" />
-                      <span>Find facilities</span>
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Facility Types Grid with better section heading */}
-            <div className="mb-8">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-bold text-gray-800">Popular facility types</h2>
-                <Button variant="link" className="text-blue-700 hover:text-blue-900 p-0 h-auto">
-                  View all
+        {/* Filter Panel */}
+        <Card className="mb-8 overflow-hidden border-none shadow-md bg-white">
+          <CardContent className="p-5">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold text-gray-800">Søk etter lokaler</h2>
+              <div className="flex gap-2">
+                <Button 
+                  variant={viewMode === "grid" ? "default" : "outline"} 
+                  size="sm" 
+                  onClick={() => setViewMode("grid")}
+                  className={viewMode === "grid" ? "bg-blue-600" : ""}
+                >
+                  <List className="mr-1 h-4 w-4" />
+                  <span>Liste</span>
+                </Button>
+                <Button 
+                  variant={viewMode === "map" ? "default" : "outline"} 
+                  size="sm" 
+                  onClick={() => setViewMode("map")}
+                  className={viewMode === "map" ? "bg-blue-600" : ""}
+                >
+                  <Map className="mr-1 h-4 w-4" />
+                  <span>Kart</span>
                 </Button>
               </div>
-              <FacilityTypeGrid />
             </div>
-            
-            {/* Mobile-only notifications section with improved styling */}
-            <div className="lg:hidden mt-6">
-              <h3 className="text-lg font-bold text-gray-800 flex items-center mb-3">
-                <BellRing className="h-4 w-4 mr-2 text-blue-600" />
-                Notifications
-              </h3>
-              <Card className="border border-blue-100 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                <CardContent className="p-4 bg-gradient-to-r from-blue-50 to-white">
-                  <div className="flex justify-between items-center">
-                    <p className="font-medium text-sm">Your booking for Music room at Halleren is approved</p>
-                    <Button variant="ghost" className="p-1">
-                      <span className="sr-only">View</span>
-                      <ChevronRight className="h-4 w-4 text-blue-600" />
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+              <div className="md:col-span-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1">Dato</label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal bg-white border-gray-300 h-11",
+                        !date && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {date ? format(date, "dd.MM.yyyy") : <span>dd.mm.åååå</span>}
                     </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0">
+                    <Calendar
+                      mode="single"
+                      selected={date}
+                      onSelect={setDate}
+                      initialFocus
+                      className="bg-white pointer-events-auto"
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
 
-          {/* Right Column - Notifications and Info with enhanced styling */}
-          <div className="space-y-5 hidden lg:block">
-            <div>
-              <h3 className="text-lg font-bold text-gray-800 flex items-center mb-3">
-                <BellRing className="h-4 w-4 mr-2 text-blue-600" />
-                Notifications
-              </h3>
-              <Card className="border border-blue-100 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                <CardContent className="p-4 bg-gradient-to-r from-blue-50 to-white">
-                  <div className="flex justify-between items-center">
-                    <p className="font-medium text-sm">Your booking for Music room at Halleren is approved</p>
-                    <Button variant="ghost" className="p-1">
-                      <span className="sr-only">View</span>
-                      <ChevronRight className="h-4 w-4 text-blue-600" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-              <Card className="border border-blue-100 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow mt-3">
-                <CardContent className="p-4 bg-gradient-to-r from-blue-50 to-white">
-                  <div className="flex justify-between items-center">
-                    <p className="font-medium text-sm">Your booking request for Gymnasium is pending approval</p>
-                    <Button variant="ghost" className="p-1">
-                      <span className="sr-only">View</span>
-                      <ChevronRight className="h-4 w-4 text-blue-600" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+              <div className="md:col-span-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1">Klokkeslett</label>
+                <Select>
+                  <SelectTrigger className="bg-white h-11 border-gray-300 w-full">
+                    <SelectValue placeholder="Velg tid" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white">
+                    <SelectItem value="morning">08:00 - 12:00</SelectItem>
+                    <SelectItem value="afternoon">12:00 - 16:00</SelectItem>
+                    <SelectItem value="evening">16:00 - 20:00</SelectItem>
+                    <SelectItem value="night">20:00 - 23:00</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-            <div>
-              <h3 className="text-lg font-bold text-gray-800 mb-3">Resource availability</h3>
-              <Card className="overflow-hidden shadow-sm border-none rounded-lg mb-4">
-                <CardContent className="p-4 bg-gradient-to-br from-blue-50 to-white">
-                  <div className="space-y-3">
-                    <p className="text-sm text-gray-600">Check real-time availability of our facilities before making a booking.</p>
-                    <Button variant="link" className="p-0 h-auto text-blue-700 hover:text-blue-900 font-medium text-sm">
-                      Booking guidelines
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card className="overflow-hidden shadow-sm border-none rounded-lg">
-                <CardContent className="p-4 bg-gradient-to-br from-amber-50 to-white">
-                  <div className="space-y-3">
-                    <h4 className="font-semibold text-base">Need help?</h4>
-                    <p className="text-sm text-gray-600">Our support team is available Monday to Friday, 8:00 - 16:00.</p>
-                    <Button variant="outline" className="w-full bg-white text-blue-700 hover:bg-blue-50 text-sm h-9">
-                      Contact support
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+              <div className="md:col-span-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1">Type lokale</label>
+                <Select value={facilityType} onValueChange={setFacilityType}>
+                  <SelectTrigger className="bg-white h-11 border-gray-300 w-full">
+                    <SelectValue placeholder="Velg type" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white">
+                    <SelectItem value="sports-hall">Gymsal</SelectItem>
+                    <SelectItem value="meeting-room">Møterom</SelectItem>
+                    <SelectItem value="auditorium">Auditorium</SelectItem>
+                    <SelectItem value="gymnasium">Idrettshall</SelectItem>
+                    <SelectItem value="kitchen">Kjøkken</SelectItem>
+                    <SelectItem value="classroom">Klasserom</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="md:col-span-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1">By / Bydel</label>
+                <Select value={location} onValueChange={setLocation}>
+                  <SelectTrigger className="bg-white h-11 border-gray-300 w-full">
+                    <SelectValue placeholder="Velg sted" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white">
+                    <SelectItem value="drammen-sentrum">Drammen sentrum</SelectItem>
+                    <SelectItem value="konnerud">Konnerud</SelectItem>
+                    <SelectItem value="åssiden">Åssiden</SelectItem>
+                    <SelectItem value="bragernes">Bragernes</SelectItem>
+                    <SelectItem value="strømsø">Strømsø</SelectItem>
+                    <SelectItem value="gulskogen">Gulskogen</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="md:col-span-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1">&nbsp;</label>
+                <Button 
+                  className="w-full h-11 bg-[#0B3D91] hover:bg-blue-700 text-white font-medium shadow-sm"
+                >
+                  <Search className="mr-2 h-4 w-4" />
+                  <span>Søk</span>
+                </Button>
+              </div>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Facilities Grid */}
+        <div className="mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Facility Card */}
+            {[1, 2, 3, 4, 5, 6].map(i => (
+              <Card key={i} className="overflow-hidden hover:shadow-lg transition-shadow">
+                <div className="h-48 bg-gray-200 relative">
+                  <img 
+                    src={`https://images.unsplash.com/photo-1577301886662-26e1b2e2a00b?auto=format&fit=crop&w=600&q=80`} 
+                    alt="Facility" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <CardContent className="p-4">
+                  <h3 className="font-bold text-lg mb-1">Gymsal {i} - Brandengen skole</h3>
+                  <p className="text-sm text-gray-500 mb-2">Knoffs gate 8, Drammen</p>
+                  <div className="flex justify-between items-center">
+                    <div className="text-sm">
+                      <span className="font-medium">Neste ledige tid:</span> I dag, 18:00
+                    </div>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="text-blue-700 border-blue-200"
+                      onClick={() => navigate(`/facilities/${i}`)}
+                    >
+                      Se detaljer →
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
+        </div>
+
+        {/* Pagination */}
+        <div className="flex justify-center mb-8">
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious href="#" />
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationLink href="#" isActive>1</PaginationLink>
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationLink href="#">2</PaginationLink>
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationLink href="#">3</PaginationLink>
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationEllipsis />
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationNext href="#" />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
         </div>
       </div>
 
-      {/* Footer with improved styling */}
-      <footer className="bg-white py-4 px-4 border-t mt-auto">
-        <div className="container mx-auto flex flex-col sm:flex-row justify-between items-center gap-3">
-          <div className="flex flex-wrap justify-center gap-4">
-            <Button variant="link" className="p-0 h-auto text-blue-700 hover:text-blue-900 font-medium text-sm">
-              Privacy policy
-            </Button>
-            <Button variant="link" className="p-0 h-auto text-blue-700 hover:text-blue-900 font-medium text-sm">
-              Contact support
-            </Button>
-            <Button variant="link" className="p-0 h-auto text-blue-700 hover:text-blue-900 font-medium text-sm">
-              Booking guidelines
-            </Button>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button variant="link" className="p-0 h-auto text-blue-700 hover:text-blue-900 font-medium text-sm">
-              English
-            </Button>
-            <span className="text-gray-300">|</span>
-            <Button variant="link" className="p-0 h-auto text-blue-700 hover:text-blue-900 font-medium text-sm">
-              Norsk
-            </Button>
-          </div>
-        </div>
-      </footer>
+      <GlobalFooter />
     </div>
   );
 };
