@@ -1,20 +1,15 @@
 
 import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Toggle } from "@/components/ui/toggle";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { cn } from "@/lib/utils";
-import { Menu, User, LogIn } from "lucide-react";
+import { Menu } from "lucide-react";
+import Logo from "@/components/header/Logo";
+import LanguageToggle from "@/components/header/LanguageToggle";
+import ProfileMenu from "@/components/header/ProfileMenu";
+import MobileMenu from "@/components/header/MobileMenu";
 
 const GlobalHeader = () => {
   const navigate = useNavigate();
-  const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [language, setLanguage] = useState<'NO' | 'EN'>('NO');
   
@@ -47,9 +42,7 @@ const GlobalHeader = () => {
       <div className="container mx-auto flex justify-between items-center">
         {/* Logo (left) */}
         <div className="flex items-center">
-          <a href="/" className="flex items-center">
-            <img src="https://www.drammen.kommune.no/Logos/logo-drammen-new.svg" alt="Drammen Kommune Logo" className="h-16 w-auto" />
-          </a>
+          <Logo />
         </div>
 
         {/* Mobile Menu Button */}
@@ -63,102 +56,31 @@ const GlobalHeader = () => {
 
         {/* Right side: Language toggle & Login/Profile */}
         <div className="hidden lg:flex items-center space-x-4">
-          {/* Language toggle replaces the two buttons */}
-          <Toggle 
-            pressed={language === 'EN'}
-            onPressedChange={toggleLanguage}
-            className="border rounded-md px-3 py-1"
-          >
-            {language === 'NO' ? 'NO' : 'EN'}
-          </Toggle>
+          {/* Language toggle */}
+          <LanguageToggle 
+            language={language} 
+            toggleLanguage={toggleLanguage} 
+          />
           
-          {/* Conditionally show login button or profile based on login status */}
-          {!isLoggedIn ? (
-            <Button 
-              variant="outline" 
-              className="flex items-center gap-1 h-9 px-4 border-blue-200 text-blue-700 hover:bg-blue-50"
-              onClick={handleLogin}
-            >
-              <LogIn className="w-4 h-4" />
-              <span>Logg inn</span>
-            </Button>
-          ) : (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="rounded-full p-2 h-10 w-10 bg-blue-50 hover:bg-blue-100">
-                  <span className="sr-only">User profile</span>
-                  <User className="h-5 w-5 text-blue-700" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuItem onClick={() => navigate("/profile")}>
-                  Min profil
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate("/settings")}>
-                  Innstillinger
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleLogout}>
-                  Logg ut
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
+          {/* Profile menu (login button or dropdown) */}
+          <ProfileMenu 
+            isLoggedIn={isLoggedIn} 
+            handleLogin={handleLogin} 
+            handleLogout={handleLogout} 
+          />
         </div>
       </div>
 
-      {/* Mobile Menu (full-screen, conditional rendering) */}
-      {mobileMenuOpen && (
-        <div className="fixed inset-0 z-50 bg-white lg:hidden pt-16 px-4">
-          <div className="flex flex-col gap-4 p-4">
-            {/* Show different buttons based on login state in mobile menu */}
-            {!isLoggedIn ? (
-              <Button 
-                variant="ghost" 
-                className="w-full justify-start text-lg font-medium py-3"
-                onClick={() => {
-                  handleLogin();
-                  setMobileMenuOpen(false);
-                }}
-              >
-                <LogIn className="mr-2 h-5 w-5" />
-                Logg inn
-              </Button>
-            ) : (
-              <Button 
-                variant="ghost" 
-                className="w-full justify-start text-lg font-medium py-3"
-                onClick={() => {
-                  handleLogout();
-                  setMobileMenuOpen(false);
-                }}
-              >
-                <LogIn className="mr-2 h-5 w-5" />
-                Logg ut
-              </Button>
-            )}
-            
-            <div className="border-t my-2"></div>
-            {/* Language toggle for mobile */}
-            <div className="flex justify-around mt-4">
-              <Button 
-                variant={language === 'NO' ? "secondary" : "ghost"} 
-                className="flex-1 h-10"
-                onClick={() => setLanguage('NO')}
-              >
-                NO
-              </Button>
-              <span className="text-gray-300 flex items-center">|</span>
-              <Button 
-                variant={language === 'EN' ? "secondary" : "ghost"} 
-                className="flex-1 h-10"
-                onClick={() => setLanguage('EN')}
-              >
-                EN
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Mobile Menu */}
+      <MobileMenu 
+        isOpen={mobileMenuOpen}
+        language={language}
+        isLoggedIn={isLoggedIn}
+        setLanguage={setLanguage}
+        handleLogin={handleLogin}
+        handleLogout={handleLogout}
+        closeMobileMenu={() => setMobileMenuOpen(false)}
+      />
     </header>
   );
 };
