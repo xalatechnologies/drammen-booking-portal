@@ -28,7 +28,7 @@ const FacilityGrid = () => {
       name: "Brandengen Skole - Gymsal",
       address: "Knoffs gate 8, 3044 Drammen",
       type: "Gymsal",
-      image: "https://scontent.fosl3-1.fna.fbcdn.net/v/t39.30808-6/310558649_2982037632038258_5388301097931219324_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=3d9321&_nc_ohc=wv-0jbxGnD0AX8rZsZN&_nc_ht=scontent.fosl3-1.fna&oh=00_AfA73Pe7e1SRrkqeZa69K8uXs9ByGhACQ-eOo-IEjteTew&oe=65748690",
+      image: "https://www.drammen.kommune.no/globalassets/tjenester/skole/bilder/brandengen-skole.jpg?quality=80&width=900",
       nextAvailable: "I dag, 18:00"
     },
     {
