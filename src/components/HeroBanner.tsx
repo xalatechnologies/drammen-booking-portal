@@ -3,7 +3,7 @@ import React from "react";
 
 const HeroBanner = () => {
   return (
-    <div className="mb-8 rounded-xl overflow-hidden shadow-lg">
+    <div className="mb-5 rounded-xl overflow-hidden shadow-lg">
       <div className="relative">
         <img 
           src="/lovable-uploads/5a43abf2-1c2e-44cb-96a6-6509c7fe3281.png" 

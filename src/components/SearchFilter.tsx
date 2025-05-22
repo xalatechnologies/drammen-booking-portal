@@ -51,17 +51,16 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
   });
 
   return (
-    <Card className="mb-8 overflow-hidden border-none shadow-md bg-white">
-      <CardContent className="p-5">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
+    <Card className="mb-5 overflow-hidden border-none shadow-md bg-white">
+      <CardContent className="p-4">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
           <div className="md:col-span-3">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Datoperiode</label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
                   className={cn(
-                    "w-full justify-start text-left font-normal bg-white border-gray-300 h-11",
+                    "w-full justify-start text-left font-normal bg-white border-gray-300 h-10",
                     !dateRange && "text-muted-foreground"
                   )}
                 >
@@ -75,7 +74,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
                       format(dateRange.from, "dd.MM.yyyy")
                     )
                   ) : (
-                    <span>Velg periode</span>
+                    <span>Velg datoperiode</span>
                   )}
                 </Button>
               </PopoverTrigger>
@@ -92,10 +91,9 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
           </div>
 
           <div className="md:col-span-3">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Type lokale</label>
             <Select value={facilityType} onValueChange={setFacilityType}>
-              <SelectTrigger className="bg-white h-11 border-gray-300 w-full">
-                <SelectValue placeholder="Velg type" />
+              <SelectTrigger className="bg-white h-10 border-gray-300 w-full">
+                <SelectValue placeholder="Velg type lokale" />
               </SelectTrigger>
               <SelectContent className="bg-white">
                 <SelectItem value="sports-hall">Gymsal</SelectItem>
@@ -109,10 +107,9 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
           </div>
 
           <div className="md:col-span-3">
-            <label className="block text-sm font-medium text-gray-700 mb-1">By / Bydel</label>
             <Select value={location} onValueChange={setLocation}>
-              <SelectTrigger className="bg-white h-11 border-gray-300 w-full">
-                <SelectValue placeholder="Velg sted" />
+              <SelectTrigger className="bg-white h-10 border-gray-300 w-full">
+                <SelectValue placeholder="Velg område/bydel" />
               </SelectTrigger>
               <SelectContent className="bg-white">
                 <SelectItem value="drammen-sentrum">Drammen sentrum</SelectItem>
@@ -127,7 +124,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
 
           <div className="md:col-span-2">
             <Button 
-              className="w-full h-11 bg-[#0B3D91] hover:bg-blue-700 text-white font-medium shadow-sm"
+              className="w-full h-10 bg-[#0B3D91] hover:bg-blue-700 text-white font-medium shadow-sm"
             >
               <Search className="mr-2 h-4 w-4" />
               <span>Søk</span>
@@ -135,7 +132,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
           </div>
           
           <div className="md:col-span-1">
-            <div className="flex gap-2 h-11">
+            <div className="flex gap-2 h-10">
               <Button 
                 variant={viewMode === "grid" ? "default" : "outline"} 
                 size="sm" 
