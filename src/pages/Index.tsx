@@ -29,8 +29,8 @@ const Index = () => {
           viewMode={viewMode}
           setViewMode={setViewMode}
         />
-        <FacilityGrid />
-        <PaginationControls />
+        {viewMode === "grid" && <FacilityGrid />}
+        {viewMode === "grid" && <PaginationControls />}
       </div>
 
       <GlobalFooter />

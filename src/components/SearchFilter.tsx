@@ -21,6 +21,7 @@ import {
 import { Calendar as CalendarIcon, Map, List, Search } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import MapView from "./MapView";
 
 interface SearchFilterProps {
   date: Date | undefined;
@@ -156,6 +157,10 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
             </Button>
           </div>
         </div>
+        
+        {viewMode === "map" && (
+          <MapView facilityType={facilityType} location={location} />
+        )}
       </CardContent>
     </Card>
   );
