@@ -68,7 +68,7 @@ const FacilityGrid = () => {
       name: "Marienlyst Stadion - Møtesal",
       address: "Marienlyst 14, 3045 Drammen",
       type: "Møtesal",
-      image: "https://images.unsplash.com/photo-1473177104440-ffee2f376098?w=600&auto=format&fit=crop",
+      image: "/lovable-uploads/07eaca70-1e9b-4e73-ab4e-6b9b7f1ca27e.png",
       nextAvailable: "Lørdag, 10:00"
     },
     {
