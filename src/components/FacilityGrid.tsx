@@ -21,7 +21,7 @@ interface Facility {
 const FacilityGrid = () => {
   const navigate = useNavigate();
   
-  // Mock data with real Drammen addresses and facilities
+  // Mock data with real Drammen addresses and facilities - reduced to 6 cards
   const facilities: Facility[] = [
     {
       id: 1,
@@ -30,22 +30,6 @@ const FacilityGrid = () => {
       type: "Gymsal",
       image: "/lovable-uploads/13aee1f6-e9d9-474b-9ed7-c656d703d19b.png",
       nextAvailable: "I dag, 18:00"
-    },
-    {
-      id: 2,
-      name: "Bragernes Skole - Aula",
-      address: "Capjonsgate 3, 3016 Drammen",
-      type: "Aula",
-      image: "https://www.drammen.kommune.no/globalassets/tjenester/skole/bilder/bragernes-skole.jpg?quality=80&width=900",
-      nextAvailable: "I morgen, 16:30"
-    },
-    {
-      id: 3,
-      name: "Danvik Folkehøgskole - Møterom",
-      address: "Gjerpenkollen 3, 3022 Drammen",
-      type: "Møterom",
-      image: "/lovable-uploads/1d336434-5d93-4af7-8f92-32867c579c2a.png",
-      nextAvailable: "I dag, 15:00"
     },
     {
       id: 4,
@@ -86,14 +70,6 @@ const FacilityGrid = () => {
       type: "Fotballhall",
       image: "/lovable-uploads/a72ba2e2-f0a3-4561-bff6-17fa721a0c02.png",
       nextAvailable: "Lørdag, 18:30"
-    },
-    {
-      id: 9,
-      name: "Strømsø Skole - Klasserom",
-      address: "Knoffs gate 30, 3044 Drammen",
-      type: "Klasserom",
-      image: "/lovable-uploads/bda6906f-cc9a-4d78-9e9e-84c342947fae.png",
-      nextAvailable: "Mandag, 16:00"
     }
   ];
 
