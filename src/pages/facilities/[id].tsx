@@ -26,7 +26,7 @@ const FacilityDetail = () => {
     equipment: ["Projektor", "Lydanlegg", "Whiteboard", "Wi-Fi"],
     description: "Dette er en moderne gymsal på Brandengen skole, perfekt for idrettsaktiviteter, trening og mindre arrangementer. Salen er utstyrt med standard sportsutstyr og har god ventilasjon.",
     images: [
-      "https://images.unsplash.com/photo-1577301886662-26e1b2e2a00b?auto=format&fit=crop&w=1200&q=80",
+      "/lovable-uploads/08e8f8d5-4126-4805-a56e-e4337f97dbd0.png",
       "https://images.unsplash.com/photo-1580237072617-771c3ecc4a24?auto=format&fit=crop&w=1200&q=80",
       "https://images.unsplash.com/photo-1516205651411-aef33a44f7c2?auto=format&fit=crop&w=1200&q=80"
     ]
