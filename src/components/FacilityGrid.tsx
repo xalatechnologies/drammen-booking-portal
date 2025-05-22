@@ -107,6 +107,12 @@ const FacilityGrid = () => {
                 src={facility.image} 
                 alt={facility.name} 
                 className="w-full h-full object-cover"
+                onError={(e) => {
+                  // Fallback to a placeholder if image fails to load
+                  const target = e.target as HTMLImageElement;
+                  target.src = "https://images.unsplash.com/photo-1525361147853-4bf9f54a0e98?w=600&auto=format&fit=crop";
+                  target.onerror = null; // Prevent infinite loop
+                }}
               />
               <div className="absolute top-2 right-2 bg-white/80 backdrop-blur-sm text-xs font-medium py-1 px-2 rounded-lg">
                 {facility.type}
