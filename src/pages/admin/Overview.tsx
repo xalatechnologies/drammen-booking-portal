@@ -130,23 +130,24 @@ const OverviewPage = () => {
         </Card>
       </div>
       
-      {/* Charts Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Rapporter & Analytikk</CardTitle>
+      {/* Smaller Charts Section */}
+      <Card className="h-64">
+        <CardHeader className="py-2">
+          <CardTitle className="text-sm">Rapporter & Analytikk</CardTitle>
         </CardHeader>
-        <CardContent>
-          <ChartContainer config={chartConfig}>
-            <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" />
-              <YAxis />
-              <ChartTooltip content={<ChartTooltipContent />} />
-              <Legend />
-              <Bar dataKey="bookings" fill="#4f46e5" name="Bookinger" />
-              <Bar dataKey="approvals" fill="#10b981" name="Godkjenninger" />
-            </BarChart>
-          </ChartContainer>
+        <CardContent className="p-2">
+          <div className="h-44">
+            <ChartContainer config={chartConfig}>
+              <BarChart data={chartData.slice(0, 4)} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="month" />
+                <YAxis />
+                <ChartTooltip content={<ChartTooltipContent />} />
+                <Bar dataKey="bookings" fill="#4f46e5" name="Bookinger" />
+                <Bar dataKey="approvals" fill="#10b981" name="Godkjenninger" />
+              </BarChart>
+            </ChartContainer>
+          </div>
         </CardContent>
       </Card>
       
