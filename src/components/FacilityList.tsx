@@ -60,6 +60,26 @@ const mockFacilities = [
     nextAvailable: new Date(2025, 4, 22, 15, 30),
     capacity: 100,
   },
+  {
+    id: 5,
+    name: "Fjell Community House",
+    description: "Modern meeting spaces for local community gatherings",
+    type: "community-house",
+    location: "fjell",
+    image: "https://images.unsplash.com/photo-1551038247-3d9af20df552?w=600&auto=format&fit=crop",
+    nextAvailable: new Date(2025, 4, 25, 12, 0),
+    capacity: 75,
+  },
+  {
+    id: 6,
+    name: "Strømsø School Kitchen",
+    description: "Full-service kitchen for cooking classes and events",
+    type: "kitchen",
+    location: "stromso",
+    image: "https://images.unsplash.com/photo-1556909114-44e3e9699e2b?w=600&auto=format&fit=crop",
+    nextAvailable: new Date(2025, 4, 26, 16, 0),
+    capacity: 20,
+  },
 ];
 
 const FacilityList: React.FC<FacilityListProps> = ({

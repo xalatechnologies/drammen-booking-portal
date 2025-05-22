@@ -3,15 +3,9 @@ import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { 
   Home, 
-  Users, 
   School, 
-  Activity,
-  UtensilsCrossed,
-  GraduationCap,
-  Theater,
-  Music,
-  Waves,
-  CircleDot
+  MapPin,
+  Building
 } from "lucide-react";
 
 interface FacilityType {
@@ -19,6 +13,7 @@ interface FacilityType {
   name: string;
   location: string;
   key: string;
+  image?: string;
 }
 
 const FacilityTypeGrid = () => {
@@ -27,73 +22,85 @@ const FacilityTypeGrid = () => {
       icon: <Home className="h-5 w-5 text-orange-500" />,
       name: "Gymnasium",
       location: "Halleren",
-      key: "gymnasium"
+      key: "gymnasium",
+      image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&auto=format&fit=crop"
     },
     {
-      icon: <Users className="h-5 w-5 text-blue-500" />,
+      icon: <Building className="h-5 w-5 text-blue-500" />,
       name: "Meeting room",
       location: "City",
-      key: "meeting-room"
+      key: "meeting-room",
+      image: "https://images.unsplash.com/photo-1517502884422-41eaead166d4?w=600&auto=format&fit=crop"
     },
     {
       icon: <School className="h-5 w-5 text-yellow-500" />,
       name: "Auditorium",
       location: "Plant",
-      key: "auditorium"
+      key: "auditorium",
+      image: "https://images.unsplash.com/photo-1596194081696-4bab3a813b63?w=600&auto=format&fit=crop"
     },
     {
-      icon: <Activity className="h-5 w-5 text-green-500" />,
+      icon: <Home className="h-5 w-5 text-green-500" />,
       name: "Sports field",
       location: "Halleren",
-      key: "sports-field"
+      key: "sports-field",
+      image: "https://images.unsplash.com/photo-1525361147853-4bf9f54a0e98?w=600&auto=format&fit=crop"
     },
     {
-      icon: <CircleDot className="h-5 w-5 text-purple-500" />,
+      icon: <MapPin className="h-5 w-5 text-purple-500" />,
       name: "Tennis court",
       location: "Halleren",
-      key: "tennis-court"
+      key: "tennis-court",
+      image: "https://images.unsplash.com/photo-1581093458791-9d09a19b1322?w=600&auto=format&fit=crop"
     },
     {
-      icon: <Waves className="h-5 w-5 text-blue-500" />,
+      icon: <MapPin className="h-5 w-5 text-blue-500" />,
       name: "Swimming pool",
       location: "Gym",
-      key: "swimming-pool"
+      key: "swimming-pool",
+      image: "https://images.unsplash.com/photo-1527576539890-dfa815648363?w=600&auto=format&fit=crop"
     },
     {
-      icon: <Theater className="h-5 w-5 text-amber-500" />,
+      icon: <Building className="h-5 w-5 text-amber-500" />,
       name: "Banquet hall",
       location: "Halleren",
-      key: "banquet-hall"
+      key: "banquet-hall",
+      image: "https://images.unsplash.com/photo-1551038247-3d9af20df552?w=600&auto=format&fit=crop"
     },
     {
-      icon: <UtensilsCrossed className="h-5 w-5 text-red-500" />,
+      icon: <Home className="h-5 w-5 text-red-500" />,
       name: "Kitchen",
       location: "Kitchen",
-      key: "kitchen"
+      key: "kitchen",
+      image: "https://images.unsplash.com/photo-1556909114-44e3e9699e2b?w=600&auto=format&fit=crop"
     },
     {
-      icon: <Activity className="h-5 w-5 text-yellow-500" />,
+      icon: <Building className="h-5 w-5 text-yellow-500" />,
       name: "Activity hall",
       location: "Halleren",
-      key: "activity-hall"
+      key: "activity-hall",
+      image: "https://images.unsplash.com/photo-1488972685288-c3fd157d7c7a?w=600&auto=format&fit=crop"
     },
     {
-      icon: <GraduationCap className="h-5 w-5 text-orange-500" />,
+      icon: <School className="h-5 w-5 text-orange-500" />,
       name: "Classroom",
       location: "Halleren",
-      key: "classroom"
+      key: "classroom",
+      image: "https://images.unsplash.com/photo-1487958449943-2429e8be8625?w=600&auto=format&fit=crop"
     },
     {
-      icon: <Music className="h-5 w-5 text-teal-500" />,
+      icon: <Building className="h-5 w-5 text-teal-500" />,
       name: "Conference room",
       location: "Hall",
-      key: "conference-room"
+      key: "conference-room",
+      image: "https://images.unsplash.com/photo-1517502884422-41eaead166d4?w=600&auto=format&fit=crop"
     },
     {
-      icon: <Theater className="h-5 w-5 text-indigo-500" />,
+      icon: <Building className="h-5 w-5 text-indigo-500" />,
       name: "Exhibition hall",
       location: "Hall",
-      key: "exhibition-hall"
+      key: "exhibition-hall",
+      image: "https://images.unsplash.com/photo-1473177104440-ffee2f376098?w=600&auto=format&fit=crop"
     }
   ];
 
