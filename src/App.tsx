@@ -25,7 +25,7 @@ const App = () => (
           <Route path="/facilities/:id" element={<FacilityDetail />} />
           <Route path="/bookings" element={<BookingsPage />} />
           
-          {/* Riktig oppsett for admin ruter med wildcard */}
+          {/* Setting up admin routes correctly with nested paths */}
           <Route path="/admin/*" element={<AdminDashboard />} />
           
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
