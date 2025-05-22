@@ -81,10 +81,10 @@ const FacilityGrid = () => {
     },
     {
       id: 8,
-      name: "Konnerud Samfunnshus - Festsal",
-      address: "Bernåsbakken 3, 3032 Drammen",
-      type: "Festsal",
-      image: "https://images.unsplash.com/photo-1551038247-3d9af20df552?w=600&auto=format&fit=crop",
+      name: "Åssiden Fotballhall",
+      address: "Kleiveneveien 23, 3038 Drammen",
+      type: "Fotballhall",
+      image: "/lovable-uploads/a72ba2e2-f0a3-4561-bff6-17fa721a0c02.png",
       nextAvailable: "Lørdag, 18:30"
     },
     {
