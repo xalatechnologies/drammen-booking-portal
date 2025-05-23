@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -5,9 +6,11 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
-import { Clock, MapPin, Users, Calendar, CheckCircle, XCircle } from "lucide-react";
+import { Clock, MapPin, Users, Calendar, CheckCircle, XCircle, Info } from "lucide-react";
 import { format } from "date-fns";
 import { nb } from "date-fns/locale";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 // Define the facility type
 interface Facility {
@@ -210,6 +213,34 @@ const FacilityGrid: React.FC<FacilityGridProps> = ({
   // Show all facilities if there are no active filters
   const facilitiesToDisplay = filteredFacilities;
   
+  // Function to render accessibility badges with proper styling
+  const renderAccessibilityBadges = (accessibilityFeatures: string[]) => {
+    const badges = {
+      "wheelchair": { label: "Rullestol", color: "bg-blue-50 text-blue-700 border-blue-200" },
+      "hearing-loop": { label: "Teleslynge", color: "bg-green-50 text-green-700 border-green-200" },
+      "sign-language": { label: "Tegnspråk", color: "bg-purple-50 text-purple-700 border-purple-200" }
+    };
+    
+    return (
+      <div className="flex flex-wrap gap-1.5 mt-2">
+        {accessibilityFeatures.map((feature) => {
+          const badge = badges[feature as keyof typeof badges];
+          if (!badge) return null;
+          
+          return (
+            <Badge 
+              key={feature} 
+              variant="outline" 
+              className={cn("text-xs font-medium py-1 px-2 rounded-md", badge.color)}
+            >
+              {badge.label}
+            </Badge>
+          );
+        })}
+      </div>
+    );
+  };
+  
   return (
     <div className="mb-8">
       {facilitiesToDisplay.length === 0 ? (
@@ -220,12 +251,15 @@ const FacilityGrid: React.FC<FacilityGridProps> = ({
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {facilitiesToDisplay.map(facility => (
-            <Card key={facility.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-              <div className="h-48 bg-gray-200 relative">
+            <Card 
+              key={facility.id} 
+              className="overflow-hidden hover:shadow-lg transition-all duration-200 hover:translate-y-[-2px] group border border-gray-200"
+            >
+              <div className="h-52 bg-gray-200 relative overflow-hidden">
                 <img 
                   src={facility.image} 
                   alt={facility.name} 
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                   onError={(e) => {
                     // Fallback to a placeholder if image fails to load
                     const target = e.target as HTMLImageElement;
@@ -233,71 +267,68 @@ const FacilityGrid: React.FC<FacilityGridProps> = ({
                     target.onerror = null; // Prevent infinite loop
                   }}
                 />
-                <div className="absolute top-2 right-2 bg-white/80 backdrop-blur-sm text-xs font-medium py-1 px-2 rounded-lg">
-                  {facility.type}
-                </div>
-                <div className="absolute bottom-2 left-2 flex flex-wrap gap-1">
-                  {facility.accessibility.includes("wheelchair") && (
-                    <span className="px-1.5 py-0.5 bg-blue-100 text-blue-800 rounded-md text-xs">Rullestol</span>
-                  )}
-                  {facility.accessibility.includes("hearing-loop") && (
-                    <span className="px-1.5 py-0.5 bg-green-100 text-green-800 rounded-md text-xs">Teleslynge</span>
-                  )}
-                  {facility.accessibility.includes("sign-language") && (
-                    <span className="px-1.5 py-0.5 bg-purple-100 text-purple-800 rounded-md text-xs">Tegnspråk</span>
-                  )}
+                <div className="absolute top-3 right-3">
+                  <Badge className="bg-white/90 backdrop-blur-sm text-gray-800 border-0 font-medium px-2.5 py-1 shadow-sm">
+                    {facility.type}
+                  </Badge>
                 </div>
               </div>
-              <CardContent className="p-4">
-                <h3 className="font-bold text-lg mb-1">{facility.name}</h3>
-                <p className="text-sm text-gray-600 mb-3 flex items-center">
-                  <MapPin className="h-3 w-3 mr-1 text-gray-500" />
-                  {facility.address}
-                </p>
-                
-                <div className="flex items-center text-sm text-gray-600 mb-2">
-                  <Users className="h-3 w-3 mr-1 text-gray-500" />
-                  <span>Kapasitet: {facility.capacity} personer</span>
+              
+              <CardContent className="p-5 space-y-4">
+                <div>
+                  <h3 className="font-bold text-lg mb-1 text-gray-900">{facility.name}</h3>
+                  <div className="flex items-start gap-1.5 text-sm text-gray-600">
+                    <MapPin className="h-4 w-4 text-gray-500 shrink-0 mt-0.5" />
+                    <span className="line-clamp-1">{facility.address}</span>
+                  </div>
+                  
+                  <div className="mt-1 flex items-center gap-1.5 text-sm text-gray-600">
+                    <Users className="h-4 w-4 text-gray-500" />
+                    <span>Kapasitet: {facility.capacity} personer</span>
+                  </div>
+                  
+                  {renderAccessibilityBadges(facility.accessibility)}
                 </div>
                 
-                <div className="text-sm mb-3">
-                  <div className="font-medium mb-1">Tilgjengelighet:</div>
+                <div className="bg-gray-50 p-3 rounded-lg border border-gray-100">
+                  <h4 className="text-sm font-medium mb-2 flex items-center gap-1.5">
+                    <Calendar className="h-4 w-4 text-blue-600" />
+                    <span>Tilgjengelighet</span>
+                  </h4>
+                  
                   {facility.availableTimes && facility.availableTimes[0]?.slots.map((slot, i) => (
-                    <div key={i} className="flex justify-between items-center mb-1">
-                      <div className="flex items-center">
-                        <Calendar className="h-3 w-3 mr-1 text-blue-600" />
-                        <span className="mr-2">
-                          {format(facility.availableTimes![0].date, "EEE, d. MMM", { locale: nb })}:
-                        </span>
-                        <span>{slot.start} - {slot.end}</span>
-                      </div>
+                    <div key={i} className="flex justify-between items-center py-1 border-b last:border-0 border-gray-100">
+                      <span className="text-sm">
+                        {format(facility.availableTimes![0].date, "EEE d. MMM", { locale: nb })} • {slot.start}-{slot.end}
+                      </span>
                       {slot.available ? (
-                        <span className="flex items-center text-green-600">
-                          <CheckCircle className="h-3 w-3 mr-1" />
-                          <span className="text-xs">Ledig</span>
-                        </span>
+                        <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 text-xs gap-1 flex items-center">
+                          <CheckCircle className="h-3 w-3" />
+                          <span>Ledig</span>
+                        </Badge>
                       ) : (
-                        <span className="flex items-center text-red-500">
-                          <XCircle className="h-3 w-3 mr-1" />
-                          <span className="text-xs">Opptatt</span>
-                        </span>
+                        <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200 text-xs gap-1 flex items-center">
+                          <XCircle className="h-3 w-3" />
+                          <span>Opptatt</span>
+                        </Badge>
                       )}
                     </div>
                   ))}
                 </div>
                 
-                <div className="flex justify-between items-center">
-                  <div className="text-sm flex items-center text-blue-700">
-                    <Clock className="h-3 w-3 mr-1" />
-                    <span>Neste ledige: {facility.nextAvailable}</span>
+                <div className="flex justify-between items-center pt-1">
+                  <div className="text-sm flex items-center gap-1.5 text-blue-700">
+                    <Clock className="h-3.5 w-3.5" />
+                    <span>Neste: {facility.nextAvailable}</span>
                   </div>
+                  
                   <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="text-blue-700 border-blue-200"
                     onClick={() => navigate(`/facilities/${facility.id}`)}
+                    className="bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 shadow-sm"
+                    size="sm"
                   >
-                    Se detaljer →
+                    <Info className="h-3.5 w-3.5 mr-1.5" />
+                    Detaljer
                   </Button>
                 </div>
               </CardContent>
