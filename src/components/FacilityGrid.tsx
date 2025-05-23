@@ -164,31 +164,41 @@ const FacilityGrid: React.FC<FacilityGridProps> = ({
     }
   ];
 
-  // Filter facilities based on criteria
+  // Filter facilities based on criteria - fixed filtering logic
   const filteredFacilities = facilities.filter(facility => {
-    // Filter by facility type (if provided)
-    if (facilityType && facilityType !== "" && !facility.type.toLowerCase().includes(facilityType.toLowerCase().replace("-", " "))) {
+    // Only apply filters if they have valid values
+    
+    // Filter by facility type (if provided and not empty)
+    if (facilityType && facilityType !== "" && 
+        !facility.type.toLowerCase().includes(facilityType.toLowerCase().replace("-", " "))) {
       return false;
     }
     
-    // Filter by location (if provided)
-    if (location && location !== "" && !facility.address.toLowerCase().includes(location.toLowerCase().replace("-", " "))) {
+    // Filter by location (if provided and not empty)
+    if (location && location !== "" && 
+        !facility.address.toLowerCase().includes(location.toLowerCase().replace("-", " "))) {
       return false;
     }
     
-    // Filter by accessibility (if provided)
-    if (accessibility && accessibility !== "" && !facility.accessibility.includes(accessibility)) {
+    // Filter by accessibility (if provided and not empty)
+    if (accessibility && accessibility !== "" && 
+        !facility.accessibility.includes(accessibility)) {
       return false;
     }
     
-    // Filter by capacity (if provided)
-    if (capacity && (facility.capacity < capacity[0] || facility.capacity > capacity[1])) {
+    // Filter by capacity (if provided with valid values)
+    if (capacity && Array.isArray(capacity) && capacity.length === 2 && 
+        (facility.capacity < capacity[0] || facility.capacity > capacity[1])) {
       return false;
     }
     
+    // If all filters are passed or not applicable, include this facility
     return true;
   });
 
+  console.log("Filtered facilities:", filteredFacilities.length, "out of", facilities.length);
+  console.log("Filter values:", { facilityType, location, accessibility, capacity });
+  
   return (
     <div className="mb-8">
       {filteredFacilities.length === 0 ? (
