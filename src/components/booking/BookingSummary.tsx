@@ -5,7 +5,7 @@ import { nb } from "date-fns/locale";
 import { CalendarDays, Clock, Users, Mail, Phone, User, Building } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
-interface BookingData {
+export interface BookingData {
   date: Date;
   timeSlot: string;
   purpose: string;

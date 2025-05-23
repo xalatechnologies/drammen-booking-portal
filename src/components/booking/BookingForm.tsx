@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -27,8 +26,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { CalendarDays, Clock, Users, Info, CheckCircle } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BookingSummary } from "./BookingSummary";
+import { BookingSummary, BookingData } from "./BookingSummary";
 
 const bookingFormSchema = z.object({
   date: z.date({
@@ -138,6 +136,21 @@ export function BookingForm({
   const goToPreviousStep = () => {
     if (currentStep === 'contact') setCurrentStep('details');
     else if (currentStep === 'confirm') setCurrentStep('contact');
+  };
+
+  // Now we ensure we're passing a complete BookingData object with all required properties
+  const getBookingDataForSummary = (): BookingData => {
+    const values = form.getValues();
+    return {
+      date: values.date,
+      timeSlot: values.timeSlot || "",
+      purpose: values.purpose || "",
+      attendees: values.attendees || 0,
+      contactName: values.contactName || "",
+      contactEmail: values.contactEmail || "",
+      contactPhone: values.contactPhone || "",
+      organization: values.organization
+    };
   };
 
   return (
@@ -371,7 +384,7 @@ export function BookingForm({
               
               <BookingSummary
                 facilityName={facilityName}
-                bookingData={form.getValues()}
+                bookingData={getBookingDataForSummary()}
               />
               
               <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
