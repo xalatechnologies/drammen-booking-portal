@@ -10,6 +10,8 @@ import FacilityDetail from "./pages/facilities/[id]";
 import BookingsPage from "./pages/bookings";
 import AdminDashboard from "./pages/admin/Dashboard";
 import LoginSelection from "./pages/LoginSelection";
+import SettingsPage from "./pages/settings";
+import ProfilePage from "./pages/profile";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +26,8 @@ const App = () => (
           <Route path="/login" element={<LoginSelection />} />
           <Route path="/facilities/:id" element={<FacilityDetail />} />
           <Route path="/bookings" element={<BookingsPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
           
           {/* Setting up admin routes correctly with nested paths */}
           <Route path="/admin/*" element={<AdminDashboard />} />
