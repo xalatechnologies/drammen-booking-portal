@@ -140,13 +140,30 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
             </Select>
           </div>
 
-          <div className="flex-none md:flex-1 lg:flex-initial w-full md:w-auto">
+          <div className="flex-none w-auto">
             <Button 
-              className="w-full md:w-auto h-10 bg-[#0B3D91] hover:bg-blue-700 text-white font-medium shadow-sm"
+              className="h-10 bg-[#0B3D91] hover:bg-blue-700 text-white font-medium shadow-sm"
             >
               <Search className="mr-2 h-4 w-4" />
               <span>Søk</span>
             </Button>
+          </div>
+
+          <div className="flex-none ml-1">
+            <Collapsible
+              open={showAdvancedFilters}
+              onOpenChange={setShowAdvancedFilters}
+            >
+              <CollapsibleTrigger asChild>
+                <Button variant="outline" size="sm" className="h-10 flex items-center gap-1 bg-white border-gray-300 px-2">
+                  <Filter className="h-3.5 w-3.5" />
+                  <span className="text-xs">Filter</span>
+                  <span className="text-xs ml-1">
+                    {showAdvancedFilters ? "▲" : "▼"}
+                  </span>
+                </Button>
+              </CollapsibleTrigger>
+            </Collapsible>
           </div>
           
           <div className="flex-none flex gap-1 h-10 w-auto ml-auto">
@@ -186,62 +203,46 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
           </div>
         </div>
         
-        {/* Advanced filters */}
-        <Collapsible
-          open={showAdvancedFilters}
-          onOpenChange={setShowAdvancedFilters}
-          className="mt-3"
-        >
-          <CollapsibleTrigger asChild>
-            <Button variant="outline" size="sm" className="flex items-center gap-2 bg-white border-gray-300">
-              <Filter className="h-4 w-4" />
-              <span>Avanserte filtre</span>
-              <span className="text-xs ml-1">
-                {showAdvancedFilters ? "▲" : "▼"}
-              </span>
-            </Button>
-          </CollapsibleTrigger>
-          <CollapsibleContent className="mt-3 space-y-4 bg-gray-50 p-3 rounded-md">
-            <div>
-              <Label className="text-sm font-medium mb-2 block">Tilgjengelighet</Label>
-              <div className="flex flex-wrap gap-4">
-                <div className="flex items-center gap-2">
-                  <Checkbox id="wheelchair" 
-                    checked={accessibility === "wheelchair"}
-                    onCheckedChange={() => setAccessibility && setAccessibility("wheelchair")}
-                  />
-                  <label htmlFor="wheelchair" className="text-sm">Rullestoltilgang</label>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Checkbox id="hearing-loop" 
-                    checked={accessibility === "hearing-loop"}
-                    onCheckedChange={() => setAccessibility && setAccessibility("hearing-loop")}
-                  />
-                  <label htmlFor="hearing-loop" className="text-sm">Teleslynge</label>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Checkbox id="sign-language" 
-                    checked={accessibility === "sign-language"}
-                    onCheckedChange={() => setAccessibility && setAccessibility("sign-language")}
-                  />
-                  <label htmlFor="sign-language" className="text-sm">Tegnspråktolkning</label>
-                </div>
+        <CollapsibleContent className="mt-3 space-y-4 bg-gray-50 p-3 rounded-md">
+          <div>
+            <Label className="text-sm font-medium mb-2 block">Tilgjengelighet</Label>
+            <div className="flex flex-wrap gap-4">
+              <div className="flex items-center gap-2">
+                <Checkbox id="wheelchair" 
+                  checked={accessibility === "wheelchair"}
+                  onCheckedChange={() => setAccessibility && setAccessibility("wheelchair")}
+                />
+                <label htmlFor="wheelchair" className="text-sm">Rullestoltilgang</label>
+              </div>
+              <div className="flex items-center gap-2">
+                <Checkbox id="hearing-loop" 
+                  checked={accessibility === "hearing-loop"}
+                  onCheckedChange={() => setAccessibility && setAccessibility("hearing-loop")}
+                />
+                <label htmlFor="hearing-loop" className="text-sm">Teleslynge</label>
+              </div>
+              <div className="flex items-center gap-2">
+                <Checkbox id="sign-language" 
+                  checked={accessibility === "sign-language"}
+                  onCheckedChange={() => setAccessibility && setAccessibility("sign-language")}
+                />
+                <label htmlFor="sign-language" className="text-sm">Tegnspråktolkning</label>
               </div>
             </div>
-            
-            <div>
-              <Label className="text-sm font-medium mb-2 block">Kapasitet: {capacity ? capacity[0] : 0} - {capacity ? capacity[1] : 200}+ personer</Label>
-              <Slider
-                defaultValue={[0, 200]}
-                max={200}
-                step={10}
-                value={capacity}
-                onValueChange={(value) => setCapacity && setCapacity(value)}
-                className="w-full max-w-md"
-              />
-            </div>
-          </CollapsibleContent>
-        </Collapsible>
+          </div>
+          
+          <div>
+            <Label className="text-sm font-medium mb-2 block">Kapasitet: {capacity ? capacity[0] : 0} - {capacity ? capacity[1] : 200}+ personer</Label>
+            <Slider
+              defaultValue={[0, 200]}
+              max={200}
+              step={10}
+              value={capacity}
+              onValueChange={(value) => setCapacity && setCapacity(value)}
+              className="w-full max-w-md"
+            />
+          </div>
+        </CollapsibleContent>
       </CardContent>
     </Card>
   );
