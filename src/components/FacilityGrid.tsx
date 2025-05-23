@@ -47,7 +47,7 @@ const FacilityGrid: React.FC<FacilityGridProps> = ({
 }) => {
   const navigate = useNavigate();
   
-  // Mock data with real Drammen addresses and facilities - reduced to 6 cards
+  // Mock data with real Drammen addresses and facilities - all 6 cards
   const facilities: Facility[] = [
     {
       id: 1,
@@ -167,17 +167,17 @@ const FacilityGrid: React.FC<FacilityGridProps> = ({
   // Filter facilities based on criteria
   const filteredFacilities = facilities.filter(facility => {
     // Filter by facility type (if provided)
-    if (facilityType && !facility.type.toLowerCase().includes(facilityType.toLowerCase().replace("-", " "))) {
+    if (facilityType && facilityType !== "" && !facility.type.toLowerCase().includes(facilityType.toLowerCase().replace("-", " "))) {
       return false;
     }
     
     // Filter by location (if provided)
-    if (location && !facility.address.toLowerCase().includes(location.toLowerCase().replace("-", " "))) {
+    if (location && location !== "" && !facility.address.toLowerCase().includes(location.toLowerCase().replace("-", " "))) {
       return false;
     }
     
     // Filter by accessibility (if provided)
-    if (accessibility && !facility.accessibility.includes(accessibility)) {
+    if (accessibility && accessibility !== "" && !facility.accessibility.includes(accessibility)) {
       return false;
     }
     
