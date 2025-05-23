@@ -4,32 +4,87 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar } from "@/components/ui/calendar";
-import { Drawer, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
-import { ArrowLeft } from "lucide-react";
+import { Drawer, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger, DrawerClose } from "@/components/ui/drawer";
+import { ArrowLeft, Calendar, CheckCircle } from "lucide-react";
 import { format } from "date-fns";
 import GlobalHeader from "@/components/GlobalHeader";
 import GlobalFooter from "@/components/GlobalFooter";
+import { BookingForm } from "@/components/booking/BookingForm";
+import { useToast } from "@/hooks/use-toast";
 
 const FacilityDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [date, setDate] = useState<Date>(new Date());
   const [calendarView, setCalendarView] = useState<"day" | "week" | "month">("week");
+  const [isBookingComplete, setIsBookingComplete] = useState(false);
+  const { toast } = useToast();
   
   // Mock facility data - in a real app this would be fetched based on id
   const facility = {
     id,
     name: `Gymsal ${id} - Brandengen skole`,
     address: "Knoffs gate 8, Drammen",
-    capacity: "30 personer",
+    capacity: 30,
     equipment: ["Projektor", "Lydanlegg", "Whiteboard", "Wi-Fi"],
     description: "Dette er en moderne gymsal på Brandengen skole, perfekt for idrettsaktiviteter, trening og mindre arrangementer. Salen er utstyrt med standard sportsutstyr og har god ventilasjon.",
     images: [
       "/lovable-uploads/08e8f8d5-4126-4805-a56e-e4337f97dbd0.png",
       "https://images.unsplash.com/photo-1580237072617-771c3ecc4a24?auto=format&fit=crop&w=1200&q=80",
       "https://images.unsplash.com/photo-1516205651411-aef33a44f7c2?auto=format&fit=crop&w=1200&q=80"
+    ],
+    availableTimes: [
+      {
+        date: new Date(),
+        slots: [
+          { start: "08:00", end: "10:00", available: true },
+          { start: "10:00", end: "12:00", available: false },
+          { start: "12:00", end: "14:00", available: true },
+          { start: "14:00", end: "16:00", available: true },
+          { start: "16:00", end: "18:00", available: false },
+          { start: "18:00", end: "20:00", available: true },
+          { start: "20:00", end: "22:00", available: true },
+        ]
+      },
+      {
+        date: new Date(Date.now() + 86400000), // Tomorrow
+        slots: [
+          { start: "08:00", end: "10:00", available: true },
+          { start: "10:00", end: "12:00", available: true },
+          { start: "12:00", end: "14:00", available: true },
+          { start: "14:00", end: "16:00", available: false },
+          { start: "16:00", end: "18:00", available: true },
+          { start: "18:00", end: "20:00", available: false },
+          { start: "20:00", end: "22:00", available: true },
+        ]
+      },
+      {
+        date: new Date(Date.now() + 172800000), // Day after tomorrow
+        slots: [
+          { start: "08:00", end: "10:00", available: true },
+          { start: "10:00", end: "12:00", available: true },
+          { start: "12:00", end: "14:00", available: true },
+          { start: "14:00", end: "16:00", available: true },
+          { start: "16:00", end: "18:00", available: true },
+          { start: "18:00", end: "20:00", available: true },
+          { start: "20:00", end: "22:00", available: true },
+        ]
+      }
     ]
+  };
+
+  const handleBookingComplete = () => {
+    setIsBookingComplete(true);
+    
+    // Reset booking state after viewing the success state
+    setTimeout(() => {
+      document.getElementById("close-booking-drawer")?.click();
+      
+      // Reset the state after the drawer closes
+      setTimeout(() => {
+        setIsBookingComplete(false);
+      }, 300);
+    }, 3000);
   };
 
   return (
@@ -94,7 +149,7 @@ const FacilityDetail = () => {
                   
                   <div>
                     <p className="text-sm font-medium text-gray-500">Kapasitet</p>
-                    <p>{facility.capacity}</p>
+                    <p>{facility.capacity} personer</p>
                   </div>
                   
                   <div>
@@ -115,48 +170,44 @@ const FacilityDetail = () => {
                   Reserver nå
                 </Button>
               </DrawerTrigger>
-              <DrawerContent>
+              <DrawerContent className="max-h-[90vh] overflow-auto">
+                <DrawerClose id="close-booking-drawer" className="hidden" />
                 <DrawerHeader>
-                  <DrawerTitle>Reserver {facility.name}</DrawerTitle>
-                  <DrawerDescription>Trinn 1/3: Velg tid og dato</DrawerDescription>
+                  <DrawerTitle>{isBookingComplete ? "Reservasjon fullført!" : `Reserver ${facility.name}`}</DrawerTitle>
+                  <DrawerDescription>
+                    {isBookingComplete 
+                      ? "Din reservasjon er mottatt og vil bli behandlet." 
+                      : "Fyll ut skjemaet under for å reservere lokalet"}
+                  </DrawerDescription>
                 </DrawerHeader>
-                <div className="px-4">
-                  <div className="grid gap-6 py-4">
-                    <div className="grid gap-2">
-                      <label className="text-sm font-medium">Dato</label>
-                      <Calendar
-                        mode="single"
-                        selected={date}
-                        onSelect={(d) => d && setDate(d)}
-                        className="rounded border shadow-sm p-3 pointer-events-auto"
-                      />
+                
+                <div className="px-4 pb-4">
+                  {isBookingComplete ? (
+                    <div className="text-center py-10 space-y-4">
+                      <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
+                        <CheckCircle className="h-8 w-8 text-green-600" />
+                      </div>
+                      <h3 className="text-xl font-medium">Takk for din reservasjon!</h3>
+                      <p className="text-gray-600 max-w-md mx-auto">
+                        En bekreftelse er sendt til din e-post. Du vil også motta en SMS når reservasjonen er godkjent.
+                      </p>
+                      <Button 
+                        onClick={() => navigate("/bookings")}
+                        className="mt-6 bg-blue-600 hover:bg-blue-700"
+                      >
+                        Se dine reservasjoner
+                      </Button>
                     </div>
-                    
-                    <div className="grid gap-2">
-                      <label className="text-sm font-medium">Tidsintervall</label>
-                      <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2">
-                        <option>08:00 - 10:00</option>
-                        <option>10:00 - 12:00</option>
-                        <option>12:00 - 14:00</option>
-                        <option>14:00 - 16:00</option>
-                        <option>16:00 - 18:00</option>
-                        <option>18:00 - 20:00</option>
-                        <option>20:00 - 22:00</option>
-                      </select>
-                    </div>
-                    
-                    <div className="grid gap-2">
-                      <label className="text-sm font-medium">Formål</label>
-                      <textarea 
-                        className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2" 
-                        placeholder="Beskriv formålet med reservasjonen"
-                      />
-                    </div>
-                  </div>
+                  ) : (
+                    <BookingForm 
+                      facilityId={facility.id || ""}
+                      facilityName={facility.name}
+                      maxCapacity={facility.capacity}
+                      availableTimeSlots={facility.availableTimes}
+                      onCompleteBooking={handleBookingComplete}
+                    />
+                  )}
                 </div>
-                <DrawerFooter>
-                  <Button className="bg-[#0B3D91] hover:bg-blue-700">Neste →</Button>
-                </DrawerFooter>
               </DrawerContent>
             </Drawer>
           </div>
