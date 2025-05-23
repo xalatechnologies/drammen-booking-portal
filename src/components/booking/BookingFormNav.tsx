@@ -4,20 +4,33 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, CheckCircle } from "lucide-react";
 
 interface BookingFormNavProps {
-  currentStep: string;
+  currentStep: number;
+  isFirstStep: boolean;
+  isLastStep: boolean;
+  canContinue: boolean;
   isSubmitting: boolean;
-  onPrevious: () => void;
-  onNext: () => void;
+  isSubmitDisabled: boolean;
+  onPreviousStep: () => void;
+  onNextStep: () => void;
 }
 
-export function BookingFormNav({ currentStep, isSubmitting, onPrevious, onNext }: BookingFormNavProps) {
+export function BookingFormNav({ 
+  currentStep, 
+  isFirstStep,
+  isLastStep,
+  canContinue,
+  isSubmitting, 
+  isSubmitDisabled,
+  onPreviousStep, 
+  onNextStep 
+}: BookingFormNavProps) {
   return (
     <div className="flex justify-between pt-6 border-t border-gray-200">
-      {currentStep !== 'details' ? (
+      {!isFirstStep ? (
         <Button 
           type="button" 
           variant="outline" 
-          onClick={onPrevious} 
+          onClick={onPreviousStep} 
           disabled={isSubmitting}
           className="gap-1"
         >
@@ -29,17 +42,17 @@ export function BookingFormNav({ currentStep, isSubmitting, onPrevious, onNext }
       )}
       
       <Button 
-        type="button" 
-        onClick={onNext}
+        type={isLastStep ? "submit" : "button"}
+        onClick={isLastStep ? undefined : onNextStep}
         className="bg-blue-600 hover:bg-blue-700 gap-1"
-        disabled={isSubmitting}
+        disabled={isSubmitting || (isLastStep && isSubmitDisabled) || !canContinue}
       >
         {isSubmitting ? (
           <>
             <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-1"></span>
             Sender...
           </>
-        ) : currentStep === 'confirm' ? (
+        ) : isLastStep ? (
           <>
             Send inn reservasjon
             <CheckCircle className="h-4 w-4 ml-1" />

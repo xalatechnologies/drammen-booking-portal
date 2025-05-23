@@ -34,15 +34,33 @@ export const bookingFormSchema = z.object({
   }),
   organization: z.string().optional(),
   
-  // Recurring booking fields
-  recurrenceFrequency: z.enum(['daily', 'weekly', 'monthly']).optional(),
-  recurrenceInterval: z.coerce.number().min(1).max(30).optional(),
-  recurrenceCount: z.coerce.number().min(1).max(100).optional(),
-  recurrenceEndDate: z.date().optional(),
+  // Recurring booking fields - now as a nested object
+  recurrence: z.object({
+    frequency: z.enum(['daily', 'weekly', 'monthly']).optional(),
+    interval: z.number().min(1).max(30).optional(),
+    count: z.number().min(1).max(100).optional(),
+    until: z.date().optional()
+  }).optional(),
 });
 
 // Type for form values based on the schema
 export type BookingFormValues = z.infer<typeof bookingFormSchema>;
+
+// Type for the booking data passed to BookingConfirmStep
+export interface BookingData {
+  date: Date;
+  bookingMode: "one-time" | "date-range" | "recurring";
+  timeSlot: string;
+  purpose: string;
+  attendees: number;
+  contactName: string;
+  contactEmail: string;
+  contactPhone: string;
+  organization?: string;
+  endDate?: Date;
+  recurrenceRule?: string;
+  recurrenceDescription?: string;
+}
 
 // Step type definitions
 export type BookingStep = 'details' | 'contact' | 'confirm';

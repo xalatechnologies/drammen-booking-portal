@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -11,8 +12,8 @@ import { FormStepper } from "./FormStepper";
 import { BookingFormNav } from "./BookingFormNav";
 import { toast } from "sonner";
 import type { BookingFormValues } from "./types";
+import { generateRecurrenceRule, getRecurrenceDescription } from "@/utils/bookingConflict";
 import { addDays, format } from "date-fns";
-import { generateRecurrenceRule } from "@/lib/recurrence";
 
 interface BookingFormProps {
   facilityId: string;
@@ -170,6 +171,12 @@ export function BookingForm({
           />
         );
       case 2:
+        const recurrenceData = form.watch("recurrence");
+        const frequency = recurrenceData?.frequency;
+        const interval = recurrenceData?.interval;
+        const count = recurrenceData?.count;
+        const until = recurrenceData?.until;
+
         return (
           <BookingConfirmStep
             facilityName={facilityName}
@@ -184,15 +191,15 @@ export function BookingForm({
               contactPhone: form.watch("contactPhone") || "",
               organization: form.watch("organization") || "",
               endDate: form.watch("endDate"),
-              recurrenceRule: form.watch("recurrence") ? generateRecurrenceRule(
-                form.watch("recurrence")?.frequency || 'weekly',
-                form.watch("recurrence")?.interval || 1,
-                form.watch("recurrence")?.count,
-                form.watch("recurrence")?.until
-              ) : undefined,
-              recurrenceDescription: form.watch("recurrence")?.frequency
-                ? `Hver ${form.watch("recurrence")?.frequency} med intervall ${form.watch("recurrence")?.interval}`
-                : undefined,
+              recurrenceRule: recurrenceData && frequency ? 
+                generateRecurrenceRule(
+                  frequency,
+                  interval || 1,
+                  count,
+                  until
+                ) : undefined,
+              recurrenceDescription: recurrenceData && frequency ? 
+                getRecurrenceDescription(frequency, interval || 1) : undefined,
             }}
             termsAccepted={termsAccepted}
             onTermsAcceptedChange={onTermsAcceptedChange}
