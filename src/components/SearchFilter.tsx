@@ -71,8 +71,8 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
   return (
     <Card className="mb-5 overflow-hidden border-none shadow-md bg-white">
       <CardContent className="p-4">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
-          <div className="md:col-span-3">
+        <div className="flex flex-wrap md:flex-nowrap items-center gap-2">
+          <div className="w-full md:w-64 lg:w-auto lg:flex-1">
             <Popover>
               <PopoverTrigger asChild>
                 <Button
@@ -108,7 +108,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
             </Popover>
           </div>
 
-          <div className="md:col-span-3">
+          <div className="w-full md:w-48 lg:w-auto lg:flex-1">
             <Select value={facilityType} onValueChange={setFacilityType}>
               <SelectTrigger className="bg-white h-10 border-gray-300 w-full">
                 <SelectValue placeholder="Velg type lokale" />
@@ -124,7 +124,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
             </Select>
           </div>
 
-          <div className="md:col-span-3">
+          <div className="w-full md:w-48 lg:w-auto lg:flex-1">
             <Select value={location} onValueChange={setLocation}>
               <SelectTrigger className="bg-white h-10 border-gray-300 w-full">
                 <SelectValue placeholder="Velg område/bydel" />
@@ -140,51 +140,49 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
             </Select>
           </div>
 
-          <div className="md:col-span-2">
+          <div className="flex-none md:flex-1 lg:flex-initial w-full md:w-auto">
             <Button 
-              className="w-full h-10 bg-[#0B3D91] hover:bg-blue-700 text-white font-medium shadow-sm"
+              className="w-full md:w-auto h-10 bg-[#0B3D91] hover:bg-blue-700 text-white font-medium shadow-sm"
             >
               <Search className="mr-2 h-4 w-4" />
               <span>Søk</span>
             </Button>
           </div>
           
-          <div className="md:col-span-1">
-            <div className="flex gap-2 h-10">
-              <Button 
-                variant={viewMode === "grid" ? "default" : "outline"} 
-                size="sm" 
-                onClick={() => setViewMode("grid")}
-                className={cn(
-                  "flex-1 h-full",
-                  viewMode === "grid" ? "bg-blue-600" : ""
-                )}
-              >
-                <List className="h-4 w-4" />
-              </Button>
-              <Button 
-                variant={viewMode === "map" ? "default" : "outline"} 
-                size="sm" 
-                onClick={() => setViewMode("map")}
-                className={cn(
-                  "flex-1 h-full",
-                  viewMode === "map" ? "bg-blue-600" : ""
-                )}
-              >
-                <Map className="h-4 w-4" />
-              </Button>
-              <Button 
-                variant={viewMode === "calendar" ? "default" : "outline"} 
-                size="sm" 
-                onClick={() => setViewMode("calendar")}
-                className={cn(
-                  "flex-1 h-full",
-                  viewMode === "calendar" ? "bg-blue-600" : ""
-                )}
-              >
-                <CalendarIcon className="h-4 w-4" />
-              </Button>
-            </div>
+          <div className="flex-none flex gap-1 h-10 w-auto ml-auto">
+            <Button 
+              variant={viewMode === "grid" ? "default" : "outline"} 
+              size="sm" 
+              onClick={() => setViewMode("grid")}
+              className={cn(
+                "h-full px-2",
+                viewMode === "grid" ? "bg-blue-600" : ""
+              )}
+            >
+              <List className="h-4 w-4" />
+            </Button>
+            <Button 
+              variant={viewMode === "map" ? "default" : "outline"} 
+              size="sm" 
+              onClick={() => setViewMode("map")}
+              className={cn(
+                "h-full px-2",
+                viewMode === "map" ? "bg-blue-600" : ""
+              )}
+            >
+              <Map className="h-4 w-4" />
+            </Button>
+            <Button 
+              variant={viewMode === "calendar" ? "default" : "outline"} 
+              size="sm" 
+              onClick={() => setViewMode("calendar")}
+              className={cn(
+                "h-full px-2",
+                viewMode === "calendar" ? "bg-blue-600" : ""
+              )}
+            >
+              <CalendarIcon className="h-4 w-4" />
+            </Button>
           </div>
         </div>
         
