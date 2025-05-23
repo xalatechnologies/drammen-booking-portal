@@ -253,7 +253,7 @@ const FacilityGrid: React.FC<FacilityGridProps> = ({
           {facilitiesToDisplay.map(facility => (
             <Card 
               key={facility.id} 
-              className="overflow-hidden hover:shadow-lg transition-all duration-200 hover:translate-y-[-2px] group border border-gray-200"
+              className="overflow-hidden hover:shadow-lg transition-all duration-200 hover:translate-y-[-2px] group border border-gray-200 flex flex-col"
             >
               <div className="h-52 bg-gray-200 relative overflow-hidden">
                 <img 
@@ -274,7 +274,7 @@ const FacilityGrid: React.FC<FacilityGridProps> = ({
                 </div>
               </div>
               
-              <CardContent className="p-5 space-y-4">
+              <CardContent className="p-5 flex flex-col flex-grow">
                 <div>
                   <h3 className="font-bold text-lg mb-1 text-gray-900">{facility.name}</h3>
                   <div className="flex items-start gap-1.5 text-sm text-gray-600">
@@ -290,7 +290,7 @@ const FacilityGrid: React.FC<FacilityGridProps> = ({
                   {renderAccessibilityBadges(facility.accessibility)}
                 </div>
                 
-                <div className="bg-gray-50 p-3 rounded-lg border border-gray-100">
+                <div className="bg-gray-50 p-3 rounded-lg border border-gray-100 mt-4">
                   <h4 className="text-sm font-medium mb-2 flex items-center gap-1.5">
                     <Calendar className="h-4 w-4 text-blue-600" />
                     <span>Tilgjengelighet</span>
@@ -316,7 +316,7 @@ const FacilityGrid: React.FC<FacilityGridProps> = ({
                   ))}
                 </div>
                 
-                <div className="flex justify-between items-center pt-1">
+                <div className="flex justify-between items-center mt-auto pt-4">
                   <div className="text-sm flex items-center gap-1.5 text-blue-700">
                     <Clock className="h-3.5 w-3.5" />
                     <span>Neste: {facility.nextAvailable}</span>
