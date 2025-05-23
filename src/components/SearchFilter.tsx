@@ -18,11 +18,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Calendar as CalendarIcon, Map, List, Search, CalendarDays } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Slider } from "@/components/ui/slider";
+import { Calendar as CalendarIcon, Map, List, Search, CalendarDays, Filter } from "lucide-react";
 import { format, addDays } from "date-fns";
 import { cn } from "@/lib/utils";
 import MapView from "./MapView";
 import { DateRange } from "react-day-picker";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { Label } from "@/components/ui/label";
 
 interface SearchFilterProps {
   date: Date | undefined;
@@ -31,8 +39,12 @@ interface SearchFilterProps {
   setFacilityType: (type: string) => void;
   location: string;
   setLocation: (location: string) => void;
-  viewMode: "grid" | "map";
-  setViewMode: (mode: "grid" | "map") => void;
+  viewMode: "grid" | "map" | "calendar";
+  setViewMode: (mode: "grid" | "map" | "calendar") => void;
+  accessibility?: string;
+  setAccessibility?: (type: string) => void;
+  capacity?: number[];
+  setCapacity?: (capacity: number[]) => void;
 }
 
 const SearchFilter: React.FC<SearchFilterProps> = ({
@@ -44,11 +56,17 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
   setLocation,
   viewMode,
   setViewMode,
+  accessibility,
+  setAccessibility,
+  capacity,
+  setCapacity,
 }) => {
   const [dateRange, setDateRange] = React.useState<DateRange | undefined>({
     from: date || new Date(),
     to: date ? addDays(date, 7) : addDays(new Date(), 7)
   });
+  
+  const [showAdvancedFilters, setShowAdvancedFilters] = React.useState(false);
 
   return (
     <Card className="mb-5 overflow-hidden border-none shadow-md bg-white">
@@ -155,13 +173,77 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
               >
                 <Map className="h-4 w-4" />
               </Button>
+              <Button 
+                variant={viewMode === "calendar" ? "default" : "outline"} 
+                size="sm" 
+                onClick={() => setViewMode("calendar")}
+                className={cn(
+                  "flex-1 h-full",
+                  viewMode === "calendar" ? "bg-blue-600" : ""
+                )}
+              >
+                <CalendarIcon className="h-4 w-4" />
+              </Button>
             </div>
           </div>
         </div>
         
-        {viewMode === "map" && (
-          <MapView facilityType={facilityType} location={location} />
-        )}
+        {/* Advanced filters */}
+        <Collapsible
+          open={showAdvancedFilters}
+          onOpenChange={setShowAdvancedFilters}
+          className="mt-3"
+        >
+          <CollapsibleTrigger asChild>
+            <Button variant="outline" size="sm" className="flex items-center gap-2 bg-white border-gray-300">
+              <Filter className="h-4 w-4" />
+              <span>Avanserte filtre</span>
+              <span className="text-xs ml-1">
+                {showAdvancedFilters ? "▲" : "▼"}
+              </span>
+            </Button>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="mt-3 space-y-4 bg-gray-50 p-3 rounded-md">
+            <div>
+              <Label className="text-sm font-medium mb-2 block">Tilgjengelighet</Label>
+              <div className="flex flex-wrap gap-4">
+                <div className="flex items-center gap-2">
+                  <Checkbox id="wheelchair" 
+                    checked={accessibility === "wheelchair"}
+                    onCheckedChange={() => setAccessibility && setAccessibility("wheelchair")}
+                  />
+                  <label htmlFor="wheelchair" className="text-sm">Rullestoltilgang</label>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Checkbox id="hearing-loop" 
+                    checked={accessibility === "hearing-loop"}
+                    onCheckedChange={() => setAccessibility && setAccessibility("hearing-loop")}
+                  />
+                  <label htmlFor="hearing-loop" className="text-sm">Teleslynge</label>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Checkbox id="sign-language" 
+                    checked={accessibility === "sign-language"}
+                    onCheckedChange={() => setAccessibility && setAccessibility("sign-language")}
+                  />
+                  <label htmlFor="sign-language" className="text-sm">Tegnspråktolkning</label>
+                </div>
+              </div>
+            </div>
+            
+            <div>
+              <Label className="text-sm font-medium mb-2 block">Kapasitet: {capacity ? capacity[0] : 0} - {capacity ? capacity[1] : 200}+ personer</Label>
+              <Slider
+                defaultValue={[0, 200]}
+                max={200}
+                step={10}
+                value={capacity}
+                onValueChange={(value) => setCapacity && setCapacity(value)}
+                className="w-full max-w-md"
+              />
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
       </CardContent>
     </Card>
   );
