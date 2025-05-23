@@ -1,17 +1,18 @@
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "@/components/ui/form";
-import { useToast } from "@/hooks/use-toast";
-import { generateRecurrenceRule, checkBookingConflict } from "@/utils/bookingConflict";
-import { BookingFormValues, bookingFormSchema, BookingStep } from "./types";
-import { FormStepper } from "./FormStepper";
+import { Button } from "@/components/ui/button";
 import { BookingDetailsStep } from "./steps/BookingDetailsStep";
 import { BookingContactStep } from "./steps/BookingContactStep";
 import { BookingConfirmStep } from "./steps/BookingConfirmStep";
+import { FormStepper } from "./FormStepper";
 import { BookingFormNav } from "./BookingFormNav";
-import { BookingData } from "./BookingSummary";
+import { toast } from "sonner";
+import type { BookingFormValues } from "./types";
+import { addDays, format } from "date-fns";
+import { generateRecurrenceRule } from "@/lib/recurrence";
 
 interface BookingFormProps {
   facilityId: string;
@@ -22,240 +23,209 @@ interface BookingFormProps {
     slots: { start: string; end: string; available: boolean }[];
   }[];
   onCompleteBooking: () => void;
+  termsAccepted: boolean;
+  onTermsAcceptedChange: (accepted: boolean) => void;
 }
 
-export function BookingForm({
-  facilityId,
-  facilityName,
+const bookingFormSchema = z.object({
+  date: z.date({
+    required_error: "Vennligst velg en dato",
+  }),
+  bookingMode: z.enum(["one-time", "date-range", "recurring"], {
+    required_error: "Vennligst velg booking type",
+  }),
+  endDate: z.date().optional(),
+  timeSlot: z.string({
+    required_error: "Vennligst velg et tidspunkt",
+  }),
+  purpose: z.string({
+    required_error: "Vennligst oppgi formålet med reservasjonen",
+  }).min(10, {
+    message: "Formålet må være minst 10 tegn langt",
+  }),
+  attendees: z.number({
+    required_error: "Vennligst oppgi antall deltakere",
+  }).min(1, {
+    message: "Antall deltakere må være minst 1",
+  }),
+  contactName: z.string({
+    required_error: "Vennligst oppgi kontaktperson",
+  }).min(2, {
+    message: "Kontaktperson må være minst 2 tegn langt",
+  }),
+  contactEmail: z.string({
+    required_error: "Vennligst oppgi e-post",
+  }).email({
+    message: "Vennligst oppgi en gyldig e-postadresse",
+  }),
+  contactPhone: z.string({
+    required_error: "Vennligst oppgi telefonnummer",
+  }).regex(/^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/, {
+    message: "Vennligst oppgi et gyldig telefonnummer",
+  }),
+  organization: z.string().optional(),
+  recurrence: z.object({
+    frequency: z.enum(['daily', 'weekly', 'monthly']).optional(),
+    interval: z.number().min(1).optional(),
+    count: z.number().min(1).optional(),
+    until: z.date().optional()
+  }).optional()
+});
+
+const defaultValues: Partial<BookingFormValues> = {
+  attendees: 1,
+  bookingMode: "one-time",
+};
+
+async function createBooking(data: BookingFormValues) {
+  // Simulate API call
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      console.log("Form data submitted:", data);
+      resolve({ success: true });
+    }, 1000);
+  });
+}
+
+export function BookingForm({ 
+  facilityId, 
+  facilityName, 
   maxCapacity,
   availableTimeSlots,
   onCompleteBooking,
+  termsAccepted,
+  onTermsAcceptedChange
 }: BookingFormProps) {
-  const [currentStep, setCurrentStep] = useState<BookingStep>('details');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formProgress, setFormProgress] = useState(1);
-  const { toast } = useToast();
-
-  // Initialize form with default values
+  const [canContinue, setCanContinue] = useState(false);
+  const [currentStep, setCurrentStep] = useState(0);
+  
   const form = useForm<BookingFormValues>({
     resolver: zodResolver(bookingFormSchema),
-    defaultValues: {
-      bookingMode: 'one-time',
-      date: new Date(),
-      timeSlot: "",
-      purpose: "",
-      attendees: 1,
-      contactName: "",
-      contactEmail: "",
-      contactPhone: "",
-      organization: "",
-      recurrenceFrequency: 'weekly',
-      recurrenceInterval: 1,
-    },
+    defaultValues,
+    mode: "onChange"
   });
-
-  const onSubmit = async (data: BookingFormValues) => {
+  
+  useEffect(() => {
+    setCanContinue(form.formState.isValid);
+  }, [form.formState.isValid]);
+  
+  const nextStep = () => {
+    if (currentStep < 2 && canContinue) {
+      setCurrentStep(currentStep + 1);
+    }
+  };
+  
+  const handlePrevious = () => {
+    setCurrentStep(currentStep - 1);
+  };
+  
+  const handleSubmit = async (data: BookingFormValues) => {
+    // Validate terms acceptance before submission
+    if (!termsAccepted) {
+      toast.error("Du må godkjenne vilkårene for å fortsette");
+      return;
+    }
+    
     setIsSubmitting(true);
     
+    // Prepare booking data based on booking mode
+    let bookingData = {
+      ...data,
+      facilityId: facilityId,
+      facilityName: facilityName,
+    };
+    
     try {
-      let recurrenceRule;
+      const result = await createBooking(bookingData);
       
-      // Generate recurrence rule for recurring bookings
-      if (data.bookingMode === 'recurring' && data.recurrenceFrequency) {
-        recurrenceRule = generateRecurrenceRule(
-          data.recurrenceFrequency,
-          data.recurrenceInterval || 1,
-          data.recurrenceCount,
-          data.recurrenceEndDate
-        );
+      if (result && 'success' in result && result.success) {
+        toast.success("Reservasjonen er sendt!");
+        onCompleteBooking();
+      } else {
+        toast.error("Noe gikk galt. Vennligst prøv igjen.");
       }
-      
-      // Check for booking conflicts
-      // Note: In a real app, you'd fetch existing bookings from your database
-      const mockExistingBookings = []; // This would come from your API
-      
-      const conflictCheck = await checkBookingConflict(
-        facilityId,
-        data.date,
-        data.timeSlot,
-        data.bookingMode,
-        data.bookingMode === 'one-time' ? undefined : (data.endDate || data.recurrenceEndDate),
-        recurrenceRule,
-        mockExistingBookings
-      );
-      
-      if (conflictCheck.hasConflict) {
-        toast({
-          title: "Konflikt med eksisterende reservasjon",
-          description: "Den valgte tiden overlapper med en eksisterende reservasjon. Vennligst velg en annen tid.",
-          variant: "destructive",
-          duration: 5000,
-        });
-        setIsSubmitting(false);
-        return;
-      }
-      
-      // In a real app, this would send the data to a backend API
-      console.log("Booking data:", {
-        ...data,
-        recurrenceRule,
-        facilityId
-      });
-      
-      toast({
-        title: "Reservasjon sendt",
-        description: `Din reservasjon av ${facilityName} er mottatt.`,
-        duration: 5000,
-      });
-      
-      onCompleteBooking();
     } catch (error) {
-      console.error("Error submitting booking:", error);
-      toast({
-        title: "Feil",
-        description: "Det oppstod en feil under innsending av reservasjonen. Vennligst prøv igjen.",
-        variant: "destructive",
-        duration: 5000,
-      });
+      toast.error("Det oppstod en feil under innsendingen.");
     } finally {
       setIsSubmitting(false);
     }
   };
-
-  const goToNextStep = async () => {
-    if (currentStep === 'details') {
-      // Validate only the details fields
-      const detailsFields = ['bookingMode', 'date', 'timeSlot', 'purpose', 'attendees'];
-      
-      // Add conditional fields based on booking mode
-      if (form.watch('bookingMode') === 'date-range') {
-        detailsFields.push('endDate');
-      } else if (form.watch('bookingMode') === 'recurring') {
-        detailsFields.push('recurrenceFrequency', 'recurrenceInterval');
-        
-        // Either end date or count must be provided
-        if (form.getValues('recurrenceEndDate')) {
-          detailsFields.push('recurrenceEndDate');
-        } else {
-          detailsFields.push('recurrenceCount');
-        }
-      }
-      
-      const detailsResult = await form.trigger(detailsFields as any);
-      if (detailsResult) {
-        setCurrentStep('contact');
-        setFormProgress(2);
-      }
-    } else if (currentStep === 'contact') {
-      // Validate only the contact fields
-      const contactResult = await form.trigger(['contactName', 'contactEmail', 'contactPhone', 'organization']);
-      if (contactResult) {
-        setCurrentStep('confirm');
-        setFormProgress(3);
-      }
-    } else if (currentStep === 'confirm') {
-      form.handleSubmit(onSubmit)();
+  
+  const renderStepContent = () => {
+    switch (currentStep) {
+      case 0:
+        return (
+          <BookingDetailsStep 
+            form={form}
+            facilityName={facilityName}
+            maxCapacity={maxCapacity}
+            availableTimeSlots={availableTimeSlots}
+          />
+        );
+      case 1:
+        return (
+          <BookingContactStep 
+            form={form}
+          />
+        );
+      case 2:
+        return (
+          <BookingConfirmStep
+            facilityName={facilityName}
+            bookingData={{
+              date: form.watch("date") || new Date(),
+              bookingMode: form.watch("bookingMode") || "one-time",
+              timeSlot: form.watch("timeSlot") || "",
+              purpose: form.watch("purpose") || "",
+              attendees: form.watch("attendees") || 1,
+              contactName: form.watch("contactName") || "",
+              contactEmail: form.watch("contactEmail") || "",
+              contactPhone: form.watch("contactPhone") || "",
+              organization: form.watch("organization") || "",
+              endDate: form.watch("endDate"),
+              recurrenceRule: form.watch("recurrence") ? generateRecurrenceRule(
+                form.watch("recurrence")?.frequency || 'weekly',
+                form.watch("recurrence")?.interval || 1,
+                form.watch("recurrence")?.count,
+                form.watch("recurrence")?.until
+              ) : undefined,
+              recurrenceDescription: form.watch("recurrence")?.frequency
+                ? `Hver ${form.watch("recurrence")?.frequency} med intervall ${form.watch("recurrence")?.interval}`
+                : undefined,
+            }}
+            termsAccepted={termsAccepted}
+            onTermsAcceptedChange={onTermsAcceptedChange}
+          />
+        );
+      default:
+        return null;
     }
   };
-
-  const goToPreviousStep = () => {
-    if (currentStep === 'contact') {
-      setCurrentStep('details');
-      setFormProgress(1);
-    } else if (currentStep === 'confirm') {
-      setCurrentStep('contact');
-      setFormProgress(2);
-    }
-  };
-
-  // Construct booking data for summary view
-  const getBookingDataForSummary = (): BookingData => {
-    const values = form.getValues();
-    
-    // Construct a recurrence description based on frequency and interval
-    let recurrenceDescription = '';
-    if (values.bookingMode === 'recurring' && values.recurrenceFrequency) {
-      recurrenceDescription = getRecurrenceDescription(
-        values.recurrenceFrequency,
-        values.recurrenceInterval || 1
-      );
-    }
-    
-    return {
-      bookingMode: values.bookingMode,
-      date: values.date,
-      timeSlot: values.timeSlot || "",
-      purpose: values.purpose || "",
-      attendees: values.attendees || 0,
-      contactName: values.contactName || "",
-      contactEmail: values.contactEmail || "",
-      contactPhone: values.contactPhone || "",
-      organization: values.organization,
-      endDate: values.bookingMode === 'date-range' ? values.endDate : 
-               values.bookingMode === 'recurring' ? values.recurrenceEndDate : 
-               undefined,
-      recurrenceRule: values.bookingMode === 'recurring' && values.recurrenceFrequency ? 
-        generateRecurrenceRule(
-          values.recurrenceFrequency,
-          values.recurrenceInterval || 1,
-          values.recurrenceCount,
-          values.recurrenceEndDate
-        ) : undefined,
-      recurrenceDescription
-    };
-  };
-
-  const steps = [
-    { label: "Detaljer" },
-    { label: "Kontakt" },
-    { label: "Bekreft" },
-  ];
 
   return (
     <div className="space-y-6">
-      {/* Stepper UI */}
       <FormStepper 
-        currentStep={formProgress} 
-        totalSteps={steps.length} 
-        steps={steps} 
+        currentStep={currentStep}
+        steps={["Detaljert informasjon", "Kontaktinformasjon", "Bekreftelse"]}
       />
-
+      
       <Form {...form}>
-        <form className="space-y-6">
-          {/* Step 1: Details */}
-          {currentStep === 'details' && (
-            <BookingDetailsStep 
-              form={form}
-              availableTimeSlots={availableTimeSlots}
-              maxCapacity={maxCapacity}
-            />
-          )}
-
-          {/* Step 2: Contact */}
-          {currentStep === 'contact' && (
-            <BookingContactStep form={form} />
-          )}
-
-          {/* Step 3: Confirmation */}
-          {currentStep === 'confirm' && (
-            <BookingConfirmStep
-              facilityName={facilityName}
-              bookingData={getBookingDataForSummary()}
-            />
-          )}
-
-          {/* Navigation buttons */}
-          <BookingFormNav 
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+          {renderStepContent()}
+          
+          <BookingFormNav
             currentStep={currentStep}
+            isFirstStep={currentStep === 0}
+            isLastStep={currentStep === 2}
+            canContinue={canContinue}
+            onPreviousStep={() => setCurrentStep(currentStep - 1)}
+            onNextStep={nextStep}
             isSubmitting={isSubmitting}
-            onPrevious={goToPreviousStep}
-            onNext={goToNextStep}
+            isSubmitDisabled={!termsAccepted && currentStep === 2}
           />
         </form>
       </Form>
     </div>
   );
 }
-
-// Import needed for getBookingDataForSummary
-import { getRecurrenceDescription } from "@/utils/bookingConflict";

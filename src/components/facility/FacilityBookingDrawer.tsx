@@ -23,6 +23,7 @@ interface FacilityBookingDrawerProps {
 export function FacilityBookingDrawer({ open, onOpenChange, facility }: FacilityBookingDrawerProps) {
   const navigate = useNavigate();
   const [isBookingComplete, setIsBookingComplete] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
   
   const handleBookingComplete = () => {
     setIsBookingComplete(true);
@@ -34,6 +35,7 @@ export function FacilityBookingDrawer({ open, onOpenChange, facility }: Facility
       // Reset the state after the drawer closes
       setTimeout(() => {
         setIsBookingComplete(false);
+        setTermsAccepted(false);
       }, 300);
     }, 3000);
   };
@@ -90,6 +92,8 @@ export function FacilityBookingDrawer({ open, onOpenChange, facility }: Facility
               maxCapacity={facility.capacity}
               availableTimeSlots={facility.availableTimes}
               onCompleteBooking={handleBookingComplete}
+              termsAccepted={termsAccepted}
+              onTermsAcceptedChange={setTermsAccepted}
             />
           )}
         </div>
