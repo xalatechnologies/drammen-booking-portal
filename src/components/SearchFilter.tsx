@@ -163,6 +163,47 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
                   </span>
                 </Button>
               </CollapsibleTrigger>
+              
+              <CollapsibleContent className="mt-3 space-y-4 bg-gray-50 p-3 rounded-md">
+                <div>
+                  <Label className="text-sm font-medium mb-2 block">Tilgjengelighet</Label>
+                  <div className="flex flex-wrap gap-4">
+                    <div className="flex items-center gap-2">
+                      <Checkbox id="wheelchair" 
+                        checked={accessibility === "wheelchair"}
+                        onCheckedChange={() => setAccessibility && setAccessibility("wheelchair")}
+                      />
+                      <label htmlFor="wheelchair" className="text-sm">Rullestoltilgang</label>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Checkbox id="hearing-loop" 
+                        checked={accessibility === "hearing-loop"}
+                        onCheckedChange={() => setAccessibility && setAccessibility("hearing-loop")}
+                      />
+                      <label htmlFor="hearing-loop" className="text-sm">Teleslynge</label>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Checkbox id="sign-language" 
+                        checked={accessibility === "sign-language"}
+                        onCheckedChange={() => setAccessibility && setAccessibility("sign-language")}
+                      />
+                      <label htmlFor="sign-language" className="text-sm">Tegnspråktolkning</label>
+                    </div>
+                  </div>
+                </div>
+                
+                <div>
+                  <Label className="text-sm font-medium mb-2 block">Kapasitet: {capacity ? capacity[0] : 0} - {capacity ? capacity[1] : 200}+ personer</Label>
+                  <Slider
+                    defaultValue={[0, 200]}
+                    max={200}
+                    step={10}
+                    value={capacity}
+                    onValueChange={(value) => setCapacity && setCapacity(value)}
+                    className="w-full max-w-md"
+                  />
+                </div>
+              </CollapsibleContent>
             </Collapsible>
           </div>
           
@@ -202,47 +243,6 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
             </Button>
           </div>
         </div>
-        
-        <CollapsibleContent className="mt-3 space-y-4 bg-gray-50 p-3 rounded-md">
-          <div>
-            <Label className="text-sm font-medium mb-2 block">Tilgjengelighet</Label>
-            <div className="flex flex-wrap gap-4">
-              <div className="flex items-center gap-2">
-                <Checkbox id="wheelchair" 
-                  checked={accessibility === "wheelchair"}
-                  onCheckedChange={() => setAccessibility && setAccessibility("wheelchair")}
-                />
-                <label htmlFor="wheelchair" className="text-sm">Rullestoltilgang</label>
-              </div>
-              <div className="flex items-center gap-2">
-                <Checkbox id="hearing-loop" 
-                  checked={accessibility === "hearing-loop"}
-                  onCheckedChange={() => setAccessibility && setAccessibility("hearing-loop")}
-                />
-                <label htmlFor="hearing-loop" className="text-sm">Teleslynge</label>
-              </div>
-              <div className="flex items-center gap-2">
-                <Checkbox id="sign-language" 
-                  checked={accessibility === "sign-language"}
-                  onCheckedChange={() => setAccessibility && setAccessibility("sign-language")}
-                />
-                <label htmlFor="sign-language" className="text-sm">Tegnspråktolkning</label>
-              </div>
-            </div>
-          </div>
-          
-          <div>
-            <Label className="text-sm font-medium mb-2 block">Kapasitet: {capacity ? capacity[0] : 0} - {capacity ? capacity[1] : 200}+ personer</Label>
-            <Slider
-              defaultValue={[0, 200]}
-              max={200}
-              step={10}
-              value={capacity}
-              onValueChange={(value) => setCapacity && setCapacity(value)}
-              className="w-full max-w-md"
-            />
-          </div>
-        </CollapsibleContent>
       </CardContent>
     </Card>
   );
