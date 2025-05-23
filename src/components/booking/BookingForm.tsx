@@ -1,8 +1,9 @@
+
 import React, { useState } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { format } from "date-fns";
+import { format, addDays } from "date-fns";
 import { nb } from "date-fns/locale";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -21,17 +22,25 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  RadioGroup,
+  RadioGroupItem
+} from "@/components/ui/radio-group";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { CalendarDays, Clock, Users, Info, CheckCircle } from "lucide-react";
+import { CalendarDays, Clock, Users, Info, CheckCircle, CalendarRange, Repeat } from "lucide-react";
 import { BookingSummary, BookingData } from "./BookingSummary";
+import { generateRecurrenceRule, getRecurrenceDescription, checkBookingConflict } from "@/utils/bookingConflict";
 
+// Updated booking form schema to include different modes
 const bookingFormSchema = z.object({
+  bookingMode: z.enum(['one-time', 'date-range', 'recurring']),
   date: z.date({
     required_error: "Velg en dato for reservasjonen.",
   }),
+  endDate: z.date().optional(),
   timeSlot: z.string({
     required_error: "Velg et tidsintervall.",
   }),
@@ -57,6 +66,12 @@ const bookingFormSchema = z.object({
     message: "Telefonnummeret kan bare inneholde tall, '+' og mellomrom.",
   }),
   organization: z.string().optional(),
+  
+  // Recurring booking fields
+  recurrenceFrequency: z.enum(['daily', 'weekly', 'monthly']).optional(),
+  recurrenceInterval: z.coerce.number().min(1).max(30).optional(),
+  recurrenceCount: z.coerce.number().min(1).max(100).optional(),
+  recurrenceEndDate: z.date().optional(),
 });
 
 type BookingFormValues = z.infer<typeof bookingFormSchema>;
@@ -80,12 +95,14 @@ export function BookingForm({
   onCompleteBooking,
 }: BookingFormProps) {
   const [currentStep, setCurrentStep] = useState<'details' | 'contact' | 'confirm'>('details');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
   // Initialize form with default values
   const form = useForm<BookingFormValues>({
     resolver: zodResolver(bookingFormSchema),
     defaultValues: {
+      bookingMode: 'one-time',
       date: new Date(),
       timeSlot: "",
       purpose: "",
@@ -94,11 +111,17 @@ export function BookingForm({
       contactEmail: "",
       contactPhone: "",
       organization: "",
+      recurrenceFrequency: 'weekly',
+      recurrenceInterval: 1,
     },
   });
 
   // Get current selected date from form
   const selectedDate = form.watch("date");
+  const bookingMode = form.watch("bookingMode");
+  const recurrenceFrequency = form.watch("recurrenceFrequency");
+  const recurrenceInterval = form.watch("recurrenceInterval");
+  const recurrenceEndDate = form.watch("recurrenceEndDate");
   
   // Get available time slots for the selected date
   const availableSlotsForDate = availableTimeSlots.find(
@@ -106,23 +129,94 @@ export function BookingForm({
       dateSlots.date.toDateString() === selectedDate.toDateString()
   )?.slots || [];
 
-  const onSubmit = (data: BookingFormValues) => {
-    // In a real app, this would send the data to a backend API
-    console.log("Booking data:", data);
+  const onSubmit = async (data: BookingFormValues) => {
+    setIsSubmitting(true);
     
-    toast({
-      title: "Reservasjon sendt",
-      description: `Din reservasjon av ${facilityName} ${format(data.date, "EEEE d. MMMM", { locale: nb })} kl. ${data.timeSlot} er mottatt.`,
-      duration: 5000,
-    });
-    
-    onCompleteBooking();
+    try {
+      let recurrenceRule;
+      
+      // Generate recurrence rule for recurring bookings
+      if (data.bookingMode === 'recurring' && data.recurrenceFrequency) {
+        recurrenceRule = generateRecurrenceRule(
+          data.recurrenceFrequency,
+          data.recurrenceInterval || 1,
+          data.recurrenceCount,
+          data.recurrenceEndDate
+        );
+      }
+      
+      // Check for booking conflicts
+      // Note: In a real app, you'd fetch existing bookings from your database
+      const mockExistingBookings = []; // This would come from your API
+      
+      const conflictCheck = await checkBookingConflict(
+        facilityId,
+        data.date,
+        data.timeSlot,
+        data.bookingMode,
+        data.bookingMode === 'one-time' ? undefined : (data.endDate || data.recurrenceEndDate),
+        recurrenceRule,
+        mockExistingBookings
+      );
+      
+      if (conflictCheck.hasConflict) {
+        toast({
+          title: "Konflikt med eksisterende reservasjon",
+          description: "Den valgte tiden overlapper med en eksisterende reservasjon. Vennligst velg en annen tid.",
+          variant: "destructive",
+          duration: 5000,
+        });
+        setIsSubmitting(false);
+        return;
+      }
+      
+      // In a real app, this would send the data to a backend API
+      console.log("Booking data:", {
+        ...data,
+        recurrenceRule,
+        facilityId
+      });
+      
+      toast({
+        title: "Reservasjon sendt",
+        description: `Din reservasjon av ${facilityName} ${format(data.date, "EEEE d. MMMM", { locale: nb })} kl. ${data.timeSlot} er mottatt.`,
+        duration: 5000,
+      });
+      
+      onCompleteBooking();
+    } catch (error) {
+      console.error("Error submitting booking:", error);
+      toast({
+        title: "Feil",
+        description: "Det oppstod en feil under innsending av reservasjonen. Vennligst prøv igjen.",
+        variant: "destructive",
+        duration: 5000,
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const goToNextStep = async () => {
     if (currentStep === 'details') {
       // Validate only the details fields
-      const detailsResult = await form.trigger(['date', 'timeSlot', 'purpose', 'attendees']);
+      const detailsFields = ['bookingMode', 'date', 'timeSlot', 'purpose', 'attendees'];
+      
+      // Add conditional fields based on booking mode
+      if (bookingMode === 'date-range') {
+        detailsFields.push('endDate');
+      } else if (bookingMode === 'recurring') {
+        detailsFields.push('recurrenceFrequency', 'recurrenceInterval');
+        
+        // Either end date or count must be provided
+        if (form.getValues('recurrenceEndDate')) {
+          detailsFields.push('recurrenceEndDate');
+        } else {
+          detailsFields.push('recurrenceCount');
+        }
+      }
+      
+      const detailsResult = await form.trigger(detailsFields as any);
       if (detailsResult) setCurrentStep('contact');
     } else if (currentStep === 'contact') {
       // Validate only the contact fields
@@ -141,7 +235,18 @@ export function BookingForm({
   // Now we ensure we're passing a complete BookingData object with all required properties
   const getBookingDataForSummary = (): BookingData => {
     const values = form.getValues();
+    
+    // Construct a recurrence description based on frequency and interval
+    let recurrenceDescription = '';
+    if (values.bookingMode === 'recurring' && values.recurrenceFrequency) {
+      recurrenceDescription = getRecurrenceDescription(
+        values.recurrenceFrequency,
+        values.recurrenceInterval || 1
+      );
+    }
+    
     return {
+      bookingMode: values.bookingMode,
       date: values.date,
       timeSlot: values.timeSlot || "",
       purpose: values.purpose || "",
@@ -149,7 +254,18 @@ export function BookingForm({
       contactName: values.contactName || "",
       contactEmail: values.contactEmail || "",
       contactPhone: values.contactPhone || "",
-      organization: values.organization
+      organization: values.organization,
+      endDate: values.bookingMode === 'date-range' ? values.endDate : 
+               values.bookingMode === 'recurring' ? values.recurrenceEndDate : 
+               undefined,
+      recurrenceRule: values.bookingMode === 'recurring' && values.recurrenceFrequency ? 
+        generateRecurrenceRule(
+          values.recurrenceFrequency,
+          values.recurrenceInterval || 1,
+          values.recurrenceCount,
+          values.recurrenceEndDate
+        ) : undefined,
+      recurrenceDescription
     };
   };
 
@@ -189,6 +305,57 @@ export function BookingForm({
                 <h3 className="text-lg font-medium">Reservasjonsdetaljer</h3>
               </div>
               
+              {/* Booking Mode Selection */}
+              <FormField
+                control={form.control}
+                name="bookingMode"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Type reservasjon</FormLabel>
+                    <FormControl>
+                      <RadioGroup
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        className="flex flex-col space-y-1 sm:flex-row sm:space-y-0 sm:space-x-4"
+                      >
+                        <FormItem className="flex items-center space-x-2 space-y-0">
+                          <FormControl>
+                            <RadioGroupItem value="one-time" />
+                          </FormControl>
+                          <FormLabel className="font-normal cursor-pointer flex items-center">
+                            <CalendarDays className="h-4 w-4 mr-1 text-blue-600" />
+                            Enkelt dag
+                          </FormLabel>
+                        </FormItem>
+                        <FormItem className="flex items-center space-x-2 space-y-0">
+                          <FormControl>
+                            <RadioGroupItem value="date-range" />
+                          </FormControl>
+                          <FormLabel className="font-normal cursor-pointer flex items-center">
+                            <CalendarRange className="h-4 w-4 mr-1 text-blue-600" />
+                            Datointervall
+                          </FormLabel>
+                        </FormItem>
+                        <FormItem className="flex items-center space-x-2 space-y-0">
+                          <FormControl>
+                            <RadioGroupItem value="recurring" />
+                          </FormControl>
+                          <FormLabel className="font-normal cursor-pointer flex items-center">
+                            <Repeat className="h-4 w-4 mr-1 text-blue-600" />
+                            Gjentakende
+                          </FormLabel>
+                        </FormItem>
+                      </RadioGroup>
+                    </FormControl>
+                    <FormDescription>
+                      {bookingMode === 'one-time' && "Velg en enkelt dag og tidsintervall."}
+                      {bookingMode === 'date-range' && "Reserver for flere påfølgende dager."}
+                      {bookingMode === 'recurring' && "Gjenta reservasjonen på valgt intervall."}
+                    </FormDescription>
+                  </FormItem>
+                )}
+              />
+              
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
                   <FormField
@@ -198,7 +365,7 @@ export function BookingForm({
                       <FormItem className="flex flex-col">
                         <FormLabel className="flex items-center gap-1.5">
                           <CalendarDays className="h-4 w-4 text-blue-600" />
-                          Dato
+                          {bookingMode === 'date-range' ? 'Startdato' : bookingMode === 'recurring' ? 'Første dato' : 'Dato'}
                         </FormLabel>
                         <Calendar
                           mode="single"
@@ -206,19 +373,48 @@ export function BookingForm({
                           onSelect={(date) => date && field.onChange(date)}
                           className="rounded border shadow-sm p-3 pointer-events-auto"
                           disabled={(date) => {
-                            // Disable dates without available slots
-                            return !availableTimeSlots.some(
+                            // Disable dates without available slots and past dates
+                            const isPastDate = date < new Date(new Date().setHours(0, 0, 0, 0));
+                            const hasNoSlots = !availableTimeSlots.some(
                               (dateSlots) => dateSlots.date.toDateString() === date.toDateString()
                             );
+                            return isPastDate || hasNoSlots;
                           }}
                         />
                         <FormMessage />
                       </FormItem>
                     )}
                   />
+                  
+                  {/* End date for date range mode */}
+                  {bookingMode === 'date-range' && (
+                    <FormField
+                      control={form.control}
+                      name="endDate"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-col mt-4">
+                          <FormLabel className="flex items-center gap-1.5">
+                            <CalendarDays className="h-4 w-4 text-blue-600" />
+                            Sluttdato
+                          </FormLabel>
+                          <Calendar
+                            mode="single"
+                            selected={field.value || addDays(selectedDate, 1)}
+                            onSelect={(date) => date && field.onChange(date)}
+                            className="rounded border shadow-sm p-3 pointer-events-auto"
+                            disabled={(date) => {
+                              // Disable dates before selected start date
+                              return date < selectedDate;
+                            }}
+                          />
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
                 </div>
 
-                <div className="flex flex-col justify-between">
+                <div className="flex flex-col space-y-4">
                   <FormField
                     control={form.control}
                     name="timeSlot"
@@ -277,6 +473,107 @@ export function BookingForm({
                       </FormItem>
                     )}
                   />
+                  
+                  {/* Recurring booking options */}
+                  {bookingMode === 'recurring' && (
+                    <>
+                      <FormField
+                        control={form.control}
+                        name="recurrenceFrequency"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Frekvens</FormLabel>
+                            <Select onValueChange={field.onChange} value={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Velg frekvens" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="daily">Daglig</SelectItem>
+                                <SelectItem value="weekly">Ukentlig</SelectItem>
+                                <SelectItem value="monthly">Månedlig</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={form.control}
+                        name="recurrenceInterval"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Intervall</FormLabel>
+                            <FormControl>
+                              <Input 
+                                type="number" 
+                                {...field} 
+                                min={1} 
+                                max={30} 
+                              />
+                            </FormControl>
+                            <FormDescription>
+                              {recurrenceFrequency === 'daily' && 'Antall dager mellom hver forekomst'}
+                              {recurrenceFrequency === 'weekly' && 'Antall uker mellom hver forekomst'}
+                              {recurrenceFrequency === 'monthly' && 'Antall måneder mellom hver forekomst'}
+                            </FormDescription>
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <div className="grid grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="recurrenceCount"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Antall ganger</FormLabel>
+                              <FormControl>
+                                <Input 
+                                  type="number" 
+                                  {...field} 
+                                  min={1} 
+                                  max={100}
+                                  disabled={!!recurrenceEndDate}
+                                  placeholder="F.eks. 10"
+                                />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <FormField
+                          control={form.control}
+                          name="recurrenceEndDate"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Sluttdato</FormLabel>
+                              <FormControl>
+                                <input 
+                                  type="date" 
+                                  className="w-full px-3 py-2 border rounded-md"
+                                  value={field.value ? format(field.value, 'yyyy-MM-dd') : ''}
+                                  onChange={(e) => {
+                                    const date = e.target.value ? new Date(e.target.value) : undefined;
+                                    field.onChange(date);
+                                    // Clear count if end date is set
+                                    if (date) {
+                                      form.setValue('recurrenceCount', undefined);
+                                    }
+                                  }}
+                                  min={format(addDays(selectedDate, 1), 'yyyy-MM-dd')}
+                                />
+                              </FormControl>
+                              <FormDescription>
+                                Velg enten antall ganger eller sluttdato
+                              </FormDescription>
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
 
@@ -397,7 +694,7 @@ export function BookingForm({
 
           <div className="flex justify-between pt-6 border-t border-gray-200">
             {currentStep !== 'details' ? (
-              <Button type="button" variant="outline" onClick={goToPreviousStep}>
+              <Button type="button" variant="outline" onClick={goToPreviousStep} disabled={isSubmitting}>
                 Tilbake
               </Button>
             ) : (
@@ -408,8 +705,9 @@ export function BookingForm({
               type="button" 
               onClick={goToNextStep}
               className="bg-blue-600 hover:bg-blue-700"
+              disabled={isSubmitting}
             >
-              {currentStep === 'confirm' ? 'Send inn reservasjon' : 'Neste'}
+              {isSubmitting ? 'Sender...' : currentStep === 'confirm' ? 'Send inn reservasjon' : 'Neste'}
             </Button>
           </div>
         </form>
