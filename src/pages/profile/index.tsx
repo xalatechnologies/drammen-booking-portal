@@ -3,8 +3,37 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import GlobalHeader from "@/components/GlobalHeader";
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
+import { Calendar, Clock, MapPin } from "lucide-react";
+import { format } from "date-fns";
+import { nb } from "date-fns/locale";
 
 const ProfilePage: React.FC = () => {
+  // Mock data for available bookings
+  const availableBookings = [
+    {
+      id: 1,
+      facilityName: "Gymsal - Brandengen skole",
+      location: "Brandengen skole, Knoffs gate 8, Drammen",
+      date: new Date(2025, 4, 25, 14, 0),
+      endDate: new Date(2025, 4, 25, 16, 0),
+    },
+    {
+      id: 2,
+      facilityName: "Møterom 3 - Rådhuset",
+      location: "Rådhuset, Engene 1, Drammen",
+      date: new Date(2025, 4, 26, 10, 0),
+      endDate: new Date(2025, 4, 26, 12, 0),
+    },
+    {
+      id: 3,
+      facilityName: "Auditorium - Papirbredden",
+      location: "Papirbredden, Grønland 58, Drammen",
+      date: new Date(2025, 5, 3, 18, 0),
+      endDate: new Date(2025, 5, 3, 21, 0),
+    },
+  ];
+
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <GlobalHeader />
@@ -33,12 +62,54 @@ const ProfilePage: React.FC = () => {
           <div className="md:col-span-8">
             <Card>
               <CardHeader>
-                <CardTitle>Aktive bookinger</CardTitle>
+                <CardTitle>Ledige lokaler</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground">
-                  Du har ingen aktive bookinger for øyeblikket.
-                </p>
+                {availableBookings.length > 0 ? (
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Lokale</TableHead>
+                          <TableHead>Dato</TableHead>
+                          <TableHead>Tid</TableHead>
+                          <TableHead>Sted</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {availableBookings.map((booking) => (
+                          <TableRow key={booking.id}>
+                            <TableCell className="font-medium">{booking.facilityName}</TableCell>
+                            <TableCell>
+                              <div className="flex items-center gap-1">
+                                <Calendar className="h-4 w-4 text-blue-500" />
+                                <span>{format(booking.date, "d. MMM yyyy", {locale: nb})}</span>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex items-center gap-1">
+                                <Clock className="h-4 w-4 text-blue-500" />
+                                <span>{format(booking.date, "HH:mm")} - {format(booking.endDate, "HH:mm")}</span>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex items-center gap-1">
+                                <MapPin className="h-4 w-4 text-blue-500" />
+                                <span className="truncate max-w-[200px]" title={booking.location}>
+                                  {booking.location}
+                                </span>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                ) : (
+                  <p className="text-muted-foreground">
+                    Det er ingen ledige lokaler for øyeblikket.
+                  </p>
+                )}
               </CardContent>
             </Card>
           </div>
