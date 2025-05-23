@@ -9,14 +9,15 @@ import { format } from "date-fns";
 import { nb } from "date-fns/locale";
 
 const ProfilePage: React.FC = () => {
-  // Mock data for available bookings
-  const availableBookings = [
+  // Mock data for confirmed bookings
+  const confirmedBookings = [
     {
       id: 1,
       facilityName: "Gymsal - Brandengen skole",
       location: "Brandengen skole, Knoffs gate 8, Drammen",
       date: new Date(2025, 4, 25, 14, 0),
       endDate: new Date(2025, 4, 25, 16, 0),
+      status: "Bekreftet"
     },
     {
       id: 2,
@@ -24,6 +25,7 @@ const ProfilePage: React.FC = () => {
       location: "Rådhuset, Engene 1, Drammen",
       date: new Date(2025, 4, 26, 10, 0),
       endDate: new Date(2025, 4, 26, 12, 0),
+      status: "Bekreftet"
     },
     {
       id: 3,
@@ -31,6 +33,7 @@ const ProfilePage: React.FC = () => {
       location: "Papirbredden, Grønland 58, Drammen",
       date: new Date(2025, 5, 3, 18, 0),
       endDate: new Date(2025, 5, 3, 21, 0),
+      status: "Bekreftet"
     },
   ];
 
@@ -62,10 +65,10 @@ const ProfilePage: React.FC = () => {
           <div className="md:col-span-8">
             <Card>
               <CardHeader>
-                <CardTitle>Ledige lokaler</CardTitle>
+                <CardTitle>Mine bookinger</CardTitle>
               </CardHeader>
               <CardContent>
-                {availableBookings.length > 0 ? (
+                {confirmedBookings.length > 0 ? (
                   <div className="overflow-x-auto">
                     <Table>
                       <TableHeader>
@@ -74,10 +77,11 @@ const ProfilePage: React.FC = () => {
                           <TableHead>Dato</TableHead>
                           <TableHead>Tid</TableHead>
                           <TableHead>Sted</TableHead>
+                          <TableHead>Status</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {availableBookings.map((booking) => (
+                        {confirmedBookings.map((booking) => (
                           <TableRow key={booking.id}>
                             <TableCell className="font-medium">{booking.facilityName}</TableCell>
                             <TableCell>
@@ -100,6 +104,11 @@ const ProfilePage: React.FC = () => {
                                 </span>
                               </div>
                             </TableCell>
+                            <TableCell>
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                {booking.status}
+                              </span>
+                            </TableCell>
                           </TableRow>
                         ))}
                       </TableBody>
@@ -107,7 +116,7 @@ const ProfilePage: React.FC = () => {
                   </div>
                 ) : (
                   <p className="text-muted-foreground">
-                    Det er ingen ledige lokaler for øyeblikket.
+                    Du har ingen bookinger for øyeblikket.
                   </p>
                 )}
               </CardContent>
