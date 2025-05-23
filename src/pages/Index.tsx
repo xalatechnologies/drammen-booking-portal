@@ -35,6 +35,7 @@ const Index = () => {
         {viewMode === "grid" && <PaginationControls />}
       </div>
 
+      <div>Hello Amin</div>
       <GlobalFooter />
     </div>
   );
