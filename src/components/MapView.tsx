@@ -6,42 +6,42 @@ import { MapPin } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 
-// Mock data for facility locations with correct addresses
+// Mock data for facility locations with correct addresses and coordinates
 const facilityLocations = [
   {
     id: 1,
     name: "Brandengen Skole - Gymsal",
     address: "Iver Holters gate 48, 3041 Drammen",
-    lat: 59.7439,
-    lng: 10.2045
+    lat: 59.7461,
+    lng: 10.2089
   },
   {
     id: 4,
     name: "Fjell Skole - Aktivitetshall", 
     address: "Lauritz Hervigs vei 20, 3035 Drammen",
-    lat: 59.7338,
-    lng: 10.1846
+    lat: 59.7312,
+    lng: 10.1823
   },
   {
     id: 5,
     name: "Gulskogen Skole - Auditorium",
     address: "Vintergata 8, 3048 Drammen", 
-    lat: 59.7502,
-    lng: 10.1741
+    lat: 59.7524,
+    lng: 10.1756
   },
   {
     id: 6,
     name: "Marienlyst Stadion - Møtesal",
     address: "Schwartz gate 2, 3043 Drammen",
-    lat: 59.7365,
-    lng: 10.2103
+    lat: 59.7389,
+    lng: 10.2134
   },
   {
     id: 7,
     name: "Drammensbadet - Svømmehall",
     address: "Danvikgata 40, 3045 Drammen",
-    lat: 59.7554,
-    lng: 10.1812
+    lat: 59.7578,
+    lng: 10.1834
   },
   {
     id: 8,
