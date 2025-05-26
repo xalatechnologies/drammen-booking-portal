@@ -64,6 +64,14 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location }) => {
   const [mapToken, setMapToken] = useState<string>("");
   const [tokenInput, setTokenInput] = useState<string>("");
 
+  // Load saved token from localStorage on component mount
+  useEffect(() => {
+    const savedToken = localStorage.getItem('mapbox-token');
+    if (savedToken) {
+      setMapToken(savedToken);
+    }
+  }, []);
+
   // Filter facilities based on selected filters
   const filteredFacilities = facilityLocations.filter(facility => {
     const matchesType = !facilityType || facilityType === "";
@@ -121,7 +129,20 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location }) => {
 
   const handleTokenSubmit = () => {
     if (tokenInput.trim()) {
-      setMapToken(tokenInput.trim());
+      const token = tokenInput.trim();
+      setMapToken(token);
+      // Save token to localStorage for future use
+      localStorage.setItem('mapbox-token', token);
+    }
+  };
+
+  const handleClearToken = () => {
+    setMapToken("");
+    setTokenInput("");
+    localStorage.removeItem('mapbox-token');
+    if (mapRef.current) {
+      mapRef.current.remove();
+      mapRef.current = null;
     }
   };
 
@@ -178,7 +199,17 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location }) => {
           ) : (
             <>
               <div className="absolute top-4 right-4 z-10 bg-white/95 backdrop-blur-sm border border-gray-200 rounded-lg p-3 shadow-md max-w-xs">
-                <p className="text-sm font-medium mb-2">Viser {filteredFacilities.length} fasiliteter</p>
+                <div className="flex justify-between items-center mb-2">
+                  <p className="text-sm font-medium">Viser {filteredFacilities.length} fasiliteter</p>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={handleClearToken}
+                    className="h-6 px-2 text-xs"
+                  >
+                    Reset Token
+                  </Button>
+                </div>
                 <div className="space-y-1 max-h-32 overflow-y-auto">
                   {filteredFacilities.map(facility => (
                     <div key={facility.id} className="text-xs flex items-start gap-1.5">
