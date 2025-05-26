@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import FacilityDetail from "./pages/facilities/[id]";
@@ -28,6 +28,11 @@ const App = () => (
           <Route path="/bookings" element={<BookingsPage />} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          
+          {/* Redirect standalone routes to admin equivalents */}
+          <Route path="/users" element={<Navigate to="/admin/users" replace />} />
+          <Route path="/facilities" element={<Navigate to="/admin/facilities" replace />} />
+          <Route path="/notifications" element={<Navigate to="/admin/notifications" replace />} />
           
           {/* Setting up admin routes correctly with nested paths */}
           <Route path="/admin/*" element={<AdminDashboard />} />
