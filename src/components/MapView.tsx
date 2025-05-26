@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -12,43 +13,43 @@ const facilityLocations = [
     id: 1,
     name: "Brandengen Skole - Gymsal",
     address: "Iver Holters gate 48, 3041 Drammen",
-    lat: 59.7461,
-    lng: 10.2089
+    lat: 59.7456,
+    lng: 10.2067
   },
   {
     id: 4,
     name: "Fjell Skole - Aktivitetshall", 
     address: "Lauritz Hervigs vei 20, 3035 Drammen",
-    lat: 59.7312,
-    lng: 10.1823
+    lat: 59.7295,
+    lng: 10.1845
   },
   {
     id: 5,
     name: "Gulskogen Skole - Auditorium",
     address: "Vintergata 8, 3048 Drammen", 
-    lat: 59.7524,
-    lng: 10.1756
+    lat: 59.7518,
+    lng: 10.1734
   },
   {
     id: 6,
     name: "Marienlyst Stadion - Møtesal",
     address: "Schwartz gate 2, 3043 Drammen",
-    lat: 59.7389,
-    lng: 10.2134
+    lat: 59.7398,
+    lng: 10.2156
   },
   {
     id: 7,
     name: "Drammensbadet - Svømmehall",
     address: "Danvikgata 40, 3045 Drammen",
-    lat: 59.7578,
-    lng: 10.1834
+    lat: 59.7589,
+    lng: 10.1823
   },
   {
     id: 8,
     name: "Åssiden Fotballhall",
     address: "Buskerudveien 54, 3024 Drammen",
-    lat: 59.7624,
-    lng: 10.1425
+    lat: 59.7631,
+    lng: 10.1402
   },
 ];
 
