@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -253,7 +252,8 @@ const FacilityGrid: React.FC<FacilityGridProps> = ({
           {facilitiesToDisplay.map(facility => (
             <Card 
               key={facility.id} 
-              className="overflow-hidden hover:shadow-lg transition-all duration-200 hover:translate-y-[-2px] group border border-gray-200 flex flex-col"
+              className="overflow-hidden hover:shadow-lg transition-all duration-200 hover:translate-y-[-2px] group border border-gray-200 flex flex-col cursor-pointer"
+              onClick={() => navigate(`/facilities/${facility.id}`)}
             >
               <div className="h-52 bg-gray-200 relative overflow-hidden">
                 <img 
@@ -322,14 +322,10 @@ const FacilityGrid: React.FC<FacilityGridProps> = ({
                     <span>Neste: {facility.nextAvailable}</span>
                   </div>
                   
-                  <Button 
-                    onClick={() => navigate(`/facilities/${facility.id}`)}
-                    className="bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 shadow-sm"
-                    size="sm"
-                  >
-                    <Info className="h-3.5 w-3.5 mr-1.5" />
-                    Detaljer
-                  </Button>
+                  <div className="text-sm flex items-center gap-1.5 text-gray-600">
+                    <Info className="h-3.5 w-3.5" />
+                    <span>Klikk for detaljer</span>
+                  </div>
                 </div>
               </CardContent>
             </Card>
