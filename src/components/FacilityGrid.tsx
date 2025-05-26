@@ -212,6 +212,13 @@ const FacilityGrid: React.FC<FacilityGridProps> = ({
   // Show all facilities if there are no active filters
   const facilitiesToDisplay = filteredFacilities;
   
+  // Function to handle address click
+  const handleAddressClick = (e: React.MouseEvent, address: string) => {
+    e.stopPropagation(); // Prevent card click from triggering
+    const encodedAddress = encodeURIComponent(address);
+    window.open(`https://www.google.com/maps/search/?api=1&query=${encodedAddress}`, '_blank');
+  };
+  
   // Function to render accessibility badges with proper styling
   const renderAccessibilityBadges = (accessibilityFeatures: string[]) => {
     const badges = {
@@ -279,7 +286,13 @@ const FacilityGrid: React.FC<FacilityGridProps> = ({
                   <h3 className="font-bold text-lg mb-1 text-gray-900">{facility.name}</h3>
                   <div className="flex items-start gap-1.5 text-sm text-gray-600">
                     <MapPin className="h-4 w-4 text-gray-500 shrink-0 mt-0.5" />
-                    <span className="line-clamp-1">{facility.address}</span>
+                    <span 
+                      className="line-clamp-1 hover:text-blue-600 hover:underline cursor-pointer transition-colors"
+                      onClick={(e) => handleAddressClick(e, facility.address)}
+                      title="Klikk for å åpne i kart"
+                    >
+                      {facility.address}
+                    </span>
                   </div>
                   
                   <div className="mt-1 flex items-center gap-1.5 text-sm text-gray-600">
