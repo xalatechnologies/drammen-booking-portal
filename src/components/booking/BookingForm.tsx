@@ -4,7 +4,6 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "@/components/ui/form";
-import { Button } from "@/components/ui/button";
 import { BookingDetailsStep } from "./steps/BookingDetailsStep";
 import { BookingContactStep } from "./steps/BookingContactStep";
 import { BookingConfirmStep } from "./steps/BookingConfirmStep";
@@ -13,7 +12,6 @@ import { BookingFormNav } from "./BookingFormNav";
 import { toast } from "sonner";
 import type { BookingFormValues } from "./types";
 import { generateRecurrenceRule, getRecurrenceDescription } from "@/utils/bookingConflict";
-import { addDays, format } from "date-fns";
 
 interface BookingFormProps {
   facilityId: string;
@@ -76,6 +74,7 @@ const bookingFormSchema = z.object({
 const defaultValues: Partial<BookingFormValues> = {
   attendees: 1,
   bookingMode: "one-time",
+  date: new Date(),
 };
 
 async function createBooking(data: BookingFormValues) {
@@ -140,7 +139,7 @@ export function BookingForm({
     try {
       const result = await createBooking(bookingData);
       
-      if (result && 'success' in result && result.success) {
+      if (result && typeof result === 'object' && 'success' in result && result.success) {
         toast.success("Reservasjonen er sendt!");
         onCompleteBooking();
       } else {
@@ -159,7 +158,6 @@ export function BookingForm({
         return (
           <BookingDetailsStep 
             form={form}
-            facilityName={facilityName}
             maxCapacity={maxCapacity}
             availableTimeSlots={availableTimeSlots}
           />

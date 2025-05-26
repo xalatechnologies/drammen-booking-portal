@@ -62,21 +62,22 @@ interface BookingDetailsStepProps {
 
 export function BookingDetailsStep({ form, availableTimeSlots, maxCapacity }: BookingDetailsStepProps) {
   // Get current selected date from form
-  const selectedDate = form.watch("date");
+  const selectedDate = form.watch("date") || new Date();
   const bookingMode = form.watch("bookingMode");
-  const recurrenceFrequency = form.watch("recurrenceFrequency");
-  const recurrenceInterval = form.watch("recurrenceInterval");
-  const recurrenceEndDate = form.watch("recurrenceEndDate");
-  const recurrenceCount = form.watch("recurrenceCount");
+  const recurrenceData = form.watch("recurrence");
+  const recurrenceFrequency = recurrenceData?.frequency;
+  const recurrenceInterval = recurrenceData?.interval;
+  const recurrenceCount = recurrenceData?.count;
+  const recurrenceUntil = recurrenceData?.until;
   
   // Get available time slots for the selected date
   const availableSlotsForDate = availableTimeSlots.find(
     (dateSlots) => 
-      dateSlots.date.toDateString() === selectedDate.toDateString()
+      dateSlots.date && selectedDate && dateSlots.date.toDateString() === selectedDate.toDateString()
   )?.slots || [];
 
   // Calculate default end date suggestion (1 week from start)
-  const suggestedEndDate = addDays(selectedDate, 7);
+  const suggestedEndDate = selectedDate ? addDays(selectedDate, 7) : addDays(new Date(), 7);
 
   const getBookingModeDescription = (mode: 'one-time' | 'date-range' | 'recurring') => {
     switch (mode) {
@@ -191,7 +192,7 @@ export function BookingDetailsStep({ form, availableTimeSlots, maxCapacity }: Bo
                         variant="outline"
                         className="w-full pl-3 text-left font-normal flex justify-between items-center h-10"
                       >
-                        {format(field.value, "EEEE d. MMMM yyyy", { locale: nb })}
+                        {field.value ? format(field.value, "EEEE d. MMMM yyyy", { locale: nb }) : "Velg dato"}
                         <CalendarDays className="h-4 w-4 opacity-50" />
                       </Button>
                     </FormControl>
@@ -206,7 +207,7 @@ export function BookingDetailsStep({ form, availableTimeSlots, maxCapacity }: Bo
                         // Disable dates without available slots and past dates
                         const isPastDate = date < new Date(new Date().setHours(0, 0, 0, 0));
                         const hasNoSlots = !availableTimeSlots.some(
-                          (dateSlots) => dateSlots.date.toDateString() === date.toDateString()
+                          (dateSlots) => dateSlots.date && dateSlots.date.toDateString() === date.toDateString()
                         );
                         return isPastDate || hasNoSlots;
                       }}
@@ -252,7 +253,7 @@ export function BookingDetailsStep({ form, availableTimeSlots, maxCapacity }: Bo
                         onSelect={(date) => date && field.onChange(date)}
                         className="rounded border shadow-sm p-3 pointer-events-auto"
                         disabled={(date) => {
-                          return date < selectedDate;
+                          return selectedDate ? date < selectedDate : false;
                         }}
                         defaultMonth={selectedDate}
                         initialFocus
@@ -326,6 +327,8 @@ export function BookingDetailsStep({ form, availableTimeSlots, maxCapacity }: Bo
                   <Input 
                     type="number" 
                     {...field} 
+                    onChange={(e) => field.onChange(parseInt(e.target.value))}
+                    value={field.value || ''}
                     min={1} 
                     max={maxCapacity} 
                     className="h-10"
@@ -357,7 +360,7 @@ export function BookingDetailsStep({ form, availableTimeSlots, maxCapacity }: Bo
               form={form}
               recurrenceFrequency={recurrenceFrequency}
               recurrenceInterval={recurrenceInterval}
-              recurrenceEndDate={recurrenceEndDate}
+              recurrenceUntil={recurrenceUntil}
               recurrenceCount={recurrenceCount}
               selectedDate={selectedDate}
             />
@@ -396,7 +399,7 @@ interface RecurringBookingOptionsProps {
   form: UseFormReturn<BookingFormValues>;
   recurrenceFrequency?: 'daily' | 'weekly' | 'monthly';
   recurrenceInterval?: number;
-  recurrenceEndDate?: Date;
+  recurrenceUntil?: Date;
   recurrenceCount?: number;
   selectedDate: Date;
 }
@@ -405,7 +408,7 @@ function RecurringBookingOptions({
   form, 
   recurrenceFrequency,
   recurrenceInterval,
-  recurrenceEndDate,
+  recurrenceUntil,
   recurrenceCount,
   selectedDate
 }: RecurringBookingOptionsProps) {
@@ -420,7 +423,7 @@ function RecurringBookingOptions({
         <div className="grid grid-cols-2 gap-4">
           <FormField
             control={form.control}
-            name="recurrenceFrequency"
+            name="recurrence.frequency"
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-sm">Frekvens</FormLabel>
@@ -442,7 +445,7 @@ function RecurringBookingOptions({
           
           <FormField
             control={form.control}
-            name="recurrenceInterval"
+            name="recurrence.interval"
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-sm">Intervall</FormLabel>
@@ -450,6 +453,8 @@ function RecurringBookingOptions({
                   <Input 
                     type="number" 
                     {...field} 
+                    onChange={(e) => field.onChange(parseInt(e.target.value))}
+                    value={field.value || ''}
                     min={1} 
                     max={30}
                     className="h-9"
@@ -471,7 +476,7 @@ function RecurringBookingOptions({
           <div className="grid grid-cols-2 gap-4">
             <FormField
               control={form.control}
-              name="recurrenceCount"
+              name="recurrence.count"
               render={({ field }) => (
                 <FormItem>
                   <div className="flex items-center gap-2">
@@ -480,9 +485,11 @@ function RecurringBookingOptions({
                       <Input 
                         type="number" 
                         {...field} 
+                        onChange={(e) => field.onChange(parseInt(e.target.value))}
+                        value={field.value || ''}
                         min={1} 
                         max={100}
-                        disabled={!!recurrenceEndDate}
+                        disabled={!!recurrenceUntil}
                         placeholder="10"
                         className="h-9"
                       />
@@ -496,7 +503,7 @@ function RecurringBookingOptions({
             
             <FormField
               control={form.control}
-              name="recurrenceEndDate"
+              name="recurrence.until"
               render={({ field }) => (
                 <FormItem>
                   <div className="flex items-center gap-2">
@@ -511,7 +518,7 @@ function RecurringBookingOptions({
                               if (!field.value) {
                                 // Default to 3 months in the future if not set
                                 field.onChange(addMonths(new Date(), 3));
-                                form.setValue('recurrenceCount', undefined);
+                                form.setValue('recurrence.count', undefined);
                               }
                             }}
                           >
@@ -529,7 +536,7 @@ function RecurringBookingOptions({
                           onSelect={(date) => {
                             field.onChange(date);
                             if (date) {
-                              form.setValue('recurrenceCount', undefined);
+                              form.setValue('recurrence.count', undefined);
                             }
                           }}
                           disabled={(date) => date <= selectedDate}
@@ -567,8 +574,8 @@ function RecurringBookingOptions({
               recurrenceFrequency,
               recurrenceInterval
             )}
-            {recurrenceEndDate && (
-              <span> til {format(recurrenceEndDate, "d. MMMM yyyy", { locale: nb })}</span>
+            {recurrenceUntil && (
+              <span> til {format(recurrenceUntil, "d. MMMM yyyy", { locale: nb })}</span>
             )}
             {recurrenceCount && (
               <span> for {recurrenceCount} ganger</span>
