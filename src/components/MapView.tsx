@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -7,40 +6,40 @@ import { MapPin } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 
-// Mock data for facility locations - in a real app, this would come from your API
+// Mock data for facility locations with correct addresses
 const facilityLocations = [
   {
     id: 1,
     name: "Brandengen Skole - Gymsal",
-    address: "Knoffs gate 8, 3044 Drammen",
+    address: "Iver Holters gate 48, 3041 Drammen",
     lat: 59.7439,
     lng: 10.2045
   },
   {
     id: 4,
     name: "Fjell Skole - Aktivitetshall", 
-    address: "Lauritz Grønlands vei 40, 3035 Drammen",
+    address: "Lauritz Hervigs vei 20, 3035 Drammen",
     lat: 59.7338,
     lng: 10.1846
   },
   {
     id: 5,
     name: "Gulskogen Skole - Auditorium",
-    address: "Smithestrømsveien 13, 3048 Drammen", 
+    address: "Vintergata 8, 3048 Drammen", 
     lat: 59.7502,
     lng: 10.1741
   },
   {
     id: 6,
     name: "Marienlyst Stadion - Møtesal",
-    address: "Marienlyst 14, 3045 Drammen",
+    address: "Schwartz gate 2, 3043 Drammen",
     lat: 59.7365,
     lng: 10.2103
   },
   {
     id: 7,
     name: "Drammensbadet - Svømmehall",
-    address: "Ormåsen 1, 3048 Drammen",
+    address: "Danvikgata 40, 3045 Drammen",
     lat: 59.7554,
     lng: 10.1812
   },

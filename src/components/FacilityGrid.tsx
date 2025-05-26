@@ -48,12 +48,12 @@ const FacilityGrid: React.FC<FacilityGridProps> = ({
 }) => {
   const navigate = useNavigate();
   
-  // Mock data with real Drammen addresses and facilities - all 6 cards
+  // Mock data with correct Drammen addresses and facilities - all 6 cards
   const facilities: Facility[] = [
     {
       id: 1,
       name: "Brandengen Skole - Gymsal",
-      address: "Knoffs gate 8, 3044 Drammen",
+      address: "Iver Holters gate 48, 3041 Drammen",
       type: "Gymsal",
       image: "/lovable-uploads/13aee1f6-e9d9-474b-9ed7-c656d703d19b.png",
       nextAvailable: "I dag, 18:00",
@@ -73,7 +73,7 @@ const FacilityGrid: React.FC<FacilityGridProps> = ({
     {
       id: 4,
       name: "Fjell Skole - Aktivitetshall",
-      address: "Lauritz Grønlands vei 40, 3035 Drammen",
+      address: "Lauritz Hervigs vei 20, 3035 Drammen",
       type: "Aktivitetshall",
       image: "/lovable-uploads/b12bcda3-d611-4e9e-bbcc-d53d2db38af9.png",
       nextAvailable: "Fredag, 17:00",
@@ -92,7 +92,7 @@ const FacilityGrid: React.FC<FacilityGridProps> = ({
     {
       id: 5,
       name: "Gulskogen Skole - Auditorium",
-      address: "Smithestrømsveien 13, 3048 Drammen",
+      address: "Vintergata 8, 3048 Drammen",
       type: "Auditorium",
       image: "/lovable-uploads/b692664c-737a-4a20-8673-25a401789f82.png",
       nextAvailable: "Torsdag, 19:00",
@@ -110,7 +110,7 @@ const FacilityGrid: React.FC<FacilityGridProps> = ({
     {
       id: 6,
       name: "Marienlyst Stadion - Møtesal",
-      address: "Marienlyst 14, 3045 Drammen",
+      address: "Schwartz gate 2, 3043 Drammen",
       type: "Møtesal",
       image: "/lovable-uploads/07eaca70-1e9b-4e73-ab4e-6b9b7f1ca27e.png",
       nextAvailable: "Lørdag, 10:00",
@@ -129,7 +129,7 @@ const FacilityGrid: React.FC<FacilityGridProps> = ({
     {
       id: 7,
       name: "Drammensbadet - Svømmehall",
-      address: "Ormåsen 1, 3048 Drammen",
+      address: "Danvikgata 40, 3045 Drammen",
       type: "Svømmehall",
       image: "/lovable-uploads/740258a0-d4f7-49b6-a8a6-9c994e75baae.png",
       nextAvailable: "Søndag, 12:00",
