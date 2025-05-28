@@ -95,7 +95,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Main filters grid - including search, date, facility type, location, view mode, and controls */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 items-end">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
             {/* Search bar */}
             <div className="lg:col-span-1">
               <label className="block text-sm font-medium mb-2">Søk</label>
@@ -185,53 +185,56 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
               </Select>
             </div>
 
-            {/* View mode */}
-            <div className="lg:col-span-1">
-              <label className="block text-sm font-medium mb-2">Visning</label>
-              <div className="flex rounded-md border">
-                <Button
-                  variant={viewMode === "grid" ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => setViewMode("grid")}
-                  className="flex-1 rounded-r-none"
-                >
-                  <Grid3X3 className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant={viewMode === "map" ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => setViewMode("map")}
-                  className="flex-1 rounded-none border-x"
-                >
-                  <Map className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant={viewMode === "calendar" ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => setViewMode("calendar")}
-                  className="flex-1 rounded-l-none"
-                >
-                  <CalendarView className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
+            {/* View mode and Filter controls - combined in one column */}
+            <div className="lg:col-span-1 flex flex-col gap-2">
+              <label className="block text-sm font-medium">Visning og filtre</label>
+              <div className="flex gap-1">
+                {/* View mode */}
+                <div className="flex rounded-md border flex-1">
+                  <Button
+                    variant={viewMode === "grid" ? "default" : "ghost"}
+                    size="sm"
+                    onClick={() => setViewMode("grid")}
+                    className="flex-1 rounded-r-none"
+                  >
+                    <Grid3X3 className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant={viewMode === "map" ? "default" : "ghost"}
+                    size="sm"
+                    onClick={() => setViewMode("map")}
+                    className="flex-1 rounded-none border-x"
+                  >
+                    <Map className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant={viewMode === "calendar" ? "default" : "ghost"}
+                    size="sm"
+                    onClick={() => setViewMode("calendar")}
+                    className="flex-1 rounded-l-none"
+                  >
+                    <CalendarView className="h-4 w-4" />
+                  </Button>
+                </div>
 
-            {/* Filter controls */}
-            <div className="lg:col-span-1 flex items-end gap-1">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-                className="text-xs px-2 py-1 h-8"
-              >
-                <Filter className="h-3 w-3 mr-1" />
-                {showAdvancedFilters ? "Skjul" : "Mer"}
-              </Button>
-              {hasActiveFilters && (
-                <Button variant="ghost" size="sm" onClick={clearFilters} className="h-8 w-8 p-0">
-                  <X className="h-3 w-3" />
-                </Button>
-              )}
+                {/* Filter controls */}
+                <div className="flex gap-1">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+                    className="text-xs px-2 py-1 h-8"
+                  >
+                    <Filter className="h-3 w-3 mr-1" />
+                    {showAdvancedFilters ? "Skjul" : "Mer"}
+                  </Button>
+                  {hasActiveFilters && (
+                    <Button variant="ghost" size="sm" onClick={clearFilters} className="h-8 w-8 p-0">
+                      <X className="h-3 w-3" />
+                    </Button>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
 
