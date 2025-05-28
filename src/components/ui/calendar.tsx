@@ -60,8 +60,6 @@ function Calendar({
           const unavailableCheck = isDateUnavailable(date);
           const holidayCheck = isNorwegianHoliday(date);
           
-          console.log(`Checking date ${date.toDateString()}: holiday=${holidayCheck.isHoliday}, unavailable=${unavailableCheck.isUnavailable}`);
-          
           let dayClass = "";
           let title = "";
           

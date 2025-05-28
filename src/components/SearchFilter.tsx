@@ -1,16 +1,22 @@
 
-import React from "react";
+import React, { useState } from "react";
+import { DateRange } from "react-day-picker";
+import { format } from "date-fns";
+import { nb } from "date-fns/locale";
+import {
+  CalendarIcon,
+  MapPin,
+  Users,
+  Grid3X3,
+  Map,
+  Calendar as CalendarView,
+  Search,
+  Filter,
+  X,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Calendar } from "@/components/ui/calendar";
-import {
-  Card,
-  CardContent,
-} from "@/components/ui/card";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
@@ -18,22 +24,23 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Slider } from "@/components/ui/slider";
-import { Calendar as CalendarIcon, Map, List, Search, CalendarDays, Filter } from "lucide-react";
-import { format, addDays } from "date-fns";
-import { cn } from "@/lib/utils";
-import MapView from "./MapView";
-import { DateRange } from "react-day-picker";
 import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import { Label } from "@/components/ui/label";
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Slider } from "@/components/ui/slider";
+import { cn } from "@/lib/utils";
 
 interface SearchFilterProps {
-  date: Date | undefined;
+  date?: Date;
   setDate: (date: Date | undefined) => void;
   facilityType: string;
   setFacilityType: (type: string) => void;
@@ -41,10 +48,10 @@ interface SearchFilterProps {
   setLocation: (location: string) => void;
   viewMode: "grid" | "map" | "calendar";
   setViewMode: (mode: "grid" | "map" | "calendar") => void;
-  accessibility?: string;
-  setAccessibility?: (type: string) => void;
-  capacity?: number[];
-  setCapacity?: (capacity: number[]) => void;
+  accessibility: string;
+  setAccessibility: (accessibility: string) => void;
+  capacity: number[];
+  setCapacity: (capacity: number[]) => void;
 }
 
 const SearchFilter: React.FC<SearchFilterProps> = ({
@@ -61,190 +68,262 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
   capacity,
   setCapacity,
 }) => {
-  const [dateRange, setDateRange] = React.useState<DateRange | undefined>({
-    from: date || new Date(),
-    to: date ? addDays(date, 7) : addDays(new Date(), 7)
-  });
-  
-  const [showAdvancedFilters, setShowAdvancedFilters] = React.useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+  const [dateRange, setDateRange] = useState<DateRange | undefined>();
+
+  const clearFilters = () => {
+    setDate(undefined);
+    setDateRange(undefined);
+    setFacilityType("");
+    setLocation("");
+    setAccessibility("");
+    setCapacity([0, 200]);
+    setSearchTerm("");
+  };
+
+  const hasActiveFilters = date || dateRange || facilityType || location || accessibility || capacity[0] > 0 || capacity[1] < 200 || searchTerm;
 
   return (
-    <Card className="mb-5 overflow-hidden border-none shadow-md bg-white">
-      <CardContent className="p-4">
-        <div className="flex flex-wrap md:flex-nowrap items-center gap-2">
-          <div className="w-full md:w-64 lg:w-auto lg:flex-1">
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={cn(
-                    "w-full justify-start text-left font-normal bg-white border-gray-300 h-10",
-                    !dateRange && "text-muted-foreground"
-                  )}
-                >
-                  <CalendarDays className="mr-2 h-4 w-4" />
-                  {dateRange?.from ? (
-                    dateRange.to ? (
-                      <>
-                        {format(dateRange.from, "dd.MM.yyyy")} - {format(dateRange.to, "dd.MM.yyyy")}
-                      </>
+    <div className="mb-8 space-y-4">
+      <Card>
+        <CardHeader className="pb-4">
+          <CardTitle className="flex items-center justify-between">
+            <span className="flex items-center">
+              <Search className="h-5 w-5 mr-2 text-blue-600" />
+              Søk og filtrer lokaler
+            </span>
+            <div className="flex items-center space-x-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+              >
+                <Filter className="h-4 w-4 mr-1" />
+                {showAdvancedFilters ? "Skjul" : "Vis"} avanserte filtre
+              </Button>
+              {hasActiveFilters && (
+                <Button variant="ghost" size="sm" onClick={clearFilters}>
+                  <X className="h-4 w-4 mr-1" />
+                  Nullstill
+                </Button>
+              )}
+            </div>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Search bar */}
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Input
+              placeholder="Søk etter lokaler..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+
+          {/* Quick filters */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Date range picker */}
+            <div>
+              <label className="block text-sm font-medium mb-2">Datointervall</label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start text-left font-normal"
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {dateRange?.from ? (
+                      dateRange.to ? (
+                        <>
+                          {format(dateRange.from, "dd.MM", { locale: nb })} -{" "}
+                          {format(dateRange.to, "dd.MM.yy", { locale: nb })}
+                        </>
+                      ) : (
+                        format(dateRange.from, "dd.MM.yyyy", { locale: nb })
+                      )
                     ) : (
-                      format(dateRange.from, "dd.MM.yyyy")
-                    )
-                  ) : (
-                    <span>Velg datoperiode</span>
-                  )}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
-                <Calendar
-                  mode="range"
-                  selected={dateRange}
-                  onSelect={setDateRange}
-                  initialFocus
-                  className="bg-white pointer-events-auto"
-                />
-              </PopoverContent>
-            </Popover>
-          </div>
-
-          <div className="w-full md:w-48 lg:w-auto lg:flex-1">
-            <Select value={facilityType} onValueChange={setFacilityType}>
-              <SelectTrigger className="bg-white h-10 border-gray-300 w-full">
-                <SelectValue placeholder="Velg type lokale" />
-              </SelectTrigger>
-              <SelectContent className="bg-white">
-                <SelectItem value="sports-hall">Gymsal</SelectItem>
-                <SelectItem value="meeting-room">Møterom</SelectItem>
-                <SelectItem value="auditorium">Auditorium</SelectItem>
-                <SelectItem value="gymnasium">Idrettshall</SelectItem>
-                <SelectItem value="kitchen">Kjøkken</SelectItem>
-                <SelectItem value="classroom">Klasserom</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="w-full md:w-48 lg:w-auto lg:flex-1">
-            <Select value={location} onValueChange={setLocation}>
-              <SelectTrigger className="bg-white h-10 border-gray-300 w-full">
-                <SelectValue placeholder="Velg område/bydel" />
-              </SelectTrigger>
-              <SelectContent className="bg-white">
-                <SelectItem value="drammen-sentrum">Drammen sentrum</SelectItem>
-                <SelectItem value="konnerud">Konnerud</SelectItem>
-                <SelectItem value="åssiden">Åssiden</SelectItem>
-                <SelectItem value="bragernes">Bragernes</SelectItem>
-                <SelectItem value="strømsø">Strømsø</SelectItem>
-                <SelectItem value="gulskogen">Gulskogen</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="flex-none w-auto">
-            <Button 
-              className="h-10 bg-[#0B3D91] hover:bg-blue-700 text-white font-medium shadow-sm"
-            >
-              <Search className="mr-2 h-4 w-4" />
-              <span>Søk</span>
-            </Button>
-          </div>
-
-          <div className="flex-none ml-1">
-            <Collapsible
-              open={showAdvancedFilters}
-              onOpenChange={setShowAdvancedFilters}
-            >
-              <CollapsibleTrigger asChild>
-                <Button variant="outline" size="sm" className="h-10 flex items-center gap-1 bg-white border-gray-300 px-2">
-                  <Filter className="h-3.5 w-3.5" />
-                  <span className="text-xs">Filter</span>
-                  <span className="text-xs ml-1">
-                    {showAdvancedFilters ? "▲" : "▼"}
-                  </span>
-                </Button>
-              </CollapsibleTrigger>
-              
-              <CollapsibleContent className="mt-3 space-y-4 bg-gray-50 p-3 rounded-md">
-                <div>
-                  <Label className="text-sm font-medium mb-2 block">Tilgjengelighet</Label>
-                  <div className="flex flex-wrap gap-4">
-                    <div className="flex items-center gap-2">
-                      <Checkbox id="wheelchair" 
-                        checked={accessibility === "wheelchair"}
-                        onCheckedChange={() => setAccessibility && setAccessibility("wheelchair")}
-                      />
-                      <label htmlFor="wheelchair" className="text-sm">Rullestoltilgang</label>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Checkbox id="hearing-loop" 
-                        checked={accessibility === "hearing-loop"}
-                        onCheckedChange={() => setAccessibility && setAccessibility("hearing-loop")}
-                      />
-                      <label htmlFor="hearing-loop" className="text-sm">Teleslynge</label>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Checkbox id="sign-language" 
-                        checked={accessibility === "sign-language"}
-                        onCheckedChange={() => setAccessibility && setAccessibility("sign-language")}
-                      />
-                      <label htmlFor="sign-language" className="text-sm">Tegnspråktolkning</label>
-                    </div>
-                  </div>
-                </div>
-                
-                <div>
-                  <Label className="text-sm font-medium mb-2 block">Kapasitet: {capacity ? capacity[0] : 0} - {capacity ? capacity[1] : 200}+ personer</Label>
-                  <Slider
-                    defaultValue={[0, 200]}
-                    max={200}
-                    step={10}
-                    value={capacity}
-                    onValueChange={(value) => setCapacity && setCapacity(value)}
-                    className="w-full max-w-md"
+                      <span>Velg periode</span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    initialFocus
+                    mode="range"
+                    defaultMonth={dateRange?.from}
+                    selected={dateRange}
+                    onSelect={setDateRange}
+                    numberOfMonths={2}
+                    className="pointer-events-auto"
                   />
-                </div>
-              </CollapsibleContent>
-            </Collapsible>
+                </PopoverContent>
+              </Popover>
+            </div>
+
+            {/* Facility type */}
+            <div>
+              <label className="block text-sm font-medium mb-2">Type lokale</label>
+              <Select value={facilityType} onValueChange={setFacilityType}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Alle typer" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">Alle typer</SelectItem>
+                  <SelectItem value="sports-hall">Idrettshall</SelectItem>
+                  <SelectItem value="gymnasium">Gymsal</SelectItem>
+                  <SelectItem value="meeting-room">Møterom</SelectItem>
+                  <SelectItem value="auditorium">Auditorium</SelectItem>
+                  <SelectItem value="classroom">Klasserom</SelectItem>
+                  <SelectItem value="outdoor-field">Utendørsbane</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Location */}
+            <div>
+              <label className="block text-sm font-medium mb-2">Område</label>
+              <Select value={location} onValueChange={setLocation}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Alle områder" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">Alle områder</SelectItem>
+                  <SelectItem value="drammen-sentrum">Drammen sentrum</SelectItem>
+                  <SelectItem value="konnerud">Konnerud</SelectItem>
+                  <SelectItem value="stromsø">Strømsø</SelectItem>
+                  <SelectItem value="bragernes">Bragernes</SelectItem>
+                  <SelectItem value="åssiden">Åssiden</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* View mode */}
+            <div>
+              <label className="block text-sm font-medium mb-2">Visning</label>
+              <div className="flex rounded-md border">
+                <Button
+                  variant={viewMode === "grid" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setViewMode("grid")}
+                  className="flex-1 rounded-r-none"
+                >
+                  <Grid3X3 className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant={viewMode === "map" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setViewMode("map")}
+                  className="flex-1 rounded-none border-x"
+                >
+                  <Map className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant={viewMode === "calendar" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setViewMode("calendar")}
+                  className="flex-1 rounded-l-none"
+                >
+                  <CalendarView className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
           </div>
-          
-          <div className="flex-none flex gap-1 h-10 w-auto ml-auto">
-            <Button 
-              variant={viewMode === "grid" ? "default" : "outline"} 
-              size="sm" 
-              onClick={() => setViewMode("grid")}
-              className={cn(
-                "h-full px-2",
-                viewMode === "grid" ? "bg-blue-600" : ""
+
+          {/* Advanced filters */}
+          {showAdvancedFilters && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t">
+              <div>
+                <label className="block text-sm font-medium mb-2">Tilgjengelighet</label>
+                <Select value={accessibility} onValueChange={setAccessibility}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Alle" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">Alle</SelectItem>
+                    <SelectItem value="wheelchair">Rullestoltilpasset</SelectItem>
+                    <SelectItem value="hearing-loop">Teleslynge</SelectItem>
+                    <SelectItem value="sign-language">Tegnspråktolking</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Kapasitet: {capacity[0]} - {capacity[1]} personer
+                </label>
+                <Slider
+                  value={capacity}
+                  onValueChange={setCapacity}
+                  max={200}
+                  step={10}
+                  className="mt-2"
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Active filters */}
+          {hasActiveFilters && (
+            <div className="flex flex-wrap gap-2 pt-2 border-t">
+              {dateRange?.from && (
+                <Badge variant="secondary" className="flex items-center">
+                  <CalendarIcon className="h-3 w-3 mr-1" />
+                  {dateRange.to 
+                    ? `${format(dateRange.from, "dd.MM", { locale: nb })} - ${format(dateRange.to, "dd.MM.yy", { locale: nb })}`
+                    : format(dateRange.from, "dd.MM.yyyy", { locale: nb })
+                  }
+                  <X 
+                    className="h-3 w-3 ml-1 cursor-pointer" 
+                    onClick={() => setDateRange(undefined)}
+                  />
+                </Badge>
               )}
-            >
-              <List className="h-4 w-4" />
-            </Button>
-            <Button 
-              variant={viewMode === "map" ? "default" : "outline"} 
-              size="sm" 
-              onClick={() => setViewMode("map")}
-              className={cn(
-                "h-full px-2",
-                viewMode === "map" ? "bg-blue-600" : ""
+              {facilityType && (
+                <Badge variant="secondary" className="flex items-center">
+                  {facilityType}
+                  <X 
+                    className="h-3 w-3 ml-1 cursor-pointer" 
+                    onClick={() => setFacilityType("")}
+                  />
+                </Badge>
               )}
-            >
-              <Map className="h-4 w-4" />
-            </Button>
-            <Button 
-              variant={viewMode === "calendar" ? "default" : "outline"} 
-              size="sm" 
-              onClick={() => setViewMode("calendar")}
-              className={cn(
-                "h-full px-2",
-                viewMode === "calendar" ? "bg-blue-600" : ""
+              {location && (
+                <Badge variant="secondary" className="flex items-center">
+                  <MapPin className="h-3 w-3 mr-1" />
+                  {location}
+                  <X 
+                    className="h-3 w-3 ml-1 cursor-pointer" 
+                    onClick={() => setLocation("")}
+                  />
+                </Badge>
               )}
-            >
-              <CalendarIcon className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+              {accessibility && (
+                <Badge variant="secondary" className="flex items-center">
+                  {accessibility}
+                  <X 
+                    className="h-3 w-3 ml-1 cursor-pointer" 
+                    onClick={() => setAccessibility("")}
+                  />
+                </Badge>
+              )}
+              {(capacity[0] > 0 || capacity[1] < 200) && (
+                <Badge variant="secondary" className="flex items-center">
+                  <Users className="h-3 w-3 mr-1" />
+                  {capacity[0]} - {capacity[1]} personer
+                  <X 
+                    className="h-3 w-3 ml-1 cursor-pointer" 
+                    onClick={() => setCapacity([0, 200])}
+                  />
+                </Badge>
+              )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 

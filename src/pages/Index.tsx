@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
+import { DateRange } from "react-day-picker";
 import GlobalHeader from "@/components/GlobalHeader";
 import GlobalFooter from "@/components/GlobalFooter";
 import HeroBanner from "@/components/HeroBanner";
@@ -13,6 +14,7 @@ import CalendarView from "@/components/CalendarView";
 const Index = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [date, setDate] = useState<Date>();
+  const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [facilityType, setFacilityType] = useState<string>("");
   const [location, setLocation] = useState<string>("");
   const [viewMode, setViewMode] = useState<"grid" | "map" | "calendar">("grid");
