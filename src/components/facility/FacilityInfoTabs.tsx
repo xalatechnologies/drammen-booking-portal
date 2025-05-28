@@ -1,9 +1,9 @@
-
 import React, { useState } from "react";
 import { format } from "date-fns";
 import { CheckCircle, Users, Clock, Info } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { isDateUnavailable, isNorwegianHoliday } from "@/utils/holidaysAndAvailability";
 
 interface FacilityInfoTabsProps {
   description: string;
@@ -101,16 +101,53 @@ export function FacilityInfoTabs({ description, capacity, equipment }: FacilityI
           </div>
         </div>
         
+        {/* Availability Legend */}
+        <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+          <h3 className="text-sm font-medium mb-2">Forklaring:</h3>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+            <div className="flex items-center">
+              <div className="w-3 h-3 bg-green-50 border border-green-200 rounded mr-2"></div>
+              <span>Ledig</span>
+            </div>
+            <div className="flex items-center">
+              <div className="w-3 h-3 bg-red-50 border border-red-200 rounded mr-2"></div>
+              <span>Helligdag</span>
+            </div>
+            <div className="flex items-center">
+              <div className="w-3 h-3 bg-orange-50 border border-orange-200 rounded mr-2"></div>
+              <span>Helg</span>
+            </div>
+            <div className="flex items-center">
+              <div className="w-3 h-3 bg-yellow-50 border border-yellow-200 rounded mr-2"></div>
+              <span>Vedlikehold</span>
+            </div>
+          </div>
+        </div>
+        
         <div className="border rounded-lg overflow-x-auto">
           <table className="w-full">
             <thead>
               <tr>
                 <th className="p-2 border-b border-r text-left">Tid</th>
-                {[0, 1, 2, 3, 4].map(day => (
-                  <th key={day} className="p-2 border-b border-r text-center">
-                    {format(new Date(date.getTime() + day * 24 * 60 * 60 * 1000), "EEE d.MMM")}
-                  </th>
-                ))}
+                {[0, 1, 2, 3, 4].map(day => {
+                  const currentDate = new Date(date.getTime() + day * 24 * 60 * 60 * 1000);
+                  const unavailableCheck = isDateUnavailable(currentDate);
+                  const holidayCheck = isNorwegianHoliday(currentDate);
+                  
+                  return (
+                    <th key={day} className="p-2 border-b border-r text-center">
+                      <div>
+                        {format(currentDate, "EEE d.MMM")}
+                        {holidayCheck.isHoliday && (
+                          <div className="text-xs text-red-600 mt-1">{holidayCheck.name}</div>
+                        )}
+                        {unavailableCheck.isUnavailable && !holidayCheck.isHoliday && (
+                          <div className="text-xs text-orange-600 mt-1">{unavailableCheck.details}</div>
+                        )}
+                      </div>
+                    </th>
+                  );
+                })}
               </tr>
             </thead>
             <tbody>
@@ -118,6 +155,40 @@ export function FacilityInfoTabs({ description, capacity, equipment }: FacilityI
                 <tr key={i} className={i % 2 === 0 ? "bg-gray-50" : ""}>
                   <td className="p-2 border-b border-r">{time}</td>
                   {[0, 1, 2, 3, 4].map(day => {
+                    const currentDate = new Date(date.getTime() + day * 24 * 60 * 60 * 1000);
+                    const unavailableCheck = isDateUnavailable(currentDate);
+                    
+                    // If the day is unavailable, show the reason
+                    if (unavailableCheck.isUnavailable) {
+                      const bgColor = {
+                        'past': 'bg-gray-100',
+                        'weekend': 'bg-orange-100',
+                        'holiday': 'bg-red-100',
+                        'maintenance': 'bg-yellow-100'
+                      }[unavailableCheck.reason!];
+                      
+                      const textColor = {
+                        'past': 'text-gray-500',
+                        'weekend': 'text-orange-600',
+                        'holiday': 'text-red-600',
+                        'maintenance': 'text-yellow-600'
+                      }[unavailableCheck.reason!];
+                      
+                      return (
+                        <td 
+                          key={day} 
+                          className={`p-2 border-b border-r text-center ${bgColor}`}
+                          title={unavailableCheck.details}
+                        >
+                          <span className={textColor}>
+                            {unavailableCheck.reason === 'past' ? 'Fortid' : 
+                             unavailableCheck.reason === 'weekend' ? 'Helg' :
+                             unavailableCheck.reason === 'holiday' ? 'Helligdag' : 'Vedlikehold'}
+                          </span>
+                        </td>
+                      );
+                    }
+                    
                     // Mock availability - in a real app this would be based on actual bookings
                     const isAvailable = Math.random() > 0.3;
                     return (
@@ -139,7 +210,7 @@ export function FacilityInfoTabs({ description, capacity, equipment }: FacilityI
         
         <p className="text-sm text-gray-500 mt-4">
           <Info className="h-4 w-4 inline-block mr-1" />
-          Fargemarkering viser når lokalet er ledig (grønt) eller opptatt (rødt).
+          Fargemarkering viser når lokalet er ledig (grønt), opptatt (rødt), eller ikke tilgjengelig på grunn av helligdager, helger eller vedlikehold.
         </p>
       </TabsContent>
     </Tabs>

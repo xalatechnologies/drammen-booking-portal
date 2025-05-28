@@ -1,9 +1,11 @@
+
 import * as React from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { DayPicker } from "react-day-picker";
 
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
+import { isDateUnavailable, isNorwegianHoliday } from "@/utils/holidaysAndAvailability";
 
 export type CalendarProps = React.ComponentProps<typeof DayPicker>;
 
@@ -54,6 +56,51 @@ function Calendar({
       components={{
         IconLeft: ({ ..._props }) => <ChevronLeft className="h-4 w-4" />,
         IconRight: ({ ..._props }) => <ChevronRight className="h-4 w-4" />,
+        Day: ({ date, ...dayProps }) => {
+          const unavailableCheck = isDateUnavailable(date);
+          const holidayCheck = isNorwegianHoliday(date);
+          
+          let dayClass = "";
+          let title = "";
+          
+          if (unavailableCheck.isUnavailable) {
+            switch (unavailableCheck.reason) {
+              case 'past':
+                dayClass = "text-gray-400 line-through";
+                title = "Fortid - ikke tilgjengelig";
+                break;
+              case 'weekend':
+                dayClass = "text-orange-600 bg-orange-50 border border-orange-200";
+                title = "Helg - begrenset tilgang";
+                break;
+              case 'holiday':
+                dayClass = "text-red-600 bg-red-50 border border-red-200";
+                title = `Helligdag: ${unavailableCheck.details}`;
+                break;
+              case 'maintenance':
+                dayClass = "text-yellow-600 bg-yellow-50 border border-yellow-200";
+                title = "Vedlikehold - ikke tilgjengelig";
+                break;
+            }
+          }
+          
+          return (
+            <button
+              {...dayProps}
+              title={title}
+              className={cn(
+                buttonVariants({ variant: "ghost" }),
+                "h-9 w-9 p-0 font-normal aria-selected:opacity-100 relative",
+                dayClass
+              )}
+            >
+              {date.getDate()}
+              {holidayCheck.isHoliday && (
+                <div className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></div>
+              )}
+            </button>
+          );
+        }
       }}
       {...props}
     />
