@@ -217,19 +217,19 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
             </div>
 
             {/* Filter controls */}
-            <div className="lg:col-span-1 flex items-end gap-2">
+            <div className="lg:col-span-1 flex items-end gap-1">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-                className="flex-1"
+                className="text-xs px-2 py-1 h-8"
               >
-                <Filter className="h-4 w-4 mr-1" />
-                {showAdvancedFilters ? "Skjul" : "Vis"} avanserte
+                <Filter className="h-3 w-3 mr-1" />
+                {showAdvancedFilters ? "Skjul" : "Mer"}
               </Button>
               {hasActiveFilters && (
-                <Button variant="ghost" size="sm" onClick={clearFilters}>
-                  <X className="h-4 w-4" />
+                <Button variant="ghost" size="sm" onClick={clearFilters} className="h-8 w-8 p-0">
+                  <X className="h-3 w-3" />
                 </Button>
               )}
             </div>
