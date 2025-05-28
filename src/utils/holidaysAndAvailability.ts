@@ -1,27 +1,57 @@
 
-import { addDays, format, isWeekend } from 'date-fns';
+import { addDays, format, isWeekend, getYear } from 'date-fns';
 
-// Norwegian national holidays for 2025
-export const norwegianHolidays2025 = [
-  { date: new Date(2025, 0, 1), name: 'Nyttårsdag' },
-  { date: new Date(2025, 2, 13), name: 'Skjærtorsdag' },
-  { date: new Date(2025, 2, 14), name: 'Langfredag' },
-  { date: new Date(2025, 2, 16), name: 'Første påskedag' },
-  { date: new Date(2025, 2, 17), name: 'Andre påskedag' },
-  { date: new Date(2025, 3, 1), name: 'Arbeidernes dag' },
-  { date: new Date(2025, 3, 17), name: 'Grunnlovsdag' },
-  { date: new Date(2025, 4, 25), name: 'Kristi himmelfartsdag' },
-  { date: new Date(2025, 5, 4), name: 'Første pinsedag' },
-  { date: new Date(2025, 5, 5), name: 'Andre pinsedag' },
-  { date: new Date(2025, 11, 25), name: 'Første juledag' },
-  { date: new Date(2025, 11, 26), name: 'Andre juledag' }
-];
+// Function to calculate Easter date for a given year (using the algorithm)
+const getEasterDate = (year: number): Date => {
+  const a = year % 19;
+  const b = Math.floor(year / 100);
+  const c = year % 100;
+  const d = Math.floor(b / 4);
+  const e = b % 4;
+  const f = Math.floor((b + 8) / 25);
+  const g = Math.floor((b - f + 1) / 3);
+  const h = (19 * a + b - d - g + 15) % 30;
+  const i = Math.floor(c / 4);
+  const k = c % 4;
+  const l = (32 + 2 * e + 2 * i - h - k) % 7;
+  const m = Math.floor((a + 11 * h + 22 * l) / 451);
+  const month = Math.floor((h + l - 7 * m + 114) / 31);
+  const day = ((h + l - 7 * m + 114) % 31) + 1;
+  return new Date(year, month - 1, day);
+};
+
+// Function to get all Norwegian holidays for a given year
+export const getNorwegianHolidaysForYear = (year: number) => {
+  const easter = getEasterDate(year);
+  
+  return [
+    // Fixed holidays
+    { date: new Date(year, 0, 1), name: 'Nyttårsdag' },
+    { date: new Date(year, 4, 1), name: 'Arbeidernes dag' },
+    { date: new Date(year, 4, 17), name: 'Grunnlovsdag' },
+    { date: new Date(year, 11, 25), name: 'Første juledag' },
+    { date: new Date(year, 11, 26), name: 'Andre juledag' },
+    
+    // Easter-based holidays (calculated dynamically)
+    { date: addDays(easter, -3), name: 'Skjærtorsdag' },
+    { date: addDays(easter, -2), name: 'Langfredag' },
+    { date: easter, name: 'Første påskedag' },
+    { date: addDays(easter, 1), name: 'Andre påskedag' },
+    { date: addDays(easter, 39), name: 'Kristi himmelfartsdag' },
+    { date: addDays(easter, 49), name: 'Første pinsedag' },
+    { date: addDays(easter, 50), name: 'Andre pinsedag' },
+  ];
+};
 
 // Function to check if a date is a Norwegian holiday
 export const isNorwegianHoliday = (date: Date): { isHoliday: boolean; name?: string } => {
-  const holiday = norwegianHolidays2025.find(
+  const year = getYear(date);
+  const holidays = getNorwegianHolidaysForYear(year);
+  
+  const holiday = holidays.find(
     holiday => holiday.date.toDateString() === date.toDateString()
   );
+  
   return {
     isHoliday: !!holiday,
     name: holiday?.name
@@ -61,10 +91,12 @@ export const isDateUnavailable = (date: Date): {
     };
   }
   
-  // Mock some maintenance days
+  // Mock some maintenance days (you can make this more dynamic in the future)
   const maintenanceDays = [
     new Date(2025, 5, 15), // June 15, 2025
     new Date(2025, 6, 20), // July 20, 2025
+    new Date(2026, 5, 15), // June 15, 2026
+    new Date(2026, 6, 20), // July 20, 2026
   ];
   
   const isMaintenanceDay = maintenanceDays.some(
