@@ -88,45 +88,30 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
     <div className="mb-8 space-y-4">
       <Card>
         <CardHeader className="pb-4">
-          <CardTitle className="flex items-center justify-between">
-            <span className="flex items-center">
-              <Search className="h-5 w-5 mr-2 text-blue-600" />
-              Søk og filtrer lokaler
-            </span>
-            <div className="flex items-center space-x-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-              >
-                <Filter className="h-4 w-4 mr-1" />
-                {showAdvancedFilters ? "Skjul" : "Vis"} avanserte filtre
-              </Button>
-              {hasActiveFilters && (
-                <Button variant="ghost" size="sm" onClick={clearFilters}>
-                  <X className="h-4 w-4 mr-1" />
-                  Nullstill
-                </Button>
-              )}
-            </div>
+          <CardTitle className="flex items-center">
+            <Search className="h-5 w-5 mr-2 text-blue-600" />
+            Søk og filtrer lokaler
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* Search bar */}
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-            <Input
-              placeholder="Søk etter lokaler..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
-          </div>
+          {/* Main filters grid - including search, date, facility type, location, view mode, and controls */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 items-end">
+            {/* Search bar */}
+            <div className="lg:col-span-1">
+              <label className="block text-sm font-medium mb-2">Søk</label>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Input
+                  placeholder="Søk etter lokaler..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+            </div>
 
-          {/* Quick filters */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Date range picker */}
-            <div>
+            <div className="lg:col-span-1">
               <label className="block text-sm font-medium mb-2">Datointervall</label>
               <Popover>
                 <PopoverTrigger asChild>
@@ -164,7 +149,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
             </div>
 
             {/* Facility type */}
-            <div>
+            <div className="lg:col-span-1">
               <label className="block text-sm font-medium mb-2">Type lokale</label>
               <Select value={facilityType || "all"} onValueChange={setFacilityType}>
                 <SelectTrigger>
@@ -183,7 +168,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
             </div>
 
             {/* Location */}
-            <div>
+            <div className="lg:col-span-1">
               <label className="block text-sm font-medium mb-2">Område</label>
               <Select value={location || "all"} onValueChange={setLocation}>
                 <SelectTrigger>
@@ -201,7 +186,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
             </div>
 
             {/* View mode */}
-            <div>
+            <div className="lg:col-span-1">
               <label className="block text-sm font-medium mb-2">Visning</label>
               <div className="flex rounded-md border">
                 <Button
@@ -229,6 +214,24 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
                   <CalendarView className="h-4 w-4" />
                 </Button>
               </div>
+            </div>
+
+            {/* Filter controls */}
+            <div className="lg:col-span-1 flex items-end gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+                className="flex-1"
+              >
+                <Filter className="h-4 w-4 mr-1" />
+                {showAdvancedFilters ? "Skjul" : "Vis"} avanserte
+              </Button>
+              {hasActiveFilters && (
+                <Button variant="ghost" size="sm" onClick={clearFilters}>
+                  <X className="h-4 w-4" />
+                </Button>
+              )}
             </div>
           </div>
 
