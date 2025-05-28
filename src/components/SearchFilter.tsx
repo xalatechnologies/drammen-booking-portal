@@ -75,14 +75,14 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
   const clearFilters = () => {
     setDate(undefined);
     setDateRange(undefined);
-    setFacilityType("");
-    setLocation("");
-    setAccessibility("");
+    setFacilityType("all");
+    setLocation("all");
+    setAccessibility("all");
     setCapacity([0, 200]);
     setSearchTerm("");
   };
 
-  const hasActiveFilters = date || dateRange || facilityType || location || accessibility || capacity[0] > 0 || capacity[1] < 200 || searchTerm;
+  const hasActiveFilters = date || dateRange || (facilityType && facilityType !== "all") || (location && location !== "all") || (accessibility && accessibility !== "all") || capacity[0] > 0 || capacity[1] < 200 || searchTerm;
 
   return (
     <div className="mb-8 space-y-4">
@@ -166,12 +166,12 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
             {/* Facility type */}
             <div>
               <label className="block text-sm font-medium mb-2">Type lokale</label>
-              <Select value={facilityType} onValueChange={setFacilityType}>
+              <Select value={facilityType || "all"} onValueChange={setFacilityType}>
                 <SelectTrigger>
                   <SelectValue placeholder="Alle typer" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Alle typer</SelectItem>
+                  <SelectItem value="all">Alle typer</SelectItem>
                   <SelectItem value="sports-hall">Idrettshall</SelectItem>
                   <SelectItem value="gymnasium">Gymsal</SelectItem>
                   <SelectItem value="meeting-room">Møterom</SelectItem>
@@ -185,12 +185,12 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
             {/* Location */}
             <div>
               <label className="block text-sm font-medium mb-2">Område</label>
-              <Select value={location} onValueChange={setLocation}>
+              <Select value={location || "all"} onValueChange={setLocation}>
                 <SelectTrigger>
                   <SelectValue placeholder="Alle områder" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Alle områder</SelectItem>
+                  <SelectItem value="all">Alle områder</SelectItem>
                   <SelectItem value="drammen-sentrum">Drammen sentrum</SelectItem>
                   <SelectItem value="konnerud">Konnerud</SelectItem>
                   <SelectItem value="stromsø">Strømsø</SelectItem>
@@ -237,12 +237,12 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t">
               <div>
                 <label className="block text-sm font-medium mb-2">Tilgjengelighet</label>
-                <Select value={accessibility} onValueChange={setAccessibility}>
+                <Select value={accessibility || "all"} onValueChange={setAccessibility}>
                   <SelectTrigger>
                     <SelectValue placeholder="Alle" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Alle</SelectItem>
+                    <SelectItem value="all">Alle</SelectItem>
                     <SelectItem value="wheelchair">Rullestoltilpasset</SelectItem>
                     <SelectItem value="hearing-loop">Teleslynge</SelectItem>
                     <SelectItem value="sign-language">Tegnspråktolking</SelectItem>
@@ -281,31 +281,31 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
                   />
                 </Badge>
               )}
-              {facilityType && (
+              {facilityType && facilityType !== "all" && (
                 <Badge variant="secondary" className="flex items-center">
                   {facilityType}
                   <X 
                     className="h-3 w-3 ml-1 cursor-pointer" 
-                    onClick={() => setFacilityType("")}
+                    onClick={() => setFacilityType("all")}
                   />
                 </Badge>
               )}
-              {location && (
+              {location && location !== "all" && (
                 <Badge variant="secondary" className="flex items-center">
                   <MapPin className="h-3 w-3 mr-1" />
                   {location}
                   <X 
                     className="h-3 w-3 ml-1 cursor-pointer" 
-                    onClick={() => setLocation("")}
+                    onClick={() => setLocation("all")}
                   />
                 </Badge>
               )}
-              {accessibility && (
+              {accessibility && accessibility !== "all" && (
                 <Badge variant="secondary" className="flex items-center">
                   {accessibility}
                   <X 
                     className="h-3 w-3 ml-1 cursor-pointer" 
-                    onClick={() => setAccessibility("")}
+                    onClick={() => setAccessibility("all")}
                   />
                 </Badge>
               )}

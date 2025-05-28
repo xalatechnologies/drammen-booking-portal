@@ -15,10 +15,10 @@ const Index = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [date, setDate] = useState<Date>();
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
-  const [facilityType, setFacilityType] = useState<string>("");
-  const [location, setLocation] = useState<string>("");
+  const [facilityType, setFacilityType] = useState<string>("all");
+  const [location, setLocation] = useState<string>("all");
   const [viewMode, setViewMode] = useState<"grid" | "map" | "calendar">("grid");
-  const [accessibility, setAccessibility] = useState<string>("");
+  const [accessibility, setAccessibility] = useState<string>("all");
   const [capacity, setCapacity] = useState<number[]>([0, 200]);
 
   // Initialize state from URL parameters
@@ -70,23 +70,26 @@ const Index = () => {
         {viewMode === "grid" && (
           <FacilityGrid 
             date={date}
-            facilityType={facilityType}
-            location={location}
-            accessibility={accessibility}
+            facilityType={facilityType === "all" ? "" : facilityType}
+            location={location === "all" ? "" : location}
+            accessibility={accessibility === "all" ? "" : accessibility}
             capacity={capacity}
           />
         )}
         
         {viewMode === "map" && (
-          <MapView facilityType={facilityType} location={location} />
+          <MapView 
+            facilityType={facilityType === "all" ? "" : facilityType} 
+            location={location === "all" ? "" : location} 
+          />
         )}
         
         {viewMode === "calendar" && (
           <CalendarView 
             date={date}
-            facilityType={facilityType}
-            location={location}
-            accessibility={accessibility}
+            facilityType={facilityType === "all" ? "" : facilityType}
+            location={location === "all" ? "" : location}
+            accessibility={accessibility === "all" ? "" : accessibility}
             capacity={capacity}
           />
         )}
