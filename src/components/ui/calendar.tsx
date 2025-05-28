@@ -60,28 +60,33 @@ function Calendar({
           const unavailableCheck = isDateUnavailable(date);
           const holidayCheck = isNorwegianHoliday(date);
           
+          console.log(`Checking date ${date.toDateString()}: holiday=${holidayCheck.isHoliday}, unavailable=${unavailableCheck.isUnavailable}`);
+          
           let dayClass = "";
           let title = "";
           
           if (unavailableCheck.isUnavailable) {
             switch (unavailableCheck.reason) {
               case 'past':
-                dayClass = "text-gray-400 line-through";
+                dayClass = "text-gray-400 line-through opacity-50";
                 title = "Fortid - ikke tilgjengelig";
                 break;
               case 'weekend':
-                dayClass = "text-orange-600 bg-orange-50 border border-orange-200";
+                dayClass = "text-orange-700 bg-orange-100 border border-orange-300 font-semibold";
                 title = "Helg - begrenset tilgang";
                 break;
               case 'holiday':
-                dayClass = "text-red-600 bg-red-50 border border-red-200";
+                dayClass = "text-red-700 bg-red-100 border border-red-300 font-semibold";
                 title = `Helligdag: ${unavailableCheck.details}`;
                 break;
               case 'maintenance':
-                dayClass = "text-yellow-600 bg-yellow-50 border border-yellow-200";
+                dayClass = "text-yellow-700 bg-yellow-100 border border-yellow-300 font-semibold";
                 title = "Vedlikehold - ikke tilgjengelig";
                 break;
             }
+          } else {
+            dayClass = "text-green-700 bg-green-50 hover:bg-green-100";
+            title = "Tilgjengelig for booking";
           }
           
           return (
@@ -90,13 +95,13 @@ function Calendar({
               title={title}
               className={cn(
                 buttonVariants({ variant: "ghost" }),
-                "h-9 w-9 p-0 font-normal aria-selected:opacity-100 relative",
+                "h-9 w-9 p-0 font-normal aria-selected:opacity-100 relative rounded-md",
                 dayClass
               )}
             >
               {date.getDate()}
               {holidayCheck.isHoliday && (
-                <div className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></div>
+                <div className="absolute -top-1 -right-1 w-2 h-2 bg-red-600 rounded-full border border-white"></div>
               )}
             </button>
           );

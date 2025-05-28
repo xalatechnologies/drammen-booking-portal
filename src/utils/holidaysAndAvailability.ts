@@ -24,6 +24,8 @@ const getEasterDate = (year: number): Date => {
 export const getNorwegianHolidaysForYear = (year: number) => {
   const easter = getEasterDate(year);
   
+  console.log(`Calculating holidays for year ${year}, Easter: ${easter.toDateString()}`);
+  
   return [
     // Fixed holidays
     { date: new Date(year, 0, 1), name: 'Nyttårsdag' },
@@ -49,7 +51,12 @@ export const isNorwegianHoliday = (date: Date): { isHoliday: boolean; name?: str
   const holidays = getNorwegianHolidaysForYear(year);
   
   const holiday = holidays.find(
-    holiday => holiday.date.toDateString() === date.toDateString()
+    holiday => {
+      const holidayDateString = holiday.date.toDateString();
+      const checkDateString = date.toDateString();
+      console.log(`Comparing ${holidayDateString} with ${checkDateString}`);
+      return holidayDateString === checkDateString;
+    }
   );
   
   return {
