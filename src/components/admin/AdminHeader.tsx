@@ -27,8 +27,8 @@ const AdminHeader = () => {
           </div>
         </div>
         
-        <div className="flex-1 max-w-md mx-8">
-          <div className="relative">
+        <div className="flex-1 flex justify-center px-8">
+          <div className="relative w-full max-w-md">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
             <Input
               placeholder="Søk"
@@ -37,7 +37,7 @@ const AdminHeader = () => {
           </div>
         </div>
 
-        <div className="ml-auto flex items-center gap-4">
+        <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon" className="relative">
             <Globe className="h-5 w-5" />
           </Button>
