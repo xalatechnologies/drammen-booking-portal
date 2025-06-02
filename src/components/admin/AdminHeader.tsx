@@ -95,11 +95,11 @@ const AdminHeader = () => {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="sm" className="relative h-9 gap-2">
                 <Avatar className="h-8 w-8">
-                  <AvatarImage src="/placeholder.svg" alt="Ibrahim Rahmani" />
-                  <AvatarFallback className="bg-indigo-600 text-white">IR</AvatarFallback>
+                  <AvatarImage src="/placeholder.svg" alt="admin user" />
+                  <AvatarFallback className="bg-indigo-600 text-white">AU</AvatarFallback>
                 </Avatar>
                 <div className="hidden md:flex flex-col items-start">
-                  <span className="text-sm font-medium">Ibrahim Rahmani</span>
+                  <span className="text-sm font-medium">admin user</span>
                   <span className="text-xs text-gray-500">Admin</span>
                 </div>
               </Button>
