@@ -4,17 +4,11 @@ import { useNavigate, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
   Users,
-  FileText,
   Bell,
-  Settings,
   Activity,
   BarChart3,
   Building,
-  Archive,
   ClipboardList,
-  Gauge,
-  MapPin,
-  MessageSquare,
   Languages
 } from "lucide-react";
 import {
@@ -44,7 +38,7 @@ const AdminSidebar = () => {
     },
   ];
 
-  const operationsItems = [
+  const bookingItems = [
     {
       title: "Fasilitetsstyring",
       icon: Building,
@@ -62,35 +56,12 @@ const AdminSidebar = () => {
     },
   ];
 
-  const resourcesItems = [
+  const managementItems = [
     {
       title: "Brukere & Roller",
       icon: Users,
       path: "/admin/users",
     },
-    {
-      title: "Inventar",
-      icon: Archive,
-      path: "/admin/inventory",
-    },
-    {
-      title: "Prosedyrer",
-      icon: FileText,
-      path: "/admin/procedures",
-    },
-    {
-      title: "Målere",
-      icon: Gauge,
-      path: "/admin/meters",
-    },
-    {
-      title: "Lokasjoner",
-      icon: MapPin,
-      path: "/admin/locations",
-    },
-  ];
-
-  const collaborationItems = [
     {
       title: "Rapporter & Analytikk",
       icon: BarChart3,
@@ -101,19 +72,9 @@ const AdminSidebar = () => {
       icon: Bell,
       path: "/admin/notifications",
     },
-    {
-      title: "Meldinger",
-      icon: MessageSquare,
-      path: "/admin/messages",
-    },
   ];
 
-  const administrationItems = [
-    {
-      title: "Organisasjon",
-      icon: Building,
-      path: "/admin/organization",
-    },
+  const systemItems = [
     {
       title: "Oversettelser",
       icon: Languages,
@@ -162,10 +123,9 @@ const AdminSidebar = () => {
       
       <SidebarContent className="px-3 py-4 space-y-6">
         {renderMenuGroup(overviewItems, "OVERSIKT")}
-        {renderMenuGroup(operationsItems, "OPERASJONER")}
-        {renderMenuGroup(resourcesItems, "RESSURSER")}
-        {renderMenuGroup(collaborationItems, "SAMARBEID")}
-        {renderMenuGroup(administrationItems, "ADMINISTRASJON")}
+        {renderMenuGroup(bookingItems, "BOOKING")}
+        {renderMenuGroup(managementItems, "ADMINISTRASJON")}
+        {renderMenuGroup(systemItems, "SYSTEM")}
       </SidebarContent>
 
       <SidebarFooter className="p-4 border-t">
