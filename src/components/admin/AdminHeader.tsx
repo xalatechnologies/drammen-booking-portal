@@ -20,7 +20,7 @@ const AdminHeader = () => {
         <div className="flex items-center gap-4">
           <SidebarTrigger />
           <div className="hidden md:flex">
-            <h1 className="text-xl font-semibold">Admin Dashbord — Analytisk Oversikt</h1>
+            <h1 className="text-xl font-semibold">Admin Dashbord</h1>
           </div>
         </div>
         <div className="ml-auto flex items-center gap-4">
