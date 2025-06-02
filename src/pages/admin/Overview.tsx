@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -28,7 +27,6 @@ const OverviewPage = () => {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold mb-2">Admin Dashboard 👋</h1>
-            <p className="text-indigo-100">Administrer bookingsystemet for Drammen Kommune</p>
           </div>
           <Button className="bg-white/20 hover:bg-white/30 text-white border-white/30 gap-2">
             <Settings className="h-4 w-4" />
