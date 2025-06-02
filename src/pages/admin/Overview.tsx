@@ -1,217 +1,232 @@
 
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent
-} from "@/components/ui/chart";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  ResponsiveContainer,
-  Tooltip, 
-  Legend 
-} from "recharts";
-import { ChartBarIcon } from "lucide-react";
+  Wrench, 
+  AlertTriangle, 
+  Clock, 
+  CheckCircle,
+  TrendingUp,
+  Plus,
+  FileText,
+  DollarSign,
+  Package
+} from "lucide-react";
 
 const OverviewPage = () => {
-  // Sample data for the overview page
-  const statsData = [
-    { name: "Totalt Antall Fasiliteter", value: 124 },
-    { name: "Ventende Godkjenninger", value: 18 },
-    { name: "Aktive Brukere", value: 543 },
+  const statsCards = [
+    {
+      title: "Open Work Orders",
+      value: "12",
+      change: "+2 from yesterday",
+      icon: Wrench,
+      color: "bg-blue-50",
+      iconColor: "text-blue-600",
+      trend: "up"
+    },
+    {
+      title: "Low Stock Items",
+      value: "7",
+      change: "3 critical",
+      icon: AlertTriangle,
+      color: "bg-red-50",
+      iconColor: "text-red-600",
+      trend: "down"
+    },
+    {
+      title: "Upcoming PM",
+      value: "15",
+      change: "Next 7 days",
+      icon: Clock,
+      color: "bg-purple-50",
+      iconColor: "text-purple-600",
+      trend: "up"
+    },
+    {
+      title: "Active Assets",
+      value: "143",
+      change: "All systems operational",
+      icon: CheckCircle,
+      color: "bg-green-50",
+      iconColor: "text-green-600",
+      trend: "neutral"
+    }
   ];
 
-  const chartData = [
-    { month: "Jan", bookings: 65, approvals: 28 },
-    { month: "Feb", bookings: 59, approvals: 25 },
-    { month: "Mar", bookings: 80, approvals: 36 },
-    { month: "Apr", bookings: 81, approvals: 32 },
-    { month: "May", bookings: 56, approvals: 24 },
-    { month: "Jun", bookings: 55, approvals: 20 },
+  const workOrders = [
+    {
+      id: "#5489",
+      title: "Forklift - Hydraulics Non-Start",
+      assignee: "Mary Kavanagh",
+      status: "On Hold",
+      statusColor: "bg-yellow-100 text-yellow-800",
+      dueDate: "Due Today"
+    },
+    {
+      id: "#5495",
+      title: "Daily Site Walk",
+      assignee: "Mary Kavanagh",
+      status: "Open",
+      statusColor: "bg-blue-100 text-blue-800",
+      dueDate: "Due Tomorrow"
+    },
+    {
+      id: "#5488",
+      title: "OSHA Compliance - Daily Site Walk",
+      assignee: "Chris Manning",
+      status: "On Hold",
+      statusColor: "bg-yellow-100 text-yellow-800",
+      dueDate: "Due This Week"
+    }
   ];
 
-  // Fixed chart config to match expected type
-  const chartConfig = {
-    bookings: { label: "Bookinger", color: "#4f46e5" },
-    approvals: { label: "Godkjenninger", color: "#10b981" },
-  };
+  const quickActions = [
+    {
+      title: "New Work Order",
+      icon: Wrench,
+      color: "bg-blue-50 text-blue-600"
+    },
+    {
+      title: "New Request",
+      icon: FileText,
+      color: "bg-green-50 text-green-600"
+    },
+    {
+      title: "New PO",
+      icon: DollarSign,
+      color: "bg-yellow-50 text-yellow-600"
+    },
+    {
+      title: "Add Asset",
+      icon: Package,
+      color: "bg-purple-50 text-purple-600"
+    }
+  ];
 
   return (
     <div className="space-y-6">
-      <h2 className="text-3xl font-bold tracking-tight">Dashbord Oversikt</h2>
-      
+      {/* Welcome Section */}
+      <div className="bg-gradient-to-r from-slate-900 to-slate-700 rounded-lg p-6 text-white">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold mb-2 flex items-center gap-2">
+              Welcome back! 👋
+            </h1>
+            <p className="text-slate-300">Here's what's happening with your operations today</p>
+          </div>
+          <Button className="bg-slate-600 hover:bg-slate-500 text-white">
+            Create Work Order
+          </Button>
+        </div>
+      </div>
+
       {/* Stats Cards */}
-      <div className="grid gap-6 md:grid-cols-3">
-        {statsData.map((stat) => (
-          <Card key={stat.name}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{stat.name}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stat.value}</div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {statsCards.map((stat, index) => (
+          <Card key={index} className="relative overflow-hidden">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground mb-1">
+                    {stat.title}
+                  </p>
+                  <p className="text-3xl font-bold">{stat.value}</p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {stat.change}
+                  </p>
+                </div>
+                <div className={`p-3 rounded-lg ${stat.color}`}>
+                  <stat.icon className={`h-6 w-6 ${stat.iconColor}`} />
+                </div>
+              </div>
+              {stat.trend === "up" && (
+                <div className="absolute top-4 right-4">
+                  <TrendingUp className="h-4 w-4 text-green-500" />
+                </div>
+              )}
             </CardContent>
           </Card>
         ))}
       </div>
-      
-      {/* Main Content Section with 3 columns */}
-      <div className="grid gap-6 md:grid-cols-3">
-        <Card className="col-span-1">
-          <CardHeader>
-            <CardTitle>Oversiktsstatistikk</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              Nøkkelindikatorer og målinger for fasilitetsstyring
-            </p>
-            <ul className="mt-4 space-y-2">
-              <li className="flex justify-between">
-                <span className="text-sm">Gj.snitt godkjenningstid:</span>
-                <span className="font-medium">2,4 dager</span>
-              </li>
-              <li className="flex justify-between">
-                <span className="text-sm">Utnyttelsesgrad:</span>
-                <span className="font-medium">76%</span>
-              </li>
-              <li className="flex justify-between">
-                <span className="text-sm">Månedlige bookinger:</span>
-                <span className="font-medium">342</span>
-              </li>
-            </ul>
-          </CardContent>
-        </Card>
-        
-        <Card className="col-span-1">
-          <CardHeader>
-            <CardTitle>Fasilitetsstyring</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              Nylige fasilitetoppdateringer og ventende handlinger
-            </p>
-            <ul className="mt-4 space-y-2">
-              <li className="text-sm">
-                <span className="font-medium">3</span> nye fasiliteter lagt til
-              </li>
-              <li className="text-sm">
-                <span className="font-medium">7</span> fasiliteter trenger vedlikehold
-              </li>
-              <li className="text-sm">
-                <span className="font-medium">12</span> venter på verifisering
-              </li>
-            </ul>
-          </CardContent>
-        </Card>
-        
-        <Card className="col-span-1">
-          <CardHeader>
-            <CardTitle>Godkjenningsprosesser</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              Status for nåværende godkjenningsprosesser
-            </p>
-            <ul className="mt-4 space-y-2">
-              <li className="text-sm">
-                <span className="font-medium">8</span> venter på første gjennomgang
-              </li>
-              <li className="text-sm">
-                <span className="font-medium">5</span> venter på endelig godkjenning
-              </li>
-              <li className="text-sm">
-                <span className="font-medium">3</span> avvist denne måneden
-              </li>
-            </ul>
-          </CardContent>
-        </Card>
-      </div>
-      
-      {/* Rapporter & Analytikk Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Rapporter & Analytikk</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Siste måneders aktivitet</p>
-                <div className="text-2xl font-bold">215</div>
-                <p className="text-xs text-green-600">+5.2% fra forrige periode</p>
-              </div>
-            </div>
-            <div className="h-64 w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Bar dataKey="bookings" name="Bookinger" fill="#4f46e5" />
-                  <Bar dataKey="approvals" name="Godkjenninger" fill="#10b981" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-      
-      {/* Additional Section for Notification Settings */}
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Varslingsinnstillinger</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground mb-4">
-              Konfigurer hvilke varsler du ønsker å motta
-            </p>
-            <div className="space-y-3">
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Recent Work Orders */}
+        <div className="lg:col-span-2">
+          <Card>
+            <div className="p-6 border-b">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">E-postvarsler</span>
-                <span className="text-sm text-green-600">Aktivert</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">SMS-varsler</span>
-                <span className="text-sm text-red-600">Deaktivert</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Nettleservarsler</span>
-                <span className="text-sm text-green-600">Aktivert</span>
+                <h3 className="text-lg font-semibold">Recent Work Orders</h3>
+                <Badge variant="secondary">3 active</Badge>
               </div>
             </div>
-          </CardContent>
-        </Card>
-        
-        {/* Admin Profile & Settings Section */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Adminprofil & Innstillinger</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-start gap-4">
-              <div className="flex-shrink-0">
-                <img
-                  src="/placeholder.svg"
-                  alt="Admin profil"
-                  className="h-16 w-16 rounded-full"
-                />
+            <CardContent className="p-0">
+              <div className="space-y-0">
+                {workOrders.map((order, index) => (
+                  <div key={index} className="p-6 border-b last:border-b-0 hover:bg-gray-50 transition-colors">
+                    <div className="flex items-start justify-between">
+                      <div className="space-y-2 flex-1">
+                        <div className="flex items-center gap-3">
+                          <span className="text-sm font-medium text-blue-600">{order.id}</span>
+                          <Badge className={order.statusColor} variant="secondary">
+                            {order.status}
+                          </Badge>
+                        </div>
+                        <h4 className="font-medium">{order.title}</h4>
+                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                          <div className="flex items-center gap-2">
+                            <Avatar className="h-6 w-6">
+                              <AvatarFallback className="text-xs bg-blue-100 text-blue-600">
+                                {order.assignee.split(' ').map(n => n[0]).join('')}
+                              </AvatarFallback>
+                            </Avatar>
+                            <span>{order.assignee}</span>
+                          </div>
+                          <span>•</span>
+                          <span>{order.dueDate}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
-              <div className="space-y-1">
-                <h3 className="font-semibold">Adminbruker</h3>
-                <p className="text-sm text-muted-foreground">admin@drammen.kommune.no</p>
-                <p className="text-sm text-muted-foreground">Siste innlogging: 22. mai 2025 09:15</p>
-                <p className="text-sm text-muted-foreground">Rolle: Systemadministrator</p>
+              <div className="p-6 border-t bg-gray-50">
+                <Button variant="outline" className="w-full">
+                  View All Work Orders
+                </Button>
               </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Quick Actions */}
+        <div>
+          <Card>
+            <div className="p-6 border-b">
+              <h3 className="text-lg font-semibold flex items-center gap-2">
+                ⚡ Quick Actions
+              </h3>
             </div>
-          </CardContent>
-        </Card>
+            <CardContent className="p-6">
+              <div className="space-y-3">
+                {quickActions.map((action, index) => (
+                  <Button
+                    key={index}
+                    variant="outline"
+                    className="w-full justify-start gap-3 h-12"
+                  >
+                    <div className={`p-2 rounded-md ${action.color}`}>
+                      <action.icon className="h-4 w-4" />
+                    </div>
+                    {action.title}
+                  </Button>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );
