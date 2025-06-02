@@ -15,7 +15,7 @@ import {
   BarChart3,
   TrendingUp,
   TrendingDown,
-  Wrench,
+  Calendar,
   ClipboardList
 } from "lucide-react";
 
@@ -27,10 +27,10 @@ const OverviewPage = () => {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold mb-2">Velkommen tilbake! 👋</h1>
-            <p className="text-indigo-100">Her er hva som skjer med dine operasjoner i dag</p>
+            <p className="text-indigo-100">Her er oversikten over Drammen Kommune booking system i dag</p>
           </div>
           <Button className="bg-white/20 hover:bg-white/30 text-white border-white/30">
-            Opprett Arbeidsordre
+            Ny Reservasjon
           </Button>
         </div>
       </div>
@@ -43,32 +43,32 @@ const OverviewPage = () => {
               <div>
                 <div className="flex items-center gap-2 mb-2">
                   <div className="p-2 bg-blue-100 rounded-lg">
-                    <Building className="h-5 w-5 text-blue-600" />
+                    <Calendar className="h-5 w-5 text-blue-600" />
                   </div>
                 </div>
-                <p className="text-2xl font-bold">12</p>
-                <p className="text-sm text-gray-600">Åpne Arbeidsordrer</p>
-                <p className="text-xs text-blue-600 mt-1">+2 fra i går</p>
+                <p className="text-2xl font-bold">34</p>
+                <p className="text-sm text-gray-600">Aktive Reservasjoner</p>
+                <p className="text-xs text-blue-600 mt-1">+5 fra i går</p>
               </div>
               <TrendingUp className="h-4 w-4 text-blue-500" />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-l-4 border-l-red-500">
+        <Card className="border-l-4 border-l-yellow-500">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
                 <div className="flex items-center gap-2 mb-2">
-                  <div className="p-2 bg-red-100 rounded-lg">
-                    <AlertTriangle className="h-5 w-5 text-red-600" />
+                  <div className="p-2 bg-yellow-100 rounded-lg">
+                    <Clock className="h-5 w-5 text-yellow-600" />
                   </div>
                 </div>
-                <p className="text-2xl font-bold">7</p>
-                <p className="text-sm text-gray-600">Kritiske Varsler</p>
-                <p className="text-xs text-red-600 mt-1">3 kritiske</p>
+                <p className="text-2xl font-bold">12</p>
+                <p className="text-sm text-gray-600">Ventende Godkjenninger</p>
+                <p className="text-xs text-yellow-600 mt-1">Trenger handling</p>
               </div>
-              <TrendingDown className="h-4 w-4 text-red-500" />
+              <AlertTriangle className="h-4 w-4 text-yellow-500" />
             </div>
           </CardContent>
         </Card>
@@ -79,12 +79,12 @@ const OverviewPage = () => {
               <div>
                 <div className="flex items-center gap-2 mb-2">
                   <div className="p-2 bg-purple-100 rounded-lg">
-                    <Clock className="h-5 w-5 text-purple-600" />
+                    <ClipboardList className="h-5 w-5 text-purple-600" />
                   </div>
                 </div>
-                <p className="text-2xl font-bold">15</p>
-                <p className="text-sm text-gray-600">Kommende PM</p>
-                <p className="text-xs text-purple-600 mt-1">Neste 7 dager</p>
+                <p className="text-2xl font-bold">28</p>
+                <p className="text-sm text-gray-600">Nye Forespørsler</p>
+                <p className="text-xs text-purple-600 mt-1">Siste 7 dager</p>
               </div>
               <TrendingUp className="h-4 w-4 text-purple-500" />
             </div>
@@ -97,12 +97,12 @@ const OverviewPage = () => {
               <div>
                 <div className="flex items-center gap-2 mb-2">
                   <div className="p-2 bg-green-100 rounded-lg">
-                    <CheckCircle className="h-5 w-5 text-green-600" />
+                    <Building className="h-5 w-5 text-green-600" />
                   </div>
                 </div>
                 <p className="text-2xl font-bold">143</p>
                 <p className="text-sm text-gray-600">Aktive Fasiliteter</p>
-                <p className="text-xs text-green-600 mt-1">Alle systemer operative</p>
+                <p className="text-xs text-green-600 mt-1">Alle tilgjengelige</p>
               </div>
               <TrendingUp className="h-4 w-4 text-green-500" />
             </div>
@@ -112,32 +112,32 @@ const OverviewPage = () => {
 
       {/* Main Content Grid */}
       <div className="grid gap-6 md:grid-cols-3">
-        {/* Recent Work Orders */}
+        {/* Recent Bookings */}
         <Card className="col-span-2">
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-lg font-semibold">Nylige Arbeidsordrer</CardTitle>
+            <CardTitle className="text-lg font-semibold">Nylige Reservasjoner</CardTitle>
             <Badge variant="secondary" className="text-blue-600 bg-blue-50">
-              3 aktive
+              8 aktive
             </Badge>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between p-4 border rounded-lg">
               <div className="flex items-center gap-3">
                 <Avatar className="h-8 w-8">
-                  <AvatarFallback className="bg-orange-100 text-orange-600">MK</AvatarFallback>
+                  <AvatarFallback className="bg-blue-100 text-blue-600">DI</AvatarFallback>
                 </Avatar>
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="font-medium text-blue-600">#5489</span>
-                    <Badge variant="outline" className="text-orange-600 border-orange-200 bg-orange-50">
-                      Venter
+                    <span className="font-medium text-blue-600">#B-2024-001</span>
+                    <Badge variant="outline" className="text-green-600 border-green-200 bg-green-50">
+                      Godkjent
                     </Badge>
                   </div>
-                  <p className="font-medium">Gaffeltruck - Hydraulikk starter ikke</p>
+                  <p className="font-medium">Drammen Idrettshall - Hovedhall</p>
                   <div className="flex items-center gap-4 text-sm text-gray-500 mt-1">
-                    <span>Mary Kavanagh</span>
+                    <span>Drammen IL</span>
                     <span>•</span>
-                    <span>Frist i dag</span>
+                    <span>15. februar 2024</span>
                   </div>
                 </div>
               </div>
@@ -146,49 +146,49 @@ const OverviewPage = () => {
             <div className="flex items-center justify-between p-4 border rounded-lg">
               <div className="flex items-center gap-3">
                 <Avatar className="h-8 w-8">
-                  <AvatarFallback className="bg-blue-100 text-blue-600">MK</AvatarFallback>
+                  <AvatarFallback className="bg-orange-100 text-orange-600">BK</AvatarFallback>
                 </Avatar>
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="font-medium text-blue-600">#5495</span>
+                    <span className="font-medium text-blue-600">#B-2024-002</span>
+                    <Badge variant="outline" className="text-yellow-600 border-yellow-200 bg-yellow-50">
+                      Venter
+                    </Badge>
+                  </div>
+                  <p className="font-medium">Brandengen Skole - Gymsal</p>
+                  <div className="flex items-center gap-4 text-sm text-gray-500 mt-1">
+                    <span>Bragernes Kulturforening</span>
+                    <span>•</span>
+                    <span>20. februar 2024</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between p-4 border rounded-lg">
+              <div className="flex items-center gap-3">
+                <Avatar className="h-8 w-8">
+                  <AvatarFallback className="bg-purple-100 text-purple-600">SI</AvatarFallback>
+                </Avatar>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium text-blue-600">#B-2024-003</span>
                     <Badge variant="outline" className="text-blue-600 border-blue-200 bg-blue-50">
-                      Åpen
+                      Under behandling
                     </Badge>
                   </div>
-                  <p className="font-medium">Daglig områdeinspeksjon</p>
+                  <p className="font-medium">Strømsø Samfunnshus - Storhall</p>
                   <div className="flex items-center gap-4 text-sm text-gray-500 mt-1">
-                    <span>Mary Kavanagh</span>
+                    <span>Strømsø IL</span>
                     <span>•</span>
-                    <span>Frist i morgen</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between p-4 border rounded-lg">
-              <div className="flex items-center gap-3">
-                <Avatar className="h-8 w-8">
-                  <AvatarFallback className="bg-orange-100 text-orange-600">CM</AvatarFallback>
-                </Avatar>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium text-blue-600">#5488</span>
-                    <Badge variant="outline" className="text-orange-600 border-orange-200 bg-orange-50">
-                      Venter
-                    </Badge>
-                  </div>
-                  <p className="font-medium">OSHA Compliance - Daglig områdeinspeksjon</p>
-                  <div className="flex items-center gap-4 text-sm text-gray-500 mt-1">
-                    <span>Chris Manning</span>
-                    <span>•</span>
-                    <span>Frist denne uken</span>
+                    <span>25. februar 2024</span>
                   </div>
                 </div>
               </div>
             </div>
 
             <Button variant="outline" className="w-full">
-              Se alle arbeidsordrer
+              Se alle reservasjoner
             </Button>
           </CardContent>
         </Card>
@@ -203,30 +203,30 @@ const OverviewPage = () => {
           <CardContent className="space-y-3">
             <Button className="w-full justify-start gap-3 h-12" variant="outline">
               <div className="p-2 bg-blue-100 rounded-lg">
-                <Wrench className="h-4 w-4 text-blue-600" />
+                <Calendar className="h-4 w-4 text-blue-600" />
               </div>
-              Ny Arbeidsordre
+              Ny Reservasjon
             </Button>
             
             <Button className="w-full justify-start gap-3 h-12" variant="outline">
               <div className="p-2 bg-green-100 rounded-lg">
-                <ClipboardList className="h-4 w-4 text-green-600" />
+                <Building className="h-4 w-4 text-green-600" />
               </div>
-              Ny Forespørsel
+              Legg til Fasilitet
             </Button>
             
             <Button className="w-full justify-start gap-3 h-12" variant="outline">
               <div className="p-2 bg-purple-100 rounded-lg">
-                <FileText className="h-4 w-4 text-purple-600" />
+                <Users className="h-4 w-4 text-purple-600" />
               </div>
-              Ny Innkjøpsordre
+              Administrer Brukere
             </Button>
             
             <Button className="w-full justify-start gap-3 h-12" variant="outline">
               <div className="p-2 bg-orange-100 rounded-lg">
-                <Building className="h-4 w-4 text-orange-600" />
+                <BarChart3 className="h-4 w-4 text-orange-600" />
               </div>
-              Legg til Fasilitet
+              Se Rapporter
             </Button>
           </CardContent>
         </Card>
