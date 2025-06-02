@@ -16,7 +16,8 @@ import {
   TrendingUp,
   TrendingDown,
   Calendar,
-  ClipboardList
+  ClipboardList,
+  Settings
 } from "lucide-react";
 
 const OverviewPage = () => {
@@ -26,11 +27,12 @@ const OverviewPage = () => {
       <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl p-8 text-white">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold mb-2">Velkommen tilbake! 👋</h1>
-            <p className="text-indigo-100">Her er oversikten over Drammen Kommune booking system i dag</p>
+            <h1 className="text-3xl font-bold mb-2">Admin Dashboard 👋</h1>
+            <p className="text-indigo-100">Administrer bookingsystemet for Drammen Kommune</p>
           </div>
-          <Button className="bg-white/20 hover:bg-white/30 text-white border-white/30">
-            Ny Reservasjon
+          <Button className="bg-white/20 hover:bg-white/30 text-white border-white/30 gap-2">
+            <Settings className="h-4 w-4" />
+            Systeminnstillinger
           </Button>
         </div>
       </div>
@@ -202,17 +204,17 @@ const OverviewPage = () => {
           </CardHeader>
           <CardContent className="space-y-3">
             <Button className="w-full justify-start gap-3 h-12" variant="outline">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Calendar className="h-4 w-4 text-blue-600" />
+              <div className="p-2 bg-yellow-100 rounded-lg">
+                <Clock className="h-4 w-4 text-yellow-600" />
               </div>
-              Ny Reservasjon
+              Behandle Forespørsler
             </Button>
             
             <Button className="w-full justify-start gap-3 h-12" variant="outline">
               <div className="p-2 bg-green-100 rounded-lg">
                 <Building className="h-4 w-4 text-green-600" />
               </div>
-              Legg til Fasilitet
+              Administrer Fasiliteter
             </Button>
             
             <Button className="w-full justify-start gap-3 h-12" variant="outline">
