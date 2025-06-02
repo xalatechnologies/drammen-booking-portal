@@ -142,6 +142,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
                     selected={dateRange}
                     onSelect={setDateRange}
                     numberOfMonths={2}
+                    weekStartsOn={1}
                     className="pointer-events-auto"
                   />
                 </PopoverContent>
