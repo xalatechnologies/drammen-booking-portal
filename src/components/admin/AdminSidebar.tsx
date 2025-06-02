@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
@@ -29,6 +28,7 @@ import {
   SidebarHeader,
   SidebarFooter,
 } from "@/components/ui/sidebar";
+import Logo from "@/components/header/Logo";
 
 const AdminSidebar = () => {
   const navigate = useNavigate();
@@ -149,14 +149,8 @@ const AdminSidebar = () => {
   return (
     <Sidebar className="border-r bg-white">
       <SidebarHeader className="p-4 border-b">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-sm">DK</span>
-          </div>
-          <div>
-            <h1 className="font-semibold text-gray-900">Drammen Kommune</h1>
-            <p className="text-xs text-gray-500">Booking System</p>
-          </div>
+        <div className="flex items-center justify-center">
+          <Logo />
         </div>
       </SidebarHeader>
       
