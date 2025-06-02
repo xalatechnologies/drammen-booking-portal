@@ -1,215 +1,233 @@
 
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent
-} from "@/components/ui/chart";
-import { 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  ResponsiveContainer,
-  Tooltip, 
-  Legend 
-} from "recharts";
-import { ChartBarIcon } from "lucide-react";
+  Building,
+  AlertTriangle,
+  Clock,
+  CheckCircle,
+  Plus,
+  FileText,
+  Users,
+  BarChart3,
+  TrendingUp,
+  TrendingDown,
+  Wrench,
+  ClipboardList
+} from "lucide-react";
 
 const OverviewPage = () => {
-  // Sample data for the overview page
-  const statsData = [
-    { name: "Totalt Antall Fasiliteter", value: 124 },
-    { name: "Ventende Godkjenninger", value: 18 },
-    { name: "Aktive Brukere", value: 543 },
-  ];
-
-  const chartData = [
-    { month: "Jan", bookings: 65, approvals: 28 },
-    { month: "Feb", bookings: 59, approvals: 25 },
-    { month: "Mar", bookings: 80, approvals: 36 },
-    { month: "Apr", bookings: 81, approvals: 32 },
-    { month: "May", bookings: 56, approvals: 24 },
-    { month: "Jun", bookings: 55, approvals: 20 },
-  ];
-
-  // Fixed chart config to match expected type
-  const chartConfig = {
-    bookings: { label: "Bookinger", color: "#4f46e5" },
-    approvals: { label: "Godkjenninger", color: "#10b981" },
-  };
-
   return (
-    <div className="space-y-6">
-      <h2 className="text-3xl font-bold tracking-tight">Dashbord Oversikt</h2>
-      
+    <div className="space-y-6 p-6">
+      {/* Welcome Section */}
+      <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl p-8 text-white">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold mb-2">Velkommen tilbake! 👋</h1>
+            <p className="text-indigo-100">Her er hva som skjer med dine operasjoner i dag</p>
+          </div>
+          <Button className="bg-white/20 hover:bg-white/30 text-white border-white/30">
+            Opprett Arbeidsordre
+          </Button>
+        </div>
+      </div>
+
       {/* Stats Cards */}
-      <div className="grid gap-6 md:grid-cols-3">
-        {statsData.map((stat) => (
-          <Card key={stat.name}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{stat.name}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stat.value}</div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-      
-      {/* Main Content Section with 3 columns */}
-      <div className="grid gap-6 md:grid-cols-3">
-        <Card className="col-span-1">
-          <CardHeader>
-            <CardTitle>Oversiktsstatistikk</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              Nøkkelindikatorer og målinger for fasilitetsstyring
-            </p>
-            <ul className="mt-4 space-y-2">
-              <li className="flex justify-between">
-                <span className="text-sm">Gj.snitt godkjenningstid:</span>
-                <span className="font-medium">2,4 dager</span>
-              </li>
-              <li className="flex justify-between">
-                <span className="text-sm">Utnyttelsesgrad:</span>
-                <span className="font-medium">76%</span>
-              </li>
-              <li className="flex justify-between">
-                <span className="text-sm">Månedlige bookinger:</span>
-                <span className="font-medium">342</span>
-              </li>
-            </ul>
-          </CardContent>
-        </Card>
-        
-        <Card className="col-span-1">
-          <CardHeader>
-            <CardTitle>Fasilitetsstyring</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              Nylige fasilitetoppdateringer og ventende handlinger
-            </p>
-            <ul className="mt-4 space-y-2">
-              <li className="text-sm">
-                <span className="font-medium">3</span> nye fasiliteter lagt til
-              </li>
-              <li className="text-sm">
-                <span className="font-medium">7</span> fasiliteter trenger vedlikehold
-              </li>
-              <li className="text-sm">
-                <span className="font-medium">12</span> venter på verifisering
-              </li>
-            </ul>
-          </CardContent>
-        </Card>
-        
-        <Card className="col-span-1">
-          <CardHeader>
-            <CardTitle>Godkjenningsprosesser</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              Status for nåværende godkjenningsprosesser
-            </p>
-            <ul className="mt-4 space-y-2">
-              <li className="text-sm">
-                <span className="font-medium">8</span> venter på første gjennomgang
-              </li>
-              <li className="text-sm">
-                <span className="font-medium">5</span> venter på endelig godkjenning
-              </li>
-              <li className="text-sm">
-                <span className="font-medium">3</span> avvist denne måneden
-              </li>
-            </ul>
-          </CardContent>
-        </Card>
-      </div>
-      
-      {/* Rapporter & Analytikk Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Rapporter & Analytikk</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col space-y-4">
+      <div className="grid gap-6 md:grid-cols-4">
+        <Card className="border-l-4 border-l-blue-500">
+          <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Siste måneders aktivitet</p>
-                <div className="text-2xl font-bold">215</div>
-                <p className="text-xs text-green-600">+5.2% fra forrige periode</p>
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="p-2 bg-blue-100 rounded-lg">
+                    <Building className="h-5 w-5 text-blue-600" />
+                  </div>
+                </div>
+                <p className="text-2xl font-bold">12</p>
+                <p className="text-sm text-gray-600">Åpne Arbeidsordrer</p>
+                <p className="text-xs text-blue-600 mt-1">+2 fra i går</p>
               </div>
-            </div>
-            <div className="h-64 w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Bar dataKey="bookings" name="Bookinger" fill="#4f46e5" />
-                  <Bar dataKey="approvals" name="Godkjenninger" fill="#10b981" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-      
-      {/* Additional Section for Notification Settings */}
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Varslingsinnstillinger</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground mb-4">
-              Konfigurer hvilke varsler du ønsker å motta
-            </p>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">E-postvarsler</span>
-                <span className="text-sm text-green-600">Aktivert</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">SMS-varsler</span>
-                <span className="text-sm text-red-600">Deaktivert</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Nettleservarsler</span>
-                <span className="text-sm text-green-600">Aktivert</span>
-              </div>
+              <TrendingUp className="h-4 w-4 text-blue-500" />
             </div>
           </CardContent>
         </Card>
-        
-        {/* Admin Profile & Settings Section */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Adminprofil & Innstillinger</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-start gap-4">
-              <div className="flex-shrink-0">
-                <img
-                  src="/placeholder.svg"
-                  alt="Admin profil"
-                  className="h-16 w-16 rounded-full"
-                />
+
+        <Card className="border-l-4 border-l-red-500">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="p-2 bg-red-100 rounded-lg">
+                    <AlertTriangle className="h-5 w-5 text-red-600" />
+                  </div>
+                </div>
+                <p className="text-2xl font-bold">7</p>
+                <p className="text-sm text-gray-600">Kritiske Varsler</p>
+                <p className="text-xs text-red-600 mt-1">3 kritiske</p>
               </div>
-              <div className="space-y-1">
-                <h3 className="font-semibold">Adminbruker</h3>
-                <p className="text-sm text-muted-foreground">admin@drammen.kommune.no</p>
-                <p className="text-sm text-muted-foreground">Siste innlogging: 22. mai 2025 09:15</p>
-                <p className="text-sm text-muted-foreground">Rolle: Systemadministrator</p>
+              <TrendingDown className="h-4 w-4 text-red-500" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-l-4 border-l-purple-500">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="p-2 bg-purple-100 rounded-lg">
+                    <Clock className="h-5 w-5 text-purple-600" />
+                  </div>
+                </div>
+                <p className="text-2xl font-bold">15</p>
+                <p className="text-sm text-gray-600">Kommende PM</p>
+                <p className="text-xs text-purple-600 mt-1">Neste 7 dager</p>
+              </div>
+              <TrendingUp className="h-4 w-4 text-purple-500" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-l-4 border-l-green-500">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="p-2 bg-green-100 rounded-lg">
+                    <CheckCircle className="h-5 w-5 text-green-600" />
+                  </div>
+                </div>
+                <p className="text-2xl font-bold">143</p>
+                <p className="text-sm text-gray-600">Aktive Fasiliteter</p>
+                <p className="text-xs text-green-600 mt-1">Alle systemer operative</p>
+              </div>
+              <TrendingUp className="h-4 w-4 text-green-500" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Main Content Grid */}
+      <div className="grid gap-6 md:grid-cols-3">
+        {/* Recent Work Orders */}
+        <Card className="col-span-2">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="text-lg font-semibold">Nylige Arbeidsordrer</CardTitle>
+            <Badge variant="secondary" className="text-blue-600 bg-blue-50">
+              3 aktive
+            </Badge>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between p-4 border rounded-lg">
+              <div className="flex items-center gap-3">
+                <Avatar className="h-8 w-8">
+                  <AvatarFallback className="bg-orange-100 text-orange-600">MK</AvatarFallback>
+                </Avatar>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium text-blue-600">#5489</span>
+                    <Badge variant="outline" className="text-orange-600 border-orange-200 bg-orange-50">
+                      Venter
+                    </Badge>
+                  </div>
+                  <p className="font-medium">Gaffeltruck - Hydraulikk starter ikke</p>
+                  <div className="flex items-center gap-4 text-sm text-gray-500 mt-1">
+                    <span>Mary Kavanagh</span>
+                    <span>•</span>
+                    <span>Frist i dag</span>
+                  </div>
+                </div>
               </div>
             </div>
+
+            <div className="flex items-center justify-between p-4 border rounded-lg">
+              <div className="flex items-center gap-3">
+                <Avatar className="h-8 w-8">
+                  <AvatarFallback className="bg-blue-100 text-blue-600">MK</AvatarFallback>
+                </Avatar>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium text-blue-600">#5495</span>
+                    <Badge variant="outline" className="text-blue-600 border-blue-200 bg-blue-50">
+                      Åpen
+                    </Badge>
+                  </div>
+                  <p className="font-medium">Daglig områdeinspeksjon</p>
+                  <div className="flex items-center gap-4 text-sm text-gray-500 mt-1">
+                    <span>Mary Kavanagh</span>
+                    <span>•</span>
+                    <span>Frist i morgen</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between p-4 border rounded-lg">
+              <div className="flex items-center gap-3">
+                <Avatar className="h-8 w-8">
+                  <AvatarFallback className="bg-orange-100 text-orange-600">CM</AvatarFallback>
+                </Avatar>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium text-blue-600">#5488</span>
+                    <Badge variant="outline" className="text-orange-600 border-orange-200 bg-orange-50">
+                      Venter
+                    </Badge>
+                  </div>
+                  <p className="font-medium">OSHA Compliance - Daglig områdeinspeksjon</p>
+                  <div className="flex items-center gap-4 text-sm text-gray-500 mt-1">
+                    <span>Chris Manning</span>
+                    <span>•</span>
+                    <span>Frist denne uken</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <Button variant="outline" className="w-full">
+              Se alle arbeidsordrer
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* Quick Actions */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold flex items-center gap-2">
+              ⚡ Hurtighandlinger
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <Button className="w-full justify-start gap-3 h-12" variant="outline">
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <Wrench className="h-4 w-4 text-blue-600" />
+              </div>
+              Ny Arbeidsordre
+            </Button>
+            
+            <Button className="w-full justify-start gap-3 h-12" variant="outline">
+              <div className="p-2 bg-green-100 rounded-lg">
+                <ClipboardList className="h-4 w-4 text-green-600" />
+              </div>
+              Ny Forespørsel
+            </Button>
+            
+            <Button className="w-full justify-start gap-3 h-12" variant="outline">
+              <div className="p-2 bg-purple-100 rounded-lg">
+                <FileText className="h-4 w-4 text-purple-600" />
+              </div>
+              Ny Innkjøpsordre
+            </Button>
+            
+            <Button className="w-full justify-start gap-3 h-12" variant="outline">
+              <div className="p-2 bg-orange-100 rounded-lg">
+                <Building className="h-4 w-4 text-orange-600" />
+              </div>
+              Legg til Fasilitet
+            </Button>
           </CardContent>
         </Card>
       </div>

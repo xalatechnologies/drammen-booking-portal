@@ -8,7 +8,14 @@ import {
   Bell,
   Settings,
   Activity,
-  BarChart3
+  BarChart3,
+  Building,
+  Archive,
+  ClipboardList,
+  Gauge,
+  MapPin,
+  MessageSquare,
+  Languages
 } from "lucide-react";
 import {
   Sidebar,
@@ -19,6 +26,8 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
+  SidebarHeader,
+  SidebarFooter,
 } from "@/components/ui/sidebar";
 
 const AdminSidebar = () => {
@@ -26,15 +35,18 @@ const AdminSidebar = () => {
   const location = useLocation();
   const currentPath = location.pathname;
 
-  const menuItems = [
+  const overviewItems = [
     {
-      title: "Oversikt",
+      title: "Dashboard",
       icon: LayoutDashboard,
       path: "/admin",
     },
+  ];
+
+  const operationsItems = [
     {
       title: "Fasilitetsstyring",
-      icon: FileText,
+      icon: Building,
       path: "/admin/facilities",
     },
     {
@@ -43,24 +55,63 @@ const AdminSidebar = () => {
       path: "/admin/approvals",
     },
     {
+      title: "Forespørsler",
+      icon: ClipboardList,
+      path: "/admin/requests",
+    },
+  ];
+
+  const resourcesItems = [
+    {
       title: "Brukere & Roller",
       icon: Users,
       path: "/admin/users",
     },
+    {
+      title: "Inventar",
+      icon: Archive,
+      path: "/admin/inventory",
+    },
+    {
+      title: "Prosedyrer",
+      icon: FileText,
+      path: "/admin/procedures",
+    },
+    {
+      title: "Målere",
+      icon: Gauge,
+      path: "/admin/meters",
+    },
+    {
+      title: "Lokasjoner",
+      icon: MapPin,
+      path: "/admin/locations",
+    },
+  ];
+
+  const collaborationItems = [
     {
       title: "Rapporter & Analytikk",
       icon: BarChart3,
       path: "/admin/reports",
     },
     {
-      title: "Varsler",
-      icon: Bell,
-      path: "/admin/notifications",
+      title: "Meldinger",
+      icon: MessageSquare,
+      path: "/admin/messages",
+    },
+  ];
+
+  const administrationItems = [
+    {
+      title: "Organisasjon",
+      icon: Building,
+      path: "/admin/organization",
     },
     {
-      title: "Profil & Innstillinger",
-      icon: Settings,
-      path: "/admin/profile",
+      title: "Oversettelser",
+      icon: Languages,
+      path: "/admin/translations",
     },
   ];
 
@@ -71,29 +122,58 @@ const AdminSidebar = () => {
     return currentPath.startsWith(path) && path !== "/admin";
   };
 
+  const renderMenuGroup = (items: any[], groupLabel: string) => (
+    <SidebarGroup>
+      <SidebarGroupLabel className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
+        {groupLabel}
+      </SidebarGroupLabel>
+      <SidebarGroupContent>
+        <SidebarMenu>
+          {items.map((item) => (
+            <SidebarMenuItem key={item.path}>
+              <SidebarMenuButton
+                isActive={isActive(item.path)}
+                onClick={() => navigate(item.path)}
+                className="flex items-center gap-3 px-3 py-2 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-100 hover:text-gray-900 transition-colors"
+              >
+                <item.icon className="h-5 w-5" />
+                <span>{item.title}</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          ))}
+        </SidebarMenu>
+      </SidebarGroupContent>
+    </SidebarGroup>
+  );
+
   return (
-    <Sidebar>
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>Admin</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {menuItems.map((item) => (
-                <SidebarMenuItem key={item.path}>
-                  <SidebarMenuButton
-                    isActive={isActive(item.path)}
-                    tooltip={item.title}
-                    onClick={() => navigate(item.path)}
-                  >
-                    <item.icon />
-                    <span>{item.title}</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+    <Sidebar className="border-r bg-white">
+      <SidebarHeader className="p-4 border-b">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
+            <span className="text-white font-bold text-sm">DK</span>
+          </div>
+          <div>
+            <h1 className="font-semibold text-gray-900">Drammen Kommune</h1>
+            <p className="text-xs text-gray-500">Booking System</p>
+          </div>
+        </div>
+      </SidebarHeader>
+      
+      <SidebarContent className="px-3 py-4 space-y-6">
+        {renderMenuGroup(overviewItems, "OVERSIKT")}
+        {renderMenuGroup(operationsItems, "OPERASJONER")}
+        {renderMenuGroup(resourcesItems, "RESSURSER")}
+        {renderMenuGroup(collaborationItems, "SAMARBEID")}
+        {renderMenuGroup(administrationItems, "ADMINISTRASJON")}
       </SidebarContent>
+
+      <SidebarFooter className="p-4 border-t">
+        <div className="flex items-center gap-2">
+          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+          <span className="text-sm text-gray-600">Alle systemer operative</span>
+        </div>
+      </SidebarFooter>
     </Sidebar>
   );
 };
