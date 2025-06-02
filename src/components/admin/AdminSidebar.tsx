@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
@@ -94,6 +95,11 @@ const AdminSidebar = () => {
       title: "Rapporter & Analytikk",
       icon: BarChart3,
       path: "/admin/reports",
+    },
+    {
+      title: "Varsler",
+      icon: Bell,
+      path: "/admin/notifications",
     },
     {
       title: "Meldinger",
