@@ -106,7 +106,6 @@ const CalendarView: React.FC<CalendarViewProps> = ({
     });
   };
 
-  // Hours to display in the calendar (simplified to 4-hour blocks for this view)
   const hours = [8, 12, 16, 20];
   
   return (
@@ -173,19 +172,23 @@ const CalendarView: React.FC<CalendarViewProps> = ({
                     }
                     
                     return (
-                      <th key={i} className={`p-2 text-center border-b min-w-[100px] ${headerClass}`}>
-                        <div className="font-medium">{format(day, "EEEE", { locale: nb })}</div>
-                        <div className="text-sm">{format(day, "dd.MM")}</div>
-                        {holidayCheck.isHoliday && (
-                          <div className="text-xs font-semibold mt-1 text-red-800">
-                            {holidayCheck.name}
+                      <th key={i} className={`p-2 text-center border-b min-w-[100px] h-20 ${headerClass}`}>
+                        <div className="flex flex-col justify-center h-full">
+                          <div className="font-medium">{format(day, "EEEE", { locale: nb })}</div>
+                          <div className="text-sm">{format(day, "dd.MM")}</div>
+                          <div className="text-xs mt-1 min-h-[16px]">
+                            {holidayCheck.isHoliday && (
+                              <span className="font-semibold text-red-800">
+                                {holidayCheck.name}
+                              </span>
+                            )}
+                            {unavailableCheck.isUnavailable && !holidayCheck.isHoliday && (
+                              <span>
+                                {unavailableCheck.details}
+                              </span>
+                            )}
                           </div>
-                        )}
-                        {unavailableCheck.isUnavailable && !holidayCheck.isHoliday && (
-                          <div className="text-xs mt-1">
-                            {unavailableCheck.details}
-                          </div>
-                        )}
+                        </div>
                       </th>
                     );
                   })}
@@ -232,17 +235,16 @@ const CalendarView: React.FC<CalendarViewProps> = ({
                               const unavailableCheck = isDateUnavailable(new Date(day));
                               const isBooked = isTimeSlotBooked(facility.id, new Date(day), hour);
                               
-                              // If the day is unavailable, show the reason with appropriate styling
                               if (unavailableCheck.isUnavailable) {
                                 const bgColor = {
-                                  'past': 'bg-gray-200',
+                                  'past': 'bg-gray-300',
                                   'weekend': 'bg-amber-200',
                                   'holiday': 'bg-red-300',
                                   'maintenance': 'bg-yellow-200'
                                 }[unavailableCheck.reason!];
                                 
                                 const textColor = {
-                                  'past': 'text-gray-600',
+                                  'past': 'text-gray-700',
                                   'weekend': 'text-amber-800',
                                   'holiday': 'text-red-800',
                                   'maintenance': 'text-yellow-800'
