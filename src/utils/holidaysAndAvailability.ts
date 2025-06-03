@@ -121,16 +121,16 @@ export const isDateUnavailable = (date: Date): {
   return { isUnavailable: false };
 };
 
-// Get availability status with color coding for UI
+// Get availability status with improved color coding for UI
 export const getDateAvailabilityStatus = (date: Date) => {
   const unavailableCheck = isDateUnavailable(date);
   
   if (unavailableCheck.isUnavailable) {
     const colorClass = {
-      'past': 'text-gray-400 bg-gray-100',
-      'weekend': 'text-orange-600 bg-orange-50',
-      'holiday': 'text-red-600 bg-red-50',
-      'maintenance': 'text-yellow-600 bg-yellow-50'
+      'past': 'text-gray-500 bg-gray-100',
+      'weekend': 'text-amber-800 bg-amber-100',
+      'holiday': 'text-red-800 bg-red-200',
+      'maintenance': 'text-yellow-800 bg-yellow-200'
     }[unavailableCheck.reason!];
     
     return {
@@ -143,7 +143,7 @@ export const getDateAvailabilityStatus = (date: Date) => {
   
   return {
     isAvailable: true,
-    colorClass: 'text-green-600 bg-green-50',
+    colorClass: 'text-green-800 bg-green-100',
     tooltip: 'Tilgjengelig for booking',
     reason: 'available'
   };

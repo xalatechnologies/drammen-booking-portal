@@ -62,28 +62,32 @@ function Calendar({
           
           let dayClass = "";
           let title = "";
+          let isDisabled = false;
           
           if (unavailableCheck.isUnavailable) {
             switch (unavailableCheck.reason) {
               case 'past':
-                dayClass = "text-gray-400 line-through opacity-50";
+                dayClass = "text-gray-500 bg-gray-100 line-through opacity-60 cursor-not-allowed";
                 title = "Fortid - ikke tilgjengelig";
+                isDisabled = true;
                 break;
               case 'weekend':
-                dayClass = "text-orange-700 bg-orange-100 border border-orange-300 font-semibold";
+                dayClass = "text-amber-800 bg-amber-100 border-2 border-amber-300 font-semibold hover:bg-amber-200";
                 title = "Helg - begrenset tilgang";
                 break;
               case 'holiday':
-                dayClass = "text-red-700 bg-red-100 border border-red-300 font-semibold";
-                title = `Helligdag: ${unavailableCheck.details}`;
+                dayClass = "text-red-800 bg-red-200 border-2 border-red-400 font-bold cursor-not-allowed";
+                title = `Helligdag: ${unavailableCheck.details} - ikke tilgjengelig`;
+                isDisabled = true;
                 break;
               case 'maintenance':
-                dayClass = "text-yellow-700 bg-yellow-100 border border-yellow-300 font-semibold";
+                dayClass = "text-yellow-800 bg-yellow-200 border-2 border-yellow-400 font-semibold cursor-not-allowed";
                 title = "Vedlikehold - ikke tilgjengelig";
+                isDisabled = true;
                 break;
             }
           } else {
-            dayClass = "text-green-700 bg-green-50 hover:bg-green-100";
+            dayClass = "text-green-800 bg-green-100 hover:bg-green-200 border border-green-300";
             title = "Tilgjengelig for booking";
           }
           
@@ -91,15 +95,17 @@ function Calendar({
             <button
               {...dayProps}
               title={title}
+              disabled={isDisabled}
               className={cn(
                 buttonVariants({ variant: "ghost" }),
-                "h-9 w-9 p-0 font-normal aria-selected:opacity-100 relative rounded-md",
-                dayClass
+                "h-9 w-9 p-0 font-normal aria-selected:opacity-100 relative rounded-md transition-colors",
+                dayClass,
+                isDisabled && "pointer-events-none"
               )}
             >
               {date.getDate()}
               {holidayCheck.isHoliday && (
-                <div className="absolute -top-1 -right-1 w-2 h-2 bg-red-600 rounded-full border border-white"></div>
+                <div className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-red-600 rounded-full border-2 border-white shadow-sm"></div>
               )}
             </button>
           );

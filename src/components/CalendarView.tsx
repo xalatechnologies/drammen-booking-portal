@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { format, addDays, startOfWeek, addWeeks, subWeeks } from "date-fns";
 import { ChevronLeft, ChevronRight, CalendarDays } from "lucide-react";
 import { nb } from "date-fns/locale";
+import { isDateUnavailable, isNorwegianHoliday } from "@/utils/holidaysAndAvailability";
 
 interface Booking {
   id: number;
@@ -147,12 +148,47 @@ const CalendarView: React.FC<CalendarViewProps> = ({
               <thead>
                 <tr className="bg-gray-50">
                   <th className="p-2 text-left border-b border-r min-w-[200px]">Lokale</th>
-                  {days.map((day, i) => (
-                    <th key={i} className="p-2 text-center border-b min-w-[100px]">
-                      <div className="font-medium">{format(day, "EEEE", { locale: nb })}</div>
-                      <div className="text-sm text-gray-500">{format(day, "dd.MM")}</div>
-                    </th>
-                  ))}
+                  {days.map((day, i) => {
+                    const unavailableCheck = isDateUnavailable(day);
+                    const holidayCheck = isNorwegianHoliday(day);
+                    
+                    let headerClass = "";
+                    if (unavailableCheck.isUnavailable) {
+                      switch (unavailableCheck.reason) {
+                        case 'past':
+                          headerClass = "bg-gray-200 text-gray-600";
+                          break;
+                        case 'weekend':
+                          headerClass = "bg-amber-100 text-amber-800";
+                          break;
+                        case 'holiday':
+                          headerClass = "bg-red-200 text-red-800 font-bold";
+                          break;
+                        case 'maintenance':
+                          headerClass = "bg-yellow-200 text-yellow-800";
+                          break;
+                      }
+                    } else {
+                      headerClass = "bg-green-100 text-green-800";
+                    }
+                    
+                    return (
+                      <th key={i} className={`p-2 text-center border-b min-w-[100px] ${headerClass}`}>
+                        <div className="font-medium">{format(day, "EEEE", { locale: nb })}</div>
+                        <div className="text-sm">{format(day, "dd.MM")}</div>
+                        {holidayCheck.isHoliday && (
+                          <div className="text-xs font-semibold mt-1 text-red-800">
+                            {holidayCheck.name}
+                          </div>
+                        )}
+                        {unavailableCheck.isUnavailable && !holidayCheck.isHoliday && (
+                          <div className="text-xs mt-1">
+                            {unavailableCheck.details}
+                          </div>
+                        )}
+                      </th>
+                    );
+                  })}
                 </tr>
               </thead>
               <tbody>
@@ -193,19 +229,52 @@ const CalendarView: React.FC<CalendarViewProps> = ({
                           <td className="p-2 text-center border text-sm">
                             <div className="font-medium">{hour}:00 - {hour + 4}:00</div>
                             {days.map((day, dayIndex) => {
+                              const unavailableCheck = isDateUnavailable(new Date(day));
                               const isBooked = isTimeSlotBooked(facility.id, new Date(day), hour);
+                              
+                              // If the day is unavailable, show the reason with appropriate styling
+                              if (unavailableCheck.isUnavailable) {
+                                const bgColor = {
+                                  'past': 'bg-gray-200',
+                                  'weekend': 'bg-amber-200',
+                                  'holiday': 'bg-red-300',
+                                  'maintenance': 'bg-yellow-200'
+                                }[unavailableCheck.reason!];
+                                
+                                const textColor = {
+                                  'past': 'text-gray-600',
+                                  'weekend': 'text-amber-800',
+                                  'holiday': 'text-red-800',
+                                  'maintenance': 'text-yellow-800'
+                                }[unavailableCheck.reason!];
+                                
+                                return (
+                                  <td 
+                                    key={dayIndex} 
+                                    className={`p-2 border text-center ${bgColor}`}
+                                    title={unavailableCheck.details}
+                                  >
+                                    <span className={`${textColor} font-semibold`}>
+                                      {unavailableCheck.reason === 'past' ? 'Fortid' : 
+                                       unavailableCheck.reason === 'weekend' ? 'Helg' :
+                                       unavailableCheck.reason === 'holiday' ? 'Helligdag' : 'Vedlikehold'}
+                                    </span>
+                                  </td>
+                                );
+                              }
+                              
                               return (
                                 <td 
                                   key={dayIndex} 
-                                  className={`p-2 border text-center ${isBooked ? 'bg-red-50' : 'bg-green-50'}`}
+                                  className={`p-2 border text-center ${isBooked ? 'bg-red-200' : 'bg-green-100'}`}
                                 >
                                   {isBooked ? (
-                                    <span className="text-red-600 font-medium">Opptatt</span>
+                                    <span className="text-red-800 font-bold">Opptatt</span>
                                   ) : (
                                     <Button 
                                       variant="ghost" 
                                       size="sm"
-                                      className="text-green-600 hover:text-green-800 hover:bg-green-100"
+                                      className="text-green-800 hover:text-green-900 hover:bg-green-200 font-semibold"
                                       onClick={() => window.location.href = `/facilities/${facility.id}?date=${format(day, 'yyyy-MM-dd')}&time=${hour}:00`}
                                     >
                                       Ledig
