@@ -26,7 +26,7 @@ const FilterSelects: React.FC<FilterSelectsProps> = ({
       <div>
         <Select value={facilityType || "all"} onValueChange={setFacilityType}>
           <SelectTrigger className="h-10 border-gray-200 hover:border-blue-500">
-            <SelectValue placeholder="Type lokale (alle)" />
+            <SelectValue placeholder="Velg type lokale" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Alle typer</SelectItem>
@@ -43,7 +43,7 @@ const FilterSelects: React.FC<FilterSelectsProps> = ({
       <div>
         <Select value={location || "all"} onValueChange={setLocation}>
           <SelectTrigger className="h-10 border-gray-200 hover:border-blue-500">
-            <SelectValue placeholder="Område (alle)" />
+            <SelectValue placeholder="Velg område" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Alle områder</SelectItem>
