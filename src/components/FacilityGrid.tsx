@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -5,7 +6,7 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
-import { Clock, MapPin, Users, Calendar, CheckCircle, XCircle, Info } from "lucide-react";
+import { Clock, MapPin, Users, Calendar, CheckCircle, XCircle, Wrench } from "lucide-react";
 import { format } from "date-fns";
 import { nb } from "date-fns/locale";
 import { Badge } from "@/components/ui/badge";
@@ -21,6 +22,11 @@ interface Facility {
   nextAvailable: string;
   capacity: number;
   accessibility: string[];
+  area: string;
+  suitableFor: string[];
+  equipment: string[];
+  openingHours: string;
+  description: string;
   availableTimes?: {
     date: Date;
     slots: {
@@ -48,17 +54,22 @@ const FacilityGrid: React.FC<FacilityGridProps> = ({
 }) => {
   const navigate = useNavigate();
   
-  // Mock data with correct Drammen addresses and facilities - all 6 cards
+  // Mock data with correct Drammen addresses and facilities - all 6 cards with extended information
   const facilities: Facility[] = [
     {
       id: 1,
       name: "Brandengen Skole - Gymsal",
       address: "Iver Holters gate 48, 3041 Drammen",
       type: "Gymsal",
+      area: "Bragernes",
       image: "/lovable-uploads/13aee1f6-e9d9-474b-9ed7-c656d703d19b.png",
       nextAvailable: "I dag, 18:00",
       capacity: 120,
       accessibility: ["wheelchair", "hearing-loop"],
+      suitableFor: ["Basketball", "Volleyball", "Håndball", "Badminton"],
+      equipment: ["Basketkurver", "Volleyballnett", "Lydsystem", "Projektor"],
+      openingHours: "Man-Fre: 08:00-22:00, Lør-Søn: 10:00-20:00",
+      description: "En moderne gymsal med høy standard og god ventilasjon. Ideell for ballsport og større arrangementer.",
       availableTimes: [
         {
           date: new Date(2025, 4, 25),
@@ -75,10 +86,15 @@ const FacilityGrid: React.FC<FacilityGridProps> = ({
       name: "Fjell Skole - Aktivitetshall",
       address: "Lauritz Hervigs vei 20, 3035 Drammen",
       type: "Aktivitetshall",
+      area: "Konnerud",
       image: "/lovable-uploads/b12bcda3-d611-4e9e-bbcc-d53d2db38af9.png",
       nextAvailable: "Fredag, 17:00",
       capacity: 200,
       accessibility: ["wheelchair"],
+      suitableFor: ["Fotball", "Innebandy", "Dans", "Konsert"],
+      equipment: ["Fotballmål", "Lydanlegg", "Scene", "Garderober"],
+      openingHours: "Man-Tor: 07:00-23:00, Fre: 07:00-24:00, Lør-Søn: 09:00-22:00",
+      description: "Stor aktivitetshall med mulighet for både sport og kulturarrangementer. God akustikk og moderne fasiliteter.",
       availableTimes: [
         {
           date: new Date(2025, 4, 28),
@@ -94,10 +110,15 @@ const FacilityGrid: React.FC<FacilityGridProps> = ({
       name: "Gulskogen Skole - Auditorium",
       address: "Vintergata 8, 3048 Drammen",
       type: "Auditorium",
+      area: "Gulskogen",
       image: "/lovable-uploads/b692664c-737a-4a20-8673-25a401789f82.png",
       nextAvailable: "Torsdag, 19:00",
       capacity: 150,
       accessibility: ["wheelchair", "hearing-loop", "sign-language"],
+      suitableFor: ["Presentasjoner", "Teater", "Konferanser", "Filmvisning"],
+      equipment: ["Projektor", "Lydsystem", "Mikrofoner", "Scene", "Lysrigger"],
+      openingHours: "Man-Fre: 08:00-22:00, Lør: 10:00-18:00, Søn: Stengt",
+      description: "Profesjonelt auditorium med scenebelysning og høykvalitets lyd- og bildeutstyr. Perfekt for større arrangementer.",
       availableTimes: [
         {
           date: new Date(2025, 4, 27),
@@ -112,10 +133,15 @@ const FacilityGrid: React.FC<FacilityGridProps> = ({
       name: "Marienlyst Stadion - Møtesal",
       address: "Schwartz gate 2, 3043 Drammen",
       type: "Møtesal",
+      area: "Strømsø",
       image: "/lovable-uploads/07eaca70-1e9b-4e73-ab4e-6b9b7f1ca27e.png",
       nextAvailable: "Lørdag, 10:00",
       capacity: 80,
       accessibility: ["wheelchair"],
+      suitableFor: ["Møter", "Kurs", "Workshops", "Seminarer"],
+      equipment: ["Whiteboard", "Projektor", "WiFi", "Kaffe/te", "Flipchart"],
+      openingHours: "Man-Fre: 07:00-20:00, Lør: 09:00-16:00, Søn: Stengt",
+      description: "Romslig møtesal med naturlig lys og moderne konferanseutstyr. Ideell for bedriftsmøter og kursvirksomhet.",
       availableTimes: [
         {
           date: new Date(2025, 4, 30),
@@ -131,10 +157,15 @@ const FacilityGrid: React.FC<FacilityGridProps> = ({
       name: "Drammensbadet - Svømmehall",
       address: "Danvikgata 40, 3045 Drammen",
       type: "Svømmehall",
+      area: "Åssiden",
       image: "/lovable-uploads/740258a0-d4f7-49b6-a8a6-9c994e75baae.png",
       nextAvailable: "Søndag, 12:00",
       capacity: 250,
       accessibility: ["wheelchair", "hearing-loop"],
+      suitableFor: ["Svømming", "Vanngymnastikk", "Svømmeopplæring", "Konkurranser"],
+      equipment: ["25m basseng", "Barnebassseng", "Garderober", "Dusjer", "Livredningsutstyr"],
+      openingHours: "Man-Fre: 06:00-22:00, Lør-Søn: 08:00-20:00",
+      description: "Moderne svømmeanlegg med både konkurransebasseng og barneområde. Høy standard på fasiliteter og sikkerhet.",
       availableTimes: [
         {
           date: new Date(2025, 5, 1),
@@ -150,10 +181,15 @@ const FacilityGrid: React.FC<FacilityGridProps> = ({
       name: "Åssiden Fotballhall",
       address: "Buskerudveien 54, 3024 Drammen",
       type: "Fotballhall",
+      area: "Åssiden",
       image: "/lovable-uploads/a72ba2e2-f0a3-4561-bff6-17fa721a0c02.png",
       nextAvailable: "Lørdag, 18:30",
       capacity: 300,
       accessibility: ["wheelchair"],
+      suitableFor: ["Fotball", "Futsal", "Innebandy", "Håndball"],
+      equipment: ["Kunstgress", "Fotballmål", "Tilskuerplasser", "Garderober", "Kafeteria"],
+      openingHours: "Man-Søn: 07:00-23:00",
+      description: "Stor fotballhall med kunstgress av høy kvalitet. Egnet for både trening, kamper og turneringer.",
       availableTimes: [
         {
           date: new Date(2025, 4, 30),
@@ -238,7 +274,7 @@ const FacilityGrid: React.FC<FacilityGridProps> = ({
     };
     
     return (
-      <div className="flex flex-wrap gap-1.5 mt-2">
+      <div className="flex flex-wrap gap-1.5">
         {accessibilityFeatures.map((feature) => {
           const badge = badges[feature as keyof typeof badges];
           if (!badge) return null;
@@ -265,14 +301,14 @@ const FacilityGrid: React.FC<FacilityGridProps> = ({
           <p className="text-gray-500">Prøv å endre søkekriteriene dine</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {facilitiesToDisplay.map(facility => (
             <Card 
               key={facility.id} 
               className="overflow-hidden hover:shadow-lg transition-all duration-200 hover:translate-y-[-2px] group border border-gray-200 flex flex-col cursor-pointer"
               onClick={() => navigate(`/facilities/${facility.id}`)}
             >
-              <div className="h-52 bg-gray-200 relative overflow-hidden">
+              <div className="h-48 bg-gray-200 relative overflow-hidden">
                 <img 
                   src={facility.image} 
                   alt={facility.name} 
@@ -289,11 +325,16 @@ const FacilityGrid: React.FC<FacilityGridProps> = ({
                     {facility.type}
                   </Badge>
                 </div>
+                <div className="absolute top-3 left-3">
+                  <Badge variant="outline" className="bg-white/90 backdrop-blur-sm text-gray-700 border-gray-200 font-medium px-2.5 py-1 shadow-sm">
+                    {facility.area}
+                  </Badge>
+                </div>
               </div>
               
-              <CardContent className="p-5 flex flex-col flex-grow">
+              <CardContent className="p-4 flex flex-col flex-grow space-y-3">
                 <div>
-                  <h3 className="font-bold text-lg mb-1 text-gray-900">{facility.name}</h3>
+                  <h3 className="font-bold text-lg mb-1 text-gray-900 line-clamp-1">{facility.name}</h3>
                   <div className="flex items-start gap-1.5 text-sm text-gray-600">
                     <MapPin className="h-4 w-4 text-gray-500 shrink-0 mt-0.5" />
                     <span 
@@ -309,11 +350,61 @@ const FacilityGrid: React.FC<FacilityGridProps> = ({
                     <Users className="h-4 w-4 text-gray-500" />
                     <span>Kapasitet: {facility.capacity} personer</span>
                   </div>
-                  
-                  {renderAccessibilityBadges(facility.accessibility)}
+                </div>
+
+                <div className="text-sm text-gray-700">
+                  <p className="line-clamp-2">{facility.description}</p>
                 </div>
                 
-                <div className="bg-gray-50 p-3 rounded-lg border border-gray-100 mt-4">
+                <div>
+                  <h4 className="text-sm font-medium mb-2 text-gray-900">Tilgjengelighet</h4>
+                  {renderAccessibilityBadges(facility.accessibility)}
+                </div>
+
+                <div>
+                  <h4 className="text-sm font-medium mb-2 text-gray-900">Egnet for</h4>
+                  <div className="flex flex-wrap gap-1.5">
+                    {facility.suitableFor.slice(0, 3).map((item, i) => (
+                      <Badge key={i} variant="outline" className="bg-gray-50 text-gray-700 border-gray-200 text-xs py-1 px-2">
+                        {item}
+                      </Badge>
+                    ))}
+                    {facility.suitableFor.length > 3 && (
+                      <Badge variant="outline" className="bg-gray-50 text-gray-700 border-gray-200 text-xs py-1 px-2">
+                        +{facility.suitableFor.length - 3} flere
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-sm font-medium mb-2 flex items-center gap-1.5 text-gray-900">
+                    <Wrench className="h-4 w-4 text-blue-600" />
+                    <span>Tilgjengelig utstyr</span>
+                  </h4>
+                  <div className="flex flex-wrap gap-1.5">
+                    {facility.equipment.slice(0, 2).map((item, i) => (
+                      <Badge key={i} variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 text-xs py-1 px-2">
+                        {item}
+                      </Badge>
+                    ))}
+                    {facility.equipment.length > 2 && (
+                      <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 text-xs py-1 px-2">
+                        +{facility.equipment.length - 2} flere
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-sm font-medium mb-1 flex items-center gap-1.5 text-gray-900">
+                    <Clock className="h-4 w-4 text-green-600" />
+                    <span>Åpningstider</span>
+                  </h4>
+                  <p className="text-xs text-gray-600">{facility.openingHours}</p>
+                </div>
+                
+                <div className="bg-gray-50 p-3 rounded-lg border border-gray-100 mt-auto">
                   <h4 className="text-sm font-medium mb-2 flex items-center gap-1.5">
                     <Calendar className="h-4 w-4 text-blue-600" />
                     <span>Tilgjengelighet</span>
@@ -337,18 +428,6 @@ const FacilityGrid: React.FC<FacilityGridProps> = ({
                       )}
                     </div>
                   ))}
-                </div>
-                
-                <div className="flex justify-between items-center mt-auto pt-4">
-                  <div className="text-sm flex items-center gap-1.5 text-blue-700">
-                    <Clock className="h-3.5 w-3.5" />
-                    <span>Neste: {facility.nextAvailable}</span>
-                  </div>
-                  
-                  <div className="text-sm flex items-center gap-1.5 text-gray-600">
-                    <Info className="h-3.5 w-3.5" />
-                    <span>Klikk for detaljer</span>
-                  </div>
                 </div>
               </CardContent>
             </Card>
