@@ -22,7 +22,7 @@ const FilterSelects: React.FC<FilterSelectsProps> = ({
   setLocation,
 }) => {
   return (
-    <>
+    <div className="grid grid-cols-2 gap-4">
       <div>
         <Select value={facilityType || "all"} onValueChange={setFacilityType}>
           <SelectTrigger className="h-10 border-gray-200 hover:border-blue-500">
@@ -55,7 +55,7 @@ const FilterSelects: React.FC<FilterSelectsProps> = ({
           </SelectContent>
         </Select>
       </div>
-    </>
+    </div>
   );
 };
 
