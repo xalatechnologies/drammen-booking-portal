@@ -2,13 +2,12 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Users, Calendar, Clock, Shield } from "lucide-react";
+import { Users, Calendar, Clock } from "lucide-react";
 
 interface FacilityDetailsProps {
   capacity: number;
   nextAvailable: string;
   openingHours: string;
-  accessibility: string[];
   onDetailsClick: (e: React.MouseEvent) => void;
 }
 
@@ -16,22 +15,8 @@ const FacilityDetails: React.FC<FacilityDetailsProps> = ({
   capacity,
   nextAvailable,
   openingHours,
-  accessibility,
   onDetailsClick
 }) => {
-  const getAccessibilityIcon = (type: string) => {
-    switch (type) {
-      case 'wheelchair':
-        return '♿';
-      case 'hearing-loop':
-        return '🔊';
-      case 'sign-language':
-        return '👋';
-      default:
-        return '✓';
-    }
-  };
-
   return (
     <div className="w-96 p-6 flex flex-col justify-between border-l border-slate-200/80 bg-gradient-to-br from-slate-50/40 via-white to-slate-50/30 flex-shrink-0 rounded-r-lg">
       <div className="space-y-4">
@@ -61,27 +46,6 @@ const FacilityDetails: React.FC<FacilityDetailsProps> = ({
             <div className="text-xs text-slate-700 leading-relaxed font-medium">{openingHours}</div>
           </div>
         </div>
-
-        {/* Accessibility */}
-        {accessibility.length > 0 && (
-          <div className="flex items-start gap-3 text-sm p-3 rounded-lg bg-gradient-to-br from-purple-50 to-violet-50 border border-purple-200/60">
-            <Shield className="h-4 w-4 text-purple-600 flex-shrink-0 mt-0.5" />
-            <div className="flex-1 min-w-0">
-              <div className="text-xs text-purple-700 font-semibold uppercase tracking-wide mb-2">Tilgjengelighet</div>
-              <div className="flex flex-wrap gap-1">
-                {accessibility.map((item, index) => (
-                  <Badge 
-                    key={index} 
-                    variant="secondary" 
-                    className="text-xs px-2 py-1 bg-purple-100 text-purple-800 border-purple-200 font-medium"
-                  >
-                    {getAccessibilityIcon(item)} {item === 'wheelchair' ? 'Rullestol' : item === 'hearing-loop' ? 'Høreløkke' : item === 'sign-language' ? 'Tegnspråk' : item}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
       </div>
       
       <Button 

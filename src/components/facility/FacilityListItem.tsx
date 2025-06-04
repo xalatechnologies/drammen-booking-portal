@@ -87,6 +87,7 @@ const FacilityListItem: React.FC<FacilityListItemProps> = ({
             equipment={facility.equipment}
             area={facility.area}
             description={facility.description}
+            accessibility={facility.accessibility}
             onAddressClick={handleAddressClick}
           />
           
@@ -94,7 +95,6 @@ const FacilityListItem: React.FC<FacilityListItemProps> = ({
             capacity={facility.capacity}
             nextAvailable={facility.nextAvailable}
             openingHours={facility.openingHours}
-            accessibility={facility.accessibility}
             onDetailsClick={handleDetailsClick}
           />
         </div>
