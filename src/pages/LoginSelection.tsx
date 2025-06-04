@@ -37,12 +37,12 @@ const LoginSelection = () => {
           <div className="grid lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {/* Bruker Card */}
             <Card className="h-full flex flex-col overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border-0 shadow-lg bg-white">
-              <CardHeader className="bg-gradient-to-r from-blue-500 to-blue-600 text-white pb-8 pt-8">
+              <CardHeader className="bg-gradient-to-r from-slate-600 to-slate-700 text-white pb-8 pt-8">
                 <CardTitle className="flex items-center text-2xl font-bold">
                   <UserRound className="h-8 w-8 mr-3" />
                   Bruker
                 </CardTitle>
-                <CardDescription className="text-blue-100 text-lg">
+                <CardDescription className="text-slate-100 text-lg">
                   For publikum og vanlige brukere
                 </CardDescription>
               </CardHeader>
@@ -62,7 +62,7 @@ const LoginSelection = () => {
               </CardContent>
               <CardFooter className="px-8 pb-8">
                 <Button 
-                  className="w-full h-12 text-lg font-semibold bg-blue-600 hover:bg-blue-700 transition-colors" 
+                  className="w-full h-12 text-lg font-semibold bg-slate-600 hover:bg-slate-700 transition-colors" 
                   onClick={() => handleUserSelection("user")}
                 >
                   Fortsett som bruker
@@ -72,12 +72,12 @@ const LoginSelection = () => {
 
             {/* Saksbehandler Card */}
             <Card className="h-full flex flex-col overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border-0 shadow-lg bg-white">
-              <CardHeader className="bg-gradient-to-r from-orange-500 to-orange-600 text-white pb-8 pt-8">
+              <CardHeader className="bg-gradient-to-r from-teal-600 to-teal-700 text-white pb-8 pt-8">
                 <CardTitle className="flex items-center text-2xl font-bold">
                   <Briefcase className="h-8 w-8 mr-3" />
                   Saksbehandler
                 </CardTitle>
-                <CardDescription className="text-orange-100 text-lg">
+                <CardDescription className="text-teal-100 text-lg">
                   For kommuneansatte og saksbehandlere
                 </CardDescription>
               </CardHeader>
@@ -98,7 +98,7 @@ const LoginSelection = () => {
               </CardContent>
               <CardFooter className="px-8 pb-8">
                 <Button 
-                  className="w-full h-12 text-lg font-semibold bg-orange-600 hover:bg-orange-700 transition-colors" 
+                  className="w-full h-12 text-lg font-semibold bg-teal-600 hover:bg-teal-700 transition-colors" 
                   onClick={() => handleUserSelection("caseworker")}
                 >
                   Fortsett som saksbehandler
@@ -108,12 +108,12 @@ const LoginSelection = () => {
 
             {/* Administrator Card */}
             <Card className="h-full flex flex-col overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border-0 shadow-lg bg-white">
-              <CardHeader className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white pb-8 pt-8">
+              <CardHeader className="bg-gradient-to-r from-indigo-600 to-indigo-700 text-white pb-8 pt-8">
                 <CardTitle className="flex items-center text-2xl font-bold">
                   <ShieldCheck className="h-8 w-8 mr-3" />
                   Administrator
                 </CardTitle>
-                <CardDescription className="text-emerald-100 text-lg">
+                <CardDescription className="text-indigo-100 text-lg">
                   For systemadministratorer og ledelse
                 </CardDescription>
               </CardHeader>
@@ -134,7 +134,7 @@ const LoginSelection = () => {
               </CardContent>
               <CardFooter className="px-8 pb-8">
                 <Button 
-                  className="w-full h-12 text-lg font-semibold bg-emerald-600 hover:bg-emerald-700 transition-colors" 
+                  className="w-full h-12 text-lg font-semibold bg-indigo-600 hover:bg-indigo-700 transition-colors" 
                   onClick={() => handleUserSelection("admin")}
                 >
                   Fortsett som administrator
