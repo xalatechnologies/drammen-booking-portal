@@ -1,4 +1,5 @@
 
+
 import React, { useState } from "react";
 import { DateRange } from "react-day-picker";
 import { X } from "lucide-react";
@@ -94,7 +95,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
             </div>
           </div>
 
-          <div className="flex justify-end mt-4">
+          <div className="flex justify-end">
             {hasActiveFilters && (
               <Button 
                 variant="ghost" 
@@ -128,3 +129,4 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
 };
 
 export default SearchFilter;
+
