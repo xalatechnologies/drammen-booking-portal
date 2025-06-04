@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -78,7 +77,7 @@ const LoginSelection = () => {
                   Saksbehandler
                 </CardTitle>
                 <CardDescription className="text-teal-100 text-lg">
-                  For kommuneansatte og saksbehandlere
+                  For saksbehandlere
                 </CardDescription>
               </CardHeader>
               <CardContent className="flex-1 flex flex-col justify-between pt-8 px-8">
