@@ -1,9 +1,11 @@
+
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { UserRound, ShieldCheck, Briefcase } from "lucide-react";
 import GlobalHeader from "@/components/GlobalHeader";
+import GlobalFooter from "@/components/GlobalFooter";
 
 const LoginSelection = () => {
   const navigate = useNavigate();
@@ -143,6 +145,8 @@ const LoginSelection = () => {
           </div>
         </div>
       </div>
+
+      <GlobalFooter />
     </div>
   );
 };
