@@ -56,14 +56,6 @@ export function FacilityCardTabs({ facility }: FacilityCardTabsProps) {
             <span>Kapasitet: {facility.capacity} personer</span>
           </div>
 
-          <div>
-            <h4 className="text-sm font-medium mb-1 flex items-center gap-1.5 text-gray-900">
-              <Clock className="h-4 w-4 text-green-600" />
-              <span>Åpningstider</span>
-            </h4>
-            <p className="text-xs text-gray-600">{facility.openingHours}</p>
-          </div>
-
           <div className="text-sm text-gray-700">
             <p className="line-clamp-2">{facility.description}</p>
           </div>
@@ -82,6 +74,14 @@ export function FacilityCardTabs({ facility }: FacilityCardTabsProps) {
                 </Badge>
               )}
             </div>
+          </div>
+
+          <div>
+            <h4 className="text-sm font-medium mb-1 flex items-center gap-1.5 text-gray-900">
+              <Clock className="h-4 w-4 text-green-600" />
+              <span>Åpningstider</span>
+            </h4>
+            <p className="text-xs text-gray-600">{facility.openingHours}</p>
           </div>
         </TabsContent>
         
