@@ -56,13 +56,16 @@ export function FacilityCardTabs({ facility }: FacilityCardTabsProps) {
             <span>Kapasitet: {facility.capacity} personer</span>
           </div>
 
+          <div>
+            <h4 className="text-sm font-medium mb-1 flex items-center gap-1.5 text-gray-900">
+              <Clock className="h-4 w-4 text-green-600" />
+              <span>Åpningstider</span>
+            </h4>
+            <p className="text-xs text-gray-600">{facility.openingHours}</p>
+          </div>
+
           <div className="text-sm text-gray-700">
             <p className="line-clamp-2">{facility.description}</p>
-          </div>
-          
-          <div>
-            <h4 className="text-sm font-medium mb-2 text-gray-900">Tilgjengelighet</h4>
-            <AccessibilityBadges accessibility={facility.accessibility} />
           </div>
 
           <div>
@@ -84,6 +87,11 @@ export function FacilityCardTabs({ facility }: FacilityCardTabsProps) {
         
         <TabsContent value="details" className="space-y-3 mt-0">
           <div>
+            <h4 className="text-sm font-medium mb-2 text-gray-900">Tilgjengelighet</h4>
+            <AccessibilityBadges accessibility={facility.accessibility} />
+          </div>
+
+          <div>
             <h4 className="text-sm font-medium mb-2 flex items-center gap-1.5 text-gray-900">
               <Wrench className="h-4 w-4 text-blue-600" />
               <span>Tilgjengelig utstyr</span>
@@ -100,19 +108,6 @@ export function FacilityCardTabs({ facility }: FacilityCardTabsProps) {
                 </Badge>
               )}
             </div>
-          </div>
-
-          <div>
-            <h4 className="text-sm font-medium mb-1 flex items-center gap-1.5 text-gray-900">
-              <Clock className="h-4 w-4 text-green-600" />
-              <span>Åpningstider</span>
-            </h4>
-            <p className="text-xs text-gray-600">{facility.openingHours}</p>
-          </div>
-
-          <div>
-            <h4 className="text-sm font-medium mb-2 text-gray-900">Full beskrivelse</h4>
-            <p className="text-xs text-gray-700">{facility.description}</p>
           </div>
         </TabsContent>
         
