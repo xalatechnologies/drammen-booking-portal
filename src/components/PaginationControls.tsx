@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface PaginationControlsProps {
   currentPage?: number;
@@ -24,37 +24,21 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
 
   const getVisiblePages = () => {
     const pages = [];
-    const delta = 2;
-
-    // Always show first page
-    pages.push(1);
-
-    // Calculate range around current page
-    const start = Math.max(2, page - delta);
-    const end = Math.min(totalPages - 1, page + delta);
-
-    // Add ellipsis after first page if needed
-    if (start > 2) {
-      pages.push('ellipsis-start');
-    }
-
-    // Add pages around current page
-    for (let i = start; i <= end; i++) {
-      if (i !== 1 && i !== totalPages) {
+    const maxVisible = 5;
+    
+    if (totalPages <= maxVisible) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      const start = Math.max(1, page - 2);
+      const end = Math.min(totalPages, start + maxVisible - 1);
+      
+      for (let i = start; i <= end; i++) {
         pages.push(i);
       }
     }
-
-    // Add ellipsis before last page if needed
-    if (end < totalPages - 1) {
-      pages.push('ellipsis-end');
-    }
-
-    // Always show last page (if more than 1 page)
-    if (totalPages > 1) {
-      pages.push(totalPages);
-    }
-
+    
     return pages;
   };
 
@@ -63,67 +47,53 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
   }
 
   return (
-    <div className="flex justify-center items-center mt-8 mb-8">
-      <div className="flex items-center bg-white rounded-full shadow-sm border border-gray-200 px-2 py-2">
-        {/* Previous button */}
+    <div className="flex justify-center items-center gap-1 mt-8 mb-8">
+      {/* Previous button */}
+      <button
+        onClick={() => handlePageChange(page - 1)}
+        disabled={page === 1}
+        className={`
+          h-10 w-10 flex items-center justify-center rounded-lg border transition-all duration-200
+          ${page === 1 
+            ? 'text-gray-300 border-gray-200 cursor-not-allowed bg-white' 
+            : 'text-gray-600 border-gray-300 bg-white hover:bg-gray-50 hover:border-gray-400'
+          }
+        `}
+      >
+        <ChevronLeft className="h-4 w-4" />
+      </button>
+
+      {/* Page numbers */}
+      {getVisiblePages().map((pageNum) => (
         <button
-          onClick={() => handlePageChange(page - 1)}
-          disabled={page === 1}
+          key={pageNum}
+          onClick={() => handlePageChange(pageNum)}
           className={`
-            h-9 w-9 flex items-center justify-center rounded-full transition-all duration-200
-            ${page === 1 
-              ? 'text-gray-300 cursor-not-allowed' 
-              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+            h-10 w-10 flex items-center justify-center text-sm font-medium transition-all duration-200 rounded-lg border
+            ${page === pageNum
+              ? 'bg-black text-white border-black'
+              : 'text-gray-700 border-gray-300 bg-white hover:bg-gray-50 hover:border-gray-400'
             }
           `}
         >
-          <ChevronLeft className="h-4 w-4" />
+          {pageNum}
         </button>
+      ))}
 
-        {/* Page numbers */}
-        <div className="flex items-center mx-1">
-          {getVisiblePages().map((pageNum, index) => {
-            if (pageNum === 'ellipsis-start' || pageNum === 'ellipsis-end') {
-              return (
-                <div key={`ellipsis-${index}`} className="h-9 w-9 flex items-center justify-center">
-                  <MoreHorizontal className="h-4 w-4 text-gray-400" />
-                </div>
-              );
-            }
-
-            return (
-              <button
-                key={pageNum}
-                onClick={() => handlePageChange(pageNum as number)}
-                className={`
-                  h-9 w-9 flex items-center justify-center text-sm font-medium transition-all duration-200 rounded-full
-                  ${page === pageNum
-                    ? 'bg-blue-600 text-white shadow-sm'
-                    : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
-                  }
-                `}
-              >
-                {pageNum}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Next button */}
-        <button
-          onClick={() => handlePageChange(page + 1)}
-          disabled={page === totalPages}
-          className={`
-            h-9 w-9 flex items-center justify-center rounded-full transition-all duration-200
-            ${page === totalPages 
-              ? 'text-gray-300 cursor-not-allowed' 
-              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-            }
-          `}
-        >
-          <ChevronRight className="h-4 w-4" />
-        </button>
-      </div>
+      {/* Next button */}
+      <button
+        onClick={() => handlePageChange(page + 1)}
+        disabled={page === totalPages}
+        className={`
+          h-10 w-10 flex items-center justify-center rounded-lg border transition-all duration-200
+          ${page === totalPages 
+            ? 'text-gray-300 border-gray-200 cursor-not-allowed bg-white' 
+            : 'text-gray-600 border-gray-300 bg-white hover:bg-gray-50 hover:border-gray-400'
+          }
+        `}
+      >
+        <ChevronRight className="h-4 w-4" />
+      </button>
     </div>
   );
 };
