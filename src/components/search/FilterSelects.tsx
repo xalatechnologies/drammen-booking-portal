@@ -29,7 +29,7 @@ const FilterSelects: React.FC<FilterSelectsProps> = ({
             <SelectValue placeholder="Velg type lokale" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Alle typer</SelectItem>
+            <SelectItem value="all">Velg type lokale</SelectItem>
             <SelectItem value="sports-hall">Idrettshall</SelectItem>
             <SelectItem value="gymnasium">Gymsal</SelectItem>
             <SelectItem value="meeting-room">Møterom</SelectItem>
@@ -46,7 +46,7 @@ const FilterSelects: React.FC<FilterSelectsProps> = ({
             <SelectValue placeholder="Velg område" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Alle områder</SelectItem>
+            <SelectItem value="all">Velg område</SelectItem>
             <SelectItem value="drammen-sentrum">Drammen sentrum</SelectItem>
             <SelectItem value="konnerud">Konnerud</SelectItem>
             <SelectItem value="stromsø">Strømsø</SelectItem>
