@@ -9,7 +9,6 @@ import { Separator } from "@/components/ui/separator";
 import GlobalHeader from "@/components/GlobalHeader";
 import GlobalFooter from "@/components/GlobalFooter";
 import { FacilityImageGallery } from "@/components/facility/FacilityImageGallery";
-import { FacilityBookingCard } from "@/components/facility/FacilityBookingCard";
 import { FacilityBookingDrawer } from "@/components/facility/FacilityBookingDrawer";
 import MapView from "@/components/MapView";
 import { format } from "date-fns";
@@ -400,10 +399,62 @@ const FacilityDetail = () => {
 
             {/* Right Sidebar - Booking */}
             <div className="lg:sticky lg:top-24 lg:self-start">
-              <FacilityBookingCard 
-                facility={facility} 
-                onBookClick={() => setIsBookingDrawerOpen(true)} 
-              />
+              {/* Price Card */}
+              <Card className="mb-6 shadow-sm border-blue-100">
+                <CardContent className="p-6">
+                  <div className="text-center mb-4">
+                    <div className="text-3xl font-bold text-gray-900">{facility.pricePerHour} kr</div>
+                    <div className="text-gray-500">per time</div>
+                  </div>
+                  
+                  <div className="p-4 bg-green-50 rounded-lg mb-4 text-center">
+                    <p className="text-green-800 text-sm">
+                      <CheckCircle className="inline h-4 w-4 mr-1" />
+                      Tilgjengelig for umiddelbar booking
+                    </p>
+                  </div>
+
+                  <Button 
+                    className="w-full bg-[#0B3D91] hover:bg-blue-700 text-white font-medium shadow-sm h-12"
+                    onClick={() => setIsBookingDrawerOpen(true)}
+                  >
+                    Reserver nå
+                  </Button>
+                </CardContent>
+              </Card>
+              
+              {/* Additional info cards */}
+              <Card className="mb-6 shadow-sm">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="bg-amber-100 p-2 rounded-md">
+                      <Info className="h-5 w-5 text-amber-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-medium">Avbestilling</h3>
+                      <p className="text-sm text-gray-600">
+                        Gratis avbestilling inntil 48 timer før
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card className="shadow-sm">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="bg-blue-100 p-2 rounded-md">
+                      <Clock className="h-5 w-5 text-blue-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-medium">Åpningstider</h3>
+                      <p className="text-sm text-gray-600">
+                        {facility.openingHours}
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </div>
