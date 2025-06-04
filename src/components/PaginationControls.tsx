@@ -1,15 +1,6 @@
 
 import React, { useState } from "react";
-import { 
-  Pagination, 
-  PaginationContent, 
-  PaginationEllipsis, 
-  PaginationItem, 
-  PaginationLink, 
-  PaginationNext, 
-  PaginationPrevious 
-} from "@/components/ui/pagination";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react";
 
 interface PaginationControlsProps {
   currentPage?: number;
@@ -73,73 +64,65 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
 
   return (
     <div className="flex justify-center items-center mt-8 mb-8">
-      <div className="flex items-center gap-1">
-        <Pagination>
-          <PaginationContent className="gap-1">
-            <PaginationItem>
-              <PaginationPrevious 
-                onClick={() => handlePageChange(page - 1)}
-                className={`
-                  h-10 w-10 p-0 flex items-center justify-center transition-all duration-200
-                  ${page === 1 
-                    ? 'pointer-events-none opacity-30 text-gray-400' 
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100 cursor-pointer border border-gray-200 hover:border-gray-300'
-                  }
-                `}
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </PaginationPrevious>
-            </PaginationItem>
+      <div className="flex items-center bg-white rounded-full shadow-sm border border-gray-200 px-2 py-2">
+        {/* Previous button */}
+        <button
+          onClick={() => handlePageChange(page - 1)}
+          disabled={page === 1}
+          className={`
+            h-9 w-9 flex items-center justify-center rounded-full transition-all duration-200
+            ${page === 1 
+              ? 'text-gray-300 cursor-not-allowed' 
+              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+            }
+          `}
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </button>
 
-            {getVisiblePages().map((pageNum, index) => {
-              if (pageNum === 'ellipsis-start' || pageNum === 'ellipsis-end') {
-                return (
-                  <PaginationItem key={`ellipsis-${index}`}>
-                    <PaginationEllipsis className="text-gray-400 h-10 w-10 flex items-center justify-center" />
-                  </PaginationItem>
-                );
-              }
-
+        {/* Page numbers */}
+        <div className="flex items-center mx-1">
+          {getVisiblePages().map((pageNum, index) => {
+            if (pageNum === 'ellipsis-start' || pageNum === 'ellipsis-end') {
               return (
-                <PaginationItem key={pageNum}>
-                  <PaginationLink
-                    onClick={() => handlePageChange(pageNum as number)}
-                    isActive={page === pageNum}
-                    className={`
-                      h-10 w-10 flex items-center justify-center text-sm font-medium transition-all duration-200 cursor-pointer border
-                      ${page === pageNum
-                        ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700 shadow-sm'
-                        : 'text-gray-700 hover:text-gray-900 hover:bg-gray-50 border-gray-200 hover:border-gray-300'
-                      }
-                    `}
-                  >
-                    {pageNum}
-                  </PaginationLink>
-                </PaginationItem>
+                <div key={`ellipsis-${index}`} className="h-9 w-9 flex items-center justify-center">
+                  <MoreHorizontal className="h-4 w-4 text-gray-400" />
+                </div>
               );
-            })}
+            }
 
-            <PaginationItem>
-              <PaginationNext 
-                onClick={() => handlePageChange(page + 1)}
+            return (
+              <button
+                key={pageNum}
+                onClick={() => handlePageChange(pageNum as number)}
                 className={`
-                  h-10 w-10 p-0 flex items-center justify-center transition-all duration-200
-                  ${page === totalPages 
-                    ? 'pointer-events-none opacity-30 text-gray-400' 
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100 cursor-pointer border border-gray-200 hover:border-gray-300'
+                  h-9 w-9 flex items-center justify-center text-sm font-medium transition-all duration-200 rounded-full
+                  ${page === pageNum
+                    ? 'bg-blue-600 text-white shadow-sm'
+                    : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
                   }
                 `}
               >
-                <ChevronRight className="h-4 w-4" />
-              </PaginationNext>
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
-
-        {/* Results info */}
-        <div className="text-sm text-gray-500 ml-4">
-          Side {page} av {totalPages}
+                {pageNum}
+              </button>
+            );
+          })}
         </div>
+
+        {/* Next button */}
+        <button
+          onClick={() => handlePageChange(page + 1)}
+          disabled={page === totalPages}
+          className={`
+            h-9 w-9 flex items-center justify-center rounded-full transition-all duration-200
+            ${page === totalPages 
+              ? 'text-gray-300 cursor-not-allowed' 
+              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+            }
+          `}
+        >
+          <ChevronRight className="h-4 w-4" />
+        </button>
       </div>
     </div>
   );
