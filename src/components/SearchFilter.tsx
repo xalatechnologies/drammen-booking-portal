@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { DateRange } from "react-day-picker";
 import { X } from "lucide-react";
@@ -85,25 +86,25 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
               />
             </div>
 
-            <div className="lg:col-span-1 flex justify-end">
+            <div className="lg:col-span-2 flex justify-center">
               <ViewModeToggle 
                 viewMode={viewMode}
                 setViewMode={setViewMode}
               />
             </div>
+          </div>
 
-            <div className="lg:col-span-1 flex justify-end">
-              {hasActiveFilters && (
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={clearFilters} 
-                  className="h-10 w-10 p-0 hover:bg-red-50 hover:text-red-600"
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              )}
-            </div>
+          <div className="flex justify-end mt-4">
+            {hasActiveFilters && (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={clearFilters} 
+                className="h-10 w-10 p-0 hover:bg-red-50 hover:text-red-600"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            )}
           </div>
 
           {hasActiveFilters && (
