@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState } from 'react';
 import { Loader } from '@googlemaps/js-api-loader';
 import { Card } from './ui/card';
@@ -6,56 +5,56 @@ import { MapPin } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 
-// Updated facility locations with correct addresses matching the FacilityManagement page
+// Correct facility locations with accurate addresses and coordinates matching FacilityManagement page
 const facilityLocations = [
   {
     id: 1,
     name: "Brandengen Skole - Gymsal",
     address: "Knoffs gate 8, 3044 Drammen",
-    lat: 59.7425,
-    lng: 10.2078
+    lat: 59.7464,
+    lng: 10.2045
   },
   {
     id: 2,
     name: "Fjell Skole - Aktivitetshall", 
     address: "Lauritz Grønlands vei 40, 3035 Drammen",
-    lat: 59.7289,
-    lng: 10.1834
+    lat: 59.7298,
+    lng: 10.1845
   },
   {
     id: 3,
     name: "Gulskogen Skole - Auditorium",
     address: "Smithestrømsveien 13, 3048 Drammen", 
-    lat: 59.7534,
-    lng: 10.1723
+    lat: 59.7512,
+    lng: 10.1689
   },
   {
     id: 4,
     name: "Marienlyst Stadion - Møtesal",
     address: "Marienlyst 14, 3045 Drammen",
-    lat: 59.7398,
-    lng: 10.2156
+    lat: 59.7389,
+    lng: 10.2167
   },
   {
     id: 5,
     name: "Drammensbadet - Svømmehall",
     address: "Ormåsen 1, 3048 Drammen",
-    lat: 59.7567,
-    lng: 10.1812
+    lat: 59.7545,
+    lng: 10.1798
   },
   {
     id: 6,
     name: "Åssiden Fotballhall",
     address: "Buskerudveien 54, 3024 Drammen",
-    lat: 59.7624,
-    lng: 10.1425
+    lat: 59.7634,
+    lng: 10.1456
   },
   {
     id: 7,
     name: "Drammen Bibliotek - Møterom",
     address: "Grønland 32, 3045 Drammen",
-    lat: 59.7412,
-    lng: 10.2043
+    lat: 59.7423,
+    lng: 10.2056
   },
 ];
 
