@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState } from 'react';
 import { Card } from './ui/card';
 import { MapPin } from 'lucide-react';
@@ -73,6 +72,7 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location }) => {
   const [showTokenInput, setShowTokenInput] = useState<boolean>(true);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
+  const [isInitialized, setIsInitialized] = useState<boolean>(false);
 
   // Filter facilities based on selected filters
   const filteredFacilities = facilityLocations.filter(facility => {
@@ -137,8 +137,14 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location }) => {
   };
 
   const initializeMap = async (token: string) => {
+    console.log('Starting map initialization...');
+    
+    // Wait for next tick to ensure DOM is ready
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
     if (!mapContainer.current) {
-      setError('Map container not available');
+      console.error('Map container ref is not available');
+      setError('Map container not ready. Please try again.');
       setIsLoading(false);
       return;
     }
@@ -153,17 +159,20 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location }) => {
     setError('');
 
     try {
-      console.log('Initializing map with token:', token.substring(0, 10) + '...');
+      console.log('Setting Mapbox access token...');
       
       // Set the access token
       mapboxgl.accessToken = token;
       
       // Clear any existing map
       if (map.current) {
+        console.log('Removing existing map...');
         map.current.remove();
         map.current = null;
       }
 
+      console.log('Creating new map instance...');
+      
       // Create new map with error handling
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
@@ -179,6 +188,7 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location }) => {
       // Handle successful map load
       map.current.on('load', () => {
         console.log('Map loaded successfully');
+        setIsInitialized(true);
         addMarkers();
         setIsLoading(false);
       });
@@ -186,25 +196,22 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location }) => {
       // Handle map errors with more specific error messages
       map.current.on('error', (e) => {
         console.error('Map error:', e);
+        setIsInitialized(false);
         if (e.error?.message?.includes('401')) {
           setError('Invalid Mapbox token. Please check your token and try again.');
         } else if (e.error?.message?.includes('network')) {
           setError('Network error. Please check your internet connection.');
         } else {
-          setError('Failed to load map. Please verify your Mapbox token is valid.');
+          setError(`Failed to load map: ${e.error?.message || 'Unknown error'}`);
         }
         setIsLoading(false);
-      });
-
-      // Handle source errors
-      map.current.on('sourcedataloading', () => {
-        console.log('Map source data loading...');
       });
 
     } catch (err) {
       console.error('Map initialization error:', err);
       setError('Failed to initialize map. Please check your Mapbox token and try again.');
       setIsLoading(false);
+      setIsInitialized(false);
     }
   };
 
@@ -220,8 +227,14 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location }) => {
       return;
     }
 
+    console.log('Token submitted, initializing map...');
     setShowTokenInput(false);
-    initializeMap(trimmedToken);
+    setIsInitialized(false);
+    
+    // Small delay to ensure UI state updates
+    setTimeout(() => {
+      initializeMap(trimmedToken);
+    }, 50);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -230,15 +243,17 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location }) => {
     }
   };
 
-  // Re-add markers when filters change
+  // Re-add markers when filters change (only if map is initialized)
   useEffect(() => {
-    if (map.current && !showTokenInput && !isLoading) {
+    if (map.current && isInitialized && !showTokenInput && !isLoading) {
+      console.log('Updating markers based on filter changes...');
       addMarkers();
     }
-  }, [filteredFacilities, showTokenInput, isLoading]);
+  }, [filteredFacilities, isInitialized]);
 
   useEffect(() => {
     return () => {
+      console.log('Cleaning up map component...');
       clearMarkers();
       if (map.current) {
         map.current.remove();
@@ -305,6 +320,7 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location }) => {
                       onClick={() => {
                         setShowTokenInput(true);
                         setError('');
+                        setIsInitialized(false);
                       }}
                       variant="outline"
                     >
