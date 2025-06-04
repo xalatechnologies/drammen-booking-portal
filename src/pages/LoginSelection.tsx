@@ -38,11 +38,11 @@ const LoginSelection = () => {
             {/* Bruker Card */}
             <Card className="h-full flex flex-col overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border-0 shadow-lg bg-white">
               <CardHeader className="bg-gradient-to-r from-blue-500 to-blue-600 text-white pb-8 pt-8">
-                <CardTitle className="flex items-center justify-center text-2xl font-bold">
+                <CardTitle className="flex items-center text-2xl font-bold">
                   <UserRound className="h-8 w-8 mr-3" />
                   Bruker
                 </CardTitle>
-                <CardDescription className="text-center text-blue-100 text-lg">
+                <CardDescription className="text-blue-100 text-lg">
                   For publikum og vanlige brukere
                 </CardDescription>
               </CardHeader>
@@ -70,14 +70,14 @@ const LoginSelection = () => {
               </CardFooter>
             </Card>
 
-            {/* Saksbehandlere Card */}
+            {/* Saksbehandler Card */}
             <Card className="h-full flex flex-col overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border-0 shadow-lg bg-white">
               <CardHeader className="bg-gradient-to-r from-orange-500 to-orange-600 text-white pb-8 pt-8">
-                <CardTitle className="flex items-center justify-center text-2xl font-bold">
+                <CardTitle className="flex items-center text-2xl font-bold">
                   <Briefcase className="h-8 w-8 mr-3" />
-                  Saksbehandlere
+                  Saksbehandler
                 </CardTitle>
-                <CardDescription className="text-center text-orange-100 text-lg">
+                <CardDescription className="text-orange-100 text-lg">
                   For kommuneansatte og saksbehandlere
                 </CardDescription>
               </CardHeader>
@@ -109,11 +109,11 @@ const LoginSelection = () => {
             {/* Administrator Card */}
             <Card className="h-full flex flex-col overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border-0 shadow-lg bg-white">
               <CardHeader className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white pb-8 pt-8">
-                <CardTitle className="flex items-center justify-center text-2xl font-bold">
+                <CardTitle className="flex items-center text-2xl font-bold">
                   <ShieldCheck className="h-8 w-8 mr-3" />
                   Administrator
                 </CardTitle>
-                <CardDescription className="text-center text-emerald-100 text-lg">
+                <CardDescription className="text-emerald-100 text-lg">
                   For systemadministratorer og ledelse
                 </CardDescription>
               </CardHeader>
