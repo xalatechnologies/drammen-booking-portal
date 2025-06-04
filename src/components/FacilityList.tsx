@@ -233,74 +233,83 @@ const FacilityList: React.FC<FacilityListProps> = ({
                     </div>
                   </div>
                   
-                  {/* Content */}
-                  <div className="flex-grow p-4 flex flex-col justify-between">
+                  {/* Left Content - Main info */}
+                  <div className="flex-grow p-4 flex flex-col justify-between min-w-0">
                     <div>
-                      <div className="flex justify-between items-start mb-2">
-                        <div className="flex-grow">
-                          <div className="flex items-center gap-2 mb-1">
-                            <h3 className="font-bold text-lg text-gray-900">{facility.name}</h3>
-                            <Badge variant="outline" className="bg-white text-gray-700 border-gray-200 font-medium text-xs px-2 py-1">
-                              {facility.area}
-                            </Badge>
-                          </div>
-                          <div className="flex items-center gap-1.5 text-sm text-gray-600 mb-2">
-                            <MapPin className="h-4 w-4 text-gray-500" />
-                            <span 
-                              className="hover:text-blue-600 hover:underline cursor-pointer transition-colors"
-                              onClick={(e) => handleAddressClick(e, facility)}
-                              title="Klikk for å se på kart"
-                            >
-                              {facility.address}
-                            </span>
-                          </div>
-                          
-                          {/* Activity tags moved here */}
-                          <div className="flex flex-wrap gap-1 mb-2">
-                            {facility.suitableFor.slice(0, 4).map((activity, index) => (
-                              <Badge key={index} variant="secondary" className="text-xs px-2 py-1">
-                                {activity}
-                              </Badge>
-                            ))}
-                            {facility.suitableFor.length > 4 && (
-                              <Badge variant="secondary" className="text-xs px-2 py-1">
-                                +{facility.suitableFor.length - 4}
-                              </Badge>
-                            )}
-                          </div>
-                        </div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="font-bold text-lg text-gray-900 truncate">{facility.name}</h3>
+                        <Badge variant="outline" className="bg-white text-gray-700 border-gray-200 font-medium text-xs px-2 py-1 flex-shrink-0">
+                          {facility.area}
+                        </Badge>
                       </div>
                       
-                      <p className="text-gray-600 text-sm mb-3 line-clamp-2">{facility.description}</p>
-                      
-                      <div className="flex flex-wrap gap-4 text-sm text-gray-600">
-                        <div className="flex items-center gap-1">
-                          <Calendar className="h-4 w-4 text-blue-600" />
-                          <span>{facility.nextAvailable}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Users className="h-4 w-4 text-blue-600" />
-                          <span>{facility.capacity} personer</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Clock className="h-4 w-4 text-blue-600" />
-                          <span>{facility.openingHours.split(',')[0]}</span>
-                        </div>
+                      <div className="flex items-center gap-1.5 text-sm text-gray-600 mb-2">
+                        <MapPin className="h-4 w-4 text-gray-500 flex-shrink-0" />
+                        <span 
+                          className="hover:text-blue-600 hover:underline cursor-pointer transition-colors truncate"
+                          onClick={(e) => handleAddressClick(e, facility)}
+                          title="Klikk for å se på kart"
+                        >
+                          {facility.address}
+                        </span>
                       </div>
+                      
+                      {/* Activity tags */}
+                      <div className="flex flex-wrap gap-1 mb-2">
+                        {facility.suitableFor.slice(0, 4).map((activity, index) => (
+                          <Badge key={index} variant="secondary" className="text-xs px-2 py-1">
+                            {activity}
+                          </Badge>
+                        ))}
+                        {facility.suitableFor.length > 4 && (
+                          <Badge variant="secondary" className="text-xs px-2 py-1">
+                            +{facility.suitableFor.length - 4}
+                          </Badge>
+                        )}
+                      </div>
+                      
+                      <p className="text-gray-600 text-sm line-clamp-2">{facility.description}</p>
+                    </div>
+                  </div>
+                  
+                  {/* Right Content - Details and action */}
+                  <div className="w-64 p-4 flex flex-col justify-between border-l border-gray-100 bg-gray-50/50 flex-shrink-0">
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <Calendar className="h-4 w-4 text-blue-600 flex-shrink-0" />
+                        <span className="truncate">{facility.nextAvailable}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <Users className="h-4 w-4 text-blue-600 flex-shrink-0" />
+                        <span>{facility.capacity} personer</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <Clock className="h-4 w-4 text-blue-600 flex-shrink-0" />
+                        <span className="text-xs leading-tight">{facility.openingHours}</span>
+                      </div>
+                      
+                      {/* Equipment preview */}
+                      {facility.equipment.length > 0 && (
+                        <div className="text-xs text-gray-500">
+                          <span className="font-medium">Utstyr:</span>
+                          <div className="mt-1">
+                            {facility.equipment.slice(0, 3).join(", ")}
+                            {facility.equipment.length > 3 && "..."}
+                          </div>
+                        </div>
+                      )}
                     </div>
                     
-                    <div className="flex justify-end items-center mt-4">
-                      <Button 
-                        size="sm" 
-                        className="bg-[#0B3D91] hover:bg-blue-700 text-white"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          navigate(`/facilities/${facility.id}`);
-                        }}
-                      >
-                        Se detaljer
-                      </Button>
-                    </div>
+                    <Button 
+                      size="sm" 
+                      className="bg-[#0B3D91] hover:bg-blue-700 text-white w-full mt-3"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/facilities/${facility.id}`);
+                      }}
+                    >
+                      Se detaljer
+                    </Button>
                   </div>
                 </div>
               </CardContent>
