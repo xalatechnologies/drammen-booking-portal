@@ -16,7 +16,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
     <div className="relative">
       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
       <Input
-        placeholder="Søk etter lokaler, skoler, adresser..."
+        placeholder="Søk lokaler"
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
         className="pl-10 h-10 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
