@@ -1,0 +1,88 @@
+
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import { MapPin, Badge as BadgeIcon } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { FacilityCardTabs } from "./FacilityCardTabs";
+
+interface Facility {
+  id: number;
+  name: string;
+  address: string;
+  type: string;
+  image: string;
+  nextAvailable: string;
+  capacity: number;
+  accessibility: string[];
+  area: string;
+  suitableFor: string[];
+  equipment: string[];
+  openingHours: string;
+  description: string;
+  availableTimes?: {
+    date: Date;
+    slots: {
+      start: string;
+      end: string;
+      available: boolean;
+    }[];
+  }[];
+}
+
+interface FacilityCardProps {
+  facility: Facility;
+  onAddressClick: (e: React.MouseEvent, facility: Facility) => void;
+}
+
+export function FacilityCard({ facility, onAddressClick }: FacilityCardProps) {
+  const navigate = useNavigate();
+
+  return (
+    <Card 
+      className="overflow-hidden hover:shadow-lg transition-all duration-200 hover:translate-y-[-2px] group border border-gray-200 flex flex-col cursor-pointer"
+      onClick={() => navigate(`/facilities/${facility.id}`)}
+    >
+      <div className="h-48 bg-gray-200 relative overflow-hidden">
+        <img 
+          src={facility.image} 
+          alt={facility.name} 
+          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            target.src = "https://images.unsplash.com/photo-1525361147853-4bf9f54a0e98?w=600&auto=format&fit=crop";
+            target.onerror = null;
+          }}
+        />
+        <div className="absolute top-3 right-3">
+          <Badge className="bg-white/90 backdrop-blur-sm text-gray-800 border-0 font-medium px-2.5 py-1 shadow-sm">
+            {facility.type}
+          </Badge>
+        </div>
+        <div className="absolute top-3 left-3">
+          <Badge variant="outline" className="bg-white/90 backdrop-blur-sm text-gray-700 border-gray-200 font-medium px-2.5 py-1 shadow-sm">
+            {facility.area}
+          </Badge>
+        </div>
+      </div>
+      
+      <CardContent className="p-4 flex flex-col flex-grow">
+        <div className="mb-3">
+          <h3 className="font-bold text-lg mb-1 text-gray-900 line-clamp-1">{facility.name}</h3>
+          <div className="flex items-start gap-1.5 text-sm text-gray-600">
+            <MapPin className="h-4 w-4 text-gray-500 shrink-0 mt-0.5" />
+            <span 
+              className="line-clamp-1 hover:text-blue-600 hover:underline cursor-pointer transition-colors"
+              onClick={(e) => onAddressClick(e, facility)}
+              title="Klikk for å se på kart"
+            >
+              {facility.address}
+            </span>
+          </div>
+        </div>
+
+        <FacilityCardTabs facility={facility} />
+      </CardContent>
+    </Card>
+  );
+}

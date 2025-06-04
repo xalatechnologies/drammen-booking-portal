@@ -1,16 +1,6 @@
-
 import React from "react";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-} from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
-import { Clock, MapPin, Users, Calendar, CheckCircle, XCircle, Wrench } from "lucide-react";
-import { format } from "date-fns";
-import { nb } from "date-fns/locale";
-import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
+import { FacilityCard } from "./facility/FacilityCard";
 
 // Define the facility type
 interface Facility {
@@ -265,34 +255,6 @@ const FacilityGrid: React.FC<FacilityGridProps> = ({
     navigate(`/?${searchParams.toString()}`);
   };
   
-  // Function to render accessibility badges with proper styling
-  const renderAccessibilityBadges = (accessibilityFeatures: string[]) => {
-    const badges = {
-      "wheelchair": { label: "Rullestol", color: "bg-blue-50 text-blue-700 border-blue-200" },
-      "hearing-loop": { label: "Teleslynge", color: "bg-green-50 text-green-700 border-green-200" },
-      "sign-language": { label: "Tegnspråk", color: "bg-purple-50 text-purple-700 border-purple-200" }
-    };
-    
-    return (
-      <div className="flex flex-wrap gap-1.5">
-        {accessibilityFeatures.map((feature) => {
-          const badge = badges[feature as keyof typeof badges];
-          if (!badge) return null;
-          
-          return (
-            <Badge 
-              key={feature} 
-              variant="outline" 
-              className={cn("text-xs font-medium py-1 px-2 rounded-md", badge.color)}
-            >
-              {badge.label}
-            </Badge>
-          );
-        })}
-      </div>
-    );
-  };
-  
   return (
     <div className="mb-8">
       {facilitiesToDisplay.length === 0 ? (
@@ -303,134 +265,11 @@ const FacilityGrid: React.FC<FacilityGridProps> = ({
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {facilitiesToDisplay.map(facility => (
-            <Card 
+            <FacilityCard 
               key={facility.id} 
-              className="overflow-hidden hover:shadow-lg transition-all duration-200 hover:translate-y-[-2px] group border border-gray-200 flex flex-col cursor-pointer"
-              onClick={() => navigate(`/facilities/${facility.id}`)}
-            >
-              <div className="h-48 bg-gray-200 relative overflow-hidden">
-                <img 
-                  src={facility.image} 
-                  alt={facility.name} 
-                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                  onError={(e) => {
-                    // Fallback to a placeholder if image fails to load
-                    const target = e.target as HTMLImageElement;
-                    target.src = "https://images.unsplash.com/photo-1525361147853-4bf9f54a0e98?w=600&auto=format&fit=crop";
-                    target.onerror = null; // Prevent infinite loop
-                  }}
-                />
-                <div className="absolute top-3 right-3">
-                  <Badge className="bg-white/90 backdrop-blur-sm text-gray-800 border-0 font-medium px-2.5 py-1 shadow-sm">
-                    {facility.type}
-                  </Badge>
-                </div>
-                <div className="absolute top-3 left-3">
-                  <Badge variant="outline" className="bg-white/90 backdrop-blur-sm text-gray-700 border-gray-200 font-medium px-2.5 py-1 shadow-sm">
-                    {facility.area}
-                  </Badge>
-                </div>
-              </div>
-              
-              <CardContent className="p-4 flex flex-col flex-grow space-y-3">
-                <div>
-                  <h3 className="font-bold text-lg mb-1 text-gray-900 line-clamp-1">{facility.name}</h3>
-                  <div className="flex items-start gap-1.5 text-sm text-gray-600">
-                    <MapPin className="h-4 w-4 text-gray-500 shrink-0 mt-0.5" />
-                    <span 
-                      className="line-clamp-1 hover:text-blue-600 hover:underline cursor-pointer transition-colors"
-                      onClick={(e) => handleAddressClick(e, facility)}
-                      title="Klikk for å se på kart"
-                    >
-                      {facility.address}
-                    </span>
-                  </div>
-                  
-                  <div className="mt-1 flex items-center gap-1.5 text-sm text-gray-600">
-                    <Users className="h-4 w-4 text-gray-500" />
-                    <span>Kapasitet: {facility.capacity} personer</span>
-                  </div>
-                </div>
-
-                <div className="text-sm text-gray-700">
-                  <p className="line-clamp-2">{facility.description}</p>
-                </div>
-                
-                <div>
-                  <h4 className="text-sm font-medium mb-2 text-gray-900">Tilgjengelighet</h4>
-                  {renderAccessibilityBadges(facility.accessibility)}
-                </div>
-
-                <div>
-                  <h4 className="text-sm font-medium mb-2 text-gray-900">Egnet for</h4>
-                  <div className="flex flex-wrap gap-1.5">
-                    {facility.suitableFor.slice(0, 3).map((item, i) => (
-                      <Badge key={i} variant="outline" className="bg-gray-50 text-gray-700 border-gray-200 text-xs py-1 px-2">
-                        {item}
-                      </Badge>
-                    ))}
-                    {facility.suitableFor.length > 3 && (
-                      <Badge variant="outline" className="bg-gray-50 text-gray-700 border-gray-200 text-xs py-1 px-2">
-                        +{facility.suitableFor.length - 3} flere
-                      </Badge>
-                    )}
-                  </div>
-                </div>
-
-                <div>
-                  <h4 className="text-sm font-medium mb-2 flex items-center gap-1.5 text-gray-900">
-                    <Wrench className="h-4 w-4 text-blue-600" />
-                    <span>Tilgjengelig utstyr</span>
-                  </h4>
-                  <div className="flex flex-wrap gap-1.5">
-                    {facility.equipment.slice(0, 2).map((item, i) => (
-                      <Badge key={i} variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 text-xs py-1 px-2">
-                        {item}
-                      </Badge>
-                    ))}
-                    {facility.equipment.length > 2 && (
-                      <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 text-xs py-1 px-2">
-                        +{facility.equipment.length - 2} flere
-                      </Badge>
-                    )}
-                  </div>
-                </div>
-
-                <div>
-                  <h4 className="text-sm font-medium mb-1 flex items-center gap-1.5 text-gray-900">
-                    <Clock className="h-4 w-4 text-green-600" />
-                    <span>Åpningstider</span>
-                  </h4>
-                  <p className="text-xs text-gray-600">{facility.openingHours}</p>
-                </div>
-                
-                <div className="bg-gray-50 p-3 rounded-lg border border-gray-100 mt-auto">
-                  <h4 className="text-sm font-medium mb-2 flex items-center gap-1.5">
-                    <Calendar className="h-4 w-4 text-blue-600" />
-                    <span>Tilgjengelighet</span>
-                  </h4>
-                  
-                  {facility.availableTimes && facility.availableTimes[0]?.slots.map((slot, i) => (
-                    <div key={i} className="flex justify-between items-center py-1 border-b last:border-0 border-gray-100">
-                      <span className="text-sm">
-                        {format(facility.availableTimes![0].date, "EEE d. MMM", { locale: nb })} • {slot.start}-{slot.end}
-                      </span>
-                      {slot.available ? (
-                        <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 text-xs gap-1 flex items-center">
-                          <CheckCircle className="h-3 w-3" />
-                          <span>Ledig</span>
-                        </Badge>
-                      ) : (
-                        <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200 text-xs gap-1 flex items-center">
-                          <XCircle className="h-3 w-3" />
-                          <span>Opptatt</span>
-                        </Badge>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+              facility={facility} 
+              onAddressClick={handleAddressClick}
+            />
           ))}
         </div>
       )}
