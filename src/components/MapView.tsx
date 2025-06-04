@@ -88,12 +88,26 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location }) => {
   };
 
   const initializeMap = async (key: string) => {
-    if (!mapContainerRef.current || !key) return;
+    if (!mapContainerRef.current || !key) {
+      console.log('Map container or API key not ready');
+      return;
+    }
+
+    // Wait a bit to ensure the container is fully rendered
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
+    // Double check the container is still available and visible
+    if (!mapContainerRef.current || mapContainerRef.current.offsetWidth === 0) {
+      console.log('Map container not properly mounted');
+      return;
+    }
 
     setIsLoading(true);
     clearMarkers();
 
     try {
+      console.log('Initializing Google Maps...');
+      
       const loader = new Loader({
         apiKey: key,
         version: "weekly",
@@ -106,10 +120,15 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location }) => {
       const map = new Map(mapContainerRef.current, {
         center: { lat: 59.7439, lng: 10.2045 }, // Center on Drammen
         zoom: 12,
+        mapTypeControl: true,
+        streetViewControl: true,
+        fullscreenControl: true,
       });
 
+      console.log('Map created, adding markers...');
+
       // Add markers for each facility
-      filteredFacilities.forEach(facility => {
+      filteredFacilities.forEach((facility, index) => {
         // Create info window content
         const infoWindow = new google.maps.InfoWindow({
           content: `
@@ -134,6 +153,8 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location }) => {
         marker.addListener('click', () => {
           infoWindow.open(map, marker);
         });
+        
+        console.log(`Added marker ${index + 1}: ${facility.name}`);
       });
 
       // Fit map to show all markers if there are multiple facilities
@@ -146,7 +167,7 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location }) => {
       }
 
       mapRef.current = map;
-      console.log('Google Maps loaded successfully');
+      console.log('Google Maps loaded successfully with', filteredFacilities.length, 'markers');
     } catch (error) {
       console.error('Error loading Google Maps:', error);
     } finally {
@@ -174,8 +195,13 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location }) => {
   };
 
   useEffect(() => {
-    if (apiKey) {
-      initializeMap(apiKey);
+    if (apiKey && mapContainerRef.current) {
+      // Small delay to ensure container is ready
+      const timeoutId = setTimeout(() => {
+        initializeMap(apiKey);
+      }, 200);
+      
+      return () => clearTimeout(timeoutId);
     }
   }, [apiKey, filteredFacilities]);
 
@@ -239,10 +265,11 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location }) => {
                 </div>
               </div>
 
-              {/* Map container */}
+              {/* Map container with explicit dimensions */}
               <div 
                 ref={mapContainerRef} 
                 className="h-[400px] w-full"
+                style={{ minHeight: '400px', width: '100%' }}
               />
               
               {isLoading && (
