@@ -91,8 +91,8 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location }) => {
         libraries: ["places"]
       });
 
-      const { Map } = await loader.importLibrary("maps");
-      const { AdvancedMarkerElement } = await loader.importLibrary("marker");
+      const { Map } = await loader.importLibrary("maps") as google.maps.MapsLibrary;
+      const { AdvancedMarkerElement } = await loader.importLibrary("marker") as google.maps.MarkerLibrary;
 
       // Create map instance
       const map = new Map(mapContainerRef.current, {
