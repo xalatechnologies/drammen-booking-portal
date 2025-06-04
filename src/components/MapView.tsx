@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef, useState } from 'react';
 import { Loader } from '@googlemaps/js-api-loader';
 import { Card } from './ui/card';
@@ -216,34 +217,75 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location }) => {
       <div className="mt-4">
         <Card className="min-h-[400px] relative overflow-hidden">
           {!apiKey ? (
-            <div className="h-[400px] w-full flex flex-col items-center justify-center p-6">
-              <div className="text-center max-w-md">
-                <div className="mb-6">
-                  <div className="h-16 w-16 mx-auto bg-blue-100 rounded-full flex items-center justify-center mb-4">
-                    <MapPin className="h-8 w-8 text-blue-600" />
-                  </div>
-                  <h3 className="text-lg font-medium mb-2">Google Maps API Key Required</h3>
-                  <p className="text-gray-600 mb-4">Enter your Google Maps API key to display the interactive map</p>
-                </div>
+            <div className="h-[400px] w-full relative bg-gradient-to-br from-blue-50 to-green-50">
+              {/* Illustration Map Background */}
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-100 via-green-50 to-blue-50">
+                {/* Stylized map elements */}
+                <div className="absolute top-8 left-12 w-16 h-12 bg-blue-200 rounded-full opacity-60"></div>
+                <div className="absolute top-24 right-16 w-24 h-8 bg-green-200 rounded-lg opacity-50"></div>
+                <div className="absolute bottom-20 left-8 w-20 h-16 bg-blue-300 rounded-xl opacity-40"></div>
+                <div className="absolute bottom-8 right-12 w-12 h-20 bg-green-300 rounded-lg opacity-45"></div>
                 
-                <div className="space-y-3">
-                  <Input 
-                    type="text"
-                    placeholder="AIzaSyB..." 
-                    value={keyInput}
-                    onChange={(e) => setKeyInput(e.target.value)}
-                    className="w-full"
-                  />
-                  <Button 
-                    onClick={handleKeySubmit}
-                    disabled={!keyInput.trim()}
-                    className="w-full"
-                  >
-                    Initialize Map
-                  </Button>
-                  <p className="text-xs text-gray-500">
-                    Get an API key at <a href="https://console.cloud.google.com/google/maps-apis/" className="text-blue-600 underline" target="_blank" rel="noreferrer">Google Cloud Console</a>
-                  </p>
+                {/* Mock roads */}
+                <div className="absolute top-1/3 left-0 right-0 h-1 bg-gray-300 opacity-60 transform rotate-12"></div>
+                <div className="absolute top-1/2 left-0 right-0 h-1 bg-gray-300 opacity-60 transform -rotate-6"></div>
+                <div className="absolute left-1/3 top-0 bottom-0 w-1 bg-gray-300 opacity-60"></div>
+              </div>
+
+              {/* Facility markers on illustration */}
+              {filteredFacilities.slice(0, 6).map((facility, index) => (
+                <div
+                  key={facility.id}
+                  className="absolute transform -translate-x-1/2 -translate-y-1/2 group cursor-pointer"
+                  style={{
+                    left: `${20 + (index % 3) * 30}%`,
+                    top: `${25 + Math.floor(index / 3) * 40}%`
+                  }}
+                >
+                  <div className="relative">
+                    <div className="w-8 h-8 bg-red-500 rounded-full border-2 border-white shadow-lg flex items-center justify-center transform transition-all duration-200 group-hover:scale-110">
+                      <MapPin className="h-4 w-4 text-white" />
+                    </div>
+                    
+                    {/* Tooltip */}
+                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
+                      {facility.name}
+                      <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-2 border-transparent border-t-gray-900"></div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              {/* Overlay content */}
+              <div className="absolute inset-0 flex flex-col items-center justify-center p-6 bg-white/90 backdrop-blur-sm">
+                <div className="text-center max-w-md">
+                  <div className="mb-6">
+                    <div className="h-16 w-16 mx-auto bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                      <MapPin className="h-8 w-8 text-blue-600" />
+                    </div>
+                    <h3 className="text-lg font-medium mb-2">Kartvisning - Prototype</h3>
+                    <p className="text-gray-600 mb-4">Viser {filteredFacilities.length} fasiliteter på illustrert kart. Legg inn Google Maps API-nøkkel for ekte kartfunksjonalitet.</p>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <Input 
+                      type="text"
+                      placeholder="AIzaSyB..." 
+                      value={keyInput}
+                      onChange={(e) => setKeyInput(e.target.value)}
+                      className="w-full"
+                    />
+                    <Button 
+                      onClick={handleKeySubmit}
+                      disabled={!keyInput.trim()}
+                      className="w-full"
+                    >
+                      Aktiver ekte kart
+                    </Button>
+                    <p className="text-xs text-gray-500">
+                      Få API-nøkkel på <a href="https://console.cloud.google.com/google/maps-apis/" className="text-blue-600 underline" target="_blank" rel="noreferrer">Google Cloud Console</a>
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
