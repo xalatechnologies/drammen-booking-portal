@@ -27,7 +27,7 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({
     return (
       <Button 
         variant="outline" 
-        className="flex items-center gap-1 h-9 px-4 border-blue-200 text-blue-700 hover:bg-blue-50"
+        className="flex items-center gap-1 h-9 px-4 border-gray-300 text-gray-700 hover:bg-gray-50 hover:text-gray-900"
         onClick={handleLogin}
       >
         <LogIn className="w-4 h-4" />
@@ -39,9 +39,9 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="rounded-full p-2 h-10 w-10 bg-blue-50 hover:bg-blue-100">
+        <Button variant="ghost" className="rounded-full p-2 h-10 w-10 bg-gray-100 hover:bg-gray-200">
           <span className="sr-only">User profile</span>
-          <User className="h-5 w-5 text-blue-700" />
+          <User className="h-5 w-5 text-gray-700" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
