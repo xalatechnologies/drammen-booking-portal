@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState } from 'react';
 import { Card } from './ui/card';
 import { MapPin } from 'lucide-react';
@@ -75,6 +74,17 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location }) => {
   const [error, setError] = useState<string>('');
   const [isInitialized, setIsInitialized] = useState<boolean>(false);
 
+  // Color palette for facility markers
+  const markerColors = [
+    '#ef4444', // red
+    '#3b82f6', // blue
+    '#10b981', // emerald
+    '#f59e0b', // amber
+    '#8b5cf6', // violet
+    '#ec4899', // pink
+    '#06b6d4', // cyan
+  ];
+
   // Filter facilities based on selected filters
   const filteredFacilities = facilityLocations.filter(facility => {
     const matchesType = !facilityType || facilityType === "";
@@ -92,14 +102,17 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location }) => {
 
     clearMarkers();
 
-    filteredFacilities.forEach(facility => {
+    filteredFacilities.forEach((facility, index) => {
+      // Get color for this facility (cycle through colors if more facilities than colors)
+      const markerColor = markerColors[index % markerColors.length];
+      
       // Create custom marker element
       const markerEl = document.createElement('div');
       markerEl.className = 'facility-marker';
       markerEl.style.cssText = `
         width: 30px;
         height: 30px;
-        background-color: #ef4444;
+        background-color: ${markerColor};
         border: 2px solid white;
         border-radius: 50%;
         cursor: pointer;
@@ -356,15 +369,21 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location }) => {
                   </div>
                   
                   <div className="space-y-2 max-h-48 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
-                    {filteredFacilities.map(facility => (
-                      <div key={facility.id} className="flex items-start gap-3 p-2 rounded-lg hover:bg-gray-50 transition-colors">
-                        <MapPin className="h-4 w-4 mt-1 text-red-500 flex-shrink-0" />
-                        <div className="min-w-0 flex-1">
-                          <p className="text-sm font-medium text-gray-900 truncate">{facility.name}</p>
-                          <p className="text-xs text-gray-600 truncate">{facility.address}</p>
+                    {filteredFacilities.map((facility, index) => {
+                      const markerColor = markerColors[index % markerColors.length];
+                      return (
+                        <div key={facility.id} className="flex items-start gap-3 p-2 rounded-lg hover:bg-gray-50 transition-colors">
+                          <div 
+                            className="h-4 w-4 mt-1 rounded-full flex-shrink-0 border border-white shadow-sm"
+                            style={{ backgroundColor: markerColor }}
+                          />
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm font-medium text-gray-900 truncate">{facility.name}</p>
+                            <p className="text-xs text-gray-600 truncate">{facility.address}</p>
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               )}
