@@ -2,20 +2,24 @@
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, MapPin, Users, Clock, Star, Share2, Heart, Calendar, CheckCircle, Wifi, Car, Accessibility } from "lucide-react";
+import { ArrowLeft, MapPin, Users, Clock, Star, Share2, Heart, Calendar, CheckCircle, Wifi, Car, Accessibility, Map } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import GlobalHeader from "@/components/GlobalHeader";
 import GlobalFooter from "@/components/GlobalFooter";
 import { FacilityImageGallery } from "@/components/facility/FacilityImageGallery";
 import { FacilityInfoTabs } from "@/components/facility/FacilityInfoTabs";
 import { FacilityBookingCard } from "@/components/facility/FacilityBookingCard";
 import { FacilityBookingDrawer } from "@/components/facility/FacilityBookingDrawer";
+import MapView from "@/components/MapView";
 
 const FacilityDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [isBookingDrawerOpen, setIsBookingDrawerOpen] = useState(false);
   const [isFavorited, setIsFavorited] = useState(false);
+  const [showMap, setShowMap] = useState(false);
   
   // Mock facility data - in a real app this would be fetched based on id
   const facility = {
@@ -78,103 +82,114 @@ const FacilityDetail = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex flex-col">
+    <div className="min-h-screen bg-white flex flex-col">
       <GlobalHeader />
 
-      <div className="container mx-auto px-4 py-6 max-w-7xl flex-grow">
-        {/* Enhanced Navigation Header */}
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
-          <div className="flex items-center gap-4">
-            <Button 
-              variant="outline" 
-              className="flex items-center gap-2 hover:bg-gray-50 transition-colors"
-              onClick={() => navigate("/")}
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Tilbake til søk
-            </Button>
-            
-            <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-200 px-3 py-1">
-              Idrettsanlegg
-            </Badge>
-          </div>
-          
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              className="flex items-center gap-2"
-              onClick={() => setIsFavorited(!isFavorited)}
-            >
-              <Heart className={`h-4 w-4 ${isFavorited ? 'fill-red-500 text-red-500' : ''}`} />
-              {isFavorited ? 'Fjern fra favoritter' : 'Legg til favoritter'}
-            </Button>
-            <Button variant="outline" size="sm" className="flex items-center gap-2">
-              <Share2 className="h-4 w-4" />
-              Del
-            </Button>
+      <div className="flex-grow">
+        {/* Navigation Header */}
+        <div className="bg-white border-b border-gray-200 sticky top-[72px] z-20">
+          <div className="container mx-auto px-4 py-3">
+            <div className="flex items-center justify-between">
+              <Button 
+                variant="ghost" 
+                className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
+                onClick={() => navigate("/")}
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Tilbake til søk
+              </Button>
+              
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="flex items-center gap-2"
+                  onClick={() => setIsFavorited(!isFavorited)}
+                >
+                  <Heart className={`h-4 w-4 ${isFavorited ? 'fill-red-500 text-red-500' : ''}`} />
+                </Button>
+                <Button variant="ghost" size="sm">
+                  <Share2 className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Enhanced Header Section */}
-        <div className="mb-8">
-          <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 mb-6">
-            <div className="flex-1">
-              <h1 className="text-4xl font-bold mb-3 text-gray-900">{facility.name}</h1>
-              
-              <div className="flex flex-wrap items-center gap-4 mb-4">
-                <div className="flex items-center text-gray-600">
-                  <MapPin className="h-5 w-5 mr-2 text-blue-600" />
-                  <span className="text-lg">{facility.address}</span>
+        {/* Image Gallery - Full width at top */}
+        <div className="bg-white">
+          <FacilityImageGallery images={facility.images} />
+        </div>
+
+        {/* Main Content */}
+        <div className="container mx-auto px-4 py-6 max-w-7xl">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Left Content - Details */}
+            <div className="lg:col-span-2 space-y-6">
+              {/* Header with Price */}
+              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-2">
+                    <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                      Idrettsanlegg
+                    </Badge>
+                    <div className="flex items-center gap-1">
+                      <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                      <span className="font-medium">{facility.rating}</span>
+                      <span className="text-gray-500 text-sm">({facility.reviewCount})</span>
+                    </div>
+                  </div>
+                  <h1 className="text-3xl font-bold text-gray-900 mb-3">{facility.name}</h1>
+                  <div className="flex items-center text-gray-600 mb-4">
+                    <MapPin className="h-5 w-5 mr-2" />
+                    <span>{facility.address}</span>
+                  </div>
                 </div>
                 
-                <div className="flex items-center gap-2">
-                  <div className="flex items-center gap-1">
-                    <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
-                    <span className="font-semibold text-lg">{facility.rating}</span>
-                  </div>
-                  <span className="text-gray-500">({facility.reviewCount} anmeldelser)</span>
+                <div className="text-right">
+                  <div className="text-3xl font-bold text-gray-900">{facility.pricePerHour} kr</div>
+                  <div className="text-gray-500">per time</div>
                 </div>
               </div>
 
-              {/* Quick Info Cards */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                <div className="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
+              {/* Quick Facts Grid */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <Card className="p-4">
                   <div className="flex items-center gap-2 mb-1">
-                    <Users className="h-5 w-5 text-blue-600" />
+                    <Users className="h-4 w-4 text-blue-600" />
                     <span className="text-sm font-medium text-gray-500">Kapasitet</span>
                   </div>
-                  <p className="text-xl font-bold text-gray-900">{facility.capacity} personer</p>
-                </div>
+                  <p className="font-bold">{facility.capacity}</p>
+                </Card>
                 
-                <div className="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
+                <Card className="p-4">
                   <div className="flex items-center gap-2 mb-1">
-                    <Clock className="h-5 w-5 text-green-600" />
-                    <span className="text-sm font-medium text-gray-500">Åpningstider</span>
-                  </div>
-                  <p className="text-sm font-semibold text-gray-900">{facility.openingHours}</p>
-                </div>
-                
-                <div className="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
-                  <div className="flex items-center gap-2 mb-1">
-                    <Calendar className="h-5 w-5 text-purple-600" />
-                    <span className="text-sm font-medium text-gray-500">Pris per time</span>
-                  </div>
-                  <p className="text-xl font-bold text-gray-900">{facility.pricePerHour} kr</p>
-                </div>
-                
-                <div className="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
-                  <div className="flex items-center gap-2 mb-1">
-                    <CheckCircle className="h-5 w-5 text-emerald-600" />
+                    <Calendar className="h-4 w-4 text-green-600" />
                     <span className="text-sm font-medium text-gray-500">Areal</span>
                   </div>
-                  <p className="text-xl font-bold text-gray-900">{facility.area}</p>
-                </div>
+                  <p className="font-bold">{facility.area}</p>
+                </Card>
+                
+                <Card className="p-4">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Clock className="h-4 w-4 text-purple-600" />
+                    <span className="text-sm font-medium text-gray-500">Åpent</span>
+                  </div>
+                  <p className="font-bold text-sm">06:00-23:00</p>
+                </Card>
+                
+                <Card className="p-4">
+                  <div className="flex items-center gap-2 mb-1">
+                    <CheckCircle className="h-4 w-4 text-emerald-600" />
+                    <span className="text-sm font-medium text-gray-500">Status</span>
+                  </div>
+                  <p className="font-bold text-emerald-600">Tilgjengelig</p>
+                </Card>
               </div>
 
               {/* Amenities */}
-              <div className="mb-6">
-                <h3 className="text-lg font-semibold mb-3 text-gray-900">Fasiliteter</h3>
+              <Card className="p-6">
+                <h3 className="text-lg font-semibold mb-4">Fasiliteter</h3>
                 <div className="flex flex-wrap gap-2">
                   {facility.amenities.map((amenity, index) => {
                     const getIcon = (name: string) => {
@@ -203,39 +218,55 @@ const FacilityDetail = () => {
                     </Badge>
                   )}
                 </div>
-              </div>
+              </Card>
+
+              {/* Map Section */}
+              <Card className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold">Lokasjon</h3>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowMap(!showMap)}
+                    className="flex items-center gap-2"
+                  >
+                    <Map className="h-4 w-4" />
+                    {showMap ? 'Skjul kart' : 'Vis kart'}
+                  </Button>
+                </div>
+                
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <MapPin className="h-5 w-5 text-blue-600" />
+                    <div>
+                      <p className="font-medium">{facility.address}</p>
+                      <p className="text-sm text-gray-600">Drammen Kommune</p>
+                    </div>
+                  </div>
+                  
+                  {showMap && (
+                    <div className="h-64 rounded-lg overflow-hidden border">
+                      <MapView facilityType="" location={facility.address} />
+                    </div>
+                  )}
+                </div>
+              </Card>
+
+              {/* Description */}
+              <FacilityInfoTabs 
+                description={facility.description}
+                capacity={facility.capacity}
+                equipment={facility.equipment}
+              />
             </div>
 
-            {/* Quick Booking Button */}
-            <div className="flex-shrink-0">
-              <Button 
-                size="lg" 
-                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
-                onClick={() => setIsBookingDrawerOpen(true)}
-              >
-                Book nå
-              </Button>
+            {/* Right Sidebar - Booking */}
+            <div className="lg:sticky lg:top-24 lg:self-start">
+              <FacilityBookingCard 
+                facility={facility} 
+                onBookClick={() => setIsBookingDrawerOpen(true)} 
+              />
             </div>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-          {/* Images and Description */}
-          <div className="lg:col-span-2">
-            <FacilityImageGallery images={facility.images} />
-            <FacilityInfoTabs 
-              description={facility.description}
-              capacity={facility.capacity}
-              equipment={facility.equipment}
-            />
-          </div>
-
-          {/* Enhanced Booking Card */}
-          <div className="lg:sticky lg:top-6">
-            <FacilityBookingCard 
-              facility={facility} 
-              onBookClick={() => setIsBookingDrawerOpen(true)} 
-            />
           </div>
         </div>
       </div>
