@@ -60,6 +60,7 @@ interface MapViewProps {
 const MapView: React.FC<MapViewProps> = ({ facilityType, location }) => {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<google.maps.Map | null>(null);
+  const markersRef = useRef<google.maps.Marker[]>([]);
   const [apiKey, setApiKey] = useState<string>("");
   const [keyInput, setKeyInput] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -79,10 +80,18 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location }) => {
     return matchesType && matchesLocation;
   });
 
+  const clearMarkers = () => {
+    markersRef.current.forEach(marker => {
+      marker.setMap(null);
+    });
+    markersRef.current = [];
+  };
+
   const initializeMap = async (key: string) => {
     if (!mapContainerRef.current || !key) return;
 
     setIsLoading(true);
+    clearMarkers();
 
     try {
       const loader = new Loader({
@@ -92,13 +101,11 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location }) => {
       });
 
       const { Map } = await loader.importLibrary("maps") as google.maps.MapsLibrary;
-      const { AdvancedMarkerElement } = await loader.importLibrary("marker") as google.maps.MarkerLibrary;
 
       // Create map instance
       const map = new Map(mapContainerRef.current, {
         center: { lat: 59.7439, lng: 10.2045 }, // Center on Drammen
         zoom: 12,
-        mapId: "DEMO_MAP_ID", // Required for AdvancedMarkerElement
       });
 
       // Add markers for each facility
@@ -113,12 +120,15 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location }) => {
           `
         });
 
-        // Create marker
-        const marker = new AdvancedMarkerElement({
-          map: map,
+        // Create marker using standard Marker class
+        const marker = new google.maps.Marker({
           position: { lat: facility.lat, lng: facility.lng },
+          map: map,
           title: facility.name,
         });
+
+        // Store marker reference
+        markersRef.current.push(marker);
 
         // Add click listener to show info window
         marker.addListener('click', () => {
@@ -136,6 +146,7 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location }) => {
       }
 
       mapRef.current = map;
+      console.log('Google Maps loaded successfully');
     } catch (error) {
       console.error('Error loading Google Maps:', error);
     } finally {
@@ -156,6 +167,7 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location }) => {
     setApiKey("");
     setKeyInput("");
     localStorage.removeItem('google-maps-api-key');
+    clearMarkers();
     if (mapRef.current) {
       mapRef.current = null;
     }
