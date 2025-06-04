@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
@@ -69,11 +68,11 @@ const FacilityListItem: React.FC<FacilityListItemProps> = ({
 
   return (
     <Card 
-      className="overflow-hidden hover:shadow-2xl transition-all duration-300 hover:translate-y-[-2px] group border-0 shadow-lg bg-gradient-to-br from-white via-white to-gray-50/50 cursor-pointer"
+      className="overflow-hidden hover:shadow-md transition-all duration-300 hover:translate-y-[-1px] group border border-slate-200/60 shadow-sm bg-white cursor-pointer"
       onClick={() => navigate(`/facilities/${facility.id}`)}
     >
       <CardContent className="p-0">
-        <div className="flex h-52">
+        <div className="flex h-56">
           <FacilityImage 
             image={facility.image}
             name={facility.name}
@@ -94,6 +93,7 @@ const FacilityListItem: React.FC<FacilityListItemProps> = ({
             nextAvailable={facility.nextAvailable}
             openingHours={facility.openingHours}
             equipment={facility.equipment}
+            accessibility={facility.accessibility}
             onDetailsClick={handleDetailsClick}
           />
         </div>

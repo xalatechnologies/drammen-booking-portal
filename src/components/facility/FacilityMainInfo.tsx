@@ -21,25 +21,25 @@ const FacilityMainInfo: React.FC<FacilityMainInfoProps> = ({
   onAddressClick
 }) => {
   return (
-    <div className="flex-grow p-6 flex flex-col justify-between min-w-0 bg-gradient-to-br from-white to-gray-50/30">
+    <div className="flex-grow p-6 flex flex-col justify-between min-w-0 bg-gradient-to-br from-white to-gray-50/20">
       <div>
         <div className="flex items-start gap-4 mb-3">
           <div className="flex-grow min-w-0">
             <h3 className="font-bold text-xl text-slate-800 truncate mb-2 group-hover:text-slate-900 transition-colors">{name}</h3>
             <div className="flex flex-wrap gap-2">
               {suitableFor.slice(0, 4).map((activity, index) => (
-                <Badge key={index} variant="secondary" className="text-xs px-3 py-1.5 bg-emerald-100 text-emerald-800 border-emerald-200 font-medium hover:bg-emerald-200 transition-colors">
+                <Badge key={index} variant="secondary" className="text-xs px-3 py-1.5 bg-emerald-100 text-emerald-800 border-emerald-200/60 font-medium hover:bg-emerald-200 transition-colors">
                   {activity}
                 </Badge>
               ))}
               {suitableFor.length > 4 && (
-                <Badge variant="secondary" className="text-xs px-3 py-1.5 bg-emerald-100 text-emerald-800 border-emerald-200 font-medium">
+                <Badge variant="secondary" className="text-xs px-3 py-1.5 bg-emerald-100 text-emerald-800 border-emerald-200/60 font-medium">
                   +{suitableFor.length - 4}
                 </Badge>
               )}
             </div>
           </div>
-          <Badge variant="outline" className="bg-gradient-to-r from-white to-gray-50 text-slate-700 border-slate-200 font-semibold text-sm px-3 py-1.5 flex-shrink-0 shadow-sm">
+          <Badge variant="outline" className="bg-gradient-to-r from-white to-gray-50 text-slate-700 border-slate-200/60 font-semibold text-sm px-3 py-1.5 flex-shrink-0 shadow-sm">
             {area}
           </Badge>
         </div>
