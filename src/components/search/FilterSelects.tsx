@@ -13,6 +13,10 @@ interface FilterSelectsProps {
   setFacilityType: (type: string) => void;
   location: string;
   setLocation: (location: string) => void;
+  accessibility: string;
+  setAccessibility: (accessibility: string) => void;
+  capacity: number[];
+  setCapacity: (capacity: number[]) => void;
 }
 
 const FilterSelects: React.FC<FilterSelectsProps> = ({
@@ -20,9 +24,44 @@ const FilterSelects: React.FC<FilterSelectsProps> = ({
   setFacilityType,
   location,
   setLocation,
+  accessibility,
+  setAccessibility,
+  capacity,
+  setCapacity,
 }) => {
+  const handleCapacityChange = (value: string) => {
+    switch (value) {
+      case "all":
+        setCapacity([0, 200]);
+        break;
+      case "1-50":
+        setCapacity([1, 50]);
+        break;
+      case "51-100":
+        setCapacity([51, 100]);
+        break;
+      case "101-200":
+        setCapacity([101, 200]);
+        break;
+      case "200+":
+        setCapacity([200, 500]);
+        break;
+      default:
+        setCapacity([0, 200]);
+    }
+  };
+
+  const getCapacityValue = () => {
+    if (capacity[0] === 0 && capacity[1] === 200) return "all";
+    if (capacity[0] === 1 && capacity[1] === 50) return "1-50";
+    if (capacity[0] === 51 && capacity[1] === 100) return "51-100";
+    if (capacity[0] === 101 && capacity[1] === 200) return "101-200";
+    if (capacity[0] === 200 && capacity[1] === 500) return "200+";
+    return "all";
+  };
+
   return (
-    <div className="grid grid-cols-2 gap-4">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
       <div>
         <Select value={facilityType || "all"} onValueChange={setFacilityType}>
           <SelectTrigger className="h-10 border-gray-200 hover:border-blue-500">
@@ -52,6 +91,35 @@ const FilterSelects: React.FC<FilterSelectsProps> = ({
             <SelectItem value="stromsø">Strømsø</SelectItem>
             <SelectItem value="bragernes">Bragernes</SelectItem>
             <SelectItem value="åssiden">Åssiden</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div>
+        <Select value={accessibility || "all"} onValueChange={setAccessibility}>
+          <SelectTrigger className="h-10 border-gray-200 hover:border-blue-500">
+            <SelectValue placeholder="Tilgjengelighet" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Alle</SelectItem>
+            <SelectItem value="wheelchair">Rullestoltilpasset</SelectItem>
+            <SelectItem value="hearing-loop">Teleslynge</SelectItem>
+            <SelectItem value="sign-language">Tegnspråktolking</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div>
+        <Select value={getCapacityValue()} onValueChange={handleCapacityChange}>
+          <SelectTrigger className="h-10 border-gray-200 hover:border-blue-500">
+            <SelectValue placeholder="Kapasitet" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Alle størrelser</SelectItem>
+            <SelectItem value="1-50">1-50 personer</SelectItem>
+            <SelectItem value="51-100">51-100 personer</SelectItem>
+            <SelectItem value="101-200">101-200 personer</SelectItem>
+            <SelectItem value="200+">200+ personer</SelectItem>
           </SelectContent>
         </Select>
       </div>

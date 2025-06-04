@@ -1,14 +1,13 @@
 
 import React, { useState } from "react";
 import { DateRange } from "react-day-picker";
-import { Filter, X } from "lucide-react";
+import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import SearchInput from "@/components/search/SearchInput";
 import DateRangePicker from "@/components/search/DateRangePicker";
 import FilterSelects from "@/components/search/FilterSelects";
 import ViewModeToggle from "@/components/search/ViewModeToggle";
-import AdvancedFilters from "@/components/search/AdvancedFilters";
 import ActiveFilters from "@/components/search/ActiveFilters";
 
 interface SearchFilterProps {
@@ -41,7 +40,6 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
   setCapacity,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
 
   const clearFilters = () => {
@@ -81,6 +79,10 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
                 setFacilityType={setFacilityType}
                 location={location}
                 setLocation={setLocation}
+                accessibility={accessibility}
+                setAccessibility={setAccessibility}
+                capacity={capacity}
+                setCapacity={setCapacity}
               />
             </div>
 
@@ -92,15 +94,6 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
             </div>
 
             <div className="lg:col-span-1 flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-                className="h-10 flex-1 border-gray-200 hover:border-blue-500"
-              >
-                <Filter className="h-4 w-4 mr-2" />
-                {showAdvancedFilters ? "Skjul filtre" : "Flere filtre"}
-              </Button>
               {hasActiveFilters && (
                 <Button 
                   variant="ghost" 
@@ -113,15 +106,6 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
               )}
             </div>
           </div>
-
-          {showAdvancedFilters && (
-            <AdvancedFilters 
-              accessibility={accessibility}
-              setAccessibility={setAccessibility}
-              capacity={capacity}
-              setCapacity={setCapacity}
-            />
-          )}
 
           {hasActiveFilters && (
             <ActiveFilters 
