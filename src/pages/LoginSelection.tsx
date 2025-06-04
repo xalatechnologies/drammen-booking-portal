@@ -37,12 +37,12 @@ const LoginSelection = () => {
             {/* Bruker Card */}
             <Card className="h-full flex flex-col overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border-0 shadow-lg bg-white">
               <CardHeader className="bg-gradient-to-r from-slate-600 to-slate-700 text-white pb-8 pt-8">
-                <CardTitle className="flex items-center text-2xl font-bold">
+                <CardTitle className="flex items-center text-2xl font-bold text-left">
                   <UserRound className="h-8 w-8 mr-3" />
                   Bruker
                 </CardTitle>
-                <CardDescription className="text-slate-100 text-lg">
-                  For publikum og vanlige brukere
+                <CardDescription className="text-slate-100 text-lg text-left">
+                  For publikum og aktører
                 </CardDescription>
               </CardHeader>
               <CardContent className="flex-1 flex flex-col justify-between pt-8 px-8">
@@ -72,11 +72,11 @@ const LoginSelection = () => {
             {/* Saksbehandler Card */}
             <Card className="h-full flex flex-col overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border-0 shadow-lg bg-white">
               <CardHeader className="bg-gradient-to-r from-teal-600 to-teal-700 text-white pb-8 pt-8">
-                <CardTitle className="flex items-center text-2xl font-bold">
+                <CardTitle className="flex items-center text-2xl font-bold text-left">
                   <Briefcase className="h-8 w-8 mr-3" />
                   Saksbehandler
                 </CardTitle>
-                <CardDescription className="text-teal-100 text-lg">
+                <CardDescription className="text-teal-100 text-lg text-left">
                   For saksbehandlere
                 </CardDescription>
               </CardHeader>
@@ -108,11 +108,11 @@ const LoginSelection = () => {
             {/* Administrator Card */}
             <Card className="h-full flex flex-col overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border-0 shadow-lg bg-white">
               <CardHeader className="bg-gradient-to-r from-indigo-600 to-indigo-700 text-white pb-8 pt-8">
-                <CardTitle className="flex items-center text-2xl font-bold">
+                <CardTitle className="flex items-center text-2xl font-bold text-left">
                   <ShieldCheck className="h-8 w-8 mr-3" />
                   Administrator
                 </CardTitle>
-                <CardDescription className="text-indigo-100 text-lg">
+                <CardDescription className="text-indigo-100 text-lg text-left">
                   For systemadministratorer og ledelse
                 </CardDescription>
               </CardHeader>
