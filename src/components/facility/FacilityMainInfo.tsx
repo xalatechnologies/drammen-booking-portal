@@ -7,6 +7,7 @@ interface FacilityMainInfoProps {
   name: string;
   address: string;
   suitableFor: string[];
+  equipment: string[];
   area: string;
   description: string;
   onAddressClick: (e: React.MouseEvent) => void;
@@ -16,6 +17,7 @@ const FacilityMainInfo: React.FC<FacilityMainInfoProps> = ({
   name,
   address,
   suitableFor,
+  equipment,
   area,
   description,
   onAddressClick
@@ -26,15 +28,31 @@ const FacilityMainInfo: React.FC<FacilityMainInfoProps> = ({
         <div className="flex items-start gap-4 mb-3">
           <div className="flex-grow min-w-0">
             <h3 className="font-bold text-xl text-slate-800 truncate mb-2 group-hover:text-slate-900 transition-colors">{name}</h3>
-            <div className="flex flex-wrap gap-2">
-              {suitableFor.slice(0, 4).map((activity, index) => (
+            
+            {/* Suitable For tags */}
+            <div className="flex flex-wrap gap-2 mb-3">
+              {suitableFor.slice(0, 3).map((activity, index) => (
                 <Badge key={index} variant="secondary" className="text-xs px-3 py-1.5 bg-emerald-100 text-emerald-800 border-emerald-200/60 font-medium hover:bg-emerald-200 transition-colors">
                   {activity}
                 </Badge>
               ))}
-              {suitableFor.length > 4 && (
+              {suitableFor.length > 3 && (
                 <Badge variant="secondary" className="text-xs px-3 py-1.5 bg-emerald-100 text-emerald-800 border-emerald-200/60 font-medium">
-                  +{suitableFor.length - 4}
+                  +{suitableFor.length - 3}
+                </Badge>
+              )}
+            </div>
+
+            {/* Equipment tags */}
+            <div className="flex flex-wrap gap-2">
+              {equipment.slice(0, 3).map((item, index) => (
+                <Badge key={index} variant="secondary" className="text-xs px-3 py-1.5 bg-blue-100 text-blue-800 border-blue-200/60 font-medium hover:bg-blue-200 transition-colors">
+                  {item}
+                </Badge>
+              ))}
+              {equipment.length > 3 && (
+                <Badge variant="secondary" className="text-xs px-3 py-1.5 bg-blue-100 text-blue-800 border-blue-200/60 font-medium">
+                  +{equipment.length - 3}
                 </Badge>
               )}
             </div>

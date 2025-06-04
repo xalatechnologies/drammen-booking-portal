@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
@@ -83,6 +84,7 @@ const FacilityListItem: React.FC<FacilityListItemProps> = ({
             name={facility.name}
             address={facility.address}
             suitableFor={facility.suitableFor}
+            equipment={facility.equipment}
             area={facility.area}
             description={facility.description}
             onAddressClick={handleAddressClick}
@@ -92,7 +94,6 @@ const FacilityListItem: React.FC<FacilityListItemProps> = ({
             capacity={facility.capacity}
             nextAvailable={facility.nextAvailable}
             openingHours={facility.openingHours}
-            equipment={facility.equipment}
             accessibility={facility.accessibility}
             onDetailsClick={handleDetailsClick}
           />

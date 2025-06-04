@@ -2,13 +2,12 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Users, Calendar, Clock, Wrench, Shield } from "lucide-react";
+import { Users, Calendar, Clock, Shield } from "lucide-react";
 
 interface FacilityDetailsProps {
   capacity: number;
   nextAvailable: string;
   openingHours: string;
-  equipment: string[];
   accessibility: string[];
   onDetailsClick: (e: React.MouseEvent) => void;
 }
@@ -17,7 +16,6 @@ const FacilityDetails: React.FC<FacilityDetailsProps> = ({
   capacity,
   nextAvailable,
   openingHours,
-  equipment,
   accessibility,
   onDetailsClick
 }) => {
@@ -63,20 +61,6 @@ const FacilityDetails: React.FC<FacilityDetailsProps> = ({
             <div className="text-xs text-slate-700 leading-relaxed font-medium">{openingHours}</div>
           </div>
         </div>
-        
-        {/* Equipment */}
-        {equipment.length > 0 && (
-          <div className="flex items-start gap-3 text-sm p-3 rounded-lg bg-gradient-to-br from-indigo-50 to-blue-50 border border-indigo-200/60">
-            <Wrench className="h-4 w-4 text-indigo-600 flex-shrink-0 mt-0.5" />
-            <div className="flex-1 min-w-0">
-              <div className="text-xs text-indigo-700 font-semibold uppercase tracking-wide mb-1">Utstyr</div>
-              <div className="text-xs text-slate-700 leading-relaxed font-medium">
-                {equipment.slice(0, 4).join(", ")}
-                {equipment.length > 4 && ` +${equipment.length - 4} mer`}
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Accessibility */}
         {accessibility.length > 0 && (
