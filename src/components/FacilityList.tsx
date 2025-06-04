@@ -1,178 +1,310 @@
 
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Card,
   CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { format } from "date-fns";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Calendar } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { MapPin, Calendar, Users, Clock } from "lucide-react";
+
+interface Facility {
+  id: number;
+  name: string;
+  address: string;
+  type: string;
+  image: string;
+  nextAvailable: string;
+  capacity: number;
+  accessibility: string[];
+  area: string;
+  suitableFor: string[];
+  equipment: string[];
+  openingHours: string;
+  description: string;
+  availableTimes?: {
+    date: Date;
+    slots: {
+      start: string;
+      end: string;
+      available: boolean;
+    }[];
+  }[];
+}
 
 interface FacilityListProps {
   date?: Date;
-  facilityType: string;
-  location: string;
+  facilityType?: string;
+  location?: string;
+  accessibility?: string;
+  capacity?: number[];
 }
-
-// This would typically come from an API/Supabase
-const mockFacilities = [
-  {
-    id: 1,
-    name: "Drammen Sports Hall",
-    description: "A large sports facility with multiple courts",
-    type: "sports-hall",
-    location: "central",
-    image: "https://images.unsplash.com/photo-1525361147853-4bf9f54a0e98?w=600&auto=format&fit=crop",
-    nextAvailable: new Date(2025, 4, 22, 10, 0),
-    capacity: 200,
-  },
-  {
-    id: 2,
-    name: "Konnerud Community Center",
-    description: "Modern meeting facilities for local groups",
-    type: "meeting-room",
-    location: "konnerud",
-    image: "https://images.unsplash.com/photo-1517502884422-41eaead166d4?w=600&auto=format&fit=crop",
-    nextAvailable: new Date(2025, 4, 23, 13, 0),
-    capacity: 30,
-  },
-  {
-    id: 3,
-    name: "Åssiden School Auditorium",
-    description: "Perfect for presentations and performances",
-    type: "auditorium",
-    location: "aassiden",
-    image: "https://images.unsplash.com/photo-1596194081696-4bab3a813b63?w=600&auto=format&fit=crop",
-    nextAvailable: new Date(2025, 4, 24, 9, 0),
-    capacity: 150,
-  },
-  {
-    id: 4,
-    name: "Gulskogen Gymnasium",
-    description: "Fully equipped sports facility for multiple activities",
-    type: "gym",
-    location: "gulskogen",
-    image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&auto=format&fit=crop",
-    nextAvailable: new Date(2025, 4, 22, 15, 30),
-    capacity: 100,
-  },
-  {
-    id: 5,
-    name: "Fjell Community House",
-    description: "Modern meeting spaces for local community gatherings",
-    type: "community-house",
-    location: "fjell",
-    image: "https://images.unsplash.com/photo-1551038247-3d9af20df552?w=600&auto=format&fit=crop",
-    nextAvailable: new Date(2025, 4, 25, 12, 0),
-    capacity: 75,
-  },
-  {
-    id: 6,
-    name: "Strømsø School Kitchen",
-    description: "Full-service kitchen for cooking classes and events",
-    type: "kitchen",
-    location: "stromso",
-    image: "https://images.unsplash.com/photo-1556909114-44e3e9699e2b?w=600&auto=format&fit=crop",
-    nextAvailable: new Date(2025, 4, 26, 16, 0),
-    capacity: 20,
-  },
-];
 
 const FacilityList: React.FC<FacilityListProps> = ({
   date,
   facilityType,
   location,
+  accessibility,
+  capacity
 }) => {
-  const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
+  
+  // Mock data with correct Drammen addresses and facilities
+  const facilities: Facility[] = [
+    {
+      id: 1,
+      name: "Brandengen Skole - Gymsal",
+      address: "Iver Holters gate 48, 3041 Drammen",
+      type: "Gymsal",
+      area: "Bragernes",
+      image: "/lovable-uploads/13aee1f6-e9d9-474b-9ed7-c656d703d19b.png",
+      nextAvailable: "I dag, 18:00",
+      capacity: 120,
+      accessibility: ["wheelchair", "hearing-loop"],
+      suitableFor: ["Basketball", "Volleyball", "Håndball", "Badminton"],
+      equipment: ["Basketkurver", "Volleyballnett", "Lydsystem", "Projektor"],
+      openingHours: "Man-Fre: 08:00-22:00, Lør-Søn: 10:00-20:00",
+      description: "En moderne gymsal med høy standard og god ventilasjon. Ideell for ballsport og større arrangementer.",
+    },
+    {
+      id: 4,
+      name: "Fjell Skole - Aktivitetshall",
+      address: "Lauritz Hervigs vei 20, 3035 Drammen",
+      type: "Aktivitetshall",
+      area: "Konnerud",
+      image: "/lovable-uploads/b12bcda3-d611-4e9e-bbcc-d53d2db38af9.png",
+      nextAvailable: "Fredag, 17:00",
+      capacity: 200,
+      accessibility: ["wheelchair"],
+      suitableFor: ["Fotball", "Innebandy", "Dans", "Konsert"],
+      equipment: ["Fotballmål", "Lydanlegg", "Scene", "Garderober"],
+      openingHours: "Man-Tor: 07:00-23:00, Fre: 07:00-24:00, Lør-Søn: 09:00-22:00",
+      description: "Stor aktivitetshall med mulighet for både sport og kulturarrangementer. God akustikk og moderne fasiliteter.",
+    },
+    {
+      id: 5,
+      name: "Gulskogen Skole - Auditorium",
+      address: "Vintergata 8, 3048 Drammen",
+      type: "Auditorium",
+      area: "Gulskogen",
+      image: "/lovable-uploads/b692664c-737a-4a20-8673-25a401789f82.png",
+      nextAvailable: "Torsdag, 19:00",
+      capacity: 150,
+      accessibility: ["wheelchair", "hearing-loop", "sign-language"],
+      suitableFor: ["Presentasjoner", "Teater", "Konferanser", "Filmvisning"],
+      equipment: ["Projektor", "Lydsystem", "Mikrofoner", "Scene", "Lysrigger"],
+      openingHours: "Man-Fre: 08:00-22:00, Lør: 10:00-18:00, Søn: Stengt",
+      description: "Profesjonelt auditorium med scenebelysning og høykvalitets lyd- og bildeutstyr. Perfekt for større arrangementer.",
+    },
+    {
+      id: 6,
+      name: "Marienlyst Stadion - Møtesal",
+      address: "Schwartz gate 2, 3043 Drammen",
+      type: "Møtesal",
+      area: "Strømsø",
+      image: "/lovable-uploads/07eaca70-1e9b-4e73-ab4e-6b9b7f1ca27e.png",
+      nextAvailable: "Lørdag, 10:00",
+      capacity: 80,
+      accessibility: ["wheelchair"],
+      suitableFor: ["Møter", "Kurs", "Workshops", "Seminarer"],
+      equipment: ["Whiteboard", "Projektor", "WiFi", "Kaffe/te", "Flipchart"],
+      openingHours: "Man-Fre: 07:00-20:00, Lør: 09:00-16:00, Søn: Stengt",
+      description: "Romslig møtesal med naturlig lys og moderne konferanseutstyr. Ideell for bedriftsmøter og kursvirksomhet.",
+    },
+    {
+      id: 7,
+      name: "Drammensbadet - Svømmehall",
+      address: "Danvikgata 40, 3045 Drammen",
+      type: "Svømmehall",
+      area: "Åssiden",
+      image: "/lovable-uploads/740258a0-d4f7-49b6-a8a6-9c994e75baae.png",
+      nextAvailable: "Søndag, 12:00",
+      capacity: 250,
+      accessibility: ["wheelchair", "hearing-loop"],
+      suitableFor: ["Svømming", "Vanngymnastikk", "Svømmeopplæring", "Konkurranser"],
+      equipment: ["25m basseng", "Barnebassseng", "Garderober", "Dusjer", "Livredningsutstyr"],
+      openingHours: "Man-Fre: 06:00-22:00, Lør-Søn: 08:00-20:00",
+      description: "Moderne svømmeanlegg med både konkurransebasseng og barneområde. Høy standard på fasiliteter og sikkerhet.",
+    },
+    {
+      id: 8,
+      name: "Åssiden Fotballhall",
+      address: "Buskerudveien 54, 3024 Drammen",
+      type: "Fotballhall",
+      area: "Åssiden",
+      image: "/lovable-uploads/a72ba2e2-f0a3-4561-bff6-17fa721a0c02.png",
+      nextAvailable: "Lørdag, 18:30",
+      capacity: 300,
+      accessibility: ["wheelchair"],
+      suitableFor: ["Fotball", "Futsal", "Innebandy", "Håndball"],
+      equipment: ["Kunstgress", "Fotballmål", "Tilskuerplasser", "Garderober", "Kafeteria"],
+      openingHours: "Man-Søn: 07:00-23:00",
+      description: "Stor fotballhall med kunstgress av høy kvalitet. Egnet for både trening, kamper og turneringer.",
+    }
+  ];
 
-  // Simulate API loading
-  React.useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  // Filter facilities based on search criteria
-  const filteredFacilities = mockFacilities.filter((facility) => {
-    if (facilityType && facility.type !== facilityType) return false;
-    if (location && facility.location !== location) return false;
-    return true;
+  // Filtering logic - same as FacilityGrid
+  const filteredFacilities = facilities.filter(facility => {
+    const hasActiveFilters = 
+      (facilityType && facilityType !== "") ||
+      (location && location !== "") ||
+      (accessibility && accessibility !== "") ||
+      (capacity && Array.isArray(capacity) && capacity[0] > 0);
+    
+    if (!hasActiveFilters) return true;
+    
+    let matchesCriteria = true;
+    
+    if (facilityType && facilityType !== "") {
+      matchesCriteria = matchesCriteria && 
+        facility.type.toLowerCase().includes(facilityType.toLowerCase().replace("-", " "));
+    }
+    
+    if (location && location !== "") {
+      matchesCriteria = matchesCriteria && 
+        facility.address.toLowerCase().includes(location.toLowerCase().replace("-", " "));
+    }
+    
+    if (accessibility && accessibility !== "") {
+      matchesCriteria = matchesCriteria && 
+        facility.accessibility.includes(accessibility);
+    }
+    
+    if (capacity && Array.isArray(capacity) && capacity.length === 2 && capacity[0] > 0) {
+      matchesCriteria = matchesCriteria && 
+        (facility.capacity >= capacity[0] && facility.capacity <= capacity[1]);
+    }
+    
+    return matchesCriteria;
   });
 
-  if (isLoading) {
-    return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {[1, 2, 3].map((i) => (
-          <Card key={i}>
-            <CardHeader className="p-0">
-              <Skeleton className="h-48 rounded-t-lg" />
-            </CardHeader>
-            <CardContent className="pt-6">
-              <Skeleton className="h-6 w-2/3 mb-2" />
-              <Skeleton className="h-4 w-full mb-2" />
-              <Skeleton className="h-4 w-3/4" />
-            </CardContent>
-            <CardFooter>
-              <Skeleton className="h-10 w-full" />
-            </CardFooter>
-          </Card>
-        ))}
-      </div>
-    );
-  }
+  const facilitiesToDisplay = filteredFacilities;
 
-  if (filteredFacilities.length === 0) {
-    return (
-      <div className="text-center py-12">
-        <h3 className="text-xl font-medium">No facilities found</h3>
-        <p className="text-muted-foreground mt-2">
-          Try changing your search criteria
-        </p>
-      </div>
-    );
-  }
+  // Function to handle address click - navigate to map view with filters
+  const handleAddressClick = (e: React.MouseEvent, facility: any) => {
+    e.stopPropagation();
+    const searchParams = new URLSearchParams();
+    if (facilityType) searchParams.set('facilityType', facilityType);
+    if (location) searchParams.set('location', location);
+    if (accessibility) searchParams.set('accessibility', accessibility);
+    if (capacity && Array.isArray(capacity)) {
+      searchParams.set('capacity', capacity.join(','));
+    }
+    searchParams.set('viewMode', 'map');
+    searchParams.set('focusFacility', facility.id.toString());
+    
+    navigate(`/?${searchParams.toString()}`);
+  };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {filteredFacilities.map((facility) => (
-        <Card key={facility.id} className="overflow-hidden flex flex-col">
-          <div className="h-48 overflow-hidden">
-            <img
-              src={facility.image}
-              alt={facility.name}
-              className="w-full h-full object-cover transition-transform hover:scale-105 duration-300"
-            />
-          </div>
-          <CardHeader>
-            <CardTitle>{facility.name}</CardTitle>
-          </CardHeader>
-          <CardContent className="flex-grow">
-            <p className="text-muted-foreground">{facility.description}</p>
-            <div className="flex items-center gap-2 mt-4">
-              <Calendar className="h-4 w-4" />
-              <span className="text-sm">
-                Next available:{" "}
-                {format(facility.nextAvailable, "EEE, MMM d, h:mm a")}
-              </span>
-            </div>
-            <p className="text-sm mt-2">Capacity: {facility.capacity} people</p>
-          </CardContent>
-          <CardFooter>
-            <Button
-              className="w-full"
-              onClick={() => window.location.href = `/facilities/${facility.id}`}
+    <div className="mb-8">
+      {facilitiesToDisplay.length === 0 ? (
+        <div className="text-center py-10 bg-gray-50 rounded-lg">
+          <h3 className="text-xl font-medium mb-2">Ingen lokaler funnet</h3>
+          <p className="text-gray-500">Prøv å endre søkekriteriene dine</p>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {facilitiesToDisplay.map(facility => (
+            <Card 
+              key={facility.id} 
+              className="overflow-hidden hover:shadow-lg transition-all duration-200 hover:translate-y-[-1px] group border border-gray-200 cursor-pointer"
+              onClick={() => navigate(`/facilities/${facility.id}`)}
             >
-              View Details
-            </Button>
-          </CardFooter>
-        </Card>
-      ))}
+              <CardContent className="p-0">
+                <div className="flex">
+                  {/* Image */}
+                  <div className="w-48 h-32 bg-gray-200 relative overflow-hidden flex-shrink-0">
+                    <img 
+                      src={facility.image} 
+                      alt={facility.name} 
+                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = "https://images.unsplash.com/photo-1525361147853-4bf9f54a0e98?w=600&auto=format&fit=crop";
+                        target.onerror = null;
+                      }}
+                    />
+                    <div className="absolute top-2 right-2">
+                      <Badge className="bg-white/90 backdrop-blur-sm text-gray-800 border-0 font-medium text-xs px-2 py-1 shadow-sm">
+                        {facility.type}
+                      </Badge>
+                    </div>
+                  </div>
+                  
+                  {/* Content */}
+                  <div className="flex-grow p-4 flex flex-col justify-between">
+                    <div>
+                      <div className="flex justify-between items-start mb-2">
+                        <div>
+                          <h3 className="font-bold text-lg text-gray-900 mb-1">{facility.name}</h3>
+                          <div className="flex items-center gap-1.5 text-sm text-gray-600 mb-2">
+                            <MapPin className="h-4 w-4 text-gray-500" />
+                            <span 
+                              className="hover:text-blue-600 hover:underline cursor-pointer transition-colors"
+                              onClick={(e) => handleAddressClick(e, facility)}
+                              title="Klikk for å se på kart"
+                            >
+                              {facility.address}
+                            </span>
+                          </div>
+                        </div>
+                        <Badge variant="outline" className="bg-white text-gray-700 border-gray-200 font-medium text-xs px-2 py-1">
+                          {facility.area}
+                        </Badge>
+                      </div>
+                      
+                      <p className="text-gray-600 text-sm mb-3 line-clamp-2">{facility.description}</p>
+                      
+                      <div className="flex flex-wrap gap-4 text-sm text-gray-600">
+                        <div className="flex items-center gap-1">
+                          <Calendar className="h-4 w-4 text-blue-600" />
+                          <span>{facility.nextAvailable}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Users className="h-4 w-4 text-blue-600" />
+                          <span>{facility.capacity} personer</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Clock className="h-4 w-4 text-blue-600" />
+                          <span>{facility.openingHours.split(',')[0]}</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex justify-between items-center mt-4">
+                      <div className="flex flex-wrap gap-1">
+                        {facility.suitableFor.slice(0, 3).map((activity, index) => (
+                          <Badge key={index} variant="secondary" className="text-xs px-2 py-1">
+                            {activity}
+                          </Badge>
+                        ))}
+                        {facility.suitableFor.length > 3 && (
+                          <Badge variant="secondary" className="text-xs px-2 py-1">
+                            +{facility.suitableFor.length - 3}
+                          </Badge>
+                        )}
+                      </div>
+                      
+                      <Button 
+                        size="sm" 
+                        className="bg-[#0B3D91] hover:bg-blue-700 text-white"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/facilities/${facility.id}`);
+                        }}
+                      >
+                        Se detaljer
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
