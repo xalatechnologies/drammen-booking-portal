@@ -20,40 +20,49 @@ const LoginSelection = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-50 to-gray-100">
       <GlobalHeader />
 
-      <div className="flex-1 flex items-center justify-center px-4 py-12">
-        <div className="w-full max-w-6xl">
-          <h1 className="text-3xl font-bold text-center mb-8">Velkommen til Drammen Kommune</h1>
-          <p className="text-center text-muted-foreground mb-10">
-            Velg hvordan du vil logge inn på systemet
-          </p>
+      <div className="flex-1 flex items-center justify-center px-6 py-16">
+        <div className="w-full max-w-7xl">
+          <div className="text-center mb-12">
+            <h1 className="text-4xl font-bold text-gray-900 mb-4">
+              Velkommen til Drammen Kommune
+            </h1>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Velg hvordan du vil logge inn på systemet for å få tilgang til våre tjenester
+            </p>
+          </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            <Card className="overflow-hidden transition-all hover:shadow-md">
-              <CardHeader className="bg-blue-50 pb-6">
-                <CardTitle className="flex items-center justify-center text-blue-700">
-                  <UserRound className="h-6 w-6 mr-2" />
+          <div className="grid lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            {/* Bruker Card */}
+            <Card className="h-full flex flex-col overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border-0 shadow-lg bg-white">
+              <CardHeader className="bg-gradient-to-r from-blue-500 to-blue-600 text-white pb-8 pt-8">
+                <CardTitle className="flex items-center justify-center text-2xl font-bold">
+                  <UserRound className="h-8 w-8 mr-3" />
                   Bruker
                 </CardTitle>
-                <CardDescription className="text-center">
+                <CardDescription className="text-center text-blue-100 text-lg">
                   For publikum og vanlige brukere
                 </CardDescription>
               </CardHeader>
-              <CardContent className="pt-6 text-center">
-                <p className="mb-4">
-                  Logg inn for å reservere lokaler, administrere dine bookinger og mer.
-                </p>
-                <div className="text-sm text-gray-600">
-                  <p className="font-medium mb-1">Innloggingsmetoder:</p>
-                  <p>• BankID</p>
-                  <p>• Vipps</p>
+              <CardContent className="flex-1 flex flex-col justify-between pt-8 px-8">
+                <div>
+                  <p className="text-gray-700 mb-6 text-lg leading-relaxed">
+                    Logg inn for å reservere lokaler, administrere dine bookinger og mer.
+                  </p>
+                  <div className="bg-gray-50 rounded-lg p-6">
+                    <p className="font-semibold mb-3 text-gray-900 text-lg">Innloggingsmetoder:</p>
+                    <div className="space-y-2">
+                      <p className="text-gray-700 text-base">• BankID</p>
+                      <p className="text-gray-700 text-base">• Vipps</p>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
-              <CardFooter>
+              <CardFooter className="px-8 pb-8">
                 <Button 
-                  className="w-full" 
+                  className="w-full h-12 text-lg font-semibold bg-blue-600 hover:bg-blue-700 transition-colors" 
                   onClick={() => handleUserSelection("user")}
                 >
                   Fortsett som bruker
@@ -61,31 +70,35 @@ const LoginSelection = () => {
               </CardFooter>
             </Card>
 
-            <Card className="overflow-hidden transition-all hover:shadow-md">
-              <CardHeader className="bg-orange-50 pb-6">
-                <CardTitle className="flex items-center justify-center text-orange-700">
-                  <Briefcase className="h-6 w-6 mr-2" />
+            {/* Saksbehandlere Card */}
+            <Card className="h-full flex flex-col overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border-0 shadow-lg bg-white">
+              <CardHeader className="bg-gradient-to-r from-orange-500 to-orange-600 text-white pb-8 pt-8">
+                <CardTitle className="flex items-center justify-center text-2xl font-bold">
+                  <Briefcase className="h-8 w-8 mr-3" />
                   Saksbehandlere
                 </CardTitle>
-                <CardDescription className="text-center">
+                <CardDescription className="text-center text-orange-100 text-lg">
                   For kommuneansatte og saksbehandlere
                 </CardDescription>
               </CardHeader>
-              <CardContent className="pt-6 text-center">
-                <p className="mb-4">
-                  Logg inn for å behandle søknader, administrere bookinger og håndtere henvendelser.
-                </p>
-                <div className="text-sm text-gray-600">
-                  <p className="font-medium mb-1">Innloggingsmetoder:</p>
-                  <p>• SSO (Single Sign-On)</p>
-                  <p>• BankID</p>
-                  <p>• Vipps</p>
+              <CardContent className="flex-1 flex flex-col justify-between pt-8 px-8">
+                <div>
+                  <p className="text-gray-700 mb-6 text-lg leading-relaxed">
+                    Logg inn for å behandle søknader, administrere bookinger og håndtere henvendelser.
+                  </p>
+                  <div className="bg-gray-50 rounded-lg p-6">
+                    <p className="font-semibold mb-3 text-gray-900 text-lg">Innloggingsmetoder:</p>
+                    <div className="space-y-2">
+                      <p className="text-gray-700 text-base">• SSO (Single Sign-On)</p>
+                      <p className="text-gray-700 text-base">• BankID</p>
+                      <p className="text-gray-700 text-base">• Vipps</p>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
-              <CardFooter>
+              <CardFooter className="px-8 pb-8">
                 <Button 
-                  variant="default"
-                  className="w-full bg-orange-600 hover:bg-orange-700" 
+                  className="w-full h-12 text-lg font-semibold bg-orange-600 hover:bg-orange-700 transition-colors" 
                   onClick={() => handleUserSelection("caseworker")}
                 >
                   Fortsett som saksbehandler
@@ -93,31 +106,35 @@ const LoginSelection = () => {
               </CardFooter>
             </Card>
 
-            <Card className="overflow-hidden transition-all hover:shadow-md">
-              <CardHeader className="bg-emerald-50 pb-6">
-                <CardTitle className="flex items-center justify-center text-emerald-700">
-                  <ShieldCheck className="h-6 w-6 mr-2" />
+            {/* Administrator Card */}
+            <Card className="h-full flex flex-col overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border-0 shadow-lg bg-white">
+              <CardHeader className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white pb-8 pt-8">
+                <CardTitle className="flex items-center justify-center text-2xl font-bold">
+                  <ShieldCheck className="h-8 w-8 mr-3" />
                   Administrator
                 </CardTitle>
-                <CardDescription className="text-center">
+                <CardDescription className="text-center text-emerald-100 text-lg">
                   For systemadministratorer og ledelse
                 </CardDescription>
               </CardHeader>
-              <CardContent className="pt-6 text-center">
-                <p className="mb-4">
-                  Logg inn for å administrere systemet, godkjenne bookinger, og se statistikk.
-                </p>
-                <div className="text-sm text-gray-600">
-                  <p className="font-medium mb-1">Innloggingsmetoder:</p>
-                  <p>• SSO (Single Sign-On)</p>
-                  <p>• BankID</p>
-                  <p>• Vipps</p>
+              <CardContent className="flex-1 flex flex-col justify-between pt-8 px-8">
+                <div>
+                  <p className="text-gray-700 mb-6 text-lg leading-relaxed">
+                    Logg inn for å administrere systemet, godkjenne bookinger, og se statistikk.
+                  </p>
+                  <div className="bg-gray-50 rounded-lg p-6">
+                    <p className="font-semibold mb-3 text-gray-900 text-lg">Innloggingsmetoder:</p>
+                    <div className="space-y-2">
+                      <p className="text-gray-700 text-base">• SSO (Single Sign-On)</p>
+                      <p className="text-gray-700 text-base">• BankID</p>
+                      <p className="text-gray-700 text-base">• Vipps</p>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
-              <CardFooter>
+              <CardFooter className="px-8 pb-8">
                 <Button 
-                  variant="default"
-                  className="w-full bg-emerald-600 hover:bg-emerald-700" 
+                  className="w-full h-12 text-lg font-semibold bg-emerald-600 hover:bg-emerald-700 transition-colors" 
                   onClick={() => handleUserSelection("admin")}
                 >
                   Fortsett som administrator
