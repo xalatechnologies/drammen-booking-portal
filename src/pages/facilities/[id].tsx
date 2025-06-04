@@ -1,8 +1,7 @@
-
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, MapPin, Users, Clock, Star, Share2, Heart, Calendar, CheckCircle, Wifi, Car, Accessibility, Map, Info } from "lucide-react";
+import { ArrowLeft, MapPin, Users, Clock, Star, CheckCircle, Wifi, Car, Accessibility, Map, Info } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -10,6 +9,7 @@ import GlobalHeader from "@/components/GlobalHeader";
 import GlobalFooter from "@/components/GlobalFooter";
 import { FacilityImageGallery } from "@/components/facility/FacilityImageGallery";
 import { FacilityBookingDrawer } from "@/components/facility/FacilityBookingDrawer";
+import { FacilityBookingCard } from "@/components/facility/FacilityBookingCard";
 import MapView from "@/components/MapView";
 import { format } from "date-fns";
 import { isDateUnavailable, isNorwegianHoliday } from "@/utils/holidaysAndAvailability";
@@ -18,7 +18,6 @@ const FacilityDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [isBookingDrawerOpen, setIsBookingDrawerOpen] = useState(false);
-  const [isFavorited, setIsFavorited] = useState(false);
   const [showMap, setShowMap] = useState(false);
   const [date] = useState<Date>(new Date());
   
@@ -90,30 +89,14 @@ const FacilityDetail = () => {
         {/* Navigation Header */}
         <div className="bg-white border-b border-gray-200 sticky top-[72px] z-20">
           <div className="container mx-auto px-4 py-3">
-            <div className="flex items-center justify-between">
-              <Button 
-                variant="ghost" 
-                className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
-                onClick={() => navigate("/")}
-              >
-                <ArrowLeft className="h-4 w-4" />
-                Tilbake til søk
-              </Button>
-              
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="flex items-center gap-2"
-                  onClick={() => setIsFavorited(!isFavorited)}
-                >
-                  <Heart className={`h-4 w-4 ${isFavorited ? 'fill-red-500 text-red-500' : ''}`} />
-                </Button>
-                <Button variant="ghost" size="sm">
-                  <Share2 className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
+            <Button 
+              variant="ghost" 
+              className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
+              onClick={() => navigate("/")}
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Tilbake til søk
+            </Button>
           </div>
         </div>
 
@@ -125,29 +108,22 @@ const FacilityDetail = () => {
               {/* Image Gallery */}
               <FacilityImageGallery images={facility.images} />
 
-              {/* Header with Price */}
-              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
-                      Idrettsanlegg
-                    </Badge>
-                    <div className="flex items-center gap-1">
-                      <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                      <span className="font-medium">{facility.rating}</span>
-                      <span className="text-gray-500 text-sm">({facility.reviewCount})</span>
-                    </div>
-                  </div>
-                  <h1 className="text-3xl font-bold text-gray-900 mb-3">{facility.name}</h1>
-                  <div className="flex items-center text-gray-600 mb-4">
-                    <MapPin className="h-5 w-5 mr-2" />
-                    <span>{facility.address}</span>
+              {/* Header */}
+              <div>
+                <div className="flex items-center gap-3 mb-2">
+                  <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                    Idrettsanlegg
+                  </Badge>
+                  <div className="flex items-center gap-1">
+                    <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                    <span className="font-medium">{facility.rating}</span>
+                    <span className="text-gray-500 text-sm">({facility.reviewCount})</span>
                   </div>
                 </div>
-                
-                <div className="text-right">
-                  <div className="text-3xl font-bold text-gray-900">{facility.pricePerHour} kr</div>
-                  <div className="text-gray-500">per time</div>
+                <h1 className="text-3xl font-bold text-gray-900 mb-3">{facility.name}</h1>
+                <div className="flex items-center text-gray-600 mb-4">
+                  <MapPin className="h-5 w-5 mr-2" />
+                  <span>{facility.address}</span>
                 </div>
               </div>
 
@@ -163,7 +139,7 @@ const FacilityDetail = () => {
                 
                 <Card className="p-4">
                   <div className="flex items-center gap-2 mb-1">
-                    <Calendar className="h-4 w-4 text-green-600" />
+                    <Map className="h-4 w-4 text-green-600" />
                     <span className="text-sm font-medium text-gray-500">Areal</span>
                   </div>
                   <p className="font-bold">{facility.area}</p>
@@ -206,44 +182,50 @@ const FacilityDetail = () => {
               <Card className="p-6">
                 <h2 className="text-xl font-medium mb-4">Fasiliteter og utstyr</h2>
                 
-                <h3 className="font-medium text-lg mb-3">Tilgjengelig utstyr</h3>
-                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-y-2 text-gray-700 mb-6">
-                  {facility.equipment.map((item, i) => (
-                    <li key={i} className="flex items-center">
-                      <CheckCircle className="h-4 w-4 text-green-600 mr-2" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Equipment Column */}
+                  <div>
+                    <h3 className="font-medium text-lg mb-3">Tilgjengelig utstyr</h3>
+                    <ul className="space-y-2">
+                      {facility.equipment.map((item, i) => (
+                        <li key={i} className="flex items-center text-gray-700">
+                          <CheckCircle className="h-4 w-4 text-green-600 mr-2 flex-shrink-0" />
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
 
-                <h3 className="text-lg font-semibold mb-4">Fasiliteter</h3>
-                <div className="flex flex-wrap gap-2">
-                  {facility.amenities.map((amenity, index) => {
-                    const getIcon = (name: string) => {
-                      switch (name.toLowerCase()) {
-                        case 'parkering': return <Car className="h-4 w-4" />;
-                        case 'wi-fi': return <Wifi className="h-4 w-4" />;
-                        default: return <CheckCircle className="h-4 w-4" />;
-                      }
-                    };
-                    
-                    return (
-                      <Badge 
-                        key={index} 
-                        variant="outline" 
-                        className="bg-green-50 text-green-700 border-green-200 px-3 py-1 flex items-center gap-1"
-                      >
-                        {getIcon(amenity)}
-                        {amenity}
-                      </Badge>
-                    );
-                  })}
-                  {facility.accessibility.includes('wheelchair') && (
-                    <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 px-3 py-1 flex items-center gap-1">
-                      <Accessibility className="h-4 w-4" />
-                      Rullestoltilgjengelig
-                    </Badge>
-                  )}
+                  {/* Facilities Column */}
+                  <div>
+                    <h3 className="font-medium text-lg mb-3">Fasiliteter</h3>
+                    <div className="space-y-2">
+                      {facility.amenities.map((amenity, index) => {
+                        const getIcon = (name: string) => {
+                          switch (name.toLowerCase()) {
+                            case 'parkering': return <Car className="h-4 w-4" />;
+                            case 'wi-fi': return <Wifi className="h-4 w-4" />;
+                            default: return <CheckCircle className="h-4 w-4" />;
+                          }
+                        };
+                        
+                        return (
+                          <div key={index} className="flex items-center text-gray-700">
+                            <span className="text-green-600 mr-2">
+                              {getIcon(amenity)}
+                            </span>
+                            {amenity}
+                          </div>
+                        );
+                      })}
+                      {facility.accessibility.includes('wheelchair') && (
+                        <div className="flex items-center text-gray-700">
+                          <Accessibility className="h-4 w-4 text-green-600 mr-2" />
+                          Rullestoltilgjengelig
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </Card>
 
@@ -308,7 +290,6 @@ const FacilityDetail = () => {
                             const currentDate = new Date(date.getTime() + day * 24 * 60 * 60 * 1000);
                             const unavailableCheck = isDateUnavailable(currentDate);
                             
-                            // If the day is unavailable, show the reason
                             if (unavailableCheck.isUnavailable) {
                               const bgColor = {
                                 'past': 'bg-gray-100',
@@ -339,7 +320,6 @@ const FacilityDetail = () => {
                               );
                             }
                             
-                            // Mock availability - in a real app this would be based on actual bookings
                             const isAvailable = Math.random() > 0.3;
                             return (
                               <td 
@@ -399,62 +379,10 @@ const FacilityDetail = () => {
 
             {/* Right Sidebar - Booking */}
             <div className="lg:sticky lg:top-24 lg:self-start">
-              {/* Price Card */}
-              <Card className="mb-6 shadow-sm border-blue-100">
-                <CardContent className="p-6">
-                  <div className="text-center mb-4">
-                    <div className="text-3xl font-bold text-gray-900">{facility.pricePerHour} kr</div>
-                    <div className="text-gray-500">per time</div>
-                  </div>
-                  
-                  <div className="p-4 bg-green-50 rounded-lg mb-4 text-center">
-                    <p className="text-green-800 text-sm">
-                      <CheckCircle className="inline h-4 w-4 mr-1" />
-                      Tilgjengelig for umiddelbar booking
-                    </p>
-                  </div>
-
-                  <Button 
-                    className="w-full bg-[#0B3D91] hover:bg-blue-700 text-white font-medium shadow-sm h-12"
-                    onClick={() => setIsBookingDrawerOpen(true)}
-                  >
-                    Reserver nå
-                  </Button>
-                </CardContent>
-              </Card>
-              
-              {/* Additional info cards */}
-              <Card className="mb-6 shadow-sm">
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-3">
-                    <div className="bg-amber-100 p-2 rounded-md">
-                      <Info className="h-5 w-5 text-amber-600" />
-                    </div>
-                    <div>
-                      <h3 className="font-medium">Avbestilling</h3>
-                      <p className="text-sm text-gray-600">
-                        Gratis avbestilling inntil 48 timer før
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card className="shadow-sm">
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-3">
-                    <div className="bg-blue-100 p-2 rounded-md">
-                      <Clock className="h-5 w-5 text-blue-600" />
-                    </div>
-                    <div>
-                      <h3 className="font-medium">Åpningstider</h3>
-                      <p className="text-sm text-gray-600">
-                        {facility.openingHours}
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+              <FacilityBookingCard 
+                facility={facility}
+                onBookClick={() => setIsBookingDrawerOpen(true)}
+              />
             </div>
           </div>
         </div>

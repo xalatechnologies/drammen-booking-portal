@@ -1,6 +1,6 @@
 
-import React from "react";
-import { CheckCircle, Info, Clock } from "lucide-react";
+import React, { useState } from "react";
+import { CheckCircle, Info, Clock, Share2, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -15,8 +15,40 @@ interface FacilityBookingCardProps {
 }
 
 export function FacilityBookingCard({ facility, onBookClick }: FacilityBookingCardProps) {
+  const [isFavorited, setIsFavorited] = useState(false);
+
+  const handleShare = () => {
+    if (navigator.share) {
+      navigator.share({
+        title: facility.name,
+        url: window.location.href,
+      });
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+    }
+  };
+
   return (
     <>
+      {/* Action buttons */}
+      <div className="flex items-center justify-end gap-2 mb-4">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="flex items-center gap-2"
+          onClick={() => setIsFavorited(!isFavorited)}
+        >
+          <Heart className={`h-4 w-4 ${isFavorited ? 'fill-red-500 text-red-500' : ''}`} />
+        </Button>
+        <Button 
+          variant="ghost" 
+          size="sm"
+          onClick={handleShare}
+        >
+          <Share2 className="h-4 w-4" />
+        </Button>
+      </div>
+
       {/* Price Card */}
       <Card className="mb-6 shadow-sm border-blue-100">
         <CardContent className="p-6">
