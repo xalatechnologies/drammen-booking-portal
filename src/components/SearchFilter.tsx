@@ -58,22 +58,22 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
     <div className="mb-6">
       <Card className="border-0 shadow-sm bg-white/80 backdrop-blur-sm">
         <CardContent className="p-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 items-center">
-            <div className="lg:col-span-1">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
+            <div className="lg:col-span-2">
               <SearchInput 
                 searchTerm={searchTerm}
                 setSearchTerm={setSearchTerm}
               />
             </div>
 
-            <div className="lg:col-span-1">
+            <div className="lg:col-span-2">
               <DateRangePicker 
                 dateRange={dateRange}
                 setDateRange={setDateRange}
               />
             </div>
 
-            <div className="lg:col-span-2">
+            <div className="lg:col-span-6">
               <FilterSelects 
                 facilityType={facilityType}
                 setFacilityType={setFacilityType}
@@ -93,7 +93,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
               />
             </div>
 
-            <div className="lg:col-span-1 flex gap-2">
+            <div className="lg:col-span-1 flex justify-end">
               {hasActiveFilters && (
                 <Button 
                   variant="ghost" 
