@@ -6,49 +6,56 @@ import { MapPin } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 
-// Mock data for facility locations with correct addresses and coordinates
+// Updated facility locations with correct addresses matching the FacilityManagement page
 const facilityLocations = [
   {
     id: 1,
     name: "Brandengen Skole - Gymsal",
-    address: "Iver Holters gate 48, 3041 Drammen",
-    lat: 59.7461,
-    lng: 10.2089
+    address: "Knoffs gate 8, 3044 Drammen",
+    lat: 59.7425,
+    lng: 10.2078
   },
   {
-    id: 4,
+    id: 2,
     name: "Fjell Skole - Aktivitetshall", 
-    address: "Lauritz Hervigs vei 20, 3035 Drammen",
-    lat: 59.7312,
-    lng: 10.1823
-  },
-  {
-    id: 5,
-    name: "Gulskogen Skole - Auditorium",
-    address: "Vintergata 8, 3048 Drammen", 
-    lat: 59.7524,
-    lng: 10.1756
-  },
-  {
-    id: 6,
-    name: "Marienlyst Stadion - Møtesal",
-    address: "Schwartz gate 2, 3043 Drammen",
-    lat: 59.7389,
-    lng: 10.2134
-  },
-  {
-    id: 7,
-    name: "Drammensbadet - Svømmehall",
-    address: "Danvikgata 40, 3045 Drammen",
-    lat: 59.7578,
+    address: "Lauritz Grønlands vei 40, 3035 Drammen",
+    lat: 59.7289,
     lng: 10.1834
   },
   {
-    id: 8,
+    id: 3,
+    name: "Gulskogen Skole - Auditorium",
+    address: "Smithestrømsveien 13, 3048 Drammen", 
+    lat: 59.7534,
+    lng: 10.1723
+  },
+  {
+    id: 4,
+    name: "Marienlyst Stadion - Møtesal",
+    address: "Marienlyst 14, 3045 Drammen",
+    lat: 59.7398,
+    lng: 10.2156
+  },
+  {
+    id: 5,
+    name: "Drammensbadet - Svømmehall",
+    address: "Ormåsen 1, 3048 Drammen",
+    lat: 59.7567,
+    lng: 10.1812
+  },
+  {
+    id: 6,
     name: "Åssiden Fotballhall",
     address: "Buskerudveien 54, 3024 Drammen",
     lat: 59.7624,
     lng: 10.1425
+  },
+  {
+    id: 7,
+    name: "Drammen Bibliotek - Møterom",
+    address: "Grønland 32, 3045 Drammen",
+    lat: 59.7412,
+    lng: 10.2043
   },
 ];
 
