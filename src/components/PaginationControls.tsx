@@ -73,27 +73,21 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
 
   return (
     <div className="flex justify-center items-center mt-8 mb-8">
-      <div className="flex items-center gap-2">
-        {/* Results info */}
-        <div className="text-sm text-gray-600 mr-4">
-          Side {page} av {totalPages}
-        </div>
-
+      <div className="flex items-center gap-1">
         <Pagination>
           <PaginationContent className="gap-1">
             <PaginationItem>
               <PaginationPrevious 
                 onClick={() => handlePageChange(page - 1)}
                 className={`
-                  flex items-center gap-2 px-3 py-2 text-sm font-medium transition-colors
+                  h-10 w-10 p-0 flex items-center justify-center transition-all duration-200
                   ${page === 1 
-                    ? 'pointer-events-none opacity-50 text-gray-400' 
-                    : 'text-gray-700 hover:text-gray-900 hover:bg-gray-50 cursor-pointer'
+                    ? 'pointer-events-none opacity-30 text-gray-400' 
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100 cursor-pointer border border-gray-200 hover:border-gray-300'
                   }
                 `}
               >
                 <ChevronLeft className="h-4 w-4" />
-                <span className="hidden sm:inline">Forrige</span>
               </PaginationPrevious>
             </PaginationItem>
 
@@ -101,7 +95,7 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
               if (pageNum === 'ellipsis-start' || pageNum === 'ellipsis-end') {
                 return (
                   <PaginationItem key={`ellipsis-${index}`}>
-                    <PaginationEllipsis className="text-gray-400" />
+                    <PaginationEllipsis className="text-gray-400 h-10 w-10 flex items-center justify-center" />
                   </PaginationItem>
                 );
               }
@@ -112,10 +106,10 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
                     onClick={() => handlePageChange(pageNum as number)}
                     isActive={page === pageNum}
                     className={`
-                      min-w-[40px] h-10 flex items-center justify-center text-sm font-medium transition-all cursor-pointer
+                      h-10 w-10 flex items-center justify-center text-sm font-medium transition-all duration-200 cursor-pointer border
                       ${page === pageNum
-                        ? 'bg-[#0B3D91] text-white border-[#0B3D91] hover:bg-blue-700 shadow-sm'
-                        : 'text-gray-700 hover:text-gray-900 hover:bg-gray-50 border-gray-200'
+                        ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700 shadow-sm'
+                        : 'text-gray-700 hover:text-gray-900 hover:bg-gray-50 border-gray-200 hover:border-gray-300'
                       }
                     `}
                   >
@@ -129,19 +123,23 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
               <PaginationNext 
                 onClick={() => handlePageChange(page + 1)}
                 className={`
-                  flex items-center gap-2 px-3 py-2 text-sm font-medium transition-colors
+                  h-10 w-10 p-0 flex items-center justify-center transition-all duration-200
                   ${page === totalPages 
-                    ? 'pointer-events-none opacity-50 text-gray-400' 
-                    : 'text-gray-700 hover:text-gray-900 hover:bg-gray-50 cursor-pointer'
+                    ? 'pointer-events-none opacity-30 text-gray-400' 
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100 cursor-pointer border border-gray-200 hover:border-gray-300'
                   }
                 `}
               >
-                <span className="hidden sm:inline">Neste</span>
                 <ChevronRight className="h-4 w-4" />
               </PaginationNext>
             </PaginationItem>
           </PaginationContent>
         </Pagination>
+
+        {/* Results info */}
+        <div className="text-sm text-gray-500 ml-4">
+          Side {page} av {totalPages}
+        </div>
       </div>
     </div>
   );
