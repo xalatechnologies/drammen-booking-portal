@@ -92,59 +92,69 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location }) => {
     clearMarkers();
 
     filteredFacilities.forEach(facility => {
-      if (map.current) {
-        // Create custom marker element
-        const markerEl = document.createElement('div');
-        markerEl.className = 'facility-marker';
-        markerEl.style.cssText = `
-          width: 30px;
-          height: 30px;
-          background-color: #ef4444;
-          border: 2px solid white;
-          border-radius: 50%;
-          cursor: pointer;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        `;
-        
-        // Add icon to marker
-        const icon = document.createElement('div');
-        icon.innerHTML = '📍';
-        icon.style.fontSize = '12px';
-        markerEl.appendChild(icon);
+      // Create custom marker element
+      const markerEl = document.createElement('div');
+      markerEl.className = 'facility-marker';
+      markerEl.style.cssText = `
+        width: 30px;
+        height: 30px;
+        background-color: #ef4444;
+        border: 2px solid white;
+        border-radius: 50%;
+        cursor: pointer;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      `;
+      
+      // Add icon to marker
+      const icon = document.createElement('div');
+      icon.innerHTML = '📍';
+      icon.style.fontSize = '12px';
+      markerEl.appendChild(icon);
 
-        // Create popup
-        const popup = new mapboxgl.Popup({ 
-          offset: 25,
-          closeButton: true,
-          closeOnClick: false
-        }).setHTML(`
-          <div style="padding: 8px; min-width: 200px;">
-            <h3 style="margin: 0 0 4px 0; font-weight: bold; font-size: 14px;">${facility.name}</h3>
-            <p style="margin: 0; font-size: 12px; color: #666;">${facility.address}</p>
-          </div>
-        `);
+      // Create popup
+      const popup = new mapboxgl.Popup({ 
+        offset: 25,
+        closeButton: true,
+        closeOnClick: false
+      }).setHTML(`
+        <div style="padding: 8px; min-width: 200px;">
+          <h3 style="margin: 0 0 4px 0; font-weight: bold; font-size: 14px;">${facility.name}</h3>
+          <p style="margin: 0; font-size: 12px; color: #666;">${facility.address}</p>
+        </div>
+      `);
 
-        // Add marker to map
-        const marker = new mapboxgl.Marker(markerEl)
-          .setLngLat([facility.lng, facility.lat])
-          .setPopup(popup)
-          .addTo(map.current);
+      // Add marker to map
+      const marker = new mapboxgl.Marker(markerEl)
+        .setLngLat([facility.lng, facility.lat])
+        .setPopup(popup)
+        .addTo(map.current!);
 
-        markers.current.push(marker);
-      }
+      markers.current.push(marker);
     });
   };
 
   const initializeMap = async (token: string) => {
-    if (!mapContainer.current || !token.trim()) return;
+    if (!mapContainer.current) {
+      setError('Map container not available');
+      setIsLoading(false);
+      return;
+    }
+
+    if (!token.trim() || !token.startsWith('pk.')) {
+      setError('Invalid Mapbox token. Token should start with "pk."');
+      setIsLoading(false);
+      return;
+    }
 
     setIsLoading(true);
     setError('');
 
     try {
+      console.log('Initializing map with token:', token.substring(0, 10) + '...');
+      
       // Set the access token
       mapboxgl.accessToken = token;
       
@@ -154,7 +164,7 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location }) => {
         map.current = null;
       }
 
-      // Create new map
+      // Create new map with error handling
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
         style: 'mapbox://styles/mapbox/streets-v12',
@@ -166,32 +176,52 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location }) => {
       // Add navigation controls
       map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
-      // Wait for map to load before adding markers
+      // Handle successful map load
       map.current.on('load', () => {
         console.log('Map loaded successfully');
         addMarkers();
         setIsLoading(false);
       });
 
-      // Handle map errors
+      // Handle map errors with more specific error messages
       map.current.on('error', (e) => {
         console.error('Map error:', e);
-        setError('Failed to load map. Please check your Mapbox token.');
+        if (e.error?.message?.includes('401')) {
+          setError('Invalid Mapbox token. Please check your token and try again.');
+        } else if (e.error?.message?.includes('network')) {
+          setError('Network error. Please check your internet connection.');
+        } else {
+          setError('Failed to load map. Please verify your Mapbox token is valid.');
+        }
         setIsLoading(false);
+      });
+
+      // Handle source errors
+      map.current.on('sourcedataloading', () => {
+        console.log('Map source data loading...');
       });
 
     } catch (err) {
       console.error('Map initialization error:', err);
-      setError('Failed to initialize map. Please check your Mapbox token.');
+      setError('Failed to initialize map. Please check your Mapbox token and try again.');
       setIsLoading(false);
     }
   };
 
   const handleTokenSubmit = () => {
-    if (mapboxToken.trim()) {
-      setShowTokenInput(false);
-      initializeMap(mapboxToken);
+    const trimmedToken = mapboxToken.trim();
+    if (!trimmedToken) {
+      setError('Please enter a Mapbox token');
+      return;
     }
+    
+    if (!trimmedToken.startsWith('pk.')) {
+      setError('Invalid token format. Mapbox public tokens start with "pk."');
+      return;
+    }
+
+    setShowTokenInput(false);
+    initializeMap(trimmedToken);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -202,10 +232,10 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location }) => {
 
   // Re-add markers when filters change
   useEffect(() => {
-    if (map.current && !showTokenInput) {
+    if (map.current && !showTokenInput && !isLoading) {
       addMarkers();
     }
-  }, [filteredFacilities, showTokenInput]);
+  }, [filteredFacilities, showTokenInput, isLoading]);
 
   useEffect(() => {
     return () => {
@@ -246,7 +276,7 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location }) => {
                   </Button>
                 </div>
                 {error && (
-                  <p className="text-xs text-red-600 mt-2">{error}</p>
+                  <p className="text-sm text-red-600 mt-2 p-2 bg-red-50 rounded">{error}</p>
                 )}
                 <p className="text-xs text-gray-500">
                   Get your token from{' '}
@@ -267,40 +297,61 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location }) => {
                 </div>
               )}
               
+              {error && !isLoading && (
+                <div className="absolute inset-0 bg-red-50 flex items-center justify-center z-10">
+                  <div className="text-center p-6">
+                    <p className="text-red-600 mb-4">{error}</p>
+                    <Button 
+                      onClick={() => {
+                        setShowTokenInput(true);
+                        setError('');
+                      }}
+                      variant="outline"
+                    >
+                      Try Again
+                    </Button>
+                  </div>
+                </div>
+              )}
+              
               <div ref={mapContainer} className="h-[400px] w-full" />
               
               {/* Info overlay */}
-              <div className="absolute top-4 right-4 bg-white/95 backdrop-blur-sm border border-gray-200 rounded-lg p-3 shadow-md max-w-xs">
-                <p className="text-sm font-medium mb-2">Drammen Kommune Facilities</p>
-                <p className="text-xs text-gray-600 mb-2">Showing {filteredFacilities.length} facilities</p>
-                <div className="space-y-1 max-h-32 overflow-y-auto">
-                  {filteredFacilities.map(facility => (
-                    <div key={facility.id} className="text-xs flex items-start gap-1.5">
-                      <MapPin className="h-3 w-3 mt-0.5 text-red-500 flex-shrink-0" />
-                      <span className="line-clamp-2">{facility.name}</span>
-                    </div>
-                  ))}
+              {!error && !isLoading && (
+                <div className="absolute top-4 right-4 bg-white/95 backdrop-blur-sm border border-gray-200 rounded-lg p-3 shadow-md max-w-xs">
+                  <p className="text-sm font-medium mb-2">Drammen Kommune Facilities</p>
+                  <p className="text-xs text-gray-600 mb-2">Showing {filteredFacilities.length} facilities</p>
+                  <div className="space-y-1 max-h-32 overflow-y-auto">
+                    {filteredFacilities.map(facility => (
+                      <div key={facility.id} className="text-xs flex items-start gap-1.5">
+                        <MapPin className="h-3 w-3 mt-0.5 text-red-500 flex-shrink-0" />
+                        <span className="line-clamp-2">{facility.name}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
               
               {/* Reset button */}
-              <div className="absolute bottom-4 right-4">
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => {
-                    setShowTokenInput(true);
-                    setMapboxToken('');
-                    setError('');
-                    if (map.current) {
-                      map.current.remove();
-                      map.current = null;
-                    }
-                  }}
-                >
-                  Change Token
-                </Button>
-              </div>
+              {!error && !isLoading && (
+                <div className="absolute bottom-4 right-4">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => {
+                      setShowTokenInput(true);
+                      setMapboxToken('');
+                      setError('');
+                      if (map.current) {
+                        map.current.remove();
+                        map.current = null;
+                      }
+                    }}
+                  >
+                    Change Token
+                  </Button>
+                </div>
+              )}
             </>
           )}
         </Card>
