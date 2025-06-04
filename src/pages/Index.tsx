@@ -7,6 +7,7 @@ import GlobalFooter from "@/components/GlobalFooter";
 import HeroBanner from "@/components/HeroBanner";
 import SearchFilter from "@/components/SearchFilter";
 import FacilityGrid from "@/components/FacilityGrid";
+import FacilityList from "@/components/FacilityList";
 import PaginationControls from "@/components/PaginationControls";
 import MapView from "@/components/MapView";
 import CalendarView from "@/components/CalendarView";
@@ -17,7 +18,7 @@ const Index = () => {
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [facilityType, setFacilityType] = useState<string>("all");
   const [location, setLocation] = useState<string>("all");
-  const [viewMode, setViewMode] = useState<"grid" | "map" | "calendar">("grid");
+  const [viewMode, setViewMode] = useState<"grid" | "map" | "calendar" | "list">("grid");
   const [accessibility, setAccessibility] = useState<string>("all");
   const [capacity, setCapacity] = useState<number[]>([0, 200]);
 
@@ -36,8 +37,8 @@ const Index = () => {
       const capacityArray = urlCapacity.split(',').map(Number);
       if (capacityArray.length === 2) setCapacity(capacityArray);
     }
-    if (urlViewMode && ['grid', 'map', 'calendar'].includes(urlViewMode)) {
-      setViewMode(urlViewMode as "grid" | "map" | "calendar");
+    if (urlViewMode && ['grid', 'map', 'calendar', 'list'].includes(urlViewMode)) {
+      setViewMode(urlViewMode as "grid" | "map" | "calendar" | "list");
     }
 
     // Clear URL parameters after setting state
@@ -77,6 +78,14 @@ const Index = () => {
           />
         )}
         
+        {viewMode === "list" && (
+          <FacilityList 
+            date={date}
+            facilityType={facilityType === "all" ? "" : facilityType}
+            location={location === "all" ? "" : location}
+          />
+        )}
+        
         {viewMode === "map" && (
           <MapView 
             facilityType={facilityType === "all" ? "" : facilityType} 
@@ -94,7 +103,7 @@ const Index = () => {
           />
         )}
         
-        {viewMode === "grid" && <PaginationControls />}
+        {(viewMode === "grid" || viewMode === "list") && <PaginationControls />}
       </div>
 
       <GlobalFooter />

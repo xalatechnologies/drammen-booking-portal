@@ -17,8 +17,8 @@ interface SearchFilterProps {
   setFacilityType: (type: string) => void;
   location: string;
   setLocation: (location: string) => void;
-  viewMode: "grid" | "map" | "calendar";
-  setViewMode: (mode: "grid" | "map" | "calendar") => void;
+  viewMode: "grid" | "map" | "calendar" | "list";
+  setViewMode: (mode: "grid" | "map" | "calendar" | "list") => void;
   accessibility: string;
   setAccessibility: (accessibility: string) => void;
   capacity: number[];

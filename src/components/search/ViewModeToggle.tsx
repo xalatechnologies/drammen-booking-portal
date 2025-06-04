@@ -1,11 +1,11 @@
 
 import React from "react";
-import { Grid3X3, Map, Calendar as CalendarView } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Grid3X3, Map, Calendar as CalendarView, List } from "lucide-react";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 interface ViewModeToggleProps {
-  viewMode: "grid" | "map" | "calendar";
-  setViewMode: (mode: "grid" | "map" | "calendar") => void;
+  viewMode: "grid" | "map" | "calendar" | "list";
+  setViewMode: (mode: "grid" | "map" | "calendar" | "list") => void;
 }
 
 const ViewModeToggle: React.FC<ViewModeToggleProps> = ({
@@ -13,32 +13,25 @@ const ViewModeToggle: React.FC<ViewModeToggleProps> = ({
   setViewMode,
 }) => {
   return (
-    <div className="flex rounded-lg border border-gray-200 bg-gray-50 p-1">
-      <Button
-        variant={viewMode === "grid" ? "default" : "ghost"}
-        size="sm"
-        onClick={() => setViewMode("grid")}
-        className="flex-1 h-8 rounded-md"
-      >
+    <ToggleGroup 
+      type="single" 
+      value={viewMode} 
+      onValueChange={(value) => value && setViewMode(value as "grid" | "map" | "calendar" | "list")}
+      className="border border-gray-200 bg-gray-50 rounded-lg p-1"
+    >
+      <ToggleGroupItem value="grid" className="h-8 w-8 p-0">
         <Grid3X3 className="h-4 w-4" />
-      </Button>
-      <Button
-        variant={viewMode === "map" ? "default" : "ghost"}
-        size="sm"
-        onClick={() => setViewMode("map")}
-        className="flex-1 h-8 rounded-md"
-      >
+      </ToggleGroupItem>
+      <ToggleGroupItem value="list" className="h-8 w-8 p-0">
+        <List className="h-4 w-4" />
+      </ToggleGroupItem>
+      <ToggleGroupItem value="map" className="h-8 w-8 p-0">
         <Map className="h-4 w-4" />
-      </Button>
-      <Button
-        variant={viewMode === "calendar" ? "default" : "ghost"}
-        size="sm"
-        onClick={() => setViewMode("calendar")}
-        className="flex-1 h-8 rounded-md"
-      >
+      </ToggleGroupItem>
+      <ToggleGroupItem value="calendar" className="h-8 w-8 p-0">
         <CalendarView className="h-4 w-4" />
-      </Button>
-    </div>
+      </ToggleGroupItem>
+    </ToggleGroup>
   );
 };
 
