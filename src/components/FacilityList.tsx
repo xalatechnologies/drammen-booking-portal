@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -7,7 +6,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Calendar, Users, Clock } from "lucide-react";
+import { MapPin, Calendar, Users, Clock, Wrench } from "lucide-react";
 
 interface Facility {
   id: number;
@@ -214,7 +213,7 @@ const FacilityList: React.FC<FacilityListProps> = ({
             >
               <CardContent className="p-0">
                 <div className="flex h-40">
-                  {/* Image - now takes full height */}
+                  {/* Image - full height */}
                   <div className="w-48 h-full bg-gray-200 relative overflow-hidden flex-shrink-0">
                     <img 
                       src={facility.image} 
@@ -236,17 +235,31 @@ const FacilityList: React.FC<FacilityListProps> = ({
                   {/* Left Content - Main info */}
                   <div className="flex-grow p-4 flex flex-col justify-between min-w-0">
                     <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-bold text-lg text-gray-900 truncate">{facility.name}</h3>
+                      <div className="flex items-start gap-3 mb-2">
+                        <div className="flex-grow min-w-0">
+                          <h3 className="font-bold text-lg text-gray-900 truncate mb-1">{facility.name}</h3>
+                          <div className="flex flex-wrap gap-1">
+                            {facility.suitableFor.slice(0, 4).map((activity, index) => (
+                              <Badge key={index} variant="secondary" className="text-xs px-2 py-1 bg-emerald-50 text-emerald-700 border-emerald-200">
+                                {activity}
+                              </Badge>
+                            ))}
+                            {facility.suitableFor.length > 4 && (
+                              <Badge variant="secondary" className="text-xs px-2 py-1 bg-emerald-50 text-emerald-700 border-emerald-200">
+                                +{facility.suitableFor.length - 4}
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
                         <Badge variant="outline" className="bg-white text-gray-700 border-gray-200 font-medium text-xs px-2 py-1 flex-shrink-0">
                           {facility.area}
                         </Badge>
                       </div>
                       
-                      <div className="flex items-center gap-1.5 text-sm text-gray-600 mb-2">
-                        <MapPin className="h-4 w-4 text-gray-500 flex-shrink-0" />
+                      <div className="flex items-center gap-1.5 text-sm text-gray-600 mb-3">
+                        <MapPin className="h-4 w-4 text-slate-500 flex-shrink-0" />
                         <span 
-                          className="hover:text-blue-600 hover:underline cursor-pointer transition-colors truncate"
+                          className="hover:text-slate-800 hover:underline cursor-pointer transition-colors truncate"
                           onClick={(e) => handleAddressClick(e, facility)}
                           title="Klikk for å se på kart"
                         >
@@ -254,47 +267,50 @@ const FacilityList: React.FC<FacilityListProps> = ({
                         </span>
                       </div>
                       
-                      {/* Activity tags */}
-                      <div className="flex flex-wrap gap-1 mb-2">
-                        {facility.suitableFor.slice(0, 4).map((activity, index) => (
-                          <Badge key={index} variant="secondary" className="text-xs px-2 py-1">
-                            {activity}
-                          </Badge>
-                        ))}
-                        {facility.suitableFor.length > 4 && (
-                          <Badge variant="secondary" className="text-xs px-2 py-1">
-                            +{facility.suitableFor.length - 4}
-                          </Badge>
-                        )}
-                      </div>
-                      
                       <p className="text-gray-600 text-sm line-clamp-2">{facility.description}</p>
                     </div>
                   </div>
                   
-                  {/* Right Content - Details and action */}
-                  <div className="w-64 p-4 flex flex-col justify-between border-l border-gray-100 bg-gray-50/50 flex-shrink-0">
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-2 text-sm text-gray-600">
-                        <Calendar className="h-4 w-4 text-blue-600 flex-shrink-0" />
-                        <span className="truncate">{facility.nextAvailable}</span>
+                  {/* Right Content - Enhanced details */}
+                  <div className="w-72 p-4 flex flex-col justify-between border-l border-gray-100 bg-gradient-to-br from-gray-50/80 to-slate-50/80 flex-shrink-0">
+                    <div className="space-y-4">
+                      {/* Capacity and Hours */}
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="flex items-center gap-2 text-sm">
+                          <Users className="h-4 w-4 text-amber-600 flex-shrink-0" />
+                          <div>
+                            <div className="text-xs text-gray-500 font-medium">Kapasitet</div>
+                            <div className="text-gray-800 font-semibold">{facility.capacity}</div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm">
+                          <Calendar className="h-4 w-4 text-emerald-600 flex-shrink-0" />
+                          <div>
+                            <div className="text-xs text-gray-500 font-medium">Neste ledig</div>
+                            <div className="text-gray-800 font-semibold text-xs">{facility.nextAvailable}</div>
+                          </div>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2 text-sm text-gray-600">
-                        <Users className="h-4 w-4 text-blue-600 flex-shrink-0" />
-                        <span>{facility.capacity} personer</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-gray-600">
-                        <Clock className="h-4 w-4 text-blue-600 flex-shrink-0" />
-                        <span className="text-xs leading-tight">{facility.openingHours}</span>
+
+                      {/* Opening Hours */}
+                      <div className="flex items-start gap-2 text-sm">
+                        <Clock className="h-4 w-4 text-slate-600 flex-shrink-0 mt-0.5" />
+                        <div>
+                          <div className="text-xs text-gray-500 font-medium mb-1">Åpningstider</div>
+                          <div className="text-xs text-gray-700 leading-relaxed">{facility.openingHours}</div>
+                        </div>
                       </div>
                       
-                      {/* Equipment preview */}
+                      {/* Equipment */}
                       {facility.equipment.length > 0 && (
-                        <div className="text-xs text-gray-500">
-                          <span className="font-medium">Utstyr:</span>
-                          <div className="mt-1">
-                            {facility.equipment.slice(0, 3).join(", ")}
-                            {facility.equipment.length > 3 && "..."}
+                        <div className="flex items-start gap-2 text-sm">
+                          <Wrench className="h-4 w-4 text-indigo-600 flex-shrink-0 mt-0.5" />
+                          <div>
+                            <div className="text-xs text-gray-500 font-medium mb-1">Utstyr</div>
+                            <div className="text-xs text-gray-700 leading-relaxed">
+                              {facility.equipment.slice(0, 3).join(", ")}
+                              {facility.equipment.length > 3 && "..."}
+                            </div>
                           </div>
                         </div>
                       )}
@@ -302,7 +318,7 @@ const FacilityList: React.FC<FacilityListProps> = ({
                     
                     <Button 
                       size="sm" 
-                      className="bg-[#0B3D91] hover:bg-blue-700 text-white w-full mt-3"
+                      className="bg-slate-800 hover:bg-slate-700 text-white w-full mt-4 font-medium shadow-sm"
                       onClick={(e) => {
                         e.stopPropagation();
                         navigate(`/facilities/${facility.id}`);
