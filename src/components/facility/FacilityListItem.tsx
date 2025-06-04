@@ -69,11 +69,11 @@ const FacilityListItem: React.FC<FacilityListItemProps> = ({
 
   return (
     <Card 
-      className="overflow-hidden hover:shadow-lg transition-all duration-200 hover:translate-y-[-1px] group border border-gray-200 cursor-pointer"
+      className="overflow-hidden hover:shadow-2xl transition-all duration-300 hover:translate-y-[-2px] group border-0 shadow-lg bg-gradient-to-br from-white via-white to-gray-50/50 cursor-pointer"
       onClick={() => navigate(`/facilities/${facility.id}`)}
     >
       <CardContent className="p-0">
-        <div className="flex h-40">
+        <div className="flex h-52">
           <FacilityImage 
             image={facility.image}
             name={facility.name}
