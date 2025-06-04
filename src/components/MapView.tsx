@@ -265,9 +265,9 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location }) => {
   return (
     <div className="relative w-full">
       <div className="mt-4">
-        <Card className="min-h-[400px] relative overflow-hidden">
+        <Card className="min-h-[600px] relative overflow-hidden">
           {showTokenInput ? (
-            <div className="h-[400px] w-full flex items-center justify-center bg-gray-50">
+            <div className="h-[600px] w-full flex items-center justify-center bg-gray-50">
               <div className="text-center space-y-4 p-6 max-w-md">
                 <h3 className="text-lg font-semibold">Mapbox Token Required</h3>
                 <p className="text-sm text-gray-600 mb-4">
@@ -330,7 +330,7 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location }) => {
                 </div>
               )}
               
-              <div ref={mapContainer} className="h-[400px] w-full" />
+              <div ref={mapContainer} className="h-[600px] w-full" />
               
               {/* Info overlay */}
               {!error && !isLoading && (
