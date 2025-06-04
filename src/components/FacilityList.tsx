@@ -213,9 +213,9 @@ const FacilityList: React.FC<FacilityListProps> = ({
               onClick={() => navigate(`/facilities/${facility.id}`)}
             >
               <CardContent className="p-0">
-                <div className="flex">
-                  {/* Image */}
-                  <div className="w-48 h-32 bg-gray-200 relative overflow-hidden flex-shrink-0">
+                <div className="flex h-40">
+                  {/* Image - now takes full height */}
+                  <div className="w-48 h-full bg-gray-200 relative overflow-hidden flex-shrink-0">
                     <img 
                       src={facility.image} 
                       alt={facility.name} 
@@ -237,8 +237,13 @@ const FacilityList: React.FC<FacilityListProps> = ({
                   <div className="flex-grow p-4 flex flex-col justify-between">
                     <div>
                       <div className="flex justify-between items-start mb-2">
-                        <div>
-                          <h3 className="font-bold text-lg text-gray-900 mb-1">{facility.name}</h3>
+                        <div className="flex-grow">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className="font-bold text-lg text-gray-900">{facility.name}</h3>
+                            <Badge variant="outline" className="bg-white text-gray-700 border-gray-200 font-medium text-xs px-2 py-1">
+                              {facility.area}
+                            </Badge>
+                          </div>
                           <div className="flex items-center gap-1.5 text-sm text-gray-600 mb-2">
                             <MapPin className="h-4 w-4 text-gray-500" />
                             <span 
@@ -249,10 +254,21 @@ const FacilityList: React.FC<FacilityListProps> = ({
                               {facility.address}
                             </span>
                           </div>
+                          
+                          {/* Activity tags moved here */}
+                          <div className="flex flex-wrap gap-1 mb-2">
+                            {facility.suitableFor.slice(0, 4).map((activity, index) => (
+                              <Badge key={index} variant="secondary" className="text-xs px-2 py-1">
+                                {activity}
+                              </Badge>
+                            ))}
+                            {facility.suitableFor.length > 4 && (
+                              <Badge variant="secondary" className="text-xs px-2 py-1">
+                                +{facility.suitableFor.length - 4}
+                              </Badge>
+                            )}
+                          </div>
                         </div>
-                        <Badge variant="outline" className="bg-white text-gray-700 border-gray-200 font-medium text-xs px-2 py-1">
-                          {facility.area}
-                        </Badge>
                       </div>
                       
                       <p className="text-gray-600 text-sm mb-3 line-clamp-2">{facility.description}</p>
@@ -273,20 +289,7 @@ const FacilityList: React.FC<FacilityListProps> = ({
                       </div>
                     </div>
                     
-                    <div className="flex justify-between items-center mt-4">
-                      <div className="flex flex-wrap gap-1">
-                        {facility.suitableFor.slice(0, 3).map((activity, index) => (
-                          <Badge key={index} variant="secondary" className="text-xs px-2 py-1">
-                            {activity}
-                          </Badge>
-                        ))}
-                        {facility.suitableFor.length > 3 && (
-                          <Badge variant="secondary" className="text-xs px-2 py-1">
-                            +{facility.suitableFor.length - 3}
-                          </Badge>
-                        )}
-                      </div>
-                      
+                    <div className="flex justify-end items-center mt-4">
                       <Button 
                         size="sm" 
                         className="bg-[#0B3D91] hover:bg-blue-700 text-white"
