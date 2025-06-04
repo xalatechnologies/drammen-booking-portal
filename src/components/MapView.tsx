@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef, useState } from 'react';
 import { Card } from './ui/card';
 import { MapPin } from 'lucide-react';
@@ -334,14 +335,34 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location }) => {
               
               {/* Info overlay */}
               {!error && !isLoading && (
-                <div className="absolute top-4 right-4 bg-white/95 backdrop-blur-sm border border-gray-200 rounded-lg p-3 shadow-md max-w-xs">
-                  <p className="text-sm font-medium mb-2">Drammen Kommune Facilities</p>
-                  <p className="text-xs text-gray-600 mb-2">Showing {filteredFacilities.length} facilities</p>
-                  <div className="space-y-1 max-h-32 overflow-y-auto">
+                <div className="absolute top-6 right-6 bg-white/98 backdrop-blur-md border border-gray-200 rounded-xl p-5 shadow-xl max-w-md min-w-[280px]">
+                  <div className="flex items-center gap-3 mb-4 pb-3 border-b border-gray-100">
+                    <div className="h-10 w-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                      <MapPin className="h-5 w-5 text-blue-600" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900">Drammen Kommune</h3>
+                      <p className="text-sm text-gray-600">Kommunale lokaler</p>
+                    </div>
+                  </div>
+                  
+                  <div className="mb-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-sm font-medium text-gray-700">Viser lokaler</span>
+                      <span className="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">
+                        {filteredFacilities.length}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2 max-h-48 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
                     {filteredFacilities.map(facility => (
-                      <div key={facility.id} className="text-xs flex items-start gap-1.5">
-                        <MapPin className="h-3 w-3 mt-0.5 text-red-500 flex-shrink-0" />
-                        <span className="line-clamp-2">{facility.name}</span>
+                      <div key={facility.id} className="flex items-start gap-3 p-2 rounded-lg hover:bg-gray-50 transition-colors">
+                        <MapPin className="h-4 w-4 mt-1 text-red-500 flex-shrink-0" />
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-medium text-gray-900 truncate">{facility.name}</p>
+                          <p className="text-xs text-gray-600 truncate">{facility.address}</p>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -350,10 +371,11 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location }) => {
               
               {/* Reset button */}
               {!error && !isLoading && (
-                <div className="absolute bottom-4 right-4">
+                <div className="absolute bottom-6 right-6">
                   <Button 
                     variant="outline" 
                     size="sm"
+                    className="bg-white/90 backdrop-blur-sm"
                     onClick={() => {
                       setShowTokenInput(true);
                       setMapboxToken('');
@@ -364,7 +386,7 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location }) => {
                       }
                     }}
                   >
-                    Change Token
+                    Endre token
                   </Button>
                 </div>
               )}
