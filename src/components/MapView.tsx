@@ -1,6 +1,6 @@
+
 import React, { useEffect, useRef, useState } from 'react';
-import mapboxgl from 'mapbox-gl';
-import 'mapbox-gl/dist/mapbox-gl.css';
+import { Loader } from '@googlemaps/js-api-loader';
 import { Card } from './ui/card';
 import { MapPin } from 'lucide-react';
 import { Button } from './ui/button';
@@ -59,15 +59,16 @@ interface MapViewProps {
 
 const MapView: React.FC<MapViewProps> = ({ facilityType, location }) => {
   const mapContainerRef = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<mapboxgl.Map | null>(null);
-  const [mapToken, setMapToken] = useState<string>("");
-  const [tokenInput, setTokenInput] = useState<string>("");
+  const mapRef = useRef<google.maps.Map | null>(null);
+  const [apiKey, setApiKey] = useState<string>("");
+  const [keyInput, setKeyInput] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  // Load saved token from localStorage on component mount
+  // Load saved API key from localStorage on component mount
   useEffect(() => {
-    const savedToken = localStorage.getItem('mapbox-token');
-    if (savedToken) {
-      setMapToken(savedToken);
+    const savedKey = localStorage.getItem('google-maps-api-key');
+    if (savedKey) {
+      setApiKey(savedKey);
     }
   }, []);
 
@@ -78,119 +79,126 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location }) => {
     return matchesType && matchesLocation;
   });
 
-  const initializeMap = (token: string) => {
-    if (!mapContainerRef.current || !token) return;
+  const initializeMap = async (key: string) => {
+    if (!mapContainerRef.current || !key) return;
 
-    // Set Mapbox access token
-    mapboxgl.accessToken = token;
+    setIsLoading(true);
 
-    // Create map instance
-    const map = new mapboxgl.Map({
-      container: mapContainerRef.current,
-      style: 'mapbox://styles/mapbox/streets-v12',
-      center: [10.2045, 59.7439], // Center on Drammen
-      zoom: 12
-    });
-
-    // Add navigation controls
-    map.addControl(new mapboxgl.NavigationControl(), 'top-right');
-
-    // Add markers for each facility
-    filteredFacilities.forEach(facility => {
-      // Create popup
-      const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(
-        `<div class="p-2">
-          <h3 class="font-semibold text-sm mb-1">${facility.name}</h3>
-          <p class="text-xs text-gray-600">${facility.address}</p>
-        </div>`
-      );
-
-      // Create marker
-      new mapboxgl.Marker({
-        color: '#3b82f6'
-      })
-        .setLngLat([facility.lng, facility.lat])
-        .setPopup(popup)
-        .addTo(map);
-    });
-
-    // Fit map to show all markers if there are multiple facilities
-    if (filteredFacilities.length > 1) {
-      const bounds = new mapboxgl.LngLatBounds();
-      filteredFacilities.forEach(facility => {
-        bounds.extend([facility.lng, facility.lat]);
+    try {
+      const loader = new Loader({
+        apiKey: key,
+        version: "weekly",
+        libraries: ["places"]
       });
-      map.fitBounds(bounds, { padding: 50 });
-    }
 
-    mapRef.current = map;
+      const { Map } = await loader.importLibrary("maps");
+      const { AdvancedMarkerElement } = await loader.importLibrary("marker");
+
+      // Create map instance
+      const map = new Map(mapContainerRef.current, {
+        center: { lat: 59.7439, lng: 10.2045 }, // Center on Drammen
+        zoom: 12,
+        mapId: "DEMO_MAP_ID", // Required for AdvancedMarkerElement
+      });
+
+      // Add markers for each facility
+      filteredFacilities.forEach(facility => {
+        // Create info window content
+        const infoWindow = new google.maps.InfoWindow({
+          content: `
+            <div style="padding: 8px;">
+              <h3 style="font-weight: 600; font-size: 14px; margin-bottom: 4px;">${facility.name}</h3>
+              <p style="font-size: 12px; color: #666; margin: 0;">${facility.address}</p>
+            </div>
+          `
+        });
+
+        // Create marker
+        const marker = new AdvancedMarkerElement({
+          map: map,
+          position: { lat: facility.lat, lng: facility.lng },
+          title: facility.name,
+        });
+
+        // Add click listener to show info window
+        marker.addListener('click', () => {
+          infoWindow.open(map, marker);
+        });
+      });
+
+      // Fit map to show all markers if there are multiple facilities
+      if (filteredFacilities.length > 1) {
+        const bounds = new google.maps.LatLngBounds();
+        filteredFacilities.forEach(facility => {
+          bounds.extend({ lat: facility.lat, lng: facility.lng });
+        });
+        map.fitBounds(bounds);
+      }
+
+      mapRef.current = map;
+    } catch (error) {
+      console.error('Error loading Google Maps:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleTokenSubmit = () => {
-    if (tokenInput.trim()) {
-      const token = tokenInput.trim();
-      setMapToken(token);
-      // Save token to localStorage for future use
-      localStorage.setItem('mapbox-token', token);
+  const handleKeySubmit = () => {
+    if (keyInput.trim()) {
+      const key = keyInput.trim();
+      setApiKey(key);
+      // Save key to localStorage for future use
+      localStorage.setItem('google-maps-api-key', key);
     }
   };
 
-  const handleClearToken = () => {
-    setMapToken("");
-    setTokenInput("");
-    localStorage.removeItem('mapbox-token');
+  const handleClearKey = () => {
+    setApiKey("");
+    setKeyInput("");
+    localStorage.removeItem('google-maps-api-key');
     if (mapRef.current) {
-      mapRef.current.remove();
       mapRef.current = null;
     }
   };
 
   useEffect(() => {
-    if (mapToken) {
-      initializeMap(mapToken);
+    if (apiKey) {
+      initializeMap(apiKey);
     }
-
-    // Cleanup function
-    return () => {
-      if (mapRef.current) {
-        mapRef.current.remove();
-        mapRef.current = null;
-      }
-    };
-  }, [mapToken, filteredFacilities]);
+  }, [apiKey, filteredFacilities]);
 
   return (
     <div className="relative w-full">
       <div className="mt-4">
         <Card className="min-h-[400px] relative overflow-hidden">
-          {!mapToken ? (
+          {!apiKey ? (
             <div className="h-[400px] w-full flex flex-col items-center justify-center p-6">
               <div className="text-center max-w-md">
                 <div className="mb-6">
                   <div className="h-16 w-16 mx-auto bg-blue-100 rounded-full flex items-center justify-center mb-4">
                     <MapPin className="h-8 w-8 text-blue-600" />
                   </div>
-                  <h3 className="text-lg font-medium mb-2">Mapbox Token Required</h3>
-                  <p className="text-gray-600 mb-4">Enter your Mapbox public token to display the interactive map</p>
+                  <h3 className="text-lg font-medium mb-2">Google Maps API Key Required</h3>
+                  <p className="text-gray-600 mb-4">Enter your Google Maps API key to display the interactive map</p>
                 </div>
                 
                 <div className="space-y-3">
                   <Input 
                     type="text"
-                    placeholder="pk.eyJ1IjoieW91..." 
-                    value={tokenInput}
-                    onChange={(e) => setTokenInput(e.target.value)}
+                    placeholder="AIzaSyB..." 
+                    value={keyInput}
+                    onChange={(e) => setKeyInput(e.target.value)}
                     className="w-full"
                   />
                   <Button 
-                    onClick={handleTokenSubmit}
-                    disabled={!tokenInput.trim()}
+                    onClick={handleKeySubmit}
+                    disabled={!keyInput.trim()}
                     className="w-full"
                   >
                     Initialize Map
                   </Button>
                   <p className="text-xs text-gray-500">
-                    Get a token at <a href="https://mapbox.com/" className="text-blue-600 underline" target="_blank" rel="noreferrer">mapbox.com</a>
+                    Get an API key at <a href="https://console.cloud.google.com/google/maps-apis/" className="text-blue-600 underline" target="_blank" rel="noreferrer">Google Cloud Console</a>
                   </p>
                 </div>
               </div>
@@ -203,10 +211,10 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location }) => {
                   <Button 
                     variant="ghost" 
                     size="sm" 
-                    onClick={handleClearToken}
+                    onClick={handleClearKey}
                     className="h-6 px-2 text-xs"
                   >
-                    Reset Token
+                    Reset API Key
                   </Button>
                 </div>
                 <div className="space-y-1 max-h-32 overflow-y-auto">
@@ -224,6 +232,12 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location }) => {
                 ref={mapContainerRef} 
                 className="h-[400px] w-full"
               />
+              
+              {isLoading && (
+                <div className="absolute inset-0 bg-white/50 flex items-center justify-center">
+                  <div className="text-sm text-gray-600">Loading map...</div>
+                </div>
+              )}
             </>
           )}
         </Card>
