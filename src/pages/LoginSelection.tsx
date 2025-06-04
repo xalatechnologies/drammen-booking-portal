@@ -73,12 +73,12 @@ const LoginSelection = () => {
 
             {/* Saksbehandler Card */}
             <Card className="h-full flex flex-col overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border-0 shadow-lg bg-white">
-              <CardHeader className="bg-gradient-to-r from-teal-600 to-teal-700 text-white pb-8 pt-8">
+              <CardHeader className="bg-gradient-to-r from-blue-900 to-blue-800 text-white pb-8 pt-8">
                 <CardTitle className="flex items-center text-2xl font-bold text-left">
                   <Briefcase className="h-8 w-8 mr-3" />
                   Saksbehandler
                 </CardTitle>
-                <CardDescription className="text-teal-100 text-lg text-left">
+                <CardDescription className="text-blue-100 text-lg text-left">
                   For saksbehandlere
                 </CardDescription>
               </CardHeader>
@@ -99,7 +99,7 @@ const LoginSelection = () => {
               </CardContent>
               <CardFooter className="px-8 pb-8">
                 <Button 
-                  className="w-full h-12 text-lg font-semibold bg-teal-600 hover:bg-teal-700 transition-colors" 
+                  className="w-full h-12 text-lg font-semibold bg-blue-900 hover:bg-blue-800 transition-colors" 
                   onClick={() => handleUserSelection("caseworker")}
                 >
                   Fortsett som saksbehandler
