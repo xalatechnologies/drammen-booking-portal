@@ -73,7 +73,7 @@ const FacilityListItem: React.FC<FacilityListItemProps> = ({
       onClick={() => navigate(`/facilities/${facility.id}`)}
     >
       <CardContent className="p-0">
-        <div className="flex h-56">
+        <div className="flex h-64">
           <FacilityImage 
             image={facility.image}
             name={facility.name}

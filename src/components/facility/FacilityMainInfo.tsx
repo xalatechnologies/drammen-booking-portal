@@ -45,7 +45,7 @@ const FacilityMainInfo: React.FC<FacilityMainInfoProps> = ({
             <h3 className="font-bold text-xl text-slate-800 truncate mb-2 group-hover:text-slate-900 transition-colors">{name}</h3>
             
             {/* Address right after title */}
-            <div className="flex items-center gap-2 text-sm text-slate-600 mb-3 group-hover:text-slate-700 transition-colors">
+            <div className="flex items-center gap-2 text-sm text-slate-600 mb-2 group-hover:text-slate-700 transition-colors">
               <MapPin className="h-4 w-4 text-slate-500 flex-shrink-0" />
               <span 
                 className="hover:text-emerald-700 hover:underline cursor-pointer transition-colors truncate font-medium"
@@ -55,6 +55,9 @@ const FacilityMainInfo: React.FC<FacilityMainInfoProps> = ({
                 {address}
               </span>
             </div>
+
+            {/* Description under address - single line with ellipsis */}
+            <p className="text-slate-600 text-sm truncate mb-3 leading-relaxed">{description}</p>
             
             {/* Suitable For tags - smaller */}
             <div className="flex flex-wrap gap-1.5 mb-2">
@@ -108,8 +111,6 @@ const FacilityMainInfo: React.FC<FacilityMainInfoProps> = ({
             {area}
           </Badge>
         </div>
-        
-        <p className="text-slate-600 text-sm line-clamp-3 leading-relaxed">{description}</p>
       </div>
     </div>
   );
