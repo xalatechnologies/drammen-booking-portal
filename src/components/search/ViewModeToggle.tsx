@@ -17,18 +17,18 @@ const ViewModeToggle: React.FC<ViewModeToggleProps> = ({
       type="single" 
       value={viewMode} 
       onValueChange={(value) => value && setViewMode(value as "grid" | "map" | "calendar" | "list")}
-      className="border border-gray-200 bg-gray-50 rounded-lg p-1"
+      className="border border-gray-200 bg-gray-50 rounded-lg p-1 gap-1"
     >
-      <ToggleGroupItem value="grid" className="h-8 w-8 p-0">
+      <ToggleGroupItem value="grid" className="h-8 w-8 p-0 rounded-md">
         <Grid3X3 className="h-4 w-4" />
       </ToggleGroupItem>
-      <ToggleGroupItem value="list" className="h-8 w-8 p-0">
+      <ToggleGroupItem value="list" className="h-8 w-8 p-0 rounded-md">
         <List className="h-4 w-4" />
       </ToggleGroupItem>
-      <ToggleGroupItem value="map" className="h-8 w-8 p-0">
+      <ToggleGroupItem value="map" className="h-8 w-8 p-0 rounded-md">
         <Map className="h-4 w-4" />
       </ToggleGroupItem>
-      <ToggleGroupItem value="calendar" className="h-8 w-8 p-0">
+      <ToggleGroupItem value="calendar" className="h-8 w-8 p-0 rounded-md">
         <CalendarView className="h-4 w-4" />
       </ToggleGroupItem>
     </ToggleGroup>

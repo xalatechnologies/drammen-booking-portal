@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { DateRange } from "react-day-picker";
 import { X } from "lucide-react";
@@ -86,7 +85,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
               />
             </div>
 
-            <div className="lg:col-span-1">
+            <div className="lg:col-span-1 flex justify-end">
               <ViewModeToggle 
                 viewMode={viewMode}
                 setViewMode={setViewMode}
