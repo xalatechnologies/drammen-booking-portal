@@ -91,45 +91,46 @@ const AdminSidebar = () => {
   };
 
   const renderMenuGroup = (items: any[], groupLabel: string) => (
-    <SidebarGroup className="mb-6">
-      <SidebarGroupLabel className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3 px-3">
+    <SidebarGroup className="mb-8">
+      <SidebarGroupLabel className="text-xs font-bold text-slate-500 uppercase tracking-[0.15em] mb-4 px-4 leading-5">
         {groupLabel}
       </SidebarGroupLabel>
       <SidebarGroupContent>
-        <SidebarMenu className="space-y-1">
+        <SidebarMenu className="space-y-2">
           {items.map((item) => (
             <SidebarMenuItem key={item.path}>
               <SidebarMenuButton
                 isActive={isActive(item.path)}
                 onClick={() => navigate(item.path)}
                 className={`
-                  group flex items-center justify-between w-full px-3 py-3 text-sm font-medium rounded-xl transition-all duration-200 ease-in-out
+                  group relative flex items-center justify-between w-full px-4 py-3.5 text-[15px] font-medium rounded-2xl transition-all duration-300 ease-in-out cursor-pointer
                   ${isActive(item.path) 
-                    ? 'bg-blue-50 text-blue-700 border-l-4 border-blue-600 shadow-sm' 
-                    : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900 hover:translate-x-1'
+                    ? 'bg-gradient-to-r from-blue-50 to-blue-100 text-blue-800 shadow-lg shadow-blue-100/50 border-l-[3px] border-blue-600' 
+                    : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900 hover:shadow-md hover:shadow-slate-200/50 hover:scale-[1.02]'
                   }
-                  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
+                  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-white
+                  active:scale-[0.98]
                 `}
               >
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-4">
                   <div className={`
-                    p-2 rounded-lg transition-colors duration-200
+                    relative p-2.5 rounded-xl transition-all duration-300 transform
                     ${isActive(item.path) 
-                      ? 'bg-blue-100 text-blue-600' 
-                      : 'bg-gray-100 text-gray-600 group-hover:bg-gray-200'
+                      ? 'bg-blue-200/60 text-blue-700 shadow-inner' 
+                      : 'bg-slate-100 text-slate-600 group-hover:bg-slate-200 group-hover:scale-105'
                     }
                   `}>
-                    <item.icon className="h-4 w-4" />
+                    <item.icon className="h-[18px] w-[18px]" strokeWidth={2.2} />
                   </div>
-                  <span className="truncate">{item.title}</span>
+                  <span className="truncate font-medium leading-5">{item.title}</span>
                 </div>
                 <ChevronRight className={`
-                  h-4 w-4 transition-all duration-200 
+                  h-4 w-4 transition-all duration-300 transform
                   ${isActive(item.path) 
-                    ? 'text-blue-600 opacity-100' 
-                    : 'text-gray-400 opacity-0 group-hover:opacity-100'
+                    ? 'text-blue-600 opacity-100 translate-x-0' 
+                    : 'text-slate-400 opacity-0 group-hover:opacity-100 group-hover:translate-x-1'
                   }
-                `} />
+                `} strokeWidth={2.5} />
               </SidebarMenuButton>
             </SidebarMenuItem>
           ))}
@@ -139,28 +140,31 @@ const AdminSidebar = () => {
   );
 
   return (
-    <Sidebar className="border-r border-gray-200 bg-white shadow-sm">
-      <SidebarHeader className="p-6 border-b border-gray-100 h-16 flex items-center justify-center bg-gradient-to-r from-blue-50 to-indigo-50">
-        <div className="flex items-center justify-center">
+    <Sidebar className="border-r border-slate-200/60 bg-white shadow-xl shadow-slate-200/20">
+      <SidebarHeader className="px-6 py-5 border-b border-slate-100 h-16 flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/40">
+        <div className="flex items-center justify-center transform hover:scale-105 transition-transform duration-200">
           <Logo />
         </div>
       </SidebarHeader>
       
-      <SidebarContent className="px-4 py-6 space-y-6 overflow-y-auto">
+      <SidebarContent className="px-3 py-8 space-y-2 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
         {renderMenuGroup(overviewItems, "OVERSIKT")}
         {renderMenuGroup(bookingItems, "BOOKING")}
         {renderMenuGroup(managementItems, "ADMINISTRASJON")}
         {renderMenuGroup(systemItems, "SYSTEM")}
       </SidebarContent>
 
-      <SidebarFooter className="p-6 border-t border-gray-100 bg-gray-50">
-        <div className="flex items-center gap-3 p-3 rounded-lg bg-white border border-gray-200 shadow-sm">
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-            <span className="text-sm font-medium text-gray-900">System Status</span>
+      <SidebarFooter className="p-6 border-t border-slate-100 bg-gradient-to-t from-slate-50/50 to-white">
+        <div className="flex items-center gap-4 p-4 rounded-2xl bg-white border border-slate-200/60 shadow-lg shadow-slate-200/20 hover:shadow-xl hover:shadow-slate-200/30 transition-all duration-300">
+          <div className="flex items-center gap-3">
+            <div className="relative">
+              <div className="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse"></div>
+              <div className="absolute inset-0 w-2.5 h-2.5 bg-emerald-400 rounded-full animate-ping opacity-30"></div>
+            </div>
+            <span className="text-[15px] font-semibold text-slate-800 leading-5">System Status</span>
           </div>
           <div className="ml-auto">
-            <span className="text-xs text-green-600 font-medium bg-green-50 px-2 py-1 rounded-full">
+            <span className="text-[13px] text-emerald-700 font-bold bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-200/50 shadow-sm">
               Operative
             </span>
           </div>
