@@ -7,16 +7,24 @@ const HeroBanner = () => {
       <div className="relative">
         <img 
           src="/lovable-uploads/5a43abf2-1c2e-44cb-96a6-6509c7fe3281.png" 
-          alt="Drammen by med elv og broer" 
+          alt="Drammen by med elv og broer - vakker utsikt over kommunen" 
           className="w-full h-[160px] object-cover"
+          role="img"
+          loading="eager"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-blue-900/80 to-blue-900/30 flex items-center">
           <div className="container mx-auto px-6">
             <div className="max-w-2xl">
-              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-2 leading-tight whitespace-nowrap">
+              <h1 
+                className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-2 leading-tight"
+                id="main-heading"
+              >
                 Finn ledige lokaler i Drammen Kommune
               </h1>
-              <p className="text-sm sm:text-base text-blue-100 max-w-lg">
+              <p 
+                className="text-sm sm:text-base text-blue-100 max-w-lg"
+                aria-describedby="main-heading"
+              >
                 Søk og reserver kommunale lokaler til møter, arrangementer og aktiviteter.
               </p>
             </div>
