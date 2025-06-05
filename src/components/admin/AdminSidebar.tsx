@@ -105,7 +105,7 @@ const AdminSidebar = () => {
                 className={`
                   group relative flex items-center justify-between w-full text-[15px] font-medium rounded-2xl transition-all duration-300 ease-in-out cursor-pointer
                   ${isActive(item.path) 
-                    ? 'bg-gradient-to-r from-blue-50 to-blue-100 text-blue-800 shadow-lg shadow-blue-100/50 border-l-[3px] border-blue-600 px-6 py-4' 
+                    ? 'bg-gradient-to-r from-blue-50 to-blue-100 text-blue-800 shadow-lg shadow-blue-100/50 border-l-[3px] border-blue-600 px-8 py-5' 
                     : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900 hover:shadow-md hover:shadow-slate-200/50 hover:scale-[1.02] px-5 py-3.5'
                   }
                   focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-white
@@ -141,7 +141,7 @@ const AdminSidebar = () => {
 
   return (
     <Sidebar className="border-r border-slate-200/60 bg-white shadow-xl shadow-slate-200/20 w-80">
-      <SidebarHeader className="px-8 py-5 border-b border-slate-100 h-16 flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/40">
+      <SidebarHeader className="px-8 py-6 border-b border-slate-100 h-20 flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/40">
         <div className="flex items-center justify-center transform hover:scale-105 transition-transform duration-200">
           <Logo />
         </div>
