@@ -1,5 +1,7 @@
 
 import { UseFormReturn } from "react-hook-form";
+import { z } from "zod";
+import { bookingFormSchema } from "./formSchema";
 
 export interface Zone {
   id: string;
@@ -84,20 +86,5 @@ export interface BookingFormProps {
   selectedTimeSlot: string;
 }
 
-export interface BookingFormValues {
-  bookingMode: 'one-time' | 'date-range' | 'recurring';
-  customerType: 'private' | 'nonprofit' | 'business' | 'youth' | 'senior';
-  date: Date;
-  endDate?: Date;
-  timeSlot: string;
-  zoneId: string;
-  purpose: string;
-  eventType: 'training' | 'competition' | 'meeting' | 'celebration' | 'other';
-  attendees: number;
-  ageGroup: 'mixed' | 'under-20' | 'over-20' | 'children' | 'adults';
-  contactName: string;
-  contactEmail: string;
-  contactPhone: string;
-  organization?: string;
-  specialServices?: string[];
-}
+// Use the inferred type from the Zod schema instead of manually defining it
+export type BookingFormValues = z.infer<typeof bookingFormSchema>;
