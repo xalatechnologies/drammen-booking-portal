@@ -40,7 +40,7 @@ const AdminSidebar = () => {
 
   const bookingItems = [
     {
-      title: "Fasilitetsstyring",
+      title: "Lokaler",
       icon: Building,
       path: "/admin/facilities",
     },
@@ -101,7 +101,7 @@ const AdminSidebar = () => {
               <SidebarMenuButton
                 isActive={isActive(item.path)}
                 onClick={() => navigate(item.path)}
-                className="flex items-center gap-3 px-3 py-2 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-100 hover:text-gray-900 transition-colors"
+                className="flex items-center gap-3 px-3 py-3 text-base font-medium text-gray-700 rounded-lg hover:bg-gray-100 hover:text-gray-900 transition-colors"
               >
                 <item.icon className="h-5 w-5" />
                 <span>{item.title}</span>
@@ -115,7 +115,7 @@ const AdminSidebar = () => {
 
   return (
     <Sidebar className="border-r bg-white">
-      <SidebarHeader className="p-4 border-b">
+      <SidebarHeader className="p-4 border-b h-16">
         <div className="flex items-center justify-center">
           <Logo />
         </div>

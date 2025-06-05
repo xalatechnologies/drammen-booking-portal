@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import {
   Card,
@@ -171,69 +170,69 @@ const FacilityManagementPage = () => {
       <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
         <div>
           <h1 id="page-title" className="text-4xl font-bold tracking-tight text-gray-900 mb-3">
-            Fasilitetsstyring
+            Lokaler
           </h1>
           <p className="text-lg text-gray-700 leading-relaxed">
-            Administrer og overvåk alle kommunale fasiliteter
+            Administrer og overvåk alle kommunale lokaler
           </p>
         </div>
         <Button 
           className="gap-3 text-base px-6 py-3 min-h-[48px] shadow-sm focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-          aria-label="Legg til ny fasilitet"
+          aria-label="Legg til nytt lokale"
         >
           <Plus className="h-5 w-5" aria-hidden="true" />
-          <span>Legg til fasilitet</span>
+          <span>Legg til lokale</span>
         </Button>
       </header>
 
-      {/* Statistics Cards */}
+      {/* Statistics Cards - All using same neutral styling */}
       <section aria-labelledby="statistics-heading">
-        <h2 id="statistics-heading" className="sr-only">Statistikk over fasiliteter</h2>
+        <h2 id="statistics-heading" className="sr-only">Statistikk over lokaler</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <Card className="shadow-sm border-gray-300 focus-within:ring-2 focus-within:ring-blue-500">
+          <Card className="bg-white shadow-sm border-gray-300 focus-within:ring-2 focus-within:ring-blue-500">
             <CardContent className="p-8">
               <div className="flex flex-col space-y-3">
-                <p className="text-base font-semibold text-gray-700">Totalt antall fasiliteter</p>
-                <p className="text-4xl font-bold text-gray-900" aria-label={`${stats.total} totalt antall fasiliteter`}>
+                <p className="text-base font-semibold text-gray-700">Totalt antall lokaler</p>
+                <p className="text-4xl font-bold text-gray-900" aria-label={`${stats.total} totalt antall lokaler`}>
                   {stats.total}
                 </p>
-                <p className="text-sm text-gray-600">Alle typer fasiliteter</p>
+                <p className="text-sm text-gray-600">Alle typer lokaler</p>
               </div>
             </CardContent>
           </Card>
           
-          <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-300 shadow-sm focus-within:ring-2 focus-within:ring-green-500">
+          <Card className="bg-white shadow-sm border-gray-300 focus-within:ring-2 focus-within:ring-blue-500">
             <CardContent className="p-8">
               <div className="flex flex-col space-y-3">
-                <p className="text-base font-semibold text-green-800">Aktive fasiliteter</p>
-                <p className="text-4xl font-bold text-green-900" aria-label={`${stats.active} aktive fasiliteter`}>
+                <p className="text-base font-semibold text-gray-700">Aktive lokaler</p>
+                <p className="text-4xl font-bold text-gray-900" aria-label={`${stats.active} aktive lokaler`}>
                   {stats.active}
                 </p>
-                <p className="text-sm text-green-700">Tilgjengelig for booking</p>
+                <p className="text-sm text-gray-600">Tilgjengelig for booking</p>
               </div>
             </CardContent>
           </Card>
           
-          <Card className="bg-gradient-to-br from-amber-50 to-amber-100 border-amber-300 shadow-sm focus-within:ring-2 focus-within:ring-amber-500">
+          <Card className="bg-white shadow-sm border-gray-300 focus-within:ring-2 focus-within:ring-blue-500">
             <CardContent className="p-8">
               <div className="flex flex-col space-y-3">
-                <p className="text-base font-semibold text-amber-800">Under vedlikehold</p>
-                <p className="text-4xl font-bold text-amber-900" aria-label={`${stats.maintenance} fasiliteter under vedlikehold`}>
+                <p className="text-base font-semibold text-gray-700">Under vedlikehold</p>
+                <p className="text-4xl font-bold text-gray-900" aria-label={`${stats.maintenance} lokaler under vedlikehold`}>
                   {stats.maintenance}
                 </p>
-                <p className="text-sm text-amber-700">Midlertidig utilgjengelig</p>
+                <p className="text-sm text-gray-600">Midlertidig utilgjengelig</p>
               </div>
             </CardContent>
           </Card>
           
-          <Card className="bg-gradient-to-br from-red-50 to-red-100 border-red-300 shadow-sm focus-within:ring-2 focus-within:ring-red-500">
+          <Card className="bg-white shadow-sm border-gray-300 focus-within:ring-2 focus-within:ring-blue-500">
             <CardContent className="p-8">
               <div className="flex flex-col space-y-3">
-                <p className="text-base font-semibold text-red-800">Inaktive fasiliteter</p>
-                <p className="text-4xl font-bold text-red-900" aria-label={`${stats.inactive} inaktive fasiliteter`}>
+                <p className="text-base font-semibold text-gray-700">Inaktive lokaler</p>
+                <p className="text-4xl font-bold text-gray-900" aria-label={`${stats.inactive} inaktive lokaler`}>
                   {stats.inactive}
                 </p>
-                <p className="text-sm text-red-700">Ikke tilgjengelig</p>
+                <p className="text-sm text-gray-600">Ikke tilgjengelig</p>
               </div>
             </CardContent>
           </Card>
@@ -266,17 +265,17 @@ const FacilityManagementPage = () => {
           <Card className="shadow-sm border-gray-300">
             <CardHeader className="bg-gray-50 border-b border-gray-300 rounded-t-lg pb-6">
               <CardTitle className="text-2xl font-semibold text-gray-900">
-                Fasilitetsøk & Filtre
+                Lokalsøk & Filtre
               </CardTitle>
               <CardDescription className="text-base text-gray-700 leading-relaxed">
-                Søk etter fasiliteter etter navn, type, eller adresse
+                Søk etter lokaler etter navn, type, eller adresse
               </CardDescription>
             </CardHeader>
             <CardContent className="p-8">
               <div className="flex flex-col sm:flex-row gap-6 mb-8">
                 <div className="relative flex-grow">
                   <Label htmlFor="facility-search" className="sr-only">
-                    Søk etter fasiliteter
+                    Søk etter lokaler
                   </Label>
                   <Search 
                     className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500" 
@@ -285,14 +284,14 @@ const FacilityManagementPage = () => {
                   <Input
                     id="facility-search"
                     type="search"
-                    placeholder="Søk etter fasiliteter..."
+                    placeholder="Søk etter lokaler..."
                     className="pl-12 h-12 text-base border-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     aria-describedby="search-help"
                   />
                   <div id="search-help" className="sr-only">
-                    Skriv inn navn, type eller adresse for å søke etter fasiliteter
+                    Skriv inn navn, type eller adresse for å søke etter lokaler
                   </div>
                 </div>
                 
@@ -330,7 +329,7 @@ const FacilityManagementPage = () => {
                           <Label htmlFor="all" className="text-base font-medium cursor-pointer">
                             Alle
                           </Label>
-                          <span id="all-desc" className="sr-only">Vis alle fasiliteter uavhengig av status</span>
+                          <span id="all-desc" className="sr-only">Vis alle lokaler uavhengig av status</span>
                         </div>
                         
                         <div className="flex items-center space-x-4">
@@ -346,7 +345,7 @@ const FacilityManagementPage = () => {
                           <Label htmlFor="active" className="text-base font-medium cursor-pointer">
                             Aktive
                           </Label>
-                          <span id="active-desc" className="sr-only">Vis kun aktive fasiliteter</span>
+                          <span id="active-desc" className="sr-only">Vis kun aktive lokaler</span>
                         </div>
                         
                         <div className="flex items-center space-x-4">
@@ -362,7 +361,7 @@ const FacilityManagementPage = () => {
                           <Label htmlFor="maintenance" className="text-base font-medium cursor-pointer">
                             Under vedlikehold
                           </Label>
-                          <span id="maintenance-desc" className="sr-only">Vis kun fasiliteter under vedlikehold</span>
+                          <span id="maintenance-desc" className="sr-only">Vis kun lokaler under vedlikehold</span>
                         </div>
                         
                         <div className="flex items-center space-x-4">
@@ -378,7 +377,7 @@ const FacilityManagementPage = () => {
                           <Label htmlFor="inactive" className="text-base font-medium cursor-pointer">
                             Inaktive
                           </Label>
-                          <span id="inactive-desc" className="sr-only">Vis kun inaktive fasiliteter</span>
+                          <span id="inactive-desc" className="sr-only">Vis kun inaktive lokaler</span>
                         </div>
                       </fieldset>
                     </div>
@@ -387,11 +386,11 @@ const FacilityManagementPage = () => {
               </div>
 
               <div className="rounded-lg border-2 border-gray-300 overflow-hidden shadow-sm" id="main-content">
-                <Table role="table" aria-label="Fasilitetsliste">
+                <Table role="table" aria-label="Lokaleliste">
                   <TableHeader className="bg-gray-50">
                     <TableRow className="border-gray-300">
                       <TableHead className="font-semibold text-gray-900 py-6 text-base" scope="col">
-                        Fasilitet
+                        Lokale
                       </TableHead>
                       <TableHead className="font-semibold text-gray-900 py-6 text-base" scope="col">
                         Type
@@ -416,7 +415,7 @@ const FacilityManagementPage = () => {
                         <TableCell colSpan={6} className="text-center py-12 text-gray-600">
                           <div className="flex flex-col items-center space-y-4">
                             <Search className="h-12 w-12 text-gray-400" aria-hidden="true" />
-                            <p className="text-lg font-medium">Ingen fasiliteter funnet</p>
+                            <p className="text-lg font-medium">Ingen lokaler funnet</p>
                             <p className="text-base text-gray-500">Prøv å endre søkekriteriene eller filteret</p>
                           </div>
                         </TableCell>
@@ -521,7 +520,7 @@ const FacilityManagementPage = () => {
                 </Table>
               </div>
 
-              <nav className="mt-8 flex justify-center" aria-label="Paginering for fasilitetsliste">
+              <nav className="mt-8 flex justify-center" aria-label="Paginering for lokaleliste">
                 <Pagination>
                   <PaginationContent>
                     <PaginationItem>
@@ -579,7 +578,7 @@ const FacilityManagementPage = () => {
             <CardHeader className="bg-gray-50 border-b border-gray-300 rounded-t-lg pb-6">
               <CardTitle className="text-2xl font-semibold text-gray-900">Kartvisning</CardTitle>
               <CardDescription className="text-base text-gray-700 leading-relaxed">
-                Fasiliteter vist på kart kommer snart
+                Lokaler vist på kart kommer snart
               </CardDescription>
             </CardHeader>
             <CardContent className="p-12">
