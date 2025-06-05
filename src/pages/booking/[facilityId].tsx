@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { CheckCircle, ArrowLeft, Home } from "lucide-react";
@@ -227,7 +226,6 @@ const BookingPage = () => {
               className="text-gray-600 hover:text-gray-900 p-0 h-auto font-normal"
               onClick={() => navigate(`/facilities/${facilityId}`)}
             >
-              <ArrowLeft className="h-4 w-4 mr-1" />
               {facility.name}
             </Button>
             <span className="text-gray-400">/</span>
