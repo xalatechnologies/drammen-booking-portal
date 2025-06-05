@@ -19,6 +19,8 @@ function Calendar({
     <DayPicker
       showOutsideDays={showOutsideDays}
       className={cn("p-3", className)}
+      role="application"
+      aria-label="Kalender for å velge dato"
       classNames={{
         months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
         month: "space-y-4",
@@ -27,7 +29,7 @@ function Calendar({
         nav: "space-x-1 flex items-center",
         nav_button: cn(
           buttonVariants({ variant: "outline" }),
-          "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100"
+          "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 focus:opacity-100 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
         ),
         nav_button_previous: "absolute left-1",
         nav_button_next: "absolute right-1",
@@ -39,73 +41,100 @@ function Calendar({
         cell: "h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
         day: cn(
           buttonVariants({ variant: "ghost" }),
-          "h-9 w-9 p-0 font-normal aria-selected:opacity-100"
+          "h-9 w-9 p-0 font-normal aria-selected:opacity-100 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
         ),
         day_range_end: "day-range-end",
         day_selected:
           "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
-        day_today: "bg-accent text-accent-foreground",
+        day_today: "bg-accent text-accent-foreground font-bold border-2 border-blue-600",
         day_outside:
           "day-outside text-muted-foreground opacity-50 aria-selected:bg-accent/50 aria-selected:text-muted-foreground aria-selected:opacity-30",
-        day_disabled: "text-muted-foreground opacity-50",
+        day_disabled: "text-muted-foreground opacity-50 cursor-not-allowed",
         day_range_middle:
           "aria-selected:bg-accent aria-selected:text-accent-foreground",
         day_hidden: "invisible",
         ...classNames,
       }}
       components={{
-        IconLeft: ({ ..._props }) => <ChevronLeft className="h-4 w-4" />,
-        IconRight: ({ ..._props }) => <ChevronRight className="h-4 w-4" />,
+        IconLeft: ({ ..._props }) => <ChevronLeft className="h-4 w-4" aria-hidden="true" />,
+        IconRight: ({ ..._props }) => <ChevronRight className="h-4 w-4" aria-hidden="true" />,
         Day: ({ date, ...dayProps }) => {
           const unavailableCheck = isDateUnavailable(date);
           const holidayCheck = isNorwegianHoliday(date);
           
           let dayClass = "";
-          let title = "";
+          let ariaLabel = "";
           let isDisabled = false;
+          
+          // Base aria label with date
+          const dateString = date.toLocaleDateString('nb-NO', { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+          });
           
           if (unavailableCheck.isUnavailable) {
             switch (unavailableCheck.reason) {
               case 'past':
-                dayClass = "text-gray-500 bg-gray-100 line-through opacity-60 cursor-not-allowed";
-                title = "Fortid - ikke tilgjengelig";
+                dayClass = "text-gray-700 bg-gray-200 line-through opacity-80 cursor-not-allowed border-2 border-gray-400";
+                ariaLabel = `${dateString} - Fortid, ikke tilgjengelig for booking`;
                 isDisabled = true;
                 break;
               case 'weekend':
-                dayClass = "text-amber-800 bg-amber-100 border-2 border-amber-300 font-semibold hover:bg-amber-200";
-                title = "Helg - begrenset tilgang";
+                dayClass = "text-amber-900 bg-amber-200 border-2 border-amber-500 font-semibold hover:bg-amber-300 focus:bg-amber-300";
+                ariaLabel = `${dateString} - Helg, begrenset tilgang for booking`;
                 break;
               case 'holiday':
-                dayClass = "text-red-800 bg-red-200 border-2 border-red-400 font-bold cursor-not-allowed";
-                title = `Helligdag: ${unavailableCheck.details} - ikke tilgjengelig`;
+                dayClass = "text-red-900 bg-red-300 border-2 border-red-600 font-bold cursor-not-allowed";
+                ariaLabel = `${dateString} - Helligdag: ${unavailableCheck.details}, ikke tilgjengelig for booking`;
                 isDisabled = true;
                 break;
               case 'maintenance':
-                dayClass = "text-yellow-800 bg-yellow-200 border-2 border-yellow-400 font-semibold cursor-not-allowed";
-                title = "Vedlikehold - ikke tilgjengelig";
+                dayClass = "text-yellow-900 bg-yellow-300 border-2 border-yellow-600 font-semibold cursor-not-allowed";
+                ariaLabel = `${dateString} - Vedlikehold, ikke tilgjengelig for booking`;
                 isDisabled = true;
                 break;
             }
           } else {
-            dayClass = "text-green-800 bg-green-100 hover:bg-green-200 border border-green-300";
-            title = "Tilgjengelig for booking";
+            dayClass = "text-green-900 bg-green-200 hover:bg-green-300 focus:bg-green-300 border-2 border-green-500";
+            ariaLabel = `${dateString} - Tilgjengelig for booking`;
+          }
+          
+          // Add holiday information to aria label if applicable
+          if (holidayCheck.isHoliday && !unavailableCheck.isUnavailable) {
+            ariaLabel += `. Helligdag: ${holidayCheck.name}`;
           }
           
           return (
             <button
               {...dayProps}
-              title={title}
+              aria-label={ariaLabel}
+              aria-describedby={holidayCheck.isHoliday ? `holiday-${date.getDate()}` : undefined}
               disabled={isDisabled}
+              tabIndex={isDisabled ? -1 : 0}
               className={cn(
                 buttonVariants({ variant: "ghost" }),
-                "h-9 w-9 p-0 font-normal aria-selected:opacity-100 relative rounded-md transition-colors",
+                "h-9 w-9 p-0 font-normal aria-selected:opacity-100 relative rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2",
                 dayClass,
                 isDisabled && "pointer-events-none"
               )}
             >
-              {date.getDate()}
+              <span className="sr-only">{ariaLabel}</span>
+              <span aria-hidden="true">{date.getDate()}</span>
               {holidayCheck.isHoliday && (
-                <div className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-red-600 rounded-full border-2 border-white shadow-sm"></div>
+                <>
+                  <div 
+                    className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-red-700 rounded-full border-2 border-white shadow-sm"
+                    aria-hidden="true"
+                  ></div>
+                  <div 
+                    id={`holiday-${date.getDate()}`} 
+                    className="sr-only"
+                  >
+                    Helligdag: {holidayCheck.name}
+                  </div>
+                </>
               )}
             </button>
           );
