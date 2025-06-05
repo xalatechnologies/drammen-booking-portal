@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -11,6 +12,8 @@ import { FacilityImageGallery } from "@/components/facility/FacilityImageGallery
 import { FacilityBookingDrawer } from "@/components/facility/FacilityBookingDrawer";
 import { FacilityBookingCard } from "@/components/facility/FacilityBookingCard";
 import { ZoneAvailabilityTable } from "@/components/facility/ZoneAvailabilityTable";
+import { ZoneOverviewCard } from "@/components/facility/ZoneOverviewCard";
+import { AutoApprovalCard } from "@/components/facility/AutoApprovalCard";
 import MapView from "@/components/MapView";
 import { format } from "date-fns";
 import { isDateUnavailable, isNorwegianHoliday } from "@/utils/holidaysAndAvailability";
@@ -74,6 +77,7 @@ const FacilityDetail = () => {
     amenities: ["Parkering", "Wi-Fi", "Garderober", "Dusjer", "Kafeteria"],
     openingHours: "Man-Søn: 06:00-23:00",
     zones: zones,
+    hasAutoApproval: true, // Mock data - this would come from the backend
     availableTimes: [
       {
         date: new Date(),
@@ -211,49 +215,6 @@ const FacilityDetail = () => {
                 </div>
               </Card>
 
-              {/* Zone Overview */}
-              <Card className="p-6">
-                <h2 className="text-xl font-medium mb-4">Tilgjengelige soner</h2>
-                <div className="space-y-4">
-                  {zones.map((zone) => (
-                    <Card key={zone.id} className="border border-gray-200">
-                      <CardContent className="p-4">
-                        <div className="flex justify-between items-start mb-2">
-                          <div>
-                            <h3 className="font-semibold text-lg">{zone.name}</h3>
-                            <p className="text-sm text-gray-600">{zone.description}</p>
-                          </div>
-                          <div className="text-right">
-                            <div className="text-lg font-bold">{zone.pricePerHour} kr</div>
-                            <div className="text-sm text-gray-500">per time</div>
-                          </div>
-                        </div>
-                        
-                        <div className="flex items-center gap-4 mb-3">
-                          <div className="flex items-center gap-1 text-sm text-gray-600">
-                            <Users className="h-4 w-4" />
-                            <span>Maks {zone.capacity} personer</span>
-                          </div>
-                          {zone.area && (
-                            <div className="text-sm text-gray-600">
-                              <span>{zone.area}</span>
-                            </div>
-                          )}
-                        </div>
-                        
-                        <div className="flex flex-wrap gap-1">
-                          {zone.equipment.map((item, i) => (
-                            <Badge key={i} variant="outline" className="text-xs">
-                              {item}
-                            </Badge>
-                          ))}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              </Card>
-
               {/* Zone Availability */}
               <ZoneAvailabilityTable 
                 zones={zones}
@@ -295,11 +256,15 @@ const FacilityDetail = () => {
             </div>
 
             {/* Right Sidebar - Booking */}
-            <div className="lg:sticky lg:top-24 lg:self-start">
+            <div className="lg:sticky lg:top-24 lg:self-start space-y-6">
               <FacilityBookingCard 
                 facility={facility}
                 onBookClick={() => setIsBookingDrawerOpen(true)}
               />
+              
+              <AutoApprovalCard hasAutoApproval={facility.hasAutoApproval} />
+              
+              <ZoneOverviewCard zones={zones} />
             </div>
           </div>
         </div>
