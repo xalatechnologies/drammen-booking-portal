@@ -17,9 +17,9 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 const AdminHeader = () => {
   return (
     <header className="border-b bg-white shadow-sm sticky top-0 z-50">
-      <div className="flex h-16 items-center px-6">
-        <div className="flex items-center gap-4">
-          <SidebarTrigger className="focus:ring-2 focus:ring-blue-500 focus:outline-none rounded-md" />
+      <div className="flex h-20 items-center px-6">
+        <div className="flex items-center gap-4 min-w-0">
+          <SidebarTrigger className="focus:ring-2 focus:ring-blue-500 focus:outline-none rounded-md flex-shrink-0" />
         </div>
         
         <div className="flex-1 flex justify-center px-8">
@@ -33,7 +33,7 @@ const AdminHeader = () => {
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-shrink-0">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button 
