@@ -35,19 +35,19 @@ export function FacilityInfoTabs({
       <TabsList className="w-full border-b p-0 h-auto bg-gray-50 rounded-none">
         <TabsTrigger 
           value="description" 
-          className="flex-1 py-4 px-6 rounded-none text-base font-medium data-[state=active]:bg-slate-700 data-[state=active]:text-white data-[state=active]:border-b-0 data-[state=active]:shadow-none hover:bg-slate-100 hover:text-slate-700 transition-colors"
+          className="flex-1 py-4 px-6 rounded-none text-base font-medium data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:border-b-0 data-[state=active]:shadow-none hover:bg-blue-50 hover:text-blue-700 transition-colors"
         >
           Om lokalet
         </TabsTrigger>
         <TabsTrigger 
           value="features" 
-          className="flex-1 py-4 px-6 rounded-none text-base font-medium data-[state=active]:bg-slate-700 data-[state=active]:text-white data-[state=active]:border-b-0 data-[state=active]:shadow-none hover:bg-slate-100 hover:text-slate-700 transition-colors"
+          className="flex-1 py-4 px-6 rounded-none text-base font-medium data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:border-b-0 data-[state=active]:shadow-none hover:bg-blue-50 hover:text-blue-700 transition-colors"
         >
           Fasiliteter
         </TabsTrigger>
         <TabsTrigger 
           value="availability" 
-          className="flex-1 py-4 px-6 rounded-none text-base font-medium data-[state=active]:bg-slate-700 data-[state=active]:text-white data-[state=active]:border-b-0 data-[state=active]:shadow-none hover:bg-slate-100 hover:text-slate-700 transition-colors"
+          className="flex-1 py-4 px-6 rounded-none text-base font-medium data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:border-b-0 data-[state=active]:shadow-none hover:bg-blue-50 hover:text-blue-700 transition-colors"
         >
           Tilgjengelighet
         </TabsTrigger>
