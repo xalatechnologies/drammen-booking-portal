@@ -24,6 +24,7 @@ interface BookingFormProps {
   onCompleteBooking: () => void;
   termsAccepted: boolean;
   onTermsAcceptedChange: (accepted: boolean) => void;
+  selectedZoneId?: string;
 }
 
 const bookingFormSchema = z.object({
@@ -99,7 +100,8 @@ export function BookingForm({
   availableTimeSlots,
   onCompleteBooking,
   termsAccepted,
-  onTermsAcceptedChange
+  onTermsAcceptedChange,
+  selectedZoneId
 }: BookingFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [canContinue, setCanContinue] = useState(false);
@@ -107,13 +109,22 @@ export function BookingForm({
   
   const form = useForm<BookingFormValues>({
     resolver: zodResolver(bookingFormSchema),
-    defaultValues,
+    defaultValues: {
+      ...defaultValues,
+      zoneId: selectedZoneId || defaultValues.zoneId
+    },
     mode: "onChange"
   });
   
   useEffect(() => {
     setCanContinue(form.formState.isValid);
   }, [form.formState.isValid]);
+
+  useEffect(() => {
+    if (selectedZoneId) {
+      form.setValue("zoneId", selectedZoneId);
+    }
+  }, [selectedZoneId, form]);
   
   const nextStep = () => {
     if (currentStep < 2 && canContinue) {

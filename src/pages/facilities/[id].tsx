@@ -1,21 +1,18 @@
+
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, MapPin, Users, Clock, Star, CheckCircle, Wifi, Car, Accessibility, Map, Info, Share2, Heart } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { ArrowLeft } from "lucide-react";
 import GlobalHeader from "@/components/GlobalHeader";
 import GlobalFooter from "@/components/GlobalFooter";
 import { FacilityImageGallery } from "@/components/facility/FacilityImageGallery";
 import { FacilityBookingDrawer } from "@/components/facility/FacilityBookingDrawer";
 import { ZoneAvailabilityTable } from "@/components/facility/ZoneAvailabilityTable";
-import { ZoneBookingCard } from "@/components/facility/ZoneBookingCard";
-import { AutoApprovalCard } from "@/components/facility/AutoApprovalCard";
-import MapView from "@/components/MapView";
-import { format } from "date-fns";
-import { isDateUnavailable, isNorwegianHoliday } from "@/utils/holidaysAndAvailability";
+import { FacilityHeader } from "@/components/facility/FacilityHeader";
+import { FacilityQuickFacts } from "@/components/facility/FacilityQuickFacts";
+import { FacilityDescription } from "@/components/facility/FacilityDescription";
+import { FacilityLocation } from "@/components/facility/FacilityLocation";
+import { FacilitySidebar } from "@/components/facility/FacilitySidebar";
 import { Zone } from "@/components/booking/types";
 
 const FacilityDetail = () => {
@@ -23,7 +20,6 @@ const FacilityDetail = () => {
   const navigate = useNavigate();
   const [isBookingDrawerOpen, setIsBookingDrawerOpen] = useState(false);
   const [selectedZoneId, setSelectedZoneId] = useState<string>("");
-  const [showMap, setShowMap] = useState(false);
   const [date] = useState<Date>(new Date());
   const [isFavorited, setIsFavorited] = useState(false);
   
@@ -163,74 +159,23 @@ const FacilityDetail = () => {
               <FacilityImageGallery images={facility.images} />
 
               {/* Header */}
-              <div>
-                <div className="flex items-center gap-3 mb-2">
-                  <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
-                    Idrettsanlegg
-                  </Badge>
-                  <div className="flex items-center gap-1">
-                    <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                    <span className="font-medium">{facility.rating}</span>
-                    <span className="text-gray-500 text-sm">({facility.reviewCount})</span>
-                  </div>
-                </div>
-                <h1 className="text-3xl font-bold text-gray-900 mb-3">{facility.name}</h1>
-                <div className="flex items-center text-gray-600 mb-4">
-                  <MapPin className="h-5 w-5 mr-2" />
-                  <span>{facility.address}</span>
-                </div>
-              </div>
+              <FacilityHeader
+                name={facility.name}
+                address={facility.address}
+                rating={facility.rating}
+                reviewCount={facility.reviewCount}
+              />
 
               {/* Quick Facts Grid */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <Card className="p-4">
-                  <div className="flex items-center gap-2 mb-1">
-                    <Users className="h-4 w-4 text-blue-600" />
-                    <span className="text-sm font-medium text-gray-500">Kapasitet</span>
-                  </div>
-                  <p className="font-bold">{facility.capacity}</p>
-                </Card>
-                
-                <Card className="p-4">
-                  <div className="flex items-center gap-2 mb-1">
-                    <Map className="h-4 w-4 text-green-600" />
-                    <span className="text-sm font-medium text-gray-500">Areal</span>
-                  </div>
-                  <p className="font-bold">{facility.area}</p>
-                </Card>
-                
-                <Card className="p-4">
-                  <div className="flex items-center gap-2 mb-1">
-                    <Clock className="h-4 w-4 text-purple-600" />
-                    <span className="text-sm font-medium text-gray-500">Åpent</span>
-                  </div>
-                  <p className="font-bold text-sm">06:00-23:00</p>
-                </Card>
-                
-                <Card className="p-4">
-                  <div className="flex items-center gap-2 mb-1">
-                    <CheckCircle className="h-4 w-4 text-emerald-600" />
-                    <span className="text-sm font-medium text-gray-500">Soner</span>
-                  </div>
-                  <p className="font-bold text-emerald-600">{zones.length}</p>
-                </Card>
-              </div>
+              <FacilityQuickFacts
+                capacity={facility.capacity}
+                area={facility.area}
+                openingHours={facility.openingHours}
+                zoneCount={zones.length}
+              />
 
               {/* Description */}
-              <Card className="p-6">
-                <h2 className="text-xl font-medium mb-4">Om lokalet</h2>
-                <p className="text-gray-700 whitespace-pre-line">{facility.description}</p>
-                
-                <div className="mt-6 pt-6 border-t border-gray-100">
-                  <h3 className="font-medium text-lg mb-2">Egnet for</h3>
-                  <div className="flex flex-wrap gap-2">
-                    <Badge variant="outline" className="bg-gray-50">Idrett</Badge>
-                    <Badge variant="outline" className="bg-gray-50">Trening</Badge>
-                    <Badge variant="outline" className="bg-gray-50">Arrangementer</Badge>
-                    <Badge variant="outline" className="bg-gray-50">Grupper</Badge>
-                  </div>
-                </div>
-              </Card>
+              <FacilityDescription description={facility.description} />
 
               {/* Zone Availability */}
               <ZoneAvailabilityTable 
@@ -240,108 +185,20 @@ const FacilityDetail = () => {
               />
 
               {/* Map Section */}
-              <Card className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold">Lokasjon</h3>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setShowMap(!showMap)}
-                    className="flex items-center gap-2"
-                  >
-                    <Map className="h-4 w-4" />
-                    {showMap ? 'Skjul kart' : 'Vis kart'}
-                  </Button>
-                </div>
-                
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                    <MapPin className="h-5 w-5 text-blue-600" />
-                    <div>
-                      <p className="font-medium">{facility.address}</p>
-                      <p className="text-sm text-gray-600">Drammen Kommune</p>
-                    </div>
-                  </div>
-                  
-                  {showMap && (
-                    <div className="h-64 rounded-lg overflow-hidden border">
-                      <MapView facilityType="" location={facility.address} />
-                    </div>
-                  )}
-                </div>
-              </Card>
+              <FacilityLocation address={facility.address} />
             </div>
 
             {/* Right Sidebar - Booking */}
-            <div className="lg:sticky lg:top-24 lg:self-start">
-              <ScrollArea className="h-[calc(100vh-120px)]">
-                <div className="space-y-6 pr-2">
-                  {/* Action buttons */}
-                  <div className="flex items-center justify-end gap-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="flex items-center gap-2"
-                      onClick={() => setIsFavorited(!isFavorited)}
-                    >
-                      <Heart className={`h-4 w-4 ${isFavorited ? 'fill-red-500 text-red-500' : ''}`} />
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="sm"
-                      onClick={handleShare}
-                    >
-                      <Share2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-
-                  {/* Zone booking cards */}
-                  {zones.map((zone) => (
-                    <ZoneBookingCard
-                      key={zone.id}
-                      zone={zone}
-                      facilityName={facility.name}
-                      onBookClick={handleZoneBookClick}
-                    />
-                  ))}
-                  
-                  <AutoApprovalCard hasAutoApproval={facility.hasAutoApproval} />
-                  
-                  {/* Additional info cards */}
-                  <Card className="shadow-sm">
-                    <CardContent className="p-4">
-                      <div className="flex items-center gap-3">
-                        <div className="bg-amber-100 p-2 rounded-md">
-                          <Info className="h-5 w-5 text-amber-600" />
-                        </div>
-                        <div>
-                          <h3 className="font-medium">Avbestilling</h3>
-                          <p className="text-sm text-gray-600">
-                            Gratis avbestilling inntil 48 timer før
-                          </p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                  
-                  <Card className="shadow-sm">
-                    <CardContent className="p-4">
-                      <div className="flex items-center gap-3">
-                        <div className="bg-blue-100 p-2 rounded-md">
-                          <Clock className="h-5 w-5 text-blue-600" />
-                        </div>
-                        <div>
-                          <h3 className="font-medium">Åpningstider</h3>
-                          <p className="text-sm text-gray-600">
-                            {facility.openingHours}
-                          </p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              </ScrollArea>
-            </div>
+            <FacilitySidebar
+              zones={zones}
+              facilityName={facility.name}
+              hasAutoApproval={facility.hasAutoApproval}
+              openingHours={facility.openingHours}
+              onZoneBookClick={handleZoneBookClick}
+              onShare={handleShare}
+              isFavorited={isFavorited}
+              onToggleFavorite={() => setIsFavorited(!isFavorited)}
+            />
           </div>
         </div>
       </div>
