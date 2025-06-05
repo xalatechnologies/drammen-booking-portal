@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import FacilityDetail from "./pages/facilities/[id]";
+import BookingPage from "./pages/booking/[facilityId]";
 import BookingsPage from "./pages/bookings";
 import AdminDashboard from "./pages/admin/Dashboard";
 import LoginSelection from "./pages/LoginSelection";
@@ -25,6 +26,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/login" element={<LoginSelection />} />
           <Route path="/facilities/:id" element={<FacilityDetail />} />
+          <Route path="/booking/:facilityId" element={<BookingPage />} />
           <Route path="/bookings" element={<BookingsPage />} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/profile" element={<ProfilePage />} />

@@ -5,7 +5,6 @@ import { ArrowLeft, Home } from "lucide-react";
 import GlobalHeader from "@/components/GlobalHeader";
 import GlobalFooter from "@/components/GlobalFooter";
 import { FacilityImageGallery } from "@/components/facility/FacilityImageGallery";
-import { FacilityBookingDrawer } from "@/components/facility/FacilityBookingDrawer";
 import { FacilityHeader } from "@/components/facility/FacilityHeader";
 import { FacilityQuickFacts } from "@/components/facility/FacilityQuickFacts";
 import { FacilitySidebar } from "@/components/facility/FacilitySidebar";
@@ -16,8 +15,6 @@ import { Zone } from "@/components/booking/types";
 const FacilityDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [isBookingDrawerOpen, setIsBookingDrawerOpen] = useState(false);
-  const [selectedZoneId, setSelectedZoneId] = useState<string>("");
   const [isFavorited, setIsFavorited] = useState(false);
   
   // Enhanced zones with full zone management capabilities
@@ -188,29 +185,6 @@ const FacilityDetail = () => {
     ]
   };
 
-  // Mock existing bookings for conflict checking
-  const existingBookings = [
-    {
-      id: "booking-1",
-      zoneId: "zone-2",
-      date: new Date(),
-      timeSlot: "10:00-12:00",
-      bookedBy: "Drammen Volleyball Klubb"
-    },
-    {
-      id: "booking-2", 
-      zoneId: "whole-facility",
-      date: new Date(Date.now() + 86400000),
-      timeSlot: "14:00-16:00",
-      bookedBy: "Drammen Kommune - Arrangement"
-    }
-  ];
-
-  const handleZoneBookClick = (zoneId: string) => {
-    setSelectedZoneId(zoneId);
-    setIsBookingDrawerOpen(true);
-  };
-
   const handleShare = () => {
     if (navigator.share) {
       navigator.share({
@@ -226,37 +200,37 @@ const FacilityDetail = () => {
     <div className="min-h-screen bg-white flex flex-col">
       <GlobalHeader />
 
-      <div className="flex-grow">
-        {/* Breadcrumb Navigation */}
-        <div className="bg-gray-50 border-b border-gray-200">
-          <div className="container mx-auto px-4 py-3">
-            <nav className="flex items-center space-x-2 text-sm">
-              <Button 
-                variant="ghost" 
-                size="sm"
-                className="text-gray-600 hover:text-gray-900 p-0 h-auto font-normal"
-                onClick={() => navigate("/")}
-              >
-                <Home className="h-4 w-4 mr-1" />
-                Hjem
-              </Button>
-              <span className="text-gray-400">/</span>
-              <Button 
-                variant="ghost" 
-                size="sm"
-                className="text-gray-600 hover:text-gray-900 p-0 h-auto font-normal"
-                onClick={() => navigate("/")}
-              >
-                <ArrowLeft className="h-4 w-4 mr-1" />
-                Søkeresultater
-              </Button>
-              <span className="text-gray-400">/</span>
-              <span className="text-gray-900 font-medium">Lokalet</span>
-            </nav>
-          </div>
+      {/* Breadcrumb Navigation */}
+      <div className="bg-gray-50 border-b border-gray-200">
+        <div className="container mx-auto px-4 py-3">
+          <nav className="flex items-center space-x-2 text-sm">
+            <Button 
+              variant="ghost" 
+              size="sm"
+              className="text-gray-600 hover:text-gray-900 p-0 h-auto font-normal"
+              onClick={() => navigate("/")}
+            >
+              <Home className="h-4 w-4 mr-1" />
+              Hjem
+            </Button>
+            <span className="text-gray-400">/</span>
+            <Button 
+              variant="ghost" 
+              size="sm"
+              className="text-gray-600 hover:text-gray-900 p-0 h-auto font-normal"
+              onClick={() => navigate("/")}
+            >
+              <ArrowLeft className="h-4 w-4 mr-1" />
+              Søkeresultater
+            </Button>
+            <span className="text-gray-400">/</span>
+            <span className="text-gray-900 font-medium">Lokalet</span>
+          </nav>
         </div>
+      </div>
 
-        {/* Main Content */}
+      {/* Main Content */}
+      <div className="flex-grow">
         <div className="container mx-auto px-4 py-6 max-w-7xl">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Left Content - Details */}
@@ -298,9 +272,9 @@ const FacilityDetail = () => {
             <FacilitySidebar
               zones={zones}
               facilityName={facility.name}
+              facilityId={id}
               hasAutoApproval={facility.hasAutoApproval}
               openingHours={facility.openingHours}
-              onZoneBookClick={handleZoneBookClick}
             />
           </div>
 
@@ -312,13 +286,6 @@ const FacilityDetail = () => {
       </div>
 
       <GlobalFooter />
-      
-      <FacilityBookingDrawer 
-        open={isBookingDrawerOpen}
-        onOpenChange={setIsBookingDrawerOpen}
-        facility={facility}
-        selectedZoneId={selectedZoneId}
-      />
     </div>
   );
 };
