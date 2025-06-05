@@ -93,15 +93,6 @@ export function CollapsibleFormStepper({
           );
         })}
       </div>
-      
-      {/* Progress Bar */}
-      <div className="mt-4 w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-        <div 
-          className="h-2 bg-gradient-to-r from-navy-600 to-navy-700 rounded-full transition-all duration-500 ease-out" 
-          style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
-          aria-hidden="true"
-        />
-      </div>
     </div>
   );
 }

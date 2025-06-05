@@ -16,7 +16,7 @@ import { Label } from "@/components/ui/label";
 import { BookingFormValues, Zone } from "../types";
 import { EnhancedZoneSelector } from "../EnhancedZoneSelector";
 import DateRangePicker from "../../search/DateRangePicker";
-import { Slider } from "@/components/ui/slider";
+import TimeRangePicker from "../TimeRangePicker";
 
 export interface BookingDetailsStepProps {
   form: UseFormReturn<BookingFormValues>;
@@ -33,32 +33,6 @@ export interface BookingDetailsStepProps {
 
 export function BookingDetailsStep({ form, facility }: BookingDetailsStepProps) {
   const watchedValues = form.watch();
-  
-  // Convert time to hour number for slider
-  const timeToHour = (time: string) => {
-    if (!time) return 8;
-    const [hours] = time.split(':').map(Number);
-    return hours;
-  };
-
-  // Convert hour number back to time string
-  const hourToTime = (hour: number) => {
-    return `${hour.toString().padStart(2, '0')}:00`;
-  };
-
-  const handleTimeRangeChange = (values: number[]) => {
-    const [startHour, endHour] = values;
-    form.setValue('timeSlot', `${hourToTime(startHour)}-${hourToTime(endHour)}`);
-  };
-
-  const getCurrentTimeRange = () => {
-    const timeSlot = watchedValues.timeSlot || '08:00-10:00';
-    if (timeSlot.includes('-')) {
-      const [start, end] = timeSlot.split('-');
-      return [timeToHour(start), timeToHour(end)];
-    }
-    return [8, 10];
-  };
 
   return (
     <div className="space-y-6">
@@ -96,81 +70,82 @@ export function BookingDetailsStep({ form, facility }: BookingDetailsStepProps) 
       </div>
 
       {/* Date Range, Time Range, and Attendees on same line */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <FormField
-          control={form.control}
-          name="dateRange"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-base font-semibold text-gray-900 flex items-center gap-2">
-                <Calendar className="h-5 w-5 text-slate-600" />
-                Datoperiode
-              </FormLabel>
-              <FormControl>
-                <DateRangePicker
-                  dateRange={field.value}
-                  setDateRange={field.onChange}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="timeSlot"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-base font-semibold text-gray-900 flex items-center gap-2">
-                <Clock className="h-5 w-5 text-slate-600" />
-                Tidsperiode
-              </FormLabel>
-              <FormControl>
-                <div className="space-y-3">
-                  <Slider
-                    value={getCurrentTimeRange()}
-                    onValueChange={handleTimeRangeChange}
-                    min={6}
-                    max={23}
-                    step={1}
-                    className="w-full"
+      <div className="grid grid-cols-1 md:grid-cols-7 gap-6">
+        <div className="md:col-span-3">
+          <FormField
+            control={form.control}
+            name="date"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-base font-semibold text-gray-900 flex items-center gap-2">
+                  <Calendar className="h-5 w-5 text-slate-600" />
+                  Datoperiode
+                </FormLabel>
+                <FormControl>
+                  <DateRangePicker
+                    dateRange={field.value ? { from: field.value, to: watchedValues.endDate } : undefined}
+                    setDateRange={(range) => {
+                      field.onChange(range?.from);
+                      if (range?.to) {
+                        form.setValue('endDate', range.to);
+                      }
+                    }}
                   />
-                  <div className="flex justify-between text-sm text-gray-600">
-                    <span>{hourToTime(getCurrentTimeRange()[0])}</span>
-                    <span>{hourToTime(getCurrentTimeRange()[1])}</span>
-                  </div>
-                </div>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
-        <FormField
-          control={form.control}
-          name="attendees"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-base font-semibold text-gray-900 flex items-center gap-2">
-                <Users className="h-5 w-5 text-slate-600" />
-                Antall deltakere
-              </FormLabel>
-              <FormControl>
-                <Input
-                  type="number"
-                  min="1"
-                  max="1000"
-                  placeholder="1"
-                  className="h-11 border-gray-300 focus:border-slate-700 text-base"
-                  {...field}
-                  onChange={(e) => field.onChange(Number(e.target.value))}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="md:col-span-3">
+          <FormField
+            control={form.control}
+            name="timeSlot"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-base font-semibold text-gray-900 flex items-center gap-2">
+                  <Clock className="h-5 w-5 text-slate-600" />
+                  Tidsperiode
+                </FormLabel>
+                <FormControl>
+                  <TimeRangePicker
+                    timeRange={field.value}
+                    setTimeRange={field.onChange}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <div className="md:col-span-1">
+          <FormField
+            control={form.control}
+            name="attendees"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-base font-semibold text-gray-900 flex items-center gap-2">
+                  <Users className="h-5 w-5 text-slate-600" />
+                  Antall
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    min="1"
+                    max="1000"
+                    placeholder="1"
+                    className="h-11 border-gray-300 focus:border-slate-700 text-base"
+                    {...field}
+                    onChange={(e) => field.onChange(Number(e.target.value))}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
       </div>
 
       {/* Purpose */}
