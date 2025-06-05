@@ -140,7 +140,7 @@ const AdminSidebar = () => {
 
   return (
     <Sidebar className="border-r border-slate-200/60 bg-white shadow-xl shadow-slate-200/20" collapsible="icon">
-      <SidebarContent className="px-4 py-8 space-y-2 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
+      <SidebarContent className="px-4 pt-6 pb-8 space-y-2 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
         {renderMenuGroup(overviewItems, "OVERSIKT")}
         {renderMenuGroup(bookingItems, "BOOKING")}
         {renderMenuGroup(managementItems, "ADMINISTRASJON")}
