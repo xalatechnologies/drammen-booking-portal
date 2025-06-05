@@ -18,7 +18,7 @@ interface SimilarFacilitiesSliderProps {
 export function SimilarFacilitiesSlider({ currentFacilityId }: SimilarFacilitiesSliderProps) {
   const navigate = useNavigate();
 
-  // Mock data for similar facilities - using exact same facilities as homepage
+  // Mock data for similar facilities - using same comprehensive data as main page
   const allFacilities = [
     {
       id: 1,
@@ -29,7 +29,7 @@ export function SimilarFacilitiesSlider({ currentFacilityId }: SimilarFacilities
       nextAvailable: "I dag 14:00",
       capacity: 30,
       accessibility: ["wheelchair", "hearing-loop"],
-      area: "120 m²",
+      area: "Bragernes",
       suitableFor: ["Idrett", "Trening", "Arrangementer", "Grupper"],
       equipment: ["Projektor", "Lydanlegg", "Whiteboard", "Sportsutstyr"],
       openingHours: "Man-Søn: 06:00-23:00",
@@ -58,11 +58,11 @@ export function SimilarFacilitiesSlider({ currentFacilityId }: SimilarFacilities
       nextAvailable: "I dag 10:00",
       capacity: 12,
       accessibility: ["wheelchair", "hearing-loop"],
-      area: "25 m²",
-      suitableFor: ["Møter", "Presentasjoner", "Workshops"],
+      area: "Sentrum",
+      suitableFor: ["Møter", "Presentasjoner", "Workshops", "Seminarer"],
       equipment: ["Projektor", "Whiteboard", "Videokonferanse", "Flipchart"],
       openingHours: "Man-Fre: 07:00-22:00",
-      description: "Moderne møterom i rådhuset med full teknisk utrustning.",
+      description: "Moderne møterom i rådhuset med full teknisk utrustning for profesjonelle møter.",
       availableTimes: [
         {
           date: new Date(),
@@ -87,11 +87,11 @@ export function SimilarFacilitiesSlider({ currentFacilityId }: SimilarFacilities
       nextAvailable: "I dag 16:00",
       capacity: 50,
       accessibility: ["wheelchair", "hearing-loop", "visual-guidance"],
-      area: "200 m²",
+      area: "Strømsø",
       suitableFor: ["Idrett", "Ballsport", "Turneringer", "Arrangementer"],
       equipment: ["Projektor", "Lydanlegg", "Basketkurver", "Volleyballnett", "Håndballmål", "Tribuner"],
       openingHours: "Man-Søn: 06:00-23:00",
-      description: "Stor idrettshall med tribuner og profesjonelt utstyr.",
+      description: "Stor idrettshall med tribuner og profesjonelt utstyr for alle typer ballsport.",
       availableTimes: [
         {
           date: new Date(),
@@ -116,11 +116,11 @@ export function SimilarFacilitiesSlider({ currentFacilityId }: SimilarFacilities
       nextAvailable: "I morgen 09:00",
       capacity: 200,
       accessibility: ["wheelchair", "hearing-loop", "visual-guidance"],
-      area: "300 m²",
+      area: "Grønland",
       suitableFor: ["Konferanser", "Forestillinger", "Konserter", "Presentasjoner"],
-      equipment: ["Scène", "Profesjonelt lyd- og lyssystem", "Projektor", "Mikrofoner"],
+      equipment: ["Scene", "Profesjonelt lyd- og lyssystem", "Projektor", "Mikrofoner"],
       openingHours: "Man-Søn: 08:00-23:00",
-      description: "Stort auditorium perfekt for store arrangementer og forestillinger.",
+      description: "Stort auditorium perfekt for store arrangementer og forestillinger med moderne teknologi.",
       availableTimes: [
         {
           date: new Date(),
@@ -145,11 +145,11 @@ export function SimilarFacilitiesSlider({ currentFacilityId }: SimilarFacilities
       nextAvailable: "I dag 13:00",
       capacity: 16,
       accessibility: ["wheelchair"],
-      area: "80 m²",
+      area: "Sentrum",
       suitableFor: ["Workshops", "Håndverk", "Kurser", "Prosjekter"],
       equipment: ["Verktøy", "Arbeidsbenker", "Sikkerhetsutstyr", "Ventilasjon"],
       openingHours: "Man-Fre: 08:00-20:00",
-      description: "Fullt utstyrt verksted for praktiske aktiviteter og workshops.",
+      description: "Fullt utstyrt verksted for praktiske aktiviteter og workshops med moderne sikkerhetsutstyr.",
       availableTimes: [
         {
           date: new Date(),
@@ -173,11 +173,11 @@ export function SimilarFacilitiesSlider({ currentFacilityId }: SimilarFacilities
       nextAvailable: "I dag 15:00",
       capacity: 40,
       accessibility: ["wheelchair", "hearing-loop"],
-      area: "150 m²",
+      area: "Bragernes",
       suitableFor: ["Dans", "Yoga", "Aerobic", "Gruppetrening"],
       equipment: ["Speil", "Lydanlegg", "Yoga-matter", "Treningsutstyr"],
       openingHours: "Man-Søn: 06:00-22:00",
-      description: "Fleksibel aktivitetssal perfekt for treningsaktiviteter.",
+      description: "Fleksibel aktivitetssal perfekt for treningsaktiviteter med speil og moderne lydanlegg.",
       availableTimes: [
         {
           date: new Date(),
@@ -202,11 +202,11 @@ export function SimilarFacilitiesSlider({ currentFacilityId }: SimilarFacilities
       nextAvailable: "I dag 12:00",
       capacity: 8,
       accessibility: ["wheelchair", "hearing-loop"],
-      area: "30 m²",
+      area: "Spiralen",
       suitableFor: ["Studier", "Lesing", "Stille arbeid", "Småmøter"],
       equipment: ["Bord", "Stoler", "Whiteboard", "Stikkontakter"],
       openingHours: "Man-Søn: 08:00-22:00",
-      description: "Rolig studieplass i biblioteket, perfekt for konsentrert arbeid.",
+      description: "Rolig studieplass i biblioteket, perfekt for konsentrert arbeid i stille omgivelser.",
       availableTimes: [
         {
           date: new Date(),
@@ -231,11 +231,11 @@ export function SimilarFacilitiesSlider({ currentFacilityId }: SimilarFacilities
       nextAvailable: "I dag 08:00",
       capacity: 100,
       accessibility: ["wheelchair"],
-      area: "500 m²",
+      area: "Marienlyst",
       suitableFor: ["Utendørs arrangement", "Sport", "Festivaler", "Markeder"],
       equipment: ["Strøm tilgang", "Vannposter", "Søppelkasser"],
       openingHours: "Man-Søn: 06:00-22:00",
-      description: "Stort uteområde perfekt for arrangementer under åpen himmel.",
+      description: "Stort uteområde perfekt for arrangementer under åpen himmel med god infrastruktur.",
       availableTimes: [
         {
           date: new Date(),
