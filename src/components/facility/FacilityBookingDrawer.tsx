@@ -5,6 +5,7 @@ import { CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Drawer, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerClose } from "@/components/ui/drawer";
 import { BookingForm } from "@/components/booking/BookingForm";
+import { Zone } from "@/components/booking/types";
 
 interface FacilityBookingDrawerProps {
   open: boolean;
@@ -17,6 +18,7 @@ interface FacilityBookingDrawerProps {
       slots: { start: string; end: string; available: boolean }[];
     }[];
     capacity: number;
+    zones: Zone[];
   };
 }
 
@@ -90,6 +92,7 @@ export function FacilityBookingDrawer({ open, onOpenChange, facility }: Facility
               facilityId={facility.id || ""}
               facilityName={facility.name}
               maxCapacity={facility.capacity}
+              zones={facility.zones}
               availableTimeSlots={facility.availableTimes}
               onCompleteBooking={handleBookingComplete}
               termsAccepted={termsAccepted}

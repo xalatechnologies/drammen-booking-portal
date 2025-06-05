@@ -60,7 +60,7 @@ export interface Zone {
   area?: string;
 }
 
-// Type for the booking data passed to BookingConfirmStep
+// Type for the booking data passed to BookingConfirmStep - updated to include zoneId
 export interface BookingData {
   date: Date;
   bookingMode: "one-time" | "date-range" | "recurring";
