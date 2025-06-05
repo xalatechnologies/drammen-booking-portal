@@ -26,7 +26,6 @@ interface FacilityBookingDrawerProps {
 export function FacilityBookingDrawer({ open, onOpenChange, facility, selectedZoneId }: FacilityBookingDrawerProps) {
   const navigate = useNavigate();
   const [isBookingComplete, setIsBookingComplete] = useState(false);
-  const [termsAccepted, setTermsAccepted] = useState(false);
   
   const selectedZone = facility.zones.find(zone => zone.id === selectedZoneId);
   
@@ -40,7 +39,6 @@ export function FacilityBookingDrawer({ open, onOpenChange, facility, selectedZo
       // Reset the state after the drawer closes
       setTimeout(() => {
         setIsBookingComplete(false);
-        setTermsAccepted(false);
       }, 300);
     }, 3000);
   };
@@ -92,15 +90,11 @@ export function FacilityBookingDrawer({ open, onOpenChange, facility, selectedZo
             </div>
           ) : (
             <BookingForm 
-              facilityId={facility.id || ""}
-              facilityName={facility.name}
-              maxCapacity={facility.capacity}
-              zones={facility.zones}
-              availableTimeSlots={facility.availableTimes}
-              onCompleteBooking={handleBookingComplete}
-              termsAccepted={termsAccepted}
-              onTermsAcceptedChange={setTermsAccepted}
-              selectedZoneId={selectedZoneId}
+              facility={facility}
+              selectedZoneId={selectedZoneId || ""}
+              onClose={() => {
+                handleBookingComplete();
+              }}
             />
           )}
         </div>
