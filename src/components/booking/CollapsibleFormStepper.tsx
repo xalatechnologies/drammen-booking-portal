@@ -21,49 +21,45 @@ export function CollapsibleFormStepper({
 }: CollapsibleFormStepperProps) {
   return (
     <div className="w-full" role="progressbar" aria-label={ariaLabel} aria-valuemin={0} aria-valuemax={steps.length - 1} aria-valuenow={currentStep}>
-      <div className="space-y-2">
+      <div className="flex flex-col md:flex-row gap-1">
         {steps.map((step, index) => {
           const isCompleted = currentStep > index;
           const isCurrent = currentStep === index;
           const canNavigate = canNavigateToStep(index);
           
           return (
-            <div key={index} className="flex items-center">
+            <div key={index} className="flex-1">
               <Button
                 type="button"
                 variant="ghost"
                 onClick={() => canNavigate && onStepClick(index)}
                 disabled={!canNavigate}
                 className={cn(
-                  "flex items-center gap-3 p-3 w-full justify-start h-auto font-medium text-sm transition-all duration-200",
-                  isCurrent && "bg-slate-100 border border-slate-200 rounded-md",
-                  isCompleted && "text-green-700",
-                  !canNavigate && "cursor-not-allowed opacity-50"
+                  "w-full justify-start gap-3 px-4 py-3 h-auto font-medium text-sm transition-all duration-200 rounded-lg",
+                  isCurrent && "bg-navy-50 border-2 border-navy-200 text-navy-900 shadow-sm",
+                  isCompleted && "bg-green-50 border border-green-200 text-green-800 hover:bg-green-100",
+                  !isCurrent && !isCompleted && "bg-gray-50 border border-gray-200 text-gray-700 hover:bg-gray-100",
+                  !canNavigate && "cursor-not-allowed opacity-60"
                 )}
-                role="button"
+                role="tab"
+                aria-selected={isCurrent}
                 aria-label={`Step ${index + 1}: ${step} ${isCompleted ? '(completed)' : isCurrent ? '(current)' : '(upcoming)'}`}
               >
                 {/* Step Indicator */}
                 <div 
                   className={cn(
-                    "flex items-center justify-center w-6 h-6 rounded-full border-2 flex-shrink-0 transition-all duration-200",
+                    "flex items-center justify-center w-7 h-7 rounded-full border-2 flex-shrink-0 transition-all duration-200 font-bold text-sm",
                     isCompleted 
-                      ? "bg-green-600 border-green-600" 
+                      ? "bg-green-600 border-green-600 text-white" 
                       : isCurrent 
-                        ? "bg-slate-700 border-slate-700"
-                        : "bg-white border-gray-300"
+                        ? "bg-navy-700 border-navy-700 text-white"
+                        : "bg-white border-gray-300 text-gray-500"
                   )}
                 >
                   {isCompleted ? (
-                    <CheckCircle className="h-4 w-4 text-white" aria-hidden="true" />
+                    <CheckCircle className="h-4 w-4" aria-hidden="true" />
                   ) : (
-                    <span 
-                      className={cn(
-                        "text-xs font-bold",
-                        isCurrent ? "text-white" : "text-gray-500"
-                      )}
-                      aria-hidden="true"
-                    >
+                    <span aria-hidden="true">
                       {index + 1}
                     </span>
                   )}
@@ -72,24 +68,26 @@ export function CollapsibleFormStepper({
                 {/* Step Title */}
                 <span 
                   className={cn(
-                    "flex-1 text-left font-medium",
+                    "flex-1 text-left font-semibold text-sm leading-tight",
                     isCurrent 
-                      ? "text-slate-900" 
+                      ? "text-navy-900" 
                       : isCompleted 
-                        ? "text-green-700"
-                        : "text-gray-600"
+                        ? "text-green-800"
+                        : "text-gray-700"
                   )}
                 >
                   {step}
                 </span>
                 
-                {/* Expand/Collapse Indicator */}
-                {isCurrent && (
-                  <ChevronDown className="h-4 w-4 text-slate-600" aria-hidden="true" />
-                )}
-                {!isCurrent && (
-                  <ChevronRight className="h-4 w-4 text-gray-400" aria-hidden="true" />
-                )}
+                {/* Status Indicator - Only show on mobile or when active */}
+                <div className="md:hidden">
+                  {isCurrent && (
+                    <ChevronDown className="h-4 w-4 text-navy-600" aria-hidden="true" />
+                  )}
+                  {!isCurrent && (
+                    <ChevronRight className="h-4 w-4 text-gray-400" aria-hidden="true" />
+                  )}
+                </div>
               </Button>
             </div>
           );
@@ -97,9 +95,9 @@ export function CollapsibleFormStepper({
       </div>
       
       {/* Progress Bar */}
-      <div className="mt-4 w-full h-1 bg-gray-200 rounded-full overflow-hidden">
+      <div className="mt-4 w-full h-2 bg-gray-200 rounded-full overflow-hidden">
         <div 
-          className="h-1 bg-gradient-to-r from-slate-600 to-slate-700 rounded-full transition-all duration-300 ease-out" 
+          className="h-2 bg-gradient-to-r from-navy-600 to-navy-700 rounded-full transition-all duration-500 ease-out" 
           style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
           aria-hidden="true"
         />
