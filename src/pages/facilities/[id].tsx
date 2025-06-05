@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -309,54 +308,7 @@ const FacilityDetail = () => {
               </div>
             </div>
 
-            {/* Location with Map - Enhanced with info from tabs */}
-            <Card className="p-6">
-              <div className="mb-4">
-                <h3 className="text-lg font-semibold">Lokasjon</h3>
-              </div>
-              
-              <div className="space-y-4">
-                <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                  <MapPin className="h-5 w-5 text-blue-600" />
-                  <div>
-                    <p className="font-medium">Iver Holters gate 48, 3041 Drammen</p>
-                    <p className="text-sm text-gray-600">Drammen Kommune</p>
-                  </div>
-                </div>
-
-                {/* Added transport info from tabs */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="p-3 bg-gray-50 rounded-lg">
-                    <p className="font-medium text-blue-600 mb-1">Kollektivtransport</p>
-                    <div className="space-y-2 text-sm">
-                      <div>
-                        <p className="font-medium">Buss</p>
-                        <p className="text-gray-700">Linje 102, 104 - Stopp: Brandengen skole (50m unna)</p>
-                      </div>
-                      <div>
-                        <p className="font-medium">Tog</p>
-                        <p className="text-gray-700">Drammen stasjon - 15 min med buss</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="p-3 bg-gray-50 rounded-lg">
-                    <p className="font-medium text-green-600 mb-1">Parkering</p>
-                    <div className="space-y-1 text-sm">
-                      <p className="text-gray-700">Gratis parkering tilgjengelig</p>
-                      <p className="text-gray-700">20 plasser på skolens område</p>
-                      <p className="text-gray-700">Handicapparking: 2 plasser</p>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="h-64 rounded-lg overflow-hidden border">
-                  <FacilityLocation address="Iver Holters gate 48, 3041 Drammen" />
-                </div>
-              </div>
-            </Card>
-
-            {/* Tabbed Content - Moved up and restructured */}
+            {/* Tabbed Content */}
             <FacilityInfoTabs
               description={facility.description}
               capacity={facility.capacity}
@@ -393,6 +345,52 @@ const FacilityDetail = () => {
                 </Card>
               }
             />
+
+            {/* Location with Map - Moved under tabs */}
+            <Card className="p-6">
+              <div className="mb-4">
+                <h3 className="text-lg font-semibold">Lokasjon</h3>
+              </div>
+              
+              <div className="space-y-4">
+                <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                  <MapPin className="h-5 w-5 text-blue-600" />
+                  <div>
+                    <p className="font-medium">Knoffs gate 8, Drammen</p>
+                    <p className="text-sm text-gray-600">Drammen Kommune</p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="p-3 bg-gray-50 rounded-lg">
+                    <p className="font-medium text-blue-600 mb-1">Kollektivtransport</p>
+                    <div className="space-y-2 text-sm">
+                      <div>
+                        <p className="font-medium">Buss</p>
+                        <p className="text-gray-700">Linje 102, 104 - Stopp: Brandengen skole (50m unna)</p>
+                      </div>
+                      <div>
+                        <p className="font-medium">Tog</p>
+                        <p className="text-gray-700">Drammen stasjon - 15 min med buss</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="p-3 bg-gray-50 rounded-lg">
+                    <p className="font-medium text-green-600 mb-1">Parkering</p>
+                    <div className="space-y-1 text-sm">
+                      <p className="text-gray-700">Gratis parkering tilgjengelig</p>
+                      <p className="text-gray-700">20 plasser på skolens område</p>
+                      <p className="text-gray-700">Handicapparking: 2 plasser</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="h-64 rounded-lg overflow-hidden border">
+                  <FacilityLocation address="Knoffs gate 8, Drammen" />
+                </div>
+              </div>
+            </Card>
           </div>
 
           {/* Similar Facilities Section */}
