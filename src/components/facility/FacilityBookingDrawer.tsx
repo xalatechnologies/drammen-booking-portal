@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Drawer, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerClose } from "@/components/ui/drawer";
-import { BookingForm } from "@/components/booking/BookingForm";
+import { EnhancedBookingForm } from "@/components/booking/EnhancedBookingForm";
 import { Zone } from "@/components/booking/types";
 
 interface FacilityBookingDrawerProps {
@@ -29,7 +29,7 @@ export function FacilityBookingDrawer({ open, onOpenChange, facility, selectedZo
   
   const selectedZone = facility.zones.find(zone => zone.id === selectedZoneId);
   
-  const handleBookingComplete = () => {
+  const handleBookingComplete = (reference: string) => {
     setIsBookingComplete(true);
     
     // Reset booking state after viewing the success state
@@ -89,12 +89,9 @@ export function FacilityBookingDrawer({ open, onOpenChange, facility, selectedZo
               </div>
             </div>
           ) : (
-            <BookingForm 
+            <EnhancedBookingForm 
               facility={facility}
-              selectedZoneId={selectedZoneId || ""}
-              onClose={() => {
-                handleBookingComplete();
-              }}
+              onBookingComplete={handleBookingComplete}
             />
           )}
         </div>
