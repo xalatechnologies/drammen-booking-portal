@@ -1,217 +1,273 @@
+
 import React, { useState } from "react";
 import { format } from "date-fns";
-import { CheckCircle, Users, Clock, Info } from "lucide-react";
+import { nb } from "date-fns/locale";
+import { CheckCircle, Users, Clock, Info, MapPin, Wifi, Car, Coffee, Shield, Heart } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ZoneAvailabilityTable } from "@/components/facility/ZoneAvailabilityTable";
+import MapView from "@/components/MapView";
 import { isDateUnavailable, isNorwegianHoliday } from "@/utils/holidaysAndAvailability";
+import { Zone } from "@/components/booking/types";
 
 interface FacilityInfoTabsProps {
   description: string;
   capacity: number;
   equipment: string[];
+  zones: Zone[];
+  amenities: string[];
+  address: string;
 }
 
-export function FacilityInfoTabs({ description, capacity, equipment }: FacilityInfoTabsProps) {
-  const [calendarView, setCalendarView] = useState<"day" | "week" | "month">("week");
+export function FacilityInfoTabs({ description, capacity, equipment, zones, amenities, address }: FacilityInfoTabsProps) {
+  const [showMap, setShowMap] = useState(false);
   const [date] = useState<Date>(new Date());
 
+  const getAmenityIcon = (amenity: string) => {
+    switch (amenity.toLowerCase()) {
+      case 'wi-fi':
+      case 'wifi':
+        return <Wifi className="h-4 w-4" />;
+      case 'parkering':
+        return <Car className="h-4 w-4" />;
+      case 'kafeteria':
+        return <Coffee className="h-4 w-4" />;
+      case 'sikkerhetskameraer':
+      case 'brannsikkerhet':
+      case 'førstehjelpsutstyr':
+        return <Shield className="h-4 w-4" />;
+      default:
+        return <CheckCircle className="h-4 w-4" />;
+    }
+  };
+
   return (
-    <Tabs defaultValue="description" className="bg-white rounded-lg shadow-sm">
-      <TabsList className="w-full border-b p-0 h-auto">
-        <TabsTrigger value="description" className="flex-1 py-3 rounded-none rounded-tl-lg data-[state=active]:border-b-2 data-[state=active]:border-blue-600 data-[state=active]:shadow-none">
-          Beskrivelse
+    <Tabs defaultValue="description" className="bg-white rounded-lg shadow-sm border">
+      <TabsList className="w-full border-b p-0 h-auto bg-transparent">
+        <TabsTrigger value="description" className="flex-1 py-3 rounded-none data-[state=active]:border-b-2 data-[state=active]:border-blue-600 data-[state=active]:shadow-none data-[state=active]:bg-transparent">
+          Om lokalet
         </TabsTrigger>
-        <TabsTrigger value="features" className="flex-1 py-3 rounded-none data-[state=active]:border-b-2 data-[state=active]:border-blue-600 data-[state=active]:shadow-none">
+        <TabsTrigger value="features" className="flex-1 py-3 rounded-none data-[state=active]:border-b-2 data-[state=active]:border-blue-600 data-[state=active]:shadow-none data-[state=active]:bg-transparent">
           Fasiliteter
         </TabsTrigger>
-        <TabsTrigger value="calendar" className="flex-1 py-3 rounded-none rounded-tr-lg data-[state=active]:border-b-2 data-[state=active]:border-blue-600 data-[state=active]:shadow-none">
-          Kalender
+        <TabsTrigger value="availability" className="flex-1 py-3 rounded-none data-[state=active]:border-b-2 data-[state=active]:border-blue-600 data-[state=active]:shadow-none data-[state=active]:bg-transparent">
+          Tilgjengelighet
+        </TabsTrigger>
+        <TabsTrigger value="location" className="flex-1 py-3 rounded-none data-[state=active]:border-b-2 data-[state=active]:border-blue-600 data-[state=active]:shadow-none data-[state=active]:bg-transparent">
+          Lokasjon
         </TabsTrigger>
       </TabsList>
       
-      <TabsContent value="description" className="p-6">
-        <h2 className="text-xl font-medium mb-4">Om lokalet</h2>
-        <p className="text-gray-700 whitespace-pre-line">{description}</p>
+      <TabsContent value="description" className="p-6 space-y-6">
+        <div>
+          <h2 className="text-xl font-medium mb-4">Om lokalet</h2>
+          <p className="text-gray-700 leading-relaxed">{description}</p>
+        </div>
         
-        <div className="mt-6 pt-6 border-t border-gray-100">
-          <h3 className="font-medium text-lg mb-2">Egnet for</h3>
-          <div className="flex flex-wrap gap-2">
-            <Badge variant="outline" className="bg-gray-50">Idrett</Badge>
-            <Badge variant="outline" className="bg-gray-50">Trening</Badge>
-            <Badge variant="outline" className="bg-gray-50">Arrangementer</Badge>
-            <Badge variant="outline" className="bg-gray-50">Grupper</Badge>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Card className="p-4">
+            <h3 className="font-medium text-lg mb-3 flex items-center gap-2">
+              <Heart className="h-5 w-5 text-red-500" />
+              Egnet for
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">Idrett</Badge>
+              <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">Trening</Badge>
+              <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">Arrangementer</Badge>
+              <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200">Grupper</Badge>
+              <Badge variant="outline" className="bg-pink-50 text-pink-700 border-pink-200">Dans</Badge>
+              <Badge variant="outline" className="bg-teal-50 text-teal-700 border-teal-200">Ballsport</Badge>
+              <Badge variant="outline" className="bg-indigo-50 text-indigo-700 border-indigo-200">Presentasjoner</Badge>
+            </div>
+          </Card>
+
+          <Card className="p-4">
+            <h3 className="font-medium text-lg mb-3 flex items-center gap-2">
+              <Clock className="h-5 w-5 text-blue-500" />
+              Praktisk informasjon
+            </h3>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-gray-600">Åpningstider:</span>
+                <span className="font-medium">06:00 - 23:00</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Kapasitet:</span>
+                <span className="font-medium">{capacity} personer</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Gulvtype:</span>
+                <span className="font-medium">Parkett</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Ventilasjon:</span>
+                <span className="font-medium">Moderne system</span>
+              </div>
+            </div>
+          </Card>
+        </div>
+
+        <div>
+          <h3 className="font-medium text-lg mb-3">Regler og retningslinjer</h3>
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <ul className="space-y-2 text-sm text-gray-700">
+              <li>• Innendørssko påkrevd i gymsalen</li>
+              <li>• Maks antall deltakere må respekteres</li>
+              <li>• Røyking og alkohol er forbudt</li>
+              <li>• Lokalet må ryddes etter bruk</li>
+              <li>• Skader på utstyr må rapporteres umiddelbart</li>
+              <li>• Musikk må holdes på akseptabelt nivå</li>
+            </ul>
           </div>
         </div>
       </TabsContent>
       
-      <TabsContent value="features" className="p-6">
-        <h2 className="text-xl font-medium mb-4">Fasiliteter og utstyr</h2>
-        
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4">
-          <div className="flex items-start space-x-2">
-            <Users className="h-5 w-5 text-blue-600" />
-            <div>
-              <p className="font-medium">Kapasitet</p>
-              <p className="text-gray-600">{capacity} personer</p>
-            </div>
-          </div>
+      <TabsContent value="features" className="p-6 space-y-6">
+        <div>
+          <h2 className="text-xl font-medium mb-4">Fasiliteter og utstyr</h2>
           
-          <div className="flex items-start space-x-2">
-            <Clock className="h-5 w-5 text-blue-600" />
-            <div>
-              <p className="font-medium">Åpningstider</p>
-              <p className="text-gray-600">08:00 - 22:00 alle dager</p>
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <Card className="p-4">
+              <h3 className="font-medium text-lg mb-3 flex items-center gap-2">
+                <Users className="h-5 w-5 text-blue-600" />
+                Kapasitet og størrelse
+              </h3>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Maks personer:</span>
+                  <span className="font-medium">{capacity}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Areal:</span>
+                  <span className="font-medium">120 m²</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Takhøyde:</span>
+                  <span className="font-medium">6 meter</span>
+                </div>
+              </div>
+            </Card>
+            
+            <Card className="p-4">
+              <h3 className="font-medium text-lg mb-3 flex items-center gap-2">
+                <Clock className="h-5 w-5 text-green-600" />
+                Åpningstider
+              </h3>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Mandag - Fredag:</span>
+                  <span className="font-medium">06:00 - 23:00</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Lørdag - Søndag:</span>
+                  <span className="font-medium">08:00 - 22:00</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Helligdager:</span>
+                  <span className="font-medium">Stengt</span>
+                </div>
+              </div>
+            </Card>
           </div>
         </div>
         
-        <h3 className="font-medium text-lg mt-6 mb-3">Tilgjengelig utstyr</h3>
-        <ul className="grid grid-cols-1 sm:grid-cols-2 gap-y-2 text-gray-700">
-          {equipment.map((item, i) => (
-            <li key={i} className="flex items-center">
-              <CheckCircle className="h-4 w-4 text-green-600 mr-2" />
-              {item}
-            </li>
-          ))}
-        </ul>
+        <div>
+          <h3 className="font-medium text-lg mb-3">Tilgjengelig utstyr</h3>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            {equipment.map((item, i) => (
+              <div key={i} className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
+                <CheckCircle className="h-4 w-4 text-green-600 flex-shrink-0" />
+                <span className="text-sm">{item}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <h3 className="font-medium text-lg mb-3">Fasiliteter og tjenester</h3>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            {amenities.map((amenity, i) => (
+              <div key={i} className="flex items-center gap-2 p-3 bg-blue-50 rounded-lg">
+                {getAmenityIcon(amenity)}
+                <span className="text-sm text-blue-900">{amenity}</span>
+              </div>
+            ))}
+          </div>
+        </div>
       </TabsContent>
       
-      <TabsContent value="calendar" className="p-6">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-medium">Tilgjengelighet</h2>
-          <div className="flex rounded-md overflow-hidden border">
-            <button 
-              className={`px-4 py-2 text-sm ${calendarView === "day" ? "bg-blue-600 text-white" : "bg-white"}`} 
-              onClick={() => setCalendarView("day")}
-            >
-              Dag
-            </button>
-            <button 
-              className={`px-4 py-2 text-sm ${calendarView === "week" ? "bg-blue-600 text-white" : "bg-white"}`} 
-              onClick={() => setCalendarView("week")}
-            >
-              Uke
-            </button>
-            <button 
-              className={`px-4 py-2 text-sm ${calendarView === "month" ? "bg-blue-600 text-white" : "bg-white"}`} 
-              onClick={() => setCalendarView("month")}
-            >
-              Måned
-            </button>
+      <TabsContent value="availability" className="p-6">
+        <div>
+          <h2 className="text-xl font-medium mb-4">Tilgjengelighet per sone</h2>
+          <ZoneAvailabilityTable 
+            zones={zones}
+            startDate={date}
+            timeSlots={["08:00", "10:00", "12:00", "14:00", "16:00", "18:00", "20:00"]}
+          />
+        </div>
+      </TabsContent>
+
+      <TabsContent value="location" className="p-6 space-y-6">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-medium">Lokasjon og tilkomst</h2>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowMap(!showMap)}
+            className="flex items-center gap-2"
+          >
+            <MapPin className="h-4 w-4" />
+            {showMap ? 'Skjul kart' : 'Vis kart'}
+          </Button>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Card className="p-4">
+            <h3 className="font-medium mb-3 flex items-center gap-2">
+              <MapPin className="h-5 w-5 text-blue-600" />
+              Adresse
+            </h3>
+            <div className="space-y-2">
+              <p className="font-medium">{address}</p>
+              <p className="text-sm text-gray-600">Drammen Kommune</p>
+              <p className="text-sm text-gray-600">Buskerud, Norge</p>
+            </div>
+          </Card>
+
+          <Card className="p-4">
+            <h3 className="font-medium mb-3 flex items-center gap-2">
+              <Car className="h-5 w-5 text-green-600" />
+              Parkering
+            </h3>
+            <div className="space-y-2 text-sm">
+              <p className="text-gray-700">Gratis parkering tilgjengelig</p>
+              <p className="text-gray-700">20 plasser på skolens område</p>
+              <p className="text-gray-700">Handicapparking: 2 plasser</p>
+            </div>
+          </Card>
+        </div>
+
+        {showMap && (
+          <div className="h-64 rounded-lg overflow-hidden border">
+            <MapView facilityType="" location={address} />
           </div>
-        </div>
-        
-        {/* Availability Legend */}
-        <div className="mb-4 p-3 bg-gray-50 rounded-lg">
-          <h3 className="text-sm font-medium mb-2">Forklaring:</h3>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-            <div className="flex items-center">
-              <div className="w-3 h-3 bg-green-50 border border-green-200 rounded mr-2"></div>
-              <span>Ledig</span>
+        )}
+
+        <Card className="p-4">
+          <h3 className="font-medium mb-3">Kollektivtransport</h3>
+          <div className="space-y-3 text-sm">
+            <div>
+              <p className="font-medium text-blue-600">Buss</p>
+              <p className="text-gray-700">Linje 102, 104 - Stopp: Brandengen skole (50m unna)</p>
             </div>
-            <div className="flex items-center">
-              <div className="w-3 h-3 bg-red-50 border border-red-200 rounded mr-2"></div>
-              <span>Helligdag</span>
-            </div>
-            <div className="flex items-center">
-              <div className="w-3 h-3 bg-orange-50 border border-orange-200 rounded mr-2"></div>
-              <span>Helg</span>
-            </div>
-            <div className="flex items-center">
-              <div className="w-3 h-3 bg-yellow-50 border border-yellow-200 rounded mr-2"></div>
-              <span>Vedlikehold</span>
+            <div>
+              <p className="font-medium text-green-600">Tog</p>
+              <p className="text-gray-700">Drammen stasjon - 15 min med buss</p>
             </div>
           </div>
-        </div>
-        
-        <div className="border rounded-lg overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr>
-                <th className="p-2 border-b border-r text-left">Tid</th>
-                {[0, 1, 2, 3, 4].map(day => {
-                  const currentDate = new Date(date.getTime() + day * 24 * 60 * 60 * 1000);
-                  const unavailableCheck = isDateUnavailable(currentDate);
-                  const holidayCheck = isNorwegianHoliday(currentDate);
-                  
-                  return (
-                    <th key={day} className="p-2 border-b border-r text-center">
-                      <div>
-                        {format(currentDate, "EEE d.MMM")}
-                        {holidayCheck.isHoliday && (
-                          <div className="text-xs text-red-600 mt-1">{holidayCheck.name}</div>
-                        )}
-                        {unavailableCheck.isUnavailable && !holidayCheck.isHoliday && (
-                          <div className="text-xs text-orange-600 mt-1">{unavailableCheck.details}</div>
-                        )}
-                      </div>
-                    </th>
-                  );
-                })}
-              </tr>
-            </thead>
-            <tbody>
-              {["08:00", "10:00", "12:00", "14:00", "16:00", "18:00", "20:00"].map((time, i) => (
-                <tr key={i} className={i % 2 === 0 ? "bg-gray-50" : ""}>
-                  <td className="p-2 border-b border-r">{time}</td>
-                  {[0, 1, 2, 3, 4].map(day => {
-                    const currentDate = new Date(date.getTime() + day * 24 * 60 * 60 * 1000);
-                    const unavailableCheck = isDateUnavailable(currentDate);
-                    
-                    // If the day is unavailable, show the reason
-                    if (unavailableCheck.isUnavailable) {
-                      const bgColor = {
-                        'past': 'bg-gray-100',
-                        'weekend': 'bg-orange-100',
-                        'holiday': 'bg-red-100',
-                        'maintenance': 'bg-yellow-100'
-                      }[unavailableCheck.reason!];
-                      
-                      const textColor = {
-                        'past': 'text-gray-500',
-                        'weekend': 'text-orange-600',
-                        'holiday': 'text-red-600',
-                        'maintenance': 'text-yellow-600'
-                      }[unavailableCheck.reason!];
-                      
-                      return (
-                        <td 
-                          key={day} 
-                          className={`p-2 border-b border-r text-center ${bgColor}`}
-                          title={unavailableCheck.details}
-                        >
-                          <span className={textColor}>
-                            {unavailableCheck.reason === 'past' ? 'Fortid' : 
-                             unavailableCheck.reason === 'weekend' ? 'Helg' :
-                             unavailableCheck.reason === 'holiday' ? 'Helligdag' : 'Vedlikehold'}
-                          </span>
-                        </td>
-                      );
-                    }
-                    
-                    // Mock availability - in a real app this would be based on actual bookings
-                    const isAvailable = Math.random() > 0.3;
-                    return (
-                      <td 
-                        key={day} 
-                        className={`p-2 border-b border-r text-center ${isAvailable ? "bg-green-100" : "bg-red-100"}`}
-                      >
-                        <span className={isAvailable ? "text-green-600" : "text-red-600"}>
-                          {isAvailable ? "Ledig" : "Opptatt"}
-                        </span>
-                      </td>
-                    );
-                  })}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        
-        <p className="text-sm text-gray-500 mt-4">
-          <Info className="h-4 w-4 inline-block mr-1" />
-          Fargemarkering viser når lokalet er ledig (grønt), opptatt (rødt), eller ikke tilgjengelig på grunn av helligdager, helger eller vedlikehold.
-        </p>
+        </Card>
       </TabsContent>
     </Tabs>
   );

@@ -7,12 +7,11 @@ import GlobalHeader from "@/components/GlobalHeader";
 import GlobalFooter from "@/components/GlobalFooter";
 import { FacilityImageGallery } from "@/components/facility/FacilityImageGallery";
 import { FacilityBookingDrawer } from "@/components/facility/FacilityBookingDrawer";
-import { ZoneAvailabilityTable } from "@/components/facility/ZoneAvailabilityTable";
 import { FacilityHeader } from "@/components/facility/FacilityHeader";
 import { FacilityQuickFacts } from "@/components/facility/FacilityQuickFacts";
-import { FacilityDescription } from "@/components/facility/FacilityDescription";
-import { FacilityLocation } from "@/components/facility/FacilityLocation";
 import { FacilitySidebar } from "@/components/facility/FacilitySidebar";
+import { FacilityInfoTabs } from "@/components/facility/FacilityInfoTabs";
+import { SimilarFacilitiesSlider } from "@/components/facility/SimilarFacilitiesSlider";
 import { Zone } from "@/components/booking/types";
 
 const FacilityDetail = () => {
@@ -20,7 +19,6 @@ const FacilityDetail = () => {
   const navigate = useNavigate();
   const [isBookingDrawerOpen, setIsBookingDrawerOpen] = useState(false);
   const [selectedZoneId, setSelectedZoneId] = useState<string>("");
-  const [date] = useState<Date>(new Date());
   const [isFavorited, setIsFavorited] = useState(false);
   
   // Mock facility data with zones - in a real app this would be fetched based on id
@@ -59,8 +57,8 @@ const FacilityDetail = () => {
     name: `Gymsal ${id} - Brandengen skole`,
     address: "Knoffs gate 8, Drammen",
     capacity: 30,
-    equipment: ["Projektor", "Lydanlegg", "Whiteboard", "Wi-Fi"],
-    description: "Dette er en moderne gymsal på Brandengen skole, perfekt for idrettsaktiviteter, trening og mindre arrangementer. Salen er utstyrt med standard sportsutstyr og har god ventilasjon.",
+    equipment: ["Projektor", "Lydanlegg", "Whiteboard", "Wi-Fi", "Sportsutstyr", "Basketkurver", "Volleyballnett", "Håndballmål"],
+    description: "Dette er en moderne gymsal på Brandengen skole, perfekt for idrettsaktiviteter, trening og mindre arrangementer. Salen er utstyrt med standard sportsutstyr og har god ventilasjon. Lokalet har nylig blitt renovert med moderne lyd- og lyssystemer. Gymsalen har parkett gulv av høy kvalitet som er egnet for alle typer ballsport og dans. Det er også installert moderne ventilasjonsanlegg som sikrer god luftkvalitet under intensive aktiviteter.",
     images: [
       "/lovable-uploads/08e8f8d5-4126-4805-a56e-e4337f97dbd0.png",
       "https://images.unsplash.com/photo-1580237072617-771c3ecc4a24?auto=format&fit=crop&w=1200&q=80",
@@ -68,13 +66,13 @@ const FacilityDetail = () => {
     ],
     rating: 4.8,
     reviewCount: 124,
-    pricePerHour: 450, // Base price for whole facility
+    pricePerHour: 450,
     area: "120 m²",
     accessibility: ["wheelchair", "hearing-loop"],
-    amenities: ["Parkering", "Wi-Fi", "Garderober", "Dusjer", "Kafeteria"],
+    amenities: ["Parkering", "Wi-Fi", "Garderober", "Dusjer", "Kafeteria", "Førstehjelpsutstyr", "Brannsikkerhet", "Sikkerhetskameraer"],
     openingHours: "Man-Søn: 06:00-23:00",
     zones: zones,
-    hasAutoApproval: true, // Mock data - this would come from the backend
+    hasAutoApproval: true,
     availableTimes: [
       {
         date: new Date(),
@@ -89,7 +87,7 @@ const FacilityDetail = () => {
         ]
       },
       {
-        date: new Date(Date.now() + 86400000), // Tomorrow
+        date: new Date(Date.now() + 86400000),
         slots: [
           { start: "08:00", end: "10:00", available: true },
           { start: "10:00", end: "12:00", available: true },
@@ -101,7 +99,7 @@ const FacilityDetail = () => {
         ]
       },
       {
-        date: new Date(Date.now() + 172800000), // Day after tomorrow
+        date: new Date(Date.now() + 172800000),
         slots: [
           { start: "08:00", end: "10:00", available: true },
           { start: "10:00", end: "12:00", available: true },
@@ -136,30 +134,32 @@ const FacilityDetail = () => {
       <GlobalHeader />
 
       <div className="flex-grow">
-        {/* Navigation Header */}
+        {/* Breadcrumb Navigation */}
         <div className="bg-gray-50 border-b border-gray-200">
-          <div className="container mx-auto px-4 py-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <Button 
-                  variant="ghost" 
-                  className="flex items-center gap-2 text-gray-600 hover:text-gray-900 hover:bg-white"
-                  onClick={() => navigate("/")}
-                >
-                  <Home className="h-4 w-4" />
-                  Hjem
-                </Button>
-                <span className="text-gray-400">/</span>
-                <Button 
-                  variant="ghost" 
-                  className="flex items-center gap-2 text-gray-600 hover:text-gray-900 hover:bg-white"
-                  onClick={() => navigate("/")}
-                >
-                  <ArrowLeft className="h-4 w-4" />
-                  Søkeresultater
-                </Button>
-              </div>
-            </div>
+          <div className="container mx-auto px-4 py-3">
+            <nav className="flex items-center space-x-2 text-sm">
+              <Button 
+                variant="ghost" 
+                size="sm"
+                className="text-gray-600 hover:text-gray-900 p-0 h-auto font-normal"
+                onClick={() => navigate("/")}
+              >
+                <Home className="h-4 w-4 mr-1" />
+                Hjem
+              </Button>
+              <span className="text-gray-400">/</span>
+              <Button 
+                variant="ghost" 
+                size="sm"
+                className="text-gray-600 hover:text-gray-900 p-0 h-auto font-normal"
+                onClick={() => navigate("/")}
+              >
+                <ArrowLeft className="h-4 w-4 mr-1" />
+                Søkeresultater
+              </Button>
+              <span className="text-gray-400">/</span>
+              <span className="text-gray-900 font-medium">Lokalet</span>
+            </nav>
           </div>
         </div>
 
@@ -171,7 +171,7 @@ const FacilityDetail = () => {
               {/* Image Gallery */}
               <FacilityImageGallery images={facility.images} />
 
-              {/* Header with like/share buttons */}
+              {/* Header */}
               <FacilityHeader
                 name={facility.name}
                 address={facility.address}
@@ -190,18 +190,15 @@ const FacilityDetail = () => {
                 zoneCount={zones.length}
               />
 
-              {/* Description */}
-              <FacilityDescription description={facility.description} />
-
-              {/* Zone Availability */}
-              <ZoneAvailabilityTable 
+              {/* Tabbed Content */}
+              <FacilityInfoTabs
+                description={facility.description}
+                capacity={facility.capacity}
+                equipment={facility.equipment}
                 zones={zones}
-                startDate={date}
-                timeSlots={["08:00", "10:00", "12:00", "14:00", "16:00", "18:00", "20:00"]}
+                amenities={facility.amenities}
+                address={facility.address}
               />
-
-              {/* Map Section */}
-              <FacilityLocation address={facility.address} />
             </div>
 
             {/* Right Sidebar - Booking */}
@@ -212,6 +209,11 @@ const FacilityDetail = () => {
               openingHours={facility.openingHours}
               onZoneBookClick={handleZoneBookClick}
             />
+          </div>
+
+          {/* Similar Facilities Section */}
+          <div className="mt-12">
+            <SimilarFacilitiesSlider currentFacilityId={id || ""} />
           </div>
         </div>
       </div>
