@@ -17,6 +17,8 @@ import { BookingFormValues, Zone } from "../types";
 import { EnhancedZoneSelector } from "../EnhancedZoneSelector";
 import DateRangePicker from "../../search/DateRangePicker";
 import TimeRangePicker from "../TimeRangePicker";
+import { PriceBreakdown } from "../PriceBreakdown";
+import { usePriceCalculation } from "@/hooks/usePriceCalculation";
 
 export interface BookingDetailsStepProps {
   form: UseFormReturn<BookingFormValues>;
@@ -33,6 +35,17 @@ export interface BookingDetailsStepProps {
 
 export function BookingDetailsStep({ form, facility }: BookingDetailsStepProps) {
   const watchedValues = form.watch();
+
+  // Calculate price in real-time
+  const { calculation, isLoading } = usePriceCalculation({
+    facilityId: facility.id,
+    zoneId: watchedValues.zoneId,
+    startDate: watchedValues.date,
+    endDate: watchedValues.endDate,
+    timeSlot: watchedValues.timeSlot,
+    customerType: 'private', // This could be a form field later
+    bookingMode: watchedValues.bookingMode
+  });
 
   return (
     <div className="space-y-6">
@@ -177,6 +190,15 @@ export function BookingDetailsStep({ form, facility }: BookingDetailsStepProps) 
         selectedDate={watchedValues.date || new Date()}
         selectedTimeSlot={watchedValues.timeSlot || ""}
       />
+
+      {/* Price Calculation */}
+      {(watchedValues.date && watchedValues.timeSlot && watchedValues.zoneId) && (
+        <PriceBreakdown 
+          calculation={calculation || { basePrice: 0, totalHours: 0, totalDays: 0, customerTypeDiscount: 0, weekendSurcharge: 0, subtotal: 0, finalPrice: 0, breakdown: [] }}
+          isLoading={isLoading}
+          showDetailed={true}
+        />
+      )}
     </div>
   );
 }

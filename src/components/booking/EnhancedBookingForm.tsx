@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -8,6 +9,7 @@ import { BookingConfirmStep } from "./steps/BookingConfirmStep";
 import { BookingFormNav } from "./BookingFormNav";
 import { CollapsibleFormStepper } from "./CollapsibleFormStepper";
 import { bookingFormSchema, BookingFormValues, BookingStep, Zone, BookingData } from "./types";
+
 interface EnhancedBookingFormProps {
   facility: {
     id: string | undefined;
@@ -24,6 +26,7 @@ interface EnhancedBookingFormProps {
   };
   onBookingComplete: (reference: string) => void;
 }
+
 export function EnhancedBookingForm({
   facility,
   onBookingComplete
@@ -31,8 +34,10 @@ export function EnhancedBookingForm({
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
+
   const steps: BookingStep[] = ['details', 'contact', 'confirm'];
   const stepTitles = ["Reservasjonsdetaljer", "Kontaktinformasjon", "Gjennomgå og bekreft"];
+
   const form = useForm<BookingFormValues>({
     resolver: zodResolver(bookingFormSchema),
     defaultValues: {
@@ -49,14 +54,17 @@ export function EnhancedBookingForm({
     },
     mode: 'onChange'
   });
+
   const watchedValues = form.watch();
   const isFirstStep = currentStep === 0;
   const isLastStep = currentStep === steps.length - 1;
+
   const validateCurrentStep = async (): Promise<boolean> => {
     const fieldsToValidate = getFieldsForStep(currentStep);
     const result = await form.trigger(fieldsToValidate);
     return result;
   };
+
   const getFieldsForStep = (step: number): (keyof BookingFormValues)[] => {
     switch (step) {
       case 0:
@@ -69,6 +77,7 @@ export function EnhancedBookingForm({
         return [];
     }
   };
+
   const canContinueToNextStep = (): boolean => {
     const fieldsToCheck = getFieldsForStep(currentStep);
     const errors = form.formState.errors;
@@ -79,20 +88,24 @@ export function EnhancedBookingForm({
     });
     return !hasErrors && hasValues;
   };
+
   const handleNextStep = async () => {
     const isValid = await validateCurrentStep();
     if (isValid && canContinueToNextStep()) {
       setCurrentStep(prev => Math.min(prev + 1, steps.length - 1));
     }
   };
+
   const handlePreviousStep = () => {
     setCurrentStep(prev => Math.max(prev - 1, 0));
   };
+
   const generateBookingReference = (): string => {
     const timestamp = Date.now().toString(36);
     const randomStr = Math.random().toString(36).substring(2, 8);
     return `BK-${timestamp}-${randomStr}`.toUpperCase();
   };
+
   const onSubmit = async (data: BookingFormValues) => {
     if (!termsAccepted) {
       return;
@@ -109,6 +122,7 @@ export function EnhancedBookingForm({
       setIsSubmitting(false);
     }
   };
+
   const getBookingData = (): BookingData => {
     const selectedZone = facility.zones.find(z => z.id === watchedValues.zoneId);
     return {
@@ -126,6 +140,7 @@ export function EnhancedBookingForm({
       endDate: watchedValues.endDate
     };
   };
+
   const renderCurrentStep = () => {
     switch (currentStep) {
       case 0:
@@ -133,16 +148,29 @@ export function EnhancedBookingForm({
       case 1:
         return <BookingContactStep form={form} />;
       case 2:
-        return <BookingConfirmStep facilityName={facility.name} bookingData={getBookingData()} termsAccepted={termsAccepted} onTermsAcceptedChange={setTermsAccepted} />;
+        return <BookingConfirmStep 
+          facilityName={facility.name} 
+          facilityId={facility.id}
+          bookingData={getBookingData()} 
+          termsAccepted={termsAccepted} 
+          onTermsAcceptedChange={setTermsAccepted} 
+        />;
       default:
         return null;
     }
   };
-  return <div className="bg-white shadow-sm border border-gray-200 rounded-lg overflow-hidden" role="main" aria-label="Booking form">
+
+  return (
+    <div className="bg-white shadow-sm border border-gray-200 rounded-lg overflow-hidden" role="main" aria-label="Booking form">
       {/* Clean Header */}
       <div className="bg-gradient-to-r from-slate-50 to-white px-6 py-4 border-b border-gray-200">
-        
-        <CollapsibleFormStepper currentStep={currentStep} steps={stepTitles} onStepClick={setCurrentStep} canNavigateToStep={stepIndex => stepIndex <= currentStep} aria-label="Booking progress" />
+        <CollapsibleFormStepper 
+          currentStep={currentStep} 
+          steps={stepTitles} 
+          onStepClick={setCurrentStep} 
+          canNavigateToStep={stepIndex => stepIndex <= currentStep} 
+          aria-label="Booking progress" 
+        />
       </div>
       
       <Form {...form}>
@@ -156,9 +184,19 @@ export function EnhancedBookingForm({
           
           {/* Navigation Footer */}
           <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
-            <BookingFormNav currentStep={currentStep} isFirstStep={isFirstStep} isLastStep={isLastStep} canContinue={canContinueToNextStep()} isSubmitting={isSubmitting} isSubmitDisabled={!termsAccepted} onPreviousStep={handlePreviousStep} onNextStep={handleNextStep} />
+            <BookingFormNav 
+              currentStep={currentStep} 
+              isFirstStep={isFirstStep} 
+              isLastStep={isLastStep} 
+              canContinue={canContinueToNextStep()} 
+              isSubmitting={isSubmitting} 
+              isSubmitDisabled={!termsAccepted} 
+              onPreviousStep={handlePreviousStep} 
+              onNextStep={handleNextStep} 
+            />
           </div>
         </form>
       </Form>
-    </div>;
+    </div>
+  );
 }
