@@ -54,48 +54,45 @@ export function usePriceCalculation({
 
     setIsLoading(true);
     
-    const timer = setTimeout(() => {
-      try {
-        const finalEndDate = endDate || new Date(startDate.getTime() + 2 * 60 * 60 * 1000);
-        
-        // Use a default timeSlot for calculation if none provided
-        const calculationTimeSlot = timeSlot || '09:00 - 11:00';
-        
-        console.log('Calculating price with:', {
-          facilityId,
-          zoneId,
-          startDate,
-          finalEndDate,
-          customerType,
-          timeSlot: calculationTimeSlot,
-          bookingMode,
-          eventType,
-          ageGroup
-        });
+    // Remove the timeout for immediate calculation
+    try {
+      const finalEndDate = endDate || new Date(startDate.getTime() + 2 * 60 * 60 * 1000);
+      
+      // Use the actual timeSlot if provided, otherwise use default for estimate
+      const calculationTimeSlot = timeSlot || '09:00 - 11:00';
+      
+      console.log('Calculating price with:', {
+        facilityId,
+        zoneId,
+        startDate,
+        finalEndDate,
+        customerType,
+        timeSlot: calculationTimeSlot,
+        bookingMode,
+        eventType,
+        ageGroup
+      });
 
-        const result = pricingEngine.calculatePrice(
-          facilityId,
-          zoneId,
-          startDate,
-          finalEndDate,
-          customerType,
-          calculationTimeSlot,
-          bookingMode,
-          eventType,
-          ageGroup
-        );
-        
-        console.log('Price calculation result:', result);
-        setCalculation(result);
-      } catch (error) {
-        console.error('Error calculating price:', error);
-        setCalculation(null);
-      } finally {
-        setIsLoading(false);
-      }
-    }, 50); // Faster response
-
-    return () => clearTimeout(timer);
+      const result = pricingEngine.calculatePrice(
+        facilityId,
+        zoneId,
+        startDate,
+        finalEndDate,
+        customerType,
+        calculationTimeSlot,
+        bookingMode,
+        eventType,
+        ageGroup
+      );
+      
+      console.log('Price calculation result:', result);
+      setCalculation(result);
+    } catch (error) {
+      console.error('Error calculating price:', error);
+      setCalculation(null);
+    } finally {
+      setIsLoading(false);
+    }
   }, [facilityId, zoneId, startDate, endDate, timeSlot, customerType, bookingMode, eventType, ageGroup]);
 
   const applyOverride = (amount: number, reason: string) => {
