@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -62,12 +61,12 @@ export function EnhancedBookingForm({ facility, onBookingComplete }: EnhancedBoo
 
   const getFieldsForStep = (step: number): (keyof BookingFormValues)[] => {
     switch (step) {
-      case 0: // Details step
+      case 0:
         return ['bookingMode', 'date', 'timeSlot', 'zoneId', 'purpose', 'attendees'];
-      case 1: // Contact step
+      case 1:
         return ['contactName', 'contactEmail', 'contactPhone'];
-      case 2: // Confirm step
-        return []; // No additional validation needed
+      case 2:
+        return [];
       default:
         return [];
     }
@@ -77,10 +76,7 @@ export function EnhancedBookingForm({ facility, onBookingComplete }: EnhancedBoo
     const fieldsToCheck = getFieldsForStep(currentStep);
     const errors = form.formState.errors;
     
-    // Check if any required fields for current step have errors
     const hasErrors = fieldsToCheck.some(field => errors[field]);
-    
-    // Check if required fields have values
     const hasValues = fieldsToCheck.every(field => {
       const value = watchedValues[field];
       return value !== "" && value !== undefined && value !== null;
@@ -114,11 +110,8 @@ export function EnhancedBookingForm({ facility, onBookingComplete }: EnhancedBoo
     setIsSubmitting(true);
     
     try {
-      // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 2000));
-      
       console.log('Booking submitted:', data);
-      
       const reference = generateBookingReference();
       onBookingComplete(reference);
     } catch (error) {
@@ -174,43 +167,39 @@ export function EnhancedBookingForm({ facility, onBookingComplete }: EnhancedBoo
 
   return (
     <div className="bg-white" role="main" aria-label="Booking form">
-      {/* Modern Header with Progress */}
-      <div className="px-4 py-4 border-b border-gray-200 bg-gradient-to-r from-slate-50 to-gray-50">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-xl font-semibold text-gray-900 mb-4" id="form-title">
-            {stepTitles[currentStep]}
-          </h1>
-          <FormStepper 
-            currentStep={currentStep} 
-            steps={stepTitles}
-            aria-label="Booking progress"
-          />
-        </div>
+      {/* Compact Header with Progress */}
+      <div className="px-6 pt-6 pb-4 border-b border-gray-100">
+        <h1 className="text-xl font-semibold text-gray-900 mb-4" id="form-title">
+          {stepTitles[currentStep]}
+        </h1>
+        <FormStepper 
+          currentStep={currentStep} 
+          steps={stepTitles}
+          aria-label="Booking progress"
+        />
       </div>
       
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="max-w-4xl mx-auto" noValidate>
-          {/* Form Content */}
-          <div className="px-4 py-6">
+        <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
+          {/* Compact Form Content */}
+          <div className="px-6 py-6">
             <div className="min-h-[400px]" role="tabpanel" aria-labelledby="form-title">
               {renderCurrentStep()}
             </div>
           </div>
           
-          {/* Navigation Footer */}
-          <div className="px-4 py-4 border-t border-gray-200 bg-gray-50/50">
-            <div className="max-w-4xl mx-auto">
-              <BookingFormNav
-                currentStep={currentStep}
-                isFirstStep={isFirstStep}
-                isLastStep={isLastStep}
-                canContinue={canContinueToNextStep()}
-                isSubmitting={isSubmitting}
-                isSubmitDisabled={!termsAccepted}
-                onPreviousStep={handlePreviousStep}
-                onNextStep={handleNextStep}
-              />
-            </div>
+          {/* Compact Navigation Footer */}
+          <div className="px-6 py-4 border-t border-gray-100 bg-gray-50/30">
+            <BookingFormNav
+              currentStep={currentStep}
+              isFirstStep={isFirstStep}
+              isLastStep={isLastStep}
+              canContinue={canContinueToNextStep()}
+              isSubmitting={isSubmitting}
+              isSubmitDisabled={!termsAccepted}
+              onPreviousStep={handlePreviousStep}
+              onNextStep={handleNextStep}
+            />
           </div>
         </form>
       </Form>

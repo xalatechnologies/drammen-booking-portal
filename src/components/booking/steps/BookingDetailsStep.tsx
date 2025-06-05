@@ -61,10 +61,10 @@ export function BookingDetailsStep({ form, facility }: BookingDetailsStepProps) 
   ];
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center space-x-2 pb-2 border-b">
-        <Calendar className="h-5 w-5 text-blue-600" />
-        <h3 className="text-xl font-medium">Reservasjonsdetaljer</h3>
+    <div className="space-y-5">
+      <div className="flex items-center space-x-2 pb-3 border-b border-gray-100">
+        <Calendar className="h-5 w-5 text-slate-700" />
+        <h3 className="text-lg font-medium text-gray-900">Reservasjonsdetaljer</h3>
       </div>
       
       {/* Booking Mode Selection */}
@@ -72,8 +72,8 @@ export function BookingDetailsStep({ form, facility }: BookingDetailsStepProps) 
         control={form.control}
         name="bookingMode"
         render={({ field }) => (
-          <FormItem className="space-y-3">
-            <FormLabel className="text-base font-medium">Type reservasjon</FormLabel>
+          <FormItem className="space-y-2">
+            <FormLabel className="text-sm font-medium text-gray-900">Type reservasjon</FormLabel>
             <FormControl>
               <RadioGroup
                 onValueChange={field.onChange}
@@ -81,16 +81,16 @@ export function BookingDetailsStep({ form, facility }: BookingDetailsStepProps) 
                 className="flex flex-col space-y-2"
               >
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="one-time" id="one-time" />
-                  <Label htmlFor="one-time">Engangsreservasjon</Label>
+                  <RadioGroupItem value="one-time" id="one-time" className="border-gray-400 text-slate-800" />
+                  <Label htmlFor="one-time" className="text-sm">Engangsreservasjon</Label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="date-range" id="date-range" />
-                  <Label htmlFor="date-range">Periode (flere dager)</Label>
+                  <RadioGroupItem value="date-range" id="date-range" className="border-gray-400 text-slate-800" />
+                  <Label htmlFor="date-range" className="text-sm">Periode (flere dager)</Label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="recurring" id="recurring" />
-                  <Label htmlFor="recurring">Gjentakende reservasjon</Label>
+                  <RadioGroupItem value="recurring" id="recurring" className="border-gray-400 text-slate-800" />
+                  <Label htmlFor="recurring" className="text-sm">Gjentakende reservasjon</Label>
                 </div>
               </RadioGroup>
             </FormControl>
@@ -106,8 +106,8 @@ export function BookingDetailsStep({ form, facility }: BookingDetailsStepProps) 
           name="date"
           render={({ field }) => (
             <FormItem className="flex flex-col">
-              <FormLabel className="flex items-center gap-1.5 mb-2">
-                <Calendar className="h-4 w-4 text-blue-600" />
+              <FormLabel className="flex items-center gap-1.5 text-sm font-medium text-gray-900">
+                <Calendar className="h-4 w-4 text-slate-700" />
                 {watchedValues.bookingMode === 'date-range' ? 'Startdato' : 'Dato'}
               </FormLabel>
               <Popover>
@@ -116,7 +116,7 @@ export function BookingDetailsStep({ form, facility }: BookingDetailsStepProps) 
                     <Button
                       variant={"outline"}
                       className={cn(
-                        "w-full pl-3 text-left font-normal h-10",
+                        "w-full pl-3 text-left font-normal h-9 border-gray-300 hover:border-slate-400",
                         !field.value && "text-muted-foreground"
                       )}
                     >
@@ -150,8 +150,8 @@ export function BookingDetailsStep({ form, facility }: BookingDetailsStepProps) 
             name="endDate"
             render={({ field }) => (
               <FormItem className="flex flex-col">
-                <FormLabel className="flex items-center gap-1.5 mb-2">
-                  <Calendar className="h-4 w-4 text-blue-600" />
+                <FormLabel className="flex items-center gap-1.5 text-sm font-medium text-gray-900">
+                  <Calendar className="h-4 w-4 text-slate-700" />
                   Sluttdato
                 </FormLabel>
                 <Popover>
@@ -160,7 +160,7 @@ export function BookingDetailsStep({ form, facility }: BookingDetailsStepProps) 
                       <Button
                         variant={"outline"}
                         className={cn(
-                          "w-full pl-3 text-left font-normal h-10",
+                          "w-full pl-3 text-left font-normal h-9 border-gray-300 hover:border-slate-400",
                           !field.value && "text-muted-foreground"
                         )}
                       >
@@ -199,13 +199,13 @@ export function BookingDetailsStep({ form, facility }: BookingDetailsStepProps) 
         name="timeSlot"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="flex items-center gap-1.5 mb-2">
-              <Clock className="h-4 w-4 text-blue-600" />
+            <FormLabel className="flex items-center gap-1.5 text-sm font-medium text-gray-900">
+              <Clock className="h-4 w-4 text-slate-700" />
               Tidspunkt
             </FormLabel>
             <Select onValueChange={field.onChange} defaultValue={field.value}>
               <FormControl>
-                <SelectTrigger className="h-10">
+                <SelectTrigger className="h-9 border-gray-300 focus:border-slate-800">
                   <SelectValue placeholder="Velg et tidsintervall" />
                 </SelectTrigger>
               </FormControl>
@@ -228,8 +228,8 @@ export function BookingDetailsStep({ form, facility }: BookingDetailsStepProps) 
         name="zoneId"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="flex items-center gap-1.5 mb-2">
-              <MapPin className="h-4 w-4 text-blue-600" />
+            <FormLabel className="flex items-center gap-1.5 text-sm font-medium text-gray-900">
+              <MapPin className="h-4 w-4 text-slate-700" />
               Område/Sone
             </FormLabel>
             <ZoneSelector
@@ -249,18 +249,18 @@ export function BookingDetailsStep({ form, facility }: BookingDetailsStepProps) 
         name="purpose"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="flex items-center gap-1.5 mb-2">
-              <MessageSquare className="h-4 w-4 text-blue-600" />
+            <FormLabel className="flex items-center gap-1.5 text-sm font-medium text-gray-900">
+              <MessageSquare className="h-4 w-4 text-slate-700" />
               Formål med reservasjonen
             </FormLabel>
             <FormControl>
               <Textarea
                 placeholder="Beskriv formålet med reservasjonen..."
-                className="resize-none min-h-[80px]"
+                className="resize-none min-h-[70px] border-gray-300 focus:border-slate-800"
                 {...field}
               />
             </FormControl>
-            <FormDescription>
+            <FormDescription className="text-xs text-gray-600">
               Gi en kort beskrivelse av aktiviteten eller arrangementet.
             </FormDescription>
             <FormMessage />
@@ -274,8 +274,8 @@ export function BookingDetailsStep({ form, facility }: BookingDetailsStepProps) 
         name="attendees"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="flex items-center gap-1.5 mb-2">
-              <Users className="h-4 w-4 text-blue-600" />
+            <FormLabel className="flex items-center gap-1.5 text-sm font-medium text-gray-900">
+              <Users className="h-4 w-4 text-slate-700" />
               Antall deltakere
             </FormLabel>
             <FormControl>
@@ -284,12 +284,12 @@ export function BookingDetailsStep({ form, facility }: BookingDetailsStepProps) 
                 min="1"
                 max="1000"
                 placeholder="1"
-                className="h-10"
+                className="h-9 border-gray-300 focus:border-slate-800"
                 {...field}
                 onChange={(e) => field.onChange(Number(e.target.value))}
               />
             </FormControl>
-            <FormDescription>
+            <FormDescription className="text-xs text-gray-600">
               Angi forventet antall personer som vil bruke lokalet.
             </FormDescription>
             <FormMessage />
