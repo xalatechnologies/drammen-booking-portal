@@ -11,27 +11,12 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Calendar as CalendarComponent } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { CalendarIcon } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { format } from "date-fns";
 import { BookingFormValues, Zone } from "../types";
 import { EnhancedZoneSelector } from "../EnhancedZoneSelector";
+import DateRangePicker from "../../search/DateRangePicker";
+import { Slider } from "@/components/ui/slider";
 
 export interface BookingDetailsStepProps {
   form: UseFormReturn<BookingFormValues>;
@@ -49,10 +34,31 @@ export interface BookingDetailsStepProps {
 export function BookingDetailsStep({ form, facility }: BookingDetailsStepProps) {
   const watchedValues = form.watch();
   
-  const availableTimeSlots = [
-    "08:00-10:00", "10:00-12:00", "12:00-14:00",
-    "14:00-16:00", "16:00-18:00", "18:00-20:00", "20:00-22:00"
-  ];
+  // Convert time to hour number for slider
+  const timeToHour = (time: string) => {
+    if (!time) return 8;
+    const [hours] = time.split(':').map(Number);
+    return hours;
+  };
+
+  // Convert hour number back to time string
+  const hourToTime = (hour: number) => {
+    return `${hour.toString().padStart(2, '0')}:00`;
+  };
+
+  const handleTimeRangeChange = (values: number[]) => {
+    const [startHour, endHour] = values;
+    form.setValue('timeSlot', `${hourToTime(startHour)}-${hourToTime(endHour)}`);
+  };
+
+  const getCurrentTimeRange = () => {
+    const timeSlot = watchedValues.timeSlot || '08:00-10:00';
+    if (timeSlot.includes('-')) {
+      const [start, end] = timeSlot.split('-');
+      return [timeToHour(start), timeToHour(end)];
+    }
+    return [8, 10];
+  };
 
   return (
     <div className="space-y-6">
@@ -89,46 +95,23 @@ export function BookingDetailsStep({ form, facility }: BookingDetailsStepProps) 
         />
       </div>
 
-      {/* Date and Time Selection */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* Date Range, Time Range, and Attendees on same line */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <FormField
           control={form.control}
-          name="date"
+          name="dateRange"
           render={({ field }) => (
             <FormItem>
               <FormLabel className="text-base font-semibold text-gray-900 flex items-center gap-2">
                 <Calendar className="h-5 w-5 text-slate-600" />
-                Dato
+                Datoperiode
               </FormLabel>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <FormControl>
-                    <Button
-                      variant={"outline"}
-                      className={cn(
-                        "w-full pl-4 text-left font-normal h-11 border-gray-300 hover:border-slate-400 text-base",
-                        !field.value && "text-muted-foreground"
-                      )}
-                    >
-                      {field.value ? (
-                        format(field.value, "dd.MM.yyyy")
-                      ) : (
-                        <span>Velg dato</span>
-                      )}
-                      <CalendarIcon className="ml-auto h-5 w-5 opacity-50" />
-                    </Button>
-                  </FormControl>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <CalendarComponent
-                    mode="single"
-                    selected={field.value}
-                    onSelect={field.onChange}
-                    disabled={(date) => date < new Date()}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
+              <FormControl>
+                <DateRangePicker
+                  dateRange={field.value}
+                  setDateRange={field.onChange}
+                />
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}
@@ -141,53 +124,54 @@ export function BookingDetailsStep({ form, facility }: BookingDetailsStepProps) 
             <FormItem>
               <FormLabel className="text-base font-semibold text-gray-900 flex items-center gap-2">
                 <Clock className="h-5 w-5 text-slate-600" />
-                Tidspunkt
+                Tidsperiode
               </FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger className="h-11 border-gray-300 focus:border-slate-700 text-base">
-                    <SelectValue placeholder="Velg tidspunkt" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {availableTimeSlots.map((slot) => (
-                    <SelectItem key={slot} value={slot} className="text-base">
-                      {slot}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <FormControl>
+                <div className="space-y-3">
+                  <Slider
+                    value={getCurrentTimeRange()}
+                    onValueChange={handleTimeRangeChange}
+                    min={6}
+                    max={23}
+                    step={1}
+                    className="w-full"
+                  />
+                  <div className="flex justify-between text-sm text-gray-600">
+                    <span>{hourToTime(getCurrentTimeRange()[0])}</span>
+                    <span>{hourToTime(getCurrentTimeRange()[1])}</span>
+                  </div>
+                </div>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="attendees"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-base font-semibold text-gray-900 flex items-center gap-2">
+                <Users className="h-5 w-5 text-slate-600" />
+                Antall deltakere
+              </FormLabel>
+              <FormControl>
+                <Input
+                  type="number"
+                  min="1"
+                  max="1000"
+                  placeholder="1"
+                  className="h-11 border-gray-300 focus:border-slate-700 text-base"
+                  {...field}
+                  onChange={(e) => field.onChange(Number(e.target.value))}
+                />
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
       </div>
-
-      {/* Attendees */}
-      <FormField
-        control={form.control}
-        name="attendees"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel className="text-base font-semibold text-gray-900 flex items-center gap-2">
-              <Users className="h-5 w-5 text-slate-600" />
-              Antall deltakere
-            </FormLabel>
-            <FormControl>
-              <Input
-                type="number"
-                min="1"
-                max="1000"
-                placeholder="1"
-                className="h-11 border-gray-300 focus:border-slate-700 text-base max-w-xs"
-                {...field}
-                onChange={(e) => field.onChange(Number(e.target.value))}
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
 
       {/* Purpose */}
       <FormField
