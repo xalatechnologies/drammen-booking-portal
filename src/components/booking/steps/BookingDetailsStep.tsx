@@ -52,8 +52,8 @@ export function BookingDetailsStep({ form, facility }: BookingDetailsStepProps) 
 
   return (
     <div className="space-y-6">
-      {/* Customer Type - Make this prominent */}
-      <div className="space-y-3">
+      {/* Customer Type, Event Type, and Age Group - In same line */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <FormField
           control={form.control}
           name="customerType"
@@ -74,6 +74,62 @@ export function BookingDetailsStep({ form, facility }: BookingDetailsStepProps) 
                     <SelectItem value="business">Bedrift/Næringsdrivende</SelectItem>
                     <SelectItem value="youth">Ungdom (under 20 år)</SelectItem>
                     <SelectItem value="senior">Senior (over 67 år)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="eventType"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-base font-semibold text-gray-900 flex items-center gap-2">
+                <Trophy className="h-5 w-5 text-slate-600" />
+                Type arrangement
+              </FormLabel>
+              <FormControl>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <SelectTrigger className="h-11 border-gray-300 focus:border-slate-700">
+                    <SelectValue placeholder="Velg type arrangement" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="training">Trening/Øvelse</SelectItem>
+                    <SelectItem value="competition">Konkurranse/Turnering</SelectItem>
+                    <SelectItem value="meeting">Møte/Kurs</SelectItem>
+                    <SelectItem value="celebration">Fest/Feiring</SelectItem>
+                    <SelectItem value="other">Annet</SelectItem>
+                  </SelectContent>
+                </Select>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="ageGroup"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-base font-semibold text-gray-900 flex items-center gap-2">
+                <Users className="h-5 w-5 text-slate-600" />
+                Aldersgruppe
+              </FormLabel>
+              <FormControl>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <SelectTrigger className="h-11 border-gray-300 focus:border-slate-700">
+                    <SelectValue placeholder="Velg aldersgruppe" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="mixed">Blandet alder</SelectItem>
+                    <SelectItem value="children">Barn (under 12 år)</SelectItem>
+                    <SelectItem value="under-20">Ungdom (under 20 år)</SelectItem>
+                    <SelectItem value="over-20">Voksne (over 20 år)</SelectItem>
+                    <SelectItem value="adults">Voksne (over 67 år)</SelectItem>
                   </SelectContent>
                 </Select>
               </FormControl>
@@ -193,65 +249,6 @@ export function BookingDetailsStep({ form, facility }: BookingDetailsStepProps) 
             )}
           />
         </div>
-      </div>
-
-      {/* Event Type and Age Group */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <FormField
-          control={form.control}
-          name="eventType"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-base font-semibold text-gray-900 flex items-center gap-2">
-                <Trophy className="h-5 w-5 text-slate-600" />
-                Type arrangement
-              </FormLabel>
-              <FormControl>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <SelectTrigger className="h-11 border-gray-300 focus:border-slate-700">
-                    <SelectValue placeholder="Velg type arrangement" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="training">Trening/Øvelse</SelectItem>
-                    <SelectItem value="competition">Konkurranse/Turnering</SelectItem>
-                    <SelectItem value="meeting">Møte/Kurs</SelectItem>
-                    <SelectItem value="celebration">Fest/Feiring</SelectItem>
-                    <SelectItem value="other">Annet</SelectItem>
-                  </SelectContent>
-                </Select>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="ageGroup"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-base font-semibold text-gray-900 flex items-center gap-2">
-                <Users className="h-5 w-5 text-slate-600" />
-                Aldersgruppe
-              </FormLabel>
-              <FormControl>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <SelectTrigger className="h-11 border-gray-300 focus:border-slate-700">
-                    <SelectValue placeholder="Velg aldersgruppe" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="mixed">Blandet alder</SelectItem>
-                    <SelectItem value="children">Barn (under 12 år)</SelectItem>
-                    <SelectItem value="under-20">Ungdom (under 20 år)</SelectItem>
-                    <SelectItem value="over-20">Voksne (over 20 år)</SelectItem>
-                    <SelectItem value="adults">Voksne (over 67 år)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
       </div>
 
       {/* Purpose */}
