@@ -21,7 +21,7 @@ export function DescriptionTab({ description, capacity, quickFacts, zones }: Des
 
       <div>
         <h2 className="text-2xl font-semibold mb-6">Om lokalet</h2>
-        <p className="text-gray-700 leading-relaxed text-lg">{description}</p>
+        <p className="text-lg text-gray-700 leading-relaxed">{description}</p>
       </div>
       
       <Card className="p-6">
@@ -30,13 +30,13 @@ export function DescriptionTab({ description, capacity, quickFacts, zones }: Des
           Egnet for
         </h3>
         <div className="flex flex-wrap gap-3">
-          <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 text-base py-2 px-3">Idrett</Badge>
-          <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 text-base py-2 px-3">Trening</Badge>
-          <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200 text-base py-2 px-3">Arrangementer</Badge>
-          <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200 text-base py-2 px-3">Grupper</Badge>
-          <Badge variant="outline" className="bg-pink-50 text-pink-700 border-pink-200 text-base py-2 px-3">Dans</Badge>
-          <Badge variant="outline" className="bg-teal-50 text-teal-700 border-teal-200 text-base py-2 px-3">Ballsport</Badge>
-          <Badge variant="outline" className="bg-indigo-50 text-indigo-700 border-indigo-200 text-base py-2 px-3">Presentasjoner</Badge>
+          <Badge variant="outline" className="bg-[#1e3a8a] bg-opacity-10 text-[#1e3a8a] border-[#1e3a8a] text-base py-2 px-4 font-medium">Idrett</Badge>
+          <Badge variant="outline" className="bg-[#1e3a8a] bg-opacity-10 text-[#1e3a8a] border-[#1e3a8a] text-base py-2 px-4 font-medium">Trening</Badge>
+          <Badge variant="outline" className="bg-[#1e3a8a] bg-opacity-10 text-[#1e3a8a] border-[#1e3a8a] text-base py-2 px-4 font-medium">Arrangementer</Badge>
+          <Badge variant="outline" className="bg-[#1e3a8a] bg-opacity-10 text-[#1e3a8a] border-[#1e3a8a] text-base py-2 px-4 font-medium">Grupper</Badge>
+          <Badge variant="outline" className="bg-[#1e3a8a] bg-opacity-10 text-[#1e3a8a] border-[#1e3a8a] text-base py-2 px-4 font-medium">Dans</Badge>
+          <Badge variant="outline" className="bg-[#1e3a8a] bg-opacity-10 text-[#1e3a8a] border-[#1e3a8a] text-base py-2 px-4 font-medium">Ballsport</Badge>
+          <Badge variant="outline" className="bg-[#1e3a8a] bg-opacity-10 text-[#1e3a8a] border-[#1e3a8a] text-base py-2 px-4 font-medium">Presentasjoner</Badge>
         </div>
       </Card>
 
@@ -110,7 +110,7 @@ function ZoneCard({ zone }: { zone: Zone }) {
         </div>
         <Button 
           size="sm"
-          className="bg-[#0B3D91] hover:bg-blue-700 text-white h-10 text-base px-6"
+          className="bg-[#1e3a8a] hover:bg-[#1e40af] text-white h-10 text-base px-6"
         >
           Reserver
         </Button>
@@ -122,9 +122,9 @@ function ZoneCard({ zone }: { zone: Zone }) {
 function RulesSection() {
   return (
     <div>
-      <h3 className="font-semibold text-xl mb-4">Regler og retningslinjer</h3>
+      <h3 className="font-semibold text-xl mb-6">Regler og retningslinjer</h3>
       <div className="bg-gray-50 p-6 rounded-lg">
-        <ul className="space-y-3 text-base text-gray-700 leading-relaxed">
+        <ul className="space-y-4 text-lg text-gray-700 leading-relaxed">
           <li>• Innendørssko påkrevd i gymsalen</li>
           <li>• Maks antall deltakere må respekteres</li>
           <li>• Røyking og alkohol er forbudt</li>
