@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -12,6 +11,7 @@ import { FacilityInfoTabs } from "@/components/facility/FacilityInfoTabs";
 import { SimilarFacilitiesSlider } from "@/components/facility/SimilarFacilitiesSlider";
 import { AutoApprovalCard } from "@/components/facility/AutoApprovalCard";
 import { ZoneBookingCard } from "@/components/facility/ZoneBookingCard";
+import { FacilityLocation } from "@/components/facility/FacilityLocation";
 import { Zone } from "@/components/booking/types";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { MapPin } from "lucide-react";
@@ -258,7 +258,7 @@ const FacilityDetail = () => {
                   onToggleFavorite={() => setIsFavorited(!isFavorited)}
                 />
               </div>
-              <div className="flex gap-2 mt-4">
+              <div className="flex gap-3 mt-4">
                 <Button 
                   onClick={handleBookingClick}
                   className="bg-blue-600 hover:bg-blue-700 text-white"
@@ -293,20 +293,30 @@ const FacilityDetail = () => {
               zoneCount={zones.length}
             />
 
-            {/* Auto Approval Info */}
+            {/* Auto Approval Info - More Compact */}
             {facility.hasAutoApproval && (
-              <AutoApprovalCard hasAutoApproval={facility.hasAutoApproval} />
+              <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
+                    <div className="w-2 h-2 bg-green-600 rounded-full"></div>
+                  </div>
+                  <div>
+                    <span className="font-medium text-green-800">Automatisk godkjenning</span>
+                    <span className="text-sm text-green-700 ml-2">• Reservasjonen godkjennes umiddelbart</span>
+                  </div>
+                </div>
+              </div>
             )}
 
-            {/* Zones Section */}
+            {/* Zones Section - Compact */}
             <Card>
-              <CardHeader className="pb-3">
+              <CardHeader className="pb-4">
                 <CardTitle className="flex items-center gap-2 text-lg">
                   <MapPin className="h-5 w-5" />
                   Tilgjengelige soner
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-3">
                 {zones.map((zone) => (
                   <ZoneBookingCard
                     key={zone.id}
@@ -318,12 +328,15 @@ const FacilityDetail = () => {
               </CardContent>
             </Card>
 
-            {/* Cancellation Policy */}
-            <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-              <p className="text-xs text-green-800">
+            {/* Cancellation Policy - Compact */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+              <p className="text-sm text-blue-800">
                 <strong>Gratis avbestilling</strong> opptil 24 timer før reservert tid
               </p>
             </div>
+
+            {/* Location with Map */}
+            <FacilityLocation address={facility.address} />
 
             {/* Tabbed Content */}
             <FacilityInfoTabs

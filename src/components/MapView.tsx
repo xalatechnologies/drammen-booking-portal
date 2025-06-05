@@ -6,6 +6,9 @@ import { Button } from './ui/button';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
+// Default token provided by user
+const DEFAULT_MAPBOX_TOKEN = 'pk.eyJ1IjoieGFsYXRlY2hub2xvZ2llc2FzIiwiYSI6ImNtYmh0anh6NTAweDEycXF6cm9xbDFtb2IifQ.81xizRmOh6TLUEsG0EVSEg';
+
 // Facility locations with accurate coordinates for Drammen Kommune
 const facilityLocations = [
   {
@@ -68,8 +71,6 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location }) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const markers = useRef<mapboxgl.Marker[]>([]);
-  const [mapboxToken, setMapboxToken] = useState<string>('');
-  const [showTokenInput, setShowTokenInput] = useState<boolean>(true);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
   const [isInitialized, setIsInitialized] = useState<boolean>(false);
@@ -150,8 +151,8 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location }) => {
     });
   };
 
-  const initializeMap = async (token: string) => {
-    console.log('Starting map initialization...');
+  const initializeMap = async () => {
+    console.log('Starting map initialization with default token...');
     
     // Wait for next tick to ensure DOM is ready
     await new Promise(resolve => setTimeout(resolve, 100));
@@ -163,12 +164,6 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location }) => {
       return;
     }
 
-    if (!token.trim() || !token.startsWith('pk.')) {
-      setError('Invalid Mapbox token. Token should start with "pk."');
-      setIsLoading(false);
-      return;
-    }
-
     setIsLoading(true);
     setError('');
 
@@ -176,7 +171,7 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location }) => {
       console.log('Setting Mapbox access token...');
       
       // Set the access token
-      mapboxgl.accessToken = token;
+      mapboxgl.accessToken = DEFAULT_MAPBOX_TOKEN;
       
       // Clear any existing map
       if (map.current) {
@@ -229,43 +224,10 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location }) => {
     }
   };
 
-  const handleTokenSubmit = () => {
-    const trimmedToken = mapboxToken.trim();
-    if (!trimmedToken) {
-      setError('Please enter a Mapbox token');
-      return;
-    }
-    
-    if (!trimmedToken.startsWith('pk.')) {
-      setError('Invalid token format. Mapbox public tokens start with "pk."');
-      return;
-    }
-
-    console.log('Token submitted, initializing map...');
-    setShowTokenInput(false);
-    setIsInitialized(false);
-    
-    // Small delay to ensure UI state updates
-    setTimeout(() => {
-      initializeMap(trimmedToken);
-    }, 50);
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      handleTokenSubmit();
-    }
-  };
-
-  // Re-add markers when filters change (only if map is initialized)
+  // Initialize map on component mount
   useEffect(() => {
-    if (map.current && isInitialized && !showTokenInput && !isLoading) {
-      console.log('Updating markers based on filter changes...');
-      addMarkers();
-    }
-  }, [filteredFacilities, isInitialized]);
-
-  useEffect(() => {
+    initializeMap();
+    
     return () => {
       console.log('Cleaning up map component...');
       clearMarkers();
@@ -276,140 +238,91 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location }) => {
     };
   }, []);
 
+  // Re-add markers when filters change (only if map is initialized)
+  useEffect(() => {
+    if (map.current && isInitialized && !isLoading) {
+      console.log('Updating markers based on filter changes...');
+      addMarkers();
+    }
+  }, [filteredFacilities, isInitialized]);
+
   return (
     <div className="relative w-full">
       <div className="mt-4">
-        <Card className="min-h-[600px] relative overflow-hidden">
-          {showTokenInput ? (
-            <div className="h-[600px] w-full flex items-center justify-center bg-gray-50">
-              <div className="text-center space-y-4 p-6 max-w-md">
-                <h3 className="text-lg font-semibold">Mapbox Token Required</h3>
-                <p className="text-sm text-gray-600 mb-4">
-                  Enter your Mapbox public token to view the interactive map of Drammen Kommune facilities
-                </p>
-                <div className="space-y-3">
-                  <Input
-                    type="text"
-                    placeholder="pk.eyJ1IjoieW91cnVzZXJuYW1lIiwiYSI6InlvdXJ0b2tlbiJ9..."
-                    value={mapboxToken}
-                    onChange={(e) => setMapboxToken(e.target.value)}
-                    onKeyPress={handleKeyPress}
-                    className="w-full"
-                  />
-                  <Button 
-                    onClick={handleTokenSubmit} 
-                    disabled={!mapboxToken.trim() || isLoading}
-                    className="w-full"
-                  >
-                    {isLoading ? 'Loading Map...' : 'Load Map'}
-                  </Button>
-                </div>
-                {error && (
-                  <p className="text-sm text-red-600 mt-2 p-2 bg-red-50 rounded">{error}</p>
-                )}
-                <p className="text-xs text-gray-500">
-                  Get your token from{' '}
-                  <a href="https://account.mapbox.com/access-tokens/" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
-                    account.mapbox.com/access-tokens
-                  </a>
-                </p>
+        <Card className="min-h-[400px] relative overflow-hidden">
+          {isLoading && (
+            <div className="absolute inset-0 bg-white/80 flex items-center justify-center z-10">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+                <p className="text-sm text-gray-600">Loading map...</p>
               </div>
             </div>
-          ) : (
-            <>
-              {isLoading && (
-                <div className="absolute inset-0 bg-white/80 flex items-center justify-center z-10">
-                  <div className="text-center">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
-                    <p className="text-sm text-gray-600">Loading map...</p>
-                  </div>
+          )}
+          
+          {error && !isLoading && (
+            <div className="absolute inset-0 bg-red-50 flex items-center justify-center z-10">
+              <div className="text-center p-6">
+                <p className="text-red-600 mb-4">{error}</p>
+                <Button 
+                  onClick={() => {
+                    setError('');
+                    setIsInitialized(false);
+                    initializeMap();
+                  }}
+                  variant="outline"
+                >
+                  Try Again
+                </Button>
+              </div>
+            </div>
+          )}
+          
+          <div ref={mapContainer} className="h-[400px] w-full" />
+          
+          {/* Info overlay - More Compact */}
+          {!error && !isLoading && (
+            <div className="absolute top-4 right-4 bg-white/95 backdrop-blur-md border border-gray-200 rounded-lg p-4 shadow-lg max-w-xs">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="h-8 w-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <MapPin className="h-4 w-4 text-blue-600" />
                 </div>
-              )}
-              
-              {error && !isLoading && (
-                <div className="absolute inset-0 bg-red-50 flex items-center justify-center z-10">
-                  <div className="text-center p-6">
-                    <p className="text-red-600 mb-4">{error}</p>
-                    <Button 
-                      onClick={() => {
-                        setShowTokenInput(true);
-                        setError('');
-                        setIsInitialized(false);
-                      }}
-                      variant="outline"
-                    >
-                      Try Again
-                    </Button>
-                  </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900 text-sm">Drammen Kommune</h3>
+                  <p className="text-xs text-gray-600">Kommunale lokaler</p>
                 </div>
-              )}
+              </div>
               
-              <div ref={mapContainer} className="h-[600px] w-full" />
+              <div className="mb-3">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-medium text-gray-700">Viser lokaler</span>
+                  <span className="bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-1 rounded-full">
+                    {filteredFacilities.length}
+                  </span>
+                </div>
+              </div>
               
-              {/* Info overlay */}
-              {!error && !isLoading && (
-                <div className="absolute top-6 right-6 bg-white/98 backdrop-blur-md border border-gray-200 rounded-xl p-5 shadow-xl max-w-md min-w-[280px]">
-                  <div className="flex items-center gap-3 mb-4 pb-3 border-b border-gray-100">
-                    <div className="h-10 w-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                      <MapPin className="h-5 w-5 text-blue-600" />
+              <div className="space-y-1 max-h-32 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+                {filteredFacilities.slice(0, 3).map((facility, index) => {
+                  const markerColor = markerColors[index % markerColors.length];
+                  return (
+                    <div key={facility.id} className="flex items-start gap-2 p-1 rounded hover:bg-gray-50 transition-colors">
+                      <div 
+                        className="h-3 w-3 mt-0.5 rounded-full flex-shrink-0 border border-white shadow-sm"
+                        style={{ backgroundColor: markerColor }}
+                      />
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs font-medium text-gray-900 truncate">{facility.name}</p>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900">Drammen Kommune</h3>
-                      <p className="text-sm text-gray-600">Kommunale lokaler</p>
-                    </div>
-                  </div>
-                  
-                  <div className="mb-4">
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="text-sm font-medium text-gray-700">Viser lokaler</span>
-                      <span className="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">
-                        {filteredFacilities.length}
-                      </span>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2 max-h-48 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
-                    {filteredFacilities.map((facility, index) => {
-                      const markerColor = markerColors[index % markerColors.length];
-                      return (
-                        <div key={facility.id} className="flex items-start gap-3 p-2 rounded-lg hover:bg-gray-50 transition-colors">
-                          <div 
-                            className="h-4 w-4 mt-1 rounded-full flex-shrink-0 border border-white shadow-sm"
-                            style={{ backgroundColor: markerColor }}
-                          />
-                          <div className="min-w-0 flex-1">
-                            <p className="text-sm font-medium text-gray-900 truncate">{facility.name}</p>
-                            <p className="text-xs text-gray-600 truncate">{facility.address}</p>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-              
-              {/* Reset button */}
-              {!error && !isLoading && (
-                <div className="absolute bottom-6 right-6">
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    className="bg-white/90 backdrop-blur-sm"
-                    onClick={() => {
-                      setShowTokenInput(true);
-                      setMapboxToken('');
-                      setError('');
-                      if (map.current) {
-                        map.current.remove();
-                        map.current = null;
-                      }
-                    }}
-                  >
-                    Endre token
-                  </Button>
-                </div>
-              )}
-            </>
+                  );
+                })}
+                {filteredFacilities.length > 3 && (
+                  <p className="text-xs text-gray-500 text-center pt-1">
+                    +{filteredFacilities.length - 3} flere
+                  </p>
+                )}
+              </div>
+            </div>
           )}
         </Card>
       </div>
