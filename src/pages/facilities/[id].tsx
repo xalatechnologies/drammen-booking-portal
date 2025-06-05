@@ -1,15 +1,17 @@
+
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Home } from "lucide-react";
+import { ArrowLeft, Home, Heart, Share2 } from "lucide-react";
 import GlobalHeader from "@/components/GlobalHeader";
 import GlobalFooter from "@/components/GlobalFooter";
 import { FacilityImageGallery } from "@/components/facility/FacilityImageGallery";
 import { FacilityHeader } from "@/components/facility/FacilityHeader";
 import { FacilityQuickFacts } from "@/components/facility/FacilityQuickFacts";
-import { FacilitySidebar } from "@/components/facility/FacilitySidebar";
 import { FacilityInfoTabs } from "@/components/facility/FacilityInfoTabs";
 import { SimilarFacilitiesSlider } from "@/components/facility/SimilarFacilitiesSlider";
+import { AutoApprovalCard } from "@/components/facility/AutoApprovalCard";
+import { ZoneBookingCard } from "@/components/facility/ZoneBookingCard";
 import { Zone } from "@/components/booking/types";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { MapPin } from "lucide-react";
@@ -119,7 +121,7 @@ const FacilityDetail = () => {
         entryPoints: ["Hovedinngang", "Sør-inngang"]
       },
       accessibility: ["wheelchair", "hearing-loop", "visual-guidance"],
-      features: ["Avansert AV-utstyr", "Fleksibel belysning", "Akustikk optimalisert"],
+      features: ["Avansert AV-utstyr", "Fleksibel belysning", "Akustikk optimaliseret"],
       restrictions: ["Ingen mat eller drikke", "Kun innendørssko"],
       isActive: true
     }
@@ -198,6 +200,11 @@ const FacilityDetail = () => {
     }
   };
 
+  const handleBookingClick = () => {
+    const bookingPath = `/booking/${id}`;
+    navigate(bookingPath);
+  };
+
   return (
     <div className="min-h-screen bg-white flex flex-col">
       <GlobalHeader />
@@ -233,80 +240,99 @@ const FacilityDetail = () => {
 
       {/* Main Content */}
       <div className="flex-grow">
-        <div className="container mx-auto px-4 py-6 max-w-7xl">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Left Content - Details */}
-            <div className="lg:col-span-2 space-y-6">
-              {/* Image Gallery */}
-              <FacilityImageGallery images={facility.images} />
+        <div className="container mx-auto px-4 py-6 max-w-5xl">
+          <div className="space-y-6">
+            {/* Image Gallery */}
+            <FacilityImageGallery images={facility.images} />
 
-              {/* Header */}
-              <FacilityHeader
-                name={facility.name}
-                address={facility.address}
-                rating={facility.rating}
-                reviewCount={facility.reviewCount}
-                onShare={handleShare}
-                isFavorited={isFavorited}
-                onToggleFavorite={() => setIsFavorited(!isFavorited)}
-              />
-
-              {/* Quick Facts Grid */}
-              <FacilityQuickFacts
-                capacity={facility.capacity}
-                area={facility.area}
-                openingHours={facility.openingHours}
-                zoneCount={zones.length}
-              />
-
-              {/* Zone Information - moved here from sidebar */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <MapPin className="h-5 w-5" />
-                    Soneinformasjon
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid gap-4">
-                    {zones.map((zone) => (
-                      <div key={zone.id} className="p-4 border border-gray-200 rounded-lg">
-                        <div className="flex justify-between items-start mb-2">
-                          <h3 className="font-medium">{zone.name}</h3>
-                          <span className="text-sm font-medium text-gray-600">{zone.pricePerHour} kr/time</span>
-                        </div>
-                        <p className="text-sm text-gray-600 mb-2">{zone.description}</p>
-                        <div className="flex items-center gap-4 text-sm text-gray-500">
-                          <span>Kapasitet: {zone.capacity}</span>
-                          {zone.area && <span>Areal: {zone.area}</span>}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Tabbed Content */}
-              <FacilityInfoTabs
-                description={facility.description}
-                capacity={facility.capacity}
-                equipment={facility.equipment}
-                zones={zones}
-                amenities={facility.amenities}
-                address={facility.address}
-              />
+            {/* Header with Action Buttons */}
+            <div className="flex justify-between items-start">
+              <div className="flex-1">
+                <FacilityHeader
+                  name={facility.name}
+                  address={facility.address}
+                  rating={facility.rating}
+                  reviewCount={facility.reviewCount}
+                  onShare={handleShare}
+                  isFavorited={isFavorited}
+                  onToggleFavorite={() => setIsFavorited(!isFavorited)}
+                />
+              </div>
+              <div className="flex gap-2 mt-4">
+                <Button 
+                  onClick={handleBookingClick}
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                  size="lg"
+                >
+                  Reserver nå
+                </Button>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  onClick={() => setIsFavorited(!isFavorited)}
+                  className="px-3"
+                >
+                  <Heart className={`h-5 w-5 ${isFavorited ? 'fill-red-500 text-red-500' : ''}`} />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  onClick={handleShare}
+                  className="px-3"
+                >
+                  <Share2 className="h-5 w-5" />
+                </Button>
+              </div>
             </div>
 
-            {/* Right Sidebar - Compact Booking */}
-            <FacilitySidebar
-              zones={zones}
-              facilityName={facility.name}
-              facilityId={id}
-              hasAutoApproval={facility.hasAutoApproval}
+            {/* Quick Facts Grid */}
+            <FacilityQuickFacts
+              capacity={facility.capacity}
+              area={facility.area}
               openingHours={facility.openingHours}
-              onShare={handleShare}
-              onToggleFavorite={() => setIsFavorited(!isFavorited)}
-              isFavorited={isFavorited}
+              zoneCount={zones.length}
+            />
+
+            {/* Auto Approval Info */}
+            {facility.hasAutoApproval && (
+              <AutoApprovalCard hasAutoApproval={facility.hasAutoApproval} />
+            )}
+
+            {/* Zones Section */}
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <MapPin className="h-5 w-5" />
+                  Tilgjengelige soner
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {zones.map((zone) => (
+                  <ZoneBookingCard
+                    key={zone.id}
+                    zone={zone}
+                    facilityName={facility.name}
+                    onBookClick={() => navigate(`/booking/${id}?zone=${zone.id}`)}
+                  />
+                ))}
+              </CardContent>
+            </Card>
+
+            {/* Cancellation Policy */}
+            <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+              <p className="text-xs text-green-800">
+                <strong>Gratis avbestilling</strong> opptil 24 timer før reservert tid
+              </p>
+            </div>
+
+            {/* Tabbed Content */}
+            <FacilityInfoTabs
+              description={facility.description}
+              capacity={facility.capacity}
+              equipment={facility.equipment}
+              zones={zones}
+              amenities={facility.amenities}
+              address={facility.address}
             />
           </div>
 
