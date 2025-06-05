@@ -1,3 +1,4 @@
+
 import { UseFormReturn } from "react-hook-form";
 
 export interface Zone {
@@ -33,6 +34,25 @@ export interface Zone {
   features: string[];
   restrictions?: string[];
   isActive: boolean;
+}
+
+export interface BookingConflict {
+  conflictType: 'zone-conflict' | 'sub-zone-conflict' | 'whole-facility-conflict';
+  conflictingBookingId: string;
+  conflictingZoneId: string;
+  conflictingZoneName: string;
+  timeSlot: string;
+  date: Date;
+  bookedBy: string;
+}
+
+export interface ZoneAvailabilityStatus {
+  zoneId: string;
+  date: Date;
+  timeSlot: string;
+  isAvailable: boolean;
+  conflictReason?: 'booked' | 'maintenance' | 'whole-facility-booked' | 'sub-zone-conflict';
+  conflictDetails?: BookingConflict;
 }
 
 export interface BookingData {
