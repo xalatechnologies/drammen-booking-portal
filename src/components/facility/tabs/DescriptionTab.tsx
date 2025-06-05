@@ -1,10 +1,11 @@
 
 import React from "react";
-import { Card } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Heart, MapPin, Users, CheckCircle } from "lucide-react";
+import { ZoneBookingCard } from "@/components/facility/ZoneBookingCard";
 import { Zone } from "@/components/booking/types";
+import { MapPin, Users, Calendar, Clock, CheckCircle, AlertCircle, Info } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface DescriptionTabProps {
   description: string;
@@ -14,124 +15,63 @@ interface DescriptionTabProps {
 }
 
 export function DescriptionTab({ description, capacity, quickFacts, zones }: DescriptionTabProps) {
+  const navigate = useNavigate();
+
   return (
     <div className="p-6 space-y-8">
-      {/* Quick facts */}
-      {quickFacts}
-
       <div>
         <h2 className="text-2xl font-semibold mb-6">Om lokalet</h2>
-        <p className="text-gray-700 leading-relaxed text-lg">{description}</p>
-      </div>
-      
-      <Card className="p-6">
-        <h3 className="font-semibold text-xl mb-4 flex items-center gap-2">
-          <Heart className="h-6 w-6 text-red-500" />
-          Egnet for
-        </h3>
-        <div className="flex flex-wrap gap-3">
-          <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 text-base py-2 px-3">Idrett</Badge>
-          <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 text-base py-2 px-3">Trening</Badge>
-          <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200 text-base py-2 px-3">Arrangementer</Badge>
-          <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200 text-base py-2 px-3">Grupper</Badge>
-          <Badge variant="outline" className="bg-pink-50 text-pink-700 border-pink-200 text-base py-2 px-3">Dans</Badge>
-          <Badge variant="outline" className="bg-teal-50 text-teal-700 border-teal-200 text-base py-2 px-3">Ballsport</Badge>
-          <Badge variant="outline" className="bg-indigo-50 text-indigo-700 border-indigo-200 text-base py-2 px-3">Presentasjoner</Badge>
-        </div>
-      </Card>
-
-      {/* Compact Zone cards in 3-column grid */}
-      <ZoneGrid zones={zones} />
-
-      <RulesSection />
-    </div>
-  );
-}
-
-function ZoneGrid({ zones }: { zones: Zone[] }) {
-  return (
-    <div>
-      <h3 className="font-semibold text-xl mb-6 flex items-center gap-2">
-        <MapPin className="h-6 w-6" />
-        Tilgjengelige soner
-      </h3>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {zones.map((zone) => (
-          <ZoneCard key={zone.id} zone={zone} />
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function ZoneCard({ zone }: { zone: Zone }) {
-  return (
-    <div className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
-      <div className="flex justify-between items-start mb-4">
-        <h4 className="font-semibold text-lg">{zone.name}</h4>
-        <div className="text-right">
-          <div className="text-xl font-bold text-gray-900">{zone.pricePerHour} kr</div>
-          <div className="text-base text-gray-500">per time</div>
-        </div>
-      </div>
-      
-      <div className="flex items-center gap-4 text-base text-gray-600 mb-4">
-        <div className="flex items-center gap-2">
-          <Users className="h-5 w-5" />
-          <span>{zone.capacity}</span>
-        </div>
-        {zone.area && (
-          <div className="flex items-center gap-2">
-            <MapPin className="h-5 w-5" />
-            <span>{zone.area}</span>
+        <p className="text-base text-gray-700 leading-relaxed mb-6 whitespace-pre-line">{description}</p>
+        
+        <div className="pt-6 border-t border-gray-100">
+          <h3 className="font-semibold text-xl mb-4">Egnet for</h3>
+          <div className="flex flex-wrap gap-3">
+            <Badge variant="outline" className="bg-slate-700 text-white border-slate-700 text-base py-2 px-4 font-medium">Idrett</Badge>
+            <Badge variant="outline" className="bg-slate-700 text-white border-slate-700 text-base py-2 px-4 font-medium">Trening</Badge>
+            <Badge variant="outline" className="bg-slate-700 text-white border-slate-700 text-base py-2 px-4 font-medium">Arrangementer</Badge>
+            <Badge variant="outline" className="bg-slate-700 text-white border-slate-700 text-base py-2 px-4 font-medium">Grupper</Badge>
           </div>
-        )}
-      </div>
-      
-      <p className="text-base text-gray-600 mb-4 line-clamp-2 leading-relaxed">{zone.description}</p>
-      
-      <div className="flex flex-wrap gap-2 mb-4">
-        {zone.equipment.slice(0, 2).map((item, i) => (
-          <Badge key={i} variant="outline" className="text-base py-1 px-3">
-            {item}
-          </Badge>
-        ))}
-        {zone.equipment.length > 2 && (
-          <Badge variant="outline" className="text-base py-1 px-3">
-            +{zone.equipment.length - 2}
-          </Badge>
-        )}
-      </div>
-      
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 text-base text-green-600">
-          <CheckCircle className="h-5 w-5" />
-          <span>Tilgjengelig</span>
         </div>
-        <Button 
-          size="sm"
-          className="bg-[#0B3D91] hover:bg-blue-700 text-white h-10 text-base px-6"
-        >
-          Reserver
-        </Button>
       </div>
-    </div>
-  );
-}
 
-function RulesSection() {
-  return (
-    <div>
-      <h3 className="font-semibold text-xl mb-4">Regler og retningslinjer</h3>
-      <div className="bg-gray-50 p-6 rounded-lg">
-        <ul className="space-y-3 text-base text-gray-700 leading-relaxed">
-          <li>• Innendørssko påkrevd i gymsalen</li>
-          <li>• Maks antall deltakere må respekteres</li>
-          <li>• Røyking og alkohol er forbudt</li>
-          <li>• Lokalet må ryddes etter bruk</li>
-          <li>• Skader på utstyr må rapporteres umiddelbart</li>
-          <li>• Musikk må holdes på akseptabelt nivå</li>
-        </ul>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div>
+          {quickFacts}
+        </div>
+
+        <Card>
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-2 text-xl">
+              <MapPin className="h-6 w-6" />
+              Tilgjengelige soner
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {zones.map((zone) => (
+              <ZoneBookingCard
+                key={zone.id}
+                zone={zone}
+                facilityName="Gymsal"
+                onBookClick={() => navigate(`/booking/1?zone=${zone.id}`)}
+              />
+            ))}
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="bg-slate-700 text-white rounded-lg p-6">
+        <h3 className="font-semibold text-xl mb-4 flex items-center gap-2">
+          <Info className="h-6 w-6" />
+          Regler og retningslinjer
+        </h3>
+        <div className="space-y-3 text-base leading-relaxed">
+          <p>• Kun innendørssko tillatt i gymsalen</p>
+          <p>• Mat og drikke må konsumeres i pauseområdene</p>
+          <p>• Alt utstyr må ryddes tilbake etter bruk</p>
+          <p>• Røyking er strengt forbudt i hele bygget</p>
+          <p>• Musikk og høy lyd må avsluttes senest kl. 22:00</p>
+          <p>• Nøkler/tilgangskort må returneres umiddelbart etter bruk</p>
+        </div>
       </div>
     </div>
   );
