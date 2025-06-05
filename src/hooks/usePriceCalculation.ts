@@ -39,9 +39,14 @@ export function usePriceCalculation({
       bookingMode
     });
 
-    // Show pricing as soon as we have basic info - make timeSlot optional
+    // Check if we have the minimum required information for pricing
     if (!facilityId || !zoneId || !startDate || !customerType) {
-      console.log('Missing required parameters for price calculation');
+      console.log('Missing required parameters for price calculation:', {
+        facilityId: !!facilityId,
+        zoneId: !!zoneId,
+        startDate: !!startDate,
+        customerType: !!customerType
+      });
       setCalculation(null);
       setIsLoading(false);
       return;

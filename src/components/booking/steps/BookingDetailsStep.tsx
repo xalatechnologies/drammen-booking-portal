@@ -53,6 +53,18 @@ export function BookingDetailsStep({ form, facility }: BookingDetailsStepProps) 
   // Show pricing when we have minimum required info
   const shouldShowPricing = watchedValues.customerType && watchedValues.zoneId && watchedValues.date;
 
+  console.log('BookingDetailsStep debug:', {
+    shouldShowPricing,
+    calculation,
+    isLoading,
+    watchedValues: {
+      customerType: watchedValues.customerType,
+      zoneId: watchedValues.zoneId,
+      date: watchedValues.date,
+      facilityId: facility.id
+    }
+  });
+
   return (
     <div className="space-y-6">
       {/* Customer Type, Event Type, and Age Group - In same line */}
@@ -295,8 +307,8 @@ export function BookingDetailsStep({ form, facility }: BookingDetailsStepProps) 
           <PriceBreakdown 
             calculation={calculation || { 
               basePrice: 0, 
-              totalHours: 0, 
-              totalDays: 0, 
+              totalHours: 2, 
+              totalDays: 1, 
               customerTypeDiscount: 0, 
               weekendSurcharge: 0, 
               subtotal: 0, 
