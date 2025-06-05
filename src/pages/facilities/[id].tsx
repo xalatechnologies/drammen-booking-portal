@@ -346,47 +346,50 @@ const FacilityDetail = () => {
               }
             />
 
-            {/* Location with Map - Moved under tabs */}
+            {/* Location with Map - Improved WCAG compliance */}
             <Card className="p-6">
-              <div className="mb-4">
-                <h3 className="text-lg font-semibold">Lokasjon</h3>
+              <div className="mb-6">
+                <h3 className="text-2xl font-semibold mb-2">Lokasjon</h3>
+                <p className="text-base text-gray-700 leading-relaxed">
+                  Finn veien til lokalet og se transportmuligheter og parkeringsalternativer.
+                </p>
               </div>
               
-              <div className="space-y-4">
-                <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                  <MapPin className="h-5 w-5 text-blue-600" />
+              <div className="space-y-6">
+                <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
+                  <MapPin className="h-6 w-6 text-blue-600 flex-shrink-0" />
                   <div>
-                    <p className="font-medium">Knoffs gate 8, Drammen</p>
-                    <p className="text-sm text-gray-600">Drammen Kommune</p>
+                    <p className="font-semibold text-lg">Knoffs gate 8, Drammen</p>
+                    <p className="text-base text-gray-600">Drammen Kommune</p>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="p-3 bg-gray-50 rounded-lg">
-                    <p className="font-medium text-blue-600 mb-1">Kollektivtransport</p>
-                    <div className="space-y-2 text-sm">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="p-4 bg-gray-50 rounded-lg">
+                    <h4 className="font-semibold text-lg text-blue-600 mb-3">Kollektivtransport</h4>
+                    <div className="space-y-3 text-base">
                       <div>
-                        <p className="font-medium">Buss</p>
-                        <p className="text-gray-700">Linje 102, 104 - Stopp: Brandengen skole (50m unna)</p>
+                        <p className="font-semibold text-base">Buss</p>
+                        <p className="text-gray-700 leading-relaxed">Linje 102, 104 - Stopp: Brandengen skole (50m unna)</p>
                       </div>
                       <div>
-                        <p className="font-medium">Tog</p>
-                        <p className="text-gray-700">Drammen stasjon - 15 min med buss</p>
+                        <p className="font-semibold text-base">Tog</p>
+                        <p className="text-gray-700 leading-relaxed">Drammen stasjon - 15 min med buss</p>
                       </div>
                     </div>
                   </div>
 
-                  <div className="p-3 bg-gray-50 rounded-lg">
-                    <p className="font-medium text-green-600 mb-1">Parkering</p>
-                    <div className="space-y-1 text-sm">
-                      <p className="text-gray-700">Gratis parkering tilgjengelig</p>
-                      <p className="text-gray-700">20 plasser på skolens område</p>
-                      <p className="text-gray-700">Handicapparking: 2 plasser</p>
+                  <div className="p-4 bg-gray-50 rounded-lg">
+                    <h4 className="font-semibold text-lg text-green-600 mb-3">Parkering</h4>
+                    <div className="space-y-2 text-base">
+                      <p className="text-gray-700 leading-relaxed">Gratis parkering tilgjengelig</p>
+                      <p className="text-gray-700 leading-relaxed">20 plasser på skolens område</p>
+                      <p className="text-gray-700 leading-relaxed">Handicapparking: 2 plasser</p>
                     </div>
                   </div>
                 </div>
                 
-                <div className="h-64 rounded-lg overflow-hidden border">
+                <div className="h-64 rounded-lg overflow-hidden border" role="img" aria-label="Kart som viser lokasjon for Brandengen skole på Knoffs gate 8, Drammen">
                   <FacilityLocation address="Knoffs gate 8, Drammen" />
                 </div>
               </div>

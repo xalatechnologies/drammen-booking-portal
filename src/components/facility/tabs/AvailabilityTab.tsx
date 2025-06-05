@@ -12,7 +12,11 @@ export function AvailabilityTab({ zones, startDate }: AvailabilityTabProps) {
   return (
     <div className="p-6">
       <div>
-        <h2 className="text-xl font-medium mb-4">Tilgjengelighet per sone</h2>
+        <h2 className="text-2xl font-semibold mb-6">Tilgjengelighet per sone</h2>
+        <p className="text-base text-gray-700 mb-6 leading-relaxed">
+          Se hvilke soner som er tilgjengelige for booking på ulike tidspunkt. 
+          Grønne felt viser ledige tider, røde felt viser opptatte tider.
+        </p>
         <ZoneAvailabilityTable 
           zones={zones}
           startDate={startDate}

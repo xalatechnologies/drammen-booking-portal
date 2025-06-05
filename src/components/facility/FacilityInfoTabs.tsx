@@ -32,14 +32,23 @@ export function FacilityInfoTabs({
 
   return (
     <Tabs defaultValue="description" className="bg-white rounded-lg shadow-sm border">
-      <TabsList className="w-full border-b p-0 h-auto bg-transparent">
-        <TabsTrigger value="description" className="flex-1 py-3 rounded-none data-[state=active]:border-b-2 data-[state=active]:border-blue-600 data-[state=active]:shadow-none data-[state=active]:bg-transparent">
+      <TabsList className="w-full border-b p-0 h-auto bg-gray-50 rounded-none">
+        <TabsTrigger 
+          value="description" 
+          className="flex-1 py-4 px-6 rounded-none text-base font-medium data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:border-b-0 data-[state=active]:shadow-none hover:bg-blue-50 hover:text-blue-700 transition-colors"
+        >
           Om lokalet
         </TabsTrigger>
-        <TabsTrigger value="features" className="flex-1 py-3 rounded-none data-[state=active]:border-b-2 data-[state=active]:border-blue-600 data-[state=active]:shadow-none data-[state=active]:bg-transparent">
+        <TabsTrigger 
+          value="features" 
+          className="flex-1 py-4 px-6 rounded-none text-base font-medium data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:border-b-0 data-[state=active]:shadow-none hover:bg-blue-50 hover:text-blue-700 transition-colors"
+        >
           Fasiliteter
         </TabsTrigger>
-        <TabsTrigger value="availability" className="flex-1 py-3 rounded-none data-[state=active]:border-b-2 data-[state=active]:border-blue-600 data-[state=active]:shadow-none data-[state=active]:bg-transparent">
+        <TabsTrigger 
+          value="availability" 
+          className="flex-1 py-4 px-6 rounded-none text-base font-medium data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:border-b-0 data-[state=active]:shadow-none hover:bg-blue-50 hover:text-blue-700 transition-colors"
+        >
           Tilgjengelighet
         </TabsTrigger>
       </TabsList>
