@@ -5,16 +5,18 @@ import { CheckCircle } from "lucide-react";
 interface FormStepperProps {
   currentStep: number;
   steps: string[];
+  "aria-label"?: string;
 }
 
-export function FormStepper({ currentStep, steps }: FormStepperProps) {
+export function FormStepper({ currentStep, steps, "aria-label": ariaLabel }: FormStepperProps) {
   return (
-    <div className="w-full">
+    <div className="w-full" role="progressbar" aria-label={ariaLabel} aria-valuemin={0} aria-valuemax={steps.length - 1} aria-valuenow={currentStep}>
       {/* Progress bar */}
-      <div className="w-full h-1 bg-gray-200 rounded-full mb-6 overflow-hidden">
+      <div className="w-full h-2 bg-gray-200 rounded-full mb-4 overflow-hidden">
         <div 
-          className="h-1 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full transition-all duration-500 ease-out" 
+          className="h-2 bg-gradient-to-r from-slate-800 to-slate-700 rounded-full transition-all duration-500 ease-out" 
           style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
+          aria-hidden="true"
         />
       </div>
       
@@ -31,19 +33,21 @@ export function FormStepper({ currentStep, steps }: FormStepperProps) {
                 {/* Step circle */}
                 <div 
                   className={`
-                    relative rounded-full w-10 h-10 flex items-center justify-center border-2 transition-all duration-300 z-10
+                    relative rounded-full w-8 h-8 flex items-center justify-center border-2 transition-all duration-300 z-10 text-sm font-semibold
                     ${isCompleted 
-                      ? 'bg-green-500 border-green-500 text-white shadow-lg' 
+                      ? 'bg-green-600 border-green-600 text-white shadow-md' 
                       : isCurrent 
-                        ? 'bg-blue-600 border-blue-600 text-white shadow-lg scale-110'
-                        : 'bg-white border-gray-300 text-gray-400'
+                        ? 'bg-slate-800 border-slate-800 text-white shadow-md scale-105'
+                        : 'bg-white border-gray-300 text-gray-500'
                     }
                   `}
+                  role="img"
+                  aria-label={`Step ${index + 1} ${isCompleted ? 'completed' : isCurrent ? 'current' : 'upcoming'}: ${step}`}
                 >
                   {isCompleted ? (
-                    <CheckCircle className="h-5 w-5" />
+                    <CheckCircle className="h-4 w-4" aria-hidden="true" />
                   ) : (
-                    <span className="text-sm font-semibold">{index + 1}</span>
+                    <span aria-hidden="true">{index + 1}</span>
                   )}
                 </div>
                 
@@ -53,25 +57,27 @@ export function FormStepper({ currentStep, steps }: FormStepperProps) {
                     <div 
                       className={`
                         h-0.5 w-full transition-all duration-300
-                        ${isCompleted ? 'bg-green-500' : 'bg-gray-200'}
+                        ${isCompleted ? 'bg-green-600' : 'bg-gray-200'}
                       `}
+                      aria-hidden="true"
                     />
                   </div>
                 )}
               </div>
               
               {/* Step label */}
-              <div className="mt-3 text-center max-w-24">
+              <div className="mt-2 text-center max-w-24">
                 <span 
                   className={`
                     text-xs font-medium leading-tight
                     ${isCurrent 
-                      ? 'text-blue-600' 
+                      ? 'text-slate-800 font-semibold' 
                       : isCompleted 
-                        ? 'text-green-600'
+                        ? 'text-green-700'
                         : 'text-gray-500'
                     }
                   `}
+                  aria-hidden="true"
                 >
                   {step}
                 </span>

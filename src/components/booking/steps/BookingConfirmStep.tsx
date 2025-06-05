@@ -15,10 +15,10 @@ interface BookingConfirmStepProps {
 
 export function BookingConfirmStep({ facilityName, bookingData, termsAccepted, onTermsAcceptedChange }: BookingConfirmStepProps) {
   return (
-    <div className="space-y-6">
-      <div className="flex items-center space-x-2 pb-2 border-b">
-        <CheckCircle className="h-5 w-5 text-green-600" />
-        <h3 className="text-xl font-medium">Bekreft reservasjon</h3>
+    <div className="space-y-6" role="group" aria-labelledby="confirm-heading">
+      <div className="flex items-center space-x-2 pb-2 border-b border-gray-200">
+        <CheckCircle className="h-5 w-5 text-green-600" aria-hidden="true" />
+        <h2 id="confirm-heading" className="text-lg font-medium text-gray-900">Bekreft reservasjon</h2>
       </div>
       
       <BookingSummary
@@ -26,59 +26,61 @@ export function BookingConfirmStep({ facilityName, bookingData, termsAccepted, o
         bookingData={bookingData}
       />
       
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 space-y-4">
+      <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 space-y-4">
         <div className="flex items-center gap-2">
-          <ShieldCheck className="h-5 w-5 text-blue-600 flex-shrink-0" />
-          <h4 className="font-medium">Regler og vilkår for reservasjon</h4>
+          <ShieldCheck className="h-5 w-5 text-slate-700 flex-shrink-0" aria-hidden="true" />
+          <h3 className="font-medium text-gray-900">Regler og vilkår for reservasjon</h3>
         </div>
         
-        <ul className="text-sm text-blue-800 space-y-2 ml-2">
+        <ul className="text-sm text-slate-700 space-y-2 ml-2" role="list">
           <li className="flex items-start gap-2">
-            <span className="font-bold text-blue-600">•</span>
+            <span className="font-bold text-slate-600 mt-1" aria-hidden="true">•</span>
             <span>Du må være minst 18 år for å reservere kommunale lokaler.</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="font-bold text-blue-600">•</span>
+            <span className="font-bold text-slate-600 mt-1" aria-hidden="true">•</span>
             <span>Avbestilling må skje minst 24 timer før reservert tid.</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="font-bold text-blue-600">•</span>
+            <span className="font-bold text-slate-600 mt-1" aria-hidden="true">•</span>
             <span>Lokalet skal forlates i samme stand som det var ved ankomst.</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="font-bold text-blue-600">•</span>
+            <span className="font-bold text-slate-600 mt-1" aria-hidden="true">•</span>
             <span>Ved skade på inventar eller utstyr kan du bli fakturert for reparasjon eller erstatning.</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="font-bold text-blue-600">•</span>
+            <span className="font-bold text-slate-600 mt-1" aria-hidden="true">•</span>
             <span>Kommunen forbeholder seg retten til å kansellere reservasjoner på kort varsel ved uforutsette hendelser.</span>
           </li>
         </ul>
       </div>
       
-      <div className="border-t pt-4">
+      <div className="border-t border-gray-200 pt-4">
         <div className="flex items-start gap-3">
           <Checkbox 
             id="terms" 
             checked={termsAccepted} 
             onCheckedChange={(checked) => onTermsAcceptedChange(checked === true)}
+            className="mt-1 border-gray-400 data-[state=checked]:bg-slate-800 data-[state=checked]:border-slate-800 focus:ring-2 focus:ring-slate-800 focus:ring-offset-2"
+            aria-describedby="terms-description"
           />
-          <div>
+          <div className="space-y-1">
             <label 
               htmlFor="terms" 
-              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+              className="text-sm font-medium leading-none text-gray-900 cursor-pointer block"
             >
-              Jeg bekrefter at jeg har lest og godtar reglene og vilkårene
+              Jeg bekrefter at jeg har lest og godtar reglene og vilkårene *
             </label>
-            <p className="text-sm text-gray-500 mt-1">
-              Ved å sende inn reservasjonen bekrefter du at all informasjon er korrekt
+            <p id="terms-description" className="text-xs text-gray-600">
+              Ved å sende inn reservasjonen bekrefter du at all informasjon er korrekt og at du er minst 18 år gammel
             </p>
           </div>
         </div>
       </div>
       
       {!termsAccepted && (
-        <Alert variant="destructive" className="bg-red-50 text-red-800 border-red-200">
+        <Alert variant="destructive" className="bg-red-50 text-red-800 border-red-200" role="alert">
           <AlertDescription>
             Du må godta reglene og vilkårene for å kunne sende inn reservasjonen.
           </AlertDescription>

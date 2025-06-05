@@ -173,28 +173,32 @@ export function EnhancedBookingForm({ facility, onBookingComplete }: EnhancedBoo
   };
 
   return (
-    <div className="bg-white">
+    <div className="bg-white" role="main" aria-label="Booking form">
       {/* Modern Header with Progress */}
-      <div className="px-8 py-6 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-indigo-50">
+      <div className="px-4 py-4 border-b border-gray-200 bg-gradient-to-r from-slate-50 to-gray-50">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+          <h1 className="text-xl font-semibold text-gray-900 mb-4" id="form-title">
             {stepTitles[currentStep]}
-          </h2>
-          <FormStepper currentStep={currentStep} steps={stepTitles} />
+          </h1>
+          <FormStepper 
+            currentStep={currentStep} 
+            steps={stepTitles}
+            aria-label="Booking progress"
+          />
         </div>
       </div>
       
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="max-w-4xl mx-auto">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="max-w-4xl mx-auto" noValidate>
           {/* Form Content */}
-          <div className="px-8 py-8">
-            <div className="min-h-[500px]">
+          <div className="px-4 py-6">
+            <div className="min-h-[400px]" role="tabpanel" aria-labelledby="form-title">
               {renderCurrentStep()}
             </div>
           </div>
           
           {/* Navigation Footer */}
-          <div className="px-8 py-6 border-t border-gray-100 bg-gray-50/50">
+          <div className="px-4 py-4 border-t border-gray-200 bg-gray-50/50">
             <div className="max-w-4xl mx-auto">
               <BookingFormNav
                 currentStep={currentStep}

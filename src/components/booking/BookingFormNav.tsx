@@ -25,45 +25,48 @@ export function BookingFormNav({
   onNextStep 
 }: BookingFormNavProps) {
   return (
-    <div className="flex justify-between pt-6 border-t border-gray-200">
+    <nav className="flex justify-between items-center" aria-label="Form navigation">
       {!isFirstStep ? (
         <Button 
           type="button" 
           variant="outline" 
           onClick={onPreviousStep} 
           disabled={isSubmitting}
-          className="gap-1"
+          className="gap-2 border-gray-300 hover:bg-gray-50 focus:ring-2 focus:ring-slate-800 focus:ring-offset-2"
+          aria-label="Go to previous step"
         >
-          <ChevronLeft className="h-4 w-4" />
+          <ChevronLeft className="h-4 w-4" aria-hidden="true" />
           Tilbake
         </Button>
       ) : (
-        <div></div> // Empty div to maintain layout with flex justify-between
+        <div aria-hidden="true"></div>
       )}
       
       <Button 
         type={isLastStep ? "submit" : "button"}
         onClick={isLastStep ? undefined : onNextStep}
-        className="bg-[#1e3a8a] hover:bg-[#1e40af] gap-1"
+        className="bg-slate-800 hover:bg-slate-900 focus:ring-2 focus:ring-slate-800 focus:ring-offset-2 gap-2 min-w-[140px]"
         disabled={isSubmitting || (isLastStep && isSubmitDisabled) || !canContinue}
+        aria-label={isLastStep ? "Submit booking" : "Go to next step"}
       >
         {isSubmitting ? (
           <>
-            <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-1"></span>
-            Sender...
+            <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" aria-hidden="true"></span>
+            <span>Sender...</span>
+            <span className="sr-only">Sending booking request</span>
           </>
         ) : isLastStep ? (
           <>
-            Send inn reservasjon
-            <CheckCircle className="h-4 w-4 ml-1" />
+            <span>Send inn reservasjon</span>
+            <CheckCircle className="h-4 w-4" aria-hidden="true" />
           </>
         ) : (
           <>
-            Neste
-            <ChevronRight className="h-4 w-4" />
+            <span>Neste</span>
+            <ChevronRight className="h-4 w-4" aria-hidden="true" />
           </>
         )}
       </Button>
-    </div>
+    </nav>
   );
 }
