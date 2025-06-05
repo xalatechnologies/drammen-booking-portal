@@ -2,8 +2,9 @@
 import { PriceRule, PriceCalculation, PriceBreakdownItem, CustomerType } from '@/types/pricing';
 import { isWeekend, differenceInHours, differenceInDays } from 'date-fns';
 
-// Mock price rules - in real app this would come from database
+// Enhanced mock price rules with new customer types
 const mockPriceRules: PriceRule[] = [
+  // Private customers
   {
     id: 'rule-1',
     facilityId: '1',
@@ -17,26 +18,6 @@ const mockPriceRules: PriceRule[] = [
   {
     id: 'rule-2',
     facilityId: '1',
-    zoneId: 'whole-facility',
-    customerType: 'nonprofit',
-    dayType: 'weekday',
-    priceType: 'hourly',
-    basePrice: 300,
-    isActive: true
-  },
-  {
-    id: 'rule-3',
-    facilityId: '1',
-    zoneId: 'whole-facility',
-    customerType: 'business',
-    dayType: 'weekday',
-    priceType: 'hourly',
-    basePrice: 650,
-    isActive: true
-  },
-  {
-    id: 'rule-4',
-    facilityId: '1',
     zoneId: 'zone-1',
     customerType: 'private',
     dayType: 'weekday',
@@ -45,13 +26,77 @@ const mockPriceRules: PriceRule[] = [
     isActive: true
   },
   {
-    id: 'rule-5',
+    id: 'rule-3',
     facilityId: '1',
     zoneId: 'zone-2',
     customerType: 'private',
     dayType: 'weekday',
     priceType: 'hourly',
     basePrice: 280,
+    isActive: true
+  },
+  // Nonprofit organizations
+  {
+    id: 'rule-4',
+    facilityId: '1',
+    zoneId: 'whole-facility',
+    customerType: 'nonprofit',
+    dayType: 'weekday',
+    priceType: 'hourly',
+    basePrice: 300,
+    isActive: true
+  },
+  {
+    id: 'rule-5',
+    facilityId: '1',
+    zoneId: 'zone-1',
+    customerType: 'nonprofit',
+    dayType: 'weekday',
+    priceType: 'hourly',
+    basePrice: 180,
+    isActive: true
+  },
+  {
+    id: 'rule-6',
+    facilityId: '1',
+    zoneId: 'zone-2',
+    customerType: 'nonprofit',
+    dayType: 'weekday',
+    priceType: 'hourly',
+    basePrice: 200,
+    isActive: true
+  },
+  // Business customers
+  {
+    id: 'rule-7',
+    facilityId: '1',
+    zoneId: 'whole-facility',
+    customerType: 'business',
+    dayType: 'weekday',
+    priceType: 'hourly',
+    basePrice: 650,
+    isActive: true
+  },
+  // Youth customers
+  {
+    id: 'rule-8',
+    facilityId: '1',
+    zoneId: 'whole-facility',
+    customerType: 'youth',
+    dayType: 'weekday',
+    priceType: 'hourly',
+    basePrice: 200,
+    isActive: true
+  },
+  // Senior customers
+  {
+    id: 'rule-9',
+    facilityId: '1',
+    zoneId: 'whole-facility',
+    customerType: 'senior',
+    dayType: 'weekday',
+    priceType: 'hourly',
+    basePrice: 350,
     isActive: true
   }
 ];
@@ -66,7 +111,9 @@ export class PricingEngine {
     endDate: Date,
     customerType: CustomerType = 'private',
     timeSlot: string = '',
-    bookingMode: 'one-time' | 'date-range' | 'recurring' = 'one-time'
+    bookingMode: 'one-time' | 'date-range' | 'recurring' = 'one-time',
+    eventType?: string,
+    ageGroup?: string
   ): PriceCalculation {
     const rule = this.findApplicableRule(facilityId, zoneId, startDate, customerType);
     
@@ -123,6 +170,24 @@ export class PricingEngine {
         total: -customerTypeDiscount,
         type: 'discount'
       });
+    } else if (customerType === 'youth') {
+      customerTypeDiscount = subtotal * 0.3; // 30% discount for youth
+      breakdown.push({
+        description: 'Ungdomsrabatt (30%)',
+        quantity: 1,
+        unitPrice: -customerTypeDiscount,
+        total: -customerTypeDiscount,
+        type: 'discount'
+      });
+    } else if (customerType === 'senior') {
+      customerTypeDiscount = subtotal * 0.15; // 15% discount for seniors
+      breakdown.push({
+        description: 'Seniorrabatt (15%)',
+        quantity: 1,
+        unitPrice: -customerTypeDiscount,
+        total: -customerTypeDiscount,
+        type: 'discount'
+      });
     }
 
     // Apply weekend surcharge
@@ -136,6 +201,19 @@ export class PricingEngine {
         total: weekendSurcharge,
         type: 'surcharge'
       });
+    }
+
+    // Event type modifiers
+    if (eventType === 'competition') {
+      const competitionSurcharge = subtotal * 0.1; // 10% for competitions
+      breakdown.push({
+        description: 'Tillegg konkurranse (10%)',
+        quantity: 1,
+        unitPrice: competitionSurcharge,
+        total: competitionSurcharge,
+        type: 'surcharge'
+      });
+      weekendSurcharge += competitionSurcharge;
     }
 
     const finalPrice = Math.max(0, subtotal - customerTypeDiscount + weekendSurcharge);

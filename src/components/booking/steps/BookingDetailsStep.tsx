@@ -1,7 +1,7 @@
 
 import React from "react";
 import { UseFormReturn } from "react-hook-form";
-import { Calendar, Clock, Users, MessageSquare, MapPin, Repeat } from "lucide-react";
+import { Calendar, Clock, Users, MessageSquare, MapPin, Repeat, CreditCard, Trophy } from "lucide-react";
 import {
   FormField,
   FormItem,
@@ -12,6 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { BookingFormValues, Zone } from "../types";
 import { EnhancedZoneSelector } from "../EnhancedZoneSelector";
@@ -36,19 +37,52 @@ export interface BookingDetailsStepProps {
 export function BookingDetailsStep({ form, facility }: BookingDetailsStepProps) {
   const watchedValues = form.watch();
 
-  // Calculate price in real-time
+  // Calculate price with more immediate feedback
   const { calculation, isLoading } = usePriceCalculation({
     facilityId: facility.id,
     zoneId: watchedValues.zoneId,
     startDate: watchedValues.date,
     endDate: watchedValues.endDate,
     timeSlot: watchedValues.timeSlot,
-    customerType: 'private', // This could be a form field later
-    bookingMode: watchedValues.bookingMode
+    customerType: watchedValues.customerType || 'private',
+    bookingMode: watchedValues.bookingMode,
+    eventType: watchedValues.eventType,
+    ageGroup: watchedValues.ageGroup
   });
 
   return (
     <div className="space-y-6">
+      {/* Customer Type - Make this prominent */}
+      <div className="space-y-3">
+        <FormField
+          control={form.control}
+          name="customerType"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-base font-semibold text-gray-900 flex items-center gap-2">
+                <CreditCard className="h-5 w-5 text-slate-600" />
+                Prisgruppe
+              </FormLabel>
+              <FormControl>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <SelectTrigger className="h-11 border-gray-300 focus:border-slate-700">
+                    <SelectValue placeholder="Velg prisgruppe" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="private">Privatperson</SelectItem>
+                    <SelectItem value="nonprofit">Frivillig organisasjon</SelectItem>
+                    <SelectItem value="business">Bedrift/Næringsdrivende</SelectItem>
+                    <SelectItem value="youth">Ungdom (under 20 år)</SelectItem>
+                    <SelectItem value="senior">Senior (over 67 år)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </div>
+
       {/* Booking Type */}
       <div className="space-y-3">
         <FormField
@@ -82,7 +116,7 @@ export function BookingDetailsStep({ form, facility }: BookingDetailsStepProps) 
         />
       </div>
 
-      {/* Date Range, Time Range, and Attendees on same line */}
+      {/* Date Range, Time Range, and Attendees */}
       <div className="grid grid-cols-1 md:grid-cols-7 gap-6">
         <div className="md:col-span-3">
           <FormField
@@ -161,6 +195,65 @@ export function BookingDetailsStep({ form, facility }: BookingDetailsStepProps) 
         </div>
       </div>
 
+      {/* Event Type and Age Group */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <FormField
+          control={form.control}
+          name="eventType"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-base font-semibold text-gray-900 flex items-center gap-2">
+                <Trophy className="h-5 w-5 text-slate-600" />
+                Type arrangement
+              </FormLabel>
+              <FormControl>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <SelectTrigger className="h-11 border-gray-300 focus:border-slate-700">
+                    <SelectValue placeholder="Velg type arrangement" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="training">Trening/Øvelse</SelectItem>
+                    <SelectItem value="competition">Konkurranse/Turnering</SelectItem>
+                    <SelectItem value="meeting">Møte/Kurs</SelectItem>
+                    <SelectItem value="celebration">Fest/Feiring</SelectItem>
+                    <SelectItem value="other">Annet</SelectItem>
+                  </SelectContent>
+                </Select>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="ageGroup"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-base font-semibold text-gray-900 flex items-center gap-2">
+                <Users className="h-5 w-5 text-slate-600" />
+                Aldersgruppe
+              </FormLabel>
+              <FormControl>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <SelectTrigger className="h-11 border-gray-300 focus:border-slate-700">
+                    <SelectValue placeholder="Velg aldersgruppe" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="mixed">Blandet alder</SelectItem>
+                    <SelectItem value="children">Barn (under 12 år)</SelectItem>
+                    <SelectItem value="under-20">Ungdom (under 20 år)</SelectItem>
+                    <SelectItem value="over-20">Voksne (over 20 år)</SelectItem>
+                    <SelectItem value="adults">Voksne (over 67 år)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </div>
+
       {/* Purpose */}
       <FormField
         control={form.control}
@@ -191,8 +284,8 @@ export function BookingDetailsStep({ form, facility }: BookingDetailsStepProps) 
         selectedTimeSlot={watchedValues.timeSlot || ""}
       />
 
-      {/* Price Calculation */}
-      {(watchedValues.date && watchedValues.timeSlot && watchedValues.zoneId) && (
+      {/* Price Calculation - Show as soon as we have basic info */}
+      {(watchedValues.customerType && watchedValues.zoneId) && (
         <PriceBreakdown 
           calculation={calculation || { basePrice: 0, totalHours: 0, totalDays: 0, customerTypeDiscount: 0, weekendSurcharge: 0, subtotal: 0, finalPrice: 0, breakdown: [] }}
           isLoading={isLoading}

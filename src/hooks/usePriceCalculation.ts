@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { PriceCalculation, CustomerType } from '@/types/pricing';
 import { pricingEngine } from '@/utils/pricingEngine';
@@ -11,6 +10,8 @@ interface UsePriceCalculationProps {
   timeSlot?: string;
   customerType?: CustomerType;
   bookingMode?: 'one-time' | 'date-range' | 'recurring';
+  eventType?: string;
+  ageGroup?: string;
 }
 
 export function usePriceCalculation({
@@ -20,7 +21,9 @@ export function usePriceCalculation({
   endDate,
   timeSlot,
   customerType = 'private',
-  bookingMode = 'one-time'
+  bookingMode = 'one-time',
+  eventType,
+  ageGroup
 }: UsePriceCalculationProps) {
   const [calculation, setCalculation] = useState<PriceCalculation | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -30,12 +33,13 @@ export function usePriceCalculation({
       facilityId,
       zoneId,
       startDate,
+      customerType,
       timeSlot,
       bookingMode
     });
 
-    // Reset calculation if missing required parameters
-    if (!facilityId || !zoneId || !startDate || !timeSlot) {
+    // Show pricing as soon as we have basic info
+    if (!facilityId || !zoneId || !startDate || !customerType) {
       console.log('Missing required parameters for price calculation');
       setCalculation(null);
       setIsLoading(false);
@@ -44,10 +48,9 @@ export function usePriceCalculation({
 
     setIsLoading(true);
     
-    // Simulate API delay but make it shorter for better UX
     const timer = setTimeout(() => {
       try {
-        const finalEndDate = endDate || new Date(startDate.getTime() + 2 * 60 * 60 * 1000); // Default 2 hours
+        const finalEndDate = endDate || new Date(startDate.getTime() + 2 * 60 * 60 * 1000);
         
         console.log('Calculating price with:', {
           facilityId,
@@ -55,8 +58,10 @@ export function usePriceCalculation({
           startDate,
           finalEndDate,
           customerType,
-          timeSlot,
-          bookingMode
+          timeSlot: timeSlot || '09:00 - 11:00', // Default timeSlot for calculation
+          bookingMode,
+          eventType,
+          ageGroup
         });
 
         const result = pricingEngine.calculatePrice(
@@ -65,8 +70,10 @@ export function usePriceCalculation({
           startDate,
           finalEndDate,
           customerType,
-          timeSlot,
-          bookingMode
+          timeSlot || '09:00 - 11:00', // Provide default timeSlot
+          bookingMode,
+          eventType,
+          ageGroup
         );
         
         console.log('Price calculation result:', result);
@@ -77,10 +84,10 @@ export function usePriceCalculation({
       } finally {
         setIsLoading(false);
       }
-    }, 150); // Reduced delay for better responsiveness
+    }, 100); // Even faster response
 
     return () => clearTimeout(timer);
-  }, [facilityId, zoneId, startDate, endDate, timeSlot, customerType, bookingMode]);
+  }, [facilityId, zoneId, startDate, endDate, timeSlot, customerType, bookingMode, eventType, ageGroup]);
 
   const applyOverride = (amount: number, reason: string) => {
     if (calculation) {

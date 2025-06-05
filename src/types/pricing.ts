@@ -1,11 +1,10 @@
-
 export interface PriceRule {
   id: string;
   facilityId: string;
   zoneId?: string;
-  customerType: 'private' | 'nonprofit' | 'business';
+  customerType: 'private' | 'nonprofit' | 'business' | 'youth' | 'senior';
   dayType: 'weekday' | 'weekend';
-  timeSlot?: string; // e.g., "09:00-17:00" for daytime rates
+  timeSlot?: string;
   priceType: 'hourly' | 'daily' | 'flat';
   basePrice: number;
   isActive: boolean;
@@ -41,4 +40,4 @@ export interface PriceOverride {
   timestamp: Date;
 }
 
-export type CustomerType = 'private' | 'nonprofit' | 'business';
+export type CustomerType = 'private' | 'nonprofit' | 'business' | 'youth' | 'senior';

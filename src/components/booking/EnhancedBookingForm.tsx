@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -8,7 +7,8 @@ import { BookingContactStep } from "./steps/BookingContactStep";
 import { BookingConfirmStep } from "./steps/BookingConfirmStep";
 import { BookingFormNav } from "./BookingFormNav";
 import { CollapsibleFormStepper } from "./CollapsibleFormStepper";
-import { bookingFormSchema, BookingFormValues, BookingStep, Zone, BookingData } from "./types";
+import { bookingFormSchema, BookingFormValues } from "./formSchema";
+import { Zone, BookingStep, BookingData } from "./types";
 
 interface EnhancedBookingFormProps {
   facility: {
@@ -42,15 +42,19 @@ export function EnhancedBookingForm({
     resolver: zodResolver(bookingFormSchema),
     defaultValues: {
       bookingMode: 'one-time',
+      customerType: 'private',
       date: new Date(),
       timeSlot: "",
       zoneId: "",
       purpose: "",
+      eventType: 'other',
       attendees: 1,
+      ageGroup: 'mixed',
       contactName: "",
       contactEmail: "",
       contactPhone: "",
-      organization: ""
+      organization: "",
+      specialServices: []
     },
     mode: 'onChange'
   });
@@ -68,7 +72,7 @@ export function EnhancedBookingForm({
   const getFieldsForStep = (step: number): (keyof BookingFormValues)[] => {
     switch (step) {
       case 0:
-        return ['bookingMode', 'date', 'timeSlot', 'zoneId', 'purpose', 'attendees'];
+        return ['bookingMode', 'customerType', 'date', 'timeSlot', 'zoneId', 'purpose', 'eventType', 'attendees', 'ageGroup'];
       case 1:
         return ['contactName', 'contactEmail', 'contactPhone'];
       case 2:
@@ -137,7 +141,10 @@ export function EnhancedBookingForm({
       contactEmail: watchedValues.contactEmail || '',
       contactPhone: watchedValues.contactPhone || '',
       organization: watchedValues.organization || '',
-      endDate: watchedValues.endDate
+      endDate: watchedValues.endDate,
+      customerType: watchedValues.customerType || 'private',
+      eventType: watchedValues.eventType || 'other',
+      ageGroup: watchedValues.ageGroup || 'mixed'
     };
   };
 
