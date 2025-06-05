@@ -284,12 +284,7 @@ const FacilityDetail = () => {
               Hjem
             </Button>
             <span className="text-gray-400">/</span>
-            <Button variant="ghost" size="sm" className="text-gray-600 hover:text-gray-900 p-0 h-auto font-normal" onClick={() => navigate("/")}>
-              <ArrowLeft className="h-4 w-4 mr-1" />
-              Søkeresultater
-            </Button>
-            <span className="text-gray-400">/</span>
-            <span className="text-gray-900 font-medium">Lokalet</span>
+            <span className="text-gray-900 font-medium">{facility.name}</span>
           </nav>
         </div>
       </div>
