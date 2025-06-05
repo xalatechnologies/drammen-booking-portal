@@ -16,13 +16,13 @@ const HeroBanner = () => {
           <div className="container mx-auto px-6">
             <div className="max-w-2xl">
               <h1 
-                className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-2 leading-tight"
+                className="text-lg sm:text-xl md:text-2xl lg:text-4xl xl:text-5xl font-bold text-white mb-2 leading-tight"
                 id="main-heading"
               >
                 Finn ledige lokaler i Drammen Kommune
               </h1>
               <p 
-                className="text-sm sm:text-base text-blue-100 max-w-lg"
+                className="text-xs sm:text-sm md:text-base lg:text-lg text-blue-100 max-w-lg"
                 aria-describedby="main-heading"
               >
                 Søk og reserver kommunale lokaler til møter, arrangementer og aktiviteter.
