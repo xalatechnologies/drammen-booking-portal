@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -21,37 +20,113 @@ const FacilityDetail = () => {
   const [selectedZoneId, setSelectedZoneId] = useState<string>("");
   const [isFavorited, setIsFavorited] = useState(false);
   
-  // Mock facility data with zones - in a real app this would be fetched based on id
+  // Enhanced zones with full zone management capabilities
   const zones: Zone[] = [
     {
       id: "whole-facility",
       name: "Hele lokalet",
       capacity: 30,
-      equipment: ["Projektor", "Lydanlegg", "Whiteboard", "Wi-Fi"],
+      equipment: ["Projektor", "Lydanlegg", "Whiteboard", "Wi-Fi", "Sportsutstyr", "Basketkurver", "Volleyballnett", "Håndballmål"],
       pricePerHour: 450,
-      description: "Komplett gymsal med full tilgang til alt utstyr",
-      area: "120 m²"
+      description: "Komplett gymsal med full tilgang til alt utstyr og alle soner",
+      area: "120 m²",
+      isMainZone: true,
+      subZones: ["zone-1", "zone-2"],
+      bookingRules: {
+        minBookingDuration: 2,
+        maxBookingDuration: 8,
+        allowedTimeSlots: ["08:00-10:00", "10:00-12:00", "12:00-14:00", "14:00-16:00", "16:00-18:00", "18:00-20:00", "20:00-22:00"],
+        bookingTypes: ['one-time', 'recurring', 'fixed-lease'],
+        advanceBookingDays: 90,
+        cancellationHours: 48
+      },
+      adminInfo: {
+        contactPersonName: "Lars Hansen",
+        contactPersonEmail: "lars.hansen@drammen.kommune.no",
+        specialInstructions: "Hele lokalet inkluderer begge soner og all tilgjengelig utstyr. Perfekt for store arrangementer og turneringer.",
+        maintenanceSchedule: [
+          { day: "Mandag", startTime: "06:00", endTime: "08:00" }
+        ]
+      },
+      layout: {
+        mapImageUrl: "/lovable-uploads/08e8f8d5-4126-4805-a56e-e4337f97dbd0.png",
+        coordinates: { x: 0, y: 0, width: 120, height: 80 },
+        entryPoints: ["Hovedinngang", "Utstyrsinngaang", "Nødutgang vest"]
+      },
+      accessibility: ["wheelchair", "hearing-loop", "visual-guidance"],
+      features: ["Klimaanlegg", "Moderne lyd", "LED-belysning", "Sikkerhetskameraer"],
+      isActive: true
     },
     {
       id: "zone-1",
-      name: "Sone A",
+      name: "Sone A (Nord)",
       capacity: 15,
-      equipment: ["Lydanlegg", "Wi-Fi"],
+      equipment: ["Lydanlegg", "Wi-Fi", "Basketkurv", "Håndballmål"],
       pricePerHour: 250,
-      description: "Nordre del av gymsalen",
-      area: "60 m²"
+      description: "Nordre del av gymsalen med basketbane og håndballfelt",
+      area: "60 m²",
+      parentZoneId: "whole-facility",
+      bookingRules: {
+        minBookingDuration: 1,
+        maxBookingDuration: 6,
+        allowedTimeSlots: ["08:00-10:00", "10:00-12:00", "12:00-14:00", "14:00-16:00", "16:00-18:00", "18:00-20:00", "20:00-22:00"],
+        bookingTypes: ['one-time', 'recurring'],
+        advanceBookingDays: 60,
+        cancellationHours: 24
+      },
+      adminInfo: {
+        contactPersonName: "Maria Olsen",
+        contactPersonEmail: "maria.olsen@drammen.kommune.no",
+        specialInstructions: "Egnet for mindre ballsportaktiviteter og gruppetrening.",
+        maintenanceSchedule: [
+          { day: "Tirsdag", startTime: "07:00", endTime: "08:00" }
+        ]
+      },
+      layout: {
+        coordinates: { x: 0, y: 0, width: 60, height: 80 },
+        entryPoints: ["Hovedinngang", "Nord-inngang"]
+      },
+      accessibility: ["wheelchair", "hearing-loop"],
+      features: ["Delvis klimaanlegg", "God ventilasjon"],
+      isActive: true
     },
     {
       id: "zone-2",
-      name: "Sone B",
+      name: "Sone B (Sør)",
       capacity: 15,
-      equipment: ["Projektor", "Whiteboard", "Wi-Fi"],
+      equipment: ["Projektor", "Whiteboard", "Wi-Fi", "Volleyballnett", "Presentasjonsutstyr"],
       pricePerHour: 280,
-      description: "Søndre del av gymsalen med presentasjonsutstyr",
-      area: "60 m²"
+      description: "Søndre del av gymsalen med volleyballbane og presentasjoner",
+      area: "60 m²",
+      parentZoneId: "whole-facility",
+      bookingRules: {
+        minBookingDuration: 1,
+        maxBookingDuration: 6,
+        allowedTimeSlots: ["08:00-10:00", "10:00-12:00", "12:00-14:00", "14:00-16:00", "16:00-18:00", "18:00-20:00", "20:00-22:00"],
+        bookingTypes: ['one-time', 'recurring'],
+        advanceBookingDays: 60,
+        cancellationHours: 24
+      },
+      adminInfo: {
+        contactPersonName: "Erik Nordahl",
+        contactPersonEmail: "erik.nordahl@drammen.kommune.no",
+        specialInstructions: "Perfekt for volleyball, badminton og presentasjoner. Har avansert AV-utstyr.",
+        maintenanceSchedule: [
+          { day: "Onsdag", startTime: "07:00", endTime: "08:00" }
+        ]
+      },
+      layout: {
+        coordinates: { x: 60, y: 0, width: 60, height: 80 },
+        entryPoints: ["Hovedinngang", "Sør-inngang"]
+      },
+      accessibility: ["wheelchair", "hearing-loop", "visual-guidance"],
+      features: ["Avansert AV-utstyr", "Fleksibel belysning", "Akustikk optimalisert"],
+      restrictions: ["Ingen mat eller drikke", "Kun innendørssko"],
+      isActive: true
     }
   ];
 
+  // Mock facility data with zones - in a real app this would be fetched based on id
   const facility = {
     id,
     name: `Gymsal ${id} - Brandengen skole`,
@@ -112,6 +187,24 @@ const FacilityDetail = () => {
       }
     ]
   };
+
+  // Mock existing bookings for conflict checking
+  const existingBookings = [
+    {
+      id: "booking-1",
+      zoneId: "zone-2",
+      date: new Date(),
+      timeSlot: "10:00-12:00",
+      bookedBy: "Drammen Volleyball Klubb"
+    },
+    {
+      id: "booking-2", 
+      zoneId: "whole-facility",
+      date: new Date(Date.now() + 86400000),
+      timeSlot: "14:00-16:00",
+      bookedBy: "Drammen Kommune - Arrangement"
+    }
+  ];
 
   const handleZoneBookClick = (zoneId: string) => {
     setSelectedZoneId(zoneId);

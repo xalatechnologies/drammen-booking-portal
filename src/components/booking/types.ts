@@ -49,7 +49,7 @@ export const bookingFormSchema = z.object({
 // Type for form values based on the schema
 export type BookingFormValues = z.infer<typeof bookingFormSchema>;
 
-// Zone interface
+// Enhanced Zone interface with full zone management capabilities
 export interface Zone {
   id: string;
   name: string;
@@ -58,6 +58,55 @@ export interface Zone {
   pricePerHour: number;
   description: string;
   area?: string;
+  
+  // Enhanced zone properties
+  isMainZone?: boolean; // Indicates if this is the "whole facility" zone
+  parentZoneId?: string; // For hierarchical zone structure
+  subZones?: string[]; // Child zone IDs for main zones
+  
+  // Zone-specific rules
+  bookingRules: {
+    minBookingDuration: number; // in hours
+    maxBookingDuration: number; // in hours
+    allowedTimeSlots: string[]; // e.g., ["08:00-10:00", "10:00-12:00"]
+    bookingTypes: ('one-time' | 'recurring' | 'fixed-lease')[]; // Supported booking types
+    advanceBookingDays: number; // How many days in advance can be booked
+    cancellationHours: number; // Hours before booking can be cancelled
+  };
+  
+  // Administrative information
+  adminInfo: {
+    contactPersonId?: string;
+    contactPersonName?: string;
+    contactPersonEmail?: string;
+    specialInstructions?: string;
+    maintenanceSchedule?: {
+      day: string;
+      startTime: string;
+      endTime: string;
+    }[];
+  };
+  
+  // Zone layout and visual information
+  layout?: {
+    mapImageUrl?: string;
+    coordinates?: { x: number; y: number; width: number; height: number };
+    floorPlan?: string;
+    entryPoints?: string[];
+  };
+  
+  // Accessibility and features
+  accessibility: string[];
+  features: string[];
+  restrictions?: string[];
+  
+  // Status and availability
+  isActive: boolean;
+  temporaryUnavailable?: {
+    startDate: Date;
+    endDate: Date;
+    reason: string;
+  };
 }
 
 // Type for the booking data passed to BookingConfirmStep - updated to include zoneId
@@ -76,6 +125,27 @@ export interface BookingData {
   endDate?: Date;
   recurrenceRule?: string;
   recurrenceDescription?: string;
+}
+
+// Enhanced booking conflict types
+export interface BookingConflict {
+  conflictType: 'zone-conflict' | 'whole-facility-conflict' | 'sub-zone-conflict';
+  conflictingBookingId: string;
+  conflictingZoneId: string;
+  conflictingZoneName: string;
+  timeSlot: string;
+  date: Date;
+  bookedBy?: string;
+}
+
+// Zone availability status
+export interface ZoneAvailabilityStatus {
+  zoneId: string;
+  date: Date;
+  timeSlot: string;
+  isAvailable: boolean;
+  conflictReason?: 'booked' | 'maintenance' | 'whole-facility-booked' | 'sub-zone-conflict';
+  conflictDetails?: BookingConflict;
 }
 
 // Step type definitions
