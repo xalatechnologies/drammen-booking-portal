@@ -92,7 +92,7 @@ const AdminSidebar = () => {
 
   const renderMenuGroup = (items: any[], groupLabel: string) => (
     <SidebarGroup className="mb-8">
-      <SidebarGroupLabel className="text-xs font-bold text-slate-500 uppercase tracking-[0.15em] mb-4 px-4 leading-5">
+      <SidebarGroupLabel className="text-xs font-bold text-slate-500 uppercase tracking-[0.15em] mb-4 px-6 leading-5">
         {groupLabel}
       </SidebarGroupLabel>
       <SidebarGroupContent>
@@ -103,10 +103,10 @@ const AdminSidebar = () => {
                 isActive={isActive(item.path)}
                 onClick={() => navigate(item.path)}
                 className={`
-                  group relative flex items-center justify-between w-full px-4 py-3.5 text-[15px] font-medium rounded-2xl transition-all duration-300 ease-in-out cursor-pointer
+                  group relative flex items-center justify-between w-full text-[15px] font-medium rounded-2xl transition-all duration-300 ease-in-out cursor-pointer
                   ${isActive(item.path) 
-                    ? 'bg-gradient-to-r from-blue-50 to-blue-100 text-blue-800 shadow-lg shadow-blue-100/50 border-l-[3px] border-blue-600' 
-                    : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900 hover:shadow-md hover:shadow-slate-200/50 hover:scale-[1.02]'
+                    ? 'bg-gradient-to-r from-blue-50 to-blue-100 text-blue-800 shadow-lg shadow-blue-100/50 border-l-[3px] border-blue-600 px-6 py-4' 
+                    : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900 hover:shadow-md hover:shadow-slate-200/50 hover:scale-[1.02] px-5 py-3.5'
                   }
                   focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-white
                   active:scale-[0.98]
@@ -140,22 +140,22 @@ const AdminSidebar = () => {
   );
 
   return (
-    <Sidebar className="border-r border-slate-200/60 bg-white shadow-xl shadow-slate-200/20">
-      <SidebarHeader className="px-6 py-5 border-b border-slate-100 h-16 flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/40">
+    <Sidebar className="border-r border-slate-200/60 bg-white shadow-xl shadow-slate-200/20 w-80">
+      <SidebarHeader className="px-8 py-5 border-b border-slate-100 h-16 flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/40">
         <div className="flex items-center justify-center transform hover:scale-105 transition-transform duration-200">
           <Logo />
         </div>
       </SidebarHeader>
       
-      <SidebarContent className="px-3 py-8 space-y-2 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
+      <SidebarContent className="px-4 py-8 space-y-2 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
         {renderMenuGroup(overviewItems, "OVERSIKT")}
         {renderMenuGroup(bookingItems, "BOOKING")}
         {renderMenuGroup(managementItems, "ADMINISTRASJON")}
         {renderMenuGroup(systemItems, "SYSTEM")}
       </SidebarContent>
 
-      <SidebarFooter className="p-6 border-t border-slate-100 bg-gradient-to-t from-slate-50/50 to-white">
-        <div className="flex items-center gap-4 p-4 rounded-2xl bg-white border border-slate-200/60 shadow-lg shadow-slate-200/20 hover:shadow-xl hover:shadow-slate-200/30 transition-all duration-300">
+      <SidebarFooter className="p-8 border-t border-slate-100 bg-gradient-to-t from-slate-50/50 to-white">
+        <div className="flex items-center gap-4 p-5 rounded-2xl bg-white border border-slate-200/60 shadow-lg shadow-slate-200/20 hover:shadow-xl hover:shadow-slate-200/30 transition-all duration-300">
           <div className="flex items-center gap-3">
             <div className="relative">
               <div className="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse"></div>
