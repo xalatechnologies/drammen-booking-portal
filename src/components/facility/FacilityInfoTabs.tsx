@@ -123,8 +123,67 @@ export function FacilityInfoTabs({
           </Card>
         </div>
 
-        {/* Zone cards moved into description tab */}
-        {zoneCards}
+        {/* Compact Zone cards in 3-column grid */}
+        <div>
+          <h3 className="font-medium text-lg mb-4 flex items-center gap-2">
+            <MapPin className="h-5 w-5" />
+            Tilgjengelige soner
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {zones.map((zone) => (
+              <div key={zone.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                <div className="flex justify-between items-start mb-2">
+                  <h4 className="font-medium text-sm">{zone.name}</h4>
+                  <div className="text-right">
+                    <div className="text-lg font-bold text-gray-900">{zone.pricePerHour} kr</div>
+                    <div className="text-xs text-gray-500">per time</div>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-3 text-xs text-gray-600 mb-2">
+                  <div className="flex items-center gap-1">
+                    <Users className="h-3 w-3" />
+                    <span>{zone.capacity}</span>
+                  </div>
+                  {zone.area && (
+                    <div className="flex items-center gap-1">
+                      <MapPin className="h-3 w-3" />
+                      <span>{zone.area}</span>
+                    </div>
+                  )}
+                </div>
+                
+                <p className="text-xs text-gray-600 mb-3 line-clamp-2">{zone.description}</p>
+                
+                <div className="flex flex-wrap gap-1 mb-3">
+                  {zone.equipment.slice(0, 2).map((item, i) => (
+                    <Badge key={i} variant="outline" className="text-xs py-0.5 px-1.5">
+                      {item}
+                    </Badge>
+                  ))}
+                  {zone.equipment.length > 2 && (
+                    <Badge variant="outline" className="text-xs py-0.5 px-1.5">
+                      +{zone.equipment.length - 2}
+                    </Badge>
+                  )}
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1 text-xs text-green-600">
+                    <CheckCircle className="h-3 w-3" />
+                    <span>Tilgjengelig</span>
+                  </div>
+                  <Button 
+                    size="sm"
+                    className="bg-[#0B3D91] hover:bg-blue-700 text-white h-7 text-xs px-3"
+                  >
+                    Reserver
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
 
         <div>
           <h3 className="font-medium text-lg mb-3">Regler og retningslinjer</h3>
