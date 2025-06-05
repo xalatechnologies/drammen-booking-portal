@@ -159,18 +159,14 @@ const BookingPage = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <GlobalHeader />
-
       <BookingPageHeader facilityId={facilityId} facilityName={facility.name} />
 
       <div className="flex-grow py-8">
         <div className="container mx-auto px-4 max-w-7xl">
-          {/* Enhanced Booking Form */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            <EnhancedBookingForm 
-              facility={facility}
-              onBookingComplete={handleBookingComplete}
-            />
-          </div>
+          <EnhancedBookingForm 
+            facility={facility}
+            onBookingComplete={handleBookingComplete}
+          />
         </div>
       </div>
 
