@@ -1,4 +1,3 @@
-
 import { PriceRule, PriceCalculation, PriceBreakdownItem, CustomerType } from '@/types/pricing';
 import { isWeekend, differenceInHours, differenceInDays } from 'date-fns';
 
@@ -35,7 +34,7 @@ const mockPriceRules: PriceRule[] = [
     basePrice: 280,
     isActive: true
   },
-  // Nonprofit organizations
+  // Nonprofit organizations - FREE
   {
     id: 'rule-4',
     facilityId: '1',
@@ -43,7 +42,7 @@ const mockPriceRules: PriceRule[] = [
     customerType: 'nonprofit',
     dayType: 'weekday',
     priceType: 'hourly',
-    basePrice: 300,
+    basePrice: 0,
     isActive: true
   },
   {
@@ -53,7 +52,7 @@ const mockPriceRules: PriceRule[] = [
     customerType: 'nonprofit',
     dayType: 'weekday',
     priceType: 'hourly',
-    basePrice: 180,
+    basePrice: 0,
     isActive: true
   },
   {
@@ -63,7 +62,7 @@ const mockPriceRules: PriceRule[] = [
     customerType: 'nonprofit',
     dayType: 'weekday',
     priceType: 'hourly',
-    basePrice: 200,
+    basePrice: 0,
     isActive: true
   },
   // Business customers
@@ -129,7 +128,29 @@ export class PricingEngine {
     let subtotal = 0;
     const breakdown: PriceBreakdownItem[] = [];
 
-    // Calculate base cost
+    // Special handling for nonprofit organizations - they get it for free
+    if (customerType === 'nonprofit') {
+      return {
+        basePrice: 0,
+        totalHours,
+        totalDays,
+        customerTypeDiscount: 0,
+        weekendSurcharge: 0,
+        subtotal: 0,
+        finalPrice: 0,
+        breakdown: [
+          {
+            description: 'Gratis for frivillige organisasjoner',
+            quantity: 1,
+            unitPrice: 0,
+            total: 0,
+            type: 'base'
+          }
+        ]
+      };
+    }
+
+    // Calculate base cost for paying customers
     if (rule.priceType === 'hourly') {
       subtotal = basePrice * totalHours;
       breakdown.push({
@@ -159,18 +180,9 @@ export class PricingEngine {
       });
     }
 
-    // Apply customer type discounts
+    // Apply customer type discounts (only for youth and senior now)
     let customerTypeDiscount = 0;
-    if (customerType === 'nonprofit') {
-      customerTypeDiscount = subtotal * 0.2; // 20% discount for nonprofits
-      breakdown.push({
-        description: 'Rabatt frivillige organisasjoner (20%)',
-        quantity: 1,
-        unitPrice: -customerTypeDiscount,
-        total: -customerTypeDiscount,
-        type: 'discount'
-      });
-    } else if (customerType === 'youth') {
+    if (customerType === 'youth') {
       customerTypeDiscount = subtotal * 0.3; // 30% discount for youth
       breakdown.push({
         description: 'Ungdomsrabatt (30%)',

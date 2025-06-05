@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -130,21 +131,21 @@ export function EnhancedBookingForm({
   const getBookingData = (): BookingData => {
     const selectedZone = facility.zones.find(z => z.id === watchedValues.zoneId);
     return {
-      date: watchedValues.date || new Date(),
-      bookingMode: watchedValues.bookingMode || 'one-time',
-      timeSlot: watchedValues.timeSlot || '',
-      zoneId: watchedValues.zoneId || '',
+      date: watchedValues.date,
+      bookingMode: watchedValues.bookingMode,
+      timeSlot: watchedValues.timeSlot,
+      zoneId: watchedValues.zoneId,
       zoneName: selectedZone?.name || '',
-      purpose: watchedValues.purpose || '',
-      attendees: watchedValues.attendees || 1,
-      contactName: watchedValues.contactName || '',
-      contactEmail: watchedValues.contactEmail || '',
-      contactPhone: watchedValues.contactPhone || '',
-      organization: watchedValues.organization || '',
+      purpose: watchedValues.purpose,
+      attendees: watchedValues.attendees,
+      contactName: watchedValues.contactName,
+      contactEmail: watchedValues.contactEmail,
+      contactPhone: watchedValues.contactPhone,
+      organization: watchedValues.organization,
       endDate: watchedValues.endDate,
-      customerType: watchedValues.customerType || 'private',
-      eventType: watchedValues.eventType || 'other',
-      ageGroup: watchedValues.ageGroup || 'mixed'
+      customerType: watchedValues.customerType,
+      eventType: watchedValues.eventType,
+      ageGroup: watchedValues.ageGroup
     };
   };
 
