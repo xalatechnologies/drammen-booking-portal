@@ -3,7 +3,7 @@ import React from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Heart, Clock, MapPin, Users, CheckCircle } from "lucide-react";
+import { Heart, MapPin, Users, CheckCircle } from "lucide-react";
 import { Zone } from "@/components/booking/types";
 
 interface DescriptionTabProps {
@@ -24,48 +24,21 @@ export function DescriptionTab({ description, capacity, quickFacts, zones }: Des
         <p className="text-gray-700 leading-relaxed">{description}</p>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card className="p-4">
-          <h3 className="font-medium text-lg mb-3 flex items-center gap-2">
-            <Heart className="h-5 w-5 text-red-500" />
-            Egnet for
-          </h3>
-          <div className="flex flex-wrap gap-2">
-            <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">Idrett</Badge>
-            <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">Trening</Badge>
-            <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">Arrangementer</Badge>
-            <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200">Grupper</Badge>
-            <Badge variant="outline" className="bg-pink-50 text-pink-700 border-pink-200">Dans</Badge>
-            <Badge variant="outline" className="bg-teal-50 text-teal-700 border-teal-200">Ballsport</Badge>
-            <Badge variant="outline" className="bg-indigo-50 text-indigo-700 border-indigo-200">Presentasjoner</Badge>
-          </div>
-        </Card>
-
-        <Card className="p-4">
-          <h3 className="font-medium text-lg mb-3 flex items-center gap-2">
-            <Clock className="h-5 w-5 text-blue-500" />
-            Praktisk informasjon
-          </h3>
-          <div className="space-y-2 text-sm">
-            <div className="flex justify-between">
-              <span className="text-gray-600">Åpningstider:</span>
-              <span className="font-medium">06:00 - 23:00</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">Kapasitet:</span>
-              <span className="font-medium">{capacity} personer</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">Gulvtype:</span>
-              <span className="font-medium">Parkett</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">Ventilasjon:</span>
-              <span className="font-medium">Moderne system</span>
-            </div>
-          </div>
-        </Card>
-      </div>
+      <Card className="p-4">
+        <h3 className="font-medium text-lg mb-3 flex items-center gap-2">
+          <Heart className="h-5 w-5 text-red-500" />
+          Egnet for
+        </h3>
+        <div className="flex flex-wrap gap-2">
+          <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">Idrett</Badge>
+          <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">Trening</Badge>
+          <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">Arrangementer</Badge>
+          <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200">Grupper</Badge>
+          <Badge variant="outline" className="bg-pink-50 text-pink-700 border-pink-200">Dans</Badge>
+          <Badge variant="outline" className="bg-teal-50 text-teal-700 border-teal-200">Ballsport</Badge>
+          <Badge variant="outline" className="bg-indigo-50 text-indigo-700 border-indigo-200">Presentasjoner</Badge>
+        </div>
+      </Card>
 
       {/* Compact Zone cards in 3-column grid */}
       <ZoneGrid zones={zones} />
