@@ -18,7 +18,7 @@ interface SimilarFacilitiesSliderProps {
 export function SimilarFacilitiesSlider({ currentFacilityId }: SimilarFacilitiesSliderProps) {
   const navigate = useNavigate();
 
-  // Mock data for similar facilities - using same structure as frontend FacilityCard expects
+  // Mock data for similar facilities - using exact same structure as homepage
   const similarFacilities = [
     {
       id: 3,
@@ -33,7 +33,7 @@ export function SimilarFacilitiesSlider({ currentFacilityId }: SimilarFacilities
       suitableFor: ["Idrett", "Trening", "Grupper", "Dans"],
       equipment: ["Projektor", "Lydanlegg", "Basketkurver", "Volleyballnett"],
       openingHours: "Man-Søn: 06:00-23:00",
-      description: "Moderne gymsal på Åssiden skole med god ventilasjon og moderne utstyr. Perfekt for ballsport og gruppeaktiviteter.",
+      description: "Moderne gymsal på Åssiden skole med god ventilasjon og moderne utstyr.",
       availableTimes: [
         {
           date: new Date(),
@@ -62,7 +62,7 @@ export function SimilarFacilitiesSlider({ currentFacilityId }: SimilarFacilities
       suitableFor: ["Idrett", "Ballsport", "Arrangementer", "Trening"],
       equipment: ["Lydanlegg", "Basketkurver", "Håndballmål", "Sportsutstyr"],
       openingHours: "Man-Søn: 06:00-23:00",
-      description: "Stor gymsal med høy standard og moderne sportsutstyr. Egnet for alle typer ballsport og større arrangementer.",
+      description: "Stor gymsal med høy standard og moderne sportsutstyr.",
       availableTimes: [
         {
           date: new Date(),
@@ -91,7 +91,7 @@ export function SimilarFacilitiesSlider({ currentFacilityId }: SimilarFacilities
       suitableFor: ["Idrett", "Ballsport", "Turneringer", "Arrangementer", "Dans"],
       equipment: ["Projektor", "Lydanlegg", "Basketkurver", "Volleyballnett", "Håndballmål", "Tribuner"],
       openingHours: "Man-Søn: 06:00-23:00",
-      description: "Stor idrettshall med tribuner og profesjonelt utstyr. Perfekt for turneringer og store arrangementer.",
+      description: "Stor idrettshall med tribuner og profesjonelt utstyr.",
       availableTimes: [
         {
           date: new Date(),
@@ -120,7 +120,7 @@ export function SimilarFacilitiesSlider({ currentFacilityId }: SimilarFacilities
       suitableFor: ["Idrett", "Trening", "Dans", "Grupper"],
       equipment: ["Lydanlegg", "Basketkurver", "Sportsutstyr", "Speil"],
       openingHours: "Man-Søn: 06:00-23:00",
-      description: "Gymsal med speilvegg, perfekt for dans og treningsgrupper. God akustikk og moderne belysning.",
+      description: "Gymsal med speilvegg, perfekt for dans og treningsgrupper.",
       availableTimes: [
         {
           date: new Date(),
@@ -149,7 +149,7 @@ export function SimilarFacilitiesSlider({ currentFacilityId }: SimilarFacilities
       suitableFor: ["Idrett", "Kulturarrangementer", "Møter", "Fester", "Dans"],
       equipment: ["Projektor", "Lydanlegg", "Scène", "Basketkurver", "Bord og stoler"],
       openingHours: "Man-Søn: 06:00-23:00",
-      description: "Fleksibel flerbrukshall som kan tilpasses ulike formål. Har scene og kan brukes til både idrett og kulturarrangementer.",
+      description: "Fleksibel flerbrukshall som kan tilpasses ulike formål.",
       availableTimes: [
         {
           date: new Date(),
@@ -169,7 +169,6 @@ export function SimilarFacilitiesSlider({ currentFacilityId }: SimilarFacilities
 
   const handleAddressClick = (e: React.MouseEvent, facility: any) => {
     e.stopPropagation();
-    // Handle map view for address
     console.log('Show map for:', facility.address);
   };
 
