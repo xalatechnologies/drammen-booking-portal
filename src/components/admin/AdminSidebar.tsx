@@ -89,8 +89,8 @@ const AdminSidebar = () => {
   };
 
   const renderMenuGroup = (items: any[], groupLabel: string) => (
-    <SidebarGroup className="mb-8">
-      <SidebarGroupLabel className="text-xs font-bold text-slate-500 uppercase tracking-[0.15em] mb-4 px-6 leading-5">
+    <SidebarGroup className="mb-6">
+      <SidebarGroupLabel className="text-xs font-bold text-slate-500 uppercase tracking-[0.15em] mb-4 px-4 leading-5">
         {groupLabel}
       </SidebarGroupLabel>
       <SidebarGroupContent>
@@ -103,8 +103,8 @@ const AdminSidebar = () => {
                 className={`
                   group relative flex items-center justify-between w-full text-[15px] font-medium rounded-2xl transition-all duration-300 ease-in-out cursor-pointer
                   ${isActive(item.path) 
-                    ? 'bg-gradient-to-r from-blue-50 to-blue-100 text-blue-800 shadow-lg shadow-blue-100/50 border-l-[3px] border-blue-600 px-8 py-5' 
-                    : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900 hover:shadow-md hover:shadow-slate-200/50 hover:scale-[1.02] px-5 py-3.5'
+                    ? 'bg-gradient-to-r from-blue-50 to-blue-100 text-blue-800 shadow-lg shadow-blue-100/50 border-l-[3px] border-blue-600 px-6 py-5' 
+                    : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900 hover:shadow-md hover:shadow-slate-200/50 hover:scale-[1.02] px-3 py-3.5'
                   }
                   focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-white
                   active:scale-[0.98]
@@ -139,8 +139,8 @@ const AdminSidebar = () => {
   );
 
   return (
-    <Sidebar className="border-r border-slate-200/60 bg-white shadow-xl shadow-slate-200/20" collapsible="icon">
-      <SidebarContent className="px-4 pt-6 pb-8 space-y-2 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
+    <Sidebar className="border-r border-slate-200/60 bg-white shadow-xl shadow-slate-200/20 mt-4" collapsible="icon">
+      <SidebarContent className="px-2 pt-6 pb-8 space-y-2 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
         {renderMenuGroup(overviewItems, "OVERSIKT")}
         {renderMenuGroup(bookingItems, "BOOKING")}
         {renderMenuGroup(managementItems, "ADMINISTRASJON")}
