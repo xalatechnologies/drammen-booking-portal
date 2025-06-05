@@ -11,6 +11,9 @@ export const bookingFormSchema = z.object({
   timeSlot: z.string({
     required_error: "Velg et tidsintervall.",
   }),
+  zoneId: z.string({
+    required_error: "Velg en sone.",
+  }),
   purpose: z.string().min(10, {
     message: "Formålet må være minst 10 tegn.",
   }).max(500, {
@@ -46,11 +49,24 @@ export const bookingFormSchema = z.object({
 // Type for form values based on the schema
 export type BookingFormValues = z.infer<typeof bookingFormSchema>;
 
+// Zone interface
+export interface Zone {
+  id: string;
+  name: string;
+  capacity: number;
+  equipment: string[];
+  pricePerHour: number;
+  description: string;
+  area?: string;
+}
+
 // Type for the booking data passed to BookingConfirmStep
 export interface BookingData {
   date: Date;
   bookingMode: "one-time" | "date-range" | "recurring";
   timeSlot: string;
+  zoneId: string;
+  zoneName?: string;
   purpose: string;
   attendees: number;
   contactName: string;

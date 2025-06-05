@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -10,13 +9,14 @@ import { BookingConfirmStep } from "./steps/BookingConfirmStep";
 import { FormStepper } from "./FormStepper";
 import { BookingFormNav } from "./BookingFormNav";
 import { toast } from "sonner";
-import type { BookingFormValues } from "./types";
+import type { BookingFormValues, Zone } from "./types";
 import { generateRecurrenceRule, getRecurrenceDescription } from "@/utils/bookingConflict";
 
 interface BookingFormProps {
   facilityId: string;
   facilityName: string;
   maxCapacity: number;
+  zones: Zone[];
   availableTimeSlots: {
     date: Date;
     slots: { start: string; end: string; available: boolean }[];
@@ -36,6 +36,9 @@ const bookingFormSchema = z.object({
   endDate: z.date().optional(),
   timeSlot: z.string({
     required_error: "Vennligst velg et tidspunkt",
+  }),
+  zoneId: z.string({
+    required_error: "Vennligst velg en sone",
   }),
   purpose: z.string({
     required_error: "Vennligst oppgi formålet med reservasjonen",
@@ -75,6 +78,7 @@ const defaultValues: Partial<BookingFormValues> = {
   attendees: 1,
   bookingMode: "one-time",
   date: new Date(),
+  zoneId: "whole-facility", // Default to whole facility
 };
 
 async function createBooking(data: BookingFormValues) {
@@ -91,6 +95,7 @@ export function BookingForm({
   facilityId, 
   facilityName, 
   maxCapacity,
+  zones,
   availableTimeSlots,
   onCompleteBooking,
   termsAccepted,
@@ -129,11 +134,15 @@ export function BookingForm({
     
     setIsSubmitting(true);
     
+    // Find selected zone
+    const selectedZone = zones.find(zone => zone.id === data.zoneId);
+    
     // Prepare booking data based on booking mode
     let bookingData = {
       ...data,
       facilityId: facilityId,
       facilityName: facilityName,
+      zoneName: selectedZone?.name,
     };
     
     try {
@@ -159,6 +168,7 @@ export function BookingForm({
           <BookingDetailsStep 
             form={form}
             maxCapacity={maxCapacity}
+            zones={zones}
             availableTimeSlots={availableTimeSlots}
           />
         );
@@ -174,6 +184,7 @@ export function BookingForm({
         const interval = recurrenceData?.interval;
         const count = recurrenceData?.count;
         const until = recurrenceData?.until;
+        const selectedZone = zones.find(zone => zone.id === form.watch("zoneId"));
 
         return (
           <BookingConfirmStep
@@ -182,6 +193,8 @@ export function BookingForm({
               date: form.watch("date") || new Date(),
               bookingMode: form.watch("bookingMode") || "one-time",
               timeSlot: form.watch("timeSlot") || "",
+              zoneId: form.watch("zoneId") || "",
+              zoneName: selectedZone?.name || "",
               purpose: form.watch("purpose") || "",
               attendees: form.watch("attendees") || 1,
               contactName: form.watch("contactName") || "",

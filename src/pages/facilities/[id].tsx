@@ -10,9 +10,11 @@ import GlobalFooter from "@/components/GlobalFooter";
 import { FacilityImageGallery } from "@/components/facility/FacilityImageGallery";
 import { FacilityBookingDrawer } from "@/components/facility/FacilityBookingDrawer";
 import { FacilityBookingCard } from "@/components/facility/FacilityBookingCard";
+import { ZoneAvailabilityTable } from "@/components/facility/ZoneAvailabilityTable";
 import MapView from "@/components/MapView";
 import { format } from "date-fns";
 import { isDateUnavailable, isNorwegianHoliday } from "@/utils/holidaysAndAvailability";
+import { Zone } from "@/components/booking/types";
 
 const FacilityDetail = () => {
   const { id } = useParams();
@@ -21,7 +23,37 @@ const FacilityDetail = () => {
   const [showMap, setShowMap] = useState(false);
   const [date] = useState<Date>(new Date());
   
-  // Mock facility data - in a real app this would be fetched based on id
+  // Mock facility data with zones - in a real app this would be fetched based on id
+  const zones: Zone[] = [
+    {
+      id: "whole-facility",
+      name: "Hele lokalet",
+      capacity: 30,
+      equipment: ["Projektor", "Lydanlegg", "Whiteboard", "Wi-Fi"],
+      pricePerHour: 450,
+      description: "Komplett gymsal med full tilgang til alt utstyr",
+      area: "120 m²"
+    },
+    {
+      id: "zone-1",
+      name: "Sone A",
+      capacity: 15,
+      equipment: ["Lydanlegg", "Wi-Fi"],
+      pricePerHour: 250,
+      description: "Nordre del av gymsalen",
+      area: "60 m²"
+    },
+    {
+      id: "zone-2",
+      name: "Sone B",
+      capacity: 15,
+      equipment: ["Projektor", "Whiteboard", "Wi-Fi"],
+      pricePerHour: 280,
+      description: "Søndre del av gymsalen med presentasjonsutstyr",
+      area: "60 m²"
+    }
+  ];
+
   const facility = {
     id,
     name: `Gymsal ${id} - Brandengen skole`,
@@ -36,11 +68,12 @@ const FacilityDetail = () => {
     ],
     rating: 4.8,
     reviewCount: 124,
-    pricePerHour: 450,
+    pricePerHour: 450, // Base price for whole facility
     area: "120 m²",
     accessibility: ["wheelchair", "hearing-loop"],
     amenities: ["Parkering", "Wi-Fi", "Garderober", "Dusjer", "Kafeteria"],
     openingHours: "Man-Søn: 06:00-23:00",
+    zones: zones,
     availableTimes: [
       {
         date: new Date(),
@@ -156,9 +189,9 @@ const FacilityDetail = () => {
                 <Card className="p-4">
                   <div className="flex items-center gap-2 mb-1">
                     <CheckCircle className="h-4 w-4 text-emerald-600" />
-                    <span className="text-sm font-medium text-gray-500">Status</span>
+                    <span className="text-sm font-medium text-gray-500">Soner</span>
                   </div>
-                  <p className="font-bold text-emerald-600">Tilgjengelig</p>
+                  <p className="font-bold text-emerald-600">{zones.length}</p>
                 </Card>
               </div>
 
@@ -178,171 +211,55 @@ const FacilityDetail = () => {
                 </div>
               </Card>
 
-              {/* Facilities and Equipment */}
+              {/* Zone Overview */}
               <Card className="p-6">
-                <h2 className="text-xl font-medium mb-4">Fasiliteter og utstyr</h2>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Equipment Column */}
-                  <div>
-                    <h3 className="font-medium text-lg mb-3">Tilgjengelig utstyr</h3>
-                    <ul className="space-y-2">
-                      {facility.equipment.map((item, i) => (
-                        <li key={i} className="flex items-center text-gray-700">
-                          <CheckCircle className="h-4 w-4 text-green-600 mr-2 flex-shrink-0" />
-                          {item}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  {/* Facilities Column */}
-                  <div>
-                    <h3 className="font-medium text-lg mb-3">Fasiliteter</h3>
-                    <div className="space-y-2">
-                      {facility.amenities.map((amenity, index) => {
-                        const getIcon = (name: string) => {
-                          switch (name.toLowerCase()) {
-                            case 'parkering': return <Car className="h-4 w-4" />;
-                            case 'wi-fi': return <Wifi className="h-4 w-4" />;
-                            default: return <CheckCircle className="h-4 w-4" />;
-                          }
-                        };
-                        
-                        return (
-                          <div key={index} className="flex items-center text-gray-700">
-                            <span className="text-green-600 mr-2">
-                              {getIcon(amenity)}
-                            </span>
-                            {amenity}
+                <h2 className="text-xl font-medium mb-4">Tilgjengelige soner</h2>
+                <div className="space-y-4">
+                  {zones.map((zone) => (
+                    <Card key={zone.id} className="border border-gray-200">
+                      <CardContent className="p-4">
+                        <div className="flex justify-between items-start mb-2">
+                          <div>
+                            <h3 className="font-semibold text-lg">{zone.name}</h3>
+                            <p className="text-sm text-gray-600">{zone.description}</p>
                           </div>
-                        );
-                      })}
-                      {facility.accessibility.includes('wheelchair') && (
-                        <div className="flex items-center text-gray-700">
-                          <Accessibility className="h-4 w-4 text-green-600 mr-2" />
-                          Rullestoltilgjengelig
+                          <div className="text-right">
+                            <div className="text-lg font-bold">{zone.pricePerHour} kr</div>
+                            <div className="text-sm text-gray-500">per time</div>
+                          </div>
                         </div>
-                      )}
-                    </div>
-                  </div>
+                        
+                        <div className="flex items-center gap-4 mb-3">
+                          <div className="flex items-center gap-1 text-sm text-gray-600">
+                            <Users className="h-4 w-4" />
+                            <span>Maks {zone.capacity} personer</span>
+                          </div>
+                          {zone.area && (
+                            <div className="text-sm text-gray-600">
+                              <span>{zone.area}</span>
+                            </div>
+                          )}
+                        </div>
+                        
+                        <div className="flex flex-wrap gap-1">
+                          {zone.equipment.map((item, i) => (
+                            <Badge key={i} variant="outline" className="text-xs">
+                              {item}
+                            </Badge>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
                 </div>
               </Card>
 
-              {/* Availability Calendar */}
-              <Card className="p-6">
-                <h2 className="text-xl font-medium mb-4">Tilgjengelighet</h2>
-                
-                {/* Availability Legend */}
-                <div className="mb-4 p-3 bg-gray-50 rounded-lg">
-                  <h3 className="text-sm font-medium mb-2">Forklaring:</h3>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-                    <div className="flex items-center">
-                      <div className="w-3 h-3 bg-green-50 border border-green-200 rounded mr-2"></div>
-                      <span>Ledig</span>
-                    </div>
-                    <div className="flex items-center">
-                      <div className="w-3 h-3 bg-red-50 border border-red-200 rounded mr-2"></div>
-                      <span>Helligdag</span>
-                    </div>
-                    <div className="flex items-center">
-                      <div className="w-3 h-3 bg-orange-50 border border-orange-200 rounded mr-2"></div>
-                      <span>Helg</span>
-                    </div>
-                    <div className="flex items-center">
-                      <div className="w-3 h-3 bg-yellow-50 border border-yellow-200 rounded mr-2"></div>
-                      <span>Vedlikehold</span>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="border rounded-lg overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr>
-                        <th className="p-2 border-b border-r text-left">Tid</th>
-                        {[0, 1, 2, 3, 4].map(day => {
-                          const currentDate = new Date(date.getTime() + day * 24 * 60 * 60 * 1000);
-                          const unavailableCheck = isDateUnavailable(currentDate);
-                          const holidayCheck = isNorwegianHoliday(currentDate);
-                          
-                          return (
-                            <th key={day} className="p-2 border-b border-r text-center">
-                              <div>
-                                {format(currentDate, "EEE d.MMM")}
-                                {holidayCheck.isHoliday && (
-                                  <div className="text-xs text-red-600 mt-1">{holidayCheck.name}</div>
-                                )}
-                                {unavailableCheck.isUnavailable && !holidayCheck.isHoliday && (
-                                  <div className="text-xs text-orange-600 mt-1">{unavailableCheck.details}</div>
-                                )}
-                              </div>
-                            </th>
-                          );
-                        })}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {["08:00", "10:00", "12:00", "14:00", "16:00", "18:00", "20:00"].map((time, i) => (
-                        <tr key={i} className={i % 2 === 0 ? "bg-gray-50" : ""}>
-                          <td className="p-2 border-b border-r">{time}</td>
-                          {[0, 1, 2, 3, 4].map(day => {
-                            const currentDate = new Date(date.getTime() + day * 24 * 60 * 60 * 1000);
-                            const unavailableCheck = isDateUnavailable(currentDate);
-                            
-                            if (unavailableCheck.isUnavailable) {
-                              const bgColor = {
-                                'past': 'bg-gray-100',
-                                'weekend': 'bg-orange-100',
-                                'holiday': 'bg-red-100',
-                                'maintenance': 'bg-yellow-100'
-                              }[unavailableCheck.reason!];
-                              
-                              const textColor = {
-                                'past': 'text-gray-500',
-                                'weekend': 'text-orange-600',
-                                'holiday': 'text-red-600',
-                                'maintenance': 'text-yellow-600'
-                              }[unavailableCheck.reason!];
-                              
-                              return (
-                                <td 
-                                  key={day} 
-                                  className={`p-2 border-b border-r text-center ${bgColor}`}
-                                  title={unavailableCheck.details}
-                                >
-                                  <span className={textColor}>
-                                    {unavailableCheck.reason === 'past' ? 'Fortid' : 
-                                     unavailableCheck.reason === 'weekend' ? 'Helg' :
-                                     unavailableCheck.reason === 'holiday' ? 'Helligdag' : 'Vedlikehold'}
-                                  </span>
-                                </td>
-                              );
-                            }
-                            
-                            const isAvailable = Math.random() > 0.3;
-                            return (
-                              <td 
-                                key={day} 
-                                className={`p-2 border-b border-r text-center ${isAvailable ? "bg-green-100" : "bg-red-100"}`}
-                              >
-                                <span className={isAvailable ? "text-green-600" : "text-red-600"}>
-                                  {isAvailable ? "Ledig" : "Opptatt"}
-                                </span>
-                              </td>
-                            );
-                          })}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-                
-                <p className="text-sm text-gray-500 mt-4">
-                  <Info className="h-4 w-4 inline-block mr-1" />
-                  Fargemarkering viser når lokalet er ledig (grønt), opptatt (rødt), eller ikke tilgjengelig på grunn av helligdager, helger eller vedlikehold.
-                </p>
-              </Card>
+              {/* Zone Availability */}
+              <ZoneAvailabilityTable 
+                zones={zones}
+                startDate={date}
+                timeSlots={["08:00", "10:00", "12:00", "14:00", "16:00", "18:00", "20:00"]}
+              />
 
               {/* Map Section */}
               <Card className="p-6">
