@@ -52,7 +52,6 @@ const FacilityDetail = () => {
       }]
     },
     layout: {
-      mapImageUrl: "/lovable-uploads/08e8f8d5-4126-4805-a56e-e4337f97dbd0.png",
       coordinates: {
         x: 0,
         y: 0,
