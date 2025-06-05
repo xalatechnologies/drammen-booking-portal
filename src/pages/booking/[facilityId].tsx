@@ -1,16 +1,14 @@
 import React, { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { CheckCircle, Home } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useParams } from "react-router-dom";
 import GlobalHeader from "@/components/GlobalHeader";
 import GlobalFooter from "@/components/GlobalFooter";
 import { EnhancedBookingForm } from "@/components/booking/EnhancedBookingForm";
+import { BookingPageHeader } from "@/components/facility/booking/BookingPageHeader";
+import { BookingSuccessPage } from "@/components/facility/booking/BookingSuccessPage";
 import { Zone } from "@/components/booking/types";
 
 const BookingPage = () => {
   const { facilityId } = useParams();
-  const navigate = useNavigate();
   const [isBookingComplete, setIsBookingComplete] = useState(false);
   const [bookingReference, setBookingReference] = useState("");
 
@@ -149,51 +147,10 @@ const BookingPage = () => {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col">
         <GlobalHeader />
-        
-        <div className="flex-grow flex items-center justify-center py-12 px-4">
-          <Card className="w-full max-w-2xl">
-            <CardContent className="text-center py-12">
-              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <CheckCircle className="h-10 w-10 text-green-600" />
-              </div>
-              
-              <h1 className="text-3xl font-bold text-gray-900 mb-4">
-                Reservasjon fullført!
-              </h1>
-              
-              <p className="text-lg text-gray-600 mb-6 max-w-md mx-auto">
-                Din reservasjon er mottatt og vil bli behandlet. Referansenummer: <strong>{bookingReference}</strong>
-              </p>
-              
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8 text-left">
-                <h3 className="font-semibold text-blue-900 mb-2">Hva skjer nå?</h3>
-                <ul className="text-blue-800 space-y-1 text-sm">
-                  <li>• En bekreftelse er sendt til din e-post</li>
-                  <li>• Du vil motta SMS når reservasjonen er godkjent</li>
-                  <li>• Behandlingstid er vanligvis 1-2 virkedager</li>
-                </ul>
-              </div>
-              
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button 
-                  onClick={() => navigate("/bookings")}
-                  className="bg-blue-600 hover:bg-blue-700"
-                  size="lg"
-                >
-                  Se dine reservasjoner
-                </Button>
-                <Button 
-                  variant="outline" 
-                  onClick={() => navigate(`/facilities/${facilityId}`)}
-                  size="lg"
-                >
-                  Tilbake til lokalet
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-        
+        <BookingSuccessPage 
+          bookingReference={bookingReference} 
+          facilityId={facilityId} 
+        />
         <GlobalFooter />
       </div>
     );
@@ -203,46 +160,10 @@ const BookingPage = () => {
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <GlobalHeader />
 
-      {/* Breadcrumb Navigation */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="container mx-auto px-4 py-3 max-w-7xl">
-          <nav className="flex items-center space-x-2 text-sm">
-            <Button 
-              variant="ghost" 
-              size="sm"
-              className="text-gray-600 hover:text-gray-900 p-0 h-auto font-normal"
-              onClick={() => navigate("/")}
-            >
-              <Home className="h-4 w-4 mr-1" />
-              Hjem
-            </Button>
-            <span className="text-gray-400">/</span>
-            <Button 
-              variant="ghost" 
-              size="sm"
-              className="text-gray-600 hover:text-gray-900 p-0 h-auto font-normal"
-              onClick={() => navigate(`/facilities/${facilityId}`)}
-            >
-              {facility.name}
-            </Button>
-            <span className="text-gray-400">/</span>
-            <span className="text-gray-900 font-medium">Ny reservasjon</span>
-          </nav>
-        </div>
-      </div>
+      <BookingPageHeader facilityId={facilityId} facilityName={facility.name} />
 
       <div className="flex-grow py-8">
         <div className="container mx-auto px-4 max-w-7xl">
-          {/* Page Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Reserver {facility.name}
-            </h1>
-            <p className="text-gray-600 max-w-2xl">
-              Fyll ut skjemaet under for å reservere lokalet. All informasjon behandles trygt og sikkert.
-            </p>
-          </div>
-
           {/* Enhanced Booking Form */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
             <EnhancedBookingForm 

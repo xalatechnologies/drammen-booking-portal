@@ -3,12 +3,10 @@ import React, { useState } from "react";
 import GlobalHeader from "@/components/GlobalHeader";
 import GlobalFooter from "@/components/GlobalFooter";
 import { Button } from "@/components/ui/button";
-import { BookingStatusCard, BookingStatus } from "@/components/booking/BookingStatusCard";
 import { PaymentForm } from "@/components/booking/PaymentForm";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { format } from "date-fns";
-import { nb } from "date-fns/locale";
+import { BookingsHeader } from "@/components/bookings/BookingsHeader";
+import { BookingsTabs } from "@/components/bookings/BookingsTabs";
+import { BookingStatus } from "@/components/booking/BookingStatusCard";
 
 // Mock booking data with different statuses
 const bookings = [
@@ -67,16 +65,11 @@ const BookingsPage = () => {
   const handlePaymentComplete = () => {
     setShowPaymentForm(false);
     setSelectedBooking(null);
-    // In a real app, you would update the booking status here
   };
 
   const handlePaymentCancel = () => {
     setShowPaymentForm(false);
     setSelectedBooking(null);
-  };
-
-  const getBookingsByStatus = (status: BookingStatus) => {
-    return bookings.filter(booking => booking.status === status);
   };
 
   if (showPaymentForm && selectedBooking) {
@@ -115,151 +108,8 @@ const BookingsPage = () => {
       <GlobalHeader />
 
       <div className="container mx-auto px-4 py-8 max-w-7xl flex-grow">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Mine reservasjoner
-            </h1>
-            <p className="text-gray-600">
-              Oversikt over alle dine aktive og tidligere reservasjoner
-            </p>
-          </div>
-          <Button 
-            className="bg-[#0B3D91] hover:bg-blue-700 text-white mt-4 md:mt-0"
-            onClick={() => window.location.href = "/"}
-          >
-            + Ny reservasjon
-          </Button>
-        </div>
-
-        <Tabs defaultValue="all" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="all">Alle ({bookings.length})</TabsTrigger>
-            <TabsTrigger value="pending">
-              Venter ({getBookingsByStatus('pending').length})
-            </TabsTrigger>
-            <TabsTrigger value="payment-required">
-              Betaling ({getBookingsByStatus('approved-payment-required').length})
-            </TabsTrigger>
-            <TabsTrigger value="confirmed">
-              Bekreftet ({getBookingsByStatus('approved-paid').length})
-            </TabsTrigger>
-            <TabsTrigger value="rejected">
-              Avslått ({getBookingsByStatus('rejected').length})
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="all" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {bookings.map((booking) => (
-                <div key={booking.id} className="space-y-4">
-                  <BookingStatusCard
-                    status={booking.status}
-                    facilityName={booking.facilityName}
-                    bookingReference={booking.bookingNumber}
-                    amount={booking.amount}
-                    approvalDate={booking.approvalDate}
-                    paymentDueDate={booking.paymentDueDate}
-                    onPayNow={() => handlePayNow(booking)}
-                    onViewDetails={() => console.log('View details for', booking.id)}
-                  />
-                  
-                  {/* Booking Details Card */}
-                  <Card className="border-gray-200">
-                    <CardContent className="p-4">
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm font-medium text-gray-700">Dato og tid:</span>
-                          <span className="text-sm text-gray-900">
-                            {format(booking.date, "EEEE d. MMMM yyyy", {locale: nb})} 
-                            {" kl. "}
-                            {format(booking.date, "HH:mm")} - {format(booking.endDate, "HH:mm")}
-                          </span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm font-medium text-gray-700">Lokasjon:</span>
-                          <span className="text-sm text-gray-900 text-right">{booking.location}</span>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              ))}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="pending" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {getBookingsByStatus('pending').map((booking) => (
-                <BookingStatusCard
-                  key={booking.id}
-                  status={booking.status}
-                  facilityName={booking.facilityName}
-                  bookingReference={booking.bookingNumber}
-                  amount={booking.amount}
-                  approvalDate={booking.approvalDate}
-                  paymentDueDate={booking.paymentDueDate}
-                  onPayNow={() => handlePayNow(booking)}
-                  onViewDetails={() => console.log('View details for', booking.id)}
-                />
-              ))}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="payment-required" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {getBookingsByStatus('approved-payment-required').map((booking) => (
-                <BookingStatusCard
-                  key={booking.id}
-                  status={booking.status}
-                  facilityName={booking.facilityName}
-                  bookingReference={booking.bookingNumber}
-                  amount={booking.amount}
-                  approvalDate={booking.approvalDate}
-                  paymentDueDate={booking.paymentDueDate}
-                  onPayNow={() => handlePayNow(booking)}
-                  onViewDetails={() => console.log('View details for', booking.id)}
-                />
-              ))}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="confirmed" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {getBookingsByStatus('approved-paid').map((booking) => (
-                <BookingStatusCard
-                  key={booking.id}
-                  status={booking.status}
-                  facilityName={booking.facilityName}
-                  bookingReference={booking.bookingNumber}
-                  amount={booking.amount}
-                  approvalDate={booking.approvalDate}
-                  paymentDueDate={booking.paymentDueDate}
-                  onPayNow={() => handlePayNow(booking)}
-                  onViewDetails={() => console.log('View details for', booking.id)}
-                />
-              ))}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="rejected" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {getBookingsByStatus('rejected').map((booking) => (
-                <BookingStatusCard
-                  key={booking.id}
-                  status={booking.status}
-                  facilityName={booking.facilityName}
-                  bookingReference={booking.bookingNumber}
-                  amount={booking.amount}
-                  approvalDate={booking.approvalDate}
-                  paymentDueDate={booking.paymentDueDate}
-                  onPayNow={() => handlePayNow(booking)}
-                  onViewDetails={() => console.log('View details for', booking.id)}
-                />
-              ))}
-            </div>
-          </TabsContent>
-        </Tabs>
+        <BookingsHeader totalBookings={bookings.length} />
+        <BookingsTabs bookings={bookings} onPayNow={handlePayNow} />
       </div>
 
       <GlobalFooter />
