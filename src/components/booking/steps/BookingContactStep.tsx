@@ -18,29 +18,28 @@ interface BookingContactStepProps {
 
 export function BookingContactStep({ form }: BookingContactStepProps) {
   return (
-    <div className="space-y-3" role="group" aria-labelledby="contact-heading">
-      <div className="bg-blue-50 p-2.5 rounded border border-blue-200">
-        <p className="text-blue-800 text-xs leading-relaxed">
-          <strong>Kontaktinformasjon:</strong> Brukes for bekreftelser og viktige oppdateringer. Alle felt med * er påkrevd.
+    <div className="space-y-6" role="group" aria-labelledby="contact-heading">
+      <div className="bg-navy-50 border border-navy-200 rounded-lg p-4">
+        <p className="text-navy-800 text-sm leading-relaxed">
+          <strong>Kontaktinformasjon:</strong> Denne informasjonen brukes for bekreftelser og viktige oppdateringer om din reservasjon. Alle felt merket med * er obligatoriske.
         </p>
       </div>
       
-      {/* Smart grid layout */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <FormField
           control={form.control}
           name="contactName"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="flex items-center gap-1.5 text-sm font-medium text-gray-900">
-                <User className="h-3.5 w-3.5 text-slate-600" />
-                Navn *
+              <FormLabel className="text-base font-semibold text-gray-900 flex items-center gap-2">
+                <User className="h-5 w-5 text-slate-600" />
+                Fullt navn *
               </FormLabel>
               <FormControl>
                 <Input 
-                  placeholder="Ditt navn" 
+                  placeholder="Skriv inn ditt fulle navn" 
                   {...field} 
-                  className="h-8 border-gray-300 focus:border-slate-700 text-sm"
+                  className="h-11 border-gray-300 focus:border-slate-700 text-base"
                   aria-required="true"
                 />
               </FormControl>
@@ -54,16 +53,16 @@ export function BookingContactStep({ form }: BookingContactStepProps) {
           name="contactEmail"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="flex items-center gap-1.5 text-sm font-medium text-gray-900">
-                <Mail className="h-3.5 w-3.5 text-slate-600" />
-                E-post *
+              <FormLabel className="text-base font-semibold text-gray-900 flex items-center gap-2">
+                <Mail className="h-5 w-5 text-slate-600" />
+                E-postadresse *
               </FormLabel>
               <FormControl>
                 <Input 
                   type="email" 
                   placeholder="din.epost@eksempel.no" 
                   {...field} 
-                  className="h-8 border-gray-300 focus:border-slate-700 text-sm"
+                  className="h-11 border-gray-300 focus:border-slate-700 text-base"
                   aria-required="true"
                 />
               </FormControl>
@@ -73,21 +72,21 @@ export function BookingContactStep({ form }: BookingContactStepProps) {
         />
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <FormField
           control={form.control}
           name="contactPhone"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="flex items-center gap-1.5 text-sm font-medium text-gray-900">
-                <Phone className="h-3.5 w-3.5 text-slate-600" />
-                Telefon *
+              <FormLabel className="text-base font-semibold text-gray-900 flex items-center gap-2">
+                <Phone className="h-5 w-5 text-slate-600" />
+                Telefonnummer *
               </FormLabel>
               <FormControl>
                 <Input 
-                  placeholder="99999999" 
+                  placeholder="99 99 99 99" 
                   {...field} 
-                  className="h-8 border-gray-300 focus:border-slate-700 text-sm"
+                  className="h-11 border-gray-300 focus:border-slate-700 text-base"
                   aria-required="true"
                   type="tel"
                 />
@@ -102,15 +101,15 @@ export function BookingContactStep({ form }: BookingContactStepProps) {
           name="organization"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="flex items-center gap-1.5 text-sm font-medium text-gray-900">
-                <Building className="h-3.5 w-3.5 text-slate-600" />
-                Organisasjon
+              <FormLabel className="text-base font-semibold text-gray-900 flex items-center gap-2">
+                <Building className="h-5 w-5 text-slate-600" />
+                Organisasjon/Firma
               </FormLabel>
               <FormControl>
                 <Input 
-                  placeholder="Organisasjon (valgfritt)" 
+                  placeholder="Organisasjonsnavn (valgfritt)" 
                   {...field} 
-                  className="h-8 border-gray-300 focus:border-slate-700 text-sm"
+                  className="h-11 border-gray-300 focus:border-slate-700 text-base"
                 />
               </FormControl>
               <FormMessage />

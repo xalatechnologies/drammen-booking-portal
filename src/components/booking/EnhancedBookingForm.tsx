@@ -7,7 +7,7 @@ import { BookingDetailsStep } from "./steps/BookingDetailsStep";
 import { BookingContactStep } from "./steps/BookingContactStep";
 import { BookingConfirmStep } from "./steps/BookingConfirmStep";
 import { BookingFormNav } from "./BookingFormNav";
-import { FormStepper } from "./FormStepper";
+import { CollapsibleFormStepper } from "./CollapsibleFormStepper";
 import { bookingFormSchema, BookingFormValues, BookingStep, Zone, BookingData } from "./types";
 
 interface EnhancedBookingFormProps {
@@ -29,7 +29,7 @@ export function EnhancedBookingForm({ facility, onBookingComplete }: EnhancedBoo
   const [termsAccepted, setTermsAccepted] = useState(false);
 
   const steps: BookingStep[] = ['details', 'contact', 'confirm'];
-  const stepTitles = ["Reservasjonsdetaljer", "Kontaktinformasjon", "Bekreft"];
+  const stepTitles = ["Reservasjonsdetaljer", "Kontaktinformasjon", "Gjennomgå og bekreft"];
 
   const form = useForm<BookingFormValues>({
     resolver: zodResolver(bookingFormSchema),
@@ -167,34 +167,31 @@ export function EnhancedBookingForm({ facility, onBookingComplete }: EnhancedBoo
 
   return (
     <div className="bg-white shadow-sm border border-gray-200 rounded-lg overflow-hidden" role="main" aria-label="Booking form">
-      {/* Compact Header */}
-      <div className="bg-gradient-to-r from-slate-50 to-white px-4 py-3 border-b border-gray-200">
-        <div className="flex items-center justify-between mb-2">
-          <h1 className="text-lg font-semibold text-gray-900" id="form-title">
-            {stepTitles[currentStep]}
-          </h1>
-          <div className="text-xs text-gray-500 font-medium">
-            Steg {currentStep + 1} av {steps.length}
-          </div>
-        </div>
-        <FormStepper 
+      {/* Clean Header */}
+      <div className="bg-gradient-to-r from-slate-50 to-white px-6 py-4 border-b border-gray-200">
+        <h1 className="text-xl font-semibold text-gray-900 mb-4" id="form-title">
+          Ny reservasjon
+        </h1>
+        <CollapsibleFormStepper 
           currentStep={currentStep} 
           steps={stepTitles}
+          onStepClick={setCurrentStep}
+          canNavigateToStep={(stepIndex) => stepIndex <= currentStep}
           aria-label="Booking progress"
         />
       </div>
       
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
-          {/* Ultra Compact Form Content */}
-          <div className="p-4">
-            <div className="min-h-[320px]" role="tabpanel" aria-labelledby="form-title">
+          {/* Form Content */}
+          <div className="px-6 py-6">
+            <div className="min-h-[400px]" role="tabpanel" aria-labelledby="form-title">
               {renderCurrentStep()}
             </div>
           </div>
           
-          {/* Sticky Navigation Footer */}
-          <div className="px-4 py-3 bg-gray-50 border-t border-gray-200 sticky bottom-0">
+          {/* Navigation Footer */}
+          <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
             <BookingFormNav
               currentStep={currentStep}
               isFirstStep={isFirstStep}
