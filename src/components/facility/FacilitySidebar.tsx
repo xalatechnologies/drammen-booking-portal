@@ -59,7 +59,7 @@ export function FacilitySidebar({
       </Card>
 
       {/* Auto Approval Info */}
-      {hasAutoApproval && <AutoApprovalCard />}
+      {hasAutoApproval && <AutoApprovalCard hasAutoApproval={hasAutoApproval} />}
 
       {/* Zones Section */}
       <Card>
@@ -74,6 +74,7 @@ export function FacilitySidebar({
             <div key={zone.id}>
               <ZoneBookingCard
                 zone={zone}
+                facilityName={facilityName}
                 onBookClick={() => handleBookingClick(zone.id)}
               />
               {index < zones.length - 1 && <Separator className="my-4" />}

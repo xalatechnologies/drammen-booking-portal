@@ -1,121 +1,96 @@
 
 import React from "react";
 import { UseFormReturn } from "react-hook-form";
-import { Calendar, CalendarRange, Repeat } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
-import { Calendar as CalendarComponent } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Button } from "@/components/ui/button";
+import { Calendar, Clock, Users, MessageSquare, MapPin } from "lucide-react";
+import {
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormDescription,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ZoneSelector } from "../ZoneSelector";
-import { BookingFormValues, Zone } from "../types";
-import { format } from "date-fns";
-import { nb } from "date-fns/locale";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { format } from "date-fns";
+import { BookingFormValues, Zone } from "../types";
+import { ZoneSelector } from "../ZoneSelector";
 
-interface BookingDetailsStepProps {
+export interface BookingDetailsStepProps {
   form: UseFormReturn<BookingFormValues>;
-  maxCapacity: number;
-  zones: Zone[];
-  availableTimeSlots: {
-    date: Date;
-    slots: { start: string; end: string; available: boolean }[];
-  }[];
+  facility: {
+    id: string | undefined;
+    name: string;
+    zones: Zone[];
+    availableTimes: {
+      date: Date;
+      slots: { start: string; end: string; available: boolean }[];
+    }[];
+  };
 }
 
-export function BookingDetailsStep({ form, maxCapacity, zones, availableTimeSlots }: BookingDetailsStepProps) {
-  const bookingMode = form.watch("bookingMode");
-  const selectedDate = form.watch("date");
-  const selectedTimeSlot = form.watch("timeSlot");
-  const selectedZoneId = form.watch("zoneId");
+export function BookingDetailsStep({ form, facility }: BookingDetailsStepProps) {
+  const watchedValues = form.watch();
   
-  // Find selected zone to get its capacity
-  const selectedZone = zones.find(zone => zone.id === selectedZoneId);
-  const effectiveMaxCapacity = selectedZone?.capacity || maxCapacity;
-
-  // Get available time slots for selected date
-  const daySlots = availableTimeSlots.find(
-    day => day.date.toDateString() === selectedDate?.toDateString()
-  )?.slots || [];
+  const availableTimeSlots = [
+    "08:00-10:00",
+    "10:00-12:00", 
+    "12:00-14:00",
+    "14:00-16:00",
+    "16:00-18:00",
+    "18:00-20:00",
+    "20:00-22:00"
+  ];
 
   return (
     <div className="space-y-6">
+      <div className="flex items-center space-x-2 pb-2 border-b">
+        <Calendar className="h-5 w-5 text-blue-600" />
+        <h3 className="text-xl font-medium">Reservasjonsdetaljer</h3>
+      </div>
+      
       {/* Booking Mode Selection */}
       <FormField
         control={form.control}
         name="bookingMode"
         render={({ field }) => (
           <FormItem className="space-y-3">
-            <FormLabel className="text-base font-semibold">Type booking</FormLabel>
+            <FormLabel className="text-base font-medium">Type reservasjon</FormLabel>
             <FormControl>
               <RadioGroup
                 onValueChange={field.onChange}
                 defaultValue={field.value}
-                className="grid grid-cols-1 md:grid-cols-3 gap-4"
+                className="flex flex-col space-y-2"
               >
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-2">
                   <RadioGroupItem value="one-time" id="one-time" />
-                  <Label htmlFor="one-time" className="flex-1 cursor-pointer">
-                    <Card className={cn(
-                      "transition-all",
-                      bookingMode === "one-time" ? "ring-2 ring-blue-500 border-blue-200" : "hover:border-gray-300"
-                    )}>
-                      <CardContent className="p-4">
-                        <div className="flex items-center gap-3">
-                          <Calendar className="h-5 w-5 text-blue-600" />
-                          <div>
-                            <h3 className="font-medium">Engangsreservasjon</h3>
-                            <p className="text-sm text-gray-600">Én spesifikk dato</p>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </Label>
+                  <Label htmlFor="one-time">Engangsreservasjon</Label>
                 </div>
-                
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-2">
                   <RadioGroupItem value="date-range" id="date-range" />
-                  <Label htmlFor="date-range" className="flex-1 cursor-pointer">
-                    <Card className={cn(
-                      "transition-all",
-                      bookingMode === "date-range" ? "ring-2 ring-blue-500 border-blue-200" : "hover:border-gray-300"
-                    )}>
-                      <CardContent className="p-4">
-                        <div className="flex items-center gap-3">
-                          <CalendarRange className="h-5 w-5 text-green-600" />
-                          <div>
-                            <h3 className="font-medium">Periode</h3>
-                            <p className="text-sm text-gray-600">Flere påfølgende dager</p>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </Label>
+                  <Label htmlFor="date-range">Periode (flere dager)</Label>
                 </div>
-                
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-2">
                   <RadioGroupItem value="recurring" id="recurring" />
-                  <Label htmlFor="recurring" className="flex-1 cursor-pointer">
-                    <Card className={cn(
-                      "transition-all",
-                      bookingMode === "recurring" ? "ring-2 ring-blue-500 border-blue-200" : "hover:border-gray-300"
-                    )}>
-                      <CardContent className="p-4">
-                        <div className="flex items-center gap-3">
-                          <Repeat className="h-5 w-5 text-purple-600" />
-                          <div>
-                            <h3 className="font-medium">Gjentakende</h3>
-                            <p className="text-sm text-gray-600">Regelmessige reservasjoner</p>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </Label>
+                  <Label htmlFor="recurring">Gjentakende reservasjon</Label>
                 </div>
               </RadioGroup>
             </FormControl>
@@ -125,28 +100,32 @@ export function BookingDetailsStep({ form, maxCapacity, zones, availableTimeSlot
       />
 
       {/* Date Selection */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <FormField
           control={form.control}
           name="date"
           render={({ field }) => (
             <FormItem className="flex flex-col">
-              <FormLabel>Startdato</FormLabel>
+              <FormLabel className="flex items-center gap-1.5 mb-2">
+                <Calendar className="h-4 w-4 text-blue-600" />
+                {watchedValues.bookingMode === 'date-range' ? 'Startdato' : 'Dato'}
+              </FormLabel>
               <Popover>
                 <PopoverTrigger asChild>
                   <FormControl>
                     <Button
-                      variant="outline"
+                      variant={"outline"}
                       className={cn(
-                        "w-full pl-3 text-left font-normal",
+                        "w-full pl-3 text-left font-normal h-10",
                         !field.value && "text-muted-foreground"
                       )}
                     >
                       {field.value ? (
-                        format(field.value, "PPP", { locale: nb })
+                        format(field.value, "dd.MM.yyyy")
                       ) : (
                         <span>Velg dato</span>
                       )}
+                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                     </Button>
                   </FormControl>
                 </PopoverTrigger>
@@ -155,7 +134,7 @@ export function BookingDetailsStep({ form, maxCapacity, zones, availableTimeSlot
                     mode="single"
                     selected={field.value}
                     onSelect={field.onChange}
-                    disabled={(date) => date < new Date() || date < new Date("1900-01-01")}
+                    disabled={(date) => date < new Date()}
                     initialFocus
                   />
                 </PopoverContent>
@@ -164,30 +143,33 @@ export function BookingDetailsStep({ form, maxCapacity, zones, availableTimeSlot
             </FormItem>
           )}
         />
-
-        {/* End Date for range and recurring bookings */}
-        {(bookingMode === "date-range" || bookingMode === "recurring") && (
+        
+        {watchedValues.bookingMode === 'date-range' && (
           <FormField
             control={form.control}
             name="endDate"
             render={({ field }) => (
               <FormItem className="flex flex-col">
-                <FormLabel>Sluttdato</FormLabel>
+                <FormLabel className="flex items-center gap-1.5 mb-2">
+                  <Calendar className="h-4 w-4 text-blue-600" />
+                  Sluttdato
+                </FormLabel>
                 <Popover>
                   <PopoverTrigger asChild>
                     <FormControl>
                       <Button
-                        variant="outline"
+                        variant={"outline"}
                         className={cn(
-                          "w-full pl-3 text-left font-normal",
+                          "w-full pl-3 text-left font-normal h-10",
                           !field.value && "text-muted-foreground"
                         )}
                       >
                         {field.value ? (
-                          format(field.value, "PPP", { locale: nb })
+                          format(field.value, "dd.MM.yyyy")
                         ) : (
                           <span>Velg sluttdato</span>
                         )}
+                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                       </Button>
                     </FormControl>
                   </PopoverTrigger>
@@ -196,7 +178,10 @@ export function BookingDetailsStep({ form, maxCapacity, zones, availableTimeSlot
                       mode="single"
                       selected={field.value}
                       onSelect={field.onChange}
-                      disabled={(date) => date < new Date() || date < new Date("1900-01-01")}
+                      disabled={(date) => 
+                        date < new Date() || 
+                        (watchedValues.date && date <= watchedValues.date)
+                      }
                       initialFocus
                     />
                   </PopoverContent>
@@ -214,21 +199,20 @@ export function BookingDetailsStep({ form, maxCapacity, zones, availableTimeSlot
         name="timeSlot"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Tidspunkt</FormLabel>
+            <FormLabel className="flex items-center gap-1.5 mb-2">
+              <Clock className="h-4 w-4 text-blue-600" />
+              Tidspunkt
+            </FormLabel>
             <Select onValueChange={field.onChange} defaultValue={field.value}>
               <FormControl>
-                <SelectTrigger>
-                  <SelectValue placeholder="Velg tidspunkt" />
+                <SelectTrigger className="h-10">
+                  <SelectValue placeholder="Velg et tidsintervall" />
                 </SelectTrigger>
               </FormControl>
               <SelectContent>
-                {daySlots.map((slot) => (
-                  <SelectItem 
-                    key={`${slot.start}-${slot.end}`} 
-                    value={`${slot.start}-${slot.end}`}
-                    disabled={!slot.available}
-                  >
-                    {slot.start} - {slot.end} {!slot.available && "(Opptatt)"}
+                {availableTimeSlots.map((slot) => (
+                  <SelectItem key={slot} value={slot}>
+                    {slot}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -239,11 +223,24 @@ export function BookingDetailsStep({ form, maxCapacity, zones, availableTimeSlot
       />
 
       {/* Zone Selection */}
-      <ZoneSelector 
-        form={form}
-        zones={zones}
-        selectedDate={selectedDate || new Date()}
-        selectedTimeSlot={selectedTimeSlot || ""}
+      <FormField
+        control={form.control}
+        name="zoneId"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className="flex items-center gap-1.5 mb-2">
+              <MapPin className="h-4 w-4 text-blue-600" />
+              Område/Sone
+            </FormLabel>
+            <ZoneSelector
+              form={form}
+              zones={facility.zones}
+              selectedDate={watchedValues.date || new Date()}
+              selectedTimeSlot={watchedValues.timeSlot || ""}
+            />
+            <FormMessage />
+          </FormItem>
+        )}
       />
 
       {/* Purpose */}
@@ -252,38 +249,49 @@ export function BookingDetailsStep({ form, maxCapacity, zones, availableTimeSlot
         name="purpose"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Formål med reservasjonen</FormLabel>
+            <FormLabel className="flex items-center gap-1.5 mb-2">
+              <MessageSquare className="h-4 w-4 text-blue-600" />
+              Formål med reservasjonen
+            </FormLabel>
             <FormControl>
               <Textarea
                 placeholder="Beskriv formålet med reservasjonen..."
-                className="min-h-[100px]"
+                className="resize-none min-h-[80px]"
                 {...field}
               />
             </FormControl>
+            <FormDescription>
+              Gi en kort beskrivelse av aktiviteten eller arrangementet.
+            </FormDescription>
             <FormMessage />
           </FormItem>
         )}
       />
 
-      {/* Attendees */}
+      {/* Number of Attendees */}
       <FormField
         control={form.control}
         name="attendees"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Antall deltakere</FormLabel>
+            <FormLabel className="flex items-center gap-1.5 mb-2">
+              <Users className="h-4 w-4 text-blue-600" />
+              Antall deltakere
+            </FormLabel>
             <FormControl>
               <Input
                 type="number"
                 min="1"
-                max={effectiveMaxCapacity}
+                max="1000"
+                placeholder="1"
+                className="h-10"
                 {...field}
-                onChange={(e) => field.onChange(parseInt(e.target.value) || 1)}
+                onChange={(e) => field.onChange(Number(e.target.value))}
               />
             </FormControl>
-            <p className="text-sm text-gray-600">
-              Maksimalt {effectiveMaxCapacity} deltakere for valgt sone
-            </p>
+            <FormDescription>
+              Angi forventet antall personer som vil bruke lokalet.
+            </FormDescription>
             <FormMessage />
           </FormItem>
         )}
