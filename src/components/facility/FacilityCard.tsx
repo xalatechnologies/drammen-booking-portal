@@ -55,12 +55,12 @@ export function FacilityCard({ facility, onAddressClick }: FacilityCardProps) {
           }}
         />
         <div className="absolute top-3 right-3">
-          <Badge className="bg-white/90 backdrop-blur-sm text-gray-800 border-0 font-medium px-2.5 py-1 shadow-sm">
+          <Badge className="bg-white/90 backdrop-blur-sm text-gray-800 border-0 font-medium px-2.5 py-1 shadow-sm text-sm">
             {facility.type}
           </Badge>
         </div>
         <div className="absolute top-3 left-3">
-          <Badge variant="outline" className="bg-white/90 backdrop-blur-sm text-gray-700 border-gray-200 font-medium px-2.5 py-1 shadow-sm">
+          <Badge variant="outline" className="bg-white/90 backdrop-blur-sm text-gray-700 border-gray-200 font-medium px-2.5 py-1 shadow-sm text-sm">
             {facility.area}
           </Badge>
         </div>
@@ -68,9 +68,9 @@ export function FacilityCard({ facility, onAddressClick }: FacilityCardProps) {
       
       <CardContent className="p-4 flex flex-col flex-grow">
         <div className="mb-3">
-          <h3 className="font-bold text-lg mb-1 text-gray-900 line-clamp-1">{facility.name}</h3>
-          <div className="flex items-start gap-1.5 text-sm text-gray-600">
-            <MapPin className="h-4 w-4 text-gray-500 shrink-0 mt-0.5" />
+          <h3 className="font-bold text-xl mb-2 text-gray-900 line-clamp-1">{facility.name}</h3>
+          <div className="flex items-start gap-1.5 text-base text-gray-600">
+            <MapPin className="h-5 w-5 text-gray-500 shrink-0 mt-0.5" />
             <span 
               className="line-clamp-1 hover:text-blue-600 hover:underline cursor-pointer transition-colors"
               onClick={(e) => onAddressClick(e, facility)}
