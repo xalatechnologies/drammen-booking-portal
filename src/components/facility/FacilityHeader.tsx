@@ -22,7 +22,7 @@ export function FacilityHeader({
   return (
     <div>
       <div className="flex items-center gap-3 mb-2">
-        <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+        <Badge variant="outline" className="bg-[#1e3a8a] bg-opacity-10 text-[#1e3a8a] border-[#1e3a8a]">
           Idrettsanlegg
         </Badge>
         <div className="flex items-center gap-1">

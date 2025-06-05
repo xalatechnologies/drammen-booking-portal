@@ -44,7 +44,7 @@ export function BookingFormNav({
       <Button 
         type={isLastStep ? "submit" : "button"}
         onClick={isLastStep ? undefined : onNextStep}
-        className="bg-blue-600 hover:bg-blue-700 gap-1"
+        className="bg-[#1e3a8a] hover:bg-[#1e40af] gap-1"
         disabled={isSubmitting || (isLastStep && isSubmitDisabled) || !canContinue}
       >
         {isSubmitting ? (

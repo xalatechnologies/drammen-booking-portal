@@ -93,17 +93,17 @@ export function FacilityCardTabs({ facility }: FacilityCardTabsProps) {
 
           <div>
             <h4 className="text-sm font-medium mb-2 flex items-center gap-1.5 text-gray-900">
-              <Wrench className="h-4 w-4 text-blue-600" />
+              <Wrench className="h-4 w-4 text-[#1e3a8a]" />
               <span>Tilgjengelig utstyr</span>
             </h4>
             <div className="flex flex-wrap gap-1.5">
               {facility.equipment.slice(0, 4).map((item, i) => (
-                <Badge key={i} variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 text-xs py-1 px-2">
+                <Badge key={i} variant="outline" className="bg-[#1e3a8a] bg-opacity-10 text-[#1e3a8a] border-[#1e3a8a] text-xs py-1 px-2">
                   {item}
                 </Badge>
               ))}
               {facility.equipment.length > 4 && (
-                <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 text-xs py-1 px-2">
+                <Badge variant="outline" className="bg-[#1e3a8a] bg-opacity-10 text-[#1e3a8a] border-[#1e3a8a] text-xs py-1 px-2">
                   +{facility.equipment.length - 4} flere
                 </Badge>
               )}
@@ -114,7 +114,7 @@ export function FacilityCardTabs({ facility }: FacilityCardTabsProps) {
         <TabsContent value="availability" className="mt-0">
           <div className="bg-gray-50 p-3 rounded-lg border border-gray-100">
             <h4 className="text-sm font-medium mb-2 flex items-center gap-1.5">
-              <Calendar className="h-4 w-4 text-blue-600" />
+              <Calendar className="h-4 w-4 text-[#1e3a8a]" />
               <span>Tilgjengelighet</span>
             </h4>
             

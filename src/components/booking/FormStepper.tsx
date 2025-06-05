@@ -12,7 +12,7 @@ export function FormStepper({ currentStep, steps }: FormStepperProps) {
       {/* Progress bar */}
       <div className="w-full h-2 bg-gray-100 rounded-full mb-4">
         <div 
-          className="h-2 bg-blue-600 rounded-full transition-all duration-300" 
+          className="h-2 bg-[#1e3a8a] rounded-full transition-all duration-300" 
           style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
         ></div>
       </div>
@@ -24,9 +24,9 @@ export function FormStepper({ currentStep, steps }: FormStepperProps) {
             <div 
               className={`rounded-full w-10 h-10 flex items-center justify-center border-2 transition-colors
                 ${currentStep === index 
-                  ? 'bg-blue-600 border-blue-600 text-white' 
+                  ? 'bg-[#1e3a8a] border-[#1e3a8a] text-white' 
                   : currentStep > index 
-                    ? 'bg-white border-blue-600 text-blue-600'
+                    ? 'bg-white border-[#1e3a8a] text-[#1e3a8a]'
                     : 'bg-white border-gray-300 text-gray-400'}`}
             >
               {index + 1}
