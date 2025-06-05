@@ -1,11 +1,10 @@
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { CheckCircle, ArrowLeft, Home } from "lucide-react";
+import { CheckCircle, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import GlobalHeader from "@/components/GlobalHeader";
 import GlobalFooter from "@/components/GlobalFooter";
-import { FormStepper } from "@/components/booking/FormStepper";
 import { EnhancedBookingForm } from "@/components/booking/EnhancedBookingForm";
 import { Zone } from "@/components/booking/types";
 
@@ -120,7 +119,7 @@ const BookingPage = () => {
           entryPoints: ["Hovedinngang", "Sør-inngang"]
         },
         accessibility: ["wheelchair", "hearing-loop", "visual-guidance"],
-        features: ["Avansert AV-utstyr", "Fleksibel belysning", "Akustikk optimalisert"],
+        features: ["Avansert AV-utstyr", "Fleksibel belysning", "Akustikk optimaliseret"],
         restrictions: ["Ingen mat eller drikke", "Kun innendørssko"],
         isActive: true
       }
@@ -145,8 +144,6 @@ const BookingPage = () => {
     setBookingReference(reference);
     setIsBookingComplete(true);
   };
-
-  const steps = ["Detaljer", "Kontakt", "Bekreft"];
 
   if (isBookingComplete) {
     return (
@@ -208,7 +205,7 @@ const BookingPage = () => {
 
       {/* Breadcrumb Navigation */}
       <div className="bg-white border-b border-gray-200">
-        <div className="container mx-auto px-4 py-3">
+        <div className="container mx-auto px-4 py-3 max-w-7xl">
           <nav className="flex items-center space-x-2 text-sm">
             <Button 
               variant="ghost" 
@@ -235,30 +232,24 @@ const BookingPage = () => {
       </div>
 
       <div className="flex-grow py-8">
-        <div className="container mx-auto px-4 max-w-4xl">
+        <div className="container mx-auto px-4 max-w-7xl">
           {/* Page Header */}
-          <div className="text-center mb-8">
+          <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
               Reserver {facility.name}
             </h1>
-            <p className="text-gray-600 max-w-2xl mx-auto">
+            <p className="text-gray-600 max-w-2xl">
               Fyll ut skjemaet under for å reservere lokalet. All informasjon behandles trygt og sikkert.
             </p>
           </div>
 
-          {/* Main Booking Form Card */}
-          <Card className="shadow-lg">
-            <CardHeader className="border-b bg-gray-50">
-              <CardTitle className="text-xl">Reservasjonsskjema</CardTitle>
-              <FormStepper currentStep={0} steps={steps} />
-            </CardHeader>
-            <CardContent className="p-8">
-              <EnhancedBookingForm 
-                facility={facility}
-                onBookingComplete={handleBookingComplete}
-              />
-            </CardContent>
-          </Card>
+          {/* Enhanced Booking Form */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <EnhancedBookingForm 
+              facility={facility}
+              onBookingComplete={handleBookingComplete}
+            />
+          </div>
         </div>
       </div>
 
