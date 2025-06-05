@@ -32,7 +32,7 @@ const TimeRangePicker: React.FC<TimeRangePickerProps> = ({
       <PopoverTrigger asChild>
         <Button
           variant="outline"
-          className="w-full h-10 justify-start text-left font-normal border-gray-200 hover:border-blue-500"
+          className="w-full h-11 justify-start text-left font-normal border-gray-200 hover:border-slate-700"
         >
           <Clock className="mr-2 h-4 w-4 text-gray-500" />
           {timeRange ? (

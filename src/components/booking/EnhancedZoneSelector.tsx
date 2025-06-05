@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Users, Zap, AlertTriangle, CheckCircle, Info, MapPin, Building, Clock } from "lucide-react";
+import { Users, AlertTriangle, CheckCircle, Info, MapPin, Building, Clock } from "lucide-react";
 import { BookingFormValues, Zone } from "./types";
 import { FormField, FormItem, FormControl, FormMessage, FormLabel } from "@/components/ui/form";
 import { ZoneConflictManager, ExistingBooking } from "@/utils/zoneConflictManager";
@@ -68,41 +68,25 @@ export function EnhancedZoneSelector({
     );
   };
 
-  // Smart recommendations
-  const recommendations = conflictManager.getBookingRecommendations(
-    attendees,
-    [],
-    selectedDate,
-    selectedTimeSlot
-  );
-
-  const recommendedZoneId = recommendations[0]?.id;
-
-  const renderZoneCard = (zone: Zone, isRecommended: boolean = false) => {
+  const renderZoneCard = (zone: Zone) => {
     const { isAvailable, conflict } = getZoneAvailability(zone);
     const isSelected = selectedZoneId === zone.id;
     
     return (
       <Card className={`transition-all cursor-pointer ${
         isSelected 
-          ? 'ring-2 ring-blue-500 border-blue-200 bg-blue-50' 
+          ? 'ring-2 ring-slate-700 border-slate-300 bg-slate-50' 
           : isAvailable
-            ? 'hover:border-blue-300 hover:shadow-sm'
+            ? 'hover:border-slate-300 hover:shadow-sm'
             : 'opacity-60'
-      } ${isRecommended ? 'border-2 border-green-400' : ''}`}>
+      }`}>
         <CardContent className="p-4">
           <div className="flex justify-between items-start">
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-2">
                 <h3 className="font-semibold text-base">{zone.name}</h3>
-                {isRecommended && (
-                  <Badge className="bg-green-600 text-white text-xs">
-                    <Zap className="h-3 w-3 mr-1" />
-                    Anbefalt
-                  </Badge>
-                )}
                 {zone.isMainZone && (
-                  <Badge variant="outline" className="bg-blue-100 text-blue-800 text-xs">
+                  <Badge variant="outline" className="bg-slate-100 text-slate-800 text-xs">
                     <Building className="h-3 w-3 mr-1" />
                     Komplett
                   </Badge>
@@ -172,7 +156,7 @@ export function EnhancedZoneSelector({
     );
   };
 
-  // Organize zones
+  // Organize zones - show main zones first, then sub zones
   const mainZones = zones.filter(zone => zone.isMainZone);
   const subZones = zones.filter(zone => !zone.isMainZone);
 
@@ -188,10 +172,10 @@ export function EnhancedZoneSelector({
           </FormLabel>
           
           {/* Smart tip */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+          <div className="bg-slate-50 border border-slate-200 rounded-lg p-3">
             <div className="flex items-start gap-2">
-              <Info className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
-              <div className="text-sm text-blue-800">
+              <Info className="h-4 w-4 text-slate-600 mt-0.5 flex-shrink-0" />
+              <div className="text-sm text-slate-800">
                 <p><strong>For {attendees} personer:</strong> Vi anbefaler soner med kapasitet på minst {Math.ceil(attendees * 1.2)} personer</p>
               </div>
             </div>
@@ -209,20 +193,14 @@ export function EnhancedZoneSelector({
               value={field.value}
               className="space-y-3"
             >
-              {/* All zones in one list with smart ordering */}
+              {/* Main zones first, then sub zones */}
               {[...mainZones, ...subZones]
                 .sort((a, b) => {
-                  // Recommended first
-                  if (a.id === recommendedZoneId) return -1;
-                  if (b.id === recommendedZoneId) return 1;
                   // Available zones before unavailable
                   const aAvailable = getZoneAvailability(a).isAvailable;
                   const bAvailable = getZoneAvailability(b).isAvailable;
                   if (aAvailable && !bAvailable) return -1;
                   if (!aAvailable && bAvailable) return 1;
-                  // Main zones before sub zones
-                  if (a.isMainZone && !b.isMainZone) return -1;
-                  if (!a.isMainZone && b.isMainZone) return 1;
                   return 0;
                 })
                 .map((zone) => (
@@ -234,7 +212,7 @@ export function EnhancedZoneSelector({
                       className="mt-4"
                     />
                     <Label htmlFor={zone.id} className="flex-1 cursor-pointer">
-                      {renderZoneCard(zone, zone.id === recommendedZoneId)}
+                      {renderZoneCard(zone)}
                     </Label>
                   </div>
                 ))}
