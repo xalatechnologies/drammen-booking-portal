@@ -16,9 +16,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         <div className="flex flex-1 w-full overflow-hidden">
           <AdminSidebar />
           <main className="flex-1 overflow-auto">
-            <div className="p-8 max-w-7xl mx-auto">
-              {children}
-            </div>
+            {children}
           </main>
         </div>
       </div>
