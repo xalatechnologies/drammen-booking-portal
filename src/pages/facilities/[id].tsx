@@ -1,18 +1,17 @@
-
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, MapPin, Users, Clock, Star, CheckCircle, Wifi, Car, Accessibility, Map, Info } from "lucide-react";
+import { ArrowLeft, MapPin, Users, Clock, Star, CheckCircle, Wifi, Car, Accessibility, Map, Info, Share2, Heart } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import GlobalHeader from "@/components/GlobalHeader";
 import GlobalFooter from "@/components/GlobalFooter";
 import { FacilityImageGallery } from "@/components/facility/FacilityImageGallery";
 import { FacilityBookingDrawer } from "@/components/facility/FacilityBookingDrawer";
-import { FacilityBookingCard } from "@/components/facility/FacilityBookingCard";
 import { ZoneAvailabilityTable } from "@/components/facility/ZoneAvailabilityTable";
-import { ZoneOverviewCard } from "@/components/facility/ZoneOverviewCard";
+import { ZoneBookingCard } from "@/components/facility/ZoneBookingCard";
 import { AutoApprovalCard } from "@/components/facility/AutoApprovalCard";
 import MapView from "@/components/MapView";
 import { format } from "date-fns";
@@ -23,8 +22,10 @@ const FacilityDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [isBookingDrawerOpen, setIsBookingDrawerOpen] = useState(false);
+  const [selectedZoneId, setSelectedZoneId] = useState<string>("");
   const [showMap, setShowMap] = useState(false);
   const [date] = useState<Date>(new Date());
+  const [isFavorited, setIsFavorited] = useState(false);
   
   // Mock facility data with zones - in a real app this would be fetched based on id
   const zones: Zone[] = [
@@ -116,6 +117,22 @@ const FacilityDetail = () => {
         ]
       }
     ]
+  };
+
+  const handleZoneBookClick = (zoneId: string) => {
+    setSelectedZoneId(zoneId);
+    setIsBookingDrawerOpen(true);
+  };
+
+  const handleShare = () => {
+    if (navigator.share) {
+      navigator.share({
+        title: facility.name,
+        url: window.location.href,
+      });
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+    }
   };
 
   return (
@@ -256,15 +273,74 @@ const FacilityDetail = () => {
             </div>
 
             {/* Right Sidebar - Booking */}
-            <div className="lg:sticky lg:top-24 lg:self-start space-y-6">
-              <FacilityBookingCard 
-                facility={facility}
-                onBookClick={() => setIsBookingDrawerOpen(true)}
-              />
-              
-              <AutoApprovalCard hasAutoApproval={facility.hasAutoApproval} />
-              
-              <ZoneOverviewCard zones={zones} />
+            <div className="lg:sticky lg:top-24 lg:self-start">
+              <ScrollArea className="h-[calc(100vh-120px)]">
+                <div className="space-y-6 pr-2">
+                  {/* Action buttons */}
+                  <div className="flex items-center justify-end gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="flex items-center gap-2"
+                      onClick={() => setIsFavorited(!isFavorited)}
+                    >
+                      <Heart className={`h-4 w-4 ${isFavorited ? 'fill-red-500 text-red-500' : ''}`} />
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={handleShare}
+                    >
+                      <Share2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+
+                  {/* Zone booking cards */}
+                  {zones.map((zone) => (
+                    <ZoneBookingCard
+                      key={zone.id}
+                      zone={zone}
+                      facilityName={facility.name}
+                      onBookClick={handleZoneBookClick}
+                    />
+                  ))}
+                  
+                  <AutoApprovalCard hasAutoApproval={facility.hasAutoApproval} />
+                  
+                  {/* Additional info cards */}
+                  <Card className="shadow-sm">
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-3">
+                        <div className="bg-amber-100 p-2 rounded-md">
+                          <Info className="h-5 w-5 text-amber-600" />
+                        </div>
+                        <div>
+                          <h3 className="font-medium">Avbestilling</h3>
+                          <p className="text-sm text-gray-600">
+                            Gratis avbestilling inntil 48 timer før
+                          </p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card className="shadow-sm">
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-3">
+                        <div className="bg-blue-100 p-2 rounded-md">
+                          <Clock className="h-5 w-5 text-blue-600" />
+                        </div>
+                        <div>
+                          <h3 className="font-medium">Åpningstider</h3>
+                          <p className="text-sm text-gray-600">
+                            {facility.openingHours}
+                          </p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </ScrollArea>
             </div>
           </div>
         </div>
@@ -276,6 +352,7 @@ const FacilityDetail = () => {
         open={isBookingDrawerOpen}
         onOpenChange={setIsBookingDrawerOpen}
         facility={facility}
+        selectedZoneId={selectedZoneId}
       />
     </div>
   );

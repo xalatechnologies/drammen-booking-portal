@@ -10,6 +10,7 @@ import { Zone } from "@/components/booking/types";
 interface FacilityBookingDrawerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  selectedZoneId?: string;
   facility: {
     id: string | undefined;
     name: string;
@@ -22,10 +23,12 @@ interface FacilityBookingDrawerProps {
   };
 }
 
-export function FacilityBookingDrawer({ open, onOpenChange, facility }: FacilityBookingDrawerProps) {
+export function FacilityBookingDrawer({ open, onOpenChange, facility, selectedZoneId }: FacilityBookingDrawerProps) {
   const navigate = useNavigate();
   const [isBookingComplete, setIsBookingComplete] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
+  
+  const selectedZone = facility.zones.find(zone => zone.id === selectedZoneId);
   
   const handleBookingComplete = () => {
     setIsBookingComplete(true);
@@ -50,7 +53,7 @@ export function FacilityBookingDrawer({ open, onOpenChange, facility }: Facility
           <DrawerTitle className="text-2xl">
             {isBookingComplete 
               ? "Reservasjon fullført!" 
-              : `Reserver ${facility.name}`
+              : `Reserver ${selectedZone?.name || facility.name}`
             }
           </DrawerTitle>
           <DrawerDescription className="max-w-md mx-auto">
@@ -97,6 +100,7 @@ export function FacilityBookingDrawer({ open, onOpenChange, facility }: Facility
               onCompleteBooking={handleBookingComplete}
               termsAccepted={termsAccepted}
               onTermsAcceptedChange={setTermsAccepted}
+              selectedZoneId={selectedZoneId}
             />
           )}
         </div>
