@@ -19,7 +19,7 @@ export function FacilityLocation({ address }: FacilityLocationProps) {
     
     // Convert address to coordinates (in a real app, use geocoding API)
     // For now we'll use Drammen's coordinates
-    const coordinates = [10.2052, 59.7440]; // Approximate coordinates for Drammen
+    const coordinates: [number, number] = [10.2052, 59.7440]; // Specify as tuple to match LngLatLike
     
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
