@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { PriceCalculation, CustomerType } from '@/types/pricing';
 import { pricingEngine } from '@/utils/pricingEngine';
@@ -38,7 +39,7 @@ export function usePriceCalculation({
       bookingMode
     });
 
-    // Show pricing as soon as we have basic info
+    // Show pricing as soon as we have basic info - make timeSlot optional
     if (!facilityId || !zoneId || !startDate || !customerType) {
       console.log('Missing required parameters for price calculation');
       setCalculation(null);
@@ -52,13 +53,16 @@ export function usePriceCalculation({
       try {
         const finalEndDate = endDate || new Date(startDate.getTime() + 2 * 60 * 60 * 1000);
         
+        // Use a default timeSlot for calculation if none provided
+        const calculationTimeSlot = timeSlot || '09:00 - 11:00';
+        
         console.log('Calculating price with:', {
           facilityId,
           zoneId,
           startDate,
           finalEndDate,
           customerType,
-          timeSlot: timeSlot || '09:00 - 11:00', // Default timeSlot for calculation
+          timeSlot: calculationTimeSlot,
           bookingMode,
           eventType,
           ageGroup
@@ -70,7 +74,7 @@ export function usePriceCalculation({
           startDate,
           finalEndDate,
           customerType,
-          timeSlot || '09:00 - 11:00', // Provide default timeSlot
+          calculationTimeSlot,
           bookingMode,
           eventType,
           ageGroup
@@ -84,7 +88,7 @@ export function usePriceCalculation({
       } finally {
         setIsLoading(false);
       }
-    }, 100); // Even faster response
+    }, 50); // Faster response
 
     return () => clearTimeout(timer);
   }, [facilityId, zoneId, startDate, endDate, timeSlot, customerType, bookingMode, eventType, ageGroup]);

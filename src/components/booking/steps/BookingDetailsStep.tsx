@@ -37,7 +37,7 @@ export interface BookingDetailsStepProps {
 export function BookingDetailsStep({ form, facility }: BookingDetailsStepProps) {
   const watchedValues = form.watch();
 
-  // Calculate price with more immediate feedback
+  // Calculate price with more immediate feedback - show as soon as we have basic info
   const { calculation, isLoading } = usePriceCalculation({
     facilityId: facility.id,
     zoneId: watchedValues.zoneId,
@@ -49,6 +49,9 @@ export function BookingDetailsStep({ form, facility }: BookingDetailsStepProps) 
     eventType: watchedValues.eventType,
     ageGroup: watchedValues.ageGroup
   });
+
+  // Show pricing when we have minimum required info
+  const shouldShowPricing = watchedValues.customerType && watchedValues.zoneId && watchedValues.date;
 
   return (
     <div className="space-y-6">
@@ -282,12 +285,28 @@ export function BookingDetailsStep({ form, facility }: BookingDetailsStepProps) 
       />
 
       {/* Price Calculation - Show as soon as we have basic info */}
-      {(watchedValues.customerType && watchedValues.zoneId) && (
-        <PriceBreakdown 
-          calculation={calculation || { basePrice: 0, totalHours: 0, totalDays: 0, customerTypeDiscount: 0, weekendSurcharge: 0, subtotal: 0, finalPrice: 0, breakdown: [] }}
-          isLoading={isLoading}
-          showDetailed={true}
-        />
+      {shouldShowPricing && (
+        <div className="space-y-2">
+          {!watchedValues.timeSlot && (
+            <div className="text-sm text-amber-600 bg-amber-50 border border-amber-200 rounded-lg p-3">
+              💡 Prisberegning basert på estimert 2-timers booking. Velg tidsperiode for nøyaktig pris.
+            </div>
+          )}
+          <PriceBreakdown 
+            calculation={calculation || { 
+              basePrice: 0, 
+              totalHours: 0, 
+              totalDays: 0, 
+              customerTypeDiscount: 0, 
+              weekendSurcharge: 0, 
+              subtotal: 0, 
+              finalPrice: 0, 
+              breakdown: [] 
+            }}
+            isLoading={isLoading}
+            showDetailed={true}
+          />
+        </div>
       )}
     </div>
   );
