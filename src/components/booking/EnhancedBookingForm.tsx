@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -8,8 +7,7 @@ import { BookingContactStep } from "./steps/BookingContactStep";
 import { BookingConfirmStep } from "./steps/BookingConfirmStep";
 import { BookingFormNav } from "./BookingFormNav";
 import { FormStepper } from "./FormStepper";
-import { bookingFormSchema, BookingFormValues, BookingStep, Zone } from "./types";
-import type { BookingData } from "./BookingSummary";
+import { bookingFormSchema, BookingFormValues, BookingStep, Zone, BookingData } from "./types";
 
 interface EnhancedBookingFormProps {
   facility: {
