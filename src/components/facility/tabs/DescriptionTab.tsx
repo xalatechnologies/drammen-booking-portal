@@ -1,7 +1,9 @@
+
 import React from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Heart, MapPin, Users, CheckCircle } from "lucide-react";
 import { Zone } from "@/components/booking/types";
 
@@ -43,6 +45,8 @@ export function DescriptionTab({ description, capacity, quickFacts, zones }: Des
       <ZoneGrid zones={zones} />
 
       <RulesSection />
+      
+      <FaqSection />
     </div>
   );
 }
@@ -122,16 +126,99 @@ function RulesSection() {
   return (
     <div>
       <h3 className="font-semibold text-xl mb-6">Regler og retningslinjer</h3>
-      <div className="bg-gray-50 p-6 rounded-lg">
-        <ul className="space-y-4 text-lg text-gray-700 leading-relaxed">
-          <li>• Innendørssko påkrevd i gymsalen</li>
-          <li>• Maks antall deltakere må respekteres</li>
-          <li>• Røyking og alkohol er forbudt</li>
-          <li>• Lokalet må ryddes etter bruk</li>
-          <li>• Skader på utstyr må rapporteres umiddelbart</li>
-          <li>• Musikk må holdes på akseptabelt nivå</li>
-        </ul>
-      </div>
+      <Accordion type="single" collapsible className="w-full">
+        <AccordionItem value="safety-rules">
+          <AccordionTrigger className="text-lg font-medium">Sikkerhetsregler</AccordionTrigger>
+          <AccordionContent>
+            <ul className="space-y-2 text-base text-gray-700">
+              <li>• Innendørssko påkrevd i gymsalen</li>
+              <li>• Skader på utstyr må rapporteres umiddelbart</li>
+              <li>• Førstehjelpsutstyr er tilgjengelig ved hovedinngangen</li>
+            </ul>
+          </AccordionContent>
+        </AccordionItem>
+
+        <AccordionItem value="capacity-rules">
+          <AccordionTrigger className="text-lg font-medium">Kapasitet og bruk</AccordionTrigger>
+          <AccordionContent>
+            <ul className="space-y-2 text-base text-gray-700">
+              <li>• Maks antall deltakere må respekteres</li>
+              <li>• Lokalet må ryddes etter bruk</li>
+              <li>• Musikk må holdes på akseptabelt nivå</li>
+            </ul>
+          </AccordionContent>
+        </AccordionItem>
+
+        <AccordionItem value="prohibited">
+          <AccordionTrigger className="text-lg font-medium">Forbudte aktiviteter</AccordionTrigger>
+          <AccordionContent>
+            <ul className="space-y-2 text-base text-gray-700">
+              <li>• Røyking og alkohol er forbudt</li>
+              <li>• Ingen mat eller drikke på treningsgulvet</li>
+              <li>• Kjæledyr er ikke tillatt</li>
+            </ul>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
+    </div>
+  );
+}
+
+function FaqSection() {
+  return (
+    <div>
+      <h3 className="font-semibold text-xl mb-6">Ofte stilte spørsmål</h3>
+      <Accordion type="single" collapsible className="w-full">
+        <AccordionItem value="booking-hours">
+          <AccordionTrigger className="text-lg font-medium">Når kan jeg reservere lokalet?</AccordionTrigger>
+          <AccordionContent>
+            <p className="text-base text-gray-700">
+              Lokalet er tilgjengelig for reservasjon fra kl. 06:00 til 23:00, mandag til søndag. 
+              Du kan reservere opptil 90 dager i forveien.
+            </p>
+          </AccordionContent>
+        </AccordionItem>
+
+        <AccordionItem value="cancellation">
+          <AccordionTrigger className="text-lg font-medium">Kan jeg avbestille reservasjonen min?</AccordionTrigger>
+          <AccordionContent>
+            <p className="text-base text-gray-700">
+              Ja, du kan avbestille gratis opptil 24 timer før reservert tid. 
+              Avbestilling etter dette vil medføre full betaling av reservasjonen.
+            </p>
+          </AccordionContent>
+        </AccordionItem>
+
+        <AccordionItem value="equipment">
+          <AccordionTrigger className="text-lg font-medium">Hvilke utstyr er inkludert?</AccordionTrigger>
+          <AccordionContent>
+            <p className="text-base text-gray-700">
+              Alle reservasjoner inkluderer standard sportsutstyr som basketkurver, volleyballnett, 
+              håndballmål, lydanlegg og projektor. Spesialutstyr kan reserveres separat.
+            </p>
+          </AccordionContent>
+        </AccordionItem>
+
+        <AccordionItem value="payment">
+          <AccordionTrigger className="text-lg font-medium">Hvordan betaler jeg for reservasjonen?</AccordionTrigger>
+          <AccordionContent>
+            <p className="text-base text-gray-700">
+              Du kan betale med kort, Vipps eller faktura. Betaling må være fullført før reservasjonen bekreftes. 
+              Vi aksepterer alle norske bankkort og internasjonale kredittkort.
+            </p>
+          </AccordionContent>
+        </AccordionItem>
+
+        <AccordionItem value="access">
+          <AccordionTrigger className="text-lg font-medium">Hvordan får jeg tilgang til lokalet?</AccordionTrigger>
+          <AccordionContent>
+            <p className="text-base text-gray-700">
+              Du vil motta en tilgangskode per SMS 30 minutter før reservert tid. 
+              Denne koden gir deg tilgang til lokalet og deaktiveres automatisk når reservasjonstiden utløper.
+            </p>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
     </div>
   );
 }
