@@ -8,7 +8,6 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ZoneAvailabilityTable } from "@/components/facility/ZoneAvailabilityTable";
-import MapView from "@/components/MapView";
 import { isDateUnavailable, isNorwegianHoliday } from "@/utils/holidaysAndAvailability";
 import { Zone } from "@/components/booking/types";
 
@@ -19,10 +18,20 @@ interface FacilityInfoTabsProps {
   zones: Zone[];
   amenities: string[];
   address: string;
+  quickFacts: React.ReactNode;
+  zoneCards: React.ReactNode;
 }
 
-export function FacilityInfoTabs({ description, capacity, equipment, zones, amenities, address }: FacilityInfoTabsProps) {
-  const [showMap, setShowMap] = useState(false);
+export function FacilityInfoTabs({ 
+  description, 
+  capacity, 
+  equipment, 
+  zones, 
+  amenities, 
+  address,
+  quickFacts,
+  zoneCards
+}: FacilityInfoTabsProps) {
   const [date] = useState<Date>(new Date());
 
   // Filter out Wi-Fi from equipment since it's shown in amenities
@@ -60,12 +69,12 @@ export function FacilityInfoTabs({ description, capacity, equipment, zones, amen
         <TabsTrigger value="availability" className="flex-1 py-3 rounded-none data-[state=active]:border-b-2 data-[state=active]:border-blue-600 data-[state=active]:shadow-none data-[state=active]:bg-transparent">
           Tilgjengelighet
         </TabsTrigger>
-        <TabsTrigger value="location" className="flex-1 py-3 rounded-none data-[state=active]:border-b-2 data-[state=active]:border-blue-600 data-[state=active]:shadow-none data-[state=active]:bg-transparent">
-          Lokasjon
-        </TabsTrigger>
       </TabsList>
       
       <TabsContent value="description" className="p-6 space-y-6">
+        {/* Quick facts moved into the description tab */}
+        {quickFacts}
+
         <div>
           <h2 className="text-xl font-medium mb-4">Om lokalet</h2>
           <p className="text-gray-700 leading-relaxed">{description}</p>
@@ -113,6 +122,9 @@ export function FacilityInfoTabs({ description, capacity, equipment, zones, amen
             </div>
           </Card>
         </div>
+
+        {/* Zone cards moved into description tab */}
+        {zoneCards}
 
         <div>
           <h3 className="font-medium text-lg mb-3">Regler og retningslinjer</h3>
@@ -212,67 +224,6 @@ export function FacilityInfoTabs({ description, capacity, equipment, zones, amen
             timeSlots={["08:00", "10:00", "12:00", "14:00", "16:00", "18:00", "20:00"]}
           />
         </div>
-      </TabsContent>
-
-      <TabsContent value="location" className="p-6 space-y-6">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-medium">Lokasjon og tilkomst</h2>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowMap(!showMap)}
-            className="flex items-center gap-2"
-          >
-            <MapPin className="h-4 w-4" />
-            {showMap ? 'Skjul kart' : 'Vis kart'}
-          </Button>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card className="p-4">
-            <h3 className="font-medium mb-3 flex items-center gap-2">
-              <MapPin className="h-5 w-5 text-blue-600" />
-              Adresse
-            </h3>
-            <div className="space-y-2">
-              <p className="font-medium">{address}</p>
-              <p className="text-sm text-gray-600">Drammen Kommune</p>
-              <p className="text-sm text-gray-600">Buskerud, Norge</p>
-            </div>
-          </Card>
-
-          <Card className="p-4">
-            <h3 className="font-medium mb-3 flex items-center gap-2">
-              <Car className="h-5 w-5 text-green-600" />
-              Parkering
-            </h3>
-            <div className="space-y-2 text-sm">
-              <p className="text-gray-700">Gratis parkering tilgjengelig</p>
-              <p className="text-gray-700">20 plasser på skolens område</p>
-              <p className="text-gray-700">Handicapparking: 2 plasser</p>
-            </div>
-          </Card>
-        </div>
-
-        {showMap && (
-          <div className="h-64 rounded-lg overflow-hidden border">
-            <MapView facilityType="" location={address} />
-          </div>
-        )}
-
-        <Card className="p-4">
-          <h3 className="font-medium mb-3">Kollektivtransport</h3>
-          <div className="space-y-3 text-sm">
-            <div>
-              <p className="font-medium text-blue-600">Buss</p>
-              <p className="text-gray-700">Linje 102, 104 - Stopp: Brandengen skole (50m unna)</p>
-            </div>
-            <div>
-              <p className="font-medium text-green-600">Tog</p>
-              <p className="text-gray-700">Drammen stasjon - 15 min med buss</p>
-            </div>
-          </div>
-        </Card>
       </TabsContent>
     </Tabs>
   );

@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -14,7 +15,7 @@ import { ZoneBookingCard } from "@/components/facility/ZoneBookingCard";
 import { FacilityLocation } from "@/components/facility/FacilityLocation";
 import { Zone } from "@/components/booking/types";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { MapPin } from "lucide-react";
+import { MapPin, Car, Users, Map, Clock, CheckCircle } from "lucide-react";
 
 const FacilityDetail = () => {
   const { id } = useParams();
@@ -285,14 +286,6 @@ const FacilityDetail = () => {
               </div>
             </div>
 
-            {/* Quick Facts Grid */}
-            <FacilityQuickFacts
-              capacity={facility.capacity}
-              area={facility.area}
-              openingHours={facility.openingHours}
-              zoneCount={zones.length}
-            />
-
             {/* Auto Approval and Cancellation Policy */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {facility.hasAutoApproval && (
@@ -316,27 +309,7 @@ const FacilityDetail = () => {
               </div>
             </div>
 
-            {/* Zones Section */}
-            <Card>
-              <CardHeader className="pb-4">
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <MapPin className="h-5 w-5" />
-                  Tilgjengelige soner
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {zones.map((zone) => (
-                  <ZoneBookingCard
-                    key={zone.id}
-                    zone={zone}
-                    facilityName={facility.name}
-                    onBookClick={() => navigate(`/booking/${id}?zone=${zone.id}`)}
-                  />
-                ))}
-              </CardContent>
-            </Card>
-
-            {/* Location with Map - Always Showing */}
+            {/* Location with Map - Enhanced with info from tabs */}
             <Card className="p-6">
               <div className="mb-4">
                 <h3 className="text-lg font-semibold">Lokasjon</h3>
@@ -350,6 +323,32 @@ const FacilityDetail = () => {
                     <p className="text-sm text-gray-600">Drammen Kommune</p>
                   </div>
                 </div>
+
+                {/* Added transport info from tabs */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="p-3 bg-gray-50 rounded-lg">
+                    <p className="font-medium text-blue-600 mb-1">Kollektivtransport</p>
+                    <div className="space-y-2 text-sm">
+                      <div>
+                        <p className="font-medium">Buss</p>
+                        <p className="text-gray-700">Linje 102, 104 - Stopp: Brandengen skole (50m unna)</p>
+                      </div>
+                      <div>
+                        <p className="font-medium">Tog</p>
+                        <p className="text-gray-700">Drammen stasjon - 15 min med buss</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="p-3 bg-gray-50 rounded-lg">
+                    <p className="font-medium text-green-600 mb-1">Parkering</p>
+                    <div className="space-y-1 text-sm">
+                      <p className="text-gray-700">Gratis parkering tilgjengelig</p>
+                      <p className="text-gray-700">20 plasser på skolens område</p>
+                      <p className="text-gray-700">Handicapparking: 2 plasser</p>
+                    </div>
+                  </div>
+                </div>
                 
                 <div className="h-64 rounded-lg overflow-hidden border">
                   <FacilityLocation address="Iver Holters gate 48, 3041 Drammen" />
@@ -357,7 +356,7 @@ const FacilityDetail = () => {
               </div>
             </Card>
 
-            {/* Tabbed Content */}
+            {/* Tabbed Content - Moved up and restructured */}
             <FacilityInfoTabs
               description={facility.description}
               capacity={facility.capacity}
@@ -365,6 +364,34 @@ const FacilityDetail = () => {
               zones={zones}
               amenities={facility.amenities}
               address={facility.address}
+              quickFacts={
+                <FacilityQuickFacts
+                  capacity={facility.capacity}
+                  area={facility.area}
+                  openingHours={facility.openingHours}
+                  zoneCount={zones.length}
+                />
+              }
+              zoneCards={
+                <Card>
+                  <CardHeader className="pb-4">
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <MapPin className="h-5 w-5" />
+                      Tilgjengelige soner
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {zones.map((zone) => (
+                      <ZoneBookingCard
+                        key={zone.id}
+                        zone={zone}
+                        facilityName={facility.name}
+                        onBookClick={() => navigate(`/booking/${id}?zone=${zone.id}`)}
+                      />
+                    ))}
+                  </CardContent>
+                </Card>
+              }
             />
           </div>
 
