@@ -19,9 +19,9 @@ export function FacilityImageGallery({ images }: FacilityImageGalleryProps) {
 
   return (
     <>
-      {/* Image Gallery with Navigation */}
+      {/* Image Gallery with Navigation - Made bigger and taller */}
       <div className="relative rounded-lg overflow-hidden mb-4">
-        <div className="h-80 relative">
+        <div className="h-96 relative">
           {images.map((img, i) => (
             <div 
               key={i} 

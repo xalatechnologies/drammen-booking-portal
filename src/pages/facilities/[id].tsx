@@ -240,7 +240,7 @@ const FacilityDetail = () => {
 
       {/* Main Content */}
       <div className="flex-grow">
-        <div className="container mx-auto px-4 py-6 max-w-5xl">
+        <div className="container mx-auto px-4 py-6 max-w-7xl">
           <div className="space-y-6">
             {/* Image Gallery */}
             <FacilityImageGallery images={facility.images} />
@@ -293,22 +293,30 @@ const FacilityDetail = () => {
               zoneCount={zones.length}
             />
 
-            {/* Auto Approval Info - More Compact */}
-            {facility.hasAutoApproval && (
-              <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-                <div className="flex items-center gap-3">
-                  <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
-                    <div className="w-2 h-2 bg-green-600 rounded-full"></div>
-                  </div>
-                  <div>
-                    <span className="font-medium text-green-800">Automatisk godkjenning</span>
-                    <span className="text-sm text-green-700 ml-2">• Reservasjonen godkjennes umiddelbart</span>
+            {/* Auto Approval and Cancellation Policy */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {facility.hasAutoApproval && (
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
+                      <div className="w-2 h-2 bg-green-600 rounded-full"></div>
+                    </div>
+                    <div>
+                      <span className="font-medium text-green-800">Automatisk godkjenning</span>
+                      <span className="text-sm text-green-700 ml-2">• Reservasjonen godkjennes umiddelbart</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* Zones Section - Compact */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <p className="text-sm text-blue-800">
+                  <strong>Gratis avbestilling</strong> opptil 24 timer før reservert tid
+                </p>
+              </div>
+            </div>
+
+            {/* Zones Section */}
             <Card>
               <CardHeader className="pb-4">
                 <CardTitle className="flex items-center gap-2 text-lg">
@@ -328,15 +336,26 @@ const FacilityDetail = () => {
               </CardContent>
             </Card>
 
-            {/* Cancellation Policy - Compact */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-              <p className="text-sm text-blue-800">
-                <strong>Gratis avbestilling</strong> opptil 24 timer før reservert tid
-              </p>
-            </div>
-
-            {/* Location with Map */}
-            <FacilityLocation address={facility.address} />
+            {/* Location with Map - Always Showing */}
+            <Card className="p-6">
+              <div className="mb-4">
+                <h3 className="text-lg font-semibold">Lokasjon</h3>
+              </div>
+              
+              <div className="space-y-4">
+                <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                  <MapPin className="h-5 w-5 text-blue-600" />
+                  <div>
+                    <p className="font-medium">Iver Holters gate 48, 3041 Drammen</p>
+                    <p className="text-sm text-gray-600">Drammen Kommune</p>
+                  </div>
+                </div>
+                
+                <div className="h-64 rounded-lg overflow-hidden border">
+                  <FacilityLocation address="Iver Holters gate 48, 3041 Drammen" />
+                </div>
+              </div>
+            </Card>
 
             {/* Tabbed Content */}
             <FacilityInfoTabs
