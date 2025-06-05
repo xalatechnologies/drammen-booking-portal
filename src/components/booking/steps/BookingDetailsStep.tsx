@@ -31,7 +31,7 @@ import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { BookingFormValues, Zone } from "../types";
-import { ZoneSelector } from "../ZoneSelector";
+import { EnhancedZoneSelector } from "../EnhancedZoneSelector";
 
 export interface BookingDetailsStepProps {
   form: UseFormReturn<BookingFormValues>;
@@ -163,77 +163,61 @@ export function BookingDetailsStep({ form, facility }: BookingDetailsStepProps) 
         />
       </div>
 
-      {/* Zone Selection */}
+      {/* Attendees */}
       <FormField
         control={form.control}
-        name="zoneId"
+        name="attendees"
         render={({ field }) => (
           <FormItem>
             <FormLabel className="text-base font-semibold text-gray-900 flex items-center gap-2">
-              <MapPin className="h-5 w-5 text-slate-600" />
-              Område/Sone
+              <Users className="h-5 w-5 text-slate-600" />
+              Antall deltakere
             </FormLabel>
-            <ZoneSelector
-              form={form}
-              zones={facility.zones}
-              selectedDate={watchedValues.date || new Date()}
-              selectedTimeSlot={watchedValues.timeSlot || ""}
-            />
+            <FormControl>
+              <Input
+                type="number"
+                min="1"
+                max="1000"
+                placeholder="1"
+                className="h-11 border-gray-300 focus:border-slate-700 text-base max-w-xs"
+                {...field}
+                onChange={(e) => field.onChange(Number(e.target.value))}
+              />
+            </FormControl>
             <FormMessage />
           </FormItem>
         )}
       />
 
-      {/* Attendees and Purpose */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <FormField
-          control={form.control}
-          name="attendees"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-base font-semibold text-gray-900 flex items-center gap-2">
-                <Users className="h-5 w-5 text-slate-600" />
-                Antall deltakere
-              </FormLabel>
-              <FormControl>
-                <Input
-                  type="number"
-                  min="1"
-                  max="1000"
-                  placeholder="1"
-                  className="h-11 border-gray-300 focus:border-slate-700 text-base"
-                  {...field}
-                  onChange={(e) => field.onChange(Number(e.target.value))}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+      {/* Purpose */}
+      <FormField
+        control={form.control}
+        name="purpose"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className="text-base font-semibold text-gray-900 flex items-center gap-2">
+              <MessageSquare className="h-5 w-5 text-slate-600" />
+              Formål med reservasjonen
+            </FormLabel>
+            <FormControl>
+              <Textarea
+                placeholder="Beskriv kort hva lokalet skal brukes til..."
+                className="resize-none h-24 border-gray-300 focus:border-slate-700 text-base"
+                {...field}
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
 
-        <div className="md:col-span-2">
-          <FormField
-            control={form.control}
-            name="purpose"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-base font-semibold text-gray-900 flex items-center gap-2">
-                  <MessageSquare className="h-5 w-5 text-slate-600" />
-                  Formål med reservasjonen
-                </FormLabel>
-                <FormControl>
-                  <Textarea
-                    placeholder="Beskriv kort hva lokalet skal brukes til..."
-                    className="resize-none h-24 border-gray-300 focus:border-slate-700 text-base"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-      </div>
+      {/* Zone Selection */}
+      <EnhancedZoneSelector
+        form={form}
+        zones={facility.zones}
+        selectedDate={watchedValues.date || new Date()}
+        selectedTimeSlot={watchedValues.timeSlot || ""}
+      />
     </div>
   );
 }
