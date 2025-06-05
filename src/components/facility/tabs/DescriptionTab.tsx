@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -30,13 +29,13 @@ export function DescriptionTab({ description, capacity, quickFacts, zones }: Des
           Egnet for
         </h3>
         <div className="flex flex-wrap gap-3">
-          <Badge variant="outline" className="bg-[#1e3a8a] bg-opacity-10 text-[#1e3a8a] border-[#1e3a8a] text-base py-2 px-4 font-medium">Idrett</Badge>
-          <Badge variant="outline" className="bg-[#1e3a8a] bg-opacity-10 text-[#1e3a8a] border-[#1e3a8a] text-base py-2 px-4 font-medium">Trening</Badge>
-          <Badge variant="outline" className="bg-[#1e3a8a] bg-opacity-10 text-[#1e3a8a] border-[#1e3a8a] text-base py-2 px-4 font-medium">Arrangementer</Badge>
-          <Badge variant="outline" className="bg-[#1e3a8a] bg-opacity-10 text-[#1e3a8a] border-[#1e3a8a] text-base py-2 px-4 font-medium">Grupper</Badge>
-          <Badge variant="outline" className="bg-[#1e3a8a] bg-opacity-10 text-[#1e3a8a] border-[#1e3a8a] text-base py-2 px-4 font-medium">Dans</Badge>
-          <Badge variant="outline" className="bg-[#1e3a8a] bg-opacity-10 text-[#1e3a8a] border-[#1e3a8a] text-base py-2 px-4 font-medium">Ballsport</Badge>
-          <Badge variant="outline" className="bg-[#1e3a8a] bg-opacity-10 text-[#1e3a8a] border-[#1e3a8a] text-base py-2 px-4 font-medium">Presentasjoner</Badge>
+          <Badge variant="outline" className="bg-[#1e3a8a] bg-opacity-10 text-[#1e3a8a] border-[#1e3a8a] border-[0.5px] text-base py-2 px-4 font-medium">Idrett</Badge>
+          <Badge variant="outline" className="bg-[#1e3a8a] bg-opacity-10 text-[#1e3a8a] border-[#1e3a8a] border-[0.5px] text-base py-2 px-4 font-medium">Trening</Badge>
+          <Badge variant="outline" className="bg-[#1e3a8a] bg-opacity-10 text-[#1e3a8a] border-[#1e3a8a] border-[0.5px] text-base py-2 px-4 font-medium">Arrangementer</Badge>
+          <Badge variant="outline" className="bg-[#1e3a8a] bg-opacity-10 text-[#1e3a8a] border-[#1e3a8a] border-[0.5px] text-base py-2 px-4 font-medium">Grupper</Badge>
+          <Badge variant="outline" className="bg-[#1e3a8a] bg-opacity-10 text-[#1e3a8a] border-[#1e3a8a] border-[0.5px] text-base py-2 px-4 font-medium">Dans</Badge>
+          <Badge variant="outline" className="bg-[#1e3a8a] bg-opacity-10 text-[#1e3a8a] border-[#1e3a8a] border-[0.5px] text-base py-2 px-4 font-medium">Ballsport</Badge>
+          <Badge variant="outline" className="bg-[#1e3a8a] bg-opacity-10 text-[#1e3a8a] border-[#1e3a8a] border-[0.5px] text-base py-2 px-4 font-medium">Presentasjoner</Badge>
         </div>
       </Card>
 
