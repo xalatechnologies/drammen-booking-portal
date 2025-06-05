@@ -25,6 +25,11 @@ export function FacilityInfoTabs({ description, capacity, equipment, zones, amen
   const [showMap, setShowMap] = useState(false);
   const [date] = useState<Date>(new Date());
 
+  // Filter out Wi-Fi from equipment since it's shown in amenities
+  const filteredEquipment = equipment.filter(item => 
+    !item.toLowerCase().includes('wi-fi') && !item.toLowerCase().includes('wifi')
+  );
+
   const getAmenityIcon = (amenity: string) => {
     switch (amenity.toLowerCase()) {
       case 'wi-fi':
@@ -176,7 +181,7 @@ export function FacilityInfoTabs({ description, capacity, equipment, zones, amen
         <div>
           <h3 className="font-medium text-lg mb-3">Tilgjengelig utstyr</h3>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-            {equipment.map((item, i) => (
+            {filteredEquipment.map((item, i) => (
               <div key={i} className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
                 <CheckCircle className="h-4 w-4 text-green-600 flex-shrink-0" />
                 <span className="text-sm">{item}</span>
