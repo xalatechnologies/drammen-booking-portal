@@ -4,6 +4,7 @@ import { Bell, Search, Globe } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,19 +18,22 @@ import Logo from "@/components/header/Logo";
 const AdminHeader = () => {
   return (
     <header className="border-b bg-white shadow-sm sticky top-0 z-50">
-      <div className="flex h-20 items-center px-6">
+      <div className="flex h-16 items-center px-6">
         <div className="flex items-center gap-4 min-w-0">
           <Logo />
         </div>
         
         <div className="flex-1 flex justify-center px-8">
-          <div className="relative w-full max-w-lg">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <Input
-              placeholder="Søk i alt innhold..."
-              className="pl-10 h-10 text-base bg-gray-50 border-gray-200 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none focus:border-blue-500"
-              aria-label="Søk i systemet"
-            />
+          <div className="flex items-center gap-4 w-full max-w-lg">
+            <SidebarTrigger className="focus:ring-2 focus:ring-blue-500 focus:outline-none rounded-md" />
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Input
+                placeholder="Søk i alt innhold..."
+                className="pl-10 h-10 text-base bg-gray-50 border-gray-200 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none focus:border-blue-500"
+                aria-label="Søk i systemet"
+              />
+            </div>
           </div>
         </div>
 
