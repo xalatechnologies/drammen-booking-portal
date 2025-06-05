@@ -1,6 +1,6 @@
 
-import React, { useState } from "react";
-import { CheckCircle, Info, Clock, Share2, Heart, Users, Map } from "lucide-react";
+import React from "react";
+import { CheckCircle, Users, Map } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -14,58 +14,57 @@ interface ZoneBookingCardProps {
 
 export function ZoneBookingCard({ zone, facilityName, onBookClick }: ZoneBookingCardProps) {
   return (
-    <Card className="mb-4 shadow-sm border-blue-100">
-      <CardContent className="p-6">
-        <div className="mb-4">
-          <h3 className="text-lg font-semibold mb-1">{zone.name}</h3>
-          <p className="text-sm text-gray-600 mb-3">{zone.description}</p>
-          
-          <div className="flex items-center gap-4 mb-3">
-            <div className="flex items-center gap-1 text-sm text-gray-600">
-              <Users className="h-4 w-4" />
-              <span>Maks {zone.capacity}</span>
+    <div className="border border-gray-200 rounded-lg p-4">
+      <div className="flex justify-between items-start mb-3">
+        <div className="flex-1">
+          <h3 className="font-medium text-base mb-1">{zone.name}</h3>
+          <div className="flex items-center gap-3 text-sm text-gray-600 mb-2">
+            <div className="flex items-center gap-1">
+              <Users className="h-3 w-3" />
+              <span>{zone.capacity}</span>
             </div>
             {zone.area && (
-              <div className="flex items-center gap-1 text-sm text-gray-600">
-                <Map className="h-4 w-4" />
+              <div className="flex items-center gap-1">
+                <Map className="h-3 w-3" />
                 <span>{zone.area}</span>
               </div>
             )}
           </div>
-          
-          <div className="flex flex-wrap gap-1 mb-4">
-            {zone.equipment.slice(0, 2).map((item, i) => (
-              <Badge key={i} variant="outline" className="text-xs">
-                {item}
-              </Badge>
-            ))}
-            {zone.equipment.length > 2 && (
-              <Badge variant="outline" className="text-xs">
-                +{zone.equipment.length - 2} mer
-              </Badge>
-            )}
-          </div>
         </div>
-        
-        <div className="text-center mb-4">
-          <div className="text-2xl font-bold text-gray-900">{zone.pricePerHour} kr</div>
-          <div className="text-gray-500 text-sm">per time</div>
+        <div className="text-right">
+          <div className="text-lg font-bold text-gray-900">{zone.pricePerHour} kr</div>
+          <div className="text-xs text-gray-500">per time</div>
         </div>
-        
-        <div className="p-3 bg-green-50 rounded-lg mb-4 text-center">
-          <p className="text-green-800 text-sm">
-            <CheckCircle className="inline h-4 w-4 mr-1" />
-            Tilgjengelig for umiddelbar booking
-          </p>
+      </div>
+      
+      <p className="text-sm text-gray-600 mb-3 line-clamp-2">{zone.description}</p>
+      
+      <div className="flex flex-wrap gap-1 mb-3">
+        {zone.equipment.slice(0, 2).map((item, i) => (
+          <Badge key={i} variant="outline" className="text-xs py-0.5 px-2">
+            {item}
+          </Badge>
+        ))}
+        {zone.equipment.length > 2 && (
+          <Badge variant="outline" className="text-xs py-0.5 px-2">
+            +{zone.equipment.length - 2}
+          </Badge>
+        )}
+      </div>
+      
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-1 text-xs text-green-600">
+          <CheckCircle className="h-3 w-3" />
+          <span>Tilgjengelig</span>
         </div>
-
         <Button 
-          className="w-full bg-[#0B3D91] hover:bg-blue-700 text-white font-medium shadow-sm h-12 mb-3"
+          size="sm"
+          className="bg-[#0B3D91] hover:bg-blue-700 text-white h-8 text-xs"
           onClick={() => onBookClick(zone.id)}
         >
-          Reserver {zone.name}
+          Reserver
         </Button>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

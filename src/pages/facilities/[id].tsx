@@ -11,6 +11,8 @@ import { FacilitySidebar } from "@/components/facility/FacilitySidebar";
 import { FacilityInfoTabs } from "@/components/facility/FacilityInfoTabs";
 import { SimilarFacilitiesSlider } from "@/components/facility/SimilarFacilitiesSlider";
 import { Zone } from "@/components/booking/types";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { MapPin } from "lucide-react";
 
 const FacilityDetail = () => {
   const { id } = useParams();
@@ -257,6 +259,33 @@ const FacilityDetail = () => {
                 zoneCount={zones.length}
               />
 
+              {/* Zone Information - moved here from sidebar */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <MapPin className="h-5 w-5" />
+                    Soneinformasjon
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid gap-4">
+                    {zones.map((zone) => (
+                      <div key={zone.id} className="p-4 border border-gray-200 rounded-lg">
+                        <div className="flex justify-between items-start mb-2">
+                          <h3 className="font-medium">{zone.name}</h3>
+                          <span className="text-sm font-medium text-gray-600">{zone.pricePerHour} kr/time</span>
+                        </div>
+                        <p className="text-sm text-gray-600 mb-2">{zone.description}</p>
+                        <div className="flex items-center gap-4 text-sm text-gray-500">
+                          <span>Kapasitet: {zone.capacity}</span>
+                          {zone.area && <span>Areal: {zone.area}</span>}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
               {/* Tabbed Content */}
               <FacilityInfoTabs
                 description={facility.description}
@@ -268,13 +297,16 @@ const FacilityDetail = () => {
               />
             </div>
 
-            {/* Right Sidebar - Booking */}
+            {/* Right Sidebar - Compact Booking */}
             <FacilitySidebar
               zones={zones}
               facilityName={facility.name}
               facilityId={id}
               hasAutoApproval={facility.hasAutoApproval}
               openingHours={facility.openingHours}
+              onShare={handleShare}
+              onToggleFavorite={() => setIsFavorited(!isFavorited)}
+              isFavorited={isFavorited}
             />
           </div>
 
