@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Home } from "lucide-react";
 import GlobalHeader from "@/components/GlobalHeader";
 import GlobalFooter from "@/components/GlobalFooter";
 import { FacilityImageGallery } from "@/components/facility/FacilityImageGallery";
@@ -137,16 +137,29 @@ const FacilityDetail = () => {
 
       <div className="flex-grow">
         {/* Navigation Header */}
-        <div className="bg-white border-b border-gray-200 sticky top-[72px] z-20">
-          <div className="container mx-auto px-4 py-3">
-            <Button 
-              variant="ghost" 
-              className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
-              onClick={() => navigate("/")}
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Tilbake til søk
-            </Button>
+        <div className="bg-gray-50 border-b border-gray-200">
+          <div className="container mx-auto px-4 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <Button 
+                  variant="ghost" 
+                  className="flex items-center gap-2 text-gray-600 hover:text-gray-900 hover:bg-white"
+                  onClick={() => navigate("/")}
+                >
+                  <Home className="h-4 w-4" />
+                  Hjem
+                </Button>
+                <span className="text-gray-400">/</span>
+                <Button 
+                  variant="ghost" 
+                  className="flex items-center gap-2 text-gray-600 hover:text-gray-900 hover:bg-white"
+                  onClick={() => navigate("/")}
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                  Søkeresultater
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -158,12 +171,15 @@ const FacilityDetail = () => {
               {/* Image Gallery */}
               <FacilityImageGallery images={facility.images} />
 
-              {/* Header */}
+              {/* Header with like/share buttons */}
               <FacilityHeader
                 name={facility.name}
                 address={facility.address}
                 rating={facility.rating}
                 reviewCount={facility.reviewCount}
+                onShare={handleShare}
+                isFavorited={isFavorited}
+                onToggleFavorite={() => setIsFavorited(!isFavorited)}
               />
 
               {/* Quick Facts Grid */}
@@ -195,9 +211,6 @@ const FacilityDetail = () => {
               hasAutoApproval={facility.hasAutoApproval}
               openingHours={facility.openingHours}
               onZoneBookClick={handleZoneBookClick}
-              onShare={handleShare}
-              isFavorited={isFavorited}
-              onToggleFavorite={() => setIsFavorited(!isFavorited)}
             />
           </div>
         </div>
