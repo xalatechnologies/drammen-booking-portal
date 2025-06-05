@@ -7,7 +7,6 @@ import {
   FormItem,
   FormLabel,
   FormControl,
-  FormDescription,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -51,64 +50,23 @@ export function BookingDetailsStep({ form, facility }: BookingDetailsStepProps) 
   const watchedValues = form.watch();
   
   const availableTimeSlots = [
-    "08:00-10:00",
-    "10:00-12:00", 
-    "12:00-14:00",
-    "14:00-16:00",
-    "16:00-18:00",
-    "18:00-20:00",
-    "20:00-22:00"
+    "08:00-10:00", "10:00-12:00", "12:00-14:00",
+    "14:00-16:00", "16:00-18:00", "18:00-20:00", "20:00-22:00"
   ];
 
   return (
-    <div className="space-y-5">
-      <div className="flex items-center space-x-2 pb-3 border-b border-gray-100">
-        <Calendar className="h-5 w-5 text-slate-700" />
-        <h3 className="text-lg font-medium text-gray-900">Reservasjonsdetaljer</h3>
-      </div>
-      
-      {/* Booking Mode Selection */}
-      <FormField
-        control={form.control}
-        name="bookingMode"
-        render={({ field }) => (
-          <FormItem className="space-y-2">
-            <FormLabel className="text-sm font-medium text-gray-900">Type reservasjon</FormLabel>
-            <FormControl>
-              <RadioGroup
-                onValueChange={field.onChange}
-                defaultValue={field.value}
-                className="flex flex-col space-y-2"
-              >
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="one-time" id="one-time" className="border-gray-400 text-slate-800" />
-                  <Label htmlFor="one-time" className="text-sm">Engangsreservasjon</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="date-range" id="date-range" className="border-gray-400 text-slate-800" />
-                  <Label htmlFor="date-range" className="text-sm">Periode (flere dager)</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="recurring" id="recurring" className="border-gray-400 text-slate-800" />
-                  <Label htmlFor="recurring" className="text-sm">Gjentakende reservasjon</Label>
-                </div>
-              </RadioGroup>
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-
-      {/* Date Selection */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="space-y-3">
+      {/* Smart grid layout for maximum efficiency */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        {/* Date */}
         <FormField
           control={form.control}
           name="date"
           render={({ field }) => (
-            <FormItem className="flex flex-col">
+            <FormItem>
               <FormLabel className="flex items-center gap-1.5 text-sm font-medium text-gray-900">
-                <Calendar className="h-4 w-4 text-slate-700" />
-                {watchedValues.bookingMode === 'date-range' ? 'Startdato' : 'Dato'}
+                <Calendar className="h-3.5 w-3.5 text-slate-600" />
+                Dato
               </FormLabel>
               <Popover>
                 <PopoverTrigger asChild>
@@ -116,7 +74,7 @@ export function BookingDetailsStep({ form, facility }: BookingDetailsStepProps) 
                     <Button
                       variant={"outline"}
                       className={cn(
-                        "w-full pl-3 text-left font-normal h-9 border-gray-300 hover:border-slate-400",
+                        "w-full pl-3 text-left font-normal h-8 border-gray-300 hover:border-slate-400 text-sm",
                         !field.value && "text-muted-foreground"
                       )}
                     >
@@ -125,7 +83,7 @@ export function BookingDetailsStep({ form, facility }: BookingDetailsStepProps) 
                       ) : (
                         <span>Velg dato</span>
                       )}
-                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                      <CalendarIcon className="ml-auto h-3.5 w-3.5 opacity-50" />
                     </Button>
                   </FormControl>
                 </PopoverTrigger>
@@ -143,93 +101,45 @@ export function BookingDetailsStep({ form, facility }: BookingDetailsStepProps) 
             </FormItem>
           )}
         />
-        
-        {watchedValues.bookingMode === 'date-range' && (
-          <FormField
-            control={form.control}
-            name="endDate"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel className="flex items-center gap-1.5 text-sm font-medium text-gray-900">
-                  <Calendar className="h-4 w-4 text-slate-700" />
-                  Sluttdato
-                </FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant={"outline"}
-                        className={cn(
-                          "w-full pl-3 text-left font-normal h-9 border-gray-300 hover:border-slate-400",
-                          !field.value && "text-muted-foreground"
-                        )}
-                      >
-                        {field.value ? (
-                          format(field.value, "dd.MM.yyyy")
-                        ) : (
-                          <span>Velg sluttdato</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <CalendarComponent
-                      mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
-                      disabled={(date) => 
-                        date < new Date() || 
-                        (watchedValues.date && date <= watchedValues.date)
-                      }
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        )}
+
+        {/* Time Slot */}
+        <FormField
+          control={form.control}
+          name="timeSlot"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="flex items-center gap-1.5 text-sm font-medium text-gray-900">
+                <Clock className="h-3.5 w-3.5 text-slate-600" />
+                Tidspunkt
+              </FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger className="h-8 border-gray-300 focus:border-slate-700 text-sm">
+                    <SelectValue placeholder="Velg tid" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {availableTimeSlots.map((slot) => (
+                    <SelectItem key={slot} value={slot} className="text-sm">
+                      {slot}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
       </div>
 
-      {/* Time Slot Selection */}
-      <FormField
-        control={form.control}
-        name="timeSlot"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel className="flex items-center gap-1.5 text-sm font-medium text-gray-900">
-              <Clock className="h-4 w-4 text-slate-700" />
-              Tidspunkt
-            </FormLabel>
-            <Select onValueChange={field.onChange} defaultValue={field.value}>
-              <FormControl>
-                <SelectTrigger className="h-9 border-gray-300 focus:border-slate-800">
-                  <SelectValue placeholder="Velg et tidsintervall" />
-                </SelectTrigger>
-              </FormControl>
-              <SelectContent>
-                {availableTimeSlots.map((slot) => (
-                  <SelectItem key={slot} value={slot}>
-                    {slot}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-
-      {/* Zone Selection */}
+      {/* Zone Selection - full width for prominence */}
       <FormField
         control={form.control}
         name="zoneId"
         render={({ field }) => (
           <FormItem>
             <FormLabel className="flex items-center gap-1.5 text-sm font-medium text-gray-900">
-              <MapPin className="h-4 w-4 text-slate-700" />
+              <MapPin className="h-3.5 w-3.5 text-slate-600" />
               Område/Sone
             </FormLabel>
             <ZoneSelector
@@ -243,55 +153,82 @@ export function BookingDetailsStep({ form, facility }: BookingDetailsStepProps) 
         )}
       />
 
-      {/* Purpose */}
+      {/* Compact booking mode selection */}
+      <FormField
+        control={form.control}
+        name="bookingMode"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className="text-sm font-medium text-gray-900">Type</FormLabel>
+            <FormControl>
+              <RadioGroup
+                onValueChange={field.onChange}
+                defaultValue={field.value}
+                className="flex flex-row gap-4"
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="one-time" id="one-time" className="border-gray-400 text-slate-700 w-3.5 h-3.5" />
+                  <Label htmlFor="one-time" className="text-xs font-medium">Engang</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="recurring" id="recurring" className="border-gray-400 text-slate-700 w-3.5 h-3.5" />
+                  <Label htmlFor="recurring" className="text-xs font-medium">Gjentakende</Label>
+                </div>
+              </RadioGroup>
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      {/* Smart two-column layout for efficiency */}
+      <div className="grid grid-cols-2 gap-3">
+        <FormField
+          control={form.control}
+          name="attendees"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="flex items-center gap-1.5 text-sm font-medium text-gray-900">
+                <Users className="h-3.5 w-3.5 text-slate-600" />
+                Deltakere
+              </FormLabel>
+              <FormControl>
+                <Input
+                  type="number"
+                  min="1"
+                  max="1000"
+                  placeholder="1"
+                  className="h-8 border-gray-300 focus:border-slate-700 text-sm"
+                  {...field}
+                  onChange={(e) => field.onChange(Number(e.target.value))}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* Empty space for visual balance */}
+        <div></div>
+      </div>
+
+      {/* Purpose - compact textarea */}
       <FormField
         control={form.control}
         name="purpose"
         render={({ field }) => (
           <FormItem>
             <FormLabel className="flex items-center gap-1.5 text-sm font-medium text-gray-900">
-              <MessageSquare className="h-4 w-4 text-slate-700" />
-              Formål med reservasjonen
+              <MessageSquare className="h-3.5 w-3.5 text-slate-600" />
+              Formål
             </FormLabel>
             <FormControl>
               <Textarea
-                placeholder="Beskriv formålet med reservasjonen..."
-                className="resize-none min-h-[70px] border-gray-300 focus:border-slate-800"
+                placeholder="Kort beskrivelse av aktiviteten..."
+                className="resize-none h-16 border-gray-300 focus:border-slate-700 text-sm"
                 {...field}
               />
             </FormControl>
-            <FormDescription className="text-xs text-gray-600">
-              Gi en kort beskrivelse av aktiviteten eller arrangementet.
-            </FormDescription>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-
-      {/* Number of Attendees */}
-      <FormField
-        control={form.control}
-        name="attendees"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel className="flex items-center gap-1.5 text-sm font-medium text-gray-900">
-              <Users className="h-4 w-4 text-slate-700" />
-              Antall deltakere
-            </FormLabel>
-            <FormControl>
-              <Input
-                type="number"
-                min="1"
-                max="1000"
-                placeholder="1"
-                className="h-9 border-gray-300 focus:border-slate-800"
-                {...field}
-                onChange={(e) => field.onChange(Number(e.target.value))}
-              />
-            </FormControl>
-            <FormDescription className="text-xs text-gray-600">
-              Angi forventet antall personer som vil bruke lokalet.
-            </FormDescription>
             <FormMessage />
           </FormItem>
         )}

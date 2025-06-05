@@ -32,10 +32,10 @@ export function BookingFormNav({
           variant="outline" 
           onClick={onPreviousStep} 
           disabled={isSubmitting}
-          className="gap-2 border-gray-300 hover:bg-gray-50 focus:ring-2 focus:ring-slate-800 focus:ring-offset-2"
+          className="gap-1.5 border-gray-300 hover:bg-gray-50 focus:ring-2 focus:ring-slate-700 focus:ring-offset-2 h-8 px-3 text-sm"
           aria-label="Go to previous step"
         >
-          <ChevronLeft className="h-4 w-4" aria-hidden="true" />
+          <ChevronLeft className="h-3.5 w-3.5" aria-hidden="true" />
           Tilbake
         </Button>
       ) : (
@@ -45,25 +45,24 @@ export function BookingFormNav({
       <Button 
         type={isLastStep ? "submit" : "button"}
         onClick={isLastStep ? undefined : onNextStep}
-        className="bg-slate-800 hover:bg-slate-900 focus:ring-2 focus:ring-slate-800 focus:ring-offset-2 gap-2 min-w-[140px]"
+        className="bg-slate-700 hover:bg-slate-800 focus:ring-2 focus:ring-slate-700 focus:ring-offset-2 gap-1.5 min-w-[120px] h-8 px-4 text-sm"
         disabled={isSubmitting || (isLastStep && isSubmitDisabled) || !canContinue}
         aria-label={isLastStep ? "Submit booking" : "Go to next step"}
       >
         {isSubmitting ? (
           <>
-            <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" aria-hidden="true"></span>
+            <span className="animate-spin h-3.5 w-3.5 border-2 border-white border-t-transparent rounded-full" aria-hidden="true"></span>
             <span>Sender...</span>
-            <span className="sr-only">Sending booking request</span>
           </>
         ) : isLastStep ? (
           <>
-            <span>Send inn reservasjon</span>
-            <CheckCircle className="h-4 w-4" aria-hidden="true" />
+            <span>Send inn</span>
+            <CheckCircle className="h-3.5 w-3.5" aria-hidden="true" />
           </>
         ) : (
           <>
             <span>Neste</span>
-            <ChevronRight className="h-4 w-4" aria-hidden="true" />
+            <ChevronRight className="h-3.5 w-3.5" aria-hidden="true" />
           </>
         )}
       </Button>
