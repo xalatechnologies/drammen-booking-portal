@@ -21,10 +21,8 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
-  SidebarHeader,
   SidebarFooter,
 } from "@/components/ui/sidebar";
-import Logo from "@/components/header/Logo";
 
 const AdminSidebar = () => {
   const navigate = useNavigate();
@@ -110,9 +108,10 @@ const AdminSidebar = () => {
                   }
                   focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-white
                   active:scale-[0.98]
+                  group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-2
                 `}
               >
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4 group-data-[collapsible=icon]:gap-0">
                   <div className={`
                     relative p-2.5 rounded-xl transition-all duration-300 transform
                     ${isActive(item.path) 
@@ -122,10 +121,10 @@ const AdminSidebar = () => {
                   `}>
                     <item.icon className="h-[18px] w-[18px]" strokeWidth={2.2} />
                   </div>
-                  <span className="truncate font-medium leading-5">{item.title}</span>
+                  <span className="truncate font-medium leading-5 group-data-[collapsible=icon]:hidden">{item.title}</span>
                 </div>
                 <ChevronRight className={`
-                  h-4 w-4 transition-all duration-300 transform
+                  h-4 w-4 transition-all duration-300 transform group-data-[collapsible=icon]:hidden
                   ${isActive(item.path) 
                     ? 'text-blue-600 opacity-100 translate-x-0' 
                     : 'text-slate-400 opacity-0 group-hover:opacity-100 group-hover:translate-x-1'
@@ -140,13 +139,7 @@ const AdminSidebar = () => {
   );
 
   return (
-    <Sidebar className="border-r border-slate-200/60 bg-white shadow-xl shadow-slate-200/20 w-80">
-      <SidebarHeader className="px-8 py-6 border-b border-slate-100 h-20 flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/40">
-        <div className="flex items-center justify-center transform hover:scale-105 transition-transform duration-200">
-          <Logo />
-        </div>
-      </SidebarHeader>
-      
+    <Sidebar className="border-r border-slate-200/60 bg-white shadow-xl shadow-slate-200/20" collapsible="icon">
       <SidebarContent className="px-4 py-8 space-y-2 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
         {renderMenuGroup(overviewItems, "OVERSIKT")}
         {renderMenuGroup(bookingItems, "BOOKING")}
@@ -154,16 +147,16 @@ const AdminSidebar = () => {
         {renderMenuGroup(systemItems, "SYSTEM")}
       </SidebarContent>
 
-      <SidebarFooter className="p-8 border-t border-slate-100 bg-gradient-to-t from-slate-50/50 to-white">
-        <div className="flex items-center gap-4 p-5 rounded-2xl bg-white border border-slate-200/60 shadow-lg shadow-slate-200/20 hover:shadow-xl hover:shadow-slate-200/30 transition-all duration-300">
-          <div className="flex items-center gap-3">
+      <SidebarFooter className="p-8 border-t border-slate-100 bg-gradient-to-t from-slate-50/50 to-white group-data-[collapsible=icon]:p-2">
+        <div className="flex items-center gap-4 p-5 rounded-2xl bg-white border border-slate-200/60 shadow-lg shadow-slate-200/20 hover:shadow-xl hover:shadow-slate-200/30 transition-all duration-300 group-data-[collapsible=icon]:p-2 group-data-[collapsible=icon]:justify-center">
+          <div className="flex items-center gap-3 group-data-[collapsible=icon]:gap-0">
             <div className="relative">
               <div className="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse"></div>
               <div className="absolute inset-0 w-2.5 h-2.5 bg-emerald-400 rounded-full animate-ping opacity-30"></div>
             </div>
-            <span className="text-[15px] font-semibold text-slate-800 leading-5">System Status</span>
+            <span className="text-[15px] font-semibold text-slate-800 leading-5 group-data-[collapsible=icon]:hidden">System Status</span>
           </div>
-          <div className="ml-auto">
+          <div className="ml-auto group-data-[collapsible=icon]:hidden">
             <span className="text-[13px] text-emerald-700 font-bold bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-200/50 shadow-sm">
               Operative
             </span>
