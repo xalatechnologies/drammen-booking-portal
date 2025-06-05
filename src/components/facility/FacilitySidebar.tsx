@@ -46,7 +46,7 @@ export function FacilitySidebar({
       <div className="flex gap-2">
         <Button 
           onClick={() => handleBookingClick()}
-          className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+          className="flex-1 bg-[#1e3a8a] hover:bg-[#1e40af] text-white"
           size="lg"
         >
           Reserver nå

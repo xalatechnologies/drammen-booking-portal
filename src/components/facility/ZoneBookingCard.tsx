@@ -59,7 +59,7 @@ export function ZoneBookingCard({ zone, facilityName, onBookClick }: ZoneBooking
         </div>
         <Button 
           size="sm"
-          className="bg-[#0B3D91] hover:bg-blue-700 text-white h-8 text-xs"
+          className="bg-[#1e3a8a] hover:bg-[#1e40af] text-white h-8 text-xs"
           onClick={() => onBookClick(zone.id)}
         >
           Reserver

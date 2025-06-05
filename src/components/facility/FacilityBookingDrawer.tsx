@@ -75,7 +75,7 @@ export function FacilityBookingDrawer({ open, onOpenChange, facility, selectedZo
               <div className="flex gap-4 justify-center pt-4">
                 <Button 
                   onClick={() => navigate("/bookings")}
-                  className="bg-blue-600 hover:bg-blue-700"
+                  className="bg-[#1e3a8a] hover:bg-[#1e40af]"
                   size="lg"
                 >
                   Se dine reservasjoner

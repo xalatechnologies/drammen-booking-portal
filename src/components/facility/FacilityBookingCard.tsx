@@ -65,7 +65,7 @@ export function FacilityBookingCard({ facility, onBookClick }: FacilityBookingCa
           </div>
 
           <Button 
-            className="w-full bg-[#0B3D91] hover:bg-blue-700 text-white font-medium shadow-sm h-12"
+            className="w-full bg-[#1e3a8a] hover:bg-[#1e40af] text-white font-medium shadow-sm h-12"
             onClick={onBookClick}
           >
             Reserver nå
