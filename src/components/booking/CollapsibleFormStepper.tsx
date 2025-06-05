@@ -36,7 +36,7 @@ export function CollapsibleFormStepper({
                 disabled={!canNavigate}
                 className={cn(
                   "w-full justify-start gap-3 px-4 py-3 h-auto font-medium text-sm transition-all duration-200 rounded-lg",
-                  isCurrent && "bg-navy-50 border-2 border-navy-200 text-navy-900 shadow-sm",
+                  isCurrent && "bg-slate-800 border-2 border-slate-800 text-white shadow-sm",
                   isCompleted && "bg-green-50 border border-green-200 text-green-800 hover:bg-green-100",
                   !isCurrent && !isCompleted && "bg-gray-50 border border-gray-200 text-gray-700 hover:bg-gray-100",
                   !canNavigate && "cursor-not-allowed opacity-60"
@@ -52,7 +52,7 @@ export function CollapsibleFormStepper({
                     isCompleted 
                       ? "bg-green-600 border-green-600 text-white" 
                       : isCurrent 
-                        ? "bg-navy-700 border-navy-700 text-white"
+                        ? "bg-white border-white text-slate-800"
                         : "bg-white border-gray-300 text-gray-500"
                   )}
                 >
@@ -70,7 +70,7 @@ export function CollapsibleFormStepper({
                   className={cn(
                     "flex-1 text-left font-semibold text-sm leading-tight",
                     isCurrent 
-                      ? "text-navy-900" 
+                      ? "text-white" 
                       : isCompleted 
                         ? "text-green-800"
                         : "text-gray-700"
@@ -82,7 +82,7 @@ export function CollapsibleFormStepper({
                 {/* Status Indicator - Only show on mobile or when active */}
                 <div className="md:hidden">
                   {isCurrent && (
-                    <ChevronDown className="h-4 w-4 text-navy-600" aria-hidden="true" />
+                    <ChevronDown className="h-4 w-4 text-white" aria-hidden="true" />
                   )}
                   {!isCurrent && (
                     <ChevronRight className="h-4 w-4 text-gray-400" aria-hidden="true" />
