@@ -1,13 +1,21 @@
+
 import React from "react";
+
 const HeroBanner = () => {
-  return <div className="mb-4 rounded-xl overflow-hidden shadow-lg">
+  return (
+    <div className="mb-4 rounded-xl overflow-hidden shadow-lg">
       <div className="relative">
-        <img src="/lovable-uploads/5a43abf2-1c2e-44cb-96a6-6509c7fe3281.png" alt="Drammen by med elv og broer" className="w-full h-[160px] object-cover" />
+        <img 
+          src="/lovable-uploads/5a43abf2-1c2e-44cb-96a6-6509c7fe3281.png" 
+          alt="Drammen by med elv og broer" 
+          className="w-full h-[160px] object-cover" 
+        />
         <div className="absolute inset-0 bg-gradient-to-r from-blue-900/80 to-blue-900/30 flex items-center">
-          <div className="container mx-auto px-6">
+          <div className="container mx-auto px-8 py-8">
             <div className="max-w-2xl">
-              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-2 leading-tight whitespace-nowrap py-[5px] px-[30px] mx-0 my-px">
-                Finn ledige lokaler i Drammen Kommune
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-2 leading-tight">
+                Finn ledige lokaler<br />
+                Drammen Kommune
               </h1>
               <p className="text-sm sm:text-base text-blue-100 max-w-lg">
                 Søk og reserver kommunale lokaler til møter, arrangementer og aktiviteter.
@@ -16,6 +24,8 @@ const HeroBanner = () => {
           </div>
         </div>
       </div>
-    </div>;
+    </div>
+  );
 };
+
 export default HeroBanner;
