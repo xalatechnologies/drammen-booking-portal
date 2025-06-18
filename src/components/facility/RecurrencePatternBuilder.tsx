@@ -22,8 +22,20 @@ const frequencyOptions = [
   { value: 'monthly' as const, label: 'Månedlig', icon: '🗓️' }
 ];
 
+type SupportedFrequency = 'weekly' | 'biweekly' | 'monthly';
+
 export function RecurrencePatternBuilder({ pattern, onPatternChange, onClose, onApplyPattern }: RecurrencePatternBuilderProps) {
-  const [selectedFrequency, setSelectedFrequency] = useState<'weekly' | 'biweekly' | 'monthly'>(pattern.type || 'weekly');
+  // Ensure we only use supported frequency types, default to 'weekly'
+  const getSupportedFrequency = (type: RecurrencePattern['type']): SupportedFrequency => {
+    if (type === 'weekly' || type === 'biweekly' || type === 'monthly') {
+      return type;
+    }
+    return 'weekly';
+  };
+
+  const [selectedFrequency, setSelectedFrequency] = useState<SupportedFrequency>(
+    getSupportedFrequency(pattern.type)
+  );
 
   const updatePattern = (updates: Partial<RecurrencePattern>) => {
     onPatternChange({ ...pattern, ...updates });
@@ -43,7 +55,7 @@ export function RecurrencePatternBuilder({ pattern, onPatternChange, onClose, on
     updatePattern({ timeSlots: newTimeSlots });
   };
 
-  const handleFrequencyChange = (frequency: 'weekly' | 'biweekly' | 'monthly') => {
+  const handleFrequencyChange = (frequency: SupportedFrequency) => {
     setSelectedFrequency(frequency);
     updatePattern({ type: frequency });
   };
@@ -59,66 +71,74 @@ export function RecurrencePatternBuilder({ pattern, onPatternChange, onClose, on
   const selectedDays = pattern.weekdays.map(day => weekdayNames[day]).join(', ');
 
   return (
-    <Card className="w-full max-w-3xl mx-auto shadow-xl border-0 bg-white">
-      <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-100">
+    <Card className="w-full max-w-4xl mx-auto shadow-2xl border-0 bg-white">
+      <CardHeader className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
         <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-3 text-xl font-semibold text-gray-800">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <Repeat className="h-5 w-5 text-blue-600" />
+          <CardTitle className="flex items-center gap-3 text-xl font-bold">
+            <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
+              <Repeat className="h-6 w-6" />
             </div>
-            Gjentakende reservasjon
+            Gjentakende Reservasjon
           </CardTitle>
           <Button
             variant="ghost"
             size="sm"
             onClick={onClose}
-            className="h-8 w-8 p-0 text-gray-400 hover:text-gray-600"
+            className="h-8 w-8 p-0 text-white/80 hover:text-white hover:bg-white/20"
           >
-            <X className="h-4 w-4" />
+            <X className="h-5 w-5" />
           </Button>
         </div>
       </CardHeader>
       
       <CardContent className="p-8 space-y-8">
-        {/* Frequency Selection */}
-        <div className="space-y-4">
-          <div className="flex items-center gap-2">
-            <Calendar className="h-5 w-5 text-blue-600" />
-            <h3 className="text-lg font-medium text-gray-800">Frekvens</h3>
+        {/* Smart Frequency Selection */}
+        <div className="space-y-6">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-blue-100 rounded-lg">
+              <Calendar className="h-5 w-5 text-blue-600" />
+            </div>
+            <h3 className="text-xl font-bold text-gray-800">Hvor ofte?</h3>
           </div>
-          <div className="grid grid-cols-3 gap-4">
-            {frequencyOptions.map((option) => (
-              <Button
-                key={option.value}
-                variant={selectedFrequency === option.value ? 'default' : 'outline'}
-                onClick={() => handleFrequencyChange(option.value)}
-                className={`h-20 flex-col gap-2 text-base font-medium transition-all ${
-                  selectedFrequency === option.value 
-                    ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg' 
-                    : 'hover:bg-blue-50 hover:border-blue-300'
-                }`}
-              >
-                <span className="text-2xl">{option.icon}</span>
-                <span>{option.label}</span>
-              </Button>
-            ))}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {frequencyOptions.map((option) => {
+              const isSelected = selectedFrequency === option.value;
+              return (
+                <Button
+                  key={option.value}
+                  variant={isSelected ? 'default' : 'outline'}
+                  onClick={() => handleFrequencyChange(option.value)}
+                  className={`h-24 flex-col gap-3 text-lg font-semibold transition-all transform hover:scale-105 ${
+                    isSelected 
+                      ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-xl ring-4 ring-blue-200' 
+                      : 'hover:bg-blue-50 hover:border-blue-300 hover:shadow-lg'
+                  }`}
+                >
+                  <span className="text-3xl">{option.icon}</span>
+                  <span>{option.label}</span>
+                  {isSelected && <Check className="absolute top-2 right-2 h-4 w-4" />}
+                </Button>
+              );
+            })}
           </div>
         </div>
 
-        {/* Weekday Selection */}
-        <div className="space-y-4">
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-2">
-              <span className="text-lg">📅</span>
-              <h3 className="text-lg font-medium text-gray-800">Dager</h3>
+        {/* Smart Weekday Selection */}
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-green-100 rounded-lg">
+                <span className="text-xl">📅</span>
+              </div>
+              <h3 className="text-xl font-bold text-gray-800">Hvilke dager?</h3>
             </div>
             {pattern.weekdays.length > 0 && (
-              <Badge variant="secondary" className="ml-2">
+              <Badge className="bg-green-100 text-green-800 px-3 py-1 text-sm font-semibold">
                 {pattern.weekdays.length} valgt
               </Badge>
             )}
           </div>
-          <div className="flex gap-2 flex-wrap">
+          <div className="flex gap-3 flex-wrap justify-center">
             {weekdayNames.map((day, index) => {
               const isSelected = pattern.weekdays.includes(index);
               return (
@@ -126,13 +146,13 @@ export function RecurrencePatternBuilder({ pattern, onPatternChange, onClose, on
                   key={index}
                   variant={isSelected ? 'default' : 'outline'}
                   onClick={() => toggleWeekday(index)}
-                  className={`w-16 h-16 p-0 text-base font-medium transition-all ${
+                  className={`w-20 h-20 p-0 text-lg font-bold transition-all transform hover:scale-110 relative ${
                     isSelected 
-                      ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-md' 
-                      : 'hover:bg-blue-50 hover:border-blue-300'
+                      ? 'bg-green-600 hover:bg-green-700 text-white shadow-xl ring-4 ring-green-200' 
+                      : 'hover:bg-green-50 hover:border-green-300 hover:shadow-lg'
                   }`}
                 >
-                  {isSelected && <Check className="absolute top-1 right-1 h-3 w-3" />}
+                  {isSelected && <Check className="absolute top-1 right-1 h-4 w-4" />}
                   {day}
                 </Button>
               );
@@ -140,18 +160,22 @@ export function RecurrencePatternBuilder({ pattern, onPatternChange, onClose, on
           </div>
         </div>
 
-        {/* Time Slots Selection */}
-        <div className="space-y-4">
-          <div className="flex items-center gap-2">
-            <Clock className="h-5 w-5 text-blue-600" />
-            <h3 className="text-lg font-medium text-gray-800">Tidspunkt</h3>
+        {/* Smart Time Slots Selection */}
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-purple-100 rounded-lg">
+                <Clock className="h-5 w-5 text-purple-600" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-800">Hvilke tider?</h3>
+            </div>
             {pattern.timeSlots.length > 0 && (
-              <Badge variant="secondary" className="ml-2">
+              <Badge className="bg-purple-100 text-purple-800 px-3 py-1 text-sm font-semibold">
                 {pattern.timeSlots.length} valgt
               </Badge>
             )}
           </div>
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
             {timeSlots.map((slot) => {
               const isSelected = pattern.timeSlots.includes(slot);
               return (
@@ -159,10 +183,10 @@ export function RecurrencePatternBuilder({ pattern, onPatternChange, onClose, on
                   key={slot}
                   variant={isSelected ? 'default' : 'outline'}
                   onClick={() => toggleTimeSlot(slot)}
-                  className={`h-12 text-base font-medium transition-all relative ${
+                  className={`h-14 text-base font-semibold transition-all transform hover:scale-105 relative ${
                     isSelected 
-                      ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-md' 
-                      : 'hover:bg-blue-50 hover:border-blue-300'
+                      ? 'bg-purple-600 hover:bg-purple-700 text-white shadow-lg ring-3 ring-purple-200' 
+                      : 'hover:bg-purple-50 hover:border-purple-300 hover:shadow-md'
                   }`}
                 >
                   {isSelected && <Check className="absolute top-1 right-1 h-3 w-3" />}
@@ -173,23 +197,25 @@ export function RecurrencePatternBuilder({ pattern, onPatternChange, onClose, on
           </div>
         </div>
 
-        {/* Preview */}
+        {/* Smart Preview */}
         {isValid && (
-          <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-6">
-            <div className="flex items-center gap-2 mb-3">
-              <Check className="h-5 w-5 text-green-600" />
-              <h4 className="text-lg font-medium text-green-800">Din reservasjon</h4>
+          <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border-2 border-emerald-200 rounded-2xl p-6 shadow-lg">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 bg-emerald-100 rounded-lg">
+                <Check className="h-5 w-5 text-emerald-600" />
+              </div>
+              <h4 className="text-xl font-bold text-emerald-800">Perfect! Din reservasjon</h4>
             </div>
-            <div className="space-y-2">
-              <div className="flex items-center gap-3">
-                <Badge className="bg-green-100 text-green-800 border-green-300">
+            <div className="space-y-3">
+              <div className="flex items-center gap-3 flex-wrap">
+                <Badge className="bg-emerald-600 text-white text-sm font-semibold px-3 py-1">
                   {frequencyOptions.find(f => f.value === selectedFrequency)?.label}
                 </Badge>
-                <span className="text-green-700 font-medium">{selectedDays}</span>
+                <span className="text-emerald-800 font-bold text-lg">{selectedDays}</span>
               </div>
-              <div className="flex flex-wrap gap-2 mt-3">
+              <div className="flex flex-wrap gap-2">
                 {pattern.timeSlots.map(slot => (
-                  <Badge key={slot} variant="outline" className="text-green-700 border-green-300">
+                  <Badge key={slot} variant="outline" className="text-emerald-700 border-emerald-300 bg-white font-medium">
                     {slot}
                   </Badge>
                 ))}
@@ -198,34 +224,47 @@ export function RecurrencePatternBuilder({ pattern, onPatternChange, onClose, on
           </div>
         )}
 
-        {/* Validation Message */}
+        {/* Smart Validation */}
         {!isValid && (
-          <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-            <div className="flex items-center gap-2 text-amber-800">
-              <span className="text-lg">⚠️</span>
-              <span className="font-medium">
-                Velg minst én dag og ett tidspunkt for å fortsette
-              </span>
+          <div className="bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-200 rounded-2xl p-6 shadow-lg">
+            <div className="flex items-center gap-3 text-amber-800">
+              <div className="p-2 bg-amber-100 rounded-lg">
+                <span className="text-xl">⚠️</span>
+              </div>
+              <div>
+                <p className="font-bold text-lg">Nesten ferdig!</p>
+                <p className="text-sm opacity-80">
+                  {pattern.weekdays.length === 0 && pattern.timeSlots.length === 0 
+                    ? "Velg dager og tider" 
+                    : pattern.weekdays.length === 0 
+                    ? "Velg minst én dag" 
+                    : "Velg minst ett tidspunkt"}
+                </p>
+              </div>
             </div>
           </div>
         )}
 
-        {/* Action Buttons */}
-        <div className="flex gap-4 pt-6 border-t border-gray-100">
+        {/* Smart Action Buttons */}
+        <div className="flex gap-4 pt-6 border-t-2 border-gray-100">
           <Button 
             variant="outline" 
             onClick={onClose} 
-            className="flex-1 h-12 text-base font-medium"
+            className="flex-1 h-14 text-lg font-semibold hover:bg-gray-50"
           >
             Avbryt
           </Button>
           <Button 
             onClick={handleApplyPattern}
             disabled={!isValid}
-            className="flex-1 h-12 text-base font-medium bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className={`flex-1 h-14 text-lg font-bold transition-all transform ${
+              isValid 
+                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-xl hover:scale-105' 
+                : 'opacity-50 cursor-not-allowed'
+            }`}
           >
-            <Check className="h-4 w-4 mr-2" />
-            Opprett reservasjoner
+            <Check className="h-5 w-5 mr-2" />
+            Opprett Reservasjoner
           </Button>
         </div>
       </CardContent>
