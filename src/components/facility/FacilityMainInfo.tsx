@@ -3,7 +3,6 @@
 import React from "react";
 import { MapPin, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { AccessibilityBadges } from "./AccessibilityBadges";
 
 interface FacilityMainInfoProps {
   name: string;
@@ -73,19 +72,9 @@ const FacilityMainInfo: React.FC<FacilityMainInfoProps> = ({
             )}
           </div>
         </div>
-
-        {/* Accessibility */}
-        {accessibility && accessibility.length > 0 && (
-          <div className="space-y-3">
-            <div className="ml-7">
-              <AccessibilityBadges accessibility={accessibility} />
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
 };
 
 export default FacilityMainInfo;
-
