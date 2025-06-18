@@ -1,9 +1,9 @@
 
-import { AdditionalService, ServiceBooking, ServiceCategory } from '@/types/additionalServices';
+import { AdditionalService, ServiceCategory, ServiceFilters } from '@/types/additionalServices';
+import { ActorType } from '@/types/pricing';
 import { PaginatedResponse, PaginationParams, ApiResponse } from '@/types/api';
 import { additionalServiceRepository } from '@/dal/repositories';
-import { ServicePricingEngine, ServicePriceCalculation } from '@/utils/servicePricingEngine';
-import { ActorType } from '@/types/pricing';
+import { ServicePricingEngine } from '@/utils/servicePricingEngine';
 
 // Simulate API delay
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -11,35 +11,16 @@ const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 export class AdditionalServicesService {
   static async getServices(
     pagination: PaginationParams,
-    filters?: {
-      category?: ServiceCategory;
-      facilityId?: string;
-      zoneId?: string;
-      isActive?: boolean;
-      searchTerm?: string;
-    }
+    filters?: ServiceFilters
   ): Promise<ApiResponse<PaginatedResponse<AdditionalService>>> {
     try {
       await delay(200);
-      const result = await additionalServiceRepository.findAll(pagination, filters, 'name', 'asc');
+      const result = await additionalServiceRepository.findAll(pagination, filters);
       return result;
     } catch (error) {
       return {
         success: false,
-        error: { message: "Failed to fetch additional services", details: error },
-      };
-    }
-  }
-
-  static async getServiceById(id: string): Promise<ApiResponse<AdditionalService>> {
-    try {
-      await delay(150);
-      const result = await additionalServiceRepository.findById(id);
-      return result;
-    } catch (error) {
-      return {
-        success: false,
-        error: { message: "Failed to fetch service", details: error },
+        error: { message: "Failed to fetch services", details: error },
       };
     }
   }
@@ -49,30 +30,59 @@ export class AdditionalServicesService {
     facilityId?: string
   ): Promise<ApiResponse<AdditionalService[]>> {
     try {
-      await delay(200);
-      
-      const filters = {
+      await delay(150);
+      const filters: ServiceFilters = {
         category,
+        isActive: true,
+        ...(facilityId && { facilityId })
+      };
+      
+      const result = await additionalServiceRepository.findAll(
+        { page: 1, limit: 100 },
+        filters
+      );
+      
+      return {
+        success: true,
+        data: result.data?.data || []
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: { message: "Failed to fetch services by category", details: error },
+      };
+    }
+  }
+
+  static async getPopularServices(
+    facilityId: string,
+    limit?: number
+  ): Promise<ApiResponse<AdditionalService[]>> {
+    try {
+      await delay(100);
+      const filters: ServiceFilters = {
         facilityId,
         isActive: true
       };
       
       const result = await additionalServiceRepository.findAll(
-        { page: 1, limit: 100 },
-        filters,
-        'name',
-        'asc'
+        { page: 1, limit: limit || 10 },
+        filters
       );
       
-      if (result.success && result.data) {
-        return { success: true, data: result.data.data };
-      }
+      // Filter popular services (those with 'popular' tag)
+      const popularServices = (result.data?.data || []).filter(service =>
+        service.metadata.tags.includes('popular')
+      );
       
-      return result as any;
+      return {
+        success: true,
+        data: popularServices
+      };
     } catch (error) {
       return {
         success: false,
-        error: { message: "Failed to fetch services by category", details: error },
+        error: { message: "Failed to fetch popular services", details: error },
       };
     }
   }
@@ -84,19 +94,19 @@ export class AdditionalServicesService {
     attendees?: number,
     timeSlot?: string,
     date?: Date
-  ): Promise<ApiResponse<ServicePriceCalculation>> {
+  ) {
     try {
-      await delay(100);
+      await delay(50);
       
-      const serviceResult = await this.getServiceById(serviceId);
+      const serviceResult = await additionalServiceRepository.findById(serviceId);
       if (!serviceResult.success || !serviceResult.data) {
         return {
           success: false,
           error: { message: "Service not found" }
         };
       }
-      
-      const calculation = ServicePricingEngine.calculateServicePrice(
+
+      return ServicePricingEngine.calculateServicePrice(
         serviceResult.data,
         quantity,
         actorType,
@@ -104,8 +114,6 @@ export class AdditionalServicesService {
         timeSlot,
         date
       );
-      
-      return calculation;
     } catch (error) {
       return {
         success: false,
@@ -118,103 +126,66 @@ export class AdditionalServicesService {
     serviceId: string,
     requestedDate: Date,
     timeSlot?: string
-  ): Promise<ApiResponse<{ available: boolean; conflicts?: string[] }>> {
+  ): Promise<ApiResponse<boolean>> {
     try {
       await delay(100);
       
-      const serviceResult = await this.getServiceById(serviceId);
+      const serviceResult = await additionalServiceRepository.findById(serviceId);
       if (!serviceResult.success || !serviceResult.data) {
         return {
           success: false,
           error: { message: "Service not found" }
         };
       }
-      
+
       const service = serviceResult.data;
-      const conflicts: string[] = [];
       
-      // Check if service is available on requested date
-      if (!service.availability.isAlwaysAvailable) {
-        const dayOfWeek = requestedDate.getDay();
-        const availableSlot = service.availability.availableTimeSlots?.find(
-          slot => slot.dayOfWeek === dayOfWeek
-        );
-        
-        if (!availableSlot) {
-          conflicts.push(`Service not available on ${requestedDate.toLocaleDateString()}`);
-        }
+      // Check if service is always available
+      if (service.availability.isAlwaysAvailable) {
+        return { success: true, data: true };
       }
-      
+
+      // Check lead time
+      const now = new Date();
+      const leadTimeMs = service.availability.leadTimeHours * 60 * 60 * 1000;
+      if (requestedDate.getTime() - now.getTime() < leadTimeMs) {
+        return { success: true, data: false };
+      }
+
+      // Check max advance booking
+      const maxAdvanceMs = service.availability.maxAdvanceBookingDays * 24 * 60 * 60 * 1000;
+      if (requestedDate.getTime() - now.getTime() > maxAdvanceMs) {
+        return { success: true, data: false };
+      }
+
       // Check blackout periods
-      const isBlackedOut = service.availability.blackoutPeriods.some(
-        period => requestedDate >= period.startDate && requestedDate <= period.endDate
+      const isBlackedOut = service.availability.blackoutPeriods.some(period =>
+        requestedDate >= period.startDate && requestedDate <= period.endDate
       );
       
       if (isBlackedOut) {
-        conflicts.push("Service is not available during this period");
+        return { success: true, data: false };
       }
-      
-      // Check lead time
-      const leadTimeMs = service.availability.leadTimeHours * 60 * 60 * 1000;
-      const minimumBookingTime = new Date(Date.now() + leadTimeMs);
-      
-      if (requestedDate < minimumBookingTime) {
-        conflicts.push(`Service requires ${service.availability.leadTimeHours} hours advance notice`);
-      }
-      
-      // Check maximum advance booking
-      const maxAdvanceMs = service.availability.maxAdvanceBookingDays * 24 * 60 * 60 * 1000;
-      const maxBookingTime = new Date(Date.now() + maxAdvanceMs);
-      
-      if (requestedDate > maxBookingTime) {
-        conflicts.push(`Service can only be booked ${service.availability.maxAdvanceBookingDays} days in advance`);
-      }
-      
-      return {
-        success: true,
-        data: {
-          available: conflicts.length === 0,
-          conflicts: conflicts.length > 0 ? conflicts : undefined
+
+      // Check available time slots if specified
+      if (service.availability.availableTimeSlots && timeSlot) {
+        const dayOfWeek = requestedDate.getDay();
+        const availableSlot = service.availability.availableTimeSlots.find(slot =>
+          slot.dayOfWeek === dayOfWeek
+        );
+        
+        if (!availableSlot) {
+          return { success: true, data: false };
         }
-      };
+        
+        // TODO: Check if timeSlot falls within availableSlot time range
+      }
+
+      return { success: true, data: true };
     } catch (error) {
       return {
         success: false,
         error: { message: "Failed to validate service availability", details: error },
-      };
-    }
-  }
-
-  static async getPopularServices(
-    facilityId: string,
-    limit: number = 6
-  ): Promise<ApiResponse<AdditionalService[]>> {
-    try {
-      await delay(150);
-      
-      const result = await additionalServiceRepository.findAll(
-        { page: 1, limit },
-        { facilityId, isActive: true },
-        'name',
-        'asc'
-      );
-      
-      if (result.success && result.data) {
-        // Filter by popular services (mock implementation)
-        const popularServices = result.data.data.filter(service => 
-          service.metadata.tags.includes('popular') || 
-          service.category === 'cleaning' || 
-          service.category === 'equipment'
-        );
-        
-        return { success: true, data: popularServices.slice(0, limit) };
-      }
-      
-      return result as any;
-    } catch (error) {
-      return {
-        success: false,
-        error: { message: "Failed to fetch popular services", details: error },
       };
     }
   }

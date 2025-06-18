@@ -8,9 +8,11 @@ import { ServiceSummary } from '../services/ServiceSummary';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { ServiceCategory, AdditionalService } from '@/types/additionalServices';
 import { useAdditionalServices, useServicePricing } from '@/hooks/useAdditionalServices';
 import { useTranslation } from '@/i18n';
+import { AlertTriangle } from 'lucide-react';
 
 interface BookingServicesStepProps {
   form: UseFormReturn<BookingFormValues>;
@@ -36,46 +38,55 @@ export function BookingServicesStep({
   const [selectedServices, setSelectedServices] = useState<Record<string, number>>({});
   const [calculatedServices, setCalculatedServices] = useState<SelectedService[]>([]);
   const [totalServicesCost, setTotalServicesCost] = useState(0);
+  const [calculationError, setCalculationError] = useState<string | null>(null);
 
-  const { services, isLoading } = useAdditionalServices(facilityId, selectedCategory);
+  const { services, isLoading, error } = useAdditionalServices(facilityId, selectedCategory);
   const { calculateServicePrice } = useServicePricing();
 
   // Update calculated services when selections change
   useEffect(() => {
     const updateCalculatedServices = async () => {
-      const newCalculatedServices: SelectedService[] = [];
-      let total = 0;
+      try {
+        setCalculationError(null);
+        const newCalculatedServices: SelectedService[] = [];
+        let total = 0;
 
-      for (const [serviceId, quantity] of Object.entries(selectedServices)) {
-        if (quantity > 0) {
-          const service = services.find(s => s.id === serviceId);
-          if (service) {
-            const result = await calculateServicePrice(
-              serviceId,
-              quantity,
-              actorType as any,
-              attendees
-            );
-
-            if (result.success && result.data) {
-              const serviceData: SelectedService = {
-                service,
+        for (const [serviceId, quantity] of Object.entries(selectedServices)) {
+          if (quantity > 0) {
+            const service = services.find(s => s.id === serviceId);
+            if (service) {
+              const result = await calculateServicePrice(
+                serviceId,
                 quantity,
-                totalPrice: result.data.totalPrice
-              };
-              newCalculatedServices.push(serviceData);
-              total += result.data.totalPrice;
+                actorType as any,
+                attendees
+              );
+
+              if (result.success && result.data) {
+                const serviceData: SelectedService = {
+                  service,
+                  quantity,
+                  totalPrice: result.data.totalPrice
+                };
+                newCalculatedServices.push(serviceData);
+                total += result.data.totalPrice;
+              } else {
+                setCalculationError(`Kunne ikke beregne pris for ${service.name}`);
+              }
             }
           }
         }
-      }
 
-      setCalculatedServices(newCalculatedServices);
-      setTotalServicesCost(total);
+        setCalculatedServices(newCalculatedServices);
+        setTotalServicesCost(total);
+      } catch (error) {
+        console.error('Error calculating service prices:', error);
+        setCalculationError('En feil oppstod ved beregning av priser');
+      }
     };
 
     updateCalculatedServices();
-  }, [selectedServices, services, actorType, attendees]);
+  }, [selectedServices, services, actorType, attendees, calculateServicePrice]);
 
   // Update form with selected services
   useEffect(() => {
@@ -103,6 +114,7 @@ export function BookingServicesStep({
 
   const clearAllServices = () => {
     setSelectedServices({});
+    setCalculationError(null);
   };
 
   return (
@@ -115,6 +127,16 @@ export function BookingServicesStep({
           {t('booking.steps.servicesDescription', {}, 'Velg tilleggstjenester for ditt arrangement')}
         </p>
       </div>
+
+      {/* Error Display */}
+      {(error || calculationError) && (
+        <Alert variant="destructive">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertDescription>
+            {calculationError || (error as any)?.message || 'En feil oppstod'}
+          </AlertDescription>
+        </Alert>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Service Selection */}
