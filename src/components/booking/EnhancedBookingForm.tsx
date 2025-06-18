@@ -1,16 +1,13 @@
 
-import React, { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import React from "react";
 import { Form } from "@/components/ui/form";
-import { BookingDetailsStep } from "./steps/BookingDetailsStep";
-import { BookingContactStep } from "./steps/BookingContactStep";
-import { BookingServicesStep } from "./steps/BookingServicesStep";
-import { BookingConfirmStep } from "./steps/BookingConfirmStep";
 import { BookingFormNav } from "./BookingFormNav";
 import { CollapsibleFormStepper } from "./CollapsibleFormStepper";
-import { bookingFormSchema, BookingFormValues } from "./formSchema";
-import { Zone, BookingStep, BookingData } from "./types";
+import { BookingFormProvider, useBookingForm } from "./BookingFormProvider";
+import { BookingFormSteps } from "./BookingFormSteps";
+import { validateCurrentStep, canContinueToNextStep } from "./BookingFormValidation";
+import { Zone, BookingStep } from "./types";
+import { BookingFormValues } from "./formSchema";
 
 interface EnhancedBookingFormProps {
   facility: {
@@ -29,13 +26,15 @@ interface EnhancedBookingFormProps {
   onBookingComplete: (reference: string) => void;
 }
 
-export function EnhancedBookingForm({
-  facility,
-  onBookingComplete
-}: EnhancedBookingFormProps) {
-  const [currentStep, setCurrentStep] = useState<number>(0);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [termsAccepted, setTermsAccepted] = useState(false);
+function BookingFormContent({ facility, onBookingComplete }: EnhancedBookingFormProps) {
+  const {
+    form,
+    currentStep,
+    setCurrentStep,
+    isSubmitting,
+    setIsSubmitting,
+    termsAccepted
+  } = useBookingForm();
 
   const steps: BookingStep[] = ['details', 'services', 'contact', 'confirm'];
   const stepTitles = [
@@ -45,72 +44,18 @@ export function EnhancedBookingForm({
     "Gjennomgå og bekreft"
   ];
 
-  const form = useForm<BookingFormValues>({
-    resolver: zodResolver(bookingFormSchema),
-    defaultValues: {
-      bookingMode: 'one-time',
-      customerType: 'private',
-      date: new Date(),
-      timeSlot: "",
-      zoneId: "",
-      purpose: "",
-      eventType: 'other',
-      attendees: 1,
-      ageGroup: 'mixed',
-      contactName: "",
-      contactEmail: "",
-      contactPhone: "",
-      organization: "",
-      specialServices: []
-    },
-    mode: 'onChange'
-  });
-
-  const watchedValues = form.watch();
   const isFirstStep = currentStep === 0;
   const isLastStep = currentStep === steps.length - 1;
 
-  const validateCurrentStep = async (): Promise<boolean> => {
-    const fieldsToValidate = getFieldsForStep(currentStep);
-    const result = await form.trigger(fieldsToValidate);
-    return result;
-  };
-
-  const getFieldsForStep = (step: number): (keyof BookingFormValues)[] => {
-    switch (step) {
-      case 0: // Details
-        return ['bookingMode', 'customerType', 'date', 'timeSlot', 'zoneId', 'purpose', 'eventType', 'attendees', 'ageGroup'];
-      case 1: // Services
-        return []; // Services are optional
-      case 2: // Contact
-        return ['contactName', 'contactEmail', 'contactPhone'];
-      case 3: // Confirm
-        return [];
-      default:
-        return [];
-    }
-  };
-
-  const canContinueToNextStep = (): boolean => {
-    const fieldsToCheck = getFieldsForStep(currentStep);
-    const errors = form.formState.errors;
-    const hasErrors = fieldsToCheck.some(field => errors[field]);
-    const hasValues = fieldsToCheck.every(field => {
-      const value = watchedValues[field];
-      return value !== "" && value !== undefined && value !== null;
-    });
-    return !hasErrors && hasValues;
-  };
-
   const handleNextStep = async () => {
-    const isValid = await validateCurrentStep();
-    if (isValid && canContinueToNextStep()) {
-      setCurrentStep(prev => Math.min(prev + 1, steps.length - 1));
+    const isValid = await validateCurrentStep(form, currentStep);
+    if (isValid && canContinueToNextStep(form, currentStep)) {
+      setCurrentStep(Math.min(currentStep + 1, steps.length - 1));
     }
   };
 
   const handlePreviousStep = () => {
-    setCurrentStep(prev => Math.max(prev - 1, 0));
+    setCurrentStep(Math.max(currentStep - 1, 0));
   };
 
   const generateBookingReference = (): string => {
@@ -136,55 +81,6 @@ export function EnhancedBookingForm({
     }
   };
 
-  const getBookingData = (): BookingData => {
-    const selectedZone = facility.zones.find(z => z.id === watchedValues.zoneId);
-    return {
-      date: watchedValues.date,
-      bookingMode: watchedValues.bookingMode,
-      timeSlot: watchedValues.timeSlot,
-      zoneId: watchedValues.zoneId,
-      zoneName: selectedZone?.name || '',
-      purpose: watchedValues.purpose,
-      attendees: watchedValues.attendees,
-      contactName: watchedValues.contactName,
-      contactEmail: watchedValues.contactEmail,
-      contactPhone: watchedValues.contactPhone,
-      organization: watchedValues.organization,
-      endDate: watchedValues.endDate,
-      customerType: watchedValues.customerType,
-      eventType: watchedValues.eventType,
-      ageGroup: watchedValues.ageGroup
-    };
-  };
-
-  const renderCurrentStep = () => {
-    switch (currentStep) {
-      case 0:
-        return <BookingDetailsStep form={form} facility={facility} />;
-      case 1:
-        return (
-          <BookingServicesStep 
-            form={form} 
-            facilityId={facility.id || '1'}
-            actorType={watchedValues.customerType}
-            attendees={watchedValues.attendees}
-          />
-        );
-      case 2:
-        return <BookingContactStep form={form} />;
-      case 3:
-        return <BookingConfirmStep 
-          facilityName={facility.name} 
-          facilityId={facility.id}
-          bookingData={getBookingData()} 
-          termsAccepted={termsAccepted} 
-          onTermsAcceptedChange={setTermsAccepted} 
-        />;
-      default:
-        return null;
-    }
-  };
-
   return (
     <div className="bg-white shadow-sm border border-gray-200 rounded-lg overflow-hidden" role="main" aria-label="Booking form">
       {/* Clean Header */}
@@ -203,7 +99,7 @@ export function EnhancedBookingForm({
           {/* Form Content */}
           <div className="px-6 py-6">
             <div className="min-h-[400px]" role="tabpanel" aria-labelledby="form-title">
-              {renderCurrentStep()}
+              <BookingFormSteps facility={facility} />
             </div>
           </div>
           
@@ -213,7 +109,7 @@ export function EnhancedBookingForm({
               currentStep={currentStep} 
               isFirstStep={isFirstStep} 
               isLastStep={isLastStep} 
-              canContinue={canContinueToNextStep()} 
+              canContinue={canContinueToNextStep(form, currentStep)} 
               isSubmitting={isSubmitting} 
               isSubmitDisabled={!termsAccepted} 
               onPreviousStep={handlePreviousStep} 
@@ -223,5 +119,13 @@ export function EnhancedBookingForm({
         </form>
       </Form>
     </div>
+  );
+}
+
+export function EnhancedBookingForm(props: EnhancedBookingFormProps) {
+  return (
+    <BookingFormProvider>
+      <BookingFormContent {...props} />
+    </BookingFormProvider>
   );
 }

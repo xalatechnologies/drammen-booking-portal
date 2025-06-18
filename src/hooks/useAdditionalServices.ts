@@ -29,7 +29,7 @@ export function useAdditionalServices(facilityId?: string, category?: ServiceCat
         );
 
         if (result.success && result.data) {
-          setServices(result.data.items);
+          setServices(result.data.data);
         } else {
           setError(result.error?.message || 'Failed to fetch services');
         }

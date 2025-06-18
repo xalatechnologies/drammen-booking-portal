@@ -1,8 +1,9 @@
-
-import { Booking, BookingCreateRequest, BookingUpdateRequest, BookingFilters, BookingStatus } from '@/types/booking';
+import { Booking, BookingCreateRequest, BookingUpdateRequest, BookingFilters } from '@/types/booking';
 import { PaginatedResponse, PaginationParams, ApiResponse } from '@/types/api';
 import { bookingRepository } from '@/dal/repositories';
-import { ActorType, BookingType } from '@/types/pricing';
+import { BookingValidationService } from './booking/BookingValidationService';
+import { BookingNotificationService } from './booking/BookingNotificationService';
+import { BookingConflictService } from './booking/BookingConflictService';
 
 // Simulate API delay
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -14,22 +15,12 @@ export class BookingService {
   ): Promise<ApiResponse<PaginatedResponse<Booking>>> {
     try {
       await delay(300);
-
-      const result = await bookingRepository.findAll(
-        pagination,
-        filters,
-        'createdAt',
-        'desc'
-      );
-
+      const result = await bookingRepository.findAll(pagination, filters, 'createdAt', 'desc');
       return result;
     } catch (error) {
       return {
         success: false,
-        error: {
-          message: "Failed to fetch bookings",
-          details: error,
-        },
+        error: { message: "Failed to fetch bookings", details: error },
       };
     }
   }
@@ -37,16 +28,12 @@ export class BookingService {
   static async getBookingById(id: string): Promise<ApiResponse<Booking>> {
     try {
       await delay(200);
-
       const result = await bookingRepository.findById(id);
       return result;
     } catch (error) {
       return {
         success: false,
-        error: {
-          message: "Failed to fetch booking",
-          details: error,
-        },
+        error: { message: "Failed to fetch booking", details: error },
       };
     }
   }
@@ -56,36 +43,33 @@ export class BookingService {
       await delay(400);
 
       // Validate the booking request
-      const validation = await this.validateBookingRequest(request);
+      const validation = await BookingValidationService.validateBookingRequest(request);
       if (!validation.success) {
         return validation;
       }
 
       // Check for conflicts
-      const conflictCheck = await bookingRepository.checkBookingConflicts(
+      const conflictResult = await BookingConflictService.checkBookingConflicts(
         request.zoneId,
         request.startDate,
         request.endDate
       );
 
-      if (!conflictCheck.success) {
+      if (!conflictResult.success) {
         return {
           success: false,
-          error: {
-            message: "Failed to check booking conflicts",
-            details: conflictCheck.error,
-          },
+          error: { message: "Failed to check booking conflicts", details: conflictResult.error },
         };
       }
 
-      if (conflictCheck.data?.hasConflict) {
+      if (conflictResult.data?.hasConflict) {
         return {
           success: false,
           error: {
             message: "Booking conflict detected",
             details: {
-              conflicts: conflictCheck.data.conflictingBookings,
-              alternatives: conflictCheck.data.availableAlternatives
+              conflicts: conflictResult.data.conflicts,
+              alternatives: conflictResult.data.alternatives
             },
           },
         };
@@ -95,18 +79,14 @@ export class BookingService {
       const result = await bookingRepository.create(request);
       
       if (result.success && result.data) {
-        // Trigger notifications (would be implemented separately)
-        await this.triggerBookingNotifications(result.data, 'created');
+        await BookingNotificationService.triggerBookingNotifications(result.data, 'created');
       }
 
       return result;
     } catch (error) {
       return {
         success: false,
-        error: {
-          message: "Failed to create booking",
-          details: error,
-        },
+        error: { message: "Failed to create booking", details: error },
       };
     }
   }
@@ -128,21 +108,21 @@ export class BookingService {
         const startDate = request.startDate || existing.data.startDate;
         const endDate = request.endDate || existing.data.endDate;
 
-        const conflictCheck = await bookingRepository.checkBookingConflicts(
+        const conflictResult = await BookingConflictService.checkBookingConflicts(
           existing.data.zoneId,
           startDate,
           endDate,
-          id // Exclude current booking from conflict check
+          id
         );
 
-        if (conflictCheck.success && conflictCheck.data?.hasConflict) {
+        if (conflictResult.success && conflictResult.data?.hasConflict) {
           return {
             success: false,
             error: {
               message: "Booking conflict detected",
               details: {
-                conflicts: conflictCheck.data.conflictingBookings,
-                alternatives: conflictCheck.data.availableAlternatives
+                conflicts: conflictResult.data.conflicts,
+                alternatives: conflictResult.data.alternatives
               },
             },
           };
@@ -152,17 +132,14 @@ export class BookingService {
       const result = await bookingRepository.update(id, request);
       
       if (result.success && result.data) {
-        await this.triggerBookingNotifications(result.data, 'updated');
+        await BookingNotificationService.triggerBookingNotifications(result.data, 'updated');
       }
 
       return result;
     } catch (error) {
       return {
         success: false,
-        error: {
-          message: "Failed to update booking",
-          details: error,
-        },
+        error: { message: "Failed to update booking", details: error },
       };
     }
   }
@@ -178,7 +155,7 @@ export class BookingService {
       );
 
       if (result.success && result.data) {
-        await this.triggerBookingNotifications(result.data, 'cancelled');
+        await BookingNotificationService.triggerBookingNotifications(result.data, 'cancelled');
       }
 
       return result;
@@ -204,12 +181,11 @@ export class BookingService {
       );
 
       if (result.success && result.data) {
-        // Update approval workflow status
         if (result.data.approvalWorkflow) {
           result.data.approvalStatus = 'approved';
         }
         
-        await this.triggerBookingNotifications(result.data, 'approved');
+        await BookingNotificationService.triggerBookingNotifications(result.data, 'approved');
       }
 
       return result;
@@ -235,12 +211,11 @@ export class BookingService {
       );
 
       if (result.success && result.data) {
-        // Update approval workflow status
         if (result.data.approvalWorkflow) {
           result.data.approvalStatus = 'rejected';
         }
         
-        await this.triggerBookingNotifications(result.data, 'rejected');
+        await BookingNotificationService.triggerBookingNotifications(result.data, 'rejected');
       }
 
       return result;
@@ -392,70 +367,5 @@ export class BookingService {
         },
       };
     }
-  }
-
-  // Private helper methods
-
-  private static async validateBookingRequest(request: BookingCreateRequest): Promise<ApiResponse<null>> {
-    // Basic validation
-    if (!request.facilityId || !request.zoneId) {
-      return {
-        success: false,
-        error: { message: "Facility ID and Zone ID are required" }
-      };
-    }
-
-    if (!request.startDate || !request.endDate) {
-      return {
-        success: false,
-        error: { message: "Start date and end date are required" }
-      };
-    }
-
-    if (request.startDate >= request.endDate) {
-      return {
-        success: false,
-        error: { message: "End date must be after start date" }
-      };
-    }
-
-    if (request.startDate < new Date()) {
-      return {
-        success: false,
-        error: { message: "Cannot book in the past" }
-      };
-    }
-
-    if (!request.contactName || !request.contactEmail || !request.contactPhone) {
-      return {
-        success: false,
-        error: { message: "Contact information is required" }
-      };
-    }
-
-    if (request.expectedAttendees < 1) {
-      return {
-        success: false,
-        error: { message: "Expected attendees must be at least 1" }
-      };
-    }
-
-    return { success: true, data: null };
-  }
-
-  private static async triggerBookingNotifications(booking: Booking, event: string) {
-    // This would integrate with the notification system
-    console.log(`Booking notification triggered: ${event} for booking ${booking.id}`);
-    
-    // Example notification events:
-    // - created: New booking submitted
-    // - updated: Booking modified
-    // - approved: Booking approved
-    // - rejected: Booking rejected
-    // - cancelled: Booking cancelled
-    // - recurring-created: Recurring booking series created
-    // - reminder: Upcoming booking reminder
-    
-    // Implementation would send emails, SMS, push notifications, etc.
   }
 }
