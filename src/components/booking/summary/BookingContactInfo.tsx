@@ -1,6 +1,7 @@
 
 import React from "react";
 import { Mail, Phone, User, Building } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface BookingContactInfoProps {
   contactName: string;
@@ -15,6 +16,25 @@ export function BookingContactInfo({
   contactPhone, 
   organization 
 }: BookingContactInfoProps) {
+  const { language } = useLanguage();
+  
+  const translations = {
+    NO: {
+      contactPerson: "Kontaktperson",
+      email: "E-post",
+      phone: "Telefon",
+      organization: "Organisasjon"
+    },
+    EN: {
+      contactPerson: "Contact person",
+      email: "Email",
+      phone: "Phone",
+      organization: "Organization"
+    }
+  };
+
+  const t = translations[language];
+  
   return (
     <div className="space-y-4">
       <div className="flex items-start gap-3">
@@ -22,7 +42,7 @@ export function BookingContactInfo({
           <User className="h-5 w-5" />
         </div>
         <div>
-          <p className="text-sm text-gray-500">Kontaktperson</p>
+          <p className="text-sm text-gray-500">{t.contactPerson}</p>
           <p className="font-medium">{contactName}</p>
         </div>
       </div>
@@ -32,7 +52,7 @@ export function BookingContactInfo({
           <Mail className="h-5 w-5" />
         </div>
         <div>
-          <p className="text-sm text-gray-500">E-post</p>
+          <p className="text-sm text-gray-500">{t.email}</p>
           <p className="font-medium">{contactEmail}</p>
         </div>
       </div>
@@ -42,7 +62,7 @@ export function BookingContactInfo({
           <Phone className="h-5 w-5" />
         </div>
         <div>
-          <p className="text-sm text-gray-500">Telefon</p>
+          <p className="text-sm text-gray-500">{t.phone}</p>
           <p className="font-medium">{contactPhone}</p>
         </div>
       </div>
@@ -53,7 +73,7 @@ export function BookingContactInfo({
             <Building className="h-5 w-5" />
           </div>
           <div>
-            <p className="text-sm text-gray-500">Organisasjon</p>
+            <p className="text-sm text-gray-500">{t.organization}</p>
             <p className="font-medium">{organization}</p>
           </div>
         </div>

@@ -7,6 +7,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface TimeRangePickerProps {
   timeRange: string;
@@ -17,6 +18,19 @@ const TimeRangePicker: React.FC<TimeRangePickerProps> = ({
   timeRange,
   setTimeRange,
 }) => {
+  const { language } = useLanguage();
+  
+  const translations = {
+    NO: {
+      selectTimeSlot: "Velg tidsperiode"
+    },
+    EN: {
+      selectTimeSlot: "Select time period"
+    }
+  };
+
+  const t = translations[language];
+  
   const timeOptions = [
     "08:00 - 10:00", "08:00 - 12:00", "08:00 - 16:00",
     "09:00 - 11:00", "09:00 - 13:00", "09:00 - 17:00",
@@ -38,7 +52,7 @@ const TimeRangePicker: React.FC<TimeRangePickerProps> = ({
           {timeRange ? (
             timeRange
           ) : (
-            <span className="text-gray-500">Velg tidsperiode</span>
+            <span className="text-gray-500">{t.selectTimeSlot}</span>
           )}
         </Button>
       </PopoverTrigger>

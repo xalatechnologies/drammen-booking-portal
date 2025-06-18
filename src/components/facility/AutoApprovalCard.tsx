@@ -2,12 +2,32 @@
 import React from "react";
 import { CheckCircle, Clock } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface AutoApprovalCardProps {
   hasAutoApproval: boolean;
 }
 
 export function AutoApprovalCard({ hasAutoApproval }: AutoApprovalCardProps) {
+  const { language } = useLanguage();
+  
+  const translations = {
+    NO: {
+      autoApproval: "Automatisk godkjenning",
+      manualApproval: "Manuell godkjenning",
+      autoDescription: "Reservasjonen godkjennes umiddelbart",
+      manualDescription: "Reservasjonen må godkjennes manuelt"
+    },
+    EN: {
+      autoApproval: "Automatic approval",
+      manualApproval: "Manual approval",
+      autoDescription: "Reservation is approved immediately",
+      manualDescription: "Reservation requires manual approval"
+    }
+  };
+
+  const t = translations[language];
+  
   return (
     <Card className="shadow-sm">
       <CardContent className="p-4">
@@ -21,13 +41,10 @@ export function AutoApprovalCard({ hasAutoApproval }: AutoApprovalCardProps) {
           </div>
           <div>
             <h3 className="font-medium">
-              {hasAutoApproval ? "Automatisk godkjenning" : "Manuell godkjenning"}
+              {hasAutoApproval ? t.autoApproval : t.manualApproval}
             </h3>
             <p className="text-sm text-gray-600">
-              {hasAutoApproval 
-                ? "Reservasjonen godkjennes umiddelbart"
-                : "Reservasjonen må godkjennes manuelt"
-              }
+              {hasAutoApproval ? t.autoDescription : t.manualDescription}
             </p>
           </div>
         </div>

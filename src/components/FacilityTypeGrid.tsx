@@ -7,98 +7,146 @@ import {
   MapPin,
   Building
 } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface FacilityType {
   icon: React.ReactNode;
-  name: string;
-  location: string;
+  nameKey: string;
+  locationKey: string;
   key: string;
   image?: string;
 }
 
 const FacilityTypeGrid = () => {
+  const { language } = useLanguage();
+  
+  const translations = {
+    NO: {
+      gymnasium: "Gymnasium",
+      meetingRoom: "Møterom",
+      auditorium: "Auditorium",
+      sportsField: "Sportsbane",
+      tennisCourt: "Tennisbane",
+      swimmingPool: "Svømmebasseng",
+      banquetHall: "Festsal",
+      kitchen: "Kjøkken",
+      activityHall: "Aktivitetshall",
+      classroom: "Klasserom",
+      conferenceRoom: "Konferanserom",
+      exhibitionHall: "Utstillingshall",
+      halleren: "Halleren",
+      city: "Sentrum",
+      plant: "Planten",
+      gym: "Treningssenter",
+      hall: "Hall",
+      kitchen: "Kjøkken"
+    },
+    EN: {
+      gymnasium: "Gymnasium",
+      meetingRoom: "Meeting room",
+      auditorium: "Auditorium",
+      sportsField: "Sports field",
+      tennisCourt: "Tennis court",
+      swimmingPool: "Swimming pool",
+      banquetHall: "Banquet hall",
+      kitchen: "Kitchen",
+      activityHall: "Activity hall",
+      classroom: "Classroom",
+      conferenceRoom: "Conference room",
+      exhibitionHall: "Exhibition hall",
+      halleren: "Halleren",
+      city: "City",
+      plant: "Plant",
+      gym: "Gym",
+      hall: "Hall",
+      kitchen: "Kitchen"
+    }
+  };
+
+  const t = translations[language];
+
   const facilityTypes: FacilityType[] = [
     {
       icon: <Home className="h-6 w-6 text-orange-500" />,
-      name: "Gymnasium",
-      location: "Halleren",
+      nameKey: "gymnasium",
+      locationKey: "halleren",
       key: "gymnasium",
       image: "/lovable-uploads/13aee1f6-e9d9-474b-9ed7-c656d703d19b.png"
     },
     {
       icon: <Building className="h-6 w-6 text-blue-500" />,
-      name: "Meeting room",
-      location: "City",
+      nameKey: "meetingRoom",
+      locationKey: "city",
       key: "meeting-room",
       image: "https://images.unsplash.com/photo-1517502884422-41eaead166d4?w=600&auto=format&fit=crop"
     },
     {
       icon: <School className="h-6 w-6 text-yellow-500" />,
-      name: "Auditorium",
-      location: "Plant",
+      nameKey: "auditorium",
+      locationKey: "plant",
       key: "auditorium",
       image: "https://www.drammen.kommune.no/globalassets/tjenester/skole/bilder/bragernes-skole.jpg?quality=80&width=900"
     },
     {
       icon: <Home className="h-6 w-6 text-green-500" />,
-      name: "Sports field",
-      location: "Halleren",
+      nameKey: "sportsField",
+      locationKey: "halleren",
       key: "sports-field",
       image: "https://img8.custompublish.com/getfile.php/4858135.2928.i7jbbupwjptlwn/750x0/6390879_4858135.jpg"
     },
     {
       icon: <MapPin className="h-6 w-6 text-purple-500" />,
-      name: "Tennis court",
-      location: "Halleren",
+      nameKey: "tennisCourt",
+      locationKey: "halleren",
       key: "tennis-court",
       image: "https://images.unsplash.com/photo-1581093458791-9d09a19b1322?w=600&auto=format&fit=crop"
     },
     {
       icon: <MapPin className="h-6 w-6 text-blue-500" />,
-      name: "Swimming pool",
-      location: "Gym",
+      nameKey: "swimmingPool",
+      locationKey: "gym",
       key: "swimming-pool",
       image: "https://images.unsplash.com/photo-1527576539890-dfa815648363?w=600&auto=format&fit=crop"
     },
     {
       icon: <Building className="h-6 w-6 text-amber-500" />,
-      name: "Banquet hall",
-      location: "Halleren",
+      nameKey: "banquetHall",
+      locationKey: "halleren",
       key: "banquet-hall",
       image: "https://images.unsplash.com/photo-1551038247-3d9af20df552?w=600&auto=format&fit=crop"
     },
     {
       icon: <Home className="h-6 w-6 text-red-500" />,
-      name: "Kitchen",
-      location: "Kitchen",
+      nameKey: "kitchen",
+      locationKey: "kitchen",
       key: "kitchen",
       image: "https://images.unsplash.com/photo-1556909114-44e3e9699e2b?w=600&auto=format&fit=crop"
     },
     {
       icon: <Building className="h-6 w-6 text-yellow-500" />,
-      name: "Activity hall",
-      location: "Halleren",
+      nameKey: "activityHall",
+      locationKey: "halleren",
       key: "activity-hall",
       image: "https://images.unsplash.com/photo-1488972685288-c3fd157d7c7a?w=600&auto=format&fit=crop"
     },
     {
       icon: <School className="h-6 w-6 text-orange-500" />,
-      name: "Classroom",
-      location: "Halleren",
+      nameKey: "classroom",
+      locationKey: "halleren",
       key: "classroom",
       image: "https://images.unsplash.com/photo-1487958449943-2429e8be8625?w=600&auto=format&fit=crop"
     },
     {
       icon: <Building className="h-6 w-6 text-teal-500" />,
-      name: "Conference room",
-      location: "Hall",
+      nameKey: "conferenceRoom",
+      locationKey: "hall",
       key: "conference-room",
       image: "https://images.unsplash.com/photo-1517502884422-41eaead166d4?w=600&auto=format&fit=crop"
     },
     {
       icon: <Building className="h-6 w-6 text-indigo-500" />,
-      name: "Exhibition hall",
-      location: "Hall",
+      nameKey: "exhibitionHall",
+      locationKey: "hall",
       key: "exhibition-hall",
       image: "https://images.unsplash.com/photo-1473177104440-ffee2f376098?w=600&auto=format&fit=crop"
     }
@@ -115,7 +163,7 @@ const FacilityTypeGrid = () => {
           <div className="h-24 w-full">
             <img 
               src={facility.image} 
-              alt={facility.name} 
+              alt={t[facility.nameKey as keyof typeof t]} 
               className="w-full h-full object-cover"
             />
           </div>
@@ -125,8 +173,8 @@ const FacilityTypeGrid = () => {
                 {facility.icon}
               </div>
               <div className="flex-1">
-                <h3 className="font-semibold text-base text-gray-800 truncate">{facility.name}</h3>
-                <p className="text-blue-600 text-sm font-medium truncate">{facility.location}</p>
+                <h3 className="font-semibold text-base text-gray-800 truncate">{t[facility.nameKey as keyof typeof t]}</h3>
+                <p className="text-blue-600 text-sm font-medium truncate">{t[facility.locationKey as keyof typeof t]}</p>
               </div>
             </div>
           </CardContent>

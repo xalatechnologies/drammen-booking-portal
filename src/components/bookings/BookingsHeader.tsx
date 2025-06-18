@@ -1,13 +1,15 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface BookingsHeaderProps {
   totalBookings: number;
-  language?: 'NO' | 'EN';
 }
 
-export function BookingsHeader({ totalBookings, language = 'NO' }: BookingsHeaderProps) {
+export function BookingsHeader({ totalBookings }: BookingsHeaderProps) {
+  const { language } = useLanguage();
+  
   const translations = {
     NO: {
       title: "Mine reservasjoner",

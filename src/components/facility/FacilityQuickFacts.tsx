@@ -2,16 +2,18 @@
 import React from "react";
 import { Users, Map, Clock, CheckCircle } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface FacilityQuickFactsProps {
   capacity: number;
   area: string;
   openingHours: string;
   zoneCount: number;
-  language?: 'NO' | 'EN';
 }
 
-export function FacilityQuickFacts({ capacity, area, openingHours, zoneCount, language = 'NO' }: FacilityQuickFactsProps) {
+export function FacilityQuickFacts({ capacity, area, openingHours, zoneCount }: FacilityQuickFactsProps) {
+  const { language } = useLanguage();
+  
   const translations = {
     NO: {
       capacity: "Kapasitet",

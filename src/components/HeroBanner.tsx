@@ -1,7 +1,25 @@
 
 import React from "react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const HeroBanner = () => {
+  const { language } = useLanguage();
+  
+  const translations = {
+    NO: {
+      title: "Finn ledige lokaler",
+      subtitle: "Drammen Kommune",
+      description: "Søk og reserver kommunale lokaler til møter, arrangementer og aktiviteter."
+    },
+    EN: {
+      title: "Find available facilities",
+      subtitle: "Drammen Municipality",
+      description: "Search and book municipal facilities for meetings, events and activities."
+    }
+  };
+
+  const t = translations[language];
+
   return (
     <div className="mb-4 rounded-xl overflow-hidden shadow-lg">
       <div className="relative">
@@ -14,11 +32,11 @@ const HeroBanner = () => {
           <div className="container mx-auto px-8 py-8">
             <div className="max-w-2xl">
               <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-2 leading-tight">
-                Finn ledige lokaler<br />
-                Drammen Kommune
+                {t.title}<br />
+                {t.subtitle}
               </h1>
               <p className="text-sm sm:text-base text-blue-100 max-w-lg">
-                Søk og reserver kommunale lokaler til møter, arrangementer og aktiviteter.
+                {t.description}
               </p>
             </div>
           </div>

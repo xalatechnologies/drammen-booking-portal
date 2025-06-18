@@ -2,6 +2,7 @@
 import React from "react";
 import { MapPin } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface FacilityHeaderProps {
   name: string;
@@ -9,14 +10,14 @@ interface FacilityHeaderProps {
   onShare: () => void;
   isFavorited: boolean;
   onToggleFavorite: () => void;
-  language?: 'NO' | 'EN';
 }
 
 export function FacilityHeader({ 
   name, 
-  address,
-  language = 'NO'
+  address
 }: FacilityHeaderProps) {
+  const { language } = useLanguage();
+  
   const translations = {
     NO: {
       sportsCenter: "Idrettsanlegg"
