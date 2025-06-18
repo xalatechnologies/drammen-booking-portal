@@ -1,7 +1,7 @@
 
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { MapPin, Users, Heart, Share2, ArrowRight } from "lucide-react";
+import { MapPin, Users, Heart, Share2, Projector, Volume2, FileText, ChefHat, Car, Wifi, Snowflake, Accessibility } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -60,34 +60,50 @@ export function FacilityCard({ facility, onAddressClick }: FacilityCardProps) {
   };
 
   const getAmenityIcons = () => {
-    const amenityMap: { [key: string]: string } = {
-      'projektor': '📽️',
-      'lydanlegg': '🔊',
-      'whiteboard': '📝',
-      'kjøkken': '🍳',
-      'parkering': '🚗',
-      'wifi': '📶',
-      'klimaanlegg': '❄️',
-      'rullestolvennlig': '♿',
+    const amenityMap: { [key: string]: React.ElementType } = {
+      'projektor': Projector,
+      'lydanlegg': Volume2,
+      'whiteboard': FileText,
+      'kjøkken': ChefHat,
+      'parkering': Car,
+      'wifi': Wifi,
+      'klimaanlegg': Snowflake,
+      'rullestolvennlig': Accessibility,
     };
     
-    return facility.equipment.slice(0, 4).map(item => 
-      amenityMap[item.toLowerCase()] || '⚡'
-    );
+    return facility.equipment.slice(0, 4).map((item, index) => {
+      const IconComponent = amenityMap[item.toLowerCase()] || FileText;
+      return (
+        <IconComponent 
+          key={index}
+          className="h-5 w-5 text-gray-600" 
+          aria-label={item}
+        />
+      );
+    });
   };
 
   return (
     <Card 
-      className="group overflow-hidden hover:shadow-2xl transition-all duration-500 hover:translate-y-[-8px] border-0 shadow-lg bg-white relative cursor-pointer"
+      className="group overflow-hidden hover:shadow-2xl transition-all duration-500 hover:translate-y-[-8px] border-0 shadow-lg bg-white relative cursor-pointer focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-opacity-50"
       onClick={() => navigate(`/facilities/${facility.id}`)}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      role="button"
+      tabIndex={0}
+      aria-label={`Se detaljer for ${facility.name} på ${facility.address}`}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          navigate(`/facilities/${facility.id}`);
+        }
+      }}
     >
       {/* Enhanced Image Section */}
-      <div className="relative h-64 overflow-hidden">
+      <div className="relative h-48 overflow-hidden">
         <img 
           src={facility.image} 
-          alt={facility.name} 
+          alt={`Bilde av ${facility.name}`}
           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
           onError={(e) => {
             const target = e.target as HTMLImageElement;
@@ -104,34 +120,36 @@ export function FacilityCard({ facility, onAddressClick }: FacilityCardProps) {
           <Button
             variant="ghost"
             size="sm"
-            className="bg-white/20 backdrop-blur-md hover:bg-white/30 text-white border-0 h-10 w-10 p-0 rounded-full"
+            className="bg-white/20 backdrop-blur-md hover:bg-white/30 text-white border-0 h-12 w-12 p-0 rounded-full focus:ring-2 focus:ring-white focus:ring-offset-2"
             onClick={handleFavorite}
+            aria-label={isFavorited ? "Fjern fra favoritter" : "Legg til favoritter"}
           >
-            <Heart className={`h-4 w-4 ${isFavorited ? 'fill-red-500 text-red-500' : ''}`} />
+            <Heart className={`h-5 w-5 ${isFavorited ? 'fill-red-500 text-red-500' : ''}`} />
           </Button>
           <Button
             variant="ghost"
             size="sm"
-            className="bg-white/20 backdrop-blur-md hover:bg-white/30 text-white border-0 h-10 w-10 p-0 rounded-full"
+            className="bg-white/20 backdrop-blur-md hover:bg-white/30 text-white border-0 h-12 w-12 p-0 rounded-full focus:ring-2 focus:ring-white focus:ring-offset-2"
             onClick={handleShare}
+            aria-label="Del lokale"
           >
-            <Share2 className="h-4 w-4" />
+            <Share2 className="h-5 w-5" />
           </Button>
         </div>
 
         {/* Type and Area Badges */}
         <div className="absolute top-4 left-4 flex flex-col gap-2">
-          <Badge className="bg-white/95 backdrop-blur-sm text-gray-800 border-0 font-semibold px-3 py-1.5 shadow-lg">
+          <Badge className="bg-white/95 backdrop-blur-sm text-gray-800 border-0 font-semibold px-4 py-2 text-base shadow-lg">
             {t(`facility.types.${facility.type}`, {}, facility.type)}
           </Badge>
-          <Badge variant="outline" className="bg-black/20 backdrop-blur-sm text-white border-white/30 font-medium px-3 py-1.5">
+          <Badge variant="outline" className="bg-black/20 backdrop-blur-sm text-white border-white/30 font-medium px-4 py-2 text-base">
             {facility.area}
           </Badge>
         </div>
 
         {/* Facility Name Overlay */}
         <div className="absolute bottom-4 left-4 right-4">
-          <h3 className="text-2xl font-bold text-white mb-2 drop-shadow-lg">
+          <h3 className="text-3xl font-bold text-white mb-2 drop-shadow-lg">
             {facility.name}
           </h3>
         </div>
@@ -139,10 +157,10 @@ export function FacilityCard({ facility, onAddressClick }: FacilityCardProps) {
       
       <CardContent className="p-6">
         {/* Location */}
-        <div className="flex items-center gap-2 mb-4 text-gray-600 hover:text-blue-600 transition-colors group/location">
-          <MapPin className="h-4 w-4 text-gray-400 group-hover/location:text-blue-500" />
+        <div className="flex items-center gap-3 mb-5 text-gray-600 hover:text-blue-600 transition-colors group/location">
+          <MapPin className="h-5 w-5 text-gray-400 group-hover/location:text-blue-500" />
           <span 
-            className="text-sm font-medium line-clamp-1 cursor-pointer"
+            className="text-base font-medium line-clamp-1 cursor-pointer"
             onClick={(e) => onAddressClick(e, facility)}
           >
             {facility.address}
@@ -150,33 +168,29 @@ export function FacilityCard({ facility, onAddressClick }: FacilityCardProps) {
         </div>
 
         {/* Description */}
-        <p className="text-gray-700 text-sm leading-relaxed mb-4 line-clamp-2">
+        <p className="text-gray-700 text-base leading-relaxed mb-5 line-clamp-2">
           {facility.description}
         </p>
 
         {/* Capacity and Amenities Row */}
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2 text-gray-600">
-            <Users className="h-4 w-4" />
-            <span className="text-sm font-medium">{facility.capacity} personer</span>
+        <div className="flex items-center justify-between mb-5">
+          <div className="flex items-center gap-3 text-gray-600">
+            <Users className="h-5 w-5" />
+            <span className="text-base font-medium">{facility.capacity} personer</span>
           </div>
           
-          <div className="flex gap-1">
-            {getAmenityIcons().map((icon, index) => (
-              <span key={index} className="text-lg" title={facility.equipment[index]}>
-                {icon}
-              </span>
-            ))}
+          <div className="flex gap-3" aria-label="Tilgjengelig utstyr">
+            {getAmenityIcons()}
           </div>
         </div>
 
         {/* Suitable For Tags */}
-        <div className="mb-5">
+        <div className="mb-6">
           <div className="flex flex-wrap gap-2">
             {facility.suitableFor.slice(0, 2).map((activity, index) => (
               <Badge
                 key={index}
-                className="bg-blue-50 text-blue-700 border-blue-200 font-medium px-3 py-1 text-xs hover:bg-blue-100 transition-colors"
+                className="bg-blue-50 text-blue-700 border-blue-200 font-medium px-4 py-2 text-base hover:bg-blue-100 transition-colors"
               >
                 {activity}
               </Badge>
@@ -184,25 +198,13 @@ export function FacilityCard({ facility, onAddressClick }: FacilityCardProps) {
             {facility.suitableFor.length > 2 && (
               <Badge 
                 variant="outline" 
-                className="bg-gray-50 text-gray-600 border-gray-300 font-medium px-3 py-1 text-xs"
+                className="bg-gray-50 text-gray-600 border-gray-300 font-medium px-4 py-2 text-base"
               >
                 +{facility.suitableFor.length - 2}
               </Badge>
             )}
           </div>
         </div>
-
-        {/* Action Button */}
-        <Button 
-          className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 group/button"
-          onClick={(e) => {
-            e.stopPropagation();
-            navigate(`/facilities/${facility.id}`);
-          }}
-        >
-          <span>Se detaljer</span>
-          <ArrowRight className="h-4 w-4 ml-2 group-hover/button:translate-x-1 transition-transform duration-200" />
-        </Button>
       </CardContent>
 
       {/* Hover Effect Border */}

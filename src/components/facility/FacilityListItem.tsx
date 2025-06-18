@@ -1,7 +1,7 @@
 
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { MapPin, Users, Heart, Share2, ArrowRight } from "lucide-react";
+import { MapPin, Users, Heart, Share2, Projector, Volume2, FileText, ChefHat, Car, Wifi, Snowflake, Accessibility } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -81,26 +81,42 @@ const FacilityListItem: React.FC<FacilityListItemProps> = ({
   };
 
   const getAmenityIcons = () => {
-    const amenityMap: { [key: string]: string } = {
-      'projektor': '📽️',
-      'lydanlegg': '🔊',
-      'whiteboard': '📝',
-      'kjøkken': '🍳',
-      'parkering': '🚗',
-      'wifi': '📶',
-      'klimaanlegg': '❄️',
-      'rullestolvennlig': '♿',
+    const amenityMap: { [key: string]: React.ElementType } = {
+      'projektor': Projector,
+      'lydanlegg': Volume2,
+      'whiteboard': FileText,
+      'kjøkken': ChefHat,
+      'parkering': Car,
+      'wifi': Wifi,
+      'klimaanlegg': Snowflake,
+      'rullestolvennlig': Accessibility,
     };
     
-    return facility.equipment.slice(0, 6).map(item => 
-      amenityMap[item.toLowerCase()] || '⚡'
-    );
+    return facility.equipment.slice(0, 6).map((item, index) => {
+      const IconComponent = amenityMap[item.toLowerCase()] || FileText;
+      return (
+        <IconComponent 
+          key={index}
+          className="h-6 w-6 text-gray-600" 
+          aria-label={item}
+        />
+      );
+    });
   };
 
   return (
     <Card 
-      className="group overflow-hidden hover:shadow-2xl transition-all duration-500 hover:translate-y-[-4px] border border-slate-200/60 shadow-lg bg-white cursor-pointer mb-6"
+      className="group overflow-hidden hover:shadow-2xl transition-all duration-500 hover:translate-y-[-4px] border border-slate-200/60 shadow-lg bg-white cursor-pointer mb-6 focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-opacity-50"
       onClick={() => navigate(`/facilities/${facility.id}`)}
+      role="button"
+      tabIndex={0}
+      aria-label={`Se detaljer for ${facility.name} på ${facility.address}`}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          navigate(`/facilities/${facility.id}`);
+        }
+      }}
     >
       <CardContent className="p-0">
         <div className="flex h-80">
@@ -108,7 +124,7 @@ const FacilityListItem: React.FC<FacilityListItemProps> = ({
           <div className="w-80 flex-shrink-0 relative overflow-hidden">
             <img 
               src={facility.image} 
-              alt={facility.name} 
+              alt={`Bilde av ${facility.name}`}
               className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110"
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
@@ -122,14 +138,14 @@ const FacilityListItem: React.FC<FacilityListItemProps> = ({
             
             {/* Type Badge */}
             <div className="absolute top-4 right-4">
-              <Badge className="bg-white/95 backdrop-blur-sm text-slate-700 border-0 font-semibold text-sm px-3 py-1.5 shadow-lg">
+              <Badge className="bg-white/95 backdrop-blur-sm text-slate-700 border-0 font-semibold text-base px-4 py-2 shadow-lg">
                 {facility.type}
               </Badge>
             </div>
 
             {/* Area Badge */}
             <div className="absolute top-4 left-4">
-              <Badge variant="outline" className="bg-white/90 backdrop-blur-sm text-slate-700 border-slate-200 font-medium px-3 py-1.5 shadow-sm">
+              <Badge variant="outline" className="bg-white/90 backdrop-blur-sm text-slate-700 border-slate-200 font-medium px-4 py-2 text-base shadow-sm">
                 {facility.area}
               </Badge>
             </div>
@@ -138,15 +154,15 @@ const FacilityListItem: React.FC<FacilityListItemProps> = ({
           {/* Main Content */}
           <div className="flex-1 p-8 flex flex-col">
             {/* Header with Actions */}
-            <div className="flex justify-between items-start mb-4">
+            <div className="flex justify-between items-start mb-5">
               <div className="flex-1">
-                <h3 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-blue-600 transition-colors line-clamp-1">
+                <h3 className="text-3xl font-bold text-gray-900 mb-4 group-hover:text-blue-600 transition-colors line-clamp-1">
                   {facility.name}
                 </h3>
                 
-                <div className="flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors cursor-pointer mb-3" onClick={handleAddressClick}>
-                  <MapPin className="h-4 w-4" />
-                  <span className="text-sm font-medium line-clamp-1">{facility.address}</span>
+                <div className="flex items-center gap-3 text-gray-600 hover:text-blue-600 transition-colors cursor-pointer mb-4" onClick={handleAddressClick}>
+                  <MapPin className="h-5 w-5" />
+                  <span className="text-base font-medium line-clamp-1">{facility.address}</span>
                 </div>
               </div>
 
@@ -155,40 +171,38 @@ const FacilityListItem: React.FC<FacilityListItemProps> = ({
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-9 w-9 p-0 hover:bg-gray-100 rounded-full"
+                  className="h-12 w-12 p-0 hover:bg-gray-100 rounded-full focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                   onClick={handleFavorite}
+                  aria-label={isFavorited ? "Fjern fra favoritter" : "Legg til favoritter"}
                 >
-                  <Heart className={`h-4 w-4 ${isFavorited ? 'fill-red-500 text-red-500' : 'text-gray-400'}`} />
+                  <Heart className={`h-5 w-5 ${isFavorited ? 'fill-red-500 text-red-500' : 'text-gray-400'}`} />
                 </Button>
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-9 w-9 p-0 hover:bg-gray-100 rounded-full"
+                  className="h-12 w-12 p-0 hover:bg-gray-100 rounded-full focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                   onClick={handleShare}
+                  aria-label="Del lokale"
                 >
-                  <Share2 className="h-4 w-4 text-gray-400" />
+                  <Share2 className="h-5 w-5 text-gray-400" />
                 </Button>
               </div>
             </div>
 
             {/* Description */}
-            <p className="text-gray-700 leading-relaxed mb-4 line-clamp-2 flex-grow">
+            <p className="text-gray-700 leading-relaxed mb-5 line-clamp-2 flex-grow text-base">
               {facility.description}
             </p>
 
             {/* Capacity and Amenities */}
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2 text-gray-600">
-                <Users className="h-5 w-5" />
-                <span className="font-medium">{facility.capacity} personer</span>
+            <div className="flex items-center justify-between mb-5">
+              <div className="flex items-center gap-3 text-gray-600">
+                <Users className="h-6 w-6" />
+                <span className="font-medium text-lg">{facility.capacity} personer</span>
               </div>
               
-              <div className="flex gap-1">
-                {getAmenityIcons().map((icon, index) => (
-                  <span key={index} className="text-xl" title={facility.equipment[index]}>
-                    {icon}
-                  </span>
-                ))}
+              <div className="flex gap-3" aria-label="Tilgjengelig utstyr">
+                {getAmenityIcons()}
               </div>
             </div>
 
@@ -198,7 +212,7 @@ const FacilityListItem: React.FC<FacilityListItemProps> = ({
                 {facility.suitableFor.slice(0, 3).map((activity, index) => (
                   <Badge
                     key={index}
-                    className="bg-blue-50 text-blue-700 border-blue-200 font-medium px-3 py-1.5 text-sm hover:bg-blue-100 transition-colors"
+                    className="bg-blue-50 text-blue-700 border-blue-200 font-medium px-4 py-2 text-base hover:bg-blue-100 transition-colors"
                   >
                     {activity}
                   </Badge>
@@ -206,25 +220,13 @@ const FacilityListItem: React.FC<FacilityListItemProps> = ({
                 {facility.suitableFor.length > 3 && (
                   <Badge 
                     variant="outline" 
-                    className="bg-gray-50 text-gray-600 border-gray-300 font-medium px-3 py-1.5 text-sm"
+                    className="bg-gray-50 text-gray-600 border-gray-300 font-medium px-4 py-2 text-base"
                   >
                     +{facility.suitableFor.length - 3} flere
                   </Badge>
                 )}
               </div>
             </div>
-
-            {/* Action Button */}
-            <Button 
-              className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 group/button"
-              onClick={(e) => {
-                e.stopPropagation();
-                navigate(`/facilities/${facility.id}`);
-              }}
-            >
-              <span>Se detaljer og book</span>
-              <ArrowRight className="h-4 w-4 ml-2 group-hover/button:translate-x-1 transition-transform duration-200" />
-            </Button>
           </div>
         </div>
       </CardContent>
