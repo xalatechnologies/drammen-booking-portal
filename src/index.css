@@ -84,74 +84,118 @@
     @apply border-border;
   }
   body {
-    @apply surface-primary text-primary font-sans antialiased;
+    @apply bg-background text-foreground font-sans antialiased;
   }
 }
 
-@layer components {
-  /* Button Design Tokens */
-  .btn-primary {
-    @apply bg-brand-primary hover:bg-brand-secondary text-text-inverse font-semibold py-md px-lg rounded-lg transition-all duration-200 shadow-md hover:shadow-lg;
+@layer utilities {
+  /* Design Token Surface Classes */
+  .surface-primary {
+    @apply bg-background text-foreground;
   }
   
-  .btn-secondary {
-    @apply bg-surface-secondary hover:bg-neutral-200 text-text-primary font-medium py-md px-lg rounded-lg border border-primary transition-all duration-200;
+  .surface-secondary {
+    @apply bg-secondary text-secondary-foreground;
   }
   
-  .btn-ghost {
-    @apply bg-transparent hover:bg-surface-secondary text-text-primary font-medium py-md px-lg rounded-lg transition-all duration-200;
+  .surface-tertiary {
+    @apply bg-muted text-muted-foreground;
   }
   
-  /* Card Design Tokens */
-  .card-primary {
-    @apply surface-primary border-primary rounded-xl shadow-md hover:shadow-lg transition-all duration-200;
+  /* Design Token Text Classes */
+  .text-primary {
+    @apply text-foreground;
   }
   
-  .card-glass {
-    @apply glass-effect shadow-glass rounded-xl backdrop-blur-lg;
+  .text-secondary {
+    @apply text-muted-foreground;
   }
   
-  /* Input Design Tokens */
-  .input-primary {
-    @apply surface-primary border-primary text-text-primary py-md px-lg rounded-lg focus:border-brand-primary focus:ring-2 focus:ring-navy-600/20 transition-all duration-200;
+  .text-tertiary {
+    @apply text-muted-foreground/70;
   }
   
-  /* Text Design Tokens */
-  .heading-primary {
-    @apply text-text-primary font-bold tracking-tight;
+  .text-inverse {
+    @apply text-primary-foreground;
   }
   
-  .heading-secondary {
-    @apply text-text-secondary font-semibold;
+  /* Design Token Border Classes */
+  .border-primary {
+    @apply border-border;
   }
   
-  .body-primary {
-    @apply text-text-primary font-normal leading-normal;
+  .border-secondary {
+    @apply border-muted;
   }
   
-  .body-secondary {
-    @apply text-text-secondary font-normal leading-relaxed;
+  /* Brand Colors */
+  .bg-brand-primary {
+    @apply bg-primary;
   }
   
-  /* Badge Design Tokens */
-  .badge-primary {
-    @apply bg-brand-primary text-text-inverse font-medium py-xs px-sm rounded-full text-xs;
+  .bg-brand-secondary {
+    @apply bg-secondary;
   }
   
-  .badge-secondary {
-    @apply bg-surface-secondary text-text-primary font-medium py-xs px-sm rounded-full text-xs border border-primary;
+  .text-brand-primary {
+    @apply text-primary;
   }
   
-  .badge-success {
-    @apply bg-semantic-success text-text-inverse font-medium py-xs px-sm rounded-full text-xs;
+  /* Semantic Colors */
+  .bg-semantic-success {
+    @apply bg-green-500;
   }
   
-  .badge-warning {
-    @apply bg-semantic-warning text-text-inverse font-medium py-xs px-sm rounded-full text-xs;
+  .bg-semantic-warning {
+    @apply bg-yellow-500;
   }
   
-  .badge-error {
-    @apply bg-semantic-error text-text-inverse font-medium py-xs px-sm rounded-full text-xs;
+  .bg-semantic-error {
+    @apply bg-red-500;
+  }
+  
+  .bg-semantic-info {
+    @apply bg-blue-500;
+  }
+  
+  /* Glass Effect */
+  .glass-effect {
+    backdrop-filter: blur(10px);
+    @apply bg-background/95 border border-border/20;
+  }
+  
+  .dark .glass-effect {
+    @apply bg-background/95 border-border/10;
+  }
+  
+  /* Shadow Glass */
+  .shadow-glass {
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  }
+  
+  /* Gradients */
+  .gradient-primary {
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary)) 100%);
+  }
+  
+  .gradient-secondary {
+    background: linear-gradient(135deg, hsl(var(--secondary)) 0%, hsl(var(--accent)) 100%);
+  }
+  
+  /* Hover Lift Effect */
+  .hover-lift {
+    transform: translateY(0);
+    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-2px);
+    @apply shadow-lg;
+  }
+  
+  /* Focus Ring */
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background;
   }
 }
 
@@ -167,22 +211,7 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Hover lift effect */
-.hover-lift {
-  transform: translateY(0);
-  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
-}
-
-.hover-lift:hover {
-  transform: translateY(-2px);
-}
-
 /* Smooth scrolling */
 html {
   scroll-behavior: smooth;
-}
-
-/* Focus styles */
-.focus-ring {
-  @apply focus:outline-none focus:ring-2 focus:ring-brand-secondary focus:ring-offset-2 focus:ring-offset-surface-primary;
 }
