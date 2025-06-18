@@ -2,10 +2,11 @@
 import React, { useState } from "react";
 import { format, addDays, startOfWeek } from "date-fns";
 import { nb } from "date-fns/locale";
-import { ChevronLeft, ChevronRight, Calendar } from "lucide-react";
+import { ChevronLeft, ChevronRight, Calendar, Users, DollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Zone } from "@/components/booking/types";
 import { isDateUnavailable, isNorwegianHoliday } from "@/utils/holidaysAndAvailability";
 import { ZoneConflictManager, ExistingBooking } from "@/utils/zoneConflictManager";
@@ -18,7 +19,7 @@ interface AvailabilityTabProps {
 export function AvailabilityTab({ zones, startDate }: AvailabilityTabProps) {
   const [currentWeekStart, setCurrentWeekStart] = useState(startOfWeek(startDate, { weekStartsOn: 1 }));
   
-  // Mock existing bookings for demo - fixed to match ExistingBooking interface
+  // Mock existing bookings for demo
   const existingBookings: ExistingBooking[] = [
     {
       id: "1",
@@ -108,12 +109,105 @@ export function AvailabilityTab({ zones, startDate }: AvailabilityTabProps) {
     }
   };
 
+  const renderZoneCalendar = (zone: Zone) => (
+    <div className="space-y-4">
+      {/* Zone Info Header */}
+      <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+        <CardContent className="p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900">{zone.name}</h3>
+              <p className="text-sm text-gray-600 mt-1">
+                Klikk på en ledig time for å starte booking
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <div className="flex items-center gap-2 bg-white p-2 rounded-lg border">
+                <Users className="h-4 w-4 text-blue-600" />
+                <span className="text-sm font-medium">{zone.capacity}</span>
+              </div>
+              <div className="flex items-center gap-2 bg-white p-2 rounded-lg border">
+                <DollarSign className="h-4 w-4 text-green-600" />
+                <span className="text-sm font-medium">{zone.pricePerHour} kr/t</span>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Week Days Header */}
+      <Card>
+        <CardContent className="p-4">
+          <div className="grid grid-cols-8 gap-2 mb-4">
+            <div className="p-2 text-xs font-medium text-gray-500">Tid</div>
+            {weekDays.map((day, i) => {
+              const holidayCheck = isNorwegianHoliday(day);
+              const isToday = format(day, 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd');
+              return (
+                <div key={i} className={`p-2 text-center rounded-lg ${isToday ? 'bg-blue-100 border-2 border-blue-300' : 'bg-gray-50'}`}>
+                  <div className={`text-xs font-medium ${isToday ? 'text-blue-800' : 'text-gray-700'}`}>
+                    {format(day, "EEE", { locale: nb })}
+                  </div>
+                  <div className={`text-sm font-bold ${isToday ? 'text-blue-900' : 'text-gray-900'}`}>
+                    {format(day, "dd.MM", { locale: nb })}
+                  </div>
+                  {holidayCheck.isHoliday && (
+                    <div className="text-xs text-red-600 mt-1 truncate" title={holidayCheck.name}>
+                      {holidayCheck.name}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Time Slots Grid */}
+          <div className="space-y-2">
+            {timeSlots.map((timeSlot) => (
+              <div key={timeSlot} className="grid grid-cols-8 gap-2">
+                <div className="p-3 text-sm font-medium text-gray-700 flex items-center bg-gray-50 rounded-lg">
+                  {timeSlot}
+                </div>
+                {weekDays.map((day, dayIndex) => {
+                  const availability = getAvailabilityStatus(zone.id, day, timeSlot);
+                  const statusColor = getStatusColor(availability.status, availability.reason);
+                  const statusText = getStatusText(availability.status, availability.reason);
+                  
+                  return (
+                    <div key={dayIndex} className="relative">
+                      <button
+                        className={`w-full h-10 rounded-lg text-xs font-medium border-2 transition-all duration-200 ${statusColor} ${
+                          availability.status === 'available' 
+                            ? 'cursor-pointer shadow-sm hover:shadow-md hover:scale-105' 
+                            : 'cursor-not-allowed opacity-75'
+                        }`}
+                        disabled={availability.status !== 'available'}
+                        title={availability.details || statusText}
+                        onClick={() => {
+                          if (availability.status === 'available') {
+                            console.log(`Booking ${zone.name} on ${format(day, 'dd.MM.yyyy')} at ${timeSlot}`);
+                          }
+                        }}
+                      >
+                        {statusText}
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+
   return (
     <div className="p-6 space-y-6">
       <div>
         <h2 className="text-2xl font-semibold mb-2">Tilgjengelighet per sone</h2>
         <p className="text-gray-600 mb-6">
-          Oversikt over ledige tider for alle soner. Klikk på en ledig time for å starte booking.
+          Velg en sone og se ledige tider. Klikk på en ledig time for å starte booking.
         </p>
       </div>
 
@@ -129,7 +223,7 @@ export function AvailabilityTab({ zones, startDate }: AvailabilityTabProps) {
           Forrige uke
         </Button>
         
-        <div className="flex items-center gap-2 text-sm font-medium">
+        <div className="flex items-center gap-2 text-sm font-medium bg-white px-4 py-2 rounded-lg border shadow-sm">
           <Calendar className="h-4 w-4" />
           {format(currentWeekStart, "dd.MM", { locale: nb })} - {format(addDays(currentWeekStart, 6), "dd.MM.yyyy", { locale: nb })}
         </div>
@@ -148,108 +242,57 @@ export function AvailabilityTab({ zones, startDate }: AvailabilityTabProps) {
       {/* Legend */}
       <Card className="bg-gray-50">
         <CardContent className="p-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-3 text-xs">
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded bg-green-100 border border-green-200"></div>
+              <div className="w-3 h-3 rounded bg-green-100 border-2 border-green-200"></div>
               <span>Ledig</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded bg-red-100 border border-red-200"></div>
+              <div className="w-3 h-3 rounded bg-red-100 border-2 border-red-200"></div>
               <span>Opptatt</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded bg-red-200 border border-red-300"></div>
+              <div className="w-3 h-3 rounded bg-red-200 border-2 border-red-300"></div>
               <span>Hele lokalet</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded bg-amber-100 border border-amber-200"></div>
-              <span>Begrenset</span>
+              <div className="w-3 h-3 rounded bg-amber-100 border-2 border-amber-200"></div>
+              <span>Helg/begrenset</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded bg-gray-200 border-2 border-gray-300"></div>
+              <span>Utilgjengelig</span>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Zones Grid */}
-      <div className="space-y-6">
-        {zones.map((zone) => (
-          <Card key={zone.id} className="overflow-hidden">
-            <CardHeader className="pb-4">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">{zone.name}</CardTitle>
-                <div className="flex items-center gap-2">
-                  <Badge variant="outline" className="text-xs">
-                    {zone.capacity} personer
-                  </Badge>
-                  <Badge variant="outline" className="text-xs">
-                    {zone.pricePerHour} kr/time
-                  </Badge>
-                </div>
+      {/* Zone Tabs */}
+      <Tabs defaultValue={zones[0]?.id} className="w-full">
+        <TabsList className="grid w-full grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-1 h-auto p-1 bg-gray-100">
+          {zones.map((zone) => (
+            <TabsTrigger 
+              key={zone.id} 
+              value={zone.id}
+              className="flex flex-col items-start p-3 h-auto data-[state=active]:bg-[#1e3a8a] data-[state=active]:text-white hover:bg-[#1e40af] hover:text-white transition-colors"
+            >
+              <span className="font-medium">{zone.name}</span>
+              <div className="flex items-center gap-2 mt-1 text-xs opacity-75">
+                <Users className="h-3 w-3" />
+                <span>{zone.capacity}</span>
+                <DollarSign className="h-3 w-3 ml-1" />
+                <span>{zone.pricePerHour}kr</span>
               </div>
-            </CardHeader>
-            <CardContent className="p-4 pt-0">
-              {/* Week Days Header */}
-              <div className="grid grid-cols-8 gap-1 mb-2">
-                <div className="p-2 text-xs font-medium text-gray-500">Tid</div>
-                {weekDays.map((day, i) => {
-                  const holidayCheck = isNorwegianHoliday(day);
-                  return (
-                    <div key={i} className="p-2 text-center">
-                      <div className="text-xs font-medium">
-                        {format(day, "EEE", { locale: nb })}
-                      </div>
-                      <div className="text-xs text-gray-600">
-                        {format(day, "dd.MM", { locale: nb })}
-                      </div>
-                      {holidayCheck.isHoliday && (
-                        <div className="text-xs text-red-600 mt-1">
-                          {holidayCheck.name}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
+            </TabsTrigger>
+          ))}
+        </TabsList>
 
-              {/* Time Slots Grid */}
-              <div className="space-y-1">
-                {timeSlots.map((timeSlot) => (
-                  <div key={timeSlot} className="grid grid-cols-8 gap-1">
-                    <div className="p-2 text-xs font-medium text-gray-700 flex items-center">
-                      {timeSlot}
-                    </div>
-                    {weekDays.map((day, dayIndex) => {
-                      const availability = getAvailabilityStatus(zone.id, day, timeSlot);
-                      const statusColor = getStatusColor(availability.status, availability.reason);
-                      const statusText = getStatusText(availability.status, availability.reason);
-                      
-                      return (
-                        <div key={dayIndex} className="relative">
-                          <button
-                            className={`w-full h-8 rounded text-xs font-medium border transition-all duration-200 ${statusColor} ${
-                              availability.status === 'available' 
-                                ? 'cursor-pointer shadow-sm hover:shadow-md' 
-                                : 'cursor-not-allowed opacity-75'
-                            }`}
-                            disabled={availability.status !== 'available'}
-                            title={availability.details || statusText}
-                            onClick={() => {
-                              if (availability.status === 'available') {
-                                console.log(`Booking ${zone.name} on ${format(day, 'dd.MM.yyyy')} at ${timeSlot}`);
-                              }
-                            }}
-                          >
-                            {statusText}
-                          </button>
-                        </div>
-                      );
-                    })}
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+        {zones.map((zone) => (
+          <TabsContent key={zone.id} value={zone.id} className="mt-6">
+            {renderZoneCalendar(zone)}
+          </TabsContent>
         ))}
-      </div>
+      </Tabs>
     </div>
   );
 }
