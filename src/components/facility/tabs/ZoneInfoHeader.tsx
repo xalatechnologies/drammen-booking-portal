@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Repeat, Trash2, ShoppingCart } from 'lucide-react';
+import { Repeat, Trash2, ShoppingCart, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Zone } from '@/components/booking/types';
@@ -14,7 +14,7 @@ interface ZoneInfoHeaderProps {
   onPatternBuilderOpen: () => void;
   onClearSelection: () => void;
   onBookingDrawerOpen: () => void;
-  zones?: Zone[]; // Add zones prop to look up zone names
+  zones?: Zone[];
 }
 
 export function ZoneInfoHeader({ 
@@ -23,90 +23,118 @@ export function ZoneInfoHeader({
   onPatternBuilderOpen, 
   onClearSelection, 
   onBookingDrawerOpen,
-  zones = [] // Default to empty array
+  zones = []
 }: ZoneInfoHeaderProps) {
   
   // Helper function to get zone name from zoneId
   const getZoneName = (zoneId: string) => {
     const foundZone = zones.find(z => z.id === zoneId);
-    return foundZone ? foundZone.name : zone.name; // Fallback to current zone name
+    return foundZone ? foundZone.name : zone.name;
   };
 
   return (
     <>
-      {/* Zone Title */}
-      <div className="mb-4">
-        <h4 className="text-lg font-semibold text-gray-900 font-inter">{zone.name}</h4>
-        <p className="text-sm text-gray-600 font-inter">Klikk på ledige timer for å velge tidsrom</p>
+      {/* Recurring Booking Info and Button */}
+      <div className="flex items-center justify-between gap-4 mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
+        <div className="flex items-start gap-3">
+          <div className="p-2 bg-blue-100 rounded-lg">
+            <Info className="h-5 w-5 text-blue-600" />
+          </div>
+          <div>
+            <h3 className="font-semibold text-gray-900 mb-1">Gjentakende booking</h3>
+            <p className="text-sm text-gray-600 leading-relaxed">
+              Opprett ukentlige eller månedlige bookinger enkelt. <br />
+              Velg dager, tidspunkt og hvor ofte det skal gjentas.
+            </p>
+          </div>
+        </div>
+        <Button
+          variant="outline"
+          onClick={onPatternBuilderOpen}
+          className="flex items-center gap-2 bg-white hover:bg-blue-50 border-blue-300 text-blue-700 font-medium px-4 py-2 shrink-0"
+        >
+          <Repeat className="h-4 w-4" />
+          Opprett mønster
+        </Button>
       </div>
 
-      {/* Actions and Selected Slots */}
-      <div className="flex items-start justify-between gap-4 mb-4">
-        {/* Left side - Recurrence button */}
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onPatternBuilderOpen}
-            className="flex items-center gap-2 font-inter"
-          >
-            <Repeat className="h-4 w-4" />
-            Gjentakende booking
-          </Button>
-        </div>
-
-        {/* Right side - Selected slots and booking button */}
-        <div className="flex flex-col items-end gap-3">
-          {/* Selected slots display */}
-          {selectedSlots.length > 0 && (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 max-w-sm">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-blue-900">
-                  Valgte tidspunkt ({selectedSlots.length})
-                </span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={onClearSelection}
-                  className="h-6 w-6 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
-                >
-                  <Trash2 className="h-3 w-3" />
-                </Button>
+      {/* Enhanced Selected Slots Display */}
+      {selectedSlots.length > 0 && (
+        <div className="mb-6">
+          <div className="bg-white border border-blue-200 rounded-xl shadow-sm overflow-hidden">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-1.5 bg-white/20 rounded-lg">
+                    <ShoppingCart className="h-4 w-4 text-white" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-white">Valgte tidspunkt</h4>
+                    <p className="text-blue-100 text-sm">{selectedSlots.length} timer valgt</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Badge className="bg-white/20 text-white border-white/30">
+                    {selectedSlots.length} timer
+                  </Badge>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={onClearSelection}
+                    className="text-white hover:bg-white/20 h-8 w-8 p-0"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
-              
-              <div className="space-y-1 max-h-32 overflow-auto">
-                {selectedSlots.slice(0, 5).map((slot, index) => (
-                  <div key={index} className="flex items-center justify-between text-xs">
-                    <span className="text-blue-800">
-                      {getZoneName(slot.zoneId)} - {format(slot.date, 'EEE dd.MM', { locale: nb })}
-                    </span>
-                    <Badge variant="secondary" className="text-xs ml-2">
+            </div>
+
+            {/* Content */}
+            <div className="p-4">
+              <div className="space-y-3 max-h-40 overflow-auto">
+                {selectedSlots.slice(0, 6).map((slot, index) => (
+                  <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200 hover:bg-blue-50 transition-colors">
+                    <div className="flex items-center gap-3">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-900">
+                          {getZoneName(slot.zoneId)}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {format(slot.date, 'EEEE dd. MMMM', { locale: nb })}
+                        </p>
+                      </div>
+                    </div>
+                    <Badge variant="outline" className="bg-white text-blue-700 border-blue-200">
                       {slot.timeSlot}
                     </Badge>
                   </div>
                 ))}
-                {selectedSlots.length > 5 && (
-                  <p className="text-xs text-blue-600 pt-1">
-                    + {selectedSlots.length - 5} flere tidspunkt
-                  </p>
+                {selectedSlots.length > 6 && (
+                  <div className="text-center py-2">
+                    <p className="text-sm text-gray-500 bg-gray-100 rounded-lg py-2 px-3">
+                      + {selectedSlots.length - 6} flere tidspunkt
+                    </p>
+                  </div>
                 )}
               </div>
-            </div>
-          )}
 
-          {/* Book button */}
-          {selectedSlots.length > 0 && (
-            <Button
-              onClick={onBookingDrawerOpen}
-              className="flex items-center gap-2 bg-[#1e3a8a] hover:bg-[#1e40af] font-inter"
-              size="lg"
-            >
-              <ShoppingCart className="h-4 w-4" />
-              Book {selectedSlots.length} tidspunkt
-            </Button>
-          )}
+              {/* Book Button */}
+              <div className="mt-4 pt-4 border-t border-gray-200">
+                <Button
+                  onClick={onBookingDrawerOpen}
+                  className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-200"
+                  size="lg"
+                >
+                  <ShoppingCart className="h-5 w-5 mr-2" />
+                  Book {selectedSlots.length} tidspunkt
+                </Button>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+      )}
     </>
   );
 }
