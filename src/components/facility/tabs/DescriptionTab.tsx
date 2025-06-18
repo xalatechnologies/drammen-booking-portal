@@ -19,6 +19,13 @@ export function DescriptionTab({ description, capacity, address, zones = [] }: D
         <p className="text-gray-700 leading-relaxed">{description}</p>
       </div>
 
+      {/* Location Map */}
+      <div className="border-t border-gray-200 pt-6">
+        <div className="h-64 rounded-lg overflow-hidden border">
+          <FacilityLocation address={address} />
+        </div>
+      </div>
+
       {/* Availability Calendar */}
       {zones.length > 0 && (
         <div className="border-t border-gray-200 pt-6">
@@ -47,13 +54,6 @@ export function DescriptionTab({ description, capacity, address, zones = [] }: D
                 <div className="w-2 h-2 rounded bg-gray-200 border border-gray-300"></div>
                 <span>Utilgjengelig</span>
               </div>
-            </div>
-          </div>
-          
-          {/* Location Map */}
-          <div className="mt-6 border-t border-gray-200 pt-6">
-            <div className="h-64 rounded-lg overflow-hidden border">
-              <FacilityLocation address={address} />
             </div>
           </div>
         </div>
