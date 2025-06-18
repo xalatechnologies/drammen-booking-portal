@@ -31,42 +31,41 @@ export function FacilityBookingCard({ facility, onBookClick }: FacilityBookingCa
   return (
     <>
       {/* Action buttons */}
-      <div className="flex items-center justify-end gap-sm mb-lg">
+      <div className="flex items-center justify-end gap-2 mb-4">
         <Button
           variant="ghost"
           size="sm"
-          className="btn-ghost"
+          className="flex items-center gap-2"
           onClick={() => setIsFavorited(!isFavorited)}
         >
-          <Heart className={`h-4 w-4 ${isFavorited ? 'fill-semantic-error text-semantic-error' : 'text-text-secondary'}`} />
+          <Heart className={`h-4 w-4 ${isFavorited ? 'fill-red-500 text-red-500' : ''}`} />
         </Button>
         <Button 
           variant="ghost" 
           size="sm"
-          className="btn-ghost"
           onClick={handleShare}
         >
-          <Share2 className="h-4 w-4 text-text-secondary" />
+          <Share2 className="h-4 w-4" />
         </Button>
       </div>
 
       {/* Price Card */}
-      <Card className="card-glass mb-lg">
-        <CardContent className="p-lg">
-          <div className="text-center mb-lg">
-            <div className="text-3xl font-bold text-text-primary">{facility.pricePerHour} kr</div>
-            <div className="text-text-secondary">per time</div>
+      <Card className="mb-6 shadow-sm border-blue-100">
+        <CardContent className="p-6">
+          <div className="text-center mb-4">
+            <div className="text-3xl font-bold text-gray-900">{facility.pricePerHour} kr</div>
+            <div className="text-gray-500">per time</div>
           </div>
           
-          <div className="p-lg bg-semantic-success/10 rounded-lg mb-lg text-center border border-semantic-success/20">
-            <p className="text-semantic-success-dark text-sm">
+          <div className="p-4 bg-green-50 rounded-lg mb-4 text-center">
+            <p className="text-green-800 text-sm">
               <CheckCircle className="inline h-4 w-4 mr-1" />
               Tilgjengelig for umiddelbar booking
             </p>
           </div>
 
           <Button 
-            className="btn-primary w-full h-12"
+            className="w-full bg-[#1e3a8a] hover:bg-[#1e40af] text-white font-medium shadow-sm h-12"
             onClick={onBookClick}
           >
             Reserver nå
@@ -75,15 +74,15 @@ export function FacilityBookingCard({ facility, onBookClick }: FacilityBookingCa
       </Card>
       
       {/* Additional info cards */}
-      <Card className="card-primary mb-lg">
-        <CardContent className="p-lg">
-          <div className="flex items-center gap-md">
-            <div className="bg-semantic-warning/10 p-sm rounded-md">
-              <Info className="h-5 w-5 text-semantic-warning" />
+      <Card className="mb-6 shadow-sm">
+        <CardContent className="p-4">
+          <div className="flex items-center gap-3">
+            <div className="bg-amber-100 p-2 rounded-md">
+              <Info className="h-5 w-5 text-amber-600" />
             </div>
             <div>
-              <h3 className="heading-secondary text-text-primary">Avbestilling</h3>
-              <p className="body-secondary text-sm">
+              <h3 className="font-medium">Avbestilling</h3>
+              <p className="text-sm text-gray-600">
                 Gratis avbestilling inntil 48 timer før
               </p>
             </div>
@@ -91,15 +90,15 @@ export function FacilityBookingCard({ facility, onBookClick }: FacilityBookingCa
         </CardContent>
       </Card>
       
-      <Card className="card-primary">
-        <CardContent className="p-lg">
-          <div className="flex items-center gap-md">
-            <div className="bg-brand-accent/10 p-sm rounded-md">
-              <Clock className="h-5 w-5 text-brand-accent" />
+      <Card className="shadow-sm">
+        <CardContent className="p-4">
+          <div className="flex items-center gap-3">
+            <div className="bg-blue-100 p-2 rounded-md">
+              <Clock className="h-5 w-5 text-blue-600" />
             </div>
             <div>
-              <h3 className="heading-secondary text-text-primary">Åpningstider</h3>
-              <p className="body-secondary text-sm">
+              <h3 className="font-medium">Åpningstider</h3>
+              <p className="text-sm text-gray-600">
                 {facility.openingHours}
               </p>
             </div>
