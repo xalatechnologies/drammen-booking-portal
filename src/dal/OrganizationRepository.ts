@@ -1,11 +1,11 @@
 
 import { BaseRepository } from './BaseRepository';
-import { Organization, OrganizationFilters } from '@/types/organization';
+import { Organization, OrganizationFilters, OrganizationType, OrganizationStatus, VerificationLevel, OrganizationMetadata } from '@/types/organization';
 import { mockOrganizations } from '@/data/mockOrganizations';
 
 interface OrganizationCreateRequest {
   name: string;
-  type: string;
+  type: OrganizationType;
   contactEmail: string;
   contactPhone?: string;
   address: any;
@@ -13,9 +13,10 @@ interface OrganizationCreateRequest {
 }
 
 interface OrganizationUpdateRequest extends Partial<OrganizationCreateRequest> {
-  status?: string;
-  verificationLevel?: string;
+  status?: OrganizationStatus;
+  verificationLevel?: VerificationLevel;
   isActive?: boolean;
+  metadata?: Partial<OrganizationMetadata>;
 }
 
 export class OrganizationRepository extends BaseRepository<Organization, OrganizationFilters, OrganizationCreateRequest, OrganizationUpdateRequest> {
@@ -74,7 +75,7 @@ export class OrganizationRepository extends BaseRepository<Organization, Organiz
     return {
       id: this.generateId(),
       name: request.name,
-      type: request.type as any,
+      type: request.type,
       orgNumber: request.orgNumber,
       contactEmail: request.contactEmail,
       contactPhone: request.contactPhone,
@@ -114,10 +115,10 @@ export class OrganizationRepository extends BaseRepository<Organization, Organiz
     return { success: true, data: orgs };
   }
 
-  async updateVerificationLevel(id: string, level: string) {
+  async updateVerificationLevel(id: string, level: VerificationLevel) {
     const index = this.data.findIndex(o => o.id === id);
     if (index !== -1) {
-      this.data[index].verificationLevel = level as any;
+      this.data[index].verificationLevel = level;
       this.data[index].updatedAt = this.getCurrentTimestamp();
       return { success: true, data: this.data[index] };
     }
