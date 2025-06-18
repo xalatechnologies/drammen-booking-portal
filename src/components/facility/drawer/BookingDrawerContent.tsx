@@ -70,7 +70,7 @@ export function BookingDrawerContent({
   };
 
   return (
-    <div className="p-4 space-y-6">
+    <div className="p-6 space-y-8">
       {step === 'summary' ? (
         <BookingSummaryStep
           selectedSlots={selectedSlots}
