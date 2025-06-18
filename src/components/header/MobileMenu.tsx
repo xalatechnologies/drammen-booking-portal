@@ -24,6 +24,19 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
 }) => {
   if (!isOpen) return null;
 
+  const translations = {
+    NO: {
+      login: "Logg inn",
+      logout: "Logg ut"
+    },
+    EN: {
+      login: "Log in",
+      logout: "Log out"
+    }
+  };
+
+  const t = translations[language];
+
   return (
     <div className="fixed inset-0 z-50 bg-white lg:hidden pt-16 px-4">
       <div className="flex flex-col gap-4 p-4">
@@ -38,7 +51,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
             }}
           >
             <LogIn className="mr-2 h-5 w-5" />
-            Logg inn
+            {t.login}
           </Button>
         ) : (
           <Button 
@@ -50,7 +63,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
             }}
           >
             <LogIn className="mr-2 h-5 w-5" />
-            Logg ut
+            {t.logout}
           </Button>
         )}
         

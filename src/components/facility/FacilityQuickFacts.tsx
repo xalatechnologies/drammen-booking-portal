@@ -8,15 +8,33 @@ interface FacilityQuickFactsProps {
   area: string;
   openingHours: string;
   zoneCount: number;
+  language?: 'NO' | 'EN';
 }
 
-export function FacilityQuickFacts({ capacity, area, openingHours, zoneCount }: FacilityQuickFactsProps) {
+export function FacilityQuickFacts({ capacity, area, openingHours, zoneCount, language = 'NO' }: FacilityQuickFactsProps) {
+  const translations = {
+    NO: {
+      capacity: "Kapasitet",
+      area: "Areal",
+      open: "Åpent",
+      zones: "Soner"
+    },
+    EN: {
+      capacity: "Capacity",
+      area: "Area",
+      open: "Open",
+      zones: "Zones"
+    }
+  };
+
+  const t = translations[language];
+
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
       <Card className="p-4">
         <div className="flex items-center gap-2 mb-1">
           <Users className="h-4 w-4 text-blue-600" />
-          <span className="text-sm font-medium text-gray-500">Kapasitet</span>
+          <span className="text-sm font-medium text-gray-500">{t.capacity}</span>
         </div>
         <p className="font-bold">{capacity}</p>
       </Card>
@@ -24,7 +42,7 @@ export function FacilityQuickFacts({ capacity, area, openingHours, zoneCount }: 
       <Card className="p-4">
         <div className="flex items-center gap-2 mb-1">
           <Map className="h-4 w-4 text-green-600" />
-          <span className="text-sm font-medium text-gray-500">Areal</span>
+          <span className="text-sm font-medium text-gray-500">{t.area}</span>
         </div>
         <p className="font-bold">{area}</p>
       </Card>
@@ -32,7 +50,7 @@ export function FacilityQuickFacts({ capacity, area, openingHours, zoneCount }: 
       <Card className="p-4">
         <div className="flex items-center gap-2 mb-1">
           <Clock className="h-4 w-4 text-purple-600" />
-          <span className="text-sm font-medium text-gray-500">Åpent</span>
+          <span className="text-sm font-medium text-gray-500">{t.open}</span>
         </div>
         <p className="font-bold text-sm">06:00-23:00</p>
       </Card>
@@ -40,7 +58,7 @@ export function FacilityQuickFacts({ capacity, area, openingHours, zoneCount }: 
       <Card className="p-4">
         <div className="flex items-center gap-2 mb-1">
           <CheckCircle className="h-4 w-4 text-emerald-600" />
-          <span className="text-sm font-medium text-gray-500">Soner</span>
+          <span className="text-sm font-medium text-gray-500">{t.zones}</span>
         </div>
         <p className="font-bold text-emerald-600">{zoneCount}</p>
       </Card>

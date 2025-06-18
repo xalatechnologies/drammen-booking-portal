@@ -1,7 +1,7 @@
 
 import React from "react";
 import { format } from "date-fns";
-import { nb } from "date-fns/locale";
+import { nb, enUS } from "date-fns/locale";
 import { Users, Clock, Calendar, CheckCircle, XCircle, Wrench, Info } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -34,25 +34,49 @@ interface Facility {
 
 interface FacilityCardTabsProps {
   facility: Facility;
+  language?: 'NO' | 'EN';
 }
 
-export function FacilityCardTabs({ facility }: FacilityCardTabsProps) {
+export function FacilityCardTabs({ facility, language = 'NO' }: FacilityCardTabsProps) {
   const handleTabsClick = (e: React.MouseEvent) => {
     e.stopPropagation();
   };
+
+  const translations = {
+    NO: {
+      overview: "Oversikt",
+      details: "Detaljer",
+      capacity: "Kapasitet",
+      people: "personer",
+      accessibility: "Tilgjengelighet",
+      equipment: "Tilgjengelig utstyr",
+      more: "flere"
+    },
+    EN: {
+      overview: "Overview",
+      details: "Details",
+      capacity: "Capacity",
+      people: "people",
+      accessibility: "Accessibility",
+      equipment: "Available equipment",
+      more: "more"
+    }
+  };
+
+  const t = translations[language];
 
   return (
     <div onClick={handleTabsClick}>
       <Tabs defaultValue="overview" className="flex-grow">
         <TabsList className="grid w-full grid-cols-2 mb-3 h-10">
-          <TabsTrigger value="overview" className="text-sm py-2">Oversikt</TabsTrigger>
-          <TabsTrigger value="details" className="text-sm py-2">Detaljer</TabsTrigger>
+          <TabsTrigger value="overview" className="text-sm py-2">{t.overview}</TabsTrigger>
+          <TabsTrigger value="details" className="text-sm py-2">{t.details}</TabsTrigger>
         </TabsList>
         
         <TabsContent value="overview" className="space-y-3 mt-0">
           <div className="flex items-center gap-1.5 text-base text-gray-600">
             <Users className="h-5 w-5 text-gray-500" />
-            <span>Kapasitet: {facility.capacity} personer</span>
+            <span>{t.capacity}: {facility.capacity} {t.people}</span>
           </div>
 
           <div className="text-base text-gray-700">
@@ -62,14 +86,14 @@ export function FacilityCardTabs({ facility }: FacilityCardTabsProps) {
         
         <TabsContent value="details" className="space-y-3 mt-0">
           <div>
-            <h4 className="text-base font-medium mb-2 text-gray-900">Tilgjengelighet</h4>
-            <AccessibilityBadges accessibility={facility.accessibility} />
+            <h4 className="text-base font-medium mb-2 text-gray-900">{t.accessibility}</h4>
+            <AccessibilityBadges accessibility={facility.accessibility} language={language} />
           </div>
 
           <div>
             <h4 className="text-base font-medium mb-2 flex items-center gap-1.5 text-gray-900">
               <Wrench className="h-5 w-5 text-[#1e3a8a]" />
-              <span>Tilgjengelig utstyr</span>
+              <span>{t.equipment}</span>
             </h4>
             <div className="flex flex-wrap gap-1.5">
               {facility.equipment.slice(0, 4).map((item, i) => (
@@ -79,7 +103,7 @@ export function FacilityCardTabs({ facility }: FacilityCardTabsProps) {
               ))}
               {facility.equipment.length > 4 && (
                 <Badge variant="outline" className="bg-[#1e3a8a] bg-opacity-10 text-[#1e3a8a] border-[#1e3a8a] text-sm py-1 px-2">
-                  +{facility.equipment.length - 4} flere
+                  +{facility.equipment.length - 4} {t.more}
                 </Badge>
               )}
             </div>

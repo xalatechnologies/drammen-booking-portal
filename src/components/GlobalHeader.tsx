@@ -37,6 +37,13 @@ const GlobalHeader = () => {
     setLanguage(prev => prev === 'NO' ? 'EN' : 'NO');
   };
 
+  // Store language in localStorage and create a context for child components
+  useEffect(() => {
+    localStorage.setItem("language", language);
+    // Dispatch custom event to notify components of language change
+    window.dispatchEvent(new CustomEvent('languageChange', { detail: language }));
+  }, [language]);
+
   return (
     <header className="bg-white dark:bg-gray-900 py-2 px-4 shadow-md sticky top-0 z-10 border-b border-gray-200 dark:border-gray-700">
       <div className="container mx-auto flex justify-between items-center">
@@ -66,7 +73,8 @@ const GlobalHeader = () => {
           <ProfileMenu 
             isLoggedIn={isLoggedIn} 
             handleLogin={handleLogin} 
-            handleLogout={handleLogout} 
+            handleLogout={handleLogout}
+            language={language}
           />
         </div>
       </div>
