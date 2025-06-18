@@ -3,19 +3,19 @@
 @layer components {
   /* Enhanced Button Variants */
   .btn-primary {
-    @apply bg-brand-primary hover:bg-brand-secondary text-text-inverse font-semibold py-md px-lg rounded-lg transition-all duration-200 shadow-md hover:shadow-lg focus:ring-2 focus:ring-brand-secondary/20 focus:ring-offset-2;
+    @apply bg-brand-primary hover:bg-brand-secondary text-text-inverse font-semibold py-md px-lg rounded-lg transition-all duration-200 shadow-md hover:shadow-lg focus:ring-2 focus:ring-navy-600/20 focus:ring-offset-2;
   }
   
   .btn-secondary {
-    @apply bg-surface-secondary hover:bg-neutral-200 text-text-primary font-medium py-md px-lg rounded-lg border border-primary transition-all duration-200 focus:ring-2 focus:ring-brand-secondary/20 focus:ring-offset-2;
+    @apply bg-surface-secondary hover:bg-neutral-200 text-text-primary font-medium py-md px-lg rounded-lg border border-primary transition-all duration-200 focus:ring-2 focus:ring-navy-600/20 focus:ring-offset-2;
   }
   
   .btn-ghost {
-    @apply bg-transparent hover:bg-surface-secondary text-text-primary font-medium py-md px-lg rounded-lg transition-all duration-200 focus:ring-2 focus:ring-brand-secondary/20 focus:ring-offset-2;
+    @apply bg-transparent hover:bg-surface-secondary text-text-primary font-medium py-md px-lg rounded-lg transition-all duration-200 focus:ring-2 focus:ring-navy-600/20 focus:ring-offset-2;
   }
   
   .btn-destructive {
-    @apply bg-semantic-error hover:bg-semantic-error-dark text-text-inverse font-medium py-md px-lg rounded-lg transition-all duration-200 shadow-md hover:shadow-lg focus:ring-2 focus:ring-semantic-error/20 focus:ring-offset-2;
+    @apply bg-semantic-error hover:bg-semantic-error-dark text-text-inverse font-medium py-md px-lg rounded-lg transition-all duration-200 shadow-md hover:shadow-lg focus:ring-2 focus:ring-red-500/20 focus:ring-offset-2;
   }
   
   /* Enhanced Card Variants */
@@ -37,11 +37,11 @@
   
   /* Enhanced Input Variants */
   .input-primary {
-    @apply surface-primary border-primary text-text-primary py-md px-lg rounded-lg focus:border-focus focus:ring-2 focus:ring-brand-secondary/20 transition-all duration-200 placeholder:text-text-tertiary;
+    @apply surface-primary border-primary text-text-primary py-md px-lg rounded-lg focus:border-brand-primary focus:ring-2 focus:ring-navy-600/20 transition-all duration-200 placeholder:text-text-tertiary;
   }
   
   .input-error {
-    @apply border-semantic-error focus:border-semantic-error focus:ring-semantic-error/20;
+    @apply border-semantic-error focus:border-semantic-error focus:ring-red-500/20;
   }
   
   /* Enhanced Text Variants */
@@ -113,23 +113,23 @@
   }
   
   .focus-ring {
-    @apply focus:outline-none focus:ring-2 focus:ring-brand-secondary focus:ring-offset-2 focus:ring-offset-surface-primary;
+    @apply focus:outline-none focus:ring-2 focus:ring-navy-600/20 focus:ring-offset-2 focus:ring-offset-surface-primary;
   }
   
   /* Status Indicators */
   .status-success {
-    @apply bg-semantic-success/10 text-semantic-success-dark border border-semantic-success/20;
+    @apply bg-green-500/10 text-green-700 border border-green-500/20;
   }
   
   .status-warning {
-    @apply bg-semantic-warning/10 text-semantic-warning-dark border border-semantic-warning/20;
+    @apply bg-yellow-500/10 text-yellow-700 border border-yellow-500/20;
   }
   
   .status-error {
-    @apply bg-semantic-error/10 text-semantic-error-dark border border-semantic-error/20;
+    @apply bg-red-500/10 text-red-700 border border-red-500/20;
   }
   
   .status-info {
-    @apply bg-semantic-info/10 text-semantic-info-dark border border-semantic-info/20;
+    @apply bg-blue-500/10 text-blue-700 border border-blue-500/20;
   }
 }
