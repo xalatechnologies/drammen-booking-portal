@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { FacilityCard } from "./facility/FacilityCard";
@@ -34,6 +35,7 @@ interface FacilityGridProps {
   location?: string;
   accessibility?: string;
   capacity?: number[];
+  searchTerm?: string;
 }
 
 const FacilityGrid: React.FC<FacilityGridProps> = ({
@@ -41,7 +43,8 @@ const FacilityGrid: React.FC<FacilityGridProps> = ({
   facilityType,
   location,
   accessibility,
-  capacity
+  capacity,
+  searchTerm
 }) => {
   const navigate = useNavigate();
   
@@ -50,14 +53,27 @@ const FacilityGrid: React.FC<FacilityGridProps> = ({
 
   // Debug all facilities to make sure they exist
   console.log("All facilities:", facilities);
+  console.log("Search term:", searchTerm);
   
-  // Simplified filtering logic - don't filter if values are empty/undefined
-  const filteredFacilities = facilities.filter(facility => {
+  // Apply search filter first if searchTerm exists
+  let searchFilteredFacilities = facilities;
+  if (searchTerm && searchTerm.trim() !== "") {
+    searchFilteredFacilities = facilities.filter(facility =>
+      facility.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      facility.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      facility.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      facility.area.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      facility.suitableFor.some(activity => activity.toLowerCase().includes(searchTerm.toLowerCase()))
+    );
+  }
+  
+  // Then apply other filters
+  const filteredFacilities = searchFilteredFacilities.filter(facility => {
     // Don't filter at all if all filter criteria are empty or default
     const hasActiveFilters = 
-      (facilityType && facilityType !== "") ||
-      (location && location !== "") ||
-      (accessibility && accessibility !== "") ||
+      (facilityType && facilityType !== "" && facilityType !== "all") ||
+      (location && location !== "" && location !== "all") ||
+      (accessibility && accessibility !== "" && accessibility !== "all") ||
       (capacity && Array.isArray(capacity) && capacity[0] > 0);
     
     // If no active filters, show all facilities
@@ -66,17 +82,17 @@ const FacilityGrid: React.FC<FacilityGridProps> = ({
     // Otherwise apply filters when criteria is provided
     let matchesCriteria = true;
     
-    if (facilityType && facilityType !== "") {
+    if (facilityType && facilityType !== "" && facilityType !== "all") {
       matchesCriteria = matchesCriteria && 
         facility.type.toLowerCase().includes(facilityType.toLowerCase().replace("-", " "));
     }
     
-    if (location && location !== "") {
+    if (location && location !== "" && location !== "all") {
       matchesCriteria = matchesCriteria && 
         facility.address.toLowerCase().includes(location.toLowerCase().replace("-", " "));
     }
     
-    if (accessibility && accessibility !== "") {
+    if (accessibility && accessibility !== "" && accessibility !== "all") {
       matchesCriteria = matchesCriteria && 
         facility.accessibility.includes(accessibility);
     }
@@ -90,9 +106,9 @@ const FacilityGrid: React.FC<FacilityGridProps> = ({
   });
 
   console.log("Filtered facilities:", filteredFacilities.length, "out of", facilities.length);
-  console.log("Filter values:", { facilityType, location, accessibility, capacity });
+  console.log("Filter values:", { facilityType, location, accessibility, capacity, searchTerm });
   
-  // Show all facilities if there are no active filters
+  // Show filtered facilities
   const facilitiesToDisplay = filteredFacilities;
   
   // Function to handle address click - navigate to map view with filters
