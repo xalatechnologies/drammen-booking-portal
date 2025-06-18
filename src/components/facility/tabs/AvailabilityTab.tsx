@@ -209,6 +209,8 @@ export function AvailabilityTab({
         onSlotClick={handleSlotClick}
       />
 
+      <LegendDisplay showLegend={showLegend} />
+
       <ZoneInfoHeader
         zone={zone}
         selectedSlots={selectedSlots}
@@ -219,8 +221,6 @@ export function AvailabilityTab({
       />
 
       <SelectedSlotsDisplay selectedSlots={selectedSlots} />
-
-      <LegendDisplay showLegend={showLegend} />
     </div>
   );
 
