@@ -21,6 +21,9 @@ const FacilityList: React.FC<FacilityListProps> = ({
     filters
   });
 
+  console.log("FacilityList - paginationInfo:", paginationInfo);
+  console.log("FacilityList - facilities count:", facilities.length);
+
   return (
     <div className="space-y-6">
       {viewMode === "grid" ? (
@@ -51,7 +54,7 @@ const FacilityList: React.FC<FacilityListProps> = ({
         </div>
       )}
 
-      {paginationInfo && paginationInfo.totalPages > 1 && (
+      {paginationInfo && (
         <PaginationControls 
           pagination={paginationInfo}
           onPageChange={goToPage}
