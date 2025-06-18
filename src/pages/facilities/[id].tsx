@@ -298,7 +298,13 @@ const FacilityDetail = () => {
             {/* Header with Action Buttons */}
             <div className="flex justify-between items-start">
               <div className="flex-1">
-                <FacilityHeader name={facility.name} address={facility.address} rating={facility.rating} reviewCount={facility.reviewCount} onShare={handleShare} isFavorited={isFavorited} onToggleFavorite={() => setIsFavorited(!isFavorited)} />
+                <FacilityHeader 
+                  name={facility.name} 
+                  address={facility.address} 
+                  onShare={handleShare} 
+                  isFavorited={isFavorited} 
+                  onToggleFavorite={() => setIsFavorited(!isFavorited)} 
+                />
               </div>
               <div className="flex gap-3 mt-4">
                 <Button onClick={handleBookingClick} size="lg" className="text-white bg-blue-900 hover:bg-blue-800">
@@ -335,7 +341,15 @@ const FacilityDetail = () => {
             </div>
 
             {/* Tabbed Content */}
-            <FacilityInfoTabs description={facility.description} capacity={facility.capacity} equipment={facility.equipment} zones={zones} amenities={facility.amenities} address={facility.address} quickFacts={<FacilityQuickFacts capacity={facility.capacity} area={facility.area} openingHours={facility.openingHours} zoneCount={zones.length} />} zoneCards={<Card>
+            <FacilityInfoTabs 
+              description={facility.description} 
+              capacity={facility.capacity} 
+              equipment={facility.equipment} 
+              zones={zones} 
+              amenities={facility.amenities} 
+              address={facility.address} 
+              quickFacts={<FacilityQuickFacts capacity={facility.capacity} area={facility.area} openingHours={facility.openingHours} zoneCount={zones.length} />} 
+              zoneCards={<Card>
                   <CardHeader className="pb-4">
                     <CardTitle className="flex items-center gap-2 text-lg">
                       <MapPin className="h-5 w-5" />
@@ -345,7 +359,8 @@ const FacilityDetail = () => {
                   <CardContent className="space-y-3">
                     {zones.map(zone => <ZoneBookingCard key={zone.id} zone={zone} facilityName={facility.name} onBookClick={() => navigate(`/booking/${id}?zone=${zone.id}`)} />)}
                   </CardContent>
-                </Card>} />
+                </Card>} 
+            />
 
             {/* Location with Map - Improved WCAG compliance */}
             <Card className="p-6">
