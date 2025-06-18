@@ -2,28 +2,49 @@
 import { useLanguage } from '@/contexts/LanguageContext';
 import { bookingTranslations } from '../translations/booking';
 import { commonTranslations } from '../translations/common';
+import { facilityTranslations } from '../translations/facility';
+import { errorTranslations } from '../translations/errors';
+import { navigationTranslations } from '../translations/navigation';
+import { adminTranslations } from '../translations/admin';
+import { TranslationParams, TranslationFunction } from '../types';
 
 type TranslationPath = string;
 
 export function useTranslation() {
   const { language } = useLanguage();
 
-  const t = (path: TranslationPath, defaultValue?: string): string => {
+  const translations = {
+    booking: bookingTranslations[language],
+    common: commonTranslations[language],
+    facility: facilityTranslations[language],
+    error: errorTranslations[language],
+    navigation: navigationTranslations[language],
+    admin: adminTranslations[language]
+  };
+
+  const t: TranslationFunction = (path: TranslationPath, params?: TranslationParams, defaultValue?: string): string => {
     try {
       const pathParts = path.split('.');
       let value: any = null;
 
-      // Check in different translation namespaces
-      if (pathParts[0] === 'booking') {
-        value = bookingTranslations[language];
-        for (let i = 1; i < pathParts.length; i++) {
-          value = value?.[pathParts[i]];
+      // Navigate through nested translation object
+      if (pathParts.length >= 2) {
+        const namespace = pathParts[0];
+        const translationObj = translations[namespace as keyof typeof translations];
+        
+        if (translationObj) {
+          value = translationObj;
+          for (let i = 1; i < pathParts.length; i++) {
+            value = value?.[pathParts[i]];
+          }
         }
-      } else if (pathParts[0] === 'common') {
-        value = commonTranslations[language];
-        for (let i = 1; i < pathParts.length; i++) {
-          value = value?.[pathParts[i]];
-        }
+      }
+
+      // Handle parameter substitution
+      if (typeof value === 'string' && params) {
+        Object.entries(params).forEach(([key, val]) => {
+          value = value.replace(`{${key}}`, String(val));
+        });
       }
 
       return value || defaultValue || path;
@@ -54,6 +75,7 @@ export function useTranslation() {
     return new Intl.DateTimeFormat(language === 'NO' ? 'nb-NO' : 'en-US', {
       hour: '2-digit',
       minute: '2-digit',
+      hour12: false, // Use 24-hour format for Norwegian
     }).format(date);
   };
 
@@ -64,7 +86,20 @@ export function useTranslation() {
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
+      hour12: false,
     }).format(date);
+  };
+
+  const formatNumber = (number: number): string => {
+    return new Intl.NumberFormat(language === 'NO' ? 'nb-NO' : 'en-US').format(number);
+  };
+
+  const formatPercent = (number: number): string => {
+    return new Intl.NumberFormat(language === 'NO' ? 'nb-NO' : 'en-US', {
+      style: 'percent',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 1,
+    }).format(number / 100);
   };
 
   return {
@@ -74,5 +109,7 @@ export function useTranslation() {
     formatDate,
     formatTime,
     formatDateTime,
+    formatNumber,
+    formatPercent,
   };
 }

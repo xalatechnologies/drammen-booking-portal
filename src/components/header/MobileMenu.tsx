@@ -2,10 +2,10 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { LogIn } from "lucide-react";
+import { useTranslation } from "@/i18n";
 
 interface MobileMenuProps {
   isOpen: boolean;
-  language: 'NO' | 'EN';
   isLoggedIn: boolean;
   setLanguage: (lang: 'NO' | 'EN') => void;
   handleLogin: () => void;
@@ -15,27 +15,15 @@ interface MobileMenuProps {
 
 const MobileMenu: React.FC<MobileMenuProps> = ({
   isOpen,
-  language,
   isLoggedIn,
   setLanguage,
   handleLogin,
   handleLogout,
   closeMobileMenu,
 }) => {
+  const { t, language } = useTranslation();
+
   if (!isOpen) return null;
-
-  const translations = {
-    NO: {
-      login: "Logg inn",
-      logout: "Logg ut"
-    },
-    EN: {
-      login: "Log in",
-      logout: "Log out"
-    }
-  };
-
-  const t = translations[language];
 
   return (
     <div className="fixed inset-0 z-50 bg-white lg:hidden pt-16 px-4">
@@ -51,7 +39,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
             }}
           >
             <LogIn className="mr-2 h-5 w-5" />
-            {t.login}
+            {t('common.actions.login', {}, 'Logg inn')}
           </Button>
         ) : (
           <Button 
@@ -63,7 +51,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
             }}
           >
             <LogIn className="mr-2 h-5 w-5" />
-            {t.logout}
+            {t('common.actions.logout', {}, 'Logg ut')}
           </Button>
         )}
         

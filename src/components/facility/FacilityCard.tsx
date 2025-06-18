@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { MapPin, Users } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useTranslation } from "@/i18n";
 
 interface Facility {
   id: number;
@@ -36,6 +37,7 @@ interface FacilityCardProps {
 
 export function FacilityCard({ facility, onAddressClick }: FacilityCardProps) {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   return (
     <Card 
@@ -55,7 +57,7 @@ export function FacilityCard({ facility, onAddressClick }: FacilityCardProps) {
         />
         <div className="absolute top-3 right-3">
           <Badge className="bg-white/90 backdrop-blur-sm text-gray-800 border-0 font-medium px-2.5 py-1 shadow-sm text-sm">
-            {facility.type}
+            {t(`facility.types.${facility.type}`, {}, facility.type)}
           </Badge>
         </div>
         <div className="absolute top-3 left-3">
@@ -76,7 +78,7 @@ export function FacilityCard({ facility, onAddressClick }: FacilityCardProps) {
             <span 
               className="line-clamp-1 hover:text-blue-600 hover:underline cursor-pointer transition-colors"
               onClick={(e) => onAddressClick(e, facility)}
-              title="Klikk for å se på kart"
+              title={t('facility.details.shareText')}
             >
               {facility.address}
             </span>
@@ -93,13 +95,13 @@ export function FacilityCard({ facility, onAddressClick }: FacilityCardProps) {
         {/* Capacity */}
         <div className="flex items-center gap-2 text-base text-gray-600 mb-4">
           <Users className="h-5 w-5 text-gray-500" />
-          <span>Kapasitet: {facility.capacity} personer</span>
+          <span>{t('facility.details.capacity')}: {facility.capacity} personer</span>
         </div>
 
-        {/* Suitable For - Enhanced */}
+        {/* Suitable For */}
         <div className="space-y-3 flex-grow">
           <div className="flex items-center text-gray-700">
-            <span className="font-semibold text-base">Egnet for</span>
+            <span className="font-semibold text-base">{t('facility.details.suitableFor')}</span>
           </div>
           <div className="flex flex-wrap gap-2">
             {facility.suitableFor.slice(0, 3).map((activity, index) => (
@@ -121,10 +123,10 @@ export function FacilityCard({ facility, onAddressClick }: FacilityCardProps) {
           </div>
         </div>
 
-        {/* Next Available - Enhanced */}
+        {/* Next Available */}
         <div className="mt-4 pt-4 border-t border-gray-100">
           <div className="bg-green-50 rounded-lg p-3">
-            <div className="text-sm font-medium text-green-800 mb-1">Neste ledige tid</div>
+            <div className="text-sm font-medium text-green-800 mb-1">{t('facility.details.nextAvailable')}</div>
             <div className="text-lg font-bold text-green-700">{facility.nextAvailable}</div>
           </div>
         </div>

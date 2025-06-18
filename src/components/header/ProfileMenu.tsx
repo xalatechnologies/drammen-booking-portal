@@ -9,38 +9,21 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { User, LogIn } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "@/i18n";
 
 interface ProfileMenuProps {
   isLoggedIn: boolean;
   handleLogin: () => void;
   handleLogout: () => void;
-  language: 'NO' | 'EN';
 }
 
 const ProfileMenu: React.FC<ProfileMenuProps> = ({ 
   isLoggedIn, 
   handleLogin, 
-  handleLogout,
-  language
+  handleLogout
 }) => {
   const navigate = useNavigate();
-
-  const translations = {
-    NO: {
-      login: "Logg inn",
-      profile: "Min profil",
-      settings: "Innstillinger",
-      logout: "Logg ut"
-    },
-    EN: {
-      login: "Log in",
-      profile: "My profile",
-      settings: "Settings",
-      logout: "Log out"
-    }
-  };
-
-  const t = translations[language];
+  const { t } = useTranslation();
 
   if (!isLoggedIn) {
     return (
@@ -50,7 +33,7 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({
         onClick={handleLogin}
       >
         <LogIn className="w-4 h-4" />
-        <span>{t.login}</span>
+        <span>{t('common.actions.login', {}, 'Logg inn')}</span>
       </Button>
     );
   }
@@ -65,13 +48,13 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuItem onClick={() => navigate("/profile")}>
-          {t.profile}
+          {t('common.navigation.profile')}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => navigate("/settings")}>
-          {t.settings}
+          {t('common.navigation.settings')}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={handleLogout}>
-          {t.logout}
+          {t('common.actions.logout', {}, 'Logg ut')}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

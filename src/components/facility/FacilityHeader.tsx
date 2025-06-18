@@ -2,7 +2,7 @@
 import React from "react";
 import { MapPin } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { useLanguage } from "@/contexts/LanguageContext";
+import { useTranslation } from "@/i18n";
 
 interface FacilityHeaderProps {
   name: string;
@@ -16,24 +16,13 @@ export function FacilityHeader({
   name, 
   address
 }: FacilityHeaderProps) {
-  const { language } = useLanguage();
-  
-  const translations = {
-    NO: {
-      sportsCenter: "Idrettsanlegg"
-    },
-    EN: {
-      sportsCenter: "Sports Facility"
-    }
-  };
-
-  const t = translations[language];
+  const { t } = useTranslation();
 
   return (
     <div>
       <div className="flex items-center gap-3 mb-2">
         <Badge variant="outline" className="bg-[#1e3a8a] bg-opacity-10 text-[#1e3a8a] border-[#1e3a8a]">
-          {t.sportsCenter}
+          {t('facility.types.Idrettshall', {}, 'Idrettsanlegg')}
         </Badge>
       </div>
       <h1 className="text-3xl font-bold text-gray-900 mb-3">{name}</h1>
