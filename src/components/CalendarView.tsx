@@ -7,8 +7,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { format, addDays, startOfWeek, addWeeks, subWeeks } from "date-fns";
-import { ChevronLeft, ChevronRight, CalendarDays } from "lucide-react";
+import { ChevronLeft, ChevronRight, Calendar, Clock, Users, MapPin } from "lucide-react";
 import { nb } from "date-fns/locale";
 import { isDateUnavailable, isNorwegianHoliday } from "@/utils/holidaysAndAvailability";
 
@@ -47,6 +48,8 @@ const CalendarView: React.FC<CalendarViewProps> = ({
       type: "sports-hall",
       capacity: 120,
       accessibility: ["wheelchair"],
+      address: "Knoffs gate 8, Drammen",
+      suitableFor: ["Basketball", "Volleyball", "Badminton"],
       bookings: [
         { id: 101, date: new Date(2025, 4, 25, 14, 0), endDate: new Date(2025, 4, 25, 16, 0), status: "confirmed" },
         { id: 102, date: new Date(2025, 4, 26, 10, 0), endDate: new Date(2025, 4, 26, 12, 0), status: "pending" }
@@ -59,6 +62,8 @@ const CalendarView: React.FC<CalendarViewProps> = ({
       type: "gymnasium",
       capacity: 200,
       accessibility: ["wheelchair", "hearing-loop"],
+      address: "Fjellstrand 15, Drammen",
+      suitableFor: ["Fotball", "Håndball", "Turn"],
       bookings: [
         { id: 201, date: new Date(2025, 4, 27, 17, 0), endDate: new Date(2025, 4, 27, 19, 0), status: "confirmed" }
       ]
@@ -70,6 +75,8 @@ const CalendarView: React.FC<CalendarViewProps> = ({
       type: "meeting-room",
       capacity: 30,
       accessibility: ["wheelchair", "hearing-loop", "sign-language"],
+      address: "Engene 1, Drammen",
+      suitableFor: ["Møter", "Presentasjoner", "Workshops"],
       bookings: []
     }
   ];
@@ -92,7 +99,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({
       const bookingDate = new Date(booking.date);
       const bookingEndDate = new Date(booking.endDate);
       const slotStart = new Date(day.setHours(hour, 0, 0, 0));
-      const slotEnd = new Date(day.setHours(hour + 4, 0, 0, 0));
+      const slotEnd = new Date(day.setHours(hour + 2, 0, 0, 0));
       
       return (
         bookingDate.getDate() === day.getDate() &&
@@ -104,196 +111,211 @@ const CalendarView: React.FC<CalendarViewProps> = ({
     });
   };
 
-  const hours = [8, 12, 16, 20];
+  const timeSlots = ["08:00-10:00", "10:00-12:00", "12:00-14:00", "14:00-16:00", "16:00-18:00", "18:00-20:00", "20:00-22:00"];
   
   return (
-    <div className="mb-8">
-      <div className="flex justify-between items-center mb-4">
+    <div className="mb-8 space-y-6">
+      {/* Enhanced Week Navigation */}
+      <div className="flex items-center justify-between p-4 bg-white rounded-lg border shadow-sm">
         <Button 
           variant="outline" 
-          size="sm" 
           onClick={() => setCurrentWeekStart(subWeeks(currentWeekStart, 1))}
+          className="flex items-center gap-2 h-10 px-4"
         >
-          <ChevronLeft className="h-4 w-4 mr-1" />
-          Forrige uke
+          <ChevronLeft className="h-4 w-4" />
+          Forrige
         </Button>
         
-        <div className="flex items-center">
-          <CalendarDays className="h-5 w-5 mr-2 text-blue-600" />
-          <span className="font-medium">
-            Uke {format(currentWeekStart, "w", { locale: nb })}: {format(currentWeekStart, "dd.MM")} - {format(addDays(currentWeekStart, 6), "dd.MM.yyyy")}
+        <div className="flex items-center gap-3 bg-blue-50 px-4 py-2 rounded-lg border border-blue-200">
+          <Calendar className="h-5 w-5 text-blue-600" />
+          <span className="font-semibold text-blue-900">
+            {format(currentWeekStart, "dd.MM", { locale: nb })} - {format(addDays(currentWeekStart, 6), "dd.MM.yyyy", { locale: nb })}
           </span>
         </div>
         
         <Button 
           variant="outline" 
-          size="sm" 
           onClick={() => setCurrentWeekStart(addWeeks(currentWeekStart, 1))}
+          className="flex items-center gap-2 h-10 px-4"
         >
-          Neste uke
-          <ChevronRight className="h-4 w-4 ml-1" />
+          Neste
+          <ChevronRight className="h-4 w-4" />
         </Button>
       </div>
 
-      <Card className="overflow-hidden">
-        <CardHeader className="bg-gray-50 py-3">
-          <CardTitle className="text-lg">Lokale-tilgjengelighet</CardTitle>
+      {/* Enhanced Calendar Grid */}
+      <Card className="shadow-lg border-0">
+        <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4">
+          <CardTitle className="text-xl font-semibold flex items-center gap-2">
+            <Calendar className="h-6 w-6" />
+            Lokaler og tilgjengelighet
+          </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse">
-              <thead>
-                <tr className="bg-gray-50">
-                  <th className="p-2 text-left border-b border-r min-w-[200px]">Lokale</th>
-                  <th className="p-2 text-left border-b border-r min-w-[120px]">Tid</th>
-                  {days.map((day, i) => {
-                    const unavailableCheck = isDateUnavailable(day);
-                    const holidayCheck = isNorwegianHoliday(day);
-                    
-                    let headerClass = "";
-                    if (unavailableCheck.isUnavailable) {
-                      switch (unavailableCheck.reason) {
-                        case 'past':
-                          headerClass = "bg-gray-200 text-gray-600";
-                          break;
-                        case 'weekend':
-                          headerClass = "bg-amber-100 text-amber-800";
-                          break;
-                        case 'holiday':
-                          headerClass = "bg-red-200 text-red-800 font-bold";
-                          break;
-                        case 'maintenance':
-                          headerClass = "bg-yellow-200 text-yellow-800";
-                          break;
-                      }
-                    } else {
-                      headerClass = "bg-green-100 text-green-800";
-                    }
-                    
-                    return (
-                      <th key={i} className={`p-2 text-center border-b min-w-[100px] h-20 ${headerClass}`}>
-                        <div className="flex flex-col justify-center h-full">
-                          <div className="font-medium">{format(day, "EEEE", { locale: nb })}</div>
-                          <div className="text-sm">{format(day, "dd.MM")}</div>
-                          <div className="text-xs mt-1 min-h-[16px]">
-                            {holidayCheck.isHoliday && (
-                              <span className="font-semibold text-red-800">
-                                {holidayCheck.name}
-                              </span>
-                            )}
-                            {unavailableCheck.isUnavailable && !holidayCheck.isHoliday && (
-                              <span>
-                                {unavailableCheck.details}
-                              </span>
-                            )}
+          {filteredFacilities.length === 0 ? (
+            <div className="p-8 text-center text-gray-500">
+              <Calendar className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+              <p className="text-lg font-medium">Ingen lokaler funnet</p>
+              <p className="text-sm">Prøv å justere filtrene dine</p>
+            </div>
+          ) : (
+            <div className="space-y-0">
+              {filteredFacilities.map((facility, facilityIndex) => (
+                <div 
+                  key={facility.id} 
+                  className={`${facilityIndex !== 0 ? 'border-t-2 border-gray-100' : ''}`}
+                >
+                  {/* Facility Header */}
+                  <div className="bg-gray-50 p-4 border-b">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <h3 className="font-bold text-lg text-gray-900 mb-2">{facility.name}</h3>
+                        <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
+                          <div className="flex items-center gap-1">
+                            <MapPin className="h-4 w-4" />
+                            <span>{facility.address}</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Users className="h-4 w-4" />
+                            <span>{facility.capacity} personer</span>
                           </div>
                         </div>
-                      </th>
-                    );
-                  })}
-                </tr>
-              </thead>
-              <tbody>
-                {filteredFacilities.length === 0 ? (
-                  <tr>
-                    <td colSpan={9} className="p-4 text-center text-gray-500">
-                      Ingen lokaler funnet med valgte filtre
-                    </td>
-                  </tr>
-                ) : (
-                  filteredFacilities.map((facility) => (
-                    <React.Fragment key={facility.id}>
-                      {hours.map((hour, hourIndex) => (
-                        <tr key={`${facility.id}-${hour}`} className={hourIndex === 0 ? "border-t-2 border-gray-200" : ""}>
-                          {hourIndex === 0 && (
-                            <td rowSpan={hours.length} className="p-2 border-r align-top">
-                              <div className="font-medium">{facility.name}</div>
-                              <div className="text-sm text-gray-500 mt-1">Kapasitet: {facility.capacity} personer</div>
-                              <div className="flex flex-wrap gap-1 mt-2">
-                                {facility.accessibility.includes("wheelchair") && (
-                                  <span className="px-1.5 py-0.5 bg-blue-100 text-blue-800 rounded-md text-xs">Rullestol</span>
-                                )}
-                                {facility.accessibility.includes("hearing-loop") && (
-                                  <span className="px-1.5 py-0.5 bg-green-100 text-green-800 rounded-md text-xs">Teleslynge</span>
-                                )}
-                              </div>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="mt-2 text-xs w-full"
-                                onClick={() => window.location.href = `/facilities/${facility.id}`}
-                              >
-                                Se detaljer
-                              </Button>
-                            </td>
+                        <div className="flex flex-wrap gap-2">
+                          {facility.suitableFor.slice(0, 3).map((activity, index) => (
+                            <Badge
+                              key={index}
+                              className="bg-blue-100 text-blue-800 border-blue-200 text-xs"
+                            >
+                              {activity}
+                            </Badge>
+                          ))}
+                          {facility.accessibility.includes("wheelchair") && (
+                            <Badge className="bg-green-100 text-green-800 border-green-200 text-xs">
+                              Rullestol
+                            </Badge>
                           )}
+                        </div>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="shrink-0"
+                        onClick={() => window.location.href = `/facilities/${facility.id}`}
+                      >
+                        Se detaljer
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Time Slots Grid */}
+                  <div className="overflow-x-auto">
+                    <div className="min-w-[800px]">
+                      {/* Day Headers */}
+                      <div className="grid grid-cols-8 border-b bg-white">
+                        <div className="p-3 border-r bg-gray-50 flex items-center">
+                          <Clock className="h-4 w-4 mr-2 text-gray-500" />
+                          <span className="font-medium text-gray-700">Tid</span>
+                        </div>
+                        {days.map((day, i) => {
+                          const unavailableCheck = isDateUnavailable(day);
+                          const holidayCheck = isNorwegianHoliday(day);
+                          const isToday = format(day, 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd');
                           
-                          <td className="p-2 border-r text-sm font-medium">
-                            {hour}:00 - {hour + 4}:00
-                          </td>
+                          let headerClass = "p-3 border-r text-center ";
+                          if (isToday) {
+                            headerClass += "bg-blue-100 border-l-4 border-l-blue-500";
+                          } else if (unavailableCheck.isUnavailable) {
+                            switch (unavailableCheck.reason) {
+                              case 'weekend':
+                                headerClass += "bg-amber-50";
+                                break;
+                              case 'holiday':
+                                headerClass += "bg-red-50";
+                                break;
+                              default:
+                                headerClass += "bg-gray-50";
+                            }
+                          } else {
+                            headerClass += "bg-green-50";
+                          }
                           
+                          return (
+                            <div key={i} className={headerClass}>
+                              <div className={`font-medium ${isToday ? 'text-blue-800' : 'text-gray-700'}`}>
+                                {format(day, "EEE", { locale: nb })}
+                              </div>
+                              <div className={`text-sm font-bold ${isToday ? 'text-blue-900' : 'text-gray-900'}`}>
+                                {format(day, "dd.MM", { locale: nb })}
+                              </div>
+                              {holidayCheck.isHoliday && (
+                                <div className="text-xs text-red-600 mt-1" title={holidayCheck.name}>
+                                  {holidayCheck.name?.substring(0, 6)}...
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+
+                      {/* Time Slot Rows */}
+                      {timeSlots.map((timeSlot, timeIndex) => (
+                        <div key={timeSlot} className="grid grid-cols-8 border-b hover:bg-gray-50/50">
+                          <div className="p-3 border-r bg-gray-50 font-medium text-gray-700 flex items-center">
+                            {timeSlot}
+                          </div>
                           {days.map((day, dayIndex) => {
                             const unavailableCheck = isDateUnavailable(new Date(day));
-                            const isBooked = isTimeSlotBooked(facility.id, new Date(day), hour);
+                            const isBooked = isTimeSlotBooked(facility.id, new Date(day), parseInt(timeSlot.split(':')[0]));
                             
+                            let cellClass = "p-3 border-r text-center relative ";
+                            let content = null;
+                            let clickHandler = null;
+
                             if (unavailableCheck.isUnavailable) {
-                              const bgColor = {
-                                'past': 'bg-gray-300',
-                                'weekend': 'bg-amber-200',
-                                'holiday': 'bg-red-300',
-                                'maintenance': 'bg-yellow-200'
-                              }[unavailableCheck.reason!];
-                              
-                              const textColor = {
-                                'past': 'text-gray-700',
-                                'weekend': 'text-amber-800',
-                                'holiday': 'text-red-800',
-                                'maintenance': 'text-yellow-800'
-                              }[unavailableCheck.reason!];
-                              
-                              return (
-                                <td 
-                                  key={dayIndex} 
-                                  className={`p-2 border text-center ${bgColor}`}
-                                  title={unavailableCheck.details}
-                                >
-                                  <span className={`${textColor} font-semibold`}>
-                                    {unavailableCheck.reason === 'past' ? 'Fortid' : 
-                                     unavailableCheck.reason === 'weekend' ? 'Helg' :
-                                     unavailableCheck.reason === 'holiday' ? 'Helligdag' : 'Vedlikehold'}
-                                  </span>
-                                </td>
+                              cellClass += "bg-gray-100";
+                              content = (
+                                <span className="text-gray-500 text-sm font-medium">
+                                  {unavailableCheck.reason === 'past' ? 'Fortid' : 
+                                   unavailableCheck.reason === 'weekend' ? 'Helg' :
+                                   unavailableCheck.reason === 'holiday' ? 'Helligdag' : 'Stengt'}
+                                </span>
                               );
+                            } else if (isBooked) {
+                              cellClass += "bg-red-100";
+                              content = (
+                                <Badge variant="destructive" className="text-xs">
+                                  Opptatt
+                                </Badge>
+                              );
+                            } else {
+                              cellClass += "bg-green-100 hover:bg-green-200 cursor-pointer transition-colors";
+                              content = (
+                                <Badge className="bg-green-600 hover:bg-green-700 text-white text-xs">
+                                  Ledig
+                                </Badge>
+                              );
+                              clickHandler = () => window.location.href = `/facilities/${facility.id}?date=${format(day, 'yyyy-MM-dd')}&time=${timeSlot}`;
                             }
                             
                             return (
-                              <td 
+                              <div 
                                 key={dayIndex} 
-                                className={`p-2 border text-center ${isBooked ? 'bg-red-200' : 'bg-green-100'}`}
+                                className={cellClass}
+                                onClick={clickHandler}
+                                title={unavailableCheck.isUnavailable ? unavailableCheck.details : undefined}
                               >
-                                {isBooked ? (
-                                  <span className="text-red-800 font-bold">Opptatt</span>
-                                ) : (
-                                  <Button 
-                                    variant="ghost" 
-                                    size="sm"
-                                    className="text-green-800 hover:text-green-900 hover:bg-green-200 font-semibold"
-                                    onClick={() => window.location.href = `/facilities/${facility.id}?date=${format(day, 'yyyy-MM-dd')}&time=${hour}:00`}
-                                  >
-                                    Ledig
-                                  </Button>
-                                )}
-                              </td>
+                                {content}
+                              </div>
                             );
                           })}
-                        </tr>
+                        </div>
                       ))}
-                    </React.Fragment>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
