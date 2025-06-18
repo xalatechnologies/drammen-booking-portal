@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
 import Logo from "@/components/header/Logo";
 import LanguageToggle from "@/components/header/LanguageToggle";
-import ThemeToggle from "@/components/header/ThemeToggle";
 import ProfileMenu from "@/components/header/ProfileMenu";
 import MobileMenu from "@/components/header/MobileMenu";
 
@@ -55,11 +54,8 @@ const GlobalHeader = () => {
           <Menu className="h-6 w-6" />
         </Button>
 
-        {/* Right side: Theme toggle, Language toggle & Login/Profile */}
+        {/* Right side: Language toggle & Login/Profile */}
         <div className="hidden lg:flex items-center space-x-2">
-          {/* Theme toggle */}
-          <ThemeToggle />
-          
           {/* Language toggle */}
           <LanguageToggle 
             language={language} 
