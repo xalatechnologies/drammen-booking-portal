@@ -32,13 +32,13 @@ export function FacilityHeader({
   return (
     <div>
       <div className="flex items-center gap-3 mb-2">
-        <Badge variant="outline" className="bg-[#1e3a8a] bg-opacity-10 text-[#1e3a8a] border-[#1e3a8a]">
+        <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 px-3 py-1 rounded-full text-sm font-medium">
           {t.sportsCenter}
         </Badge>
       </div>
-      <h1 className="text-3xl font-bold text-gray-900 mb-3">{name}</h1>
-      <div className="flex items-center text-gray-600 mb-4">
-        <MapPin className="h-5 w-5 mr-2" />
+      <h1 className="text-4xl font-bold text-gray-900 mb-4 leading-tight">{name}</h1>
+      <div className="flex items-center text-gray-600 mb-6">
+        <MapPin className="h-5 w-5 mr-2 text-blue-600" />
         <span>{address}</span>
       </div>
     </div>

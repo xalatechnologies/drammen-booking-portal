@@ -21,7 +21,7 @@ export function CollapsibleFormStepper({
 }: CollapsibleFormStepperProps) {
   return (
     <div className="w-full" role="progressbar" aria-label={ariaLabel} aria-valuemin={0} aria-valuemax={steps.length - 1} aria-valuenow={currentStep}>
-      <div className="flex flex-col md:flex-row gap-1">
+      <div className="flex flex-col md:flex-row gap-2">
         {steps.map((step, index) => {
           const isCompleted = currentStep > index;
           const isCurrent = currentStep === index;
@@ -35,10 +35,10 @@ export function CollapsibleFormStepper({
                 onClick={() => canNavigate && onStepClick(index)}
                 disabled={!canNavigate}
                 className={cn(
-                  "w-full justify-start gap-3 px-4 py-3 h-auto font-medium text-sm transition-all duration-200 rounded-lg",
-                  isCurrent && "bg-slate-800 border-2 border-slate-800 text-white shadow-sm",
-                  isCompleted && "bg-green-50 border border-green-200 text-green-800 hover:bg-green-100",
-                  !isCurrent && !isCompleted && "bg-gray-50 border border-gray-200 text-gray-700 hover:bg-gray-100",
+                  "w-full justify-start gap-3 px-5 py-4 h-auto font-medium text-base transition-all duration-300 rounded-xl",
+                  isCurrent && "bg-blue-600 border-2 border-blue-600 text-white shadow-lg",
+                  isCompleted && "bg-green-50 border-2 border-green-200 text-green-800 hover:bg-green-100",
+                  !isCurrent && !isCompleted && "bg-gray-50 border-2 border-gray-200 text-gray-700 hover:bg-gray-100",
                   !canNavigate && "cursor-not-allowed opacity-60"
                 )}
                 role="tab"
@@ -48,16 +48,16 @@ export function CollapsibleFormStepper({
                 {/* Step Indicator */}
                 <div 
                   className={cn(
-                    "flex items-center justify-center w-7 h-7 rounded-full border-2 flex-shrink-0 transition-all duration-200 font-bold text-sm",
+                    "flex items-center justify-center w-8 h-8 rounded-full border-2 flex-shrink-0 transition-all duration-300 font-bold text-sm",
                     isCompleted 
-                      ? "bg-green-600 border-green-600 text-white" 
+                      ? "bg-green-600 border-green-600 text-white shadow-md" 
                       : isCurrent 
-                        ? "bg-white border-white text-slate-800"
-                        : "bg-white border-gray-300 text-gray-500"
+                        ? "bg-white border-white text-blue-600"
+                        : "bg-white border-gray-300 text-gray-600"
                   )}
                 >
                   {isCompleted ? (
-                    <CheckCircle className="h-4 w-4" aria-hidden="true" />
+                    <CheckCircle className="h-5 w-5" aria-hidden="true" />
                   ) : (
                     <span aria-hidden="true">
                       {index + 1}
@@ -68,7 +68,7 @@ export function CollapsibleFormStepper({
                 {/* Step Title */}
                 <span 
                   className={cn(
-                    "flex-1 text-left font-semibold text-sm leading-tight",
+                    "flex-1 text-left font-semibold text-base leading-tight",
                     isCurrent 
                       ? "text-white" 
                       : isCompleted 
@@ -82,10 +82,10 @@ export function CollapsibleFormStepper({
                 {/* Status Indicator - Only show on mobile or when active */}
                 <div className="md:hidden">
                   {isCurrent && (
-                    <ChevronDown className="h-4 w-4 text-white" aria-hidden="true" />
+                    <ChevronDown className="h-5 w-5 text-white" aria-hidden="true" />
                   )}
                   {!isCurrent && (
-                    <ChevronRight className="h-4 w-4 text-gray-400" aria-hidden="true" />
+                    <ChevronRight className="h-5 w-5 text-gray-400" aria-hidden="true" />
                   )}
                 </div>
               </Button>

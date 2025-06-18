@@ -169,9 +169,9 @@ export function EnhancedBookingForm({
   };
 
   return (
-    <div className="bg-white shadow-sm border border-gray-200 rounded-lg overflow-hidden" role="main" aria-label="Booking form">
+    <div className="bg-white shadow-lg border border-gray-100 rounded-xl overflow-hidden" role="main" aria-label="Booking form">
       {/* Clean Header */}
-      <div className="bg-gradient-to-r from-slate-50 to-white px-6 py-4 border-b border-gray-200">
+      <div className="bg-gradient-to-r from-blue-50 to-white px-8 py-6 border-b border-gray-100">
         <CollapsibleFormStepper 
           currentStep={currentStep} 
           steps={stepTitles} 
@@ -184,14 +184,14 @@ export function EnhancedBookingForm({
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
           {/* Form Content */}
-          <div className="px-6 py-6">
+          <div className="px-8 py-8">
             <div className="min-h-[400px]" role="tabpanel" aria-labelledby="form-title">
               {renderCurrentStep()}
             </div>
           </div>
           
           {/* Navigation Footer */}
-          <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
+          <div className="px-8 py-6 bg-gray-50 border-t border-gray-100">
             <BookingFormNav 
               currentStep={currentStep} 
               isFirstStep={isFirstStep} 

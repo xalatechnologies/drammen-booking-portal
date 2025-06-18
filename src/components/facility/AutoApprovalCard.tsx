@@ -29,21 +29,21 @@ export function AutoApprovalCard({ hasAutoApproval }: AutoApprovalCardProps) {
   const t = translations[language];
   
   return (
-    <Card className="shadow-sm">
-      <CardContent className="p-4">
+    <Card className="shadow-md rounded-xl border-gray-100 overflow-hidden">
+      <CardContent className="p-5">
         <div className="flex items-center gap-3">
-          <div className={`p-2 rounded-md ${hasAutoApproval ? 'bg-green-100' : 'bg-amber-100'}`}>
+          <div className={`p-3 rounded-xl ${hasAutoApproval ? 'bg-green-100' : 'bg-amber-100'}`}>
             {hasAutoApproval ? (
-              <CheckCircle className="h-5 w-5 text-green-600" />
+              <CheckCircle className="h-6 w-6 text-green-600" />
             ) : (
-              <Clock className="h-5 w-5 text-amber-600" />
+              <Clock className="h-6 w-6 text-amber-600" />
             )}
           </div>
           <div>
-            <h3 className="font-medium">
+            <h3 className="font-semibold text-lg">
               {hasAutoApproval ? t.autoApproval : t.manualApproval}
             </h3>
-            <p className="text-sm text-gray-600">
+            <p className="text-base text-gray-600">
               {hasAutoApproval ? t.autoDescription : t.manualDescription}
             </p>
           </div>

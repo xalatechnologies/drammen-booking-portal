@@ -64,10 +64,10 @@ const FilterSelects: React.FC<FilterSelectsProps> = ({
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
       <div>
         <Select value={facilityType || "all"} onValueChange={setFacilityType}>
-          <SelectTrigger className="h-10 border-gray-200 hover:border-blue-500">
+          <SelectTrigger className="h-12 border-2 border-gray-200 hover:border-blue-600 focus:border-blue-600 focus:ring-blue-100 rounded-full text-base shadow-sm transition-all duration-200">
             <SelectValue placeholder="Type lokale" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="rounded-lg border-gray-200 shadow-lg">
             <SelectItem value="all">Type lokale</SelectItem>
             <SelectItem value="sports-hall">Idrettshall</SelectItem>
             <SelectItem value="gymnasium">Gymsal</SelectItem>
@@ -81,10 +81,10 @@ const FilterSelects: React.FC<FilterSelectsProps> = ({
 
       <div>
         <Select value={location || "all"} onValueChange={setLocation}>
-          <SelectTrigger className="h-10 border-gray-200 hover:border-blue-500">
+          <SelectTrigger className="h-12 border-2 border-gray-200 hover:border-blue-600 focus:border-blue-600 focus:ring-blue-100 rounded-full text-base shadow-sm transition-all duration-200">
             <SelectValue placeholder="Område" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="rounded-lg border-gray-200 shadow-lg">
             <SelectItem value="all">Område</SelectItem>
             <SelectItem value="drammen-sentrum">Drammen sentrum</SelectItem>
             <SelectItem value="konnerud">Konnerud</SelectItem>
@@ -97,10 +97,10 @@ const FilterSelects: React.FC<FilterSelectsProps> = ({
 
       <div>
         <Select value={accessibility || "all"} onValueChange={setAccessibility}>
-          <SelectTrigger className="h-10 border-gray-200 hover:border-blue-500">
+          <SelectTrigger className="h-12 border-2 border-gray-200 hover:border-blue-600 focus:border-blue-600 focus:ring-blue-100 rounded-full text-base shadow-sm transition-all duration-200">
             <SelectValue placeholder="Tilgjengelighet" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="rounded-lg border-gray-200 shadow-lg">
             <SelectItem value="all">Tilgjengelighet</SelectItem>
             <SelectItem value="wheelchair">Rullestoltilpasset</SelectItem>
             <SelectItem value="hearing-loop">Teleslynge</SelectItem>
@@ -111,10 +111,10 @@ const FilterSelects: React.FC<FilterSelectsProps> = ({
 
       <div>
         <Select value={getCapacityValue()} onValueChange={handleCapacityChange}>
-          <SelectTrigger className="h-10 border-gray-200 hover:border-blue-500">
+          <SelectTrigger className="h-12 border-2 border-gray-200 hover:border-blue-600 focus:border-blue-600 focus:ring-blue-100 rounded-full text-base shadow-sm transition-all duration-200">
             <SelectValue placeholder="Kapasitet" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="rounded-lg border-gray-200 shadow-lg">
             <SelectItem value="all">Kapasitet</SelectItem>
             <SelectItem value="1-50">1-50 personer</SelectItem>
             <SelectItem value="51-100">51-100 personer</SelectItem>

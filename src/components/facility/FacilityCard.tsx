@@ -40,39 +40,43 @@ export function FacilityCard({ facility, onAddressClick }: FacilityCardProps) {
 
   return (
     <Card 
-      className="overflow-hidden hover:shadow-lg transition-all duration-200 hover:translate-y-[-2px] group border border-gray-200 flex flex-col cursor-pointer"
+      className="overflow-hidden hover:shadow-xl transition-all duration-300 hover:translate-y-[-3px] group border border-gray-100 flex flex-col cursor-pointer rounded-xl"
       onClick={() => navigate(`/facilities/${facility.id}`)}
     >
-      <div className="h-48 bg-gray-200 relative overflow-hidden">
+      <div className="h-56 bg-gray-200 relative overflow-hidden">
         <img 
           src={facility.image} 
           alt={facility.name} 
-          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
           onError={(e) => {
             const target = e.target as HTMLImageElement;
             target.src = "https://images.unsplash.com/photo-1525361147853-4bf9f54a0e98?w=600&auto=format&fit=crop";
             target.onerror = null;
           }}
         />
-        <div className="absolute top-3 right-3">
-          <Badge className="bg-white/90 backdrop-blur-sm text-gray-800 border-0 font-medium px-2.5 py-1 shadow-sm text-sm">
+        <div className="absolute top-4 right-4">
+          <Badge className="bg-white/95 backdrop-blur-sm text-gray-800 border-0 font-semibold px-3 py-1.5 shadow-md text-sm rounded-full">
             {facility.type}
           </Badge>
         </div>
-        <div className="absolute top-3 left-3">
-          <Badge variant="outline" className="bg-white/90 backdrop-blur-sm text-gray-700 border-gray-200 font-medium px-2.5 py-1 shadow-sm text-sm">
+        <div className="absolute top-4 left-4">
+          <Badge variant="outline" className="bg-white/95 backdrop-blur-sm text-gray-700 border-gray-200 font-medium px-3 py-1.5 shadow-md text-sm rounded-full">
             {facility.area}
           </Badge>
         </div>
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent h-20"></div>
+        <div className="absolute bottom-4 left-4 right-4">
+          <p className="text-white font-medium text-sm">Neste ledig: {facility.nextAvailable}</p>
+        </div>
       </div>
       
-      <CardContent className="p-4 flex flex-col flex-grow">
-        <div className="mb-3">
-          <h3 className="font-bold text-xl mb-2 text-gray-900 line-clamp-1">{facility.name}</h3>
-          <div className="flex items-start gap-1.5 text-base text-gray-600">
-            <MapPin className="h-5 w-5 text-gray-500 shrink-0 mt-0.5" />
+      <CardContent className="p-5 flex flex-col flex-grow">
+        <div className="mb-4">
+          <h3 className="font-bold text-xl mb-3 text-gray-900 line-clamp-1 group-hover:text-blue-700 transition-colors">{facility.name}</h3>
+          <div className="flex items-start gap-2 text-base text-gray-600">
+            <MapPin className="h-5 w-5 text-blue-600 shrink-0 mt-0.5" />
             <span 
-              className="line-clamp-1 hover:text-blue-600 hover:underline cursor-pointer transition-colors"
+              className="line-clamp-1 hover:text-blue-700 hover:underline cursor-pointer transition-colors"
               onClick={(e) => onAddressClick(e, facility)}
               title="Klikk for å se på kart"
             >

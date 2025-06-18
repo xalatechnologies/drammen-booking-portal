@@ -69,42 +69,45 @@ export function FacilityCardTabs({ facility }: FacilityCardTabsProps) {
 
   return (
     <div onClick={handleTabsClick}>
-      <Tabs defaultValue="overview" className="flex-grow">
-        <TabsList className="grid w-full grid-cols-2 mb-3 h-10">
-          <TabsTrigger value="overview" className="text-sm py-2">{t.overview}</TabsTrigger>
-          <TabsTrigger value="details" className="text-sm py-2">{t.details}</TabsTrigger>
+      <Tabs defaultValue="overview" className="flex-grow mt-2">
+        <TabsList className="grid w-full grid-cols-2 mb-4 h-10 bg-gray-50 p-1 rounded-full">
+          <TabsTrigger value="overview" className="text-sm py-2 rounded-full data-[state=active]:bg-white data-[state=active]:text-blue-700 data-[state=active]:shadow-sm">{t.overview}</TabsTrigger>
+          <TabsTrigger value="details" className="text-sm py-2 rounded-full data-[state=active]:bg-white data-[state=active]:text-blue-700 data-[state=active]:shadow-sm">{t.details}</TabsTrigger>
         </TabsList>
         
-        <TabsContent value="overview" className="space-y-3 mt-0">
-          <div className="flex items-center gap-1.5 text-base text-gray-600">
-            <Users className="h-5 w-5 text-gray-500" />
-            <span>{t.capacity}: {facility.capacity} {t.people}</span>
+        <TabsContent value="overview" className="space-y-4 mt-0">
+          <div className="flex items-center gap-2 text-base text-gray-700">
+            <Users className="h-5 w-5 text-blue-600" />
+            <span className="font-medium">{t.capacity}: <span className="text-gray-900">{facility.capacity} {t.people}</span></span>
           </div>
 
-          <div className="text-base text-gray-700">
-            <p className="line-clamp-2 leading-relaxed">{facility.description}</p>
+          <div className="text-base text-gray-700 bg-gray-50 p-3 rounded-lg">
+            <p className="line-clamp-2 leading-relaxed text-gray-700">{facility.description}</p>
           </div>
         </TabsContent>
         
-        <TabsContent value="details" className="space-y-3 mt-0">
+        <TabsContent value="details" className="space-y-4 mt-0">
           <div>
-            <h4 className="text-base font-medium mb-2 text-gray-900">{t.accessibility}</h4>
+            <h4 className="text-base font-medium mb-2 text-gray-900 flex items-center gap-2">
+              <span className="w-1.5 h-1.5 bg-blue-600 rounded-full"></span>
+              {t.accessibility}
+            </h4>
             <AccessibilityBadges accessibility={facility.accessibility} />
           </div>
 
           <div>
-            <h4 className="text-base font-medium mb-2 flex items-center gap-1.5 text-gray-900">
-              <Wrench className="h-5 w-5 text-[#1e3a8a]" />
+            <h4 className="text-base font-medium mb-2 flex items-center gap-2 text-gray-900">
+              <span className="w-1.5 h-1.5 bg-blue-600 rounded-full"></span>
               <span>{t.equipment}</span>
             </h4>
             <div className="flex flex-wrap gap-1.5">
               {facility.equipment.slice(0, 4).map((item, i) => (
-                <Badge key={i} variant="outline" className="bg-[#1e3a8a] bg-opacity-10 text-[#1e3a8a] border-[#1e3a8a] text-sm py-1 px-2">
+                <Badge key={i} variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 text-sm py-1 px-2.5 rounded-full">
                   {item}
                 </Badge>
               ))}
               {facility.equipment.length > 4 && (
-                <Badge variant="outline" className="bg-[#1e3a8a] bg-opacity-10 text-[#1e3a8a] border-[#1e3a8a] text-sm py-1 px-2">
+                <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 text-sm py-1 px-2.5 rounded-full">
                   +{facility.equipment.length - 4} {t.more}
                 </Badge>
               )}

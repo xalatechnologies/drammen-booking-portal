@@ -32,54 +32,54 @@ const ActiveFilters: React.FC<ActiveFiltersProps> = ({
   setCapacity,
 }) => {
   return (
-    <div className="flex flex-wrap gap-2 pt-4 mt-4 border-t border-gray-100">
+    <div className="flex flex-wrap gap-2 pt-5 mt-5 border-t border-gray-100">
       {dateRange?.from && (
-        <Badge variant="secondary" className="flex items-center bg-blue-50 text-blue-700 border-blue-200">
-          <CalendarIcon className="h-3 w-3 mr-1" />
+        <Badge variant="secondary" className="flex items-center bg-blue-50 text-blue-700 border-blue-200 px-3 py-1.5 rounded-full text-sm">
+          <CalendarIcon className="h-3.5 w-3.5 mr-1.5" />
           {dateRange.to 
             ? `${format(dateRange.from, "dd.MM", { locale: nb })} - ${format(dateRange.to, "dd.MM.yy", { locale: nb })}`
             : format(dateRange.from, "dd.MM.yyyy", { locale: nb })
           }
           <X 
-            className="h-3 w-3 ml-1 cursor-pointer hover:text-red-600" 
+            className="h-3.5 w-3.5 ml-2 cursor-pointer hover:text-red-600 transition-colors duration-200" 
             onClick={() => setDateRange(undefined)}
           />
         </Badge>
       )}
       {facilityType && facilityType !== "all" && (
-        <Badge variant="secondary" className="flex items-center bg-green-50 text-green-700 border-green-200">
+        <Badge variant="secondary" className="flex items-center bg-green-50 text-green-700 border-green-200 px-3 py-1.5 rounded-full text-sm">
           {facilityType}
           <X 
-            className="h-3 w-3 ml-1 cursor-pointer hover:text-red-600" 
+            className="h-3.5 w-3.5 ml-2 cursor-pointer hover:text-red-600 transition-colors duration-200" 
             onClick={() => setFacilityType("all")}
           />
         </Badge>
       )}
       {location && location !== "all" && (
-        <Badge variant="secondary" className="flex items-center bg-purple-50 text-purple-700 border-purple-200">
-          <MapPin className="h-3 w-3 mr-1" />
+        <Badge variant="secondary" className="flex items-center bg-purple-50 text-purple-700 border-purple-200 px-3 py-1.5 rounded-full text-sm">
+          <MapPin className="h-3.5 w-3.5 mr-1.5" />
           {location}
           <X 
-            className="h-3 w-3 ml-1 cursor-pointer hover:text-red-600" 
+            className="h-3.5 w-3.5 ml-2 cursor-pointer hover:text-red-600 transition-colors duration-200" 
             onClick={() => setLocation("all")}
           />
         </Badge>
       )}
       {accessibility && accessibility !== "all" && (
-        <Badge variant="secondary" className="flex items-center bg-orange-50 text-orange-700 border-orange-200">
+        <Badge variant="secondary" className="flex items-center bg-orange-50 text-orange-700 border-orange-200 px-3 py-1.5 rounded-full text-sm">
           {accessibility}
           <X 
-            className="h-3 w-3 ml-1 cursor-pointer hover:text-red-600" 
+            className="h-3.5 w-3.5 ml-2 cursor-pointer hover:text-red-600 transition-colors duration-200" 
             onClick={() => setAccessibility("all")}
           />
         </Badge>
       )}
       {(capacity[0] > 0 || capacity[1] < 200) && (
-        <Badge variant="secondary" className="flex items-center bg-gray-50 text-gray-700 border-gray-200">
-          <Users className="h-3 w-3 mr-1" />
+        <Badge variant="secondary" className="flex items-center bg-gray-50 text-gray-700 border-gray-200 px-3 py-1.5 rounded-full text-sm">
+          <Users className="h-3.5 w-3.5 mr-1.5" />
           {capacity[0]} - {capacity[1]} personer
           <X 
-            className="h-3 w-3 ml-1 cursor-pointer hover:text-red-600" 
+            className="h-3.5 w-3.5 ml-2 cursor-pointer hover:text-red-600 transition-colors duration-200" 
             onClick={() => setCapacity([0, 200])}
           />
         </Badge>

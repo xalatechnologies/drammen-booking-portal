@@ -32,7 +32,7 @@ export function BookingFormNav({
           variant="outline" 
           onClick={onPreviousStep} 
           disabled={isSubmitting}
-          className="gap-2 border-gray-300 hover:bg-gray-50 focus:ring-2 focus:ring-slate-700 focus:ring-offset-2 h-11 px-6 text-base font-medium"
+          className="gap-2 border-gray-300 hover:bg-gray-50 focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 h-12 px-6 text-base font-medium rounded-xl"
           aria-label="Go to previous step"
         >
           <ChevronLeft className="h-5 w-5" aria-hidden="true" />
@@ -45,7 +45,7 @@ export function BookingFormNav({
       <Button 
         type={isLastStep ? "submit" : "button"}
         onClick={isLastStep ? undefined : onNextStep}
-        className="bg-slate-700 hover:bg-slate-800 focus:ring-2 focus:ring-slate-700 focus:ring-offset-2 gap-2 min-w-[140px] h-11 px-8 text-base font-semibold"
+        className="bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 gap-2 min-w-[140px] h-12 px-8 text-base font-semibold rounded-xl shadow-lg shadow-blue-200/50"
         disabled={isSubmitting || (isLastStep && isSubmitDisabled) || !canContinue}
         aria-label={isLastStep ? "Submit booking" : "Go to next step"}
       >

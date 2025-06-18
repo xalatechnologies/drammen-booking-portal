@@ -56,25 +56,25 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
   const hasActiveFilters = date || dateRange || (facilityType && facilityType !== "all") || (location && location !== "all") || (accessibility && accessibility !== "all") || capacity[0] > 0 || capacity[1] < 200 || searchTerm;
 
   return (
-    <div className="mb-6">
-      <Card className="border-0 shadow-sm bg-white/80 backdrop-blur-sm">
-        <CardContent className="p-6">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
-            <div className="lg:col-span-2">
+    <div className="mb-8">
+      <Card className="border-0 shadow-lg bg-white/90 backdrop-blur-sm rounded-2xl">
+        <CardContent className="p-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-center">
+            <div className="lg:col-span-3">
               <SearchInput 
                 searchTerm={searchTerm}
                 setSearchTerm={setSearchTerm}
               />
             </div>
 
-            <div className="lg:col-span-2">
+            <div className="lg:col-span-3">
               <DateRangePicker 
                 dateRange={dateRange}
                 setDateRange={setDateRange}
               />
             </div>
 
-            <div className="lg:col-span-6">
+            <div className="lg:col-span-4">
               <FilterSelects 
                 facilityType={facilityType}
                 setFacilityType={setFacilityType}
@@ -87,7 +87,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
               />
             </div>
 
-            <div className="lg:col-span-2 flex justify-center">
+            <div className="lg:col-span-2 flex justify-end">
               <ViewModeToggle 
                 viewMode={viewMode}
                 setViewMode={setViewMode}
@@ -95,13 +95,13 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
             </div>
           </div>
 
-          <div className="flex justify-end">
+          <div className="flex justify-end mt-2">
             {hasActiveFilters && (
               <Button 
                 variant="ghost" 
                 size="sm" 
                 onClick={clearFilters} 
-                className="h-10 w-10 p-0 hover:bg-red-50 hover:text-red-600"
+                className="h-10 w-10 p-0 hover:bg-red-50 hover:text-red-600 rounded-full transition-all duration-200"
               >
                 <X className="h-4 w-4" />
               </Button>
