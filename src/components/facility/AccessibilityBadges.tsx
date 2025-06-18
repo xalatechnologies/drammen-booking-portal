@@ -9,13 +9,13 @@ interface AccessibilityBadgesProps {
 
 export function AccessibilityBadges({ accessibility }: AccessibilityBadgesProps) {
   const badges = {
-    "wheelchair": { label: "Rullestol", color: "bg-navy-50 text-navy-700 border-navy-200" },
-    "hearing-loop": { label: "Teleslynge", color: "bg-green-50 text-green-700 border-green-200" },
-    "sign-language": { label: "Tegnspråk", color: "bg-purple-50 text-purple-700 border-purple-200" }
+    "wheelchair": { label: "Rullestol", className: "badge-primary" },
+    "hearing-loop": { label: "Teleslynge", className: "badge-success" },
+    "sign-language": { label: "Tegnspråk", className: "badge-secondary" }
   };
   
   return (
-    <div className="flex flex-wrap gap-1.5">
+    <div className="flex flex-wrap gap-xs">
       {accessibility.map((feature) => {
         const badge = badges[feature as keyof typeof badges];
         if (!badge) return null;
@@ -24,7 +24,7 @@ export function AccessibilityBadges({ accessibility }: AccessibilityBadgesProps)
           <Badge 
             key={feature} 
             variant="outline" 
-            className={cn("text-xs font-medium py-1 px-2 rounded-md", badge.color)}
+            className={cn("text-xs font-medium py-xs px-sm rounded-md", badge.className)}
           >
             {badge.label}
           </Badge>

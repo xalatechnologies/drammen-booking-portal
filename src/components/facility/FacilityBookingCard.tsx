@@ -31,42 +31,42 @@ export function FacilityBookingCard({ facility, onBookClick }: FacilityBookingCa
   return (
     <>
       {/* Action buttons */}
-      <div className="flex items-center justify-end gap-2 mb-4">
+      <div className="flex items-center justify-end gap-sm mb-lg">
         <Button
           variant="ghost"
           size="sm"
-          className="flex items-center gap-2 hover:bg-purple-50"
+          className="btn-ghost"
           onClick={() => setIsFavorited(!isFavorited)}
         >
-          <Heart className={`h-4 w-4 ${isFavorited ? 'fill-red-500 text-red-500' : 'text-navy-500'}`} />
+          <Heart className={`h-4 w-4 ${isFavorited ? 'fill-semantic-error text-semantic-error' : 'text-text-secondary'}`} />
         </Button>
         <Button 
           variant="ghost" 
           size="sm"
-          className="hover:bg-purple-50"
+          className="btn-ghost"
           onClick={handleShare}
         >
-          <Share2 className="h-4 w-4 text-navy-500" />
+          <Share2 className="h-4 w-4 text-text-secondary" />
         </Button>
       </div>
 
       {/* Price Card */}
-      <Card className="mb-6 glass border-0 shadow-medium bg-white/95 backdrop-blur-lg">
-        <CardContent className="p-6">
-          <div className="text-center mb-4">
-            <div className="text-3xl font-bold text-navy-900">{facility.pricePerHour} kr</div>
-            <div className="text-navy-500">per time</div>
+      <Card className="card-glass mb-lg">
+        <CardContent className="p-lg">
+          <div className="text-center mb-lg">
+            <div className="text-3xl font-bold text-text-primary">{facility.pricePerHour} kr</div>
+            <div className="text-text-secondary">per time</div>
           </div>
           
-          <div className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg mb-4 text-center border border-green-100">
-            <p className="text-green-800 text-sm">
+          <div className="p-lg bg-semantic-success/10 rounded-lg mb-lg text-center border border-semantic-success/20">
+            <p className="text-semantic-success-dark text-sm">
               <CheckCircle className="inline h-4 w-4 mr-1" />
               Tilgjengelig for umiddelbar booking
             </p>
           </div>
 
           <Button 
-            className="w-full bg-gradient-to-r from-purple-600 to-navy-600 hover:from-purple-700 hover:to-navy-700 text-white font-medium shadow-medium h-12 transition-all duration-200"
+            className="btn-primary w-full h-12"
             onClick={onBookClick}
           >
             Reserver nå
@@ -75,15 +75,15 @@ export function FacilityBookingCard({ facility, onBookClick }: FacilityBookingCa
       </Card>
       
       {/* Additional info cards */}
-      <Card className="mb-6 glass border-0 shadow-soft bg-white/90 backdrop-blur-sm">
-        <CardContent className="p-4">
-          <div className="flex items-center gap-3">
-            <div className="bg-orange-100 p-2 rounded-md">
-              <Info className="h-5 w-5 text-orange-600" />
+      <Card className="card-primary mb-lg">
+        <CardContent className="p-lg">
+          <div className="flex items-center gap-md">
+            <div className="bg-semantic-warning/10 p-sm rounded-md">
+              <Info className="h-5 w-5 text-semantic-warning" />
             </div>
             <div>
-              <h3 className="font-medium text-navy-900">Avbestilling</h3>
-              <p className="text-sm text-navy-600">
+              <h3 className="heading-secondary text-text-primary">Avbestilling</h3>
+              <p className="body-secondary text-sm">
                 Gratis avbestilling inntil 48 timer før
               </p>
             </div>
@@ -91,15 +91,15 @@ export function FacilityBookingCard({ facility, onBookClick }: FacilityBookingCa
         </CardContent>
       </Card>
       
-      <Card className="glass border-0 shadow-soft bg-white/90 backdrop-blur-sm">
-        <CardContent className="p-4">
-          <div className="flex items-center gap-3">
-            <div className="bg-purple-100 p-2 rounded-md">
-              <Clock className="h-5 w-5 text-purple-600" />
+      <Card className="card-primary">
+        <CardContent className="p-lg">
+          <div className="flex items-center gap-md">
+            <div className="bg-brand-accent/10 p-sm rounded-md">
+              <Clock className="h-5 w-5 text-brand-accent" />
             </div>
             <div>
-              <h3 className="font-medium text-navy-900">Åpningstider</h3>
-              <p className="text-sm text-navy-600">
+              <h3 className="heading-secondary text-text-primary">Åpningstider</h3>
+              <p className="body-secondary text-sm">
                 {facility.openingHours}
               </p>
             </div>

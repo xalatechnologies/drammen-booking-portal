@@ -1,0 +1,155 @@
+
+/* Design Tokens - Global Color System */
+:root {
+  /* Primary Brand Colors */
+  --color-primary: #1B254B;
+  --color-primary-light: #24388a;
+  --color-primary-dark: #0b1437;
+  
+  /* Secondary Colors */
+  --color-secondary: #4318FF;
+  --color-secondary-light: #7551FF;
+  --color-secondary-dark: #3311DB;
+  
+  /* Accent Colors */
+  --color-accent: #a855f7;
+  --color-accent-light: #c084fc;
+  --color-accent-dark: #7928ca;
+  
+  /* Neutral Colors */
+  --color-neutral-50: #F5F6FA;
+  --color-neutral-100: #EEF0F6;
+  --color-neutral-200: #DADEEC;
+  --color-neutral-300: #C9D0E3;
+  --color-neutral-400: #B0BBD5;
+  --color-neutral-500: #A3AED0;
+  --color-neutral-600: #707eae;
+  --color-neutral-700: #2D396B;
+  --color-neutral-800: #1B2559;
+  --color-neutral-900: #0b1437;
+  
+  /* Semantic Colors */
+  --color-success: #22c55e;
+  --color-success-light: #4ade80;
+  --color-success-dark: #15803d;
+  
+  --color-warning: #f59e0b;
+  --color-warning-light: #fbbf24;
+  --color-warning-dark: #d97706;
+  
+  --color-error: #ef4444;
+  --color-error-light: #f87171;
+  --color-error-dark: #dc2626;
+  
+  --color-info: #3b82f6;
+  --color-info-light: #60a5fa;
+  --color-info-dark: #2563eb;
+  
+  /* Surface Colors */
+  --color-surface-primary: #ffffff;
+  --color-surface-secondary: #F4F7FE;
+  --color-surface-tertiary: #F5F6FA;
+  
+  /* Text Colors */
+  --color-text-primary: #1B254B;
+  --color-text-secondary: #707eae;
+  --color-text-tertiary: #A3AED0;
+  --color-text-inverse: #ffffff;
+  
+  /* Border Colors */
+  --color-border-primary: #E2E8F0;
+  --color-border-secondary: #CBD5E1;
+  --color-border-focus: #4318FF;
+  
+  /* Shadow Colors */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+  
+  /* Gradients */
+  --gradient-primary: linear-gradient(135deg, #4318FF 0%, #1B254B 100%);
+  --gradient-secondary: linear-gradient(135deg, #7551FF 0%, #4318FF 100%);
+  --gradient-accent: linear-gradient(135deg, #a855f7 0%, #4318FF 100%);
+  --gradient-surface: linear-gradient(135deg, #F4F7FE 0%, #ffffff 100%);
+  
+  /* Spacing Scale */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+  --spacing-3xl: 4rem;
+  
+  /* Border Radius */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --radius-full: 9999px;
+  
+  /* Typography Scale */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+  
+  /* Line Heights */
+  --leading-tight: 1.25;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.625;
+  
+  /* Font Weights */
+  --font-normal: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+}
+
+/* Dark Mode Variables */
+.dark {
+  --color-surface-primary: #0F172A;
+  --color-surface-secondary: #1E293B;
+  --color-surface-tertiary: #334155;
+  
+  --color-text-primary: #F8FAFC;
+  --color-text-secondary: #CBD5E1;
+  --color-text-tertiary: #64748B;
+  
+  --color-border-primary: #334155;
+  --color-border-secondary: #475569;
+}
+
+/* Utility Classes for Design Tokens */
+.surface-primary { background-color: var(--color-surface-primary); }
+.surface-secondary { background-color: var(--color-surface-secondary); }
+.surface-tertiary { background-color: var(--color-surface-tertiary); }
+
+.text-primary { color: var(--color-text-primary); }
+.text-secondary { color: var(--color-text-secondary); }
+.text-tertiary { color: var(--color-text-tertiary); }
+.text-inverse { color: var(--color-text-inverse); }
+
+.border-primary { border-color: var(--color-border-primary); }
+.border-secondary { border-color: var(--color-border-secondary); }
+.border-focus { border-color: var(--color-border-focus); }
+
+.gradient-primary { background: var(--gradient-primary); }
+.gradient-secondary { background: var(--gradient-secondary); }
+.gradient-accent { background: var(--gradient-accent); }
+.gradient-surface { background: var(--gradient-surface); }
+
+.shadow-glass { box-shadow: var(--shadow-glass); }
+
+.glass-effect {
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}

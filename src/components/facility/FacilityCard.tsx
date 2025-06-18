@@ -40,10 +40,10 @@ export function FacilityCard({ facility, onAddressClick }: FacilityCardProps) {
 
   return (
     <Card 
-      className="overflow-hidden hover:shadow-strong transition-all duration-300 hover:translate-y-[-2px] group glass border-0 flex flex-col cursor-pointer hover-lift bg-white/95 backdrop-blur-lg"
+      className="card-primary hover-lift cursor-pointer group overflow-hidden"
       onClick={() => navigate(`/facilities/${facility.id}`)}
     >
-      <div className="h-48 bg-gradient-to-br from-navy-50 to-purple-50 relative overflow-hidden">
+      <div className="h-48 gradient-surface relative overflow-hidden">
         <img 
           src={facility.image} 
           alt={facility.name} 
@@ -55,24 +55,24 @@ export function FacilityCard({ facility, onAddressClick }: FacilityCardProps) {
           }}
         />
         <div className="absolute top-3 right-3">
-          <Badge className="glass text-navy-900 border-0 font-medium px-2.5 py-1 shadow-soft text-sm bg-white/95 backdrop-blur-sm">
+          <Badge className="badge-primary shadow-sm">
             {facility.type}
           </Badge>
         </div>
         <div className="absolute top-3 left-3">
-          <Badge variant="outline" className="glass text-purple-700 border-purple-200/30 font-medium px-2.5 py-1 shadow-soft text-sm bg-purple-50/95 backdrop-blur-sm">
+          <Badge className="badge-secondary">
             {facility.area}
           </Badge>
         </div>
       </div>
       
-      <CardContent className="p-4 flex flex-col flex-grow bg-white/95 backdrop-blur-sm">
-        <div className="mb-3">
-          <h3 className="font-bold text-xl mb-2 text-navy-900 line-clamp-1">{facility.name}</h3>
-          <div className="flex items-start gap-1.5 text-base text-navy-600">
-            <MapPin className="h-5 w-5 text-navy-500 shrink-0 mt-0.5" />
+      <CardContent className="p-lg surface-primary">
+        <div className="mb-md">
+          <h3 className="heading-primary text-xl mb-sm line-clamp-1">{facility.name}</h3>
+          <div className="flex items-start gap-xs text-base text-secondary">
+            <MapPin className="h-5 w-5 text-brand-secondary shrink-0 mt-0.5" />
             <span 
-              className="line-clamp-1 hover:text-purple-600 hover:underline cursor-pointer transition-colors"
+              className="line-clamp-1 hover:text-brand-accent hover:underline cursor-pointer transition-colors"
               onClick={(e) => onAddressClick(e, facility)}
               title="Klikk for å se på kart"
             >
