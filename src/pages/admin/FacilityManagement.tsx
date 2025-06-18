@@ -320,7 +320,9 @@ const FacilityManagementPage = () => {
                                 size="sm"
                                 icon={<MoreHorizontal className="h-5 w-5" />}
                                 className="h-10 w-10 p-0"
-                              />
+                              >
+                                Meny
+                              </ActionButton>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="surface-primary border-primary shadow-lg">
                               <DropdownMenuItem className="hover:bg-surface-secondary">Se detaljer</DropdownMenuItem>

@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
@@ -153,7 +152,9 @@ const AdminSidebar = () => {
       <SidebarFooter className="p-6 border-t border-primary group-data-[collapsible=icon]:p-3">
         <div className="surface-secondary flex items-center gap-4 p-6 rounded-xl border border-primary shadow-sm hover:shadow-md transition-all duration-200 group-data-[collapsible=icon]:p-3 group-data-[collapsible=icon]:justify-center">
           <div className="flex items-center gap-3 group-data-[collapsible=icon]:gap-0">
-            <StatusBadge status="success" showIcon={false} className="w-3 h-3 p-0" />
+            <StatusBadge status="success" showIcon={false} className="w-3 h-3 p-0">
+              {/* Empty children for the dot indicator */}
+            </StatusBadge>
             <BodySmall className="font-bold text-text-primary group-data-[collapsible=icon]:hidden">
               System Status
             </BodySmall>
