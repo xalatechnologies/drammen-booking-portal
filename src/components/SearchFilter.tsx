@@ -55,7 +55,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
   };
 
   const hasActiveFilters = date || dateRange || (facilityType && facilityType !== "all") || (location && location !== "all") || (accessibility && accessibility !== "all") || capacity[0] > 0 || capacity[1] < 200 || searchTerm;
-  const hasAdvancedFilters = (accessibility && accessibility !== "all") || capacity[0] > 0 || capacity[1] < 200;
+  const hasAdvancedFilters = dateRange || (accessibility && accessibility !== "all") || capacity[0] > 0 || capacity[1] < 200;
 
   return (
     <div className="mb-8">
@@ -73,16 +73,8 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
                   />
                 </div>
 
-                {/* Date Range */}
-                <div className="lg:w-64">
-                  <DateRangePicker 
-                    dateRange={dateRange}
-                    setDateRange={setDateRange}
-                  />
-                </div>
-
                 {/* Quick Filters */}
-                <div className="flex gap-3">
+                <div className="flex gap-3 items-center">
                   <div className="min-w-[140px]">
                     <FilterSelects 
                       facilityType={facilityType}
@@ -96,6 +88,12 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
                       showOnlyMain={true}
                     />
                   </div>
+
+                  {/* View Mode Toggle */}
+                  <ViewModeToggle 
+                    viewMode={viewMode}
+                    setViewMode={setViewMode}
+                  />
                   
                   {/* Filter Toggle Button */}
                   <Button
@@ -139,19 +137,26 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
           {showAdvanced && (
             <div className="border-b border-gray-100 bg-gray-50">
               <div className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-semibold text-gray-900">Avanserte filtre</h3>
-                  <ViewModeToggle 
-                    viewMode={viewMode}
-                    setViewMode={setViewMode}
-                  />
+                <h3 className="font-semibold text-gray-900 mb-4">Avanserte filtre</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {/* Date Range */}
+                  <div>
+                    <DateRangePicker 
+                      dateRange={dateRange}
+                      setDateRange={setDateRange}
+                    />
+                  </div>
+                  
+                  {/* Advanced Filters */}
+                  <div className="md:col-span-2">
+                    <AdvancedFilters 
+                      accessibility={accessibility}
+                      setAccessibility={setAccessibility}
+                      capacity={capacity}
+                      setCapacity={setCapacity}
+                    />
+                  </div>
                 </div>
-                <AdvancedFilters 
-                  accessibility={accessibility}
-                  setAccessibility={setAccessibility}
-                  capacity={capacity}
-                  setCapacity={setCapacity}
-                />
               </div>
             </div>
           )}
