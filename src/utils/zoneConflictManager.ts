@@ -1,4 +1,3 @@
-
 import { Zone, BookingConflict, ZoneAvailabilityStatus } from "@/components/booking/types";
 
 export interface ExistingBooking {
@@ -10,7 +9,7 @@ export interface ExistingBooking {
 }
 
 export class ZoneConflictManager {
-  private zones: Zone[];
+  protected zones: Zone[];  // Changed from private to protected
   private existingBookings: ExistingBooking[];
 
   constructor(zones: Zone[], existingBookings: ExistingBooking[] = []) {
