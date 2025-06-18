@@ -1,114 +1,93 @@
 
-import { useState, useEffect } from 'react';
-import { AdditionalService, ServiceFilters, ServiceCategory } from '@/types/additionalServices';
-import { AdditionalServiceRepository } from '@/dal/repositories/AdditionalServiceRepository';
+import { useQuery } from '@tanstack/react-query';
+import { AdditionalServicesService } from '@/services/AdditionalServicesService';
+import { ServiceCategory, AdditionalService } from '@/types/additionalServices';
 import { ActorType } from '@/types/pricing';
 
-const serviceRepository = new AdditionalServiceRepository();
-
-export function useAdditionalServices(facilityId?: string, category?: ServiceCategory) {
-  const [services, setServices] = useState<AdditionalService[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchServices = async () => {
-      setIsLoading(true);
-      setError(null);
-
-      try {
-        const filters: ServiceFilters = {
-          facilityId,
-          category,
-          isActive: true
-        };
-
-        const result = await serviceRepository.findAll(
-          { page: 1, limit: 100 },
-          filters
-        );
-
-        if (result.success && result.data) {
-          setServices(result.data.data);
-        } else {
-          setError(result.error?.message || 'Failed to fetch services');
+export function useAdditionalServices(facilityId: string, category?: ServiceCategory) {
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['additional-services', facilityId, category],
+    queryFn: async () => {
+      if (category) {
+        const result = await AdditionalServicesService.getServicesByCategory(category, facilityId);
+        if (result.success) {
+          return result.data || [];
         }
-      } catch (err) {
-        setError('An error occurred while fetching services');
-        console.error('Error fetching services:', err);
-      } finally {
-        setIsLoading(false);
+        throw new Error(result.error?.message || 'Failed to fetch services');
+      } else {
+        const result = await AdditionalServicesService.getServices(
+          { page: 1, limit: 100 },
+          { facilityId, isActive: true }
+        );
+        if (result.success) {
+          return result.data?.items || [];
+        }
+        throw new Error(result.error?.message || 'Failed to fetch services');
       }
-    };
-
-    fetchServices();
-  }, [facilityId, category]);
+    },
+    enabled: !!facilityId
+  });
 
   return {
-    services,
+    services: data || [],
     isLoading,
-    error,
-    refetch: () => {
-      const filters: ServiceFilters = { facilityId, category, isActive: true };
-      return serviceRepository.findAll({ page: 1, limit: 100 }, filters);
-    }
+    error
   };
 }
 
 export function useServicePricing() {
-  const [isCalculating, setIsCalculating] = useState(false);
-
   const calculateServicePrice = async (
     serviceId: string,
     quantity: number,
     actorType: ActorType,
-    attendees?: number
+    attendees?: number,
+    timeSlot?: string,
+    date?: Date
   ) => {
-    setIsCalculating(true);
-    
-    try {
-      const result = await serviceRepository.calculateServicePrice(
-        serviceId,
-        quantity,
-        actorType,
-        attendees
-      );
-      
-      return result;
-    } catch (error) {
-      return {
-        success: false,
-        error: { message: 'Failed to calculate service price', details: error }
-      };
-    } finally {
-      setIsCalculating(false);
-    }
+    return AdditionalServicesService.calculateServicePrice(
+      serviceId,
+      quantity,
+      actorType,
+      attendees,
+      timeSlot,
+      date
+    );
   };
 
-  const checkServiceAvailability = async (
+  const validateServiceAvailability = async (
     serviceId: string,
-    date: Date,
-    timeSlot: string
+    requestedDate: Date,
+    timeSlot?: string
   ) => {
-    try {
-      const result = await serviceRepository.checkServiceAvailability(
-        serviceId,
-        date,
-        timeSlot
-      );
-      
-      return result;
-    } catch (error) {
-      return {
-        success: false,
-        error: { message: 'Failed to check service availability', details: error }
-      };
-    }
+    return AdditionalServicesService.validateServiceAvailability(
+      serviceId,
+      requestedDate,
+      timeSlot
+    );
   };
 
   return {
     calculateServicePrice,
-    checkServiceAvailability,
-    isCalculating
+    validateServiceAvailability
+  };
+}
+
+export function usePopularServices(facilityId: string, limit?: number) {
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['popular-services', facilityId, limit],
+    queryFn: async () => {
+      const result = await AdditionalServicesService.getPopularServices(facilityId, limit);
+      if (result.success) {
+        return result.data || [];
+      }
+      throw new Error(result.error?.message || 'Failed to fetch popular services');
+    },
+    enabled: !!facilityId
+  });
+
+  return {
+    services: data || [],
+    isLoading,
+    error
   };
 }
