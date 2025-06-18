@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Bell, Search, Globe } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -13,12 +12,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Logo from "@/components/header/Logo";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 
 const AdminHeader = () => {
   return (
-    <header className="border-b bg-white shadow-sm sticky top-0 z-50 pb-2">
+    <header className="border-b bg-white shadow-sm z-50 pb-2">
       <div className="flex h-16 items-center px-6">
         <div className="flex items-center gap-4 min-w-0">
+          <div className="md:hidden mr-2">
+            <SidebarTrigger />
+          </div>
           <Logo />
         </div>
         

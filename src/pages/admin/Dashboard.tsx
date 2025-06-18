@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import AdminLayout from "@/components/admin/AdminLayout";
@@ -11,6 +10,8 @@ import ReportsAnalyticsPage from "@/pages/admin/ReportsAnalytics";
 import NotificationsPage from "@/pages/admin/Notifications";
 import ProfileSettingsPage from "@/pages/admin/ProfileSettings";
 import NotFound from "@/pages/NotFound";
+import RolesPage from "./Roles";
+import RoleAssignmentsPage from "./RoleAssignments";
 
 const AdminDashboard = () => {
   const location = useLocation();
@@ -35,6 +36,8 @@ const AdminDashboard = () => {
         <Route path="/reports" element={<ReportsAnalyticsPage />} />
         <Route path="/notifications" element={<NotificationsPage />} />
         <Route path="/profile" element={<ProfileSettingsPage />} />
+        <Route path="/roles" element={<RolesPage />} />
+        <Route path="/role-assignments" element={<RoleAssignmentsPage />} />
         <Route path="*" element={<Navigate to="/admin" replace />} />
       </Routes>
     </AdminLayout>

@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
@@ -71,6 +70,16 @@ const AdminSidebar = () => {
       icon: Bell,
       path: "/admin/notifications",
     },
+    {
+      title: "Roller",
+      icon: Users,
+      path: "/admin/roles",
+    },
+    {
+      title: "Tildel roller",
+      icon: Users,
+      path: "/admin/role-assignments",
+    },
   ];
 
   const systemItems = [
@@ -139,25 +148,29 @@ const AdminSidebar = () => {
   );
 
   return (
-    <Sidebar className="border-r border-slate-200/60 bg-white shadow-xl shadow-slate-200/20 mt-4" collapsible="icon">
-      <SidebarContent className="px-2 pt-6 pb-8 space-y-2 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
+    <Sidebar 
+      className="border-r border-slate-200/60 bg-white shadow-xl shadow-slate-200/20 mt-4" 
+      style={{ ...( { ['--sidebar-width']: '20rem' } as any ) }}
+      collapsible="icon"
+    >
+      <SidebarContent className="px-2 sm:px-4 pt-8 sm:pt-16 pb-10 space-y-3 overflow-y-auto max-h-screen scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
         {renderMenuGroup(overviewItems, "OVERSIKT")}
         {renderMenuGroup(bookingItems, "BOOKING")}
         {renderMenuGroup(managementItems, "ADMINISTRASJON")}
         {renderMenuGroup(systemItems, "SYSTEM")}
       </SidebarContent>
 
-      <SidebarFooter className="p-8 border-t border-slate-100 bg-gradient-to-t from-slate-50/50 to-white group-data-[collapsible=icon]:p-2">
-        <div className="flex items-center gap-4 p-5 rounded-2xl bg-white border border-slate-200/60 shadow-lg shadow-slate-200/20 hover:shadow-xl hover:shadow-slate-200/30 transition-all duration-300 group-data-[collapsible=icon]:p-2 group-data-[collapsible=icon]:justify-center">
-          <div className="flex items-center gap-3 group-data-[collapsible=icon]:gap-0">
+      <SidebarFooter className="p-10 border-t border-slate-100 bg-gradient-to-t from-slate-50/50 to-white group-data-[collapsible=icon]:p-2">
+        <div className="flex items-center gap-5 p-6 rounded-2xl bg-white border border-slate-200/60 shadow-lg shadow-slate-200/20 hover:shadow-xl hover:shadow-slate-200/30 transition-all duration-300 group-data-[collapsible=icon]:p-2 group-data-[collapsible=icon]:justify-center">
+          <div className="flex items-center gap-4 group-data-[collapsible=icon]:gap-0">
             <div className="relative">
               <div className="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse"></div>
               <div className="absolute inset-0 w-2.5 h-2.5 bg-emerald-400 rounded-full animate-ping opacity-30"></div>
             </div>
-            <span className="text-[15px] font-semibold text-slate-800 leading-5 group-data-[collapsible=icon]:hidden">System Status</span>
+            <span className="text-[16px] font-semibold text-slate-800 leading-5 group-data-[collapsible=icon]:hidden">System Status</span>
           </div>
           <div className="ml-auto group-data-[collapsible=icon]:hidden">
-            <span className="text-[13px] text-emerald-700 font-bold bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-200/50 shadow-sm">
+            <span className="text-[14px] text-emerald-700 font-bold bg-emerald-50 px-4 py-2 rounded-full border border-emerald-200/50 shadow-sm">
               Operative
             </span>
           </div>

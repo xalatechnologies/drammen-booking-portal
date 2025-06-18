@@ -45,6 +45,13 @@ import {
 } from "@/components/ui/pagination";
 
 // Define facility type
+interface OpeningHours {
+  day: string; // f.eks. 'Mandag'
+  open: string; // '08:00'
+  close: string; // '16:00'
+  closed?: boolean;
+}
+
 interface Facility {
   id: number;
   name: string;
@@ -54,14 +61,32 @@ interface Facility {
   capacity: number;
   lastBooking: string;
   nextAvailable: string;
+  allowedBookingTypes: string[];
+  openingHours: OpeningHours[];
+  bookingInterval: string; // '15', '30', 'daily'
+  season: { from: string; to: string };
 }
+
+const WEEKDAYS = [
+  "Mandag", "Tirsdag", "Onsdag", "Torsdag", "Fredag", "Lørdag", "Søndag"
+];
+const BOOKING_INTERVALS = [
+  { value: "15", label: "15 min" },
+  { value: "30", label: "30 min" },
+  { value: "daily", label: "Daglig" },
+];
+
+const BOOKING_TYPES = [
+  { value: "engangslan", label: "Engangslån" },
+  { value: "fastlan", label: "Fastlån" },
+  { value: "rammetid", label: "Rammetid" },
+  { value: "strotimer", label: "Strøtimer" },
+];
 
 const FacilityManagementPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState<string>("all");
-  
-  // Mock data for facilities
-  const facilities: Facility[] = [
+  const [facilities, setFacilities] = useState<Facility[]>([
     {
       id: 1,
       name: "Brandengen Skole - Gymsal",
@@ -71,6 +96,10 @@ const FacilityManagementPage = () => {
       capacity: 120,
       lastBooking: "2025-05-20",
       nextAvailable: "I dag, 18:00",
+      allowedBookingTypes: ["engangslan", "fastlan"],
+      openingHours: WEEKDAYS.map(day => ({ day, open: "08:00", close: "22:00", closed: false })),
+      bookingInterval: "30",
+      season: { from: "2025-01-01", to: "2025-12-31" },
     },
     {
       id: 2,
@@ -81,6 +110,10 @@ const FacilityManagementPage = () => {
       capacity: 200,
       lastBooking: "2025-05-21",
       nextAvailable: "Fredag, 17:00",
+      allowedBookingTypes: ["engangslan", "rammetid", "strotimer"],
+      openingHours: WEEKDAYS.map(day => ({ day, open: "08:00", close: "22:00", closed: false })),
+      bookingInterval: "30",
+      season: { from: "2025-01-01", to: "2025-12-31" },
     },
     {
       id: 3,
@@ -91,6 +124,10 @@ const FacilityManagementPage = () => {
       capacity: 150,
       lastBooking: "2025-05-15",
       nextAvailable: "Torsdag, 19:00",
+      allowedBookingTypes: ["engangslan"],
+      openingHours: WEEKDAYS.map(day => ({ day, open: "08:00", close: "22:00", closed: false })),
+      bookingInterval: "30",
+      season: { from: "2025-01-01", to: "2025-12-31" },
     },
     {
       id: 4,
@@ -101,6 +138,10 @@ const FacilityManagementPage = () => {
       capacity: 80,
       lastBooking: "2025-05-18",
       nextAvailable: "Lørdag, 10:00",
+      allowedBookingTypes: ["fastlan", "rammetid"],
+      openingHours: WEEKDAYS.map(day => ({ day, open: "08:00", close: "22:00", closed: false })),
+      bookingInterval: "30",
+      season: { from: "2025-01-01", to: "2025-12-31" },
     },
     {
       id: 5,
@@ -111,6 +152,10 @@ const FacilityManagementPage = () => {
       capacity: 250,
       lastBooking: "2025-05-10",
       nextAvailable: "Søndag, 12:00",
+      allowedBookingTypes: ["engangslan", "strotimer"],
+      openingHours: WEEKDAYS.map(day => ({ day, open: "08:00", close: "22:00", closed: false })),
+      bookingInterval: "30",
+      season: { from: "2025-01-01", to: "2025-12-31" },
     },
     {
       id: 6,
@@ -121,6 +166,10 @@ const FacilityManagementPage = () => {
       capacity: 300,
       lastBooking: "2025-05-19",
       nextAvailable: "Lørdag, 18:30",
+      allowedBookingTypes: ["engangslan", "fastlan", "rammetid", "strotimer"],
+      openingHours: WEEKDAYS.map(day => ({ day, open: "08:00", close: "22:00", closed: false })),
+      bookingInterval: "30",
+      season: { from: "2025-01-01", to: "2025-12-31" },
     },
     {
       id: 7,
@@ -131,9 +180,21 @@ const FacilityManagementPage = () => {
       capacity: 40,
       lastBooking: "2025-05-21",
       nextAvailable: "I morgen, 14:00",
+      allowedBookingTypes: ["engangslan"],
+      openingHours: WEEKDAYS.map(day => ({ day, open: "08:00", close: "22:00", closed: false })),
+      bookingInterval: "30",
+      season: { from: "2025-01-01", to: "2025-12-31" },
     },
-  ];
-
+  ]);
+  const [editFacility, setEditFacility] = useState<Facility | null>(null);
+  const [editBookingTypes, setEditBookingTypes] = useState<string[]>([]);
+  const [editRulesFacility, setEditRulesFacility] = useState<Facility | null>(null);
+  const [editOpeningHours, setEditOpeningHours] = useState<OpeningHours[]>([]);
+  const [editBookingInterval, setEditBookingInterval] = useState<string>("");
+  const [editSeason, setEditSeason] = useState<{ from: string; to: string }>({ from: "", to: "" });
+  const [modalOpen, setModalOpen] = useState(false);
+  const [rulesModalOpen, setRulesModalOpen] = useState(false);
+  
   // Filter facilities based on search query and active filter
   const filteredFacilities = facilities.filter((facility) => {
     const matchesSearch = facility.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -404,6 +465,9 @@ const FacilityManagementPage = () => {
                       <TableHead className="font-semibold text-gray-900 py-6 text-base" scope="col">
                         Neste ledig
                       </TableHead>
+                      <TableHead className="font-semibold text-gray-900 py-6 text-base" scope="col">
+                        Bookingtyper
+                      </TableHead>
                       <TableHead className="font-semibold text-gray-900 py-6 text-base sr-only" scope="col">
                         Handlinger
                       </TableHead>
@@ -468,6 +532,22 @@ const FacilityManagementPage = () => {
                             </div>
                           </TableCell>
                           <TableCell className="py-6">
+                            <div className="flex flex-wrap gap-2">
+                              {facility.allowedBookingTypes.length === 0 ? (
+                                <span className="text-gray-400 text-sm">Ingen</span>
+                              ) : (
+                                facility.allowedBookingTypes.map(type => {
+                                  const t = BOOKING_TYPES.find(bt => bt.value === type);
+                                  return t ? (
+                                    <span key={type} className="bg-blue-50 text-blue-800 px-2 py-1 rounded text-xs font-medium border border-blue-200">
+                                      {t.label}
+                                    </span>
+                                  ) : null;
+                                })
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell className="py-6">
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
                                 <Button 
@@ -495,14 +575,32 @@ const FacilityManagementPage = () => {
                                 <DropdownMenuItem 
                                   className="py-3 text-base cursor-pointer focus:bg-gray-100"
                                   role="menuitem"
+                                  onClick={() => {
+                                    setEditFacility(facility);
+                                    setEditBookingTypes(facility.allowedBookingTypes);
+                                    setModalOpen(true);
+                                  }}
                                 >
-                                  Rediger
+                                  Rediger bookingtyper
                                 </DropdownMenuItem>
                                 <DropdownMenuItem 
                                   className="py-3 text-base cursor-pointer focus:bg-gray-100"
                                   role="menuitem"
                                 >
                                   Endre status
+                                </DropdownMenuItem>
+                                <DropdownMenuItem 
+                                  className="py-3 text-base cursor-pointer focus:bg-gray-100"
+                                  role="menuitem"
+                                  onClick={() => {
+                                    setEditRulesFacility(facility);
+                                    setEditOpeningHours(facility.openingHours);
+                                    setEditBookingInterval(facility.bookingInterval);
+                                    setEditSeason(facility.season);
+                                    setRulesModalOpen(true);
+                                  }}
+                                >
+                                  Rediger åpningstider/bookingregler
                                 </DropdownMenuItem>
                                 <DropdownMenuItem 
                                   className="text-red-700 py-3 text-base cursor-pointer focus:bg-red-50"
@@ -603,6 +701,146 @@ const FacilityManagementPage = () => {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {modalOpen && editFacility && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md">
+            <h2 className="text-xl font-bold mb-4">Rediger bookingtyper for {editFacility.name}</h2>
+            <div className="space-y-3 mb-6">
+              {BOOKING_TYPES.map(bt => (
+                <label key={bt.value} className="flex items-center gap-3">
+                  <input
+                    type="checkbox"
+                    checked={editBookingTypes.includes(bt.value)}
+                    onChange={e => {
+                      if (e.target.checked) {
+                        setEditBookingTypes([...editBookingTypes, bt.value]);
+                      } else {
+                        setEditBookingTypes(editBookingTypes.filter(val => val !== bt.value));
+                      }
+                    }}
+                  />
+                  <span>{bt.label}</span>
+                </label>
+              ))}
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setModalOpen(false)}>Avbryt</Button>
+              <Button
+                onClick={() => {
+                  setFacilities(facilities.map(f =>
+                    f.id === editFacility.id ? { ...f, allowedBookingTypes: editBookingTypes } : f
+                  ));
+                  setModalOpen(false);
+                }}
+              >
+                Lagre
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {rulesModalOpen && editRulesFacility && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-2xl">
+            <h2 className="text-2xl font-bold mb-6">Rediger åpningstider og bookingregler for {editRulesFacility.name}</h2>
+            <div className="mb-6">
+              <h3 className="font-semibold mb-2 text-lg">Åpningstider</h3>
+              <div className="grid grid-cols-1 gap-2">
+                {editOpeningHours.map((oh, idx) => (
+                  <div key={oh.day} className="flex flex-wrap items-center gap-4 py-2 border-b border-gray-100 last:border-b-0">
+                    <span className="w-28 font-medium text-base">{oh.day}</span>
+                    <input
+                      type="time"
+                      value={oh.open}
+                      disabled={oh.closed}
+                      onChange={e => {
+                        const newHours = [...editOpeningHours];
+                        newHours[idx].open = e.target.value;
+                        setEditOpeningHours(newHours);
+                      }}
+                      className="border rounded px-2 py-1 text-base w-28"
+                    />
+                    <span className="mx-1">-</span>
+                    <input
+                      type="time"
+                      value={oh.close}
+                      disabled={oh.closed}
+                      onChange={e => {
+                        const newHours = [...editOpeningHours];
+                        newHours[idx].close = e.target.value;
+                        setEditOpeningHours(newHours);
+                      }}
+                      className="border rounded px-2 py-1 text-base w-28"
+                    />
+                    <label className="ml-2 flex items-center gap-1 text-base">
+                      <input
+                        type="checkbox"
+                        checked={oh.closed}
+                        onChange={e => {
+                          const newHours = [...editOpeningHours];
+                          newHours[idx].closed = e.target.checked;
+                          setEditOpeningHours(newHours);
+                        }}
+                        className="w-4 h-4"
+                      />
+                      Stengt
+                    </label>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="mb-6">
+              <h3 className="font-semibold mb-2 text-lg">Bookingintervall</h3>
+              <div className="flex flex-col gap-2 w-48">
+                <select
+                  value={editBookingInterval}
+                  onChange={e => setEditBookingInterval(e.target.value)}
+                  className="border rounded px-2 py-2 text-base"
+                >
+                  {BOOKING_INTERVALS.map(opt => (
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <div className="mb-6">
+              <h3 className="font-semibold mb-2 text-lg">Sesong (tilgjengelighet)</h3>
+              <div className="flex flex-col sm:flex-row gap-3 items-center">
+                <input
+                  type="date"
+                  value={editSeason.from}
+                  onChange={e => setEditSeason({ ...editSeason, from: e.target.value })}
+                  className="border rounded px-2 py-2 text-base w-40"
+                />
+                <span className="text-gray-500 text-base">til</span>
+                <input
+                  type="date"
+                  value={editSeason.to}
+                  onChange={e => setEditSeason({ ...editSeason, to: e.target.value })}
+                  className="border rounded px-2 py-2 text-base w-40"
+                />
+              </div>
+            </div>
+            <div className="flex justify-end gap-4 mt-6">
+              <Button variant="outline" size="default" onClick={() => setRulesModalOpen(false)}>Avbryt</Button>
+              <Button size="default"
+                onClick={() => {
+                  setFacilities(facilities.map(f =>
+                    f.id === editRulesFacility.id
+                      ? { ...f, openingHours: editOpeningHours, bookingInterval: editBookingInterval, season: editSeason }
+                      : f
+                  ));
+                  setRulesModalOpen(false);
+                }}
+              >
+                Lagre
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

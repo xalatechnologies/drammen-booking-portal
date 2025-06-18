@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -32,18 +31,14 @@ import { Input } from "@/components/ui/input";
 
 const OverviewPage = () => {
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-50 p-2 sm:p-4 md:p-6">
       {/* Header Section */}
       <div className="mb-8">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
           <div>
             <h1 className="text-2xl font-semibold text-gray-900 mb-2">Administrer og overvåk lokaler</h1>
             <p className="text-base text-gray-600">Administrer og overvåk lokaler</p>
           </div>
-          <Button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 h-10 text-base font-medium">
-            <Plus className="h-4 w-4 mr-2" />
-            Ny Lokal
-          </Button>
         </div>
       </div>
 
@@ -131,7 +126,7 @@ const OverviewPage = () => {
       {/* Main Content */}
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Lokaler Liste */}
-        <Card className="lg:col-span-2 bg-white border border-gray-200 shadow-sm">
+        <Card className="lg:col-span-2 bg-white border border-gray-200 shadow-sm w-full">
           <CardHeader className="border-b border-gray-100 pb-4">
             <div className="flex items-center justify-between">
               <div>
@@ -275,7 +270,7 @@ const OverviewPage = () => {
         </Card>
 
         {/* Quick Actions */}
-        <Card className="bg-white border border-gray-200 shadow-sm">
+        <Card className="bg-white border border-gray-200 shadow-sm w-full">
           <CardHeader className="border-b border-gray-100 pb-4">
             <CardTitle className="text-lg font-semibold text-gray-900">Hurtighandlinger</CardTitle>
             <p className="text-sm text-gray-600">Vanlige administrative oppgaver</p>
