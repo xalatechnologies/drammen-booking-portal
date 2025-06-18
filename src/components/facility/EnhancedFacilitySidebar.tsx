@@ -144,53 +144,42 @@ export function EnhancedFacilitySidebar({
         </CardContent>
       </Card>
 
-      {/* Zones Section */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <MapPin className="h-5 w-5" />
-            Tilgjengelige soner
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          {zones.map((zone, index) => (
-            <div key={zone.id}>
-              <ZoneBookingCard
-                zone={zone}
-                facilityName={facilityName}
-                onBookClick={() => handleBookingClick(zone.id)}
-              />
-              {index < zones.length - 1 && <Separator className="my-3" />}
-            </div>
-          ))}
-          
-          {/* Auto Approval Info under zones */}
-          {hasAutoApproval && (
-            <>
-              <Separator className="my-3" />
-              <AutoApprovalCard hasAutoApproval={hasAutoApproval} />
-            </>
-          )}
+      {/* Zones Section - Individual Cards */}
+      {zones.map((zone) => (
+        <Card key={zone.id}>
+          <CardContent className="p-0">
+            <ZoneBookingCard
+              zone={zone}
+              facilityName={facilityName}
+              onBookClick={() => handleBookingClick(zone.id)}
+            />
+          </CardContent>
+        </Card>
+      ))}
 
-          {/* Cancellation Policy Card under zones */}
-          <Separator className="my-3" />
-          <Card className="shadow-sm">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-emerald-100 rounded-md">
-                  <XCircle className="h-5 w-5 text-emerald-600" />
-                </div>
-                <div>
-                  <h3 className="font-medium text-emerald-800">
-                    Gratis avbestilling
-                  </h3>
-                  <p className="text-sm text-emerald-700">
-                    Opptil 24 timer før reservert tid
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+      {/* Policy Information Card */}
+      <Card>
+        <CardContent className="p-4 space-y-4">
+          {/* Auto Approval Info */}
+          {hasAutoApproval && <AutoApprovalCard hasAutoApproval={hasAutoApproval} />}
+          
+          {/* Separator between policies if both exist */}
+          {hasAutoApproval && <Separator />}
+          
+          {/* Cancellation Policy */}
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-emerald-100 rounded-md">
+              <XCircle className="h-5 w-5 text-emerald-600" />
+            </div>
+            <div>
+              <h3 className="font-medium text-emerald-800">
+                Gratis avbestilling
+              </h3>
+              <p className="text-sm text-emerald-700">
+                Opptil 24 timer før reservert tid
+              </p>
+            </div>
+          </div>
         </CardContent>
       </Card>
     </div>
