@@ -1,20 +1,22 @@
+
 import React, { useState } from "react";
 import { format, addDays, startOfWeek, isBefore, startOfDay } from "date-fns";
-import { nb } from "date-fns/locale";
-import { ChevronLeft, ChevronRight, Calendar, Users, DollarSign, Repeat, ShoppingCart, Trash2, AlertTriangle } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Users, DollarSign } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
 import { Zone } from "@/components/booking/types";
-import { isDateUnavailable, isNorwegianHoliday } from "@/utils/holidaysAndAvailability";
+import { isDateUnavailable } from "@/utils/holidaysAndAvailability";
 import { ExistingBooking } from "@/utils/zoneConflictManager";
 import { EnhancedZoneConflictManager } from "@/utils/enhancedZoneConflictManager";
 import { RecurrencePatternBuilder } from "@/components/facility/RecurrencePatternBuilder";
 import { BookingDrawer } from "@/components/facility/BookingDrawer";
-import { ConflictTooltip } from "@/components/facility/ConflictTooltip";
 import { ConflictResolutionWizard } from "@/components/facility/ConflictResolutionWizard";
 import { RecurrencePattern, SelectedTimeSlot, recurrenceEngine } from "@/utils/recurrenceEngine";
+import { WeekNavigation } from "./WeekNavigation";
+import { ZoneInfoHeader } from "./ZoneInfoHeader";
+import { CalendarGrid } from "./CalendarGrid";
+import { SelectedSlotsDisplay } from "./SelectedSlotsDisplay";
+import { LegendDisplay } from "./LegendDisplay";
+import { isSlotSelected, addSlotToSelection, removeSlotFromSelection } from "./AvailabilityTabUtils";
 
 interface AvailabilityTabProps {
   zones: Zone[];
@@ -64,7 +66,6 @@ export function AvailabilityTab({
 
   const conflictManager = new EnhancedZoneConflictManager(zones, existingBookings);
   const timeSlots = ["08:00-10:00", "10:00-12:00", "12:00-14:00", "14:00-16:00", "16:00-18:00", "18:00-20:00", "20:00-22:00"];
-  const weekDays = Array(7).fill(0).map((_, i) => addDays(currentWeekStart, i));
 
   const today = startOfDay(new Date());
   const currentWeekStartDay = startOfDay(currentWeekStart);
@@ -84,35 +85,15 @@ export function AvailabilityTab({
     return { status: 'available', conflict: null };
   };
 
-  const isSlotSelected = (zoneId: string, date: Date, timeSlot: string) => {
-    return selectedSlots.some(slot => 
-      slot.zoneId === zoneId && 
-      format(slot.date, 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd') && 
-      slot.timeSlot === timeSlot
-    );
-  };
-
   const handleSlotClick = (zoneId: string, date: Date, timeSlot: string, availability: string) => {
     if (availability !== 'available') return;
 
-    const isSelected = isSlotSelected(zoneId, date, timeSlot);
+    const isSelected = isSlotSelected(selectedSlots, zoneId, date, timeSlot);
 
     if (isSelected) {
-      // Remove from selection
-      setSelectedSlots(prev => prev.filter(slot => 
-        !(slot.zoneId === zoneId && 
-          format(slot.date, 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd') && 
-          slot.timeSlot === timeSlot)
-      ));
+      setSelectedSlots(prev => removeSlotFromSelection(prev, zoneId, date, timeSlot));
     } else {
-      // Add to selection
-      const newSlot: SelectedTimeSlot = {
-        zoneId,
-        date: new Date(date),
-        timeSlot,
-        duration: 2 // Default 2 hours
-      };
-      setSelectedSlots(prev => [...prev, newSlot]);
+      setSelectedSlots(prev => addSlotToSelection(prev, zoneId, date, timeSlot));
     }
   };
 
@@ -210,231 +191,35 @@ export function AvailabilityTab({
     setShowConflictWizard(false);
   };
 
-  const getStatusColor = (status: string, isSelected: boolean) => {
-    if (isSelected) {
-      return 'bg-blue-500 hover:bg-blue-600 border-blue-600 ring-2 ring-blue-300 text-white';
-    }
-    
-    switch (status) {
-      case 'available':
-        return 'bg-green-100 hover:bg-green-200 border-green-400 hover:border-green-500';
-      case 'busy':
-        return 'bg-red-100 border-red-400 cursor-not-allowed';
-      case 'unavailable':
-      default:
-        return 'bg-gray-100 border-gray-400 cursor-not-allowed';
-    }
-  };
-
-  const renderSlotButton = (zone: Zone, day: Date, timeSlot: string, dayIndex: number) => {
-    const { status, conflict } = getAvailabilityStatus(zone.id, day, timeSlot);
-    const isSelected = isSlotSelected(zone.id, day, timeSlot);
-    const statusColor = getStatusColor(status, isSelected);
-    
-    const button = (
-      <button
-        className={`w-full h-12 rounded-md border-2 transition-all duration-200 font-inter ${statusColor} ${
-          status === 'available' 
-            ? 'cursor-pointer shadow-sm hover:shadow-md transform hover:scale-105' 
-            : 'cursor-not-allowed opacity-75'
-        }`}
-        disabled={status !== 'available'}
-        onClick={() => handleSlotClick(zone.id, day, timeSlot, status)}
-      >
-        {isSelected && (
-          <div className="text-xs font-medium">✓</div>
-        )}
-        {status === 'busy' && (
-          <AlertTriangle className="h-3 w-3 mx-auto text-red-500" />
-        )}
-      </button>
-    );
-
-    if (conflict) {
-      return (
-        <ConflictTooltip key={dayIndex} conflict={conflict}>
-          {button}
-        </ConflictTooltip>
-      );
-    }
-
-    return button;
-  };
-
   const renderZoneCalendar = (zone: Zone) => (
     <div className="space-y-4">
-      {/* Zone Info Header */}
-      <div className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg">
-        <div>
-          <h4 className="text-lg font-semibold text-gray-900">{zone.name}</h4>
-          <p className="text-sm text-gray-600">Klikk på ledige timer for å velge tidsrom</p>
-        </div>
-        <div className="flex gap-3">
-          <div className="flex items-center gap-2 bg-white px-3 py-2 rounded border text-sm">
-            <Users className="h-4 w-4 text-blue-600" />
-            <span className="font-medium">{zone.capacity}</span>
-          </div>
-          <div className="flex items-center gap-2 bg-white px-3 py-2 rounded border text-sm">
-            <DollarSign className="h-4 w-4 text-green-600" />
-            <span className="font-medium">{zone.pricePerHour} kr/t</span>
-          </div>
-        </div>
-      </div>
+      <ZoneInfoHeader
+        zone={zone}
+        selectedSlots={selectedSlots}
+        onPatternBuilderOpen={() => setShowPatternBuilder(true)}
+        onClearSelection={clearSelection}
+        onBookingDrawerOpen={() => setShowBookingDrawer(true)}
+      />
 
-      {/* Quick Actions */}
-      <div className="flex items-center justify-between">
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowPatternBuilder(true)}
-            className="flex items-center gap-2"
-          >
-            <Repeat className="h-4 w-4" />
-            Gjentakende booking
-          </Button>
-          
-          {selectedSlots.length > 0 && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={clearSelection}
-              className="flex items-center gap-2 text-red-600 hover:text-red-700"
-            >
-              <Trash2 className="h-4 w-4" />
-              Tøm valg ({selectedSlots.length})
-            </Button>
-          )}
-        </div>
+      <WeekNavigation
+        currentWeekStart={currentWeekStart}
+        onWeekChange={setCurrentWeekStart}
+        canGoPrevious={canGoPrevious}
+      />
 
-        {selectedSlots.length > 0 && (
-          <Button
-            onClick={() => setShowBookingDrawer(true)}
-            className="flex items-center gap-2 bg-[#1e3a8a] hover:bg-[#1e40af]"
-          >
-            <ShoppingCart className="h-4 w-4" />
-            Book {selectedSlots.length} tidspunkt
-          </Button>
-        )}
-      </div>
+      <CalendarGrid
+        zone={zone}
+        currentWeekStart={currentWeekStart}
+        timeSlots={timeSlots}
+        selectedSlots={selectedSlots}
+        getAvailabilityStatus={getAvailabilityStatus}
+        isSlotSelected={(zoneId, date, timeSlot) => isSlotSelected(selectedSlots, zoneId, date, timeSlot)}
+        onSlotClick={handleSlotClick}
+      />
 
-      {/* Week Navigation */}
-      <div className="flex items-center justify-between mb-4">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setCurrentWeekStart(addDays(currentWeekStart, -7))}
-          className="flex items-center gap-2 h-9 px-4 text-sm"
-          disabled={!canGoPrevious}
-        >
-          <ChevronLeft className="h-4 w-4" />
-          Forrige
-        </Button>
-        
-        <div className="flex items-center gap-2 text-base font-medium bg-white px-4 py-2 rounded-lg border shadow-sm">
-          <Calendar className="h-4 w-4" />
-          {format(currentWeekStart, "dd.MM", { locale: nb })} - {format(addDays(currentWeekStart, 6), "dd.MM.yyyy", { locale: nb })}
-        </div>
-        
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setCurrentWeekStart(addDays(currentWeekStart, 7))}
-          className="flex items-center gap-2 h-9 px-4 text-sm"
-        >
-          Neste
-          <ChevronRight className="h-4 w-4" />
-        </Button>
-      </div>
+      <SelectedSlotsDisplay selectedSlots={selectedSlots} />
 
-      {/* Calendar Grid */}
-      <Card>
-        <CardContent className="p-4">
-          <div className="grid grid-cols-8 gap-2 mb-4">
-            <div className="p-2 text-base font-medium text-gray-500">Tid</div>
-            {weekDays.map((day, i) => {
-              const holidayCheck = isNorwegianHoliday(day);
-              const isToday = format(day, 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd');
-              return (
-                <div key={i} className={`p-2 text-center rounded ${isToday ? 'bg-blue-100 border border-blue-300' : 'bg-gray-50'}`}>
-                  <div className={`text-base font-medium ${isToday ? 'text-blue-800' : 'text-gray-700'}`}>
-                    {format(day, "EEE", { locale: nb })}
-                  </div>
-                  <div className={`text-base font-bold ${isToday ? 'text-blue-900' : 'text-gray-900'}`}>
-                    {format(day, "dd.MM", { locale: nb })}
-                  </div>
-                  {holidayCheck.isHoliday && (
-                    <div className="text-xs text-red-600 truncate" title={holidayCheck.name}>
-                      {holidayCheck.name?.substring(0, 8)}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Time Slots Grid */}
-          <div className="space-y-2">
-            {timeSlots.map((timeSlot) => (
-              <div key={timeSlot} className="grid grid-cols-8 gap-2">
-                <div className="p-3 text-base font-medium text-gray-700 flex items-center bg-gray-50 rounded">
-                  {timeSlot}
-                </div>
-                {weekDays.map((day, dayIndex) => {
-                  const button = renderSlotButton(zone, day, timeSlot, dayIndex);
-                  return (
-                    <div key={dayIndex} className="relative">
-                      {button}
-                    </div>
-                  );
-                })}
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Selected Slots Summary */}
-      {selectedSlots.length > 0 && (
-        <Card className="bg-blue-50 border-blue-200">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between mb-2">
-              <h4 className="font-medium text-blue-800">Valgte tidspunkt ({selectedSlots.length})</h4>
-              <Badge className="bg-blue-600">{selectedSlots.length} timer</Badge>
-            </div>
-            <div className="max-h-24 overflow-auto space-y-1">
-              {selectedSlots.slice(0, 3).map((slot, index) => (
-                <div key={index} className="text-sm text-blue-700">
-                  {format(slot.date, 'EEE dd.MM', { locale: nb })} - {slot.timeSlot}
-                </div>
-              ))}
-              {selectedSlots.length > 3 && (
-                <div className="text-xs text-blue-600">+ {selectedSlots.length - 3} flere</div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Legend */}
-      {showLegend && (
-        <div className="p-4 bg-gray-50 rounded-lg">
-          <div className="grid grid-cols-3 gap-6 text-base">
-            <div className="flex items-center gap-3">
-              <div className="w-6 h-6 rounded bg-green-100 border-2 border-green-400"></div>
-              <span>Ledig</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="w-6 h-6 rounded bg-red-100 border-2 border-red-400"></div>
-              <span>Opptatt</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="w-6 h-6 rounded bg-blue-500 border-2 border-blue-600"></div>
-              <span>Valgt</span>
-            </div>
-          </div>
-        </div>
-      )}
+      <LegendDisplay showLegend={showLegend} />
     </div>
   );
 
