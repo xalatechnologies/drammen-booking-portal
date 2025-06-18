@@ -193,15 +193,6 @@ export function AvailabilityTab({
 
   const renderZoneCalendar = (zone: Zone) => (
     <div className="space-y-4">
-      <ZoneInfoHeader
-        zone={zone}
-        selectedSlots={selectedSlots}
-        onPatternBuilderOpen={() => setShowPatternBuilder(true)}
-        onClearSelection={clearSelection}
-        onBookingDrawerOpen={() => setShowBookingDrawer(true)}
-        zones={zones}
-      />
-
       <WeekNavigation
         currentWeekStart={currentWeekStart}
         onWeekChange={setCurrentWeekStart}
@@ -216,6 +207,15 @@ export function AvailabilityTab({
         getAvailabilityStatus={getAvailabilityStatus}
         isSlotSelected={(zoneId, date, timeSlot) => isSlotSelected(selectedSlots, zoneId, date, timeSlot)}
         onSlotClick={handleSlotClick}
+      />
+
+      <ZoneInfoHeader
+        zone={zone}
+        selectedSlots={selectedSlots}
+        onPatternBuilderOpen={() => setShowPatternBuilder(true)}
+        onClearSelection={clearSelection}
+        onBookingDrawerOpen={() => setShowBookingDrawer(true)}
+        zones={zones}
       />
 
       <SelectedSlotsDisplay selectedSlots={selectedSlots} />
