@@ -45,10 +45,7 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
   const startItem = (page - 1) * pagination.limit + 1;
   const endItem = Math.min(page * pagination.limit, total);
 
-  if (totalPages <= 1) {
-    return null;
-  }
-
+  // Always show pagination controls for debugging
   return (
     <div className="flex items-center justify-center space-x-1 mt-8">
       <button
