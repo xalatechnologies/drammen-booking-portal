@@ -1,3 +1,4 @@
+
 import { Booking, BookingCreateRequest, BookingUpdateRequest, BookingFilters } from '@/types/booking';
 import { PaginatedResponse, PaginationParams, ApiResponse } from '@/types/api';
 import { bookingRepository } from '@/dal/repositories';
@@ -352,7 +353,7 @@ export class BookingService {
       const allBookings = [baseBooking.data, ...(recurringResult.data || [])];
       
       // Trigger notifications for recurring booking series
-      await this.triggerBookingNotifications(baseBooking.data, 'recurring-created');
+      await BookingNotificationService.triggerBookingNotifications(baseBooking.data, 'recurring-created');
 
       return {
         success: true,
