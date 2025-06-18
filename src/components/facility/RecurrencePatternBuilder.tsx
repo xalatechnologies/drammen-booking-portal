@@ -46,7 +46,7 @@ export function RecurrencePatternBuilder({ pattern, onPatternChange, onClose }: 
   };
 
   return (
-    <Card className="w-full max-w-2xl">
+    <Card className="w-full max-w-2xl font-inter">
       <CardHeader className="pb-4">
         <CardTitle className="flex items-center gap-2">
           <Repeat className="h-5 w-5" />

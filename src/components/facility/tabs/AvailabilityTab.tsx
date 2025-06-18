@@ -1,17 +1,19 @@
-
 import React, { useState } from "react";
 import { format, addDays, startOfWeek, isBefore, startOfDay } from "date-fns";
 import { nb } from "date-fns/locale";
-import { ChevronLeft, ChevronRight, Calendar, Users, DollarSign, Repeat, ShoppingCart, Trash2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Calendar, Users, DollarSign, Repeat, ShoppingCart, Trash2, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Zone } from "@/components/booking/types";
 import { isDateUnavailable, isNorwegianHoliday } from "@/utils/holidaysAndAvailability";
-import { ZoneConflictManager, ExistingBooking } from "@/utils/zoneConflictManager";
+import { ExistingBooking } from "@/utils/zoneConflictManager";
+import { EnhancedZoneConflictManager } from "@/utils/enhancedZoneConflictManager";
 import { RecurrencePatternBuilder } from "@/components/facility/RecurrencePatternBuilder";
 import { BookingDrawer } from "@/components/facility/BookingDrawer";
+import { ConflictTooltip } from "@/components/facility/ConflictTooltip";
+import { ConflictResolutionWizard } from "@/components/facility/ConflictResolutionWizard";
 import { RecurrencePattern, SelectedTimeSlot, recurrenceEngine } from "@/utils/recurrenceEngine";
 
 interface AvailabilityTabProps {
@@ -33,6 +35,8 @@ export function AvailabilityTab({
   const [selectedSlots, setSelectedSlots] = useState<SelectedTimeSlot[]>([]);
   const [showPatternBuilder, setShowPatternBuilder] = useState(false);
   const [showBookingDrawer, setShowBookingDrawer] = useState(false);
+  const [showConflictWizard, setShowConflictWizard] = useState(false);
+  const [conflictResolutionData, setConflictResolutionData] = useState<any>(null);
   const [currentPattern, setCurrentPattern] = useState<RecurrencePattern>({
     type: 'single',
     weekdays: [],
@@ -58,7 +62,7 @@ export function AvailabilityTab({
     }
   ];
 
-  const conflictManager = new ZoneConflictManager(zones, existingBookings);
+  const conflictManager = new EnhancedZoneConflictManager(zones, existingBookings);
   const timeSlots = ["08:00-10:00", "10:00-12:00", "12:00-14:00", "14:00-16:00", "16:00-18:00", "18:00-20:00", "20:00-22:00"];
   const weekDays = Array(7).fill(0).map((_, i) => addDays(currentWeekStart, i));
 
@@ -69,15 +73,15 @@ export function AvailabilityTab({
   const getAvailabilityStatus = (zoneId: string, date: Date, timeSlot: string) => {
     const unavailableCheck = isDateUnavailable(date);
     if (unavailableCheck.isUnavailable) {
-      return 'unavailable';
+      return { status: 'unavailable', conflict: null };
     }
 
     const conflict = conflictManager.checkZoneConflict(zoneId, date, timeSlot);
     if (conflict) {
-      return 'busy';
+      return { status: 'busy', conflict };
     }
 
-    return 'available';
+    return { status: 'available', conflict: null };
   };
 
   const isSlotSelected = (zoneId: string, date: Date, timeSlot: string) => {
@@ -119,7 +123,6 @@ export function AvailabilityTab({
   const handlePatternApply = (pattern: RecurrencePattern) => {
     if (pattern.weekdays.length === 0 || pattern.timeSlots.length === 0) return;
 
-    // Generate occurrences based on pattern
     const startDateForPattern = currentWeekStart;
     const zoneId = zones[0]?.id || 'whole-facility';
     
@@ -127,17 +130,84 @@ export function AvailabilityTab({
       pattern,
       startDateForPattern,
       zoneId,
-      12 // Next 12 weeks
+      12
     );
 
-    // Filter out unavailable slots
-    const availableOccurrences = occurrences.filter(occurrence => {
-      const status = getAvailabilityStatus(occurrence.zoneId, occurrence.date, occurrence.timeSlot);
-      return status === 'available';
+    // Check for conflicts in recurring pattern
+    const conflictedDates: Date[] = [];
+    const availableDates: Date[] = [];
+    
+    occurrences.forEach(occurrence => {
+      const { status } = getAvailabilityStatus(occurrence.zoneId, occurrence.date, occurrence.timeSlot);
+      if (status === 'available') {
+        availableDates.push(occurrence.date);
+      } else {
+        conflictedDates.push(occurrence.date);
+      }
     });
 
-    setSelectedSlots(availableOccurrences);
+    // If there are conflicts, show resolution wizard
+    if (conflictedDates.length > 0) {
+      const zone = zones.find(z => z.id === zoneId);
+      if (zone) {
+        const resolution = conflictManager.resolveRecurringConflicts(
+          zoneId,
+          occurrences.map(o => o.date),
+          pattern.timeSlots[0],
+          {
+            skipConflictedDates: true,
+            suggestAlternativeTimes: true,
+            suggestAlternativeZones: true,
+            allowPartialBooking: true
+          }
+        );
+
+        setConflictResolutionData({
+          conflictedDates: resolution.conflictedDates,
+          availableDates: resolution.availableDates,
+          alternativeTimeSlots: resolution.alternativeTimeSlots,
+          suggestedZones: resolution.suggestedZones,
+          originalZone: zone,
+          originalTimeSlot: pattern.timeSlots[0],
+          occurrences
+        });
+        setShowConflictWizard(true);
+      }
+    } else {
+      // No conflicts, proceed with booking
+      setSelectedSlots(occurrences);
+    }
+    
     setShowPatternBuilder(false);
+  };
+
+  const handleConflictResolution = (resolution: any) => {
+    // Apply the selected resolution
+    switch (resolution.type) {
+      case 'skip-conflicts':
+        if (conflictResolutionData) {
+          const availableOccurrences = conflictResolutionData.occurrences.filter((occ: SelectedTimeSlot) =>
+            resolution.selectedDates?.some(date => 
+              format(date, 'yyyy-MM-dd') === format(occ.date, 'yyyy-MM-dd')
+            )
+          );
+          setSelectedSlots(availableOccurrences);
+        }
+        break;
+      case 'use-alternatives':
+        // Implementation for alternative time slots
+        break;
+      case 'change-zone':
+        if (resolution.selectedZone && conflictResolutionData) {
+          const newOccurrences = conflictResolutionData.occurrences.map((occ: SelectedTimeSlot) => ({
+            ...occ,
+            zoneId: resolution.selectedZone.id
+          }));
+          setSelectedSlots(newOccurrences);
+        }
+        break;
+    }
+    setShowConflictWizard(false);
   };
 
   const getStatusColor = (status: string, isSelected: boolean) => {
@@ -154,6 +224,41 @@ export function AvailabilityTab({
       default:
         return 'bg-gray-100 border-gray-400 cursor-not-allowed';
     }
+  };
+
+  const renderSlotButton = (zone: Zone, day: Date, timeSlot: string, dayIndex: number) => {
+    const { status, conflict } = getAvailabilityStatus(zone.id, day, timeSlot);
+    const isSelected = isSlotSelected(zone.id, day, timeSlot);
+    const statusColor = getStatusColor(status, isSelected);
+    
+    const button = (
+      <button
+        className={`w-full h-12 rounded-md border-2 transition-all duration-200 font-inter ${statusColor} ${
+          status === 'available' 
+            ? 'cursor-pointer shadow-sm hover:shadow-md transform hover:scale-105' 
+            : 'cursor-not-allowed opacity-75'
+        }`}
+        disabled={status !== 'available'}
+        onClick={() => handleSlotClick(zone.id, day, timeSlot, status)}
+      >
+        {isSelected && (
+          <div className="text-xs font-medium">✓</div>
+        )}
+        {status === 'busy' && (
+          <AlertTriangle className="h-3 w-3 mx-auto text-red-500" />
+        )}
+      </button>
+    );
+
+    if (conflict) {
+      return (
+        <ConflictTooltip key={dayIndex} conflict={conflict}>
+          {button}
+        </ConflictTooltip>
+      );
+    }
+
+    return button;
   };
 
   const renderZoneCalendar = (zone: Zone) => (
@@ -276,25 +381,10 @@ export function AvailabilityTab({
                   {timeSlot}
                 </div>
                 {weekDays.map((day, dayIndex) => {
-                  const availability = getAvailabilityStatus(zone.id, day, timeSlot);
-                  const isSelected = isSlotSelected(zone.id, day, timeSlot);
-                  const statusColor = getStatusColor(availability, isSelected);
-                  
+                  const button = renderSlotButton(zone, day, timeSlot, dayIndex);
                   return (
                     <div key={dayIndex} className="relative">
-                      <button
-                        className={`w-full h-12 rounded-md border-2 transition-all duration-200 ${statusColor} ${
-                          availability === 'available' 
-                            ? 'cursor-pointer shadow-sm hover:shadow-md transform hover:scale-105' 
-                            : 'cursor-not-allowed opacity-75'
-                        }`}
-                        disabled={availability !== 'available'}
-                        onClick={() => handleSlotClick(zone.id, day, timeSlot, availability)}
-                      >
-                        {isSelected && (
-                          <div className="text-xs font-medium">✓</div>
-                        )}
-                      </button>
+                      {button}
                     </div>
                   );
                 })}
@@ -349,7 +439,7 @@ export function AvailabilityTab({
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 font-inter">
       {/* Enhanced Zone Tabs */}
       <Tabs defaultValue={zones[0]?.id} className="w-full">
         <TabsList className="grid w-full grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1 h-auto p-1 bg-gray-100 rounded-lg">
@@ -357,7 +447,7 @@ export function AvailabilityTab({
             <TabsTrigger 
               key={zone.id} 
               value={zone.id}
-              className="flex flex-col items-center p-3 h-auto data-[state=active]:bg-[#1e3a8a] data-[state=active]:text-white hover:bg-[#1e40af] hover:text-white transition-colors rounded-md"
+              className="flex flex-col items-center p-3 h-auto data-[state=active]:bg-[#1e3a8a] data-[state=active]:text-white hover:bg-[#1e40af] hover:text-white transition-colors rounded-md font-inter"
             >
               <span className="font-medium text-base">{zone.name}</span>
               <div className="flex items-center gap-4 mt-2 text-sm opacity-75">
@@ -393,6 +483,21 @@ export function AvailabilityTab({
             }}
           />
         </div>
+      )}
+
+      {/* Conflict Resolution Wizard */}
+      {showConflictWizard && conflictResolutionData && (
+        <ConflictResolutionWizard
+          isOpen={showConflictWizard}
+          onClose={() => setShowConflictWizard(false)}
+          conflictedDates={conflictResolutionData.conflictedDates}
+          availableDates={conflictResolutionData.availableDates}
+          alternativeTimeSlots={conflictResolutionData.alternativeTimeSlots}
+          suggestedZones={conflictResolutionData.suggestedZones}
+          originalZone={conflictResolutionData.originalZone}
+          originalTimeSlot={conflictResolutionData.originalTimeSlot}
+          onResolutionSelect={handleConflictResolution}
+        />
       )}
 
       {/* Booking Drawer */}
