@@ -18,7 +18,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
         Søk etter lokaler
       </label>
       <Search 
-        className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-600 h-5 w-5" 
+        className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-600 h-5 w-5 z-10 pointer-events-none" 
         aria-hidden="true"
       />
       <Input
