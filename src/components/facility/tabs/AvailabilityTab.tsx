@@ -199,6 +199,7 @@ export function AvailabilityTab({
         onPatternBuilderOpen={() => setShowPatternBuilder(true)}
         onClearSelection={clearSelection}
         onBookingDrawerOpen={() => setShowBookingDrawer(true)}
+        zones={zones}
       />
 
       <WeekNavigation

@@ -15,6 +15,7 @@ interface BookingSummaryStepProps {
   calculation: any;
   totalPrice: number;
   onContinue: () => void;
+  zones?: any[]; // Add zones prop to look up zone names
 }
 
 export function BookingSummaryStep({
@@ -22,11 +23,19 @@ export function BookingSummaryStep({
   facilityName,
   calculation,
   totalPrice,
-  onContinue
+  onContinue,
+  zones = [] // Default to empty array
 }: BookingSummaryStepProps) {
+  
+  // Helper function to get zone name from zoneId
+  const getZoneName = (zoneId: string) => {
+    const foundZone = zones.find((z: any) => z.id === zoneId);
+    return foundZone ? foundZone.name : 'Ukjent sone';
+  };
+
   // Group slots by zone for better display
   const slotsByZone = selectedSlots.reduce((acc, slot) => {
-    const zoneName = slot.zoneName || 'Ukjent sone';
+    const zoneName = getZoneName(slot.zoneId);
     if (!acc[zoneName]) {
       acc[zoneName] = [];
     }

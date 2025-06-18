@@ -14,6 +14,7 @@ interface ZoneInfoHeaderProps {
   onPatternBuilderOpen: () => void;
   onClearSelection: () => void;
   onBookingDrawerOpen: () => void;
+  zones?: Zone[]; // Add zones prop to look up zone names
 }
 
 export function ZoneInfoHeader({ 
@@ -21,8 +22,16 @@ export function ZoneInfoHeader({
   selectedSlots, 
   onPatternBuilderOpen, 
   onClearSelection, 
-  onBookingDrawerOpen 
+  onBookingDrawerOpen,
+  zones = [] // Default to empty array
 }: ZoneInfoHeaderProps) {
+  
+  // Helper function to get zone name from zoneId
+  const getZoneName = (zoneId: string) => {
+    const foundZone = zones.find(z => z.id === zoneId);
+    return foundZone ? foundZone.name : zone.name; // Fallback to current zone name
+  };
+
   return (
     <>
       {/* Zone Title */}
@@ -69,7 +78,7 @@ export function ZoneInfoHeader({
                 {selectedSlots.slice(0, 5).map((slot, index) => (
                   <div key={index} className="flex items-center justify-between text-xs">
                     <span className="text-blue-800">
-                      {slot.zoneName} - {format(slot.date, 'EEE dd.MM', { locale: nb })}
+                      {getZoneName(slot.zoneId)} - {format(slot.date, 'EEE dd.MM', { locale: nb })}
                     </span>
                     <Badge variant="secondary" className="text-xs ml-2">
                       {slot.timeSlot}
