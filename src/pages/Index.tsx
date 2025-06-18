@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { DateRange } from "react-day-picker";
@@ -15,7 +16,6 @@ import CalendarView from "@/components/CalendarView";
 const Index = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [date, setDate] = useState<Date>();
-  const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [facilityType, setFacilityType] = useState<string>("all");
   const [location, setLocation] = useState<string>("all");
   const [viewMode, setViewMode] = useState<"grid" | "map" | "calendar" | "list">("grid");
@@ -113,8 +113,6 @@ const Index = () => {
           <SearchFilter
             date={date}
             setDate={setDate}
-            dateRange={dateRange}
-            setDateRange={setDateRange}
             facilityType={facilityType}
             setFacilityType={setFacilityType}
             location={location}
@@ -137,3 +135,4 @@ const Index = () => {
 };
 
 export default Index;
+
