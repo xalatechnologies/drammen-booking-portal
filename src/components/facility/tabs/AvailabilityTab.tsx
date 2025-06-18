@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { format, addDays, startOfWeek, isBefore, startOfDay } from "date-fns";
 import { nb } from "date-fns/locale";
@@ -47,68 +48,26 @@ export function AvailabilityTab({ zones, startDate, showLegend = true }: Availab
   const getAvailabilityStatus = (zoneId: string, date: Date, timeSlot: string) => {
     const unavailableCheck = isDateUnavailable(date);
     if (unavailableCheck.isUnavailable) {
-      return { 
-        status: 'unavailable', 
-        reason: unavailableCheck.reason,
-        details: unavailableCheck.details 
-      };
+      return 'unavailable';
     }
 
     const conflict = conflictManager.checkZoneConflict(zoneId, date, timeSlot);
     if (conflict) {
-      return { 
-        status: 'booked', 
-        reason: conflict.conflictType,
-        details: conflict.bookedBy 
-      };
+      return 'busy';
     }
 
-    return { status: 'available' };
+    return 'available';
   };
 
-  const getStatusColor = (status: string, reason?: string) => {
+  const getStatusColor = (status: string) => {
     switch (status) {
       case 'available':
-        return 'bg-green-100 text-green-800 border-green-200 hover:bg-green-200';
-      case 'booked':
-        return reason === 'whole-facility-conflict' 
-          ? 'bg-red-200 text-red-900 border-red-300' 
-          : 'bg-red-100 text-red-800 border-red-200';
+        return 'bg-green-400 hover:bg-green-500 border-green-500';
+      case 'busy':
+        return 'bg-red-400 border-red-500 cursor-not-allowed';
       case 'unavailable':
-        switch (reason) {
-          case 'past':
-            return 'bg-gray-200 text-gray-600 border-gray-300';
-          case 'weekend':
-            return 'bg-amber-100 text-amber-800 border-amber-200';
-          case 'holiday':
-            return 'bg-red-300 text-red-900 border-red-400';
-          default:
-            return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-        }
       default:
-        return 'bg-gray-100 text-gray-600 border-gray-200';
-    }
-  };
-
-  const getStatusText = (status: string, reason?: string) => {
-    switch (status) {
-      case 'available':
-        return 'Ledig';
-      case 'booked':
-        return reason === 'whole-facility-conflict' ? 'Hele lokalet' : 'Opptatt';
-      case 'unavailable':
-        switch (reason) {
-          case 'past':
-            return 'Fortid';
-          case 'weekend':
-            return 'Helg';
-          case 'holiday':
-            return 'Helligdag';
-          default:
-            return 'Stengt';
-        }
-      default:
-        return 'Ukjent';
+        return 'bg-gray-400 border-gray-500 cursor-not-allowed';
     }
   };
 
@@ -196,26 +155,24 @@ export function AvailabilityTab({ zones, startDate, showLegend = true }: Availab
                 </div>
                 {weekDays.map((day, dayIndex) => {
                   const availability = getAvailabilityStatus(zone.id, day, timeSlot);
-                  const statusColor = getStatusColor(availability.status, availability.reason);
-                  const statusText = getStatusText(availability.status, availability.reason);
+                  const statusColor = getStatusColor(availability);
                   
                   return (
                     <div key={dayIndex} className="relative">
                       <button
-                        className={`w-full h-8 rounded text-xs font-medium border transition-all duration-200 ${statusColor} ${
-                          availability.status === 'available' 
+                        className={`w-full h-8 rounded border-2 transition-all duration-200 ${statusColor} ${
+                          availability === 'available' 
                             ? 'cursor-pointer shadow-sm hover:shadow-md hover:scale-105' 
                             : 'cursor-not-allowed opacity-75'
                         }`}
-                        disabled={availability.status !== 'available'}
-                        title={availability.details || statusText}
+                        disabled={availability !== 'available'}
                         onClick={() => {
-                          if (availability.status === 'available') {
+                          if (availability === 'available') {
                             console.log(`Booking ${zone.name} on ${format(day, 'dd.MM.yyyy')} at ${timeSlot}`);
                           }
                         }}
                       >
-                        {statusText}
+                        {/* No text content - just the colored button */}
                       </button>
                     </div>
                   );
@@ -230,29 +187,21 @@ export function AvailabilityTab({ zones, startDate, showLegend = true }: Availab
 
   return (
     <div className="space-y-4">
-      {/* Conditionally show legend only if showLegend is true */}
+      {/* Simplified legend - only 3 colors */}
       {showLegend && (
         <div className="p-3 bg-gray-50 rounded-lg">
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-2 text-xs">
-            <div className="flex items-center gap-1">
-              <div className="w-2 h-2 rounded bg-green-100 border border-green-200"></div>
+          <div className="grid grid-cols-3 gap-4 text-sm">
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 rounded bg-green-400 border-2 border-green-500"></div>
               <span>Ledig</span>
             </div>
-            <div className="flex items-center gap-1">
-              <div className="w-2 h-2 rounded bg-red-100 border border-red-200"></div>
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 rounded bg-red-400 border-2 border-red-500"></div>
               <span>Opptatt</span>
             </div>
-            <div className="flex items-center gap-1">
-              <div className="w-2 h-2 rounded bg-red-200 border border-red-300"></div>
-              <span>Hele lokalet</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <div className="w-2 h-2 rounded bg-amber-100 border border-amber-200"></div>
-              <span>Helg/begrenset</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <div className="w-2 h-2 rounded bg-gray-200 border border-gray-300"></div>
-              <span>Utilgjengelig</span>
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 rounded bg-gray-400 border-2 border-gray-500"></div>
+              <span>Ikke tilgjengelig</span>
             </div>
           </div>
         </div>
