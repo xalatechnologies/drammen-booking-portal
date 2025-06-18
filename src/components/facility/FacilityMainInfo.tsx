@@ -1,3 +1,4 @@
+
 import React from "react";
 import { MapPin, Users, Wrench } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -99,7 +100,7 @@ const FacilityMainInfo: React.FC<FacilityMainInfoProps> = ({
         {accessibility && accessibility.length > 0 && (
           <div className="space-y-3">
             <div className="ml-7">
-              <AccessibilityBadges accessibility={accessibility} size="sm" />
+              <AccessibilityBadges accessibility={accessibility} />
             </div>
           </div>
         )}
