@@ -2,7 +2,7 @@
 import { z } from "zod";
 
 export const bookingFormSchema = z.object({
-  bookingMode: z.enum(['one-time', 'date-range', 'recurring']).default('one-time'),
+  bookingMode: z.enum(['one-time', 'date-range', 'recurring']).default('one-time').optional(),
   customerType: z.enum(['private', 'nonprofit', 'business', 'youth', 'senior'], {
     required_error: "Velg prisgruppe"
   }).default('private'),
@@ -24,7 +24,8 @@ export const bookingFormSchema = z.object({
   contactEmail: z.string().email("Ugyldig e-postadresse").default(""),
   contactPhone: z.string().min(8, "Telefonnummer må være minst 8 siffer").default(""),
   organization: z.string().optional(),
-  specialServices: z.array(z.string()).optional()
+  specialServices: z.array(z.string()).optional(),
+  recurrenceRule: z.string().optional()
 });
 
 export type BookingFormValues = z.infer<typeof bookingFormSchema>;

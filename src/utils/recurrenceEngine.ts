@@ -2,7 +2,7 @@
 import { addDays, addWeeks, addMonths, format, startOfWeek, isSameDay, getDay } from 'date-fns';
 
 export interface RecurrencePattern {
-  type: 'single' | 'weekly' | 'biweekly' | 'monthly' | 'custom';
+  type: 'single' | 'weekly' | 'biweekly' | 'monthly' | 'custom' | 'daily';
   weekdays: number[]; // 0 = Sunday, 1 = Monday, etc.
   timeSlots: string[];
   interval: number; // for custom patterns
@@ -124,22 +124,131 @@ export class RecurrenceEngine {
   getPatternDescription(pattern: RecurrencePattern): string {
     const weekdayNames = ['Søndag', 'Mandag', 'Tirsdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lørdag'];
     const selectedDays = pattern.weekdays.map(day => weekdayNames[day]).join(', ');
+    const timeSlotsText = pattern.timeSlots.length > 0 
+      ? `kl. ${pattern.timeSlots.join(', ')}` 
+      : '';
 
     switch (pattern.type) {
       case 'single':
         return 'Enkelt booking';
       case 'weekly':
-        return `Ukentlig på ${selectedDays}`;
+        return `Ukentlig på ${selectedDays} ${timeSlotsText}`;
       case 'biweekly':
-        return `Annenhver uke på ${selectedDays}`;
+        return `Annenhver uke på ${selectedDays} ${timeSlotsText}`;
       case 'monthly':
         const dayName = weekdayNames[pattern.monthlyWeekday || 0];
-        return `${pattern.monthlyPattern} ${dayName} hver måned`;
+        if (pattern.monthlyPattern && pattern.monthlyWeekday !== undefined) {
+          return `${pattern.monthlyPattern} ${dayName} hver måned ${timeSlotsText}`;
+        }
+        return `Månedlig på ${selectedDays} ${timeSlotsText}`;
+      case 'daily':
+        return `Daglig ${timeSlotsText}`;
       case 'custom':
-        return `Egendefinert: hver ${pattern.interval}. dag på ${selectedDays}`;
+        return `Egendefinert: hver ${pattern.interval}. dag på ${selectedDays} ${timeSlotsText}`;
       default:
         return 'Ukjent mønster';
     }
+  }
+
+  /**
+   * Convert a recurrence pattern to an iCal RRULE string
+   */
+  patternToRRule(pattern: RecurrencePattern): string {
+    let freq = '';
+    let interval = pattern.interval || 1;
+    
+    switch (pattern.type) {
+      case 'daily':
+        freq = 'DAILY';
+        break;
+      case 'weekly':
+        freq = 'WEEKLY';
+        break;
+      case 'biweekly':
+        freq = 'WEEKLY';
+        interval = 2;
+        break;
+      case 'monthly':
+        freq = 'MONTHLY';
+        break;
+      default:
+        freq = 'WEEKLY'; // Default to weekly
+    }
+    
+    let rule = `FREQ=${freq};INTERVAL=${interval}`;
+    
+    // Add BYDAY for weekly/biweekly patterns
+    if ((pattern.type === 'weekly' || pattern.type === 'biweekly') && pattern.weekdays.length > 0) {
+      const dayMap = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
+      const byDay = pattern.weekdays.map(day => dayMap[day]).join(',');
+      rule += `;BYDAY=${byDay}`;
+    }
+    
+    // Add UNTIL if there's an end date
+    if (pattern.endDate) {
+      const untilStr = pattern.endDate.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+      rule += `;UNTIL=${untilStr}`;
+    }
+    
+    return rule;
+  }
+
+  /**
+   * Parse an iCal RRULE string to a RecurrencePattern
+   */
+  rRuleToPattern(rrule: string): Partial<RecurrencePattern> {
+    const parts = rrule.split(';');
+    const pattern: Partial<RecurrencePattern> = {
+      weekdays: [],
+      timeSlots: [],
+      interval: 1
+    };
+    
+    parts.forEach(part => {
+      const [key, value] = part.split('=');
+      
+      switch (key) {
+        case 'FREQ':
+          switch (value) {
+            case 'DAILY':
+              pattern.type = 'daily';
+              break;
+            case 'WEEKLY':
+              pattern.type = 'weekly';
+              break;
+            case 'MONTHLY':
+              pattern.type = 'monthly';
+              break;
+            default:
+              pattern.type = 'custom';
+          }
+          break;
+          
+        case 'INTERVAL':
+          pattern.interval = parseInt(value);
+          // If it's weekly with interval 2, it's biweekly
+          if (pattern.type === 'weekly' && pattern.interval === 2) {
+            pattern.type = 'biweekly';
+            pattern.interval = 1;
+          }
+          break;
+          
+        case 'BYDAY':
+          const dayMap = { 'SU': 0, 'MO': 1, 'TU': 2, 'WE': 3, 'TH': 4, 'FR': 5, 'SA': 6 };
+          pattern.weekdays = value.split(',').map(day => dayMap[day as keyof typeof dayMap]);
+          break;
+          
+        case 'UNTIL':
+          // Parse the UNTIL date (format: 20231231T000000Z)
+          const year = parseInt(value.substring(0, 4));
+          const month = parseInt(value.substring(4, 6)) - 1;
+          const day = parseInt(value.substring(6, 8));
+          pattern.endDate = new Date(year, month, day);
+          break;
+      }
+    });
+    
+    return pattern;
   }
 }
 

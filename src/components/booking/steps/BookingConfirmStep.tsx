@@ -3,6 +3,8 @@ import React from "react";
 import { CheckCircle2, AlertTriangle } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { BookingSummary, BookingData } from "../BookingSummary";
+import { RecurrencePatternDisplay } from "../RecurrencePatternDisplay";
+import { RecurrencePattern } from "@/utils/recurrenceEngine";
 
 interface BookingConfirmStepProps {
   facilityName: string;
@@ -10,6 +12,7 @@ interface BookingConfirmStepProps {
   bookingData: BookingData;
   termsAccepted: boolean;
   onTermsAcceptedChange: (accepted: boolean) => void;
+  recurrencePattern?: RecurrencePattern | null;
 }
 
 export function BookingConfirmStep({ 
@@ -17,7 +20,8 @@ export function BookingConfirmStep({
   facilityId,
   bookingData, 
   termsAccepted, 
-  onTermsAcceptedChange 
+  onTermsAcceptedChange,
+  recurrencePattern
 }: BookingConfirmStepProps) {
   return (
     <div className="space-y-6">
@@ -35,6 +39,11 @@ export function BookingConfirmStep({
         facilityId={facilityId}
         bookingData={bookingData} 
       />
+
+      {/* Recurrence Pattern Display */}
+      {recurrencePattern && bookingData.bookingMode === 'recurring' && (
+        <RecurrencePatternDisplay pattern={recurrencePattern} />
+      )}
 
       {/* Terms and Conditions */}
       <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">

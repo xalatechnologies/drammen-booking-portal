@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Calendar, MapPin, Users, Clock } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,6 +7,7 @@ import { BookingFormValues } from "./types";
 import { PriceBreakdown } from "./PriceBreakdown";
 import { usePriceCalculation } from "@/hooks/usePriceCalculation";
 import { format } from "date-fns";
+import { RecurrencePattern } from "@/utils/recurrenceEngine";
 
 // Export BookingData interface for other components to use
 export interface BookingData {
@@ -28,6 +28,7 @@ export interface BookingData {
   customerType?: string;
   eventType?: string;
   ageGroup?: string;
+  recurrenceRule?: string;
 }
 
 interface BookingSummaryProps {
@@ -35,9 +36,16 @@ interface BookingSummaryProps {
   facilityId: string;
   data?: BookingFormValues;
   bookingData?: BookingData;
+  recurrencePattern?: RecurrencePattern | null;
 }
 
-export function BookingSummary({ data, bookingData, facilityName, facilityId }: BookingSummaryProps) {
+export function BookingSummary({ 
+  data, 
+  bookingData, 
+  facilityName, 
+  facilityId,
+  recurrencePattern
+}: BookingSummaryProps) {
   // Use either data or bookingData
   const bookingInfo = data || bookingData;
 

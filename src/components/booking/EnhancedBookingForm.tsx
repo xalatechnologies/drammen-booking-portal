@@ -10,6 +10,7 @@ import { BookingFormNav } from "./BookingFormNav";
 import { CollapsibleFormStepper } from "./CollapsibleFormStepper";
 import { bookingFormSchema, BookingFormValues } from "./formSchema";
 import { Zone, BookingStep, BookingData } from "./types";
+import { RecurrencePattern } from "@/utils/recurrenceEngine";
 
 interface EnhancedBookingFormProps {
   facility: {
@@ -35,6 +36,7 @@ export function EnhancedBookingForm({
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [recurrencePattern, setRecurrencePattern] = useState<RecurrencePattern | null>(null);
 
   const steps: BookingStep[] = ['details', 'contact', 'confirm'];
   const stepTitles = ["Reservasjonsdetaljer", "Kontaktinformasjon", "Gjennomgå og bekreft"];
@@ -152,7 +154,14 @@ export function EnhancedBookingForm({
   const renderCurrentStep = () => {
     switch (currentStep) {
       case 0:
-        return <BookingDetailsStep form={form} facility={facility} />;
+        return (
+          <BookingDetailsStep 
+            form={form} 
+            facility={facility} 
+            recurrencePattern={recurrencePattern}
+            onRecurrencePatternChange={setRecurrencePattern}
+          />
+        );
       case 1:
         return <BookingContactStep form={form} />;
       case 2:
@@ -161,7 +170,8 @@ export function EnhancedBookingForm({
           facilityId={facility.id}
           bookingData={getBookingData()} 
           termsAccepted={termsAccepted} 
-          onTermsAcceptedChange={setTermsAccepted} 
+          onTermsAcceptedChange={setTermsAccepted}
+          recurrencePattern={recurrencePattern}
         />;
       default:
         return null;

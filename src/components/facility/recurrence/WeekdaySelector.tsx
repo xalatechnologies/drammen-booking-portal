@@ -1,8 +1,7 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Check } from 'lucide-react';
+import { Check, Calendar } from 'lucide-react';
 
 interface WeekdaySelectorProps {
   selectedWeekdays: number[];
@@ -17,12 +16,12 @@ export function WeekdaySelector({ selectedWeekdays, onWeekdayToggle }: WeekdaySe
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-green-100 rounded-lg">
-            <span className="text-xl">📅</span>
+            <Calendar className="h-5 w-5 text-green-600" />
           </div>
           <h3 className="text-xl font-bold text-gray-800">Hvilke dager?</h3>
         </div>
         {selectedWeekdays.length > 0 && (
-          <Badge className="bg-green-100 text-green-800 px-3 py-1 text-sm font-semibold">
+          <Badge className="bg-green-100 text-green-800 px-3 py-1 text-sm font-semibold rounded-full">
             {selectedWeekdays.length} valgt
           </Badge>
         )}
@@ -33,15 +32,15 @@ export function WeekdaySelector({ selectedWeekdays, onWeekdayToggle }: WeekdaySe
           return (
             <Button
               key={index}
-              variant={isSelected ? 'default' : 'outline'}
+              variant={isSelected ? "default" : "outline"}
               onClick={() => onWeekdayToggle(index)}
-              className={`w-20 h-20 p-0 text-lg font-bold transition-all transform hover:scale-110 relative ${
+              className={`w-20 h-20 p-0 text-lg font-bold transition-all transform hover:scale-110 relative rounded-xl ${
                 isSelected 
-                  ? 'bg-green-600 hover:bg-green-700 text-white shadow-xl ring-4 ring-green-200' 
-                  : 'hover:bg-green-50 hover:border-green-300 hover:shadow-lg'
+                  ? 'bg-green-600 hover:bg-green-700 text-white shadow-xl border-2 border-green-600' 
+                  : 'hover:bg-green-50 hover:border-green-300 hover:shadow-lg border-2 border-gray-200'
               }`}
             >
-              {isSelected && <Check className="absolute top-1 right-1 h-4 w-4" />}
+              {isSelected && <Check className="absolute top-2 right-2 h-3 w-3" />}
               {day}
             </Button>
           );

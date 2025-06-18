@@ -1,5 +1,5 @@
 import { RRule } from 'rrule';
-import { addMinutes, parseISO } from 'date-fns';
+import { addMinutes, parseISO, format } from 'date-fns';
 
 interface TimeSlot {
   start: Date;
@@ -38,30 +38,36 @@ const generateOccurrences = (
   recurrenceRule: string, 
   until: Date
 ): TimeSlot[] => {
-  // Parse the time slot to get duration in minutes
-  const slot = parseTimeSlot(startDate, timeSlot);
-  if (!slot) return [];
-  
-  const durationMinutes = (slot.end.getTime() - slot.start.getTime()) / (1000 * 60);
-  
-  // Create an RRule
-  let ruleOptions = RRule.parseString(recurrenceRule);
-  ruleOptions = {
-    ...ruleOptions,
-    dtstart: startDate,
-    until: until
-  };
-  
-  const rule = new RRule(ruleOptions);
-  
-  // Generate all occurrences
-  const occurrenceDates = rule.all();
-  
-  // Convert to TimeSlot objects
-  return occurrenceDates.map(date => ({
-    start: date,
-    end: addMinutes(date, durationMinutes)
-  }));
+  try {
+    // Parse the time slot to get duration in minutes
+    const slot = parseTimeSlot(startDate, timeSlot);
+    if (!slot) return [];
+    
+    const durationMinutes = (slot.end.getTime() - slot.start.getTime()) / (1000 * 60);
+    
+    // Create an RRule
+    let ruleOptions = RRule.parseString(recurrenceRule);
+    ruleOptions = {
+      ...ruleOptions,
+      dtstart: startDate,
+      until: until
+    };
+    
+    const rule = new RRule(ruleOptions);
+    
+    // Generate all occurrences
+    const occurrenceDates = rule.all();
+    
+    // Convert to TimeSlot objects
+    return occurrenceDates.map(date => ({
+      start: date,
+      end: addMinutes(date, durationMinutes)
+    }));
+  } catch (error) {
+    console.error('Error generating occurrences:', error);
+    console.log('Parameters:', { startDate: format(startDate, 'yyyy-MM-dd'), timeSlot, recurrenceRule, until: format(until, 'yyyy-MM-dd') });
+    return [];
+  }
 };
 
 // Check if two time slots overlap
@@ -213,10 +219,18 @@ export const getRecurrenceDescription = (
 export const generateRecurrenceRule = (
   frequency: 'daily' | 'weekly' | 'monthly',
   interval: number = 1,
+  weekdays: number[] = [],
   count?: number,
   until?: Date
 ): string => {
   let rule = `FREQ=${frequency.toUpperCase()};INTERVAL=${interval}`;
+  
+  // Add BYDAY for weekly/monthly patterns
+  if ((frequency === 'weekly' || frequency === 'monthly') && weekdays.length > 0) {
+    const dayMap = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
+    const byDay = weekdays.map(day => dayMap[day]).join(',');
+    rule += `;BYDAY=${byDay}`;
+  }
   
   if (count) {
     rule += `;COUNT=${count}`;

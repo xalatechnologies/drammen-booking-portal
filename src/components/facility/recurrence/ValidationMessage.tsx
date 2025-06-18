@@ -1,5 +1,5 @@
-
 import React from 'react';
+import { AlertTriangle } from 'lucide-react';
 
 interface ValidationMessageProps {
   selectedWeekdays: number[];
@@ -13,16 +13,16 @@ export function ValidationMessage({ selectedWeekdays, selectedTimeSlots }: Valid
   if (hasWeekdays && hasTimeSlots) return null;
 
   return (
-    <div className="bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-200 rounded-2xl p-6 shadow-lg">
+    <div className="bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-200 rounded-xl p-6 shadow-md">
       <div className="flex items-center gap-3 text-amber-800">
         <div className="p-2 bg-amber-100 rounded-lg">
-          <span className="text-xl">⚠️</span>
+          <AlertTriangle className="h-5 w-5 text-amber-600" />
         </div>
         <div>
           <p className="font-bold text-lg">Nesten ferdig!</p>
-          <p className="text-sm opacity-80">
+          <p className="text-base opacity-90">
             {!hasWeekdays && !hasTimeSlots 
-              ? "Velg dager og tider" 
+              ? "Velg dager og tider for å opprette gjentakende reservasjon" 
               : !hasWeekdays 
               ? "Velg minst én dag" 
               : "Velg minst ett tidspunkt"}

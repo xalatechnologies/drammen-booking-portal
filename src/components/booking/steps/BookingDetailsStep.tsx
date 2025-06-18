@@ -5,7 +5,6 @@ import { Calendar, Clock, Users, MessageSquare, Repeat, Trophy } from "lucide-re
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { BookingFormValues, Zone } from "../types";
@@ -16,6 +15,9 @@ import { PriceBreakdown } from "../PriceBreakdown";
 import { usePriceCalculation } from "@/hooks/usePriceCalculation";
 import { ActorType } from "@/types/pricing";
 import { CustomerTypeSection } from "./CustomerTypeSection";
+import { RecurrencePatternButton } from "../RecurrencePatternButton";
+import { RecurringBookingModal } from "../RecurringBookingModal";
+import { RecurrencePattern } from "@/utils/recurrenceEngine";
 
 export interface BookingDetailsStepProps {
   form: UseFormReturn<BookingFormValues>;
@@ -28,6 +30,8 @@ export interface BookingDetailsStepProps {
       slots: { start: string; end: string; available: boolean }[];
     }[];
   };
+  recurrencePattern: RecurrencePattern | null;
+  onRecurrencePatternChange: (pattern: RecurrencePattern | null) => void;
 }
 
 // Customer type mapping to ActorType
@@ -41,8 +45,14 @@ const customerTypeToActorType = (customerType: string): ActorType => {
   }
 };
 
-export function BookingDetailsStep({ form, facility }: BookingDetailsStepProps) {
+export function BookingDetailsStep({ 
+  form, 
+  facility, 
+  recurrencePattern, 
+  onRecurrencePatternChange 
+}: BookingDetailsStepProps) {
   const watchedValues = form.watch();
+  const [showRecurrenceModal, setShowRecurrenceModal] = useState(false);
 
   // Calculate price with more immediate feedback
   const { calculation, isLoading } = usePriceCalculation({
@@ -59,6 +69,15 @@ export function BookingDetailsStep({ form, facility }: BookingDetailsStepProps) 
 
   // Show pricing when we have minimum required info
   const shouldShowPricing = watchedValues.customerType && watchedValues.zoneId && watchedValues.date;
+
+  const handleApplyRecurrencePattern = (pattern: RecurrencePattern) => {
+    onRecurrencePatternChange(pattern);
+    
+    // Update booking mode based on pattern
+    if (pattern.weekdays.length > 0 && pattern.timeSlots.length > 0) {
+      form.setValue('bookingMode', 'recurring');
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -123,38 +142,36 @@ export function BookingDetailsStep({ form, facility }: BookingDetailsStepProps) 
         />
       </div>
 
-      {/* Booking Type */}
-      <div className="space-y-3">
-        <FormField
-          control={form.control}
-          name="bookingMode"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-base font-semibold text-gray-900 flex items-center gap-2">
-                <Repeat className="h-5 w-5 text-slate-600" />
-                Type reservasjon
-              </FormLabel>
-              <FormControl>
-                <RadioGroup
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                  className="grid grid-cols-2 gap-4"
-                >
-                  <div className="flex items-center space-x-3 border border-gray-200 rounded-lg p-4 hover:border-slate-300 transition-colors">
-                    <RadioGroupItem value="one-time" id="one-time" className="border-gray-400 text-slate-700" />
-                    <Label htmlFor="one-time" className="text-sm font-medium cursor-pointer">Engangsreservasjon</Label>
-                  </div>
-                  <div className="flex items-center space-x-3 border border-gray-200 rounded-lg p-4 hover:border-slate-300 transition-colors">
-                    <RadioGroupItem value="recurring" id="recurring" className="border-gray-400 text-slate-700" />
-                    <Label htmlFor="recurring" className="text-sm font-medium cursor-pointer">Gjentakende reservasjon</Label>
-                  </div>
-                </RadioGroup>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+      {/* Recurrence Pattern Button */}
+      <div className="space-y-4">
+        <Label className="text-base font-semibold text-gray-900 flex items-center gap-2">
+          <Repeat className="h-5 w-5 text-slate-600" />
+          Type reservasjon
+        </Label>
+        <RecurrencePatternButton 
+          pattern={recurrencePattern} 
+          onClick={() => setShowRecurrenceModal(true)} 
         />
+        
+        {recurrencePattern && (
+          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-blue-800">
+            <p className="font-medium">Gjentakende reservasjon opprettet</p>
+            <p className="text-sm mt-1">
+              {recurrenceEngine.getPatternDescription(recurrencePattern)}
+              {recurrencePattern.endDate && (
+                <span> frem til {recurrencePattern.endDate.toLocaleDateString('nb-NO')}</span>
+              )}
+            </p>
+          </div>
+        )}
       </div>
+
+      {/* Recurrence Pattern Modal */}
+      <RecurringBookingModal
+        isOpen={showRecurrenceModal}
+        onClose={() => setShowRecurrenceModal(false)}
+        onApplyPattern={handleApplyRecurrencePattern}
+      />
 
       {/* Date Range, Time Range, and Attendees */}
       <div className="grid grid-cols-1 md:grid-cols-7 gap-6">

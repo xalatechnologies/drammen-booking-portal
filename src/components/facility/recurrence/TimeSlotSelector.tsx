@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -22,26 +21,26 @@ export function TimeSlotSelector({ selectedTimeSlots, onTimeSlotToggle }: TimeSl
           <h3 className="text-xl font-bold text-gray-800">Hvilke tider?</h3>
         </div>
         {selectedTimeSlots.length > 0 && (
-          <Badge className="bg-purple-100 text-purple-800 px-3 py-1 text-sm font-semibold">
+          <Badge className="bg-purple-100 text-purple-800 px-3 py-1 text-sm font-semibold rounded-full">
             {selectedTimeSlots.length} valgt
           </Badge>
         )}
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
         {timeSlots.map((slot) => {
           const isSelected = selectedTimeSlots.includes(slot);
           return (
             <Button
               key={slot}
-              variant={isSelected ? 'default' : 'outline'}
+              variant={isSelected ? "default" : "outline"}
               onClick={() => onTimeSlotToggle(slot)}
-              className={`h-14 text-base font-semibold transition-all transform hover:scale-105 relative ${
+              className={`h-14 text-base font-medium transition-all transform hover:scale-105 relative rounded-xl ${
                 isSelected 
-                  ? 'bg-purple-600 hover:bg-purple-700 text-white shadow-lg ring-3 ring-purple-200' 
-                  : 'hover:bg-purple-50 hover:border-purple-300 hover:shadow-md'
+                  ? 'bg-purple-600 hover:bg-purple-700 text-white shadow-lg border-2 border-purple-600' 
+                  : 'hover:bg-purple-50 hover:border-purple-300 hover:shadow-md border-2 border-gray-200'
               }`}
             >
-              {isSelected && <Check className="absolute top-1 right-1 h-3 w-3" />}
+              {isSelected && <Check className="absolute top-2 right-2 h-3 w-3" />}
               {slot}
             </Button>
           );

@@ -6,11 +6,14 @@ import { EnhancedBookingForm } from "@/components/booking/EnhancedBookingForm";
 import { BookingPageHeader } from "@/components/facility/booking/BookingPageHeader";
 import { BookingSuccessPage } from "@/components/facility/booking/BookingSuccessPage";
 import { Zone } from "@/components/booking/types";
+import { RecurrencePattern } from "@/utils/recurrenceEngine";
 
 const BookingPage = () => {
   const { facilityId } = useParams();
   const [isBookingComplete, setIsBookingComplete] = useState(false);
   const [bookingReference, setBookingReference] = useState("");
+  const [recurrencePattern, setRecurrencePattern] = useState<RecurrencePattern | null>(null);
+  const [isRecurring, setIsRecurring] = useState(false);
 
   // Mock facility data - in real app this would be fetched based on facilityId
   const facility = {
@@ -140,6 +143,12 @@ const BookingPage = () => {
 
   const handleBookingComplete = (reference: string) => {
     setBookingReference(reference);
+    
+    // Check if this is a recurring booking
+    const formData = new FormData(document.querySelector('form') as HTMLFormElement);
+    const bookingMode = formData.get('bookingMode');
+    setIsRecurring(bookingMode === 'recurring');
+    
     setIsBookingComplete(true);
   };
 
@@ -150,6 +159,8 @@ const BookingPage = () => {
         <BookingSuccessPage 
           bookingReference={bookingReference} 
           facilityId={facilityId} 
+          isRecurring={isRecurring}
+          recurrencePattern={recurrencePattern}
         />
         <GlobalFooter />
       </div>
