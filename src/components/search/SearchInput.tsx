@@ -18,15 +18,15 @@ const SearchInput: React.FC<SearchInputProps> = ({
         Søk etter lokaler
       </label>
       <Search 
-        className="absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-400 h-7 w-7" 
+        className="absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-400 h-6 w-6" 
         aria-hidden="true"
       />
       <Input
         id="facility-search"
-        placeholder="Hvor vil du være? Søk etter lokaler..."
+        placeholder="Søk etter lokaler, aktiviteter eller områder..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
-        className="pl-16 h-14 border-2 border-gray-300 focus:border-gray-900 focus:ring-0 text-lg font-medium placeholder:text-gray-500 placeholder:font-normal placeholder:text-lg"
+        className="pl-14 h-14 border-0 bg-white/90 backdrop-blur-sm shadow-lg focus:shadow-xl focus:bg-white focus:ring-4 focus:ring-white/50 text-lg font-medium placeholder:text-gray-500 placeholder:font-normal placeholder:text-base rounded-xl transition-all duration-300"
         aria-describedby="search-help"
         autoComplete="off"
         role="searchbox"

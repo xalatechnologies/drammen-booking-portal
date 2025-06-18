@@ -1,6 +1,6 @@
-
 import React from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Building2, MapPin } from "lucide-react";
 
 interface FilterSelectsProps {
   facilityType: string;
@@ -29,34 +29,40 @@ const FilterSelects: React.FC<FilterSelectsProps> = ({
     return (
       <div className="flex gap-4">
         {/* Facility Type */}
-        <Select value={facilityType} onValueChange={setFacilityType}>
-          <SelectTrigger className="w-full h-14 border-2 border-gray-300 focus:border-gray-900 text-lg font-medium">
-            <SelectValue placeholder="Type lokale" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all" className="text-lg">Alle typer</SelectItem>
-            <SelectItem value="sports-hall" className="text-lg">Idrettshall</SelectItem>
-            <SelectItem value="meeting-room" className="text-lg">Møterom</SelectItem>
-            <SelectItem value="conference-room" className="text-lg">Konferanserom</SelectItem>
-            <SelectItem value="auditorium" className="text-lg">Auditorium</SelectItem>
-            <SelectItem value="gym" className="text-lg">Gymsal</SelectItem>
-          </SelectContent>
-        </Select>
+        <div className="flex-1 relative">
+          <Building2 className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5 z-10" />
+          <Select value={facilityType} onValueChange={setFacilityType}>
+            <SelectTrigger className="w-full h-14 pl-12 border-2 border-gray-200 hover:border-blue-400 focus:border-blue-500 text-lg font-medium rounded-lg bg-white shadow-sm hover:shadow-md transition-all duration-200">
+              <SelectValue placeholder="Type lokale" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all" className="text-lg">Alle typer</SelectItem>
+              <SelectItem value="sports-hall" className="text-lg">Idrettshall</SelectItem>
+              <SelectItem value="meeting-room" className="text-lg">Møterom</SelectItem>
+              <SelectItem value="conference-room" className="text-lg">Konferanserom</SelectItem>
+              <SelectItem value="auditorium" className="text-lg">Auditorium</SelectItem>
+              <SelectItem value="gym" className="text-lg">Gymsal</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
         {/* Location */}
-        <Select value={location} onValueChange={setLocation}>
-          <SelectTrigger className="w-full h-14 border-2 border-gray-300 focus:border-gray-900 text-lg font-medium">
-            <SelectValue placeholder="Område" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all" className="text-lg">Alle områder</SelectItem>
-            <SelectItem value="drammen-sentrum" className="text-lg">Drammen Sentrum</SelectItem>
-            <SelectItem value="bragernes" className="text-lg">Bragernes</SelectItem>
-            <SelectItem value="stromsø" className="text-lg">Strømsø</SelectItem>
-            <SelectItem value="konnerud" className="text-lg">Konnerud</SelectItem>
-            <SelectItem value="åssiden" className="text-lg">Åssiden</SelectItem>
-          </SelectContent>
-        </Select>
+        <div className="flex-1 relative">
+          <MapPin className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5 z-10" />
+          <Select value={location} onValueChange={setLocation}>
+            <SelectTrigger className="w-full h-14 pl-12 border-2 border-gray-200 hover:border-blue-400 focus:border-blue-500 text-lg font-medium rounded-lg bg-white shadow-sm hover:shadow-md transition-all duration-200">
+              <SelectValue placeholder="Område" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all" className="text-lg">Alle områder</SelectItem>
+              <SelectItem value="drammen-sentrum" className="text-lg">Drammen Sentrum</SelectItem>
+              <SelectItem value="bragernes" className="text-lg">Bragernes</SelectItem>
+              <SelectItem value="stromsø" className="text-lg">Strømsø</SelectItem>
+              <SelectItem value="konnerud" className="text-lg">Konnerud</SelectItem>
+              <SelectItem value="åssiden" className="text-lg">Åssiden</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
     );
   }

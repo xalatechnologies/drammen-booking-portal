@@ -26,9 +26,9 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
       <PopoverTrigger asChild>
         <Button
           variant="outline"
-          className="w-full h-14 justify-start text-left font-medium border-2 border-gray-300 hover:border-gray-900 text-lg"
+          className="w-full h-14 justify-start text-left font-medium border-0 bg-white/90 backdrop-blur-sm shadow-lg hover:shadow-xl hover:bg-white text-lg rounded-xl transition-all duration-300"
         >
-          <CalendarIcon className="mr-3 h-6 w-6 text-gray-500" />
+          <CalendarIcon className="mr-3 h-5 w-5 text-gray-500" />
           {dateRange?.from ? (
             dateRange.to ? (
               <>
@@ -39,7 +39,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
               format(dateRange.from, "dd.MM.yyyy", { locale: nb })
             )
           ) : (
-            <span className="text-gray-500 text-lg">Velg datoperiode</span>
+            <span className="text-gray-500 text-base">Velg periode</span>
           )}
         </Button>
       </PopoverTrigger>
