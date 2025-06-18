@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { DateRange } from "react-day-picker";
@@ -10,6 +11,7 @@ import FacilityList from "@/components/FacilityList";
 import PaginationControls from "@/components/PaginationControls";
 import MapView from "@/components/MapView";
 import CalendarView from "@/components/CalendarView";
+
 const Index = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [date, setDate] = useState<Date>();
@@ -27,6 +29,7 @@ const Index = () => {
     const urlAccessibility = searchParams.get('accessibility');
     const urlCapacity = searchParams.get('capacity');
     const urlViewMode = searchParams.get('viewMode');
+    
     if (urlFacilityType) setFacilityType(urlFacilityType);
     if (urlLocation) setLocation(urlLocation);
     if (urlAccessibility) setAccessibility(urlAccessibility);
@@ -43,17 +46,94 @@ const Index = () => {
       setSearchParams({});
     }
   }, [searchParams, setSearchParams]);
-  return <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex flex-col">
+
+  const renderContent = () => {
+    switch (viewMode) {
+      case "map":
+        return (
+          <MapView 
+            facilityType={facilityType} 
+            location={location}
+          />
+        );
+      case "calendar":
+        return (
+          <CalendarView 
+            date={date}
+            facilityType={facilityType}
+            location={location}
+            accessibility={accessibility}
+            capacity={capacity}
+          />
+        );
+      case "list":
+        return (
+          <>
+            <FacilityList 
+              facilityType={facilityType}
+              location={location}
+              accessibility={accessibility}
+              capacity={capacity}
+            />
+            <PaginationControls />
+          </>
+        );
+      default:
+        return (
+          <>
+            <FacilityGrid 
+              facilityType={facilityType}
+              location={location}
+              accessibility={accessibility}
+              capacity={capacity}
+            />
+            <PaginationControls />
+          </>
+        );
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex flex-col">
       {/* Skip to main content link for screen readers */}
-      <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-0 focus:left-0 bg-blue-600 text-white p-2 z-50 rounded-br-md focus:outline-none focus:ring-2 focus:ring-blue-500" tabIndex={0}>
+      <a 
+        href="#main-content" 
+        className="sr-only focus:not-sr-only focus:absolute focus:top-0 focus:left-0 bg-blue-600 text-white p-2 z-50 rounded-br-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
+        tabIndex={0}
+      >
         Hopp til hovedinnhold
       </a>
 
       <GlobalHeader />
 
-      
+      <main id="main-content" className="flex-1">
+        <div className="container mx-auto px-4 py-6">
+          <HeroBanner />
+          
+          <SearchFilter
+            date={date}
+            setDate={setDate}
+            dateRange={dateRange}
+            setDateRange={setDateRange}
+            facilityType={facilityType}
+            setFacilityType={setFacilityType}
+            location={location}
+            setLocation={setLocation}
+            viewMode={viewMode}
+            setViewMode={setViewMode}
+            accessibility={accessibility}
+            setAccessibility={setAccessibility}
+            capacity={capacity}
+            setCapacity={setCapacity}
+          />
+
+          {renderContent()}
+        </div>
+      </main>
 
       <GlobalFooter />
-    </div>;
+    </div>
+  );
 };
+
 export default Index;
