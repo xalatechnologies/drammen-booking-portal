@@ -18,23 +18,21 @@ interface AvailabilityTabProps {
 export function AvailabilityTab({ zones, startDate }: AvailabilityTabProps) {
   const [currentWeekStart, setCurrentWeekStart] = useState(startOfWeek(startDate, { weekStartsOn: 1 }));
   
-  // Mock existing bookings for demo
+  // Mock existing bookings for demo - fixed to match ExistingBooking interface
   const existingBookings: ExistingBooking[] = [
     {
       id: "1",
       zoneId: "whole-facility",
-      startDate: new Date(2025, 5, 19, 14, 0),
-      endDate: new Date(2025, 5, 19, 16, 0),
-      bookedBy: "Drammen Fotballklubb",
-      bookingType: "whole-facility"
+      date: new Date(2025, 5, 19),
+      timeSlot: "14:00",
+      bookedBy: "Drammen Fotballklubb"
     },
     {
       id: "2", 
       zoneId: "zone-1",
-      startDate: new Date(2025, 5, 20, 10, 0),
-      endDate: new Date(2025, 5, 20, 12, 0),
-      bookedBy: "Lokale Basketlag",
-      bookingType: "zone"
+      date: new Date(2025, 5, 20),
+      timeSlot: "10:00",
+      bookedBy: "Lokale Basketlag"
     }
   ];
 
@@ -67,7 +65,7 @@ export function AvailabilityTab({ zones, startDate }: AvailabilityTabProps) {
   const getStatusColor = (status: string, reason?: string) => {
     switch (status) {
       case 'available':
-        return 'bg-green-100 text-green-800 border-green-200';
+        return 'bg-green-100 text-green-800 border-green-200 hover:bg-green-200';
       case 'booked':
         return reason === 'whole-facility-conflict' 
           ? 'bg-red-200 text-red-900 border-red-300' 
@@ -175,7 +173,7 @@ export function AvailabilityTab({ zones, startDate }: AvailabilityTabProps) {
       <div className="space-y-6">
         {zones.map((zone) => (
           <Card key={zone.id} className="overflow-hidden">
-            <CardHeader className="pb-3">
+            <CardHeader className="pb-4">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-lg">{zone.name}</CardTitle>
                 <div className="flex items-center gap-2">
@@ -188,62 +186,65 @@ export function AvailabilityTab({ zones, startDate }: AvailabilityTabProps) {
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="p-0">
-              <div className="overflow-x-auto">
-                <div className="min-w-[700px]">
-                  {/* Week Days Header */}
-                  <div className="grid grid-cols-8 border-b bg-gray-50">
-                    <div className="p-3 text-sm font-medium text-gray-600">Tid</div>
-                    {weekDays.map((day, i) => {
-                      const holidayCheck = isNorwegianHoliday(day);
+            <CardContent className="p-4 pt-0">
+              {/* Week Days Header */}
+              <div className="grid grid-cols-8 gap-1 mb-2">
+                <div className="p-2 text-xs font-medium text-gray-500">Tid</div>
+                {weekDays.map((day, i) => {
+                  const holidayCheck = isNorwegianHoliday(day);
+                  return (
+                    <div key={i} className="p-2 text-center">
+                      <div className="text-xs font-medium">
+                        {format(day, "EEE", { locale: nb })}
+                      </div>
+                      <div className="text-xs text-gray-600">
+                        {format(day, "dd.MM", { locale: nb })}
+                      </div>
+                      {holidayCheck.isHoliday && (
+                        <div className="text-xs text-red-600 mt-1">
+                          {holidayCheck.name}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Time Slots Grid */}
+              <div className="space-y-1">
+                {timeSlots.map((timeSlot) => (
+                  <div key={timeSlot} className="grid grid-cols-8 gap-1">
+                    <div className="p-2 text-xs font-medium text-gray-700 flex items-center">
+                      {timeSlot}
+                    </div>
+                    {weekDays.map((day, dayIndex) => {
+                      const availability = getAvailabilityStatus(zone.id, day, timeSlot);
+                      const statusColor = getStatusColor(availability.status, availability.reason);
+                      const statusText = getStatusText(availability.status, availability.reason);
+                      
                       return (
-                        <div key={i} className="p-3 text-center">
-                          <div className="text-sm font-medium">
-                            {format(day, "EEE", { locale: nb })}
-                          </div>
-                          <div className="text-xs text-gray-600">
-                            {format(day, "dd.MM", { locale: nb })}
-                          </div>
-                          {holidayCheck.isHoliday && (
-                            <div className="text-xs text-red-600 mt-1">
-                              {holidayCheck.name}
-                            </div>
-                          )}
+                        <div key={dayIndex} className="relative">
+                          <button
+                            className={`w-full h-8 rounded text-xs font-medium border transition-all duration-200 ${statusColor} ${
+                              availability.status === 'available' 
+                                ? 'cursor-pointer shadow-sm hover:shadow-md' 
+                                : 'cursor-not-allowed opacity-75'
+                            }`}
+                            disabled={availability.status !== 'available'}
+                            title={availability.details || statusText}
+                            onClick={() => {
+                              if (availability.status === 'available') {
+                                console.log(`Booking ${zone.name} on ${format(day, 'dd.MM.yyyy')} at ${timeSlot}`);
+                              }
+                            }}
+                          >
+                            {statusText}
+                          </button>
                         </div>
                       );
                     })}
                   </div>
-
-                  {/* Time Slots */}
-                  {timeSlots.map((timeSlot) => (
-                    <div key={timeSlot} className="grid grid-cols-8 border-b hover:bg-gray-50">
-                      <div className="p-3 text-sm font-medium border-r bg-white">
-                        {timeSlot}
-                      </div>
-                      {weekDays.map((day, dayIndex) => {
-                        const availability = getAvailabilityStatus(zone.id, day, timeSlot);
-                        const statusColor = getStatusColor(availability.status, availability.reason);
-                        const statusText = getStatusText(availability.status, availability.reason);
-                        
-                        return (
-                          <div key={dayIndex} className="p-2 border-r">
-                            <button
-                              className={`w-full h-8 rounded text-xs font-medium border transition-colors ${statusColor} ${
-                                availability.status === 'available' 
-                                  ? 'hover:bg-green-200 cursor-pointer' 
-                                  : 'cursor-not-allowed'
-                              }`}
-                              disabled={availability.status !== 'available'}
-                              title={availability.details || statusText}
-                            >
-                              {statusText}
-                            </button>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  ))}
-                </div>
+                ))}
               </div>
             </CardContent>
           </Card>
