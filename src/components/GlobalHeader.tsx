@@ -38,38 +38,36 @@ const GlobalHeader = () => {
   };
 
   return (
-    <header className="glass sticky top-0 z-50 border-b border-white/20 shadow-soft animate-fade-in">
-      <div className="container mx-auto px-4 py-3">
-        <div className="flex justify-between items-center">
-          {/* Logo (left) */}
-          <div className="flex items-center">
-            <Logo />
-          </div>
+    <header className="bg-white py-2 px-4 shadow-md sticky top-0 z-10">
+      <div className="container mx-auto flex justify-between items-center">
+        {/* Logo (left) */}
+        <div className="flex items-center">
+          <Logo />
+        </div>
 
-          {/* Mobile Menu Button */}
-          <Button 
-            variant="ghost" 
-            className="lg:hidden p-2 hover:bg-navy-50 focus-ring transition-all duration-200" 
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          >
-            <Menu className="h-6 w-6 text-navy-700" />
-          </Button>
+        {/* Mobile Menu Button */}
+        <Button 
+          variant="ghost" 
+          className="lg:hidden p-2" 
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+        >
+          <Menu className="h-6 w-6" />
+        </Button>
 
-          {/* Right side: Language toggle & Login/Profile */}
-          <div className="hidden lg:flex items-center space-x-4">
-            {/* Language toggle */}
-            <LanguageToggle 
-              language={language} 
-              toggleLanguage={toggleLanguage} 
-            />
-            
-            {/* Profile menu (login button or dropdown) */}
-            <ProfileMenu 
-              isLoggedIn={isLoggedIn} 
-              handleLogin={handleLogin} 
-              handleLogout={handleLogout} 
-            />
-          </div>
+        {/* Right side: Language toggle & Login/Profile */}
+        <div className="hidden lg:flex items-center space-x-4">
+          {/* Language toggle */}
+          <LanguageToggle 
+            language={language} 
+            toggleLanguage={toggleLanguage} 
+          />
+          
+          {/* Profile menu (login button or dropdown) */}
+          <ProfileMenu 
+            isLoggedIn={isLoggedIn} 
+            handleLogin={handleLogin} 
+            handleLogout={handleLogout} 
+          />
         </div>
       </div>
 

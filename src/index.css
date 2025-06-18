@@ -5,120 +5,89 @@
 
 @layer base {
   :root {
-    /* Horizon UI Primary Colors */
-    --background: 247 250 252; /* #F7FAFC */
-    --foreground: 27 37 89; /* #1B2559 */
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
 
-    /* Card colors */
-    --card: 255 255 255; /* #FFFFFF */
-    --card-foreground: 27 37 89; /* #1B2559 */
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
 
-    /* Popover colors */
-    --popover: 255 255 255; /* #FFFFFF */
-    --popover-foreground: 27 37 89; /* #1B2559 */
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
 
-    /* Primary - Navy Blue with Purple accent */
-    --primary: 27 37 89; /* #1B2559 */
-    --primary-foreground: 255 255 255; /* #FFFFFF */
+    --primary: 220 60% 15%;
+    --primary-foreground: 210 40% 98%;
 
-    /* Secondary - Light purple */
-    --secondary: 237 242 247; /* #EDF2F7 */
-    --secondary-foreground: 45 55 72; /* #2D3748 */
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
 
-    /* Muted colors */
-    --muted: 237 242 247; /* #EDF2F7 */
-    --muted-foreground: 113 128 150; /* #718096 */
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
 
-    /* Accent - Purple */
-    --accent: 128 90 213; /* #805AD5 */
-    --accent-foreground: 255 255 255; /* #FFFFFF */
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
 
-    /* Destructive colors */
-    --destructive: 229 62 62; /* #E53E3E */
-    --destructive-foreground: 255 255 255; /* #FFFFFF */
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
 
-    /* Border and input */
-    --border: 226 232 240; /* #E2E8F0 */
-    --input: 226 232 240; /* #E2E8F0 */
-    --ring: 128 90 213; /* #805AD5 */
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 220 60% 15%;
 
-    --radius: 0.75rem;
+    --radius: 0.5rem;
 
-    /* Sidebar colors */
-    --sidebar-background: 255 255 255; /* #FFFFFF */
-    --sidebar-foreground: 45 55 72; /* #2D3748 */
-    --sidebar-primary: 27 37 89; /* #1B2559 */
-    --sidebar-primary-foreground: 255 255 255; /* #FFFFFF */
-    --sidebar-accent: 247 250 252; /* #F7FAFC */
-    --sidebar-accent-foreground: 45 55 72; /* #2D3748 */
-    --sidebar-border: 226 232 240; /* #E2E8F0 */
-    --sidebar-ring: 128 90 213; /* #805AD5 */
+    --sidebar-background: 0 0% 98%;
 
-    /* Horizon UI Custom Colors */
-    --navy-50: 247 250 252; /* #F7FAFC */
-    --navy-100: 237 242 247; /* #EDF2F7 */
-    --navy-200: 226 232 240; /* #E2E8F0 */
-    --navy-300: 203 213 224; /* #CBD5E0 */
-    --navy-400: 160 174 192; /* #A0AEC0 */
-    --navy-500: 113 128 150; /* #718096 */
-    --navy-600: 74 85 104; /* #4A5568 */
-    --navy-700: 45 55 72; /* #2D3748 */
-    --navy-800: 26 32 44; /* #1A202C */
-    --navy-900: 27 37 89; /* #1B2559 */
+    --sidebar-foreground: 240 5.3% 26.1%;
 
-    --purple-50: 250 245 255; /* #FAF5FF */
-    --purple-100: 233 213 255; /* #E9D5FF */
-    --purple-200: 196 181 253; /* #C4B5FD */
-    --purple-300: 159 122 234; /* #9F7AEA */
-    --purple-400: 128 90 213; /* #805AD5 */
-    --purple-500: 102 68 187; /* #6644BB */
-    --purple-600: 79 70 229; /* #4F46E5 */
-    --purple-700: 67 56 202; /* #4338CA */
-    --purple-800: 55 48 163; /* #3730A3 */
-    --purple-900: 49 46 129; /* #312E81 */
+    --sidebar-primary: 220 60% 15%;
 
-    /* Gradient colors */
-    --gradient-start: 128 90 213; /* #805AD5 */
-    --gradient-end: 27 37 89; /* #1B2559 */
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 220 60% 15%;
   }
 
   .dark {
-    --background: 26 32 44; /* #1A202C */
-    --foreground: 247 250 252; /* #F7FAFC */
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
 
-    --card: 45 55 72; /* #2D3748 */
-    --card-foreground: 247 250 252; /* #F7FAFC */
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
 
-    --popover: 45 55 72; /* #2D3748 */
-    --popover-foreground: 247 250 252; /* #F7FAFC */
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
 
-    --primary: 159 122 234; /* #9F7AEA */
-    --primary-foreground: 26 32 44; /* #1A202C */
+    --primary: 220 60% 25%;
+    --primary-foreground: 220 60% 95%;
 
-    --secondary: 74 85 104; /* #4A5568 */
-    --secondary-foreground: 247 250 252; /* #F7FAFC */
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
 
-    --muted: 74 85 104; /* #4A5568 */
-    --muted-foreground: 160 174 192; /* #A0AEC0 */
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
 
-    --accent: 128 90 213; /* #805AD5 */
-    --accent-foreground: 247 250 252; /* #F7FAFC */
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
 
-    --destructive: 229 62 62; /* #E53E3E */
-    --destructive-foreground: 247 250 252; /* #F7FAFC */
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
 
-    --border: 74 85 104; /* #4A5568 */
-    --input: 74 85 104; /* #4A5568 */
-    --ring: 159 122 234; /* #9F7AEA */
-
-    --sidebar-background: 45 55 72; /* #2D3748 */
-    --sidebar-foreground: 247 250 252; /* #F7FAFC */
-    --sidebar-primary: 159 122 234; /* #9F7AEA */
-    --sidebar-primary-foreground: 26 32 44; /* #1A202C */
-    --sidebar-accent: 74 85 104; /* #4A5568 */
-    --sidebar-accent-foreground: 247 250 252; /* #F7FAFC */
-    --sidebar-border: 74 85 104; /* #4A5568 */
-    --sidebar-ring: 159 122 234; /* #9F7AEA */
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 220 60% 25%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 220 60% 25%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 220 60% 25%;
   }
 }
 
@@ -128,158 +97,6 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans antialiased;
-    font-feature-settings: "cv03", "cv04", "cv11";
-  }
-
-  /* Typography improvements */
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-semibold tracking-tight;
-  }
-
-  h1 {
-    @apply text-4xl lg:text-5xl;
-  }
-
-  h2 {
-    @apply text-3xl lg:text-4xl;
-  }
-
-  h3 {
-    @apply text-2xl lg:text-3xl;
-  }
-
-  h4 {
-    @apply text-xl lg:text-2xl;
-  }
-
-  h5 {
-    @apply text-lg lg:text-xl;
-  }
-
-  h6 {
-    @apply text-base lg:text-lg;
-  }
-}
-
-@layer components {
-  /* Glass morphism utilities */
-  .glass {
-    @apply bg-white/80 backdrop-blur-lg border border-white/20;
-  }
-
-  .glass-dark {
-    @apply bg-gray-900/80 backdrop-blur-lg border border-gray-700/20;
-  }
-
-  /* Gradient utilities */
-  .gradient-primary {
-    background: linear-gradient(135deg, rgb(var(--gradient-start)) 0%, rgb(var(--gradient-end)) 100%);
-  }
-
-  .gradient-secondary {
-    background: linear-gradient(135deg, rgb(var(--purple-400)) 0%, rgb(var(--purple-600)) 100%);
-  }
-
-  .gradient-accent {
-    background: linear-gradient(135deg, rgb(var(--accent)) 0%, rgb(var(--primary)) 100%);
-  }
-
-  /* Card shadows */
-  .shadow-soft {
-    box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.05), 0 4px 16px -4px rgba(0, 0, 0, 0.05);
-  }
-
-  .shadow-medium {
-    box-shadow: 0 4px 16px -4px rgba(0, 0, 0, 0.08), 0 8px 32px -8px rgba(0, 0, 0, 0.08);
-  }
-
-  .shadow-strong {
-    box-shadow: 0 8px 32px -8px rgba(0, 0, 0, 0.12), 0 16px 64px -16px rgba(0, 0, 0, 0.12);
-  }
-
-  /* Hover effects */
-  .hover-lift {
-    @apply transition-all duration-300 ease-out hover:shadow-strong hover:-translate-y-1;
-  }
-
-  .hover-scale {
-    @apply transition-transform duration-200 ease-out hover:scale-[1.02];
-  }
-
-  /* Focus styles */
-  .focus-ring {
-    @apply focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-white;
-  }
-
-  /* Scrollbar styling */
-  .scrollbar-thin {
-    scrollbar-width: thin;
-    scrollbar-color: rgb(var(--purple-300)) transparent;
-  }
-
-  .scrollbar-thin::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  .scrollbar-thin::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  .scrollbar-thin::-webkit-scrollbar-thumb {
-    background-color: rgb(var(--purple-300));
-    border-radius: 3px;
-  }
-
-  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-    background-color: rgb(var(--purple-400));
-  }
-}
-
-@layer utilities {
-  /* Animation utilities */
-  .animate-fade-in {
-    animation: fadeIn 0.5s ease-out;
-  }
-
-  .animate-slide-up {
-    animation: slideUp 0.4s ease-out;
-  }
-
-  .animate-scale-in {
-    animation: scaleIn 0.3s ease-out;
-  }
-
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes slideUp {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes scaleIn {
-    from {
-      opacity: 0;
-      transform: scale(0.95);
-    }
-    to {
-      opacity: 1;
-      transform: scale(1);
-    }
+    @apply bg-background text-foreground;
   }
 }
