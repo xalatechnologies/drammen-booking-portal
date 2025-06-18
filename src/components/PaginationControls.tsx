@@ -46,15 +46,21 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
   const endItem = Math.min(page * pagination.limit, total);
 
   return (
-    <div className="flex flex-col items-center gap-4 mt-8 mb-8">
-      {/* Results info */}
-      <p className="text-sm text-gray-600">
-        Viser {startItem}-{endItem} av {total} lokaler
-      </p>
+    <div className="flex flex-col items-center gap-6 mt-8 mb-8">
+      {/* Enhanced results info */}
+      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg px-6 py-3 shadow-sm">
+        <div className="flex items-center gap-2">
+          <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+          <p className="text-sm font-medium text-blue-900">
+            Viser <span className="font-bold text-blue-700">{startItem}-{endItem}</span> av{" "}
+            <span className="font-bold text-blue-700">{total}</span> lokaler
+          </p>
+        </div>
+      </div>
 
       {/* Only show pagination controls if more than 1 page */}
       {totalPages > 1 && (
-        <div className="flex justify-center items-center gap-1">
+        <div className="flex justify-center items-center gap-2 bg-white rounded-xl border border-gray-200 shadow-sm p-2">
           {/* Previous button */}
           <button
             onClick={() => onPageChange(page - 1)}
@@ -63,7 +69,7 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
               h-10 w-10 flex items-center justify-center rounded-lg border transition-all duration-200
               ${!hasPrev 
                 ? 'text-gray-300 border-gray-200 cursor-not-allowed bg-white' 
-                : 'text-gray-600 border-gray-300 bg-white hover:bg-gray-50 hover:border-gray-400'
+                : 'text-gray-600 border-gray-300 bg-white hover:bg-gray-50 hover:border-gray-400 hover:shadow-sm'
               }
             `}
           >
@@ -78,8 +84,8 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
               className={`
                 h-10 w-10 flex items-center justify-center text-sm font-medium transition-all duration-200 rounded-lg border
                 ${page === pageNum
-                  ? 'bg-black text-white border-black'
-                  : 'text-gray-700 border-gray-300 bg-white hover:bg-gray-50 hover:border-gray-400'
+                  ? 'bg-black text-white border-black shadow-sm'
+                  : 'text-gray-700 border-gray-300 bg-white hover:bg-gray-50 hover:border-gray-400 hover:shadow-sm'
                 }
               `}
             >
@@ -95,7 +101,7 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
               h-10 w-10 flex items-center justify-center rounded-lg border transition-all duration-200
               ${!hasNext 
                 ? 'text-gray-300 border-gray-200 cursor-not-allowed bg-white' 
-                : 'text-gray-600 border-gray-300 bg-white hover:bg-gray-50 hover:border-gray-400'
+                : 'text-gray-600 border-gray-300 bg-white hover:bg-gray-50 hover:border-gray-400 hover:shadow-sm'
               }
             `}
           >
