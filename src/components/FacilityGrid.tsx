@@ -46,15 +46,18 @@ const FacilityGrid: React.FC<FacilityGridProps> = ({
   
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 animate-fade-in">
         {Array.from({ length: pagination.limit }).map((_, index) => (
-          <div key={index} className="space-y-4">
-            <Skeleton className="h-48 w-full rounded-lg" />
-            <Skeleton className="h-6 w-3/4" />
-            <Skeleton className="h-4 w-1/2" />
-            <div className="space-y-2">
-              <Skeleton className="h-4 w-full" />
-              <Skeleton className="h-4 w-2/3" />
+          <div key={index} className="space-y-4 animate-pulse">
+            <Skeleton className="h-48 w-full rounded-lg bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-[shimmer_1.5s_ease-in-out_infinite]" />
+            <div className="p-4 space-y-3">
+              <Skeleton className="h-6 w-3/4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-[shimmer_1.5s_ease-in-out_infinite]" />
+              <Skeleton className="h-4 w-1/2 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-[shimmer_1.5s_ease-in-out_infinite]" />
+              <div className="grid grid-cols-2 gap-4 pt-3">
+                <Skeleton className="h-16 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-[shimmer_1.5s_ease-in-out_infinite] rounded-lg" />
+                <Skeleton className="h-16 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-[shimmer_1.5s_ease-in-out_infinite] rounded-lg" />
+              </div>
+              <Skeleton className="h-10 w-full bg-gradient-to-r from-blue-200 via-blue-100 to-blue-200 bg-[length:200%_100%] animate-[shimmer_1.5s_ease-in-out_infinite] rounded-lg" />
             </div>
           </div>
         ))}
@@ -64,7 +67,7 @@ const FacilityGrid: React.FC<FacilityGridProps> = ({
 
   if (error) {
     return (
-      <div className="text-center py-10 bg-red-50 rounded-lg border border-red-200">
+      <div className="text-center py-10 bg-red-50 rounded-lg border border-red-200 animate-fade-in">
         <h3 className="text-xl font-medium mb-2 text-red-800">Noe gikk galt</h3>
         <p className="text-red-600">Kunne ikke laste inn lokaler. Prøv igjen senere.</p>
       </div>
@@ -73,7 +76,7 @@ const FacilityGrid: React.FC<FacilityGridProps> = ({
 
   if (facilities.length === 0) {
     return (
-      <div className="text-center py-10 bg-gray-50 rounded-lg">
+      <div className="text-center py-10 bg-gray-50 rounded-lg animate-fade-in">
         <h3 className="text-xl font-medium mb-2">Ingen lokaler funnet</h3>
         <p className="text-gray-500">Prøv å endre søkekriteriene dine</p>
       </div>
@@ -81,13 +84,18 @@ const FacilityGrid: React.FC<FacilityGridProps> = ({
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-      {facilities.map(facility => (
-        <FacilityCard 
+    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 animate-fade-in">
+      {facilities.map((facility, index) => (
+        <div 
           key={facility.id} 
-          facility={facility} 
-          onAddressClick={handleAddressClick}
-        />
+          className="animate-scale-in"
+          style={{ animationDelay: `${index * 50}ms` }}
+        >
+          <FacilityCard 
+            facility={facility} 
+            onAddressClick={handleAddressClick}
+          />
+        </div>
       ))}
     </div>
   );
