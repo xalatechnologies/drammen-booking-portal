@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Calendar, CreditCard, MapPin, MessageSquare, Trophy } from 'lucide-react';
+import { Calendar, CreditCard, MapPin, MessageSquare, Trophy, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -8,10 +8,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { SelectedTimeSlot } from '@/utils/recurrenceEngine';
-import { CustomerType } from '@/types/pricing';
+import { ActorType, BookingType } from '@/types/pricing';
 import { Zone } from '@/components/booking/types';
 import { PriceBreakdown } from '@/components/booking/PriceBreakdown';
-import { CustomerTypeSelector } from '@/components/booking/CustomerTypeSelector';
+import { EnhancedCustomerTypeSelector } from '@/components/booking/EnhancedCustomerTypeSelector';
+import { BookingTypeSelector } from '@/components/booking/BookingTypeSelector';
 import { format } from 'date-fns';
 import { nb } from 'date-fns/locale';
 
@@ -19,8 +20,10 @@ interface BookingSummaryStepProps {
   selectedSlots: SelectedTimeSlot[];
   facilityName: string;
   zones: Zone[];
-  customerType: CustomerType;
-  onCustomerTypeChange: (type: CustomerType) => void;
+  actorType: ActorType;
+  onActorTypeChange: (type: ActorType) => void;
+  bookingType: BookingType;
+  onBookingTypeChange: (type: BookingType) => void;
   purpose: string;
   onPurposeChange: (purpose: string) => void;
   calculation: any;
@@ -32,8 +35,10 @@ export function BookingSummaryStep({
   selectedSlots,
   facilityName,
   zones,
-  customerType,
-  onCustomerTypeChange,
+  actorType,
+  onActorTypeChange,
+  bookingType,
+  onBookingTypeChange,
   purpose,
   onPurposeChange,
   calculation,
@@ -57,6 +62,10 @@ export function BookingSummaryStep({
     acc[zoneName].push(slot);
     return acc;
   }, {} as Record<string, SelectedTimeSlot[]>);
+
+  // Check if booking requires approval
+  const requiresApproval = calculation?.requiresApproval || 
+    ['lag-foreninger', 'paraply'].includes(actorType);
 
   // Validation
   const isValid = purpose.trim().length > 0 && activityType.length > 0;
@@ -106,15 +115,43 @@ export function BookingSummaryStep({
         </CardContent>
       </Card>
 
-      {/* Customer Type Selection */}
+      {/* Actor Type Selection */}
       <Card>
         <CardContent className="p-4">
-          <CustomerTypeSelector
-            value={customerType}
-            onChange={onCustomerTypeChange}
+          <EnhancedCustomerTypeSelector
+            value={actorType}
+            onChange={onActorTypeChange}
           />
         </CardContent>
       </Card>
+
+      {/* Booking Type Selection */}
+      <Card>
+        <CardContent className="p-4">
+          <BookingTypeSelector
+            value={bookingType}
+            onChange={onBookingTypeChange}
+          />
+        </CardContent>
+      </Card>
+
+      {/* Approval Notice */}
+      {requiresApproval && (
+        <Card className="border-amber-200 bg-amber-50">
+          <CardContent className="p-4">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="h-5 w-5 text-amber-600 mt-0.5" />
+              <div>
+                <h4 className="font-medium text-amber-900">Krever godkjenning</h4>
+                <p className="text-sm text-amber-700">
+                  Denne bookingen krever godkjenning fra kommunen på grunn av aktørtype eller spesielle betingelser. 
+                  Du vil motta en bekreftelse når bookingen er behandlet.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Activity Type Selection */}
       <Card>
@@ -182,22 +219,23 @@ export function BookingSummaryStep({
                     {totalPrice === 0 ? '0*' : `${totalPrice}`} ,-
                   </span>
                 </div>
-                <div className="text-xs text-gray-600 mt-1">
-                  * Prisen er et resultat av følgende prisfaktorer:
-                </div>
-                <div className="text-xs text-gray-600">
-                  {customerType === 'nonprofit' ? 
-                    '• Kommersielle aktører og private arrangement: Høyere pris' :
-                    '• Ikke-kommersielle aktører: Standard pris'
-                  }
-                </div>
-                {calculation?.breakdown?.some((item: any) => item.description.includes('torsdag')) && (
-                  <div className="text-xs text-gray-600">
-                    • Torsdag regnes timespris: {totalPrice} ,-
-                  </div>
-                )}
-                <div className="text-xs text-gray-600">
-                  • 0% MVA på booket tid
+                
+                {/* Enhanced pricing factors display */}
+                <div className="text-xs text-gray-600 mt-2 space-y-1">
+                  <div>* Prisen er et resultat av følgende faktorer:</div>
+                  <div>• Aktørtype: {actorType === 'lag-foreninger' ? 'Lag og foreninger (gratis/redusert)' :
+                                     actorType === 'paraply' ? 'Paraplyorganisasjon (spesiell rabatt)' :
+                                     actorType === 'private-firma' ? 'Privat firma (full pris)' :
+                                     actorType === 'kommunale-enheter' ? 'Kommunal enhet (redusert pris)' :
+                                     'Privatperson (standard pris)'}</div>
+                  <div>• Bookingtype: {bookingType === 'fastlan' ? 'Fastlån (kan gi rabatt)' : 'Engangslån'}</div>
+                  {calculation?.breakdown?.some((item: any) => item.description.includes('Kveld')) && (
+                    <div>• Kveldsleie: Tillegg for kveldstimer</div>
+                  )}
+                  {calculation?.breakdown?.some((item: any) => item.description.includes('helg')) && (
+                    <div>• Helgetillegg: Ekstra kostnad for helger</div>
+                  )}
+                  <div>• 0% MVA på booket tid</div>
                 </div>
               </div>
             </div>
@@ -211,7 +249,7 @@ export function BookingSummaryStep({
         size="lg"
         disabled={!isValid}
       >
-        Fortsett til kontaktdetaljer
+        {requiresApproval ? 'Send inn til godkjenning' : 'Fortsett til kontaktdetaljer'}
       </Button>
     </>
   );

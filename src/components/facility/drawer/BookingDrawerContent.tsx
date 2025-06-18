@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SelectedTimeSlot } from '@/utils/recurrenceEngine';
 import { usePriceCalculation } from '@/hooks/usePriceCalculation';
-import { CustomerType } from '@/types/pricing';
+import { ActorType, BookingType } from '@/types/pricing';
 import { Zone } from '@/components/booking/types';
 import { BookingSummaryStep } from './BookingSummaryStep';
 import { BookingDetailsStep } from './BookingDetailsStep';
@@ -32,7 +32,8 @@ export function BookingDrawerContent({
 }: BookingDrawerContentProps) {
   const navigate = useNavigate();
   const [step, setStep] = useState<'summary' | 'details'>('summary');
-  const [customerType, setCustomerType] = useState<CustomerType>('private');
+  const [actorType, setActorType] = useState<ActorType>('private-person');
+  const [bookingType, setBookingType] = useState<BookingType>('engangs');
   const [purpose, setPurpose] = useState('');
   const [formData, setFormData] = useState<FormData>({
     name: '',
@@ -43,12 +44,12 @@ export function BookingDrawerContent({
     notes: ''
   });
 
-  // Calculate pricing for all selected slots with current customer type
+  // Calculate pricing for all selected slots with current actor and booking type
   const { calculation } = usePriceCalculation({
     facilityId,
     zoneId: selectedSlots[0]?.zoneId,
     startDate: selectedSlots[0]?.date,
-    customerType,
+    customerType: actorType as any, // For backwards compatibility
     timeSlot: selectedSlots[0]?.timeSlot
   });
 
@@ -63,8 +64,10 @@ export function BookingDrawerContent({
           ...formData,
           purpose
         },
-        customerType,
-        totalPrice
+        actorType,
+        bookingType,
+        totalPrice,
+        requiresApproval: calculation?.requiresApproval
       }
     });
   };
@@ -76,8 +79,10 @@ export function BookingDrawerContent({
           selectedSlots={selectedSlots}
           facilityName={facilityName}
           zones={zones}
-          customerType={customerType}
-          onCustomerTypeChange={setCustomerType}
+          actorType={actorType}
+          onActorTypeChange={setActorType}
+          bookingType={bookingType}
+          onBookingTypeChange={setBookingType}
           purpose={purpose}
           onPurposeChange={setPurpose}
           calculation={calculation}
