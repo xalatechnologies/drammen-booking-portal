@@ -1,5 +1,4 @@
 
-
 import React, { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { DateRange } from "react-day-picker";
@@ -7,11 +6,11 @@ import GlobalHeader from "@/components/GlobalHeader";
 import GlobalFooter from "@/components/GlobalFooter";
 import HeroBanner from "@/components/HeroBanner";
 import SearchFilter from "@/components/SearchFilter";
-import FacilityGrid from "@/components/FacilityGrid";
 import FacilityList from "@/components/FacilityList";
-import PaginationControls from "@/components/PaginationControls";
 import MapView from "@/components/MapView";
 import CalendarView from "@/components/CalendarView";
+import { useFacilitiesPagination } from "@/hooks/useFacilities";
+import { FacilityFilters } from "@/types/facility";
 
 const Index = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -21,6 +20,7 @@ const Index = () => {
   const [viewMode, setViewMode] = useState<"grid" | "map" | "calendar" | "list">("grid");
   const [accessibility, setAccessibility] = useState<string>("all");
   const [capacity, setCapacity] = useState<number[]>([0, 200]);
+  const [searchTerm, setSearchTerm] = useState<string>("");
 
   // Initialize state from URL parameters
   useEffect(() => {
@@ -29,6 +29,7 @@ const Index = () => {
     const urlAccessibility = searchParams.get('accessibility');
     const urlCapacity = searchParams.get('capacity');
     const urlViewMode = searchParams.get('viewMode');
+    const urlSearchTerm = searchParams.get('searchTerm');
     
     if (urlFacilityType) setFacilityType(urlFacilityType);
     if (urlLocation) setLocation(urlLocation);
@@ -40,12 +41,23 @@ const Index = () => {
     if (urlViewMode && ['grid', 'map', 'calendar', 'list'].includes(urlViewMode)) {
       setViewMode(urlViewMode as "grid" | "map" | "calendar" | "list");
     }
+    if (urlSearchTerm) setSearchTerm(urlSearchTerm);
 
     // Clear URL parameters after setting state
     if (searchParams.toString()) {
       setSearchParams({});
     }
   }, [searchParams, setSearchParams]);
+
+  // Create filters object
+  const filters: FacilityFilters = {
+    searchTerm: searchTerm || undefined,
+    facilityType: facilityType !== "all" ? facilityType : undefined,
+    location: location !== "all" ? location : undefined,
+    accessibility: accessibility !== "all" ? accessibility : undefined,
+    capacity: capacity[0] > 0 || capacity[1] < 200 ? capacity : undefined,
+    date: date || undefined,
+  };
 
   const renderContent = () => {
     switch (viewMode) {
@@ -67,28 +79,19 @@ const Index = () => {
           />
         );
       case "list":
+      case "grid":
         return (
-          <>
-            <FacilityList 
-              facilityType={facilityType}
-              location={location}
-              accessibility={accessibility}
-              capacity={capacity}
-            />
-            <PaginationControls />
-          </>
+          <FacilityList 
+            filters={filters}
+            viewMode={viewMode}
+          />
         );
       default:
         return (
-          <>
-            <FacilityGrid 
-              facilityType={facilityType}
-              location={location}
-              accessibility={accessibility}
-              capacity={capacity}
-            />
-            <PaginationControls />
-          </>
+          <FacilityList 
+            filters={filters}
+            viewMode="grid"
+          />
         );
     }
   };
@@ -123,6 +126,8 @@ const Index = () => {
             setAccessibility={setAccessibility}
             capacity={capacity}
             setCapacity={setCapacity}
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
           />
 
           {renderContent()}
@@ -135,4 +140,3 @@ const Index = () => {
 };
 
 export default Index;
-
