@@ -1,10 +1,9 @@
 
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { MapPin, Badge as BadgeIcon } from "lucide-react";
+import { MapPin, Users } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { FacilityCardTabs } from "./FacilityCardTabs";
 
 interface Facility {
   id: number;
@@ -66,10 +65,13 @@ export function FacilityCard({ facility, onAddressClick }: FacilityCardProps) {
         </div>
       </div>
       
-      <CardContent className="p-4 flex flex-col flex-grow">
-        <div className="mb-3">
-          <h3 className="font-bold text-xl mb-2 text-gray-900 line-clamp-1">{facility.name}</h3>
-          <div className="flex items-start gap-1.5 text-base text-gray-600">
+      <CardContent className="p-5 flex flex-col flex-grow">
+        {/* Header */}
+        <div className="mb-4">
+          <h3 className="font-bold text-xl mb-3 text-gray-900 line-clamp-1 group-hover:text-blue-600 transition-colors">
+            {facility.name}
+          </h3>
+          <div className="flex items-start gap-1.5 text-base text-gray-600 mb-3">
             <MapPin className="h-5 w-5 text-gray-500 shrink-0 mt-0.5" />
             <span 
               className="line-clamp-1 hover:text-blue-600 hover:underline cursor-pointer transition-colors"
@@ -81,7 +83,51 @@ export function FacilityCard({ facility, onAddressClick }: FacilityCardProps) {
           </div>
         </div>
 
-        <FacilityCardTabs facility={facility} />
+        {/* Description */}
+        <div className="mb-4">
+          <p className="text-gray-700 leading-relaxed line-clamp-2 text-base">
+            {facility.description}
+          </p>
+        </div>
+
+        {/* Capacity */}
+        <div className="flex items-center gap-2 text-base text-gray-600 mb-4">
+          <Users className="h-5 w-5 text-gray-500" />
+          <span>Kapasitet: {facility.capacity} personer</span>
+        </div>
+
+        {/* Suitable For - Enhanced */}
+        <div className="space-y-3 flex-grow">
+          <div className="flex items-center text-gray-700">
+            <span className="font-semibold text-base">Egnet for</span>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {facility.suitableFor.slice(0, 3).map((activity, index) => (
+              <Badge
+                key={index}
+                className="bg-blue-50 text-blue-700 border-blue-200 font-medium px-3 py-1.5 text-sm hover:bg-blue-100 transition-colors"
+              >
+                {activity}
+              </Badge>
+            ))}
+            {facility.suitableFor.length > 3 && (
+              <Badge 
+                variant="outline" 
+                className="bg-gray-50 text-gray-600 border-gray-300 font-medium px-3 py-1.5 text-sm"
+              >
+                +{facility.suitableFor.length - 3} flere
+              </Badge>
+            )}
+          </div>
+        </div>
+
+        {/* Next Available - Enhanced */}
+        <div className="mt-4 pt-4 border-t border-gray-100">
+          <div className="bg-green-50 rounded-lg p-3">
+            <div className="text-sm font-medium text-green-800 mb-1">Neste ledige tid</div>
+            <div className="text-lg font-bold text-green-700">{facility.nextAvailable}</div>
+          </div>
+        </div>
       </CardContent>
     </Card>
   );
