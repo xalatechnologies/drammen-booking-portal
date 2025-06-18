@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import {
   Card,
@@ -8,7 +7,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { format, addDays, startOfWeek, addWeeks, subWeeks } from "date-fns";
+import { format, addDays, startOfWeek, addWeeks, subWeeks, isAfter, startOfDay } from "date-fns";
 import { ChevronLeft, ChevronRight, Calendar, Clock, Users, MapPin } from "lucide-react";
 import { nb } from "date-fns/locale";
 import { isDateUnavailable, isNorwegianHoliday } from "@/utils/holidaysAndAvailability";
@@ -38,6 +37,11 @@ const CalendarView: React.FC<CalendarViewProps> = ({
   capacity,
 }) => {
   const [currentWeekStart, setCurrentWeekStart] = useState(startOfWeek(date || new Date(), { weekStartsOn: 1 }));
+  
+  // Check if we can go to previous week (prevent going to past dates)
+  const today = startOfDay(new Date());
+  const previousWeekStart = subWeeks(currentWeekStart, 1);
+  const canGoPrevious = isAfter(addDays(previousWeekStart, 6), today) || format(addDays(previousWeekStart, 6), 'yyyy-MM-dd') === format(today, 'yyyy-MM-dd');
   
   // Mock data for facility bookings
   const facilities = [
@@ -120,6 +124,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({
         <Button 
           variant="outline" 
           onClick={() => setCurrentWeekStart(subWeeks(currentWeekStart, 1))}
+          disabled={!canGoPrevious}
           className="flex items-center gap-2 h-10 px-4"
         >
           <ChevronLeft className="h-4 w-4" />
