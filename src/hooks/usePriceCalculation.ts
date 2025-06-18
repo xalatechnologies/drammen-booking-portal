@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { PriceCalculation, ActorType } from '@/types/pricing';
+import { PriceCalculation, ActorType, BookingType } from '@/types/pricing';
 import { pricingEngine } from '@/utils/pricingEngine';
 
 interface UsePriceCalculationProps {
@@ -60,6 +60,9 @@ export function usePriceCalculation({
       // Use the actual timeSlot if provided, otherwise use default for estimate
       const calculationTimeSlot = timeSlot || '09:00 - 11:00';
       
+      // Map bookingMode to BookingType
+      const bookingType: BookingType = bookingMode === 'recurring' ? 'fastlan' : 'engangs';
+      
       console.log('Calculating price with:', {
         facilityId,
         zoneId,
@@ -67,7 +70,7 @@ export function usePriceCalculation({
         finalEndDate,
         customerType,
         timeSlot: calculationTimeSlot,
-        bookingMode,
+        bookingType,
         eventType,
         ageGroup
       });
@@ -79,7 +82,7 @@ export function usePriceCalculation({
         finalEndDate,
         customerType,
         calculationTimeSlot,
-        bookingMode,
+        bookingType,
         eventType,
         ageGroup
       );

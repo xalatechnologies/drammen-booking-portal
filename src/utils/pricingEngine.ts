@@ -1,4 +1,3 @@
-
 import { ActorType, BookingType, PriceCalculation, PriceBreakdownItem } from '@/types/pricing';
 
 interface ZonePricing {

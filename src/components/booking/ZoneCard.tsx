@@ -100,10 +100,7 @@ export function ZoneCard({ zone, isSelected, isAvailable, conflict }: ZoneCardPr
           <Alert variant="destructive" className="mt-3">
             <AlertTriangle className="h-4 w-4" />
             <AlertDescription className="text-xs">
-              {conflict.conflictType === 'whole-facility-conflict' 
-                ? `Hele lokalet er reservert av ${conflict.bookedBy}` 
-                : `Reservert av ${conflict.bookedBy}`
-              }
+              Reservert av {conflict.bookedBy}
             </AlertDescription>
           </Alert>
         )}

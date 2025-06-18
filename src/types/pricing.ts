@@ -34,9 +34,7 @@ export interface PriceCalculation {
 
 export interface PriceBreakdownItem {
   description: string;
-  quantity: number;
-  unitPrice: number;
-  total: number;
+  amount: number;
   type: 'base' | 'discount' | 'surcharge' | 'override';
 }
 
