@@ -17,6 +17,7 @@ interface FilterSelectsProps {
   setAccessibility: (accessibility: string) => void;
   capacity: number[];
   setCapacity: (capacity: number[]) => void;
+  showOnlyMain?: boolean;
 }
 
 const FilterSelects: React.FC<FilterSelectsProps> = ({
@@ -28,6 +29,7 @@ const FilterSelects: React.FC<FilterSelectsProps> = ({
   setAccessibility,
   capacity,
   setCapacity,
+  showOnlyMain = false,
 }) => {
   const handleCapacityChange = (value: string) => {
     switch (value) {
@@ -59,6 +61,45 @@ const FilterSelects: React.FC<FilterSelectsProps> = ({
     if (capacity[0] === 200 && capacity[1] === 500) return "200+";
     return "all";
   };
+
+  if (showOnlyMain) {
+    return (
+      <div className="flex gap-3">
+        <div className="min-w-[140px]">
+          <Select value={facilityType || "all"} onValueChange={setFacilityType}>
+            <SelectTrigger className="h-11 border-2 border-gray-300 hover:border-gray-400 rounded-lg font-medium">
+              <SelectValue placeholder="Type lokale" />
+            </SelectTrigger>
+            <SelectContent className="z-50">
+              <SelectItem value="all">Alle typer</SelectItem>
+              <SelectItem value="sports-hall">Idrettshall</SelectItem>
+              <SelectItem value="gymnasium">Gymsal</SelectItem>
+              <SelectItem value="meeting-room">Møterom</SelectItem>
+              <SelectItem value="auditorium">Auditorium</SelectItem>
+              <SelectItem value="classroom">Klasserom</SelectItem>
+              <SelectItem value="outdoor-field">Utendørsbane</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="min-w-[140px]">
+          <Select value={location || "all"} onValueChange={setLocation}>
+            <SelectTrigger className="h-11 border-2 border-gray-300 hover:border-gray-400 rounded-lg font-medium">
+              <SelectValue placeholder="Område" />
+            </SelectTrigger>
+            <SelectContent className="z-50">
+              <SelectItem value="all">Alle områder</SelectItem>
+              <SelectItem value="drammen-sentrum">Drammen sentrum</SelectItem>
+              <SelectItem value="konnerud">Konnerud</SelectItem>
+              <SelectItem value="stromsø">Strømsø</SelectItem>
+              <SelectItem value="bragernes">Bragernes</SelectItem>
+              <SelectItem value="åssiden">Åssiden</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
