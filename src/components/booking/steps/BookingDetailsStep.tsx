@@ -1,14 +1,8 @@
 
 import React from "react";
 import { UseFormReturn } from "react-hook-form";
-import { Calendar, Clock, Users, MessageSquare, MapPin, Repeat, CreditCard, Trophy } from "lucide-react";
-import {
-  FormField,
-  FormItem,
-  FormLabel,
-  FormControl,
-  FormMessage,
-} from "@/components/ui/form";
+import { Calendar, Clock, Users, MessageSquare, Repeat, Trophy } from "lucide-react";
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -21,6 +15,7 @@ import TimeRangePicker from "../TimeRangePicker";
 import { PriceBreakdown } from "../PriceBreakdown";
 import { usePriceCalculation } from "@/hooks/usePriceCalculation";
 import { ActorType } from "@/types/pricing";
+import { CustomerTypeSection } from "./CustomerTypeSection";
 
 export interface BookingDetailsStepProps {
   form: UseFormReturn<BookingFormValues>;
@@ -49,7 +44,7 @@ const customerTypeToActorType = (customerType: string): ActorType => {
 export function BookingDetailsStep({ form, facility }: BookingDetailsStepProps) {
   const watchedValues = form.watch();
 
-  // Calculate price with more immediate feedback - show as soon as we have basic info
+  // Calculate price with more immediate feedback
   const { calculation, isLoading } = usePriceCalculation({
     facilityId: facility.id,
     zoneId: watchedValues.zoneId,
@@ -65,49 +60,11 @@ export function BookingDetailsStep({ form, facility }: BookingDetailsStepProps) 
   // Show pricing when we have minimum required info
   const shouldShowPricing = watchedValues.customerType && watchedValues.zoneId && watchedValues.date;
 
-  console.log('BookingDetailsStep debug:', {
-    shouldShowPricing,
-    calculation,
-    isLoading,
-    watchedValues: {
-      customerType: watchedValues.customerType,
-      zoneId: watchedValues.zoneId,
-      date: watchedValues.date,
-      facilityId: facility.id
-    }
-  });
-
   return (
     <div className="space-y-6">
-      {/* Customer Type, Event Type, and Age Group - In same line */}
+      {/* Customer Type, Event Type, and Age Group */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <FormField
-          control={form.control}
-          name="customerType"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-base font-semibold text-gray-900 flex items-center gap-2">
-                <CreditCard className="h-5 w-5 text-slate-600" />
-                Prisgruppe
-              </FormLabel>
-              <FormControl>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <SelectTrigger className="h-11 border-gray-300 focus:border-slate-700">
-                    <SelectValue placeholder="Velg prisgruppe" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="private">Privatperson</SelectItem>
-                    <SelectItem value="nonprofit">Frivillig organisasjon</SelectItem>
-                    <SelectItem value="business">Bedrift/Næringsdrivende</SelectItem>
-                    <SelectItem value="youth">Ungdom (under 20 år)</SelectItem>
-                    <SelectItem value="senior">Senior (over 67 år)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <CustomerTypeSection form={form} />
 
         <FormField
           control={form.control}
@@ -308,7 +265,7 @@ export function BookingDetailsStep({ form, facility }: BookingDetailsStepProps) 
         selectedTimeSlot={watchedValues.timeSlot || ""}
       />
 
-      {/* Price Calculation - Show as soon as we have basic info */}
+      {/* Price Calculation */}
       {shouldShowPricing && (
         <div className="space-y-2">
           {!watchedValues.timeSlot && (

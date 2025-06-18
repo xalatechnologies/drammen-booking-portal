@@ -1,337 +1,254 @@
 
-import { ActorType, BookingType, PriceCalculation, PriceRule, TimeSlotCategory } from '@/types/pricing';
+import { ActorType, BookingType, PriceCalculation, PriceBreakdownItem } from '@/types/pricing';
 
-// Mock price rules - these would come from database in real implementation
-const mockPriceRules: PriceRule[] = [
+interface ZonePricing {
+  id: string;
+  name: string;
+  pricePerHour: number;
+  capacity: number;
+}
+
+interface FacilityPricing {
+  id: string;
+  name: string;
+  zones: ZonePricing[];
+}
+
+// Mock pricing data
+const facilitiesPricing: FacilityPricing[] = [
   {
     id: "1",
-    facilityId: "1",
-    zoneId: "whole-facility",
-    actorType: "lag-foreninger",
-    timeSlot: "day",
-    bookingType: "engangs",
-    dayType: "weekday",
-    priceType: "hourly",
-    basePrice: 0,
-    isActive: true,
-    requiresApproval: true
-  },
-  {
-    id: "2", 
-    facilityId: "1",
-    zoneId: "whole-facility",
-    actorType: "lag-foreninger",
-    timeSlot: "evening",
-    bookingType: "fastlan",
-    dayType: "weekday",
-    priceType: "hourly",
-    basePrice: 0,
-    isActive: true,
-    requiresApproval: true
-  },
-  {
-    id: "3",
-    facilityId: "1", 
-    zoneId: "whole-facility",
-    actorType: "private-firma",
-    timeSlot: "day",
-    bookingType: "engangs",
-    dayType: "weekday",
-    priceType: "hourly",
-    basePrice: 450,
-    isActive: true
-  },
-  {
-    id: "4",
-    facilityId: "1",
-    zoneId: "whole-facility", 
-    actorType: "private-firma",
-    timeSlot: "evening",
-    bookingType: "engangs",
-    dayType: "weekday",
-    priceType: "hourly",
-    basePrice: 550,
-    isActive: true
-  },
-  {
-    id: "5",
-    facilityId: "1",
-    zoneId: "whole-facility",
-    actorType: "private-person",
-    timeSlot: "day", 
-    bookingType: "engangs",
-    dayType: "weekday",
-    priceType: "hourly",
-    basePrice: 300,
-    isActive: true
-  },
-  {
-    id: "6",
-    facilityId: "1",
-    zoneId: "whole-facility",
-    actorType: "private-person",
-    timeSlot: "evening",
-    bookingType: "engangs", 
-    dayType: "weekday",
-    priceType: "hourly",
-    basePrice: 350,
-    isActive: true
-  },
-  {
-    id: "7",
-    facilityId: "1",
-    zoneId: "whole-facility",
-    actorType: "kommunale-enheter",
-    timeSlot: "day",
-    bookingType: "engangs",
-    dayType: "weekday", 
-    priceType: "hourly",
-    basePrice: 200,
-    isActive: true
-  },
-  {
-    id: "8",
-    facilityId: "1",
-    zoneId: "whole-facility",
-    actorType: "paraply",
-    timeSlot: "day",
-    bookingType: "engangs",
-    dayType: "weekday",
-    priceType: "hourly", 
-    basePrice: 100,
-    isActive: true,
-    requiresApproval: true
-  },
-  {
-    id: "9",
-    facilityId: "1",
-    zoneId: "zone-1",
-    actorType: "private-person",
-    timeSlot: "day",
-    bookingType: "engangs",
-    dayType: "weekday",
-    priceType: "hourly",
-    basePrice: 180,
-    isActive: true
+    name: "Drammen Kulturhus",
+    zones: [
+      { id: "whole-facility", name: "Hele lokalet", pricePerHour: 800, capacity: 200 },
+      { id: "zone-1", name: "Hovedsalen", pricePerHour: 500, capacity: 120 },
+      { id: "zone-2", name: "Øvingsrom 1", pricePerHour: 200, capacity: 30 },
+      { id: "zone-3", name: "Øvingsrom 2", pricePerHour: 200, capacity: 30 }
+    ]
   }
 ];
 
-export interface PricingEngineOptions {
-  facilityId: string;
-  zoneId: string;
-  startDate: Date;
-  endDate: Date;
-  actorType: ActorType;
-  timeSlot: string;
-  bookingMode?: 'one-time' | 'date-range' | 'recurring';
-  eventType?: string;
-  ageGroup?: string;
+// Pricing multipliers for different actor types
+const actorTypeMultipliers: Record<ActorType, number> = {
+  'lag-foreninger': 0.5,      // 50% discount for clubs and associations
+  'paraply': 0.3,             // 70% discount for umbrella organizations
+  'private-firma': 1.2,       // 20% surcharge for private companies
+  'kommunale-enheter': 0.7,   // 30% discount for municipal units
+  'private-person': 1.0       // Standard price for private persons
+};
+
+// Booking type multipliers
+const bookingTypeMultipliers: Record<BookingType, number> = {
+  'fastlan': 0.9,  // 10% discount for recurring bookings
+  'engangs': 1.0   // Standard price for one-time bookings
+};
+
+// Time-based multipliers
+const timeMultipliers = {
+  morning: 1.0,    // 08:00-12:00
+  afternoon: 1.0,  // 12:00-17:00
+  evening: 1.3,    // 17:00-22:00
+  night: 1.5       // 22:00-08:00
+};
+
+const weekendMultiplier = 1.2; // 20% surcharge for weekends
+
+function getTimeMultiplier(timeSlot: string): number {
+  if (!timeSlot) return 1.0;
+  
+  const timeStr = timeSlot.split('-')[0] || timeSlot.split(' ')[0];
+  const hour = parseInt(timeStr.split(':')[0]);
+  
+  if (hour >= 8 && hour < 12) return timeMultipliers.morning;
+  if (hour >= 12 && hour < 17) return timeMultipliers.afternoon;
+  if (hour >= 17 && hour < 22) return timeMultipliers.evening;
+  return timeMultipliers.night;
 }
 
-class PricingEngine {
+function isWeekend(date: Date): boolean {
+  const day = date.getDay();
+  return day === 0 || day === 6; // Sunday or Saturday
+}
+
+function calculateHours(timeSlot: string): number {
+  if (!timeSlot || !timeSlot.includes('-')) return 2; // Default 2 hours
+  
+  const [start, end] = timeSlot.split('-').map(t => t.trim());
+  const startHour = parseInt(start.split(':')[0]);
+  const endHour = parseInt(end.split(':')[0]);
+  
+  return Math.max(1, endHour - startHour);
+}
+
+function getDaysBetween(startDate: Date, endDate: Date): number {
+  if (!endDate || endDate <= startDate) return 1;
+  
+  const timeDiff = endDate.getTime() - startDate.getTime();
+  return Math.ceil(timeDiff / (1000 * 3600 * 24)) + 1;
+}
+
+function requiresApproval(actorType: ActorType, eventType?: string): boolean {
+  // Lag og foreninger and paraply organizations require approval
+  if (actorType === 'lag-foreninger' || actorType === 'paraply') {
+    return true;
+  }
+  
+  // Large events or competitions require approval
+  if (eventType === 'competition' || eventType === 'celebration') {
+    return true;
+  }
+  
+  return false;
+}
+
+export const pricingEngine = {
   calculatePrice(
     facilityId: string,
-    zoneId: string, 
+    zoneId: string,
     startDate: Date,
     endDate: Date,
     actorType: ActorType,
     timeSlot: string,
-    bookingMode: 'one-time' | 'date-range' | 'recurring' = 'one-time',
+    bookingType: BookingType = 'engangs',
     eventType?: string,
-    ageGroup?: string
+    ageGroup?: string,
+    attendees: number = 1
   ): PriceCalculation {
-    console.log('PricingEngine.calculatePrice called with:', {
-      facilityId, zoneId, startDate, endDate, actorType, timeSlot, bookingMode
+    console.log('Calculating price for:', {
+      facilityId,
+      zoneId,
+      startDate,
+      endDate,
+      actorType,
+      timeSlot,
+      bookingType,
+      attendees
     });
 
-    const duration = (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60);
-    const totalHours = Math.max(duration, 2);
-    const isWeekend = startDate.getDay() === 0 || startDate.getDay() === 6;
-    
-    // Map booking mode to booking type
-    const bookingType: BookingType = bookingMode === 'recurring' ? 'fastlan' : 'engangs';
-    
-    // Determine time slot category
-    const hour = parseInt(timeSlot.split(':')[0]) || 12;
-    let timeSlotCategory: TimeSlotCategory;
-    if (hour < 12) timeSlotCategory = 'morning';
-    else if (hour < 17) timeSlotCategory = 'day';
-    else if (hour < 23) timeSlotCategory = 'evening';
-    else timeSlotCategory = 'night';
-
-    // Find applicable price rule
-    const rule = this.findPriceRule(facilityId, zoneId, actorType, timeSlotCategory, bookingType, isWeekend);
-    
-    if (!rule) {
-      console.warn('No price rule found, using default pricing');
-      return this.createDefaultCalculation(totalHours, actorType);
-    }
-
-    console.log('Found price rule:', rule);
-
-    // Special handling for non-profit organizations
-    if (actorType === 'lag-foreninger') {
+    const facility = facilitiesPricing.find(f => f.id === facilityId);
+    if (!facility) {
+      console.warn('Facility not found:', facilityId);
       return {
         basePrice: 0,
-        totalHours,
-        totalDays: 1,
+        totalHours: 0,
+        totalDays: 0,
         actorTypeDiscount: 0,
         timeSlotMultiplier: 1,
         bookingTypeDiscount: 0,
         weekendSurcharge: 0,
         subtotal: 0,
         finalPrice: 0,
-        requiresApproval: true,
-        breakdown: [{
-          description: 'Gratis for lag og foreninger',
-          quantity: totalHours,
-          unitPrice: 0,
-          total: 0,
-          type: 'base'
-        }]
+        requiresApproval: false,
+        breakdown: []
       };
     }
 
-    const basePrice = rule.basePrice * totalHours;
-    let finalPrice = basePrice;
-    const breakdown = [];
-
-    // Base price breakdown
-    breakdown.push({
-      description: `Grunnpris (${totalHours} timer)`,
-      quantity: totalHours,
-      unitPrice: rule.basePrice,
-      total: basePrice,
-      type: 'base' as const
-    });
-
-    // Weekend surcharge
-    let weekendSurcharge = 0;
-    if (isWeekend) {
-      weekendSurcharge = basePrice * 0.2;
-      finalPrice += weekendSurcharge;
-      breakdown.push({
-        description: 'Helgetillegg (20%)',
-        quantity: 1,
-        unitPrice: weekendSurcharge,
-        total: weekendSurcharge,
-        type: 'surcharge' as const
-      });
+    const zone = facility.zones.find(z => z.id === zoneId);
+    if (!zone) {
+      console.warn('Zone not found:', zoneId);
+      return {
+        basePrice: 0,
+        totalHours: 0,
+        totalDays: 0,
+        actorTypeDiscount: 0,
+        timeSlotMultiplier: 1,
+        bookingTypeDiscount: 0,
+        weekendSurcharge: 0,
+        subtotal: 0,
+        finalPrice: 0,
+        requiresApproval: false,
+        breakdown: []
+      };
     }
 
-    // Evening surcharge
-    let eveningSurcharge = 0;
-    if (timeSlotCategory === 'evening') {
-      eveningSurcharge = basePrice * 0.1;
-      finalPrice += eveningSurcharge;
-      breakdown.push({
-        description: 'Kveldsleie (10%)',
-        quantity: 1,
-        unitPrice: eveningSurcharge,
-        total: eveningSurcharge,
-        type: 'surcharge' as const
-      });
-    }
-
-    // Recurring booking discount
-    let bookingTypeDiscount = 0;
-    if (bookingType === 'fastlan' && actorType === 'lag-foreninger') {
-      bookingTypeDiscount = finalPrice * 0.1;
-      finalPrice -= bookingTypeDiscount;
-      breakdown.push({
-        description: 'Fastlån rabatt (10%)',
-        quantity: 1,
-        unitPrice: -bookingTypeDiscount,
-        total: -bookingTypeDiscount,
-        type: 'discount' as const
-      });
-    }
-
-    return {
-      basePrice: rule.basePrice,
-      totalHours,
-      totalDays: 1,
-      actorTypeDiscount: 0,
-      timeSlotMultiplier: timeSlotCategory === 'evening' ? 1.1 : 1,
-      bookingTypeDiscount,
-      weekendSurcharge,
-      subtotal: basePrice,
-      finalPrice: Math.max(0, finalPrice),
-      requiresApproval: rule.requiresApproval || false,
-      breakdown
-    };
-  }
-
-  private findPriceRule(
-    facilityId: string,
-    zoneId: string,
-    actorType: ActorType,
-    timeSlot: TimeSlotCategory,
-    bookingType: BookingType,
-    isWeekend: boolean
-  ): PriceRule | null {
-    const dayType = isWeekend ? 'weekend' : 'weekday';
+    const hours = calculateHours(timeSlot);
+    const days = getDaysBetween(startDate, endDate);
+    const basePrice = zone.pricePerHour;
     
-    return mockPriceRules.find(rule => 
-      rule.facilityId === facilityId &&
-      rule.zoneId === zoneId &&
-      rule.actorType === actorType &&
-      rule.timeSlot === timeSlot &&
-      rule.bookingType === bookingType &&
-      rule.dayType === dayType &&
-      rule.isActive
-    ) || mockPriceRules.find(rule =>
-      rule.facilityId === facilityId &&
-      rule.zoneId === zoneId &&
-      rule.actorType === actorType &&
-      rule.dayType === dayType &&
-      rule.isActive
-    ) || null;
-  }
-
-  private createDefaultCalculation(totalHours: number, actorType: ActorType): PriceCalculation {
-    const basePrice = 300;
-    const total = basePrice * totalHours;
+    // Calculate multipliers
+    const actorMultiplier = actorTypeMultipliers[actorType] || 1.0;
+    const bookingMultiplier = bookingTypeMultipliers[bookingType] || 1.0;
+    const timeMultiplier = getTimeMultiplier(timeSlot);
+    const weekendMulti = isWeekend(startDate) ? weekendMultiplier : 1.0;
     
+    // Calculate pricing
+    const subtotal = basePrice * hours * days;
+    const afterActorType = subtotal * actorMultiplier;
+    const afterBookingType = afterActorType * bookingMultiplier;
+    const afterTimeSlot = afterBookingType * timeMultiplier;
+    const finalPrice = Math.round(afterTimeSlot * weekendMulti);
+
+    // Create breakdown
+    const breakdown: PriceBreakdownItem[] = [
+      {
+        description: `${zone.name} - ${hours}t x ${days} dag(er)`,
+        amount: subtotal,
+        type: 'base'
+      }
+    ];
+
+    if (actorMultiplier !== 1.0) {
+      const discount = subtotal - afterActorType;
+      breakdown.push({
+        description: `${actorType} rabatt`,
+        amount: -discount,
+        type: 'discount'
+      });
+    }
+
+    if (bookingMultiplier !== 1.0) {
+      const discount = afterActorType - afterBookingType;
+      breakdown.push({
+        description: `${bookingType} rabatt`,
+        amount: -discount,
+        type: 'discount'
+      });
+    }
+
+    if (timeMultiplier !== 1.0) {
+      const surcharge = afterTimeSlot - afterBookingType;
+      breakdown.push({
+        description: 'Kveldstillegg',
+        amount: surcharge,
+        type: 'surcharge'
+      });
+    }
+
+    if (weekendMulti !== 1.0) {
+      const surcharge = finalPrice - afterTimeSlot;
+      breakdown.push({
+        description: 'Helgetillegg',
+        amount: surcharge,
+        type: 'surcharge'
+      });
+    }
+
     return {
       basePrice,
-      totalHours,
-      totalDays: 1,
-      actorTypeDiscount: 0,
-      timeSlotMultiplier: 1,
-      bookingTypeDiscount: 0,
-      weekendSurcharge: 0,
-      subtotal: total,
-      finalPrice: total,
-      requiresApproval: actorType === 'lag-foreninger' || actorType === 'paraply',
-      breakdown: [{
-        description: `Standard pris (${totalHours} timer)`,
-        quantity: totalHours,
-        unitPrice: basePrice,
-        total,
-        type: 'base'
-      }]
+      totalHours: hours,
+      totalDays: days,
+      actorTypeDiscount: actorMultiplier !== 1.0 ? (1 - actorMultiplier) * 100 : 0,
+      timeSlotMultiplier: timeMultiplier,
+      bookingTypeDiscount: bookingMultiplier !== 1.0 ? (1 - bookingMultiplier) * 100 : 0,
+      weekendSurcharge: weekendMulti !== 1.0 ? (weekendMulti - 1) * 100 : 0,
+      subtotal,
+      finalPrice,
+      requiresApproval: requiresApproval(actorType, eventType),
+      breakdown
     };
-  }
+  },
 
   applyOverride(calculation: PriceCalculation, amount: number, reason: string): PriceCalculation {
+    const override: PriceBreakdownItem = {
+      description: `Manual justering: ${reason}`,
+      amount: amount - calculation.finalPrice,
+      type: 'override'
+    };
+
     return {
       ...calculation,
-      overrideAmount: amount,
-      overrideReason: reason,
       finalPrice: amount,
-      breakdown: [
-        ...calculation.breakdown,
-        {
-          description: `Manual justering: ${reason}`,
-          quantity: 1,
-          unitPrice: amount - calculation.finalPrice,
-          total: amount - calculation.finalPrice,
-          type: 'override' as const
-        }
-      ]
+      breakdown: [...calculation.breakdown, override]
     };
   }
-}
-
-export const pricingEngine = new PricingEngine();
+};

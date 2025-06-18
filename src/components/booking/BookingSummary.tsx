@@ -31,31 +31,39 @@ export interface BookingData {
 }
 
 interface BookingSummaryProps {
-  data: BookingFormValues;
   facilityName: string;
   facilityId: string;
+  data?: BookingFormValues;
+  bookingData?: BookingData;
 }
 
-export function BookingSummary({ data, facilityName, facilityId }: BookingSummaryProps) {
+export function BookingSummary({ data, bookingData, facilityName, facilityId }: BookingSummaryProps) {
+  // Use either data or bookingData
+  const bookingInfo = data || bookingData;
+
   const { calculation, isLoading } = usePriceCalculation({
     facilityId: facilityId,
-    zoneId: data.zoneId,
-    startDate: data.date,
-    endDate: data.endDate,
-    timeSlot: data.timeSlot,
-    customerType: data.customerType as any,
-    bookingMode: data.bookingMode,
-    eventType: data.eventType,
-    ageGroup: data.ageGroup
+    zoneId: bookingInfo?.zoneId,
+    startDate: bookingInfo?.date,
+    endDate: bookingInfo?.endDate,
+    timeSlot: bookingInfo?.timeSlot,
+    customerType: bookingInfo?.customerType as any,
+    bookingMode: bookingInfo?.bookingMode,
+    eventType: bookingInfo?.eventType,
+    ageGroup: bookingInfo?.ageGroup
   });
 
   // Helper function to format time slot
   const formatTimeSlot = (timeSlot: string) => {
-    if (timeSlot.includes(' - ')) {
+    if (timeSlot?.includes(' - ')) {
       return timeSlot;
     }
     return timeSlot;
   };
+
+  if (!bookingInfo) {
+    return null;
+  }
 
   return (
     <Card>
@@ -74,23 +82,23 @@ export function BookingSummary({ data, facilityName, facilityId }: BookingSummar
           
           <div className="flex items-center gap-2">
             <Calendar className="h-4 w-4 text-gray-500" />
-            <span>{data.date ? format(data.date, 'dd.MM.yyyy') : 'Ingen dato valgt'}</span>
-            {data.endDate && data.endDate !== data.date && (
-              <span> - {format(data.endDate, 'dd.MM.yyyy')}</span>
+            <span>{bookingInfo.date ? format(bookingInfo.date, 'dd.MM.yyyy') : 'Ingen dato valgt'}</span>
+            {bookingInfo.endDate && bookingInfo.endDate !== bookingInfo.date && (
+              <span> - {format(bookingInfo.endDate, 'dd.MM.yyyy')}</span>
             )}
           </div>
           
-          {data.timeSlot && (
+          {bookingInfo.timeSlot && (
             <div className="flex items-center gap-2">
               <Clock className="h-4 w-4 text-gray-500" />
-              <span>{formatTimeSlot(data.timeSlot)}</span>
+              <span>{formatTimeSlot(bookingInfo.timeSlot)}</span>
             </div>
           )}
           
-          {data.attendees && (
+          {bookingInfo.attendees && (
             <div className="flex items-center gap-2">
               <Users className="h-4 w-4 text-gray-500" />
-              <span>{data.attendees} personer</span>
+              <span>{bookingInfo.attendees} personer</span>
             </div>
           )}
         </div>
@@ -100,20 +108,20 @@ export function BookingSummary({ data, facilityName, facilityId }: BookingSummar
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-sm text-gray-600">Kunde type:</span>
-            <Badge variant="outline">{data.customerType || 'Ikke valgt'}</Badge>
+            <Badge variant="outline">{bookingInfo.customerType || 'Ikke valgt'}</Badge>
           </div>
           
-          {data.eventType && (
+          {bookingInfo.eventType && (
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-600">Arrangement type:</span>
-              <Badge variant="outline">{data.eventType}</Badge>
+              <Badge variant="outline">{bookingInfo.eventType}</Badge>
             </div>
           )}
           
-          {data.bookingMode && (
+          {bookingInfo.bookingMode && (
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-600">Booking type:</span>
-              <Badge variant="outline">{data.bookingMode === 'one-time' ? 'Engangs' : data.bookingMode === 'recurring' ? 'Gjentakende' : 'Periode'}</Badge>
+              <Badge variant="outline">{bookingInfo.bookingMode === 'one-time' ? 'Engangs' : bookingInfo.bookingMode === 'recurring' ? 'Gjentakende' : 'Periode'}</Badge>
             </div>
           )}
         </div>
