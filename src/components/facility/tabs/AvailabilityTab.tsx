@@ -1,30 +1,44 @@
+
 import React, { useState } from "react";
 import { format, addDays, startOfWeek, isBefore, startOfDay } from "date-fns";
 import { nb } from "date-fns/locale";
-import { ChevronLeft, ChevronRight, Calendar, Users, DollarSign } from "lucide-react";
+import { ChevronLeft, ChevronRight, Calendar, Users, DollarSign, Repeat, ShoppingCart, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
 import { Zone } from "@/components/booking/types";
 import { isDateUnavailable, isNorwegianHoliday } from "@/utils/holidaysAndAvailability";
 import { ZoneConflictManager, ExistingBooking } from "@/utils/zoneConflictManager";
+import { RecurrencePatternBuilder } from "@/components/facility/RecurrencePatternBuilder";
+import { BookingDrawer } from "@/components/facility/BookingDrawer";
+import { RecurrencePattern, SelectedTimeSlot, recurrenceEngine } from "@/utils/recurrenceEngine";
 
 interface AvailabilityTabProps {
   zones: Zone[];
   startDate: Date;
   showLegend?: boolean;
+  facilityId?: string;
+  facilityName?: string;
 }
 
-interface SelectedSlot {
-  zoneId: string;
-  date: Date;
-  timeSlot: string;
-}
-
-export function AvailabilityTab({ zones, startDate, showLegend = true }: AvailabilityTabProps) {
+export function AvailabilityTab({ 
+  zones, 
+  startDate, 
+  showLegend = true,
+  facilityId = "",
+  facilityName = ""
+}: AvailabilityTabProps) {
   const [currentWeekStart, setCurrentWeekStart] = useState(startOfWeek(startDate, { weekStartsOn: 1 }));
-  const [selectedSlots, setSelectedSlots] = useState<SelectedSlot[]>([]);
-  const [isSelecting, setIsSelecting] = useState(false);
+  const [selectedSlots, setSelectedSlots] = useState<SelectedTimeSlot[]>([]);
+  const [showPatternBuilder, setShowPatternBuilder] = useState(false);
+  const [showBookingDrawer, setShowBookingDrawer] = useState(false);
+  const [currentPattern, setCurrentPattern] = useState<RecurrencePattern>({
+    type: 'single',
+    weekdays: [],
+    timeSlots: [],
+    interval: 1
+  });
   
   // Mock existing bookings for demo
   const existingBookings: ExistingBooking[] = [
@@ -45,7 +59,7 @@ export function AvailabilityTab({ zones, startDate, showLegend = true }: Availab
   ];
 
   const conflictManager = new ZoneConflictManager(zones, existingBookings);
-  const timeSlots = ["08:00", "10:00", "12:00", "14:00", "16:00", "18:00", "20:00"];
+  const timeSlots = ["08:00-10:00", "10:00-12:00", "12:00-14:00", "14:00-16:00", "16:00-18:00", "18:00-20:00", "20:00-22:00"];
   const weekDays = Array(7).fill(0).map((_, i) => addDays(currentWeekStart, i));
 
   const today = startOfDay(new Date());
@@ -77,7 +91,6 @@ export function AvailabilityTab({ zones, startDate, showLegend = true }: Availab
   const handleSlotClick = (zoneId: string, date: Date, timeSlot: string, availability: string) => {
     if (availability !== 'available') return;
 
-    const slotKey = `${zoneId}-${format(date, 'yyyy-MM-dd')}-${timeSlot}`;
     const isSelected = isSlotSelected(zoneId, date, timeSlot);
 
     if (isSelected) {
@@ -89,7 +102,13 @@ export function AvailabilityTab({ zones, startDate, showLegend = true }: Availab
       ));
     } else {
       // Add to selection
-      setSelectedSlots(prev => [...prev, { zoneId, date, timeSlot }]);
+      const newSlot: SelectedTimeSlot = {
+        zoneId,
+        date: new Date(date),
+        timeSlot,
+        duration: 2 // Default 2 hours
+      };
+      setSelectedSlots(prev => [...prev, newSlot]);
     }
   };
 
@@ -97,9 +116,33 @@ export function AvailabilityTab({ zones, startDate, showLegend = true }: Availab
     setSelectedSlots([]);
   };
 
+  const handlePatternApply = (pattern: RecurrencePattern) => {
+    if (pattern.weekdays.length === 0 || pattern.timeSlots.length === 0) return;
+
+    // Generate occurrences based on pattern
+    const startDateForPattern = currentWeekStart;
+    const zoneId = zones[0]?.id || 'whole-facility';
+    
+    const occurrences = recurrenceEngine.generateOccurrences(
+      pattern,
+      startDateForPattern,
+      zoneId,
+      12 // Next 12 weeks
+    );
+
+    // Filter out unavailable slots
+    const availableOccurrences = occurrences.filter(occurrence => {
+      const status = getAvailabilityStatus(occurrence.zoneId, occurrence.date, occurrence.timeSlot);
+      return status === 'available';
+    });
+
+    setSelectedSlots(availableOccurrences);
+    setShowPatternBuilder(false);
+  };
+
   const getStatusColor = (status: string, isSelected: boolean) => {
     if (isSelected) {
-      return 'bg-blue-500 hover:bg-blue-600 border-blue-600 ring-2 ring-blue-300';
+      return 'bg-blue-500 hover:bg-blue-600 border-blue-600 ring-2 ring-blue-300 text-white';
     }
     
     switch (status) {
@@ -115,7 +158,7 @@ export function AvailabilityTab({ zones, startDate, showLegend = true }: Availab
 
   const renderZoneCalendar = (zone: Zone) => (
     <div className="space-y-4">
-      {/* Zone Info Header - Larger fonts */}
+      {/* Zone Info Header */}
       <div className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg">
         <div>
           <h4 className="text-lg font-semibold text-gray-900">{zone.name}</h4>
@@ -133,7 +176,44 @@ export function AvailabilityTab({ zones, startDate, showLegend = true }: Availab
         </div>
       </div>
 
-      {/* Week Navigation - Larger fonts */}
+      {/* Quick Actions */}
+      <div className="flex items-center justify-between">
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowPatternBuilder(true)}
+            className="flex items-center gap-2"
+          >
+            <Repeat className="h-4 w-4" />
+            Gjentakende booking
+          </Button>
+          
+          {selectedSlots.length > 0 && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={clearSelection}
+              className="flex items-center gap-2 text-red-600 hover:text-red-700"
+            >
+              <Trash2 className="h-4 w-4" />
+              Tøm valg ({selectedSlots.length})
+            </Button>
+          )}
+        </div>
+
+        {selectedSlots.length > 0 && (
+          <Button
+            onClick={() => setShowBookingDrawer(true)}
+            className="flex items-center gap-2 bg-[#1e3a8a] hover:bg-[#1e40af]"
+          >
+            <ShoppingCart className="h-4 w-4" />
+            Book {selectedSlots.length} tidspunkt
+          </Button>
+        )}
+      </div>
+
+      {/* Week Navigation */}
       <div className="flex items-center justify-between mb-4">
         <Button
           variant="outline"
@@ -162,7 +242,7 @@ export function AvailabilityTab({ zones, startDate, showLegend = true }: Availab
         </Button>
       </div>
 
-      {/* Calendar with larger elements */}
+      {/* Calendar Grid */}
       <Card>
         <CardContent className="p-4">
           <div className="grid grid-cols-8 gap-2 mb-4">
@@ -188,7 +268,7 @@ export function AvailabilityTab({ zones, startDate, showLegend = true }: Availab
             })}
           </div>
 
-          {/* Time Slots Grid - Larger elements */}
+          {/* Time Slots Grid */}
           <div className="space-y-2">
             {timeSlots.map((timeSlot) => (
               <div key={timeSlot} className="grid grid-cols-8 gap-2">
@@ -211,6 +291,9 @@ export function AvailabilityTab({ zones, startDate, showLegend = true }: Availab
                         disabled={availability !== 'available'}
                         onClick={() => handleSlotClick(zone.id, day, timeSlot, availability)}
                       >
+                        {isSelected && (
+                          <div className="text-xs font-medium">✓</div>
+                        )}
                       </button>
                     </div>
                   );
@@ -221,7 +304,29 @@ export function AvailabilityTab({ zones, startDate, showLegend = true }: Availab
         </CardContent>
       </Card>
 
-      {/* Legend moved below calendar */}
+      {/* Selected Slots Summary */}
+      {selectedSlots.length > 0 && (
+        <Card className="bg-blue-50 border-blue-200">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between mb-2">
+              <h4 className="font-medium text-blue-800">Valgte tidspunkt ({selectedSlots.length})</h4>
+              <Badge className="bg-blue-600">{selectedSlots.length} timer</Badge>
+            </div>
+            <div className="max-h-24 overflow-auto space-y-1">
+              {selectedSlots.slice(0, 3).map((slot, index) => (
+                <div key={index} className="text-sm text-blue-700">
+                  {format(slot.date, 'EEE dd.MM', { locale: nb })} - {slot.timeSlot}
+                </div>
+              ))}
+              {selectedSlots.length > 3 && (
+                <div className="text-xs text-blue-600">+ {selectedSlots.length - 3} flere</div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Legend */}
       {showLegend && (
         <div className="p-4 bg-gray-50 rounded-lg">
           <div className="grid grid-cols-3 gap-6 text-base">
@@ -234,8 +339,8 @@ export function AvailabilityTab({ zones, startDate, showLegend = true }: Availab
               <span>Opptatt</span>
             </div>
             <div className="flex items-center gap-3">
-              <div className="w-6 h-6 rounded bg-gray-100 border-2 border-gray-400"></div>
-              <span>Ikke tilgjengelig</span>
+              <div className="w-6 h-6 rounded bg-blue-500 border-2 border-blue-600"></div>
+              <span>Valgt</span>
             </div>
           </div>
         </div>
@@ -245,7 +350,7 @@ export function AvailabilityTab({ zones, startDate, showLegend = true }: Availab
 
   return (
     <div className="space-y-6">
-      {/* Enhanced Zone Tabs with larger fonts */}
+      {/* Enhanced Zone Tabs */}
       <Tabs defaultValue={zones[0]?.id} className="w-full">
         <TabsList className="grid w-full grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1 h-auto p-1 bg-gray-100 rounded-lg">
           {zones.map((zone) => (
@@ -275,6 +380,29 @@ export function AvailabilityTab({ zones, startDate, showLegend = true }: Availab
           </TabsContent>
         ))}
       </Tabs>
+
+      {/* Pattern Builder Modal */}
+      {showPatternBuilder && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <RecurrencePatternBuilder
+            pattern={currentPattern}
+            onPatternChange={setCurrentPattern}
+            onClose={() => {
+              handlePatternApply(currentPattern);
+              setShowPatternBuilder(false);
+            }}
+          />
+        </div>
+      )}
+
+      {/* Booking Drawer */}
+      <BookingDrawer
+        isOpen={showBookingDrawer}
+        onClose={() => setShowBookingDrawer(false)}
+        selectedSlots={selectedSlots}
+        facilityId={facilityId}
+        facilityName={facilityName}
+      />
     </div>
   );
 }

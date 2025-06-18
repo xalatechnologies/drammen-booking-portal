@@ -332,11 +332,17 @@ const FacilityDetail = () => {
               </div>
             </div>
 
-            {/* Full-width Availability Calendar Section */}
+            {/* Enhanced Availability Calendar Section */}
             <div className="bg-white rounded-lg shadow-sm border">
               <div className="p-6">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">Tilgjengelighet</h2>
-                <AvailabilityTab zones={zones} startDate={new Date()} showLegend={true} />
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">Tilgjengelighet og booking</h2>
+                <AvailabilityTab 
+                  zones={zones} 
+                  startDate={new Date()} 
+                  showLegend={true}
+                  facilityId={id}
+                  facilityName={facility.name}
+                />
               </div>
             </div>
           </div>
