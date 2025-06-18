@@ -42,16 +42,6 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
     return pages;
   };
 
-  if (totalPages <= 1) {
-    return (
-      <div className="flex justify-center items-center mt-8 mb-8">
-        <p className="text-sm text-gray-500">
-          Viser {total} {total === 1 ? 'lokale' : 'lokaler'}
-        </p>
-      </div>
-    );
-  }
-
   const startItem = (page - 1) * pagination.limit + 1;
   const endItem = Math.min(page * pagination.limit, total);
 
@@ -62,55 +52,57 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
         Viser {startItem}-{endItem} av {total} lokaler
       </p>
 
-      {/* Pagination controls */}
-      <div className="flex justify-center items-center gap-1">
-        {/* Previous button */}
-        <button
-          onClick={() => onPageChange(page - 1)}
-          disabled={!hasPrev}
-          className={`
-            h-10 w-10 flex items-center justify-center rounded-lg border transition-all duration-200
-            ${!hasPrev 
-              ? 'text-gray-300 border-gray-200 cursor-not-allowed bg-white' 
-              : 'text-gray-600 border-gray-300 bg-white hover:bg-gray-50 hover:border-gray-400'
-            }
-          `}
-        >
-          <ChevronLeft className="h-4 w-4" />
-        </button>
-
-        {/* Page numbers */}
-        {getVisiblePages().map((pageNum) => (
+      {/* Only show pagination controls if more than 1 page */}
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center gap-1">
+          {/* Previous button */}
           <button
-            key={pageNum}
-            onClick={() => onPageChange(pageNum)}
+            onClick={() => onPageChange(page - 1)}
+            disabled={!hasPrev}
             className={`
-              h-10 w-10 flex items-center justify-center text-sm font-medium transition-all duration-200 rounded-lg border
-              ${page === pageNum
-                ? 'bg-black text-white border-black'
-                : 'text-gray-700 border-gray-300 bg-white hover:bg-gray-50 hover:border-gray-400'
+              h-10 w-10 flex items-center justify-center rounded-lg border transition-all duration-200
+              ${!hasPrev 
+                ? 'text-gray-300 border-gray-200 cursor-not-allowed bg-white' 
+                : 'text-gray-600 border-gray-300 bg-white hover:bg-gray-50 hover:border-gray-400'
               }
             `}
           >
-            {pageNum}
+            <ChevronLeft className="h-4 w-4" />
           </button>
-        ))}
 
-        {/* Next button */}
-        <button
-          onClick={() => onPageChange(page + 1)}
-          disabled={!hasNext}
-          className={`
-            h-10 w-10 flex items-center justify-center rounded-lg border transition-all duration-200
-            ${!hasNext 
-              ? 'text-gray-300 border-gray-200 cursor-not-allowed bg-white' 
-              : 'text-gray-600 border-gray-300 bg-white hover:bg-gray-50 hover:border-gray-400'
-            }
-          `}
-        >
-          <ChevronRight className="h-4 w-4" />
-        </button>
-      </div>
+          {/* Page numbers */}
+          {getVisiblePages().map((pageNum) => (
+            <button
+              key={pageNum}
+              onClick={() => onPageChange(pageNum)}
+              className={`
+                h-10 w-10 flex items-center justify-center text-sm font-medium transition-all duration-200 rounded-lg border
+                ${page === pageNum
+                  ? 'bg-black text-white border-black'
+                  : 'text-gray-700 border-gray-300 bg-white hover:bg-gray-50 hover:border-gray-400'
+                }
+              `}
+            >
+              {pageNum}
+            </button>
+          ))}
+
+          {/* Next button */}
+          <button
+            onClick={() => onPageChange(page + 1)}
+            disabled={!hasNext}
+            className={`
+              h-10 w-10 flex items-center justify-center rounded-lg border transition-all duration-200
+              ${!hasNext 
+                ? 'text-gray-300 border-gray-200 cursor-not-allowed bg-white' 
+                : 'text-gray-600 border-gray-300 bg-white hover:bg-gray-50 hover:border-gray-400'
+              }
+            `}
+          >
+            <ChevronRight className="h-4 w-4" />
+          </button>
+        </div>
+      )}
     </div>
   );
 };

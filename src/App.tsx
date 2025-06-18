@@ -1,5 +1,4 @@
 
-
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -24,8 +23,8 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
-            <Route path="/facilities/:facilityId" element={<FacilityPage />} />
-            <Route path="/facilities/:facilityId/book" element={<BookingPage />} />
+            <Route path="/facilities/:id" element={<FacilityPage />} />
+            <Route path="/booking/:facilityId" element={<BookingPage />} />
             <Route path="/booking/success/:bookingReference" element={<BookingSuccessPage bookingReference="" facilityId="" />} />
             <Route path="/bookings" element={<BookingsPage />} />
             <Route path="/login" element={<LoginPage />} />
@@ -39,4 +38,3 @@ const App = () => (
 );
 
 export default App;
-

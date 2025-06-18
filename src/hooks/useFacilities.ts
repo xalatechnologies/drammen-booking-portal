@@ -39,7 +39,7 @@ export function useFacilities({ pagination, filters, sort }: UseFacilitiesParams
   };
 }
 
-export function useFacilitiesPagination(initialPage = 1, initialLimit = 9) {
+export function useFacilitiesPagination(initialPage = 1, initialLimit = 6) {
   const [page, setPage] = useState(initialPage);
   const [limit, setLimit] = useState(initialLimit);
 
