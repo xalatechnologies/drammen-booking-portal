@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { format } from 'date-fns';
+import { format, addDays } from 'date-fns';
 import { Zone } from '@/components/booking/types';
 import { SelectedTimeSlot, RecurrencePattern, recurrenceEngine } from '@/utils/recurrenceEngine';
 import { EnhancedZoneConflictManager } from '@/utils/enhancedZoneConflictManager';
@@ -80,10 +80,30 @@ export function AvailabilityTabContent({
   };
 
   const handlePatternApply = (pattern: RecurrencePattern) => {
-    if (pattern.weekdays.length === 0 || pattern.timeSlots.length === 0) return;
+    if (pattern.timeSlots.length === 0) return;
 
     const startDateForPattern = currentWeekStart;
     const zoneId = zone.id;
+    
+    if (pattern.type === 'single') {
+      // Handle single booking - just select the time slots for today or first available day
+      const today = new Date();
+      const availableDays = Array(7).fill(0).map((_, i) => addDays(currentWeekStart, i));
+      const targetDate = availableDays.find(day => day >= today) || availableDays[0];
+      
+      const singleBookings = pattern.timeSlots.map(timeSlot => ({
+        zoneId,
+        date: targetDate,
+        timeSlot,
+        duration: 2 // Default 2 hours
+      }));
+      
+      setSelectedSlots(singleBookings);
+      return;
+    }
+    
+    // Handle recurring patterns
+    if (pattern.weekdays.length === 0) return;
     
     const occurrences = recurrenceEngine.generateOccurrences(
       pattern,

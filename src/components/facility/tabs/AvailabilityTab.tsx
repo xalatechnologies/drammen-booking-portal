@@ -8,7 +8,7 @@ import { EnhancedZoneConflictManager } from "@/utils/enhancedZoneConflictManager
 import { RecurrencePatternBuilder } from "@/components/facility/RecurrencePatternBuilder";
 import { BookingDrawer } from "@/components/facility/BookingDrawer";
 import { ConflictResolutionWizard } from "@/components/facility/ConflictResolutionWizard";
-import { RecurrencePattern, SelectedTimeSlot } from "@/utils/recurrenceEngine";
+import { RecurrencePattern, SelectedTimeSlot, recurrenceEngine } from "@/utils/recurrenceEngine";
 import { AvailabilityTabContent } from "./AvailabilityTabContent";
 
 interface AvailabilityTabProps {
@@ -64,6 +64,46 @@ export function AvailabilityTab({
 
   // Check if we should show tabs or just render a single zone
   const shouldShowTabs = zones.length > 1;
+
+  // Handler for pattern application
+  const handlePatternApply = (pattern: RecurrencePattern) => {
+    // Get the current active zone from tabs or use first zone
+    const activeZone = zones[0]; // For simplicity, using first zone
+    
+    if (pattern.timeSlots.length === 0) return;
+
+    const startDateForPattern = currentWeekStart;
+    const zoneId = activeZone.id;
+    
+    if (pattern.type === 'single') {
+      // Handle single booking
+      const today = new Date();
+      const availableDays = Array(7).fill(0).map((_, i) => addDays(currentWeekStart, i));
+      const targetDate = availableDays.find(day => day >= today) || availableDays[0];
+      
+      const singleBookings = pattern.timeSlots.map(timeSlot => ({
+        zoneId,
+        date: targetDate,
+        timeSlot,
+        duration: 2
+      }));
+      
+      setSelectedSlots(singleBookings);
+      return;
+    }
+    
+    // Handle recurring patterns
+    if (pattern.weekdays.length === 0) return;
+    
+    const occurrences = recurrenceEngine.generateOccurrences(
+      pattern,
+      startDateForPattern,
+      zoneId,
+      12
+    );
+
+    setSelectedSlots(occurrences);
+  };
 
   return (
     <div className="space-y-6 font-inter">
@@ -139,6 +179,7 @@ export function AvailabilityTab({
             pattern={currentPattern}
             onPatternChange={setCurrentPattern}
             onClose={() => setShowPatternBuilder(false)}
+            onApplyPattern={handlePatternApply}
           />
         </div>
       )}

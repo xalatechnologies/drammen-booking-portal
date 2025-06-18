@@ -11,12 +11,13 @@ interface RecurrencePatternBuilderProps {
   pattern: RecurrencePattern;
   onPatternChange: (pattern: RecurrencePattern) => void;
   onClose: () => void;
+  onApplyPattern?: (pattern: RecurrencePattern) => void;
 }
 
 const weekdayNames = ['Søn', 'Man', 'Tir', 'Ons', 'Tor', 'Fre', 'Lør'];
 const timeSlots = ['08:00-10:00', '10:00-12:00', '12:00-14:00', '14:00-16:00', '16:00-18:00', '18:00-20:00', '20:00-22:00'];
 
-export function RecurrencePatternBuilder({ pattern, onPatternChange, onClose }: RecurrencePatternBuilderProps) {
+export function RecurrencePatternBuilder({ pattern, onPatternChange, onClose, onApplyPattern }: RecurrencePatternBuilderProps) {
   const [activeTab, setActiveTab] = useState(pattern.type);
 
   const updatePattern = (updates: Partial<RecurrencePattern>) => {
@@ -43,6 +44,13 @@ export function RecurrencePatternBuilder({ pattern, onPatternChange, onClose }: 
       setActiveTab(value);
       updatePattern({ type: value });
     }
+  };
+
+  const handleApplyPattern = () => {
+    if (onApplyPattern) {
+      onApplyPattern(pattern);
+    }
+    onClose();
   };
 
   return (
@@ -188,8 +196,8 @@ export function RecurrencePatternBuilder({ pattern, onPatternChange, onClose }: 
             Avbryt
           </Button>
           <Button 
-            onClick={onClose}
-            disabled={pattern.weekdays.length === 0 || pattern.timeSlots.length === 0}
+            onClick={handleApplyPattern}
+            disabled={pattern.timeSlots.length === 0 || (pattern.type !== 'single' && pattern.weekdays.length === 0)}
             className="text-base px-6 py-3"
           >
             Bruk mønster
