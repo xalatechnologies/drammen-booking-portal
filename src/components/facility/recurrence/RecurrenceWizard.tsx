@@ -22,24 +22,29 @@ const STEPS = ['Frekvens', 'Dager', 'Tider', 'Bekreft'];
 
 export function RecurrenceWizard({ pattern, onPatternChange, onClose, onApplyPattern }: RecurrenceWizardProps) {
   const [currentStep, setCurrentStep] = useState(0);
-  const [selectedFrequency, setSelectedFrequency] = useState<SupportedFrequency>('weekly');
+  const [selectedFrequency, setSelectedFrequency] = useState<SupportedFrequency>(
+    pattern.type === 'weekly' || pattern.type === 'biweekly' || pattern.type === 'monthly' 
+      ? pattern.type 
+      : 'weekly'
+  );
 
   const updatePattern = (updates: Partial<RecurrencePattern>) => {
-    onPatternChange({ ...pattern, ...updates });
+    const newPattern = { ...pattern, ...updates };
+    onPatternChange(newPattern);
   };
 
   const canProceed = () => {
     switch (currentStep) {
       case 0: return true; // Frequency always has a default
-      case 1: return pattern.weekdays.length > 0;
-      case 2: return pattern.timeSlots.length > 0;
+      case 1: return pattern.weekdays && pattern.weekdays.length > 0;
+      case 2: return pattern.timeSlots && pattern.timeSlots.length > 0;
       case 3: return true;
       default: return false;
     }
   };
 
   const handleNext = () => {
-    if (currentStep < STEPS.length - 1) {
+    if (currentStep < STEPS.length - 1 && canProceed()) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -51,8 +56,9 @@ export function RecurrenceWizard({ pattern, onPatternChange, onClose, onApplyPat
   };
 
   const handleApplyPattern = () => {
+    const finalPattern = { ...pattern, type: selectedFrequency };
     if (onApplyPattern) {
-      onApplyPattern({ ...pattern, type: selectedFrequency });
+      onApplyPattern(finalPattern);
     }
     onClose();
   };
@@ -72,11 +78,12 @@ export function RecurrenceWizard({ pattern, onPatternChange, onClose, onApplyPat
       case 1:
         return (
           <WeekdayStep
-            selectedWeekdays={pattern.weekdays}
+            selectedWeekdays={pattern.weekdays || []}
             onWeekdayToggle={(day) => {
-              const newWeekdays = pattern.weekdays.includes(day)
-                ? pattern.weekdays.filter(d => d !== day)
-                : [...pattern.weekdays, day];
+              const currentWeekdays = pattern.weekdays || [];
+              const newWeekdays = currentWeekdays.includes(day)
+                ? currentWeekdays.filter(d => d !== day)
+                : [...currentWeekdays, day];
               updatePattern({ weekdays: newWeekdays });
             }}
           />
@@ -84,11 +91,12 @@ export function RecurrenceWizard({ pattern, onPatternChange, onClose, onApplyPat
       case 2:
         return (
           <TimeSlotStep
-            selectedTimeSlots={pattern.timeSlots}
+            selectedTimeSlots={pattern.timeSlots || []}
             onTimeSlotToggle={(slot) => {
-              const newTimeSlots = pattern.timeSlots.includes(slot)
-                ? pattern.timeSlots.filter(t => t !== slot)
-                : [...pattern.timeSlots, slot];
+              const currentTimeSlots = pattern.timeSlots || [];
+              const newTimeSlots = currentTimeSlots.includes(slot)
+                ? currentTimeSlots.filter(t => t !== slot)
+                : [...currentTimeSlots, slot];
               updatePattern({ timeSlots: newTimeSlots });
             }}
           />
@@ -97,8 +105,8 @@ export function RecurrenceWizard({ pattern, onPatternChange, onClose, onApplyPat
         return (
           <PreviewStep
             selectedFrequency={selectedFrequency}
-            selectedWeekdays={pattern.weekdays}
-            selectedTimeSlots={pattern.timeSlots}
+            selectedWeekdays={pattern.weekdays || []}
+            selectedTimeSlots={pattern.timeSlots || []}
           />
         );
       default:
@@ -107,7 +115,7 @@ export function RecurrenceWizard({ pattern, onPatternChange, onClose, onApplyPat
   };
 
   return (
-    <Card className="w-full max-w-3xl mx-auto bg-white border border-gray-200">
+    <Card className="w-full max-w-3xl mx-auto bg-white border border-gray-200 shadow-lg">
       <CardHeader className="bg-gray-50 border-b border-gray-200">
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-3 text-lg font-semibold text-gray-900">
@@ -130,7 +138,7 @@ export function RecurrenceWizard({ pattern, onPatternChange, onClose, onApplyPat
             <div key={index} className="flex items-center">
               <div 
                 className={`
-                  w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium
+                  w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors
                   ${index <= currentStep 
                     ? 'bg-blue-600 text-white' 
                     : 'bg-gray-200 text-gray-500'
@@ -148,7 +156,7 @@ export function RecurrenceWizard({ pattern, onPatternChange, onClose, onApplyPat
         </div>
       </CardHeader>
       
-      <CardContent className="p-6 min-h-[400px]">
+      <CardContent className="p-8 min-h-[400px]">
         {renderStep()}
       </CardContent>
 
@@ -166,7 +174,7 @@ export function RecurrenceWizard({ pattern, onPatternChange, onClose, onApplyPat
           <Button 
             onClick={handleApplyPattern}
             disabled={!canProceed()}
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700"
+            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white"
           >
             Opprett Reservasjoner
           </Button>
@@ -174,7 +182,7 @@ export function RecurrenceWizard({ pattern, onPatternChange, onClose, onApplyPat
           <Button 
             onClick={handleNext}
             disabled={!canProceed()}
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700"
+            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white"
           >
             Neste
             <ArrowRight className="h-4 w-4" />
