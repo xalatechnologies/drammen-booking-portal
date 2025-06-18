@@ -45,9 +45,9 @@ export function FacilityCardTabs({ facility }: FacilityCardTabsProps) {
     <div onClick={handleTabsClick}>
       <Tabs defaultValue="overview" className="flex-grow">
         <TabsList className="grid w-full grid-cols-3 mb-3 h-10 glass border-white/30 bg-navy-50/50">
-          <TabsTrigger value="overview" className="text-sm py-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-navy-600 data-[state=active]:text-white">Oversikt</TabsTrigger>
-          <TabsTrigger value="details" className="text-sm py-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-navy-600 data-[state=active]:text-white">Detaljer</TabsTrigger>
-          <TabsTrigger value="availability" className="text-sm py-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-navy-600 data-[state=active]:text-white">Ledighet</TabsTrigger>
+          <TabsTrigger value="overview" className="text-sm py-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-navy-600 data-[state=active]:to-navy-700 data-[state=active]:text-white">Oversikt</TabsTrigger>
+          <TabsTrigger value="details" className="text-sm py-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-navy-600 data-[state=active]:to-navy-700 data-[state=active]:text-white">Detaljer</TabsTrigger>
+          <TabsTrigger value="availability" className="text-sm py-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-navy-600 data-[state=active]:to-navy-700 data-[state=active]:text-white">Ledighet</TabsTrigger>
         </TabsList>
         
         <TabsContent value="overview" className="space-y-3 mt-0">
@@ -93,17 +93,17 @@ export function FacilityCardTabs({ facility }: FacilityCardTabsProps) {
 
           <div>
             <h4 className="text-base font-medium mb-2 flex items-center gap-1.5 text-navy-900">
-              <Wrench className="h-5 w-5 text-purple-600" />
+              <Wrench className="h-5 w-5 text-navy-600" />
               <span>Tilgjengelig utstyr</span>
             </h4>
             <div className="flex flex-wrap gap-1.5">
               {facility.equipment.slice(0, 4).map((item, i) => (
-                <Badge key={i} variant="outline" className="bg-purple-50 text-purple-700 border-purple-200 text-sm py-1 px-2">
+                <Badge key={i} variant="outline" className="bg-navy-50 text-navy-700 border-navy-200 text-sm py-1 px-2">
                   {item}
                 </Badge>
               ))}
               {facility.equipment.length > 4 && (
-                <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200 text-sm py-1 px-2">
+                <Badge variant="outline" className="bg-navy-50 text-navy-700 border-navy-200 text-sm py-1 px-2">
                   +{facility.equipment.length - 4} flere
                 </Badge>
               )}
@@ -114,7 +114,7 @@ export function FacilityCardTabs({ facility }: FacilityCardTabsProps) {
         <TabsContent value="availability" className="mt-0">
           <div className="glass p-3 rounded-lg border border-white/30 bg-navy-50/30">
             <h4 className="text-base font-medium mb-2 flex items-center gap-1.5">
-              <Calendar className="h-5 w-5 text-purple-600" />
+              <Calendar className="h-5 w-5 text-navy-600" />
               <span>Tilgjengelighet</span>
             </h4>
             
