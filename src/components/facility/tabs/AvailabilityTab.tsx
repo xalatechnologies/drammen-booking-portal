@@ -220,11 +220,7 @@ export function AvailabilityTab({ zones, startDate, showLegend = true }: Availab
           </div>
         </CardContent>
       </Card>
-    </div>
-  );
 
-  return (
-    <div className="space-y-6">
       {/* Legend moved below calendar */}
       {showLegend && (
         <div className="p-4 bg-gray-50 rounded-lg">
@@ -244,7 +240,11 @@ export function AvailabilityTab({ zones, startDate, showLegend = true }: Availab
           </div>
         </div>
       )}
+    </div>
+  );
 
+  return (
+    <div className="space-y-6">
       {/* Enhanced Zone Tabs with larger fonts */}
       <Tabs defaultValue={zones[0]?.id} className="w-full">
         <TabsList className="grid w-full grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1 h-auto p-1 bg-gray-100 rounded-lg">
