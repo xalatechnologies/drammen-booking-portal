@@ -311,8 +311,7 @@ const FacilityDetail = () => {
                   zones={zones} 
                   amenities={facility.amenities} 
                   address={facility.address} 
-                  zoneCards={<></>}
-                  facilityId={id}
+                  zoneCards={<></>} 
                 />
               </div>
 
