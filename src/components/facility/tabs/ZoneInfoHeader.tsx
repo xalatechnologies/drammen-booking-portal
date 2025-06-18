@@ -38,11 +38,11 @@ export function ZoneInfoHeader({
       <div className="flex items-center justify-between gap-4 mb-6 p-4 bg-gradient-to-r from-slate-50 to-slate-100 rounded-lg border border-slate-200">
         <div className="flex items-start gap-3">
           <div className="p-2 bg-slate-100 rounded-lg">
-            <Info className="h-5 w-5 text-slate-600" />
+            <Info className="h-6 w-6 text-slate-600" />
           </div>
           <div>
-            <h3 className="font-semibold text-gray-900 mb-1">Gjentakende booking</h3>
-            <p className="text-sm text-gray-600 leading-relaxed">
+            <h3 className="font-semibold text-gray-900 mb-2 text-lg">Gjentakende booking</h3>
+            <p className="text-base text-gray-600 leading-relaxed">
               Opprett ukentlige eller månedlige bookinger enkelt. <br />
               Velg dager, tidspunkt og hvor ofte det skal gjentas.
             </p>
@@ -51,9 +51,9 @@ export function ZoneInfoHeader({
         <Button
           variant="outline"
           onClick={onPatternBuilderOpen}
-          className="flex items-center gap-2 bg-white hover:bg-slate-50 border-slate-300 text-slate-700 font-medium px-4 py-2 shrink-0"
+          className="flex items-center gap-2 bg-white hover:bg-slate-50 border-slate-300 text-slate-700 font-medium px-5 py-3 shrink-0 text-base"
         >
-          <Repeat className="h-4 w-4" />
+          <Repeat className="h-5 w-5" />
           Opprett mønster
         </Button>
       </div>
@@ -67,15 +67,15 @@ export function ZoneInfoHeader({
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="p-1.5 bg-white/20 rounded-lg">
-                    <ShoppingCart className="h-4 w-4 text-white" />
+                    <ShoppingCart className="h-5 w-5 text-white" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-white">Valgte tidspunkt</h4>
-                    <p className="text-slate-200 text-sm">{selectedSlots.length} timer valgt</p>
+                    <h4 className="font-semibold text-white text-lg">Valgte tidspunkt</h4>
+                    <p className="text-slate-200 text-base">{selectedSlots.length} timer valgt</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Badge className="bg-white/20 text-white border-white/30">
+                  <Badge className="bg-white/20 text-white border-white/30 text-base">
                     {selectedSlots.length} timer
                   </Badge>
                   <Button
@@ -98,22 +98,22 @@ export function ZoneInfoHeader({
                     <div className="flex items-center gap-3">
                       <div className="w-2 h-2 bg-slate-600 rounded-full"></div>
                       <div>
-                        <p className="text-sm font-medium text-gray-900">
+                        <p className="text-base font-medium text-gray-900">
                           {getZoneName(slot.zoneId)}
                         </p>
-                        <p className="text-xs text-gray-500">
+                        <p className="text-sm text-gray-500">
                           {format(slot.date, 'EEEE dd. MMMM', { locale: nb })}
                         </p>
                       </div>
                     </div>
-                    <Badge variant="outline" className="bg-white text-slate-700 border-slate-200">
+                    <Badge variant="outline" className="bg-white text-slate-700 border-slate-200 text-base">
                       {slot.timeSlot}
                     </Badge>
                   </div>
                 ))}
                 {selectedSlots.length > 6 && (
                   <div className="text-center py-2">
-                    <p className="text-sm text-gray-500 bg-gray-100 rounded-lg py-2 px-3">
+                    <p className="text-base text-gray-500 bg-gray-100 rounded-lg py-2 px-3">
                       + {selectedSlots.length - 6} flere tidspunkt
                     </p>
                   </div>
@@ -124,7 +124,7 @@ export function ZoneInfoHeader({
               <div className="mt-4 pt-4 border-t border-gray-200">
                 <Button
                   onClick={onBookingDrawerOpen}
-                  className="w-full bg-gradient-to-r from-slate-700 to-slate-800 hover:from-slate-800 hover:to-slate-900 text-white font-semibold py-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-200"
+                  className="w-full bg-gradient-to-r from-slate-700 to-slate-800 hover:from-slate-800 hover:to-slate-900 text-white font-semibold py-4 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 text-lg"
                   size="lg"
                 >
                   <ShoppingCart className="h-5 w-5 mr-2" />

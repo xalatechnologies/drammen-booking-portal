@@ -48,11 +48,11 @@ export function RecurrencePatternBuilder({ pattern, onPatternChange, onClose }: 
   return (
     <Card className="w-full max-w-2xl font-inter">
       <CardHeader className="pb-4">
-        <CardTitle className="flex items-center gap-2">
-          <Repeat className="h-5 w-5" />
+        <CardTitle className="flex items-center gap-2 text-xl">
+          <Repeat className="h-6 w-6" />
           Gjentakende booking
         </CardTitle>
-        <p className="text-sm text-gray-600">
+        <p className="text-base text-gray-600">
           Velg når og hvor ofte du vil reservere
         </p>
       </CardHeader>
@@ -60,20 +60,20 @@ export function RecurrencePatternBuilder({ pattern, onPatternChange, onClose }: 
       <CardContent className="space-y-6">
         {/* Pattern Type Selection */}
         <Tabs value={activeTab} onValueChange={handleTabChange}>
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="single">Enkelt</TabsTrigger>
-            <TabsTrigger value="weekly">Ukentlig</TabsTrigger>
-            <TabsTrigger value="biweekly">Annenhver uke</TabsTrigger>
-            <TabsTrigger value="monthly">Månedlig</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-4 text-base">
+            <TabsTrigger value="single" className="text-base">Enkelt</TabsTrigger>
+            <TabsTrigger value="weekly" className="text-base">Ukentlig</TabsTrigger>
+            <TabsTrigger value="biweekly" className="text-base">Annenhver uke</TabsTrigger>
+            <TabsTrigger value="monthly" className="text-base">Månedlig</TabsTrigger>
           </TabsList>
 
           <TabsContent value="single" className="space-y-4">
-            <p className="text-sm text-gray-600">Velg tidspunkt for enkeltstående booking</p>
+            <p className="text-base text-gray-600">Velg tidspunkt for enkeltstående booking</p>
           </TabsContent>
 
           <TabsContent value="weekly" className="space-y-4">
             <div>
-              <h4 className="text-sm font-medium mb-2">Velg ukedager:</h4>
+              <h4 className="text-base font-medium mb-3">Velg ukedager:</h4>
               <div className="flex gap-2">
                 {weekdayNames.map((day, index) => (
                   <Button
@@ -81,7 +81,7 @@ export function RecurrencePatternBuilder({ pattern, onPatternChange, onClose }: 
                     variant={pattern.weekdays.includes(index) ? 'default' : 'outline'}
                     size="sm"
                     onClick={() => toggleWeekday(index)}
-                    className="w-12 h-12 p-0"
+                    className="w-14 h-14 p-0 text-base"
                   >
                     {day}
                   </Button>
@@ -92,7 +92,7 @@ export function RecurrencePatternBuilder({ pattern, onPatternChange, onClose }: 
 
           <TabsContent value="biweekly" className="space-y-4">
             <div>
-              <h4 className="text-sm font-medium mb-2">Velg ukedager (annenhver uke):</h4>
+              <h4 className="text-base font-medium mb-3">Velg ukedager (annenhver uke):</h4>
               <div className="flex gap-2">
                 {weekdayNames.map((day, index) => (
                   <Button
@@ -100,7 +100,7 @@ export function RecurrencePatternBuilder({ pattern, onPatternChange, onClose }: 
                     variant={pattern.weekdays.includes(index) ? 'default' : 'outline'}
                     size="sm"
                     onClick={() => toggleWeekday(index)}
-                    className="w-12 h-12 p-0"
+                    className="w-14 h-14 p-0 text-base"
                   >
                     {day}
                   </Button>
@@ -111,7 +111,7 @@ export function RecurrencePatternBuilder({ pattern, onPatternChange, onClose }: 
 
           <TabsContent value="monthly" className="space-y-4">
             <div>
-              <h4 className="text-sm font-medium mb-2">Velg mønster:</h4>
+              <h4 className="text-base font-medium mb-3">Velg mønster:</h4>
               <div className="grid grid-cols-2 gap-2">
                 {['first', 'second', 'third', 'fourth', 'last'].map((patternType) => (
                   <Button
@@ -119,6 +119,7 @@ export function RecurrencePatternBuilder({ pattern, onPatternChange, onClose }: 
                     variant={pattern.monthlyPattern === patternType ? 'default' : 'outline'}
                     size="sm"
                     onClick={() => updatePattern({ monthlyPattern: patternType as any })}
+                    className="text-base"
                   >
                     {patternType === 'first' && 'Første'}
                     {patternType === 'second' && 'Andre'}
@@ -135,7 +136,7 @@ export function RecurrencePatternBuilder({ pattern, onPatternChange, onClose }: 
                     variant={pattern.monthlyWeekday === index + 1 ? 'default' : 'outline'}
                     size="sm"
                     onClick={() => updatePattern({ monthlyWeekday: index + 1 })}
-                    className="w-12 h-12 p-0"
+                    className="w-14 h-14 p-0 text-base"
                   >
                     {day}
                   </Button>
@@ -147,8 +148,8 @@ export function RecurrencePatternBuilder({ pattern, onPatternChange, onClose }: 
 
         {/* Time Slots Selection */}
         <div>
-          <h4 className="text-sm font-medium mb-2 flex items-center gap-2">
-            <Clock className="h-4 w-4" />
+          <h4 className="text-base font-medium mb-3 flex items-center gap-2">
+            <Clock className="h-5 w-5" />
             Velg tidspunkt:
           </h4>
           <div className="grid grid-cols-2 gap-2">
@@ -158,7 +159,7 @@ export function RecurrencePatternBuilder({ pattern, onPatternChange, onClose }: 
                 variant={pattern.timeSlots.includes(slot) ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => toggleTimeSlot(slot)}
-                className="justify-start"
+                className="justify-start text-base"
               >
                 {slot}
               </Button>
@@ -169,12 +170,12 @@ export function RecurrencePatternBuilder({ pattern, onPatternChange, onClose }: 
         {/* Pattern Summary */}
         {pattern.weekdays.length > 0 && pattern.timeSlots.length > 0 && (
           <div className="p-4 bg-blue-50 rounded-lg">
-            <h4 className="text-sm font-medium mb-2">Valgt mønster:</h4>
+            <h4 className="text-base font-medium mb-2">Valgt mønster:</h4>
             <div className="flex flex-wrap gap-2">
-              <Badge variant="outline">
+              <Badge variant="outline" className="text-base">
                 {pattern.weekdays.map(day => weekdayNames[day]).join(', ')}
               </Badge>
-              <Badge variant="outline">
+              <Badge variant="outline" className="text-base">
                 {pattern.timeSlots.join(', ')}
               </Badge>
             </div>
@@ -183,12 +184,13 @@ export function RecurrencePatternBuilder({ pattern, onPatternChange, onClose }: 
 
         {/* Action Buttons */}
         <div className="flex justify-end gap-2 pt-4 border-t">
-          <Button variant="outline" onClick={onClose}>
+          <Button variant="outline" onClick={onClose} className="text-base px-6 py-3">
             Avbryt
           </Button>
           <Button 
             onClick={onClose}
             disabled={pattern.weekdays.length === 0 || pattern.timeSlots.length === 0}
+            className="text-base px-6 py-3"
           >
             Bruk mønster
           </Button>
