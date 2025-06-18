@@ -1,8 +1,7 @@
 
 import React from "react";
-import { Bell, Search, Globe } from "lucide-react";
+import { Bell, Search } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
@@ -12,48 +11,55 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { ActionButton } from "@/components/common/ActionButton";
+import { StatusBadge } from "@/components/common/StatusBadge";
+import { Heading5, BodySmall } from "@/components/common/Typography";
 import Logo from "@/components/header/Logo";
 
 const AdminHeader = () => {
   return (
-    <header className="border-b bg-white shadow-sm sticky top-0 z-50 pb-2">
-      <div className="flex h-16 items-center px-6">
-        <div className="flex items-center gap-4 min-w-0">
+    <header className="bg-card sticky top-0 z-50 border-b border-border shadow-md">
+      <div className="flex h-20 items-center px-xl gap-xl">
+        <div className="flex items-center gap-xl min-w-0">
           <Logo />
+          <div className="hidden md:flex items-center gap-sm">
+            <BodySmall className="text-muted-foreground">Admin</BodySmall>
+            <span className="text-muted-foreground">/</span>
+            <BodySmall className="text-foreground font-semibold">Dashboard</BodySmall>
+          </div>
         </div>
         
-        <div className="flex-1 flex justify-center px-8">
-          <div className="flex items-center gap-4 w-full max-w-lg">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input
-                placeholder="Søk i alt innhold..."
-                className="pl-10 h-10 text-base bg-gray-50 border-gray-200 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none focus:border-blue-500"
-                aria-label="Søk i systemet"
-              />
-            </div>
+        <div className="flex-1 flex justify-center px-xl">
+          <div className="relative w-full max-w-xl">
+            <Search className="absolute left-lg top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+            <Input
+              placeholder="Søk i alt innhold..."
+              className="input-primary pl-12 h-12 text-base rounded-lg"
+              aria-label="Søk i systemet"
+            />
           </div>
         </div>
 
-        <div className="flex items-center gap-3 flex-shrink-0">
+        <div className="flex items-center gap-lg flex-shrink-0">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button 
+              <ActionButton 
                 variant="ghost" 
-                className="flex items-center gap-2 px-3 py-2 h-9 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:outline-none rounded-md"
+                size="md"
+                icon={<img src="/lovable-uploads/97431924-b9fd-4ccd-b558-a9e90506c716.png" alt="NO" className="w-5 h-4 rounded-sm" />}
+                className="text-foreground focus-ring"
                 aria-label="Velg språk"
               >
-                <img src="/lovable-uploads/97431924-b9fd-4ccd-b558-a9e90506c716.png" alt="NO" className="w-4 h-3" />
-                <span>Norsk</span>
-              </Button>
+                Norsk
+              </ActionButton>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="bg-white shadow-lg border border-gray-200">
-              <DropdownMenuItem className="text-sm py-2 hover:bg-gray-50">
-                <img src="/lovable-uploads/97431924-b9fd-4ccd-b558-a9e90506c716.png" alt="NO" className="w-4 h-3 mr-2" />
+            <DropdownMenuContent align="end" className="bg-card border-border shadow-lg">
+              <DropdownMenuItem className="hover:bg-accent hover:text-accent-foreground">
+                <img src="/lovable-uploads/97431924-b9fd-4ccd-b558-a9e90506c716.png" alt="NO" className="w-5 h-4 mr-md rounded-sm" />
                 Norsk
               </DropdownMenuItem>
-              <DropdownMenuItem className="text-sm py-2 hover:bg-gray-50">
-                <img src="/lovable-uploads/b12bcda3-d611-4e9e-bbcc-d53d2db38af9.png" alt="EN" className="w-4 h-3 mr-2" />
+              <DropdownMenuItem className="hover:bg-accent hover:text-accent-foreground">
+                <img src="/lovable-uploads/b12bcda3-d611-4e9e-bbcc-d53d2db38af9.png" alt="EN" className="w-5 h-4 mr-md rounded-sm" />
                 English
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -61,33 +67,32 @@ const AdminHeader = () => {
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button 
+              <ActionButton 
                 variant="ghost" 
-                size="icon" 
-                className="relative h-9 w-9 hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:outline-none rounded-md"
+                size="md"
+                icon={<Bell className="h-5 w-5" />}
+                className="relative text-foreground focus-ring"
                 aria-label="Varsler - 3 uleste"
               >
-                <Bell className="h-4 w-4 text-gray-600" />
-                <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-red-500 text-white text-xs flex items-center justify-center font-medium">
+                <StatusBadge 
+                  status="error" 
+                  showIcon={false}
+                  className="absolute -top-1 -right-1 h-5 w-5 p-0 text-xs flex items-center justify-center"
+                >
                   3
-                </span>
-              </Button>
+                </StatusBadge>
+              </ActionButton>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-80 bg-white shadow-lg border border-gray-200">
-              <DropdownMenuLabel className="text-base font-semibold">Varsler</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="py-3 cursor-pointer hover:bg-gray-50">
-                <div className="flex flex-col gap-1">
-                  <p className="text-sm font-medium text-gray-900">Ny forespørsel om lokale</p>
-                  <p className="text-xs text-gray-600">Brandengen Skole ba om godkjenning</p>
-                  <p className="text-xs text-gray-500">2 minutter siden</p>
-                </div>
-              </DropdownMenuItem>
-              <DropdownMenuItem className="py-3 cursor-pointer hover:bg-gray-50">
-                <div className="flex flex-col gap-1">
-                  <p className="text-sm font-medium text-gray-900">Brukerrolle oppdatert</p>
-                  <p className="text-xs text-gray-600">Thomas Hansen er nå administrator</p>
-                  <p className="text-xs text-gray-500">1 time siden</p>
+            <DropdownMenuContent align="end" className="w-96 bg-card border-border shadow-lg">
+              <DropdownMenuLabel>
+                <Heading5>Varsler</Heading5>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator className="border-border" />
+              <DropdownMenuItem className="py-lg cursor-pointer hover:bg-accent hover:text-accent-foreground">
+                <div className="flex flex-col gap-sm">
+                  <BodySmall className="font-semibold text-foreground">Ny forespørsel om lokale</BodySmall>
+                  <BodySmall className="text-muted-foreground">Brandengen Skole ba om godkjenning</BodySmall>
+                  <BodySmall className="text-muted-foreground">2 minutter siden</BodySmall>
                 </div>
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -95,28 +100,31 @@ const AdminHeader = () => {
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button 
+              <ActionButton 
                 variant="ghost" 
-                size="sm" 
-                className="relative h-9 gap-2 px-2 hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:outline-none rounded-md"
+                size="md"
+                className="gap-md text-foreground focus-ring"
                 aria-label="Brukerprofil og innstillinger"
               >
-                <Avatar className="h-7 w-7">
+                <Avatar className="h-8 w-8">
                   <AvatarImage src="/placeholder.svg" alt="Development User" />
-                  <AvatarFallback className="bg-blue-600 text-white text-xs font-medium">DU</AvatarFallback>
+                  <AvatarFallback className="bg-primary text-primary-foreground text-xs font-bold">DU</AvatarFallback>
                 </Avatar>
                 <div className="hidden md:flex flex-col items-start">
-                  <span className="text-sm font-medium text-gray-900">Development User</span>
+                  <BodySmall className="font-semibold text-foreground">Development User</BodySmall>
+                  <BodySmall className="text-muted-foreground">Administrator</BodySmall>
                 </div>
-              </Button>
+              </ActionButton>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="bg-white shadow-lg border border-gray-200">
-              <DropdownMenuLabel className="text-sm font-medium">Min Konto</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-sm py-2 hover:bg-gray-50">Profil</DropdownMenuItem>
-              <DropdownMenuItem className="text-sm py-2 hover:bg-gray-50">Innstillinger</DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-sm py-2 hover:bg-gray-50 text-red-600">Logg ut</DropdownMenuItem>
+            <DropdownMenuContent align="end" className="bg-card border-border shadow-lg">
+              <DropdownMenuLabel>
+                <BodySmall className="font-semibold text-foreground">Min Konto</BodySmall>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator className="border-border" />
+              <DropdownMenuItem className="hover:bg-accent hover:text-accent-foreground">Profil</DropdownMenuItem>
+              <DropdownMenuItem className="hover:bg-accent hover:text-accent-foreground">Innstillinger</DropdownMenuItem>
+              <DropdownMenuSeparator className="border-border" />
+              <DropdownMenuItem className="hover:bg-accent hover:text-accent-foreground text-destructive">Logg ut</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
