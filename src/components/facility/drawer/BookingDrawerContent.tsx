@@ -1,8 +1,7 @@
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SelectedTimeSlot } from '@/utils/recurrenceEngine';
-import { usePriceCalculation } from '@/hooks/usePriceCalculation';
 import { ActorType, BookingType } from '@/types/pricing';
 import { Zone } from '@/components/booking/types';
 import { BookingSummaryStep } from './BookingSummaryStep';
@@ -33,7 +32,6 @@ export function BookingDrawerContent({
   const navigate = useNavigate();
   const [step, setStep] = useState<'summary' | 'details'>('summary');
   const [actorType, setActorType] = useState<ActorType>('private-person');
-  const [bookingType, setBookingType] = useState<BookingType>('engangs');
   const [purpose, setPurpose] = useState('');
   const [formData, setFormData] = useState<FormData>({
     name: '',
@@ -44,16 +42,17 @@ export function BookingDrawerContent({
     notes: ''
   });
 
-  // Calculate pricing for all selected slots with current actor and booking type
-  const { calculation } = usePriceCalculation({
-    facilityId,
-    zoneId: selectedSlots[0]?.zoneId,
-    startDate: selectedSlots[0]?.date,
-    customerType: actorType as any, // For backwards compatibility
-    timeSlot: selectedSlots[0]?.timeSlot
-  });
-
-  const totalPrice = calculation ? calculation.finalPrice * selectedSlots.length : 0;
+  // Auto-determine booking type based on selected slots
+  const bookingType: BookingType = useMemo(() => {
+    if (selectedSlots.length <= 1) {
+      return 'engangs';
+    }
+    
+    // Check if slots are recurring pattern or just multiple single bookings
+    // For now, if multiple slots, assume it's fastlån
+    // TODO: Could be enhanced to detect actual recurring patterns
+    return selectedSlots.length > 3 ? 'fastlan' : 'engangs';
+  }, [selectedSlots]);
 
   const handleSubmit = () => {
     // Navigate to booking confirmation
@@ -66,8 +65,7 @@ export function BookingDrawerContent({
         },
         actorType,
         bookingType,
-        totalPrice,
-        requiresApproval: calculation?.requiresApproval
+        requiresApproval: ['lag-foreninger', 'paraply'].includes(actorType)
       }
     });
   };
@@ -82,11 +80,11 @@ export function BookingDrawerContent({
           actorType={actorType}
           onActorTypeChange={setActorType}
           bookingType={bookingType}
-          onBookingTypeChange={setBookingType}
+          onBookingTypeChange={() => {}} // No longer needed as it's auto-determined
           purpose={purpose}
           onPurposeChange={setPurpose}
-          calculation={calculation}
-          totalPrice={totalPrice}
+          calculation={null} // Will be calculated in IntegratedPriceCalculation
+          totalPrice={0} // Will be calculated in IntegratedPriceCalculation
           onContinue={() => setStep('details')}
         />
       ) : (

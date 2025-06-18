@@ -6,12 +6,11 @@ import { Card, CardContent } from '@/components/ui/card';
 import { SelectedTimeSlot } from '@/utils/recurrenceEngine';
 import { ActorType, BookingType } from '@/types/pricing';
 import { Zone } from '@/components/booking/types';
-import { PriceBreakdown } from '@/components/booking/PriceBreakdown';
 import { BookingOverviewCard } from './BookingOverviewCard';
 import { CustomerTypeSection } from './CustomerTypeSection';
-import { BookingTypeSection } from './BookingTypeSection';
 import { ActivityDetailsForm } from './ActivityDetailsForm';
 import { PurposeForm } from './PurposeForm';
+import { IntegratedPriceCalculation } from '@/components/booking/IntegratedPriceCalculation';
 
 interface BookingSummaryStepProps {
   selectedSlots: SelectedTimeSlot[];
@@ -35,19 +34,15 @@ export function BookingSummaryStep({
   actorType,
   onActorTypeChange,
   bookingType,
-  onBookingTypeChange,
   purpose,
   onPurposeChange,
-  calculation,
-  totalPrice,
   onContinue
 }: BookingSummaryStepProps) {
   const [activityType, setActivityType] = React.useState<string>('');
   const [attendees, setAttendees] = React.useState<number>(1);
   
   // Check if booking requires approval
-  const requiresApproval = calculation?.requiresApproval || 
-    ['lag-foreninger', 'paraply'].includes(actorType);
+  const requiresApproval = ['lag-foreninger', 'paraply'].includes(actorType);
 
   // Validation
   const isValid = purpose.trim().length > 0 && activityType.length > 0 && attendees > 0;
@@ -65,9 +60,12 @@ export function BookingSummaryStep({
         onChange={onActorTypeChange}
       />
 
-      <BookingTypeSection
-        value={bookingType}
-        onChange={onBookingTypeChange}
+      {/* Integrated Price Calculation - positioned prominently after actor type */}
+      <IntegratedPriceCalculation
+        selectedSlots={selectedSlots}
+        facilityId="1" // TODO: Get from props or context
+        actorType={actorType}
+        bookingType={bookingType}
       />
 
       {/* Approval Notice */}
@@ -99,23 +97,6 @@ export function BookingSummaryStep({
         purpose={purpose}
         onPurposeChange={onPurposeChange}
       />
-
-      {/* Price Breakdown */}
-      {calculation && (
-        <Card>
-          <CardContent className="p-4">
-            <PriceBreakdown calculation={calculation} />
-            <div className="mt-3 pt-3 border-t">
-              <div className="flex justify-between items-center">
-                <span className="text-base">Sum:</span>
-                <span className="text-xl font-medium text-blue-600">
-                  {totalPrice === 0 ? '0*' : `${totalPrice}`} ,-
-                </span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
 
       <Button 
         onClick={onContinue} 
