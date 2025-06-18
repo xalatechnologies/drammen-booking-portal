@@ -37,6 +37,14 @@ export function RecurrencePatternBuilder({ pattern, onPatternChange, onClose }: 
     updatePattern({ timeSlots: newTimeSlots });
   };
 
+  const handleTabChange = (value: string) => {
+    // Type guard to ensure the value is a valid pattern type
+    if (value === 'single' || value === 'weekly' || value === 'biweekly' || value === 'monthly' || value === 'custom') {
+      setActiveTab(value);
+      updatePattern({ type: value });
+    }
+  };
+
   return (
     <Card className="w-full max-w-2xl">
       <CardHeader className="pb-4">
@@ -51,10 +59,7 @@ export function RecurrencePatternBuilder({ pattern, onPatternChange, onClose }: 
       
       <CardContent className="space-y-6">
         {/* Pattern Type Selection */}
-        <Tabs value={activeTab} onValueChange={(value) => {
-          setActiveTab(value);
-          updatePattern({ type: value as RecurrencePattern['type'] });
-        }}>
+        <Tabs value={activeTab} onValueChange={handleTabChange}>
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="single">Enkelt</TabsTrigger>
             <TabsTrigger value="weekly">Ukentlig</TabsTrigger>
