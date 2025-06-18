@@ -60,28 +60,25 @@ export function EnhancedFacilitySidebar({
 
   return (
     <div className="space-y-4">
-      {/* Action Buttons */}
+      {/* Action Buttons - Match tab button height and font size */}
       <div className="flex gap-2">
         <Button 
           onClick={handleBookingClick}
-          className="flex-1 bg-[#1e3a8a] hover:bg-[#1e40af] text-white" 
-          size="lg"
+          className="flex-1 bg-[#1e3a8a] hover:bg-[#1e40af] text-white font-medium text-base h-auto p-3"
         >
           Reserver nå
         </Button>
         <Button
           variant="outline"
-          size="lg"
           onClick={onToggleFavorite}
-          className="px-3"
+          className="px-3 h-auto p-3"
         >
           <Heart className={`h-5 w-5 ${isFavorited ? 'fill-red-500 text-red-500' : ''}`} />
         </Button>
         <Button
           variant="outline"
-          size="lg"
           onClick={onShare}
-          className="px-3"
+          className="px-3 h-auto p-3"
         >
           <Share2 className="h-5 w-5" />
         </Button>
