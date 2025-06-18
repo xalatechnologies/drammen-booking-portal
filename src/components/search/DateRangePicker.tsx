@@ -26,9 +26,9 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
       <PopoverTrigger asChild>
         <Button
           variant="outline"
-          className="w-full h-14 justify-start text-left font-normal border-2 border-gray-200 hover:border-blue-600 focus:border-blue-600 focus:ring-blue-100 text-lg shadow-sm transition-all duration-200 px-4 bg-white"
+          className="w-full h-14 justify-start text-left font-normal border-2 border-gray-200 hover:border-blue-600 focus:border-blue-600 focus:ring-blue-100 text-lg shadow-sm transition-all duration-200 px-4 bg-white placeholder:text-gray-400"
         >
-          <CalendarIcon className="mr-3 h-6 w-6 text-gray-500" />
+          <CalendarIcon className="mr-3 h-5 w-5 text-gray-500" />
           {dateRange?.from ? (
             dateRange.to ? (
               <>
@@ -39,7 +39,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
               format(dateRange.from, "dd.MM.yyyy", { locale: nb })
             )
           ) : (
-            <span className="text-gray-500">Når vil du booke?</span>
+            <span className="text-gray-400 font-normal">Når vil du booke?</span>
           )}
         </Button>
       </PopoverTrigger>

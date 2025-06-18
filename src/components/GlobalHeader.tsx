@@ -38,15 +38,15 @@ const GlobalHeader = () => {
     <header className="bg-white dark:bg-gray-900 py-2 px-4 shadow-md sticky top-0 z-10 border-b border-gray-200 dark:border-gray-700">
       <div className="container mx-auto flex justify-between items-center">
         {/* Logo (left) */}
-        <div className="flex items-center">
-          <div className="mr-4">
+        <div className="flex-shrink-0">
+          <div>
             <Logo />
           </div>
-          
-          {/* Global Search - Desktop */}
-          <div className="hidden md:block flex-grow max-w-xl">
-            <GlobalSearch />
-          </div>
+        </div>
+
+        {/* Global Search - Desktop (centered) */}
+        <div className="hidden md:block flex-1 max-w-2xl mx-auto px-4">
+          <GlobalSearch />
         </div>
 
         {/* Mobile Menu Button */}
@@ -76,8 +76,8 @@ const GlobalHeader = () => {
         </div>
       </div>
       
-      {/* Global Search - Mobile (below header) */}
-      <div className="md:hidden border-t border-gray-200 py-2 px-4">
+      {/* Global Search - Mobile (full width below header) */}
+      <div className="md:hidden border-t border-gray-200 py-3 px-4">
         <GlobalSearch />
       </div>
 

@@ -27,8 +27,8 @@ const FilterSelects: React.FC<FilterSelectsProps> = ({
       <Label className="text-base font-medium text-gray-700">Primære filtre</Label>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         <Select value={facilityType || "all"} onValueChange={setFacilityType}>
-          <SelectTrigger className="h-14 border-2 border-gray-200 hover:border-blue-600 focus:border-blue-600 focus:ring-blue-100 text-lg shadow-sm transition-all duration-200 bg-white">
-            <SelectValue placeholder="Velg type lokale" />
+          <SelectTrigger className="h-14 border-2 border-gray-200 hover:border-blue-600 focus:border-blue-600 focus:ring-blue-100 text-base shadow-sm transition-all duration-200 bg-white">
+            <SelectValue placeholder="Velg type lokale" className="text-gray-400 font-normal" />
           </SelectTrigger>
           <SelectContent className="rounded-lg border-gray-200 shadow-lg bg-white">
             <SelectItem value="all" className="text-base py-3">Type lokale</SelectItem>
@@ -42,8 +42,8 @@ const FilterSelects: React.FC<FilterSelectsProps> = ({
         </Select>
         
         <Select value={location || "all"} onValueChange={setLocation}>
-          <SelectTrigger className="h-14 border-2 border-gray-200 hover:border-blue-600 focus:border-blue-600 focus:ring-blue-100 text-lg shadow-sm transition-all duration-200 bg-white">
-            <SelectValue placeholder="Velg område" />
+          <SelectTrigger className="h-14 border-2 border-gray-200 hover:border-blue-600 focus:border-blue-600 focus:ring-blue-100 text-base shadow-sm transition-all duration-200 bg-white">
+            <SelectValue placeholder="Velg område" className="text-gray-400 font-normal" />
           </SelectTrigger>
           <SelectContent className="rounded-lg border-gray-200 shadow-lg bg-white">
             <SelectItem value="all" className="text-base py-3">Område</SelectItem>

@@ -28,7 +28,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
           placeholder="Søk etter lokaler, adresser eller områder..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="pl-14 h-16 border-2 border-gray-200 focus:border-blue-600 focus:ring-blue-100 text-lg shadow-sm hover:border-gray-300 transition-all duration-200 w-full"
+          className="pl-14 h-14 border-2 border-gray-200 focus:border-blue-600 focus:ring-blue-100 text-lg shadow-sm hover:border-gray-300 transition-all duration-200 w-full placeholder:text-gray-400 placeholder:font-normal"
           aria-describedby="search-help"
           autoComplete="off"
           role="searchbox"

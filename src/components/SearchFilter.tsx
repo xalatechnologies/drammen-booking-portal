@@ -62,27 +62,27 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
   return (
     <div className="mb-8">
       <Card className="border-0 shadow-lg bg-white/90 backdrop-blur-sm rounded-2xl overflow-hidden">
-        <CardContent className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
-            <div className="md:col-span-4 lg:col-span-5">
+        <CardContent className="p-8">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-5 items-center">
+            <div className="md:col-span-5 lg:col-span-6">
               <SearchInput 
                 searchTerm={searchTerm}
                 setSearchTerm={setSearchTerm}
               />
             </div>
 
-            <div className="md:col-span-4 lg:col-span-4">
+            <div className="md:col-span-5 lg:col-span-4">
               <DateRangePicker 
                 dateRange={dateRange}
                 setDateRange={setDateRange}
               />
             </div>
 
-            <div className="md:col-span-2 lg:col-span-2 flex justify-end">
+            <div className="md:col-span-2 lg:col-span-2 flex justify-end gap-3">
               <Button 
                 variant="outline" 
                 onClick={toggleAdvancedFilters}
-                className="mr-2 border-2 border-gray-200 hover:border-blue-600 focus:border-blue-600 focus:ring-blue-100 rounded-full text-base shadow-sm transition-all duration-200 px-4 h-12 flex items-center gap-2"
+                className="border-2 border-gray-200 hover:border-blue-600 focus:border-blue-600 focus:ring-blue-100 text-base shadow-sm transition-all duration-200 px-4 h-14 flex items-center gap-2"
               >
                 <Sliders className="h-4 w-4" />
                 <span className="hidden sm:inline">Filtre</span>

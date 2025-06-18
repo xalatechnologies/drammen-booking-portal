@@ -131,7 +131,7 @@ const GlobalSearch = () => {
           placeholder="Søk etter lokaler, områder eller aktiviteter..."
           value={searchTerm}
           onChange={handleSearchChange}
-          className="pl-12 pr-10 h-14 text-lg border-2 border-gray-200 focus:border-blue-600 focus:ring-blue-100 w-full shadow-sm hover:shadow-md transition-all duration-200"
+          className="pl-12 pr-10 h-14 text-lg border-2 border-gray-200 focus:border-blue-600 focus:ring-blue-100 w-full shadow-sm hover:shadow-md transition-all duration-200 placeholder:text-gray-400 placeholder:font-normal"
           onFocus={() => {
             if (searchTerm.length > 1) {
               setIsResultsVisible(true);

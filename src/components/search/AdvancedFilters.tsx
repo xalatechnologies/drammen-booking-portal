@@ -59,8 +59,8 @@ const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
       <Label className="text-base font-medium text-gray-700">Avanserte filtre</Label>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         <Select value={accessibility || "all"} onValueChange={setAccessibility}>
-          <SelectTrigger className="h-14 border-2 border-gray-200 hover:border-blue-600 focus:border-blue-600 focus:ring-blue-100 text-lg shadow-sm transition-all duration-200 bg-white">
-            <SelectValue placeholder="Velg tilgjengelighet" />
+          <SelectTrigger className="h-14 border-2 border-gray-200 hover:border-blue-600 focus:border-blue-600 focus:ring-blue-100 text-base shadow-sm transition-all duration-200 bg-white">
+            <SelectValue placeholder="Velg tilgjengelighet" className="text-gray-400 font-normal" />
           </SelectTrigger>
           <SelectContent className="rounded-lg border-gray-200 shadow-lg bg-white">
             <SelectItem value="all" className="text-base py-3">Alle</SelectItem>
@@ -71,8 +71,8 @@ const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
         </Select>
         
         <Select value={getCapacityValue()} onValueChange={handleCapacityChange}>
-          <SelectTrigger className="h-14 border-2 border-gray-200 hover:border-blue-600 focus:border-blue-600 focus:ring-blue-100 text-lg shadow-sm transition-all duration-200 bg-white">
-            <SelectValue placeholder="Velg kapasitet" />
+          <SelectTrigger className="h-14 border-2 border-gray-200 hover:border-blue-600 focus:border-blue-600 focus:ring-blue-100 text-base shadow-sm transition-all duration-200 bg-white">
+            <SelectValue placeholder="Velg kapasitet" className="text-gray-400 font-normal" />
           </SelectTrigger>
           <SelectContent className="rounded-lg border-gray-200 shadow-lg bg-white">
             <SelectItem value="all" className="text-base py-3">Alle størrelser</SelectItem>
