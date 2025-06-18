@@ -9,6 +9,7 @@ import { ZoneBookingCard } from "./ZoneBookingCard";
 import { AutoApprovalCard } from "./AutoApprovalCard";
 import { Zone } from "@/components/booking/types";
 import { useLanguage } from "@/contexts/LanguageContext";
+
 interface EnhancedFacilitySidebarProps {
   zones: Zone[];
   facilityName: string;
@@ -23,6 +24,7 @@ interface EnhancedFacilitySidebarProps {
   onToggleFavorite?: () => void;
   isFavorited?: boolean;
 }
+
 export function EnhancedFacilitySidebar({
   zones,
   facilityName,
@@ -131,16 +133,18 @@ export function EnhancedFacilitySidebar({
           </CardContent>
         </Card>)}
 
-      {/* Policy Information Card */}
+      {/* Auto Approval Policy Card */}
+      {hasAutoApproval && (
+        <Card>
+          <CardContent className="p-4">
+            <AutoApprovalCard hasAutoApproval={hasAutoApproval} />
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Cancellation Policy Card */}
       <Card>
-        <CardContent className="p-4 space-y-4">
-          {/* Auto Approval Info */}
-          {hasAutoApproval && <AutoApprovalCard hasAutoApproval={hasAutoApproval} />}
-          
-          {/* Separator between policies if both exist */}
-          {hasAutoApproval && <Separator />}
-          
-          {/* Cancellation Policy */}
+        <CardContent className="p-4">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-emerald-100 rounded-md">
               <XCircle className="h-5 w-5 text-emerald-600" />
