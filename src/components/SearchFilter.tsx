@@ -59,7 +59,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
 
   return (
     <div className="mb-8">
-      <Card className="border-0 shadow-lg bg-white rounded-2xl overflow-hidden">
+      <Card className="border-0 shadow-lg bg-white overflow-hidden">
         <CardContent className="p-0">
           {/* Main Search Bar - Airbnb Style */}
           <div className="border-b border-gray-100">
@@ -99,18 +99,18 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
                   <Button
                     variant="outline"
                     onClick={() => setShowAdvanced(!showAdvanced)}
-                    className={`h-11 px-4 border-2 transition-all ${
+                    className={`h-12 px-5 border-2 transition-all text-base font-medium ${
                       showAdvanced || hasAdvancedFilters
                         ? 'border-gray-900 bg-gray-900 text-white hover:bg-gray-800' 
                         : 'border-gray-300 hover:border-gray-400'
                     }`}
                   >
-                    <Filter className="h-4 w-4" />
+                    <Filter className="h-5 w-5" />
                   </Button>
 
                   {/* Search Button */}
-                  <Button className="h-11 px-6 bg-pink-600 hover:bg-pink-700 text-white font-medium rounded-lg shadow-sm">
-                    <Search className="h-4 w-4 mr-2" />
+                  <Button className="h-12 px-7 bg-pink-600 hover:bg-pink-700 text-white font-semibold shadow-sm text-base">
+                    <Search className="h-5 w-5 mr-2" />
                     Søk
                   </Button>
                 </div>
@@ -123,7 +123,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
                     variant="ghost" 
                     size="sm" 
                     onClick={clearFilters} 
-                    className="text-gray-500 hover:text-red-600 hover:bg-red-50"
+                    className="text-gray-500 hover:text-red-600 hover:bg-red-50 text-base"
                   >
                     <X className="h-4 w-4 mr-1" />
                     Nullstill filtre
@@ -137,7 +137,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
           {showAdvanced && (
             <div className="border-b border-gray-100 bg-gray-50">
               <div className="p-6">
-                <h3 className="font-semibold text-gray-900 mb-4">Avanserte filtre</h3>
+                <h3 className="font-semibold text-gray-900 mb-4 text-lg">Avanserte filtre</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {/* Date Range */}
                   <div>

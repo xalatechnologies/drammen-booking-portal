@@ -1,12 +1,5 @@
-
 import React from "react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface FilterSelectsProps {
   facilityType: string;
@@ -31,139 +24,103 @@ const FilterSelects: React.FC<FilterSelectsProps> = ({
   setCapacity,
   showOnlyMain = false,
 }) => {
-  const handleCapacityChange = (value: string) => {
-    switch (value) {
-      case "all":
-        setCapacity([0, 200]);
-        break;
-      case "1-50":
-        setCapacity([1, 50]);
-        break;
-      case "51-100":
-        setCapacity([51, 100]);
-        break;
-      case "101-200":
-        setCapacity([101, 200]);
-        break;
-      case "200+":
-        setCapacity([200, 500]);
-        break;
-      default:
-        setCapacity([0, 200]);
-    }
-  };
-
-  const getCapacityValue = () => {
-    if (capacity[0] === 0 && capacity[1] === 200) return "all";
-    if (capacity[0] === 1 && capacity[1] === 50) return "1-50";
-    if (capacity[0] === 51 && capacity[1] === 100) return "51-100";
-    if (capacity[0] === 101 && capacity[1] === 200) return "101-200";
-    if (capacity[0] === 200 && capacity[1] === 500) return "200+";
-    return "all";
-  };
-
   if (showOnlyMain) {
     return (
       <div className="flex gap-3">
-        <div className="min-w-[140px]">
-          <Select value={facilityType || "all"} onValueChange={setFacilityType}>
-            <SelectTrigger className="h-11 border-2 border-gray-300 hover:border-gray-400 rounded-lg font-medium">
-              <SelectValue placeholder="Type lokale" />
-            </SelectTrigger>
-            <SelectContent className="z-50">
-              <SelectItem value="all">Alle typer</SelectItem>
-              <SelectItem value="sports-hall">Idrettshall</SelectItem>
-              <SelectItem value="gymnasium">Gymsal</SelectItem>
-              <SelectItem value="meeting-room">Møterom</SelectItem>
-              <SelectItem value="auditorium">Auditorium</SelectItem>
-              <SelectItem value="classroom">Klasserom</SelectItem>
-              <SelectItem value="outdoor-field">Utendørsbane</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        {/* Facility Type */}
+        <Select value={facilityType} onValueChange={setFacilityType}>
+          <SelectTrigger className="w-full h-12 border-2 border-gray-300 focus:border-gray-900 text-base font-medium">
+            <SelectValue placeholder="Type lokale" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all" className="text-base">Alle typer</SelectItem>
+            <SelectItem value="sports-hall" className="text-base">Idrettshall</SelectItem>
+            <SelectItem value="meeting-room" className="text-base">Møterom</SelectItem>
+            <SelectItem value="conference-room" className="text-base">Konferanserom</SelectItem>
+            <SelectItem value="auditorium" className="text-base">Auditorium</SelectItem>
+            <SelectItem value="gym" className="text-base">Gymsal</SelectItem>
+          </SelectContent>
+        </Select>
 
-        <div className="min-w-[140px]">
-          <Select value={location || "all"} onValueChange={setLocation}>
-            <SelectTrigger className="h-11 border-2 border-gray-300 hover:border-gray-400 rounded-lg font-medium">
-              <SelectValue placeholder="Område" />
-            </SelectTrigger>
-            <SelectContent className="z-50">
-              <SelectItem value="all">Alle områder</SelectItem>
-              <SelectItem value="drammen-sentrum">Drammen sentrum</SelectItem>
-              <SelectItem value="konnerud">Konnerud</SelectItem>
-              <SelectItem value="stromsø">Strømsø</SelectItem>
-              <SelectItem value="bragernes">Bragernes</SelectItem>
-              <SelectItem value="åssiden">Åssiden</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        {/* Location */}
+        <Select value={location} onValueChange={setLocation}>
+          <SelectTrigger className="w-full h-12 border-2 border-gray-300 focus:border-gray-900 text-base font-medium">
+            <SelectValue placeholder="Område" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all" className="text-base">Alle områder</SelectItem>
+            <SelectItem value="drammen-sentrum" className="text-base">Drammen Sentrum</SelectItem>
+            <SelectItem value="bragernes" className="text-base">Bragernes</SelectItem>
+            <SelectItem value="stromsø" className="text-base">Strømsø</SelectItem>
+            <SelectItem value="konnerud" className="text-base">Konnerud</SelectItem>
+            <SelectItem value="åssiden" className="text-base">Åssiden</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
     );
   }
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-      <div>
-        <Select value={facilityType || "all"} onValueChange={setFacilityType}>
-          <SelectTrigger className="h-10 border-gray-200 hover:border-blue-500">
-            <SelectValue placeholder="Type lokale" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Type lokale</SelectItem>
-            <SelectItem value="sports-hall">Idrettshall</SelectItem>
-            <SelectItem value="gymnasium">Gymsal</SelectItem>
-            <SelectItem value="meeting-room">Møterom</SelectItem>
-            <SelectItem value="auditorium">Auditorium</SelectItem>
-            <SelectItem value="classroom">Klasserom</SelectItem>
-            <SelectItem value="outdoor-field">Utendørsbane</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* Facility Type */}
+      <Select value={facilityType} onValueChange={setFacilityType}>
+        <SelectTrigger className="w-full h-12 border-2 border-gray-300 focus:border-gray-900 text-base font-medium">
+          <SelectValue placeholder="Type lokale" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all" className="text-base">Alle typer</SelectItem>
+          <SelectItem value="sports-hall" className="text-base">Idrettshall</SelectItem>
+          <SelectItem value="meeting-room" className="text-base">Møterom</SelectItem>
+          <SelectItem value="conference-room" className="text-base">Konferanserom</SelectItem>
+          <SelectItem value="auditorium" className="text-base">Auditorium</SelectItem>
+          <SelectItem value="gym" className="text-base">Gymsal</SelectItem>
+        </SelectContent>
+      </Select>
 
-      <div>
-        <Select value={location || "all"} onValueChange={setLocation}>
-          <SelectTrigger className="h-10 border-gray-200 hover:border-blue-500">
-            <SelectValue placeholder="Område" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Område</SelectItem>
-            <SelectItem value="drammen-sentrum">Drammen sentrum</SelectItem>
-            <SelectItem value="konnerud">Konnerud</SelectItem>
-            <SelectItem value="stromsø">Strømsø</SelectItem>
-            <SelectItem value="bragernes">Bragernes</SelectItem>
-            <SelectItem value="åssiden">Åssiden</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+      {/* Location */}
+      <Select value={location} onValueChange={setLocation}>
+        <SelectTrigger className="w-full h-12 border-2 border-gray-300 focus:border-gray-900 text-base font-medium">
+          <SelectValue placeholder="Område" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all" className="text-base">Alle områder</SelectItem>
+          <SelectItem value="drammen-sentrum" className="text-base">Drammen Sentrum</SelectItem>
+          <SelectItem value="bragernes" className="text-base">Bragernes</SelectItem>
+          <SelectItem value="stromsø" className="text-base">Strømsø</SelectItem>
+          <SelectItem value="konnerud" className="text-base">Konnerud</SelectItem>
+          <SelectItem value="åssiden" className="text-base">Åssiden</SelectItem>
+        </SelectContent>
+      </Select>
 
-      <div>
-        <Select value={accessibility || "all"} onValueChange={setAccessibility}>
-          <SelectTrigger className="h-10 border-gray-200 hover:border-blue-500">
-            <SelectValue placeholder="Tilgjengelighet" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Tilgjengelighet</SelectItem>
-            <SelectItem value="wheelchair">Rullestoltilpasset</SelectItem>
-            <SelectItem value="hearing-loop">Teleslynge</SelectItem>
-            <SelectItem value="sign-language">Tegnspråktolking</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+      {/* Accessibility */}
+      <Select value={accessibility} onValueChange={setAccessibility}>
+        <SelectTrigger className="w-full h-12 border-2 border-gray-300 focus:border-gray-900 text-base font-medium">
+          <SelectValue placeholder="Tilgjengelighet" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all" className="text-base">Alle</SelectItem>
+          <SelectItem value="wheelchair" className="text-base">Rullestolvennlig</SelectItem>
+          <SelectItem value="hearing-loop" className="text-base">Hørselsløkke</SelectItem>
+          <SelectItem value="visual-aids" className="text-base">Synshjelpemidler</SelectItem>
+        </SelectContent>
+      </Select>
 
-      <div>
-        <Select value={getCapacityValue()} onValueChange={handleCapacityChange}>
-          <SelectTrigger className="h-10 border-gray-200 hover:border-blue-500">
-            <SelectValue placeholder="Kapasitet" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Kapasitet</SelectItem>
-            <SelectItem value="1-50">1-50 personer</SelectItem>
-            <SelectItem value="51-100">51-100 personer</SelectItem>
-            <SelectItem value="101-200">101-200 personer</SelectItem>
-            <SelectItem value="200+">200+ personer</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+      {/* Capacity */}
+      <Select value={`${capacity[0]}-${capacity[1]}`} onValueChange={(value) => {
+        const [min, max] = value.split("-").map(Number);
+        setCapacity([min, max]);
+      }}>
+        <SelectTrigger className="w-full h-12 border-2 border-gray-300 focus:border-gray-900 text-base font-medium">
+          <SelectValue placeholder="Kapasitet" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="0-20" className="text-base">0-20</SelectItem>
+          <SelectItem value="20-50" className="text-base">20-50</SelectItem>
+          <SelectItem value="50-100" className="text-base">50-100</SelectItem>
+          <SelectItem value="100-200" className="text-base">100-200</SelectItem>
+          <SelectItem value="200-500" className="text-base">200+</SelectItem>
+        </SelectContent>
+      </Select>
     </div>
   );
 };
