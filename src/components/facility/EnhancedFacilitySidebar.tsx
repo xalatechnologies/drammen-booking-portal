@@ -134,13 +134,7 @@ export function EnhancedFacilitySidebar({
         </Card>)}
 
       {/* Auto Approval Policy Card */}
-      {hasAutoApproval && (
-        <Card>
-          <CardContent className="p-4">
-            <AutoApprovalCard hasAutoApproval={hasAutoApproval} />
-          </CardContent>
-        </Card>
-      )}
+      {hasAutoApproval && <AutoApprovalCard hasAutoApproval={hasAutoApproval} />}
 
       {/* Cancellation Policy Card */}
       <Card>
