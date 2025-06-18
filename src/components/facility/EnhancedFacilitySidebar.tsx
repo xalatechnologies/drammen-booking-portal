@@ -39,13 +39,13 @@ export function EnhancedFacilitySidebar({
   const translations = {
     NO: {
       capacity: "Kapasitet",
-      area: "Areal",
+      area: "Areal (m²)",
       open: "Åpent",
       zones: "Soner"
     },
     EN: {
       capacity: "Capacity",
-      area: "Area",
+      area: "Area (m²)",
       open: "Open",
       zones: "Zones"
     }
