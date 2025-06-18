@@ -2,13 +2,15 @@
 import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface AccessibilityBadgesProps {
   accessibility: string[];
-  language?: 'NO' | 'EN';
 }
 
-export function AccessibilityBadges({ accessibility, language = 'NO' }: AccessibilityBadgesProps) {
+export function AccessibilityBadges({ accessibility }: AccessibilityBadgesProps) {
+  const { language } = useLanguage();
+  
   const translations = {
     NO: {
       wheelchair: "Rullestol",

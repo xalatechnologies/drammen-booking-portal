@@ -1,57 +1,38 @@
-
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
+import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { ThemeProvider } from "@/components/ThemeProvider";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { LanguageProvider } from "@/contexts/LanguageContext";
 import Index from "./pages/Index";
-import NotFound from "./pages/NotFound";
-import FacilityDetail from "./pages/facilities/[id]";
-import BookingPage from "./pages/booking/[facilityId]";
-import BookingsPage from "./pages/bookings";
-import AdminDashboard from "./pages/admin/Dashboard";
-import LoginSelection from "./pages/LoginSelection";
-import SettingsPage from "./pages/settings";
-import ProfilePage from "./pages/profile";
+import FacilityPage from "./pages/FacilityPage";
+import BookingPage from "./pages/BookingPage";
+import BookingSuccessPage from "./pages/BookingSuccessPage";
+import BookingsPage from "./pages/BookingsPage";
+import LoginPage from "./pages/LoginPage";
+import ProfilePage from "./pages/ProfilePage";
+import SettingsPage from "./pages/SettingsPage";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <ThemeProvider
-      attribute="class"
-      defaultTheme="light"
-      enableSystem
-      disableTransitionOnChange
-    >
+    <LanguageProvider>
       <TooltipProvider>
         <Toaster />
-        <Sonner />
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
-            <Route path="/login" element={<LoginSelection />} />
-            <Route path="/facilities/:id" element={<FacilityDetail />} />
-            <Route path="/booking/:facilityId" element={<BookingPage />} />
+            <Route path="/facilities/:facilityId" element={<FacilityPage />} />
+            <Route path="/facilities/:facilityId/book" element={<BookingPage />} />
+            <Route path="/booking/success/:bookingReference" element={<BookingSuccessPage />} />
             <Route path="/bookings" element={<BookingsPage />} />
-            <Route path="/settings" element={<SettingsPage />} />
+            <Route path="/login" element={<LoginPage />} />
             <Route path="/profile" element={<ProfilePage />} />
-            
-            {/* Redirect standalone routes to admin equivalents */}
-            <Route path="/users" element={<Navigate to="/admin/users" replace />} />
-            <Route path="/facilities" element={<Navigate to="/admin/facilities" replace />} />
-            <Route path="/notifications" element={<Navigate to="/admin/notifications" replace />} />
-            
-            {/* Setting up admin routes correctly with nested paths */}
-            <Route path="/admin/*" element={<AdminDashboard />} />
-            
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
+            <Route path="/settings" element={<SettingsPage />} />
           </Routes>
         </BrowserRouter>
       </TooltipProvider>
-    </ThemeProvider>
+    </LanguageProvider>
   </QueryClientProvider>
 );
 

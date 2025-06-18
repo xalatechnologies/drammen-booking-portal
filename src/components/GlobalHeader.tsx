@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
@@ -7,11 +7,12 @@ import Logo from "@/components/header/Logo";
 import LanguageToggle from "@/components/header/LanguageToggle";
 import ProfileMenu from "@/components/header/ProfileMenu";
 import MobileMenu from "@/components/header/MobileMenu";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const GlobalHeader = () => {
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [language, setLanguage] = useState<'NO' | 'EN'>('NO');
+  const { language, toggleLanguage } = useLanguage();
   
   // Add state to track if user is logged in (we'll use localStorage to persist this between refreshes)
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
@@ -31,18 +32,6 @@ const GlobalHeader = () => {
     localStorage.setItem("isLoggedIn", "false");
     setIsLoggedIn(false);
   };
-  
-  // Toggle language
-  const toggleLanguage = () => {
-    setLanguage(prev => prev === 'NO' ? 'EN' : 'NO');
-  };
-
-  // Store language in localStorage and create a context for child components
-  useEffect(() => {
-    localStorage.setItem("language", language);
-    // Dispatch custom event to notify components of language change
-    window.dispatchEvent(new CustomEvent('languageChange', { detail: language }));
-  }, [language]);
 
   return (
     <header className="bg-white dark:bg-gray-900 py-2 px-4 shadow-md sticky top-0 z-10 border-b border-gray-200 dark:border-gray-700">
@@ -84,7 +73,13 @@ const GlobalHeader = () => {
         isOpen={mobileMenuOpen}
         language={language}
         isLoggedIn={isLoggedIn}
-        setLanguage={setLanguage}
+        setLanguage={(lang) => {
+          if (lang === 'NO' || lang === 'EN') {
+            // Use the context's setLanguage method
+            const event = new CustomEvent('setLanguage', { detail: lang });
+            window.dispatchEvent(event);
+          }
+        }}
         handleLogin={handleLogin}
         handleLogout={handleLogout}
         closeMobileMenu={() => setMobileMenuOpen(false)}

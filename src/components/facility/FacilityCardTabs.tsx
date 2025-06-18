@@ -6,6 +6,7 @@ import { Users, Clock, Calendar, CheckCircle, XCircle, Wrench, Info } from "luci
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { AccessibilityBadges } from "./AccessibilityBadges";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { cn } from "@/lib/utils";
 
 interface Facility {
@@ -34,10 +35,11 @@ interface Facility {
 
 interface FacilityCardTabsProps {
   facility: Facility;
-  language?: 'NO' | 'EN';
 }
 
-export function FacilityCardTabs({ facility, language = 'NO' }: FacilityCardTabsProps) {
+export function FacilityCardTabs({ facility }: FacilityCardTabsProps) {
+  const { language } = useLanguage();
+  
   const handleTabsClick = (e: React.MouseEvent) => {
     e.stopPropagation();
   };
@@ -87,7 +89,7 @@ export function FacilityCardTabs({ facility, language = 'NO' }: FacilityCardTabs
         <TabsContent value="details" className="space-y-3 mt-0">
           <div>
             <h4 className="text-base font-medium mb-2 text-gray-900">{t.accessibility}</h4>
-            <AccessibilityBadges accessibility={facility.accessibility} language={language} />
+            <AccessibilityBadges accessibility={facility.accessibility} />
           </div>
 
           <div>
