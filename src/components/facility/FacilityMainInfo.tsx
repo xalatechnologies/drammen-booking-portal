@@ -1,7 +1,8 @@
 
 import React from "react";
-import { Badge } from "@/components/ui/badge";
-import { MapPin } from "lucide-react";
+import { MapPin, Users, Wrench } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import AccessibilityBadges from "./AccessibilityBadges";
 
 interface FacilityMainInfoProps {
   name: string;
@@ -22,95 +23,87 @@ const FacilityMainInfo: React.FC<FacilityMainInfoProps> = ({
   area,
   description,
   accessibility,
-  onAddressClick
+  onAddressClick,
 }) => {
-  const getAccessibilityIcon = (type: string) => {
-    switch (type) {
-      case 'wheelchair':
-        return '♿';
-      case 'hearing-loop':
-        return '🔊';
-      case 'sign-language':
-        return '👋';
-      default:
-        return '✓';
-    }
-  };
-
   return (
-    <div className="flex-grow p-6 flex flex-col justify-between min-w-0 bg-gradient-to-br from-white to-gray-50/20">
-      <div>
-        <div className="flex items-start gap-4 mb-3">
-          <div className="flex-grow min-w-0">
-            <h3 className="font-bold text-xl text-slate-800 truncate mb-2 group-hover:text-slate-900 transition-colors">{name}</h3>
-            
-            {/* Address right after title */}
-            <div className="flex items-center gap-2 text-sm text-slate-600 mb-2 group-hover:text-slate-700 transition-colors">
-              <MapPin className="h-4 w-4 text-slate-500 flex-shrink-0" />
-              <span 
-                className="hover:text-emerald-700 hover:underline cursor-pointer transition-colors truncate font-medium"
-                onClick={onAddressClick}
-                title="Klikk for å se på kart"
+    <div className="h-full flex flex-col justify-between py-2">
+      {/* Header Section */}
+      <div className="space-y-4">
+        <div>
+          <h3 className="text-2xl font-bold text-slate-900 mb-2 group-hover:text-slate-700 transition-colors leading-tight">
+            {name}
+          </h3>
+          <Button
+            variant="ghost"
+            onClick={onAddressClick}
+            className="text-slate-600 hover:text-slate-800 p-0 h-auto font-normal text-base hover:bg-transparent"
+          >
+            <MapPin className="h-4 w-4 mr-2 text-slate-500" />
+            {address}
+          </Button>
+        </div>
+
+        <p className="text-slate-600 text-base leading-relaxed line-clamp-2">
+          {description}
+        </p>
+      </div>
+
+      {/* Details Section */}
+      <div className="space-y-6 mt-6">
+        {/* Suitable For */}
+        <div className="space-y-3">
+          <div className="flex items-center text-slate-700">
+            <Users className="h-5 w-5 mr-2 text-slate-500" />
+            <span className="font-semibold text-base">Egnet for</span>
+          </div>
+          <div className="flex flex-wrap gap-2 ml-7">
+            {suitableFor.slice(0, 4).map((activity, index) => (
+              <span
+                key={index}
+                className="px-3 py-1.5 bg-blue-100 text-blue-800 rounded-full text-sm font-medium"
               >
-                {address}
+                {activity}
               </span>
-            </div>
-
-            {/* Description under address - single line with ellipsis */}
-            <p className="text-slate-600 text-sm truncate mb-3 leading-relaxed">{description}</p>
-            
-            {/* Suitable For tags - smaller */}
-            <div className="flex flex-wrap gap-1.5 mb-2">
-              {suitableFor.slice(0, 3).map((activity, index) => (
-                <Badge key={index} variant="secondary" className="text-xs px-2 py-1 bg-emerald-100 text-emerald-800 border-emerald-200/60 font-medium hover:bg-emerald-200 transition-colors">
-                  {activity}
-                </Badge>
-              ))}
-              {suitableFor.length > 3 && (
-                <Badge variant="secondary" className="text-xs px-2 py-1 bg-emerald-100 text-emerald-800 border-emerald-200/60 font-medium">
-                  +{suitableFor.length - 3}
-                </Badge>
-              )}
-            </div>
-
-            {/* Equipment tags - smaller */}
-            <div className="flex flex-wrap gap-1.5 mb-2">
-              {equipment.slice(0, 3).map((item, index) => (
-                <Badge key={index} variant="secondary" className="text-xs px-2 py-1 bg-blue-100 text-blue-800 border-blue-200/60 font-medium hover:bg-blue-200 transition-colors">
-                  {item}
-                </Badge>
-              ))}
-              {equipment.length > 3 && (
-                <Badge variant="secondary" className="text-xs px-2 py-1 bg-blue-100 text-blue-800 border-blue-200/60 font-medium">
-                  +{equipment.length - 3}
-                </Badge>
-              )}
-            </div>
-
-            {/* Accessibility tags - smaller */}
-            {accessibility.length > 0 && (
-              <div className="flex flex-wrap gap-1.5 mb-3">
-                {accessibility.slice(0, 3).map((item, index) => (
-                  <Badge 
-                    key={index} 
-                    variant="secondary" 
-                    className="text-xs px-2 py-1 bg-purple-100 text-purple-800 border-purple-200 font-medium"
-                  >
-                    {getAccessibilityIcon(item)} {item === 'wheelchair' ? 'Rullestol' : item === 'hearing-loop' ? 'Høreløkke' : item === 'sign-language' ? 'Tegnspråk' : item}
-                  </Badge>
-                ))}
-                {accessibility.length > 3 && (
-                  <Badge variant="secondary" className="text-xs px-2 py-1 bg-purple-100 text-purple-800 border-purple-200 font-medium">
-                    +{accessibility.length - 3}
-                  </Badge>
-                )}
-              </div>
+            ))}
+            {suitableFor.length > 4 && (
+              <span className="px-3 py-1.5 bg-slate-100 text-slate-600 rounded-full text-sm">
+                +{suitableFor.length - 4} flere
+              </span>
             )}
           </div>
-          <Badge variant="outline" className="bg-gradient-to-r from-white to-gray-50 text-slate-700 border-slate-200/60 font-semibold text-sm px-3 py-1.5 flex-shrink-0 shadow-sm">
-            {area}
-          </Badge>
         </div>
+
+        {/* Equipment */}
+        <div className="space-y-3">
+          <div className="flex items-center text-slate-700">
+            <Wrench className="h-5 w-5 mr-2 text-slate-500" />
+            <span className="font-semibold text-base">Utstyr</span>
+          </div>
+          <div className="flex flex-wrap gap-2 ml-7">
+            {equipment.slice(0, 3).map((item, index) => (
+              <span
+                key={index}
+                className="px-3 py-1.5 bg-green-100 text-green-800 rounded-full text-sm font-medium"
+              >
+                {item}
+              </span>
+            ))}
+            {equipment.length > 3 && (
+              <span className="px-3 py-1.5 bg-slate-100 text-slate-600 rounded-full text-sm">
+                +{equipment.length - 3} flere
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Accessibility */}
+        {accessibility && accessibility.length > 0 && (
+          <div className="space-y-3">
+            <div className="ml-7">
+              <AccessibilityBadges accessibility={accessibility} size="sm" />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

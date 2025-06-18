@@ -69,34 +69,40 @@ const FacilityListItem: React.FC<FacilityListItemProps> = ({
 
   return (
     <Card 
-      className="overflow-hidden hover:shadow-md transition-all duration-300 hover:translate-y-[-1px] group border border-slate-200/60 shadow-sm bg-white cursor-pointer"
+      className="overflow-hidden hover:shadow-lg transition-all duration-300 hover:translate-y-[-2px] group border border-slate-200/60 shadow-sm bg-white cursor-pointer mb-6"
       onClick={() => navigate(`/facilities/${facility.id}`)}
     >
       <CardContent className="p-0">
-        <div className="flex h-64">
-          <FacilityImage 
-            image={facility.image}
-            name={facility.name}
-            type={facility.type}
-          />
+        <div className="flex h-80">
+          <div className="w-80 flex-shrink-0">
+            <FacilityImage 
+              image={facility.image}
+              name={facility.name}
+              type={facility.type}
+            />
+          </div>
           
-          <FacilityMainInfo 
-            name={facility.name}
-            address={facility.address}
-            suitableFor={facility.suitableFor}
-            equipment={facility.equipment}
-            area={facility.area}
-            description={facility.description}
-            accessibility={facility.accessibility}
-            onAddressClick={handleAddressClick}
-          />
+          <div className="flex-1 p-8">
+            <FacilityMainInfo 
+              name={facility.name}
+              address={facility.address}
+              suitableFor={facility.suitableFor}
+              equipment={facility.equipment}
+              area={facility.area}
+              description={facility.description}
+              accessibility={facility.accessibility}
+              onAddressClick={handleAddressClick}
+            />
+          </div>
           
-          <FacilityDetails 
-            capacity={facility.capacity}
-            nextAvailable={facility.nextAvailable}
-            openingHours={facility.openingHours}
-            onDetailsClick={handleDetailsClick}
-          />
+          <div className="w-72 flex-shrink-0 border-l border-slate-100 bg-slate-50/30">
+            <FacilityDetails 
+              capacity={facility.capacity}
+              nextAvailable={facility.nextAvailable}
+              openingHours={facility.openingHours}
+              onDetailsClick={handleDetailsClick}
+            />
+          </div>
         </div>
       </CardContent>
     </Card>
