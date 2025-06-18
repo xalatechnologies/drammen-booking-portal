@@ -14,7 +14,6 @@ import { FacilityLocation } from "@/components/facility/FacilityLocation";
 import { Zone } from "@/components/booking/types";
 import { Card } from "@/components/ui/card";
 import { MapPin } from "lucide-react";
-
 const FacilityDetail = () => {
   const {
     id
@@ -271,8 +270,7 @@ const FacilityDetail = () => {
     const bookingPath = `/booking/${id}`;
     navigate(bookingPath);
   };
-  return (
-    <div className="min-h-screen bg-white flex flex-col">
+  return <div className="min-h-screen bg-white flex flex-col">
       <GlobalHeader />
 
       {/* Breadcrumb Navigation */}
@@ -299,13 +297,7 @@ const FacilityDetail = () => {
             {/* Header with Action Buttons */}
             <div className="flex justify-between items-start">
               <div className="flex-1">
-                <FacilityHeader 
-                  name={facility.name} 
-                  address={facility.address} 
-                  onShare={handleShare} 
-                  isFavorited={isFavorited} 
-                  onToggleFavorite={() => setIsFavorited(!isFavorited)} 
-                />
+                <FacilityHeader name={facility.name} address={facility.address} onShare={handleShare} isFavorited={isFavorited} onToggleFavorite={() => setIsFavorited(!isFavorited)} />
               </div>
               <div className="flex gap-3 mt-4">
                 <Button onClick={handleBookingClick} size="lg" className="text-white bg-blue-900 hover:bg-blue-800">
@@ -325,61 +317,18 @@ const FacilityDetail = () => {
               {/* Left Column - Main Content */}
               <div className="lg:col-span-2 space-y-6">
                 {/* Quick Facts */}
-                <FacilityQuickFacts 
-                  capacity={facility.capacity} 
-                  area={facility.area} 
-                  openingHours={facility.openingHours} 
-                  zoneCount={zones.length} 
-                />
+                <FacilityQuickFacts capacity={facility.capacity} area={facility.area} openingHours={facility.openingHours} zoneCount={zones.length} />
 
                 {/* Auto Approval and Cancellation Policy */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {facility.hasAutoApproval && (
-                    <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
-                          <div className="w-2 h-2 bg-green-600 rounded-full"></div>
-                        </div>
-                        <div>
-                          <span className="font-medium text-green-800">Automatisk godkjenning</span>
-                          <span className="text-sm text-green-700 ml-2">• Reservasjonen godkjennes umiddelbart</span>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                    <p className="text-sm text-blue-800">
-                      <strong>Gratis avbestilling</strong> opptil 24 timer før reservert tid
-                    </p>
-                  </div>
-                </div>
+                
 
                 {/* Tabbed Content */}
-                <FacilityInfoTabs 
-                  description={facility.description} 
-                  capacity={facility.capacity} 
-                  equipment={facility.equipment} 
-                  zones={zones} 
-                  amenities={facility.amenities} 
-                  address={facility.address} 
-                  quickFacts={<></>}
-                  zoneCards={<></>}
-                />
+                <FacilityInfoTabs description={facility.description} capacity={facility.capacity} equipment={facility.equipment} zones={zones} amenities={facility.amenities} address={facility.address} quickFacts={<></>} zoneCards={<></>} />
               </div>
 
               {/* Right Column - Sidebar */}
               <div className="lg:col-span-1">
-                <FacilitySidebar
-                  zones={zones}
-                  facilityName={facility.name}
-                  facilityId={id}
-                  hasAutoApproval={facility.hasAutoApproval}
-                  openingHours={facility.openingHours}
-                  onShare={handleShare}
-                  onToggleFavorite={() => setIsFavorited(!isFavorited)}
-                  isFavorited={isFavorited}
-                />
+                <FacilitySidebar zones={zones} facilityName={facility.name} facilityId={id} hasAutoApproval={facility.hasAutoApproval} openingHours={facility.openingHours} onShare={handleShare} onToggleFavorite={() => setIsFavorited(!isFavorited)} isFavorited={isFavorited} />
               </div>
             </div>
 
@@ -441,8 +390,6 @@ const FacilityDetail = () => {
       </div>
 
       <GlobalFooter />
-    </div>
-  );
+    </div>;
 };
-
 export default FacilityDetail;
