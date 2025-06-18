@@ -20,6 +20,7 @@ import DateRangePicker from "../../search/DateRangePicker";
 import TimeRangePicker from "../TimeRangePicker";
 import { PriceBreakdown } from "../PriceBreakdown";
 import { usePriceCalculation } from "@/hooks/usePriceCalculation";
+import { ActorType } from "@/types/pricing";
 
 export interface BookingDetailsStepProps {
   form: UseFormReturn<BookingFormValues>;
@@ -34,6 +35,17 @@ export interface BookingDetailsStepProps {
   };
 }
 
+// Customer type mapping to ActorType
+const customerTypeToActorType = (customerType: string): ActorType => {
+  switch (customerType) {
+    case 'nonprofit': return 'lag-foreninger';
+    case 'business': return 'private-firma';
+    case 'youth': return 'private-person';
+    case 'senior': return 'private-person';
+    default: return 'private-person';
+  }
+};
+
 export function BookingDetailsStep({ form, facility }: BookingDetailsStepProps) {
   const watchedValues = form.watch();
 
@@ -44,7 +56,7 @@ export function BookingDetailsStep({ form, facility }: BookingDetailsStepProps) 
     startDate: watchedValues.date,
     endDate: watchedValues.endDate,
     timeSlot: watchedValues.timeSlot,
-    customerType: watchedValues.customerType || 'private',
+    customerType: watchedValues.customerType ? customerTypeToActorType(watchedValues.customerType) : 'private-person',
     bookingMode: watchedValues.bookingMode,
     eventType: watchedValues.eventType,
     ageGroup: watchedValues.ageGroup
@@ -309,10 +321,13 @@ export function BookingDetailsStep({ form, facility }: BookingDetailsStepProps) 
               basePrice: 0, 
               totalHours: 2, 
               totalDays: 1, 
-              customerTypeDiscount: 0, 
+              actorTypeDiscount: 0, 
+              timeSlotMultiplier: 1,
+              bookingTypeDiscount: 0,
               weekendSurcharge: 0, 
               subtotal: 0, 
               finalPrice: 0, 
+              requiresApproval: false,
               breakdown: [] 
             }}
             isLoading={isLoading}

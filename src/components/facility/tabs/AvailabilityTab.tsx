@@ -1,6 +1,6 @@
+
 import React, { useState } from "react";
 import { format, addDays, startOfWeek, isBefore, startOfDay } from "date-fns";
-import { Users, DollarSign } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Zone } from "@/components/booking/types";
 import { isDateUnavailable } from "@/utils/holidaysAndAvailability";
@@ -241,12 +241,7 @@ export function AvailabilityTab({
                 <span className="font-medium text-base">{zone.name}</span>
                 <div className="flex items-center gap-4 mt-2 text-sm opacity-75">
                   <div className="flex items-center gap-1">
-                    <Users className="h-3 w-3" />
-                    <span>{zone.capacity}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <DollarSign className="h-3 w-3" />
-                    <span>{zone.pricePerHour}kr</span>
+                    <span>{zone.capacity} plasser</span>
                   </div>
                 </div>
               </TabsTrigger>

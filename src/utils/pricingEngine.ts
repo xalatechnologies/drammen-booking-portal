@@ -1,350 +1,333 @@
-import { PriceRule, PriceCalculation, PriceBreakdownItem, CustomerType } from '@/types/pricing';
-import { isWeekend, differenceInHours, differenceInDays } from 'date-fns';
 
-// Enhanced mock price rules with new customer types
+import { ActorType, BookingType, PriceCalculation, PriceRule, TimeSlotCategory } from '@/types/pricing';
+
+// Mock price rules - these would come from database in real implementation
 const mockPriceRules: PriceRule[] = [
-  // Private customers
   {
-    id: 'rule-1',
-    facilityId: '1',
-    zoneId: 'whole-facility',
-    customerType: 'private',
-    dayType: 'weekday',
-    priceType: 'hourly',
+    id: "1",
+    facilityId: "1",
+    zoneId: "whole-facility",
+    actorType: "lag-foreninger",
+    timeSlot: "day",
+    bookingType: "engangs",
+    dayType: "weekday",
+    priceType: "hourly",
+    basePrice: 0,
+    isActive: true,
+    requiresApproval: true
+  },
+  {
+    id: "2", 
+    facilityId: "1",
+    zoneId: "whole-facility",
+    actorType: "lag-foreninger",
+    timeSlot: "evening",
+    bookingType: "fastlan",
+    dayType: "weekday",
+    priceType: "hourly",
+    basePrice: 0,
+    isActive: true,
+    requiresApproval: true
+  },
+  {
+    id: "3",
+    facilityId: "1", 
+    zoneId: "whole-facility",
+    actorType: "private-firma",
+    timeSlot: "day",
+    bookingType: "engangs",
+    dayType: "weekday",
+    priceType: "hourly",
     basePrice: 450,
     isActive: true
   },
   {
-    id: 'rule-2',
-    facilityId: '1',
-    zoneId: 'zone-1',
-    customerType: 'private',
-    dayType: 'weekday',
-    priceType: 'hourly',
-    basePrice: 250,
+    id: "4",
+    facilityId: "1",
+    zoneId: "whole-facility", 
+    actorType: "private-firma",
+    timeSlot: "evening",
+    bookingType: "engangs",
+    dayType: "weekday",
+    priceType: "hourly",
+    basePrice: 550,
     isActive: true
   },
   {
-    id: 'rule-3',
-    facilityId: '1',
-    zoneId: 'zone-2',
-    customerType: 'private',
-    dayType: 'weekday',
-    priceType: 'hourly',
-    basePrice: 280,
-    isActive: true
-  },
-  // Nonprofit organizations - FREE
-  {
-    id: 'rule-4',
-    facilityId: '1',
-    zoneId: 'whole-facility',
-    customerType: 'nonprofit',
-    dayType: 'weekday',
-    priceType: 'hourly',
-    basePrice: 0,
+    id: "5",
+    facilityId: "1",
+    zoneId: "whole-facility",
+    actorType: "private-person",
+    timeSlot: "day", 
+    bookingType: "engangs",
+    dayType: "weekday",
+    priceType: "hourly",
+    basePrice: 300,
     isActive: true
   },
   {
-    id: 'rule-5',
-    facilityId: '1',
-    zoneId: 'zone-1',
-    customerType: 'nonprofit',
-    dayType: 'weekday',
-    priceType: 'hourly',
-    basePrice: 0,
+    id: "6",
+    facilityId: "1",
+    zoneId: "whole-facility",
+    actorType: "private-person",
+    timeSlot: "evening",
+    bookingType: "engangs", 
+    dayType: "weekday",
+    priceType: "hourly",
+    basePrice: 350,
     isActive: true
   },
   {
-    id: 'rule-6',
-    facilityId: '1',
-    zoneId: 'zone-2',
-    customerType: 'nonprofit',
-    dayType: 'weekday',
-    priceType: 'hourly',
-    basePrice: 0,
-    isActive: true
-  },
-  // Business customers
-  {
-    id: 'rule-7',
-    facilityId: '1',
-    zoneId: 'whole-facility',
-    customerType: 'business',
-    dayType: 'weekday',
-    priceType: 'hourly',
-    basePrice: 650,
-    isActive: true
-  },
-  // Youth customers
-  {
-    id: 'rule-8',
-    facilityId: '1',
-    zoneId: 'whole-facility',
-    customerType: 'youth',
-    dayType: 'weekday',
-    priceType: 'hourly',
+    id: "7",
+    facilityId: "1",
+    zoneId: "whole-facility",
+    actorType: "kommunale-enheter",
+    timeSlot: "day",
+    bookingType: "engangs",
+    dayType: "weekday", 
+    priceType: "hourly",
     basePrice: 200,
     isActive: true
   },
-  // Senior customers
   {
-    id: 'rule-9',
-    facilityId: '1',
-    zoneId: 'whole-facility',
-    customerType: 'senior',
-    dayType: 'weekday',
-    priceType: 'hourly',
-    basePrice: 350,
+    id: "8",
+    facilityId: "1",
+    zoneId: "whole-facility",
+    actorType: "paraply",
+    timeSlot: "day",
+    bookingType: "engangs",
+    dayType: "weekday",
+    priceType: "hourly", 
+    basePrice: 100,
+    isActive: true,
+    requiresApproval: true
+  },
+  {
+    id: "9",
+    facilityId: "1",
+    zoneId: "zone-1",
+    actorType: "private-person",
+    timeSlot: "day",
+    bookingType: "engangs",
+    dayType: "weekday",
+    priceType: "hourly",
+    basePrice: 180,
     isActive: true
   }
 ];
 
-export class PricingEngine {
-  private rules: PriceRule[] = mockPriceRules;
+export interface PricingEngineOptions {
+  facilityId: string;
+  zoneId: string;
+  startDate: Date;
+  endDate: Date;
+  actorType: ActorType;
+  timeSlot: string;
+  bookingMode?: 'one-time' | 'date-range' | 'recurring';
+  eventType?: string;
+  ageGroup?: string;
+}
 
+class PricingEngine {
   calculatePrice(
     facilityId: string,
-    zoneId: string,
+    zoneId: string, 
     startDate: Date,
     endDate: Date,
-    customerType: CustomerType = 'private',
-    timeSlot: string = '',
+    actorType: ActorType,
+    timeSlot: string,
     bookingMode: 'one-time' | 'date-range' | 'recurring' = 'one-time',
     eventType?: string,
     ageGroup?: string
   ): PriceCalculation {
-    const rule = this.findApplicableRule(facilityId, zoneId, startDate, customerType);
+    console.log('PricingEngine.calculatePrice called with:', {
+      facilityId, zoneId, startDate, endDate, actorType, timeSlot, bookingMode
+    });
+
+    const duration = (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60);
+    const totalHours = Math.max(duration, 2);
+    const isWeekend = startDate.getDay() === 0 || startDate.getDay() === 6;
+    
+    // Map booking mode to booking type
+    const bookingType: BookingType = bookingMode === 'recurring' ? 'fastlan' : 'engangs';
+    
+    // Determine time slot category
+    const hour = parseInt(timeSlot.split(':')[0]) || 12;
+    let timeSlotCategory: TimeSlotCategory;
+    if (hour < 12) timeSlotCategory = 'morning';
+    else if (hour < 17) timeSlotCategory = 'day';
+    else if (hour < 23) timeSlotCategory = 'evening';
+    else timeSlotCategory = 'night';
+
+    // Find applicable price rule
+    const rule = this.findPriceRule(facilityId, zoneId, actorType, timeSlotCategory, bookingType, isWeekend);
     
     if (!rule) {
-      return this.createDefaultCalculation();
+      console.warn('No price rule found, using default pricing');
+      return this.createDefaultCalculation(totalHours, actorType);
     }
 
-    const totalHours = this.calculateTotalHours(startDate, endDate, timeSlot, bookingMode);
-    const totalDays = this.calculateTotalDays(startDate, endDate, bookingMode);
-    const dayType = isWeekend(startDate) ? 'weekend' : 'weekday';
+    console.log('Found price rule:', rule);
 
-    let basePrice = rule.basePrice;
-    let subtotal = 0;
-    const breakdown: PriceBreakdownItem[] = [];
-
-    // Special handling for nonprofit organizations - they get it for free
-    if (customerType === 'nonprofit') {
+    // Special handling for non-profit organizations
+    if (actorType === 'lag-foreninger') {
       return {
         basePrice: 0,
         totalHours,
-        totalDays,
-        customerTypeDiscount: 0,
+        totalDays: 1,
+        actorTypeDiscount: 0,
+        timeSlotMultiplier: 1,
+        bookingTypeDiscount: 0,
         weekendSurcharge: 0,
         subtotal: 0,
         finalPrice: 0,
-        breakdown: [
-          {
-            description: 'Gratis for frivillige organisasjoner',
-            quantity: 1,
-            unitPrice: 0,
-            total: 0,
-            type: 'base'
-          }
-        ]
+        requiresApproval: true,
+        breakdown: [{
+          description: 'Gratis for lag og foreninger',
+          quantity: totalHours,
+          unitPrice: 0,
+          total: 0,
+          type: 'base'
+        }]
       };
     }
 
-    // Calculate base cost for paying customers
-    if (rule.priceType === 'hourly') {
-      subtotal = basePrice * totalHours;
-      breakdown.push({
-        description: `Timepris (${totalHours} timer)`,
-        quantity: totalHours,
-        unitPrice: basePrice,
-        total: subtotal,
-        type: 'base'
-      });
-    } else if (rule.priceType === 'daily') {
-      subtotal = basePrice * totalDays;
-      breakdown.push({
-        description: `Dagspris (${totalDays} dager)`,
-        quantity: totalDays,
-        unitPrice: basePrice,
-        total: subtotal,
-        type: 'base'
-      });
-    } else {
-      subtotal = basePrice;
-      breakdown.push({
-        description: 'Fastpris',
-        quantity: 1,
-        unitPrice: basePrice,
-        total: subtotal,
-        type: 'base'
-      });
-    }
+    const basePrice = rule.basePrice * totalHours;
+    let finalPrice = basePrice;
+    const breakdown = [];
 
-    // Apply customer type discounts (only for youth and senior now)
-    let customerTypeDiscount = 0;
-    if (customerType === 'youth') {
-      customerTypeDiscount = subtotal * 0.3; // 30% discount for youth
-      breakdown.push({
-        description: 'Ungdomsrabatt (30%)',
-        quantity: 1,
-        unitPrice: -customerTypeDiscount,
-        total: -customerTypeDiscount,
-        type: 'discount'
-      });
-    } else if (customerType === 'senior') {
-      customerTypeDiscount = subtotal * 0.15; // 15% discount for seniors
-      breakdown.push({
-        description: 'Seniorrabatt (15%)',
-        quantity: 1,
-        unitPrice: -customerTypeDiscount,
-        total: -customerTypeDiscount,
-        type: 'discount'
-      });
-    }
+    // Base price breakdown
+    breakdown.push({
+      description: `Grunnpris (${totalHours} timer)`,
+      quantity: totalHours,
+      unitPrice: rule.basePrice,
+      total: basePrice,
+      type: 'base' as const
+    });
 
-    // Apply weekend surcharge
+    // Weekend surcharge
     let weekendSurcharge = 0;
-    if (dayType === 'weekend') {
-      weekendSurcharge = subtotal * 0.15; // 15% weekend surcharge
+    if (isWeekend) {
+      weekendSurcharge = basePrice * 0.2;
+      finalPrice += weekendSurcharge;
       breakdown.push({
-        description: 'Helgetillegg (15%)',
+        description: 'Helgetillegg (20%)',
         quantity: 1,
         unitPrice: weekendSurcharge,
         total: weekendSurcharge,
-        type: 'surcharge'
+        type: 'surcharge' as const
       });
     }
 
-    // Event type modifiers
-    if (eventType === 'competition') {
-      const competitionSurcharge = subtotal * 0.1; // 10% for competitions
+    // Evening surcharge
+    let eveningSurcharge = 0;
+    if (timeSlotCategory === 'evening') {
+      eveningSurcharge = basePrice * 0.1;
+      finalPrice += eveningSurcharge;
       breakdown.push({
-        description: 'Tillegg konkurranse (10%)',
+        description: 'Kveldsleie (10%)',
         quantity: 1,
-        unitPrice: competitionSurcharge,
-        total: competitionSurcharge,
-        type: 'surcharge'
+        unitPrice: eveningSurcharge,
+        total: eveningSurcharge,
+        type: 'surcharge' as const
       });
-      weekendSurcharge += competitionSurcharge;
     }
 
-    const finalPrice = Math.max(0, subtotal - customerTypeDiscount + weekendSurcharge);
+    // Recurring booking discount
+    let bookingTypeDiscount = 0;
+    if (bookingType === 'fastlan' && actorType === 'lag-foreninger') {
+      bookingTypeDiscount = finalPrice * 0.1;
+      finalPrice -= bookingTypeDiscount;
+      breakdown.push({
+        description: 'Fastlån rabatt (10%)',
+        quantity: 1,
+        unitPrice: -bookingTypeDiscount,
+        total: -bookingTypeDiscount,
+        type: 'discount' as const
+      });
+    }
 
     return {
-      basePrice,
+      basePrice: rule.basePrice,
       totalHours,
-      totalDays,
-      customerTypeDiscount,
+      totalDays: 1,
+      actorTypeDiscount: 0,
+      timeSlotMultiplier: timeSlotCategory === 'evening' ? 1.1 : 1,
+      bookingTypeDiscount,
       weekendSurcharge,
-      subtotal,
-      finalPrice,
+      subtotal: basePrice,
+      finalPrice: Math.max(0, finalPrice),
+      requiresApproval: rule.requiresApproval || false,
       breakdown
     };
   }
 
-  private findApplicableRule(
+  private findPriceRule(
     facilityId: string,
     zoneId: string,
-    date: Date,
-    customerType: CustomerType
-  ): PriceRule | undefined {
-    const dayType = isWeekend(date) ? 'weekend' : 'weekday';
+    actorType: ActorType,
+    timeSlot: TimeSlotCategory,
+    bookingType: BookingType,
+    isWeekend: boolean
+  ): PriceRule | null {
+    const dayType = isWeekend ? 'weekend' : 'weekday';
     
-    // Try to find zone-specific rule first
-    let rule = this.rules.find(r => 
-      r.facilityId === facilityId &&
-      r.zoneId === zoneId &&
-      r.customerType === customerType &&
-      r.dayType === dayType &&
-      r.isActive
-    );
-
-    // Fallback to weekday rule if weekend rule not found
-    if (!rule && dayType === 'weekend') {
-      rule = this.rules.find(r => 
-        r.facilityId === facilityId &&
-        r.zoneId === zoneId &&
-        r.customerType === customerType &&
-        r.dayType === 'weekday' &&
-        r.isActive
-      );
-    }
-
-    // Fallback to facility-level rule
-    if (!rule) {
-      rule = this.rules.find(r => 
-        r.facilityId === facilityId &&
-        !r.zoneId &&
-        r.customerType === customerType &&
-        r.isActive
-      );
-    }
-
-    return rule;
+    return mockPriceRules.find(rule => 
+      rule.facilityId === facilityId &&
+      rule.zoneId === zoneId &&
+      rule.actorType === actorType &&
+      rule.timeSlot === timeSlot &&
+      rule.bookingType === bookingType &&
+      rule.dayType === dayType &&
+      rule.isActive
+    ) || mockPriceRules.find(rule =>
+      rule.facilityId === facilityId &&
+      rule.zoneId === zoneId &&
+      rule.actorType === actorType &&
+      rule.dayType === dayType &&
+      rule.isActive
+    ) || null;
   }
 
-  private calculateTotalHours(
-    startDate: Date,
-    endDate: Date,
-    timeSlot: string,
-    bookingMode: string
-  ): number {
-    if (timeSlot && timeSlot.includes('-')) {
-      const [startTime, endTime] = timeSlot.split(' - ');
-      const [startHour] = startTime.split(':').map(Number);
-      const [endHour] = endTime.split(':').map(Number);
-      const hoursPerDay = endHour - startHour;
-
-      if (bookingMode === 'date-range') {
-        const days = differenceInDays(endDate, startDate) + 1;
-        return hoursPerDay * days;
-      }
-      return hoursPerDay;
-    }
+  private createDefaultCalculation(totalHours: number, actorType: ActorType): PriceCalculation {
+    const basePrice = 300;
+    const total = basePrice * totalHours;
     
-    return differenceInHours(endDate, startDate) || 2; // Default 2 hours
-  }
-
-  private calculateTotalDays(
-    startDate: Date,
-    endDate: Date,
-    bookingMode: string
-  ): number {
-    if (bookingMode === 'date-range') {
-      return differenceInDays(endDate, startDate) + 1;
-    }
-    return 1;
-  }
-
-  private createDefaultCalculation(): PriceCalculation {
     return {
-      basePrice: 0,
-      totalHours: 0,
-      totalDays: 0,
-      customerTypeDiscount: 0,
+      basePrice,
+      totalHours,
+      totalDays: 1,
+      actorTypeDiscount: 0,
+      timeSlotMultiplier: 1,
+      bookingTypeDiscount: 0,
       weekendSurcharge: 0,
-      subtotal: 0,
-      finalPrice: 0,
-      breakdown: []
+      subtotal: total,
+      finalPrice: total,
+      requiresApproval: actorType === 'lag-foreninger' || actorType === 'paraply',
+      breakdown: [{
+        description: `Standard pris (${totalHours} timer)`,
+        quantity: totalHours,
+        unitPrice: basePrice,
+        total,
+        type: 'base'
+      }]
     };
   }
 
-  applyOverride(calculation: PriceCalculation, overrideAmount: number, reason: string): PriceCalculation {
-    const overrideTotal = overrideAmount - calculation.finalPrice;
-    
+  applyOverride(calculation: PriceCalculation, amount: number, reason: string): PriceCalculation {
     return {
       ...calculation,
-      overrideAmount,
+      overrideAmount: amount,
       overrideReason: reason,
-      finalPrice: overrideAmount,
+      finalPrice: amount,
       breakdown: [
         ...calculation.breakdown,
         {
-          description: `Manuell justering: ${reason}`,
+          description: `Manual justering: ${reason}`,
           quantity: 1,
-          unitPrice: overrideTotal,
-          total: overrideTotal,
-          type: 'override'
+          unitPrice: amount - calculation.finalPrice,
+          total: amount - calculation.finalPrice,
+          type: 'override' as const
         }
       ]
     };

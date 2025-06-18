@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { PriceCalculation, CustomerType } from '@/types/pricing';
+import { PriceCalculation, ActorType } from '@/types/pricing';
 import { pricingEngine } from '@/utils/pricingEngine';
 
 interface UsePriceCalculationProps {
@@ -9,7 +9,7 @@ interface UsePriceCalculationProps {
   startDate?: Date;
   endDate?: Date;
   timeSlot?: string;
-  customerType?: CustomerType;
+  customerType?: ActorType;
   bookingMode?: 'one-time' | 'date-range' | 'recurring';
   eventType?: string;
   ageGroup?: string;
@@ -21,7 +21,7 @@ export function usePriceCalculation({
   startDate,
   endDate,
   timeSlot,
-  customerType = 'private',
+  customerType = 'private-person',
   bookingMode = 'one-time',
   eventType,
   ageGroup
@@ -54,7 +54,6 @@ export function usePriceCalculation({
 
     setIsLoading(true);
     
-    // Remove the timeout for immediate calculation
     try {
       const finalEndDate = endDate || new Date(startDate.getTime() + 2 * 60 * 60 * 1000);
       
