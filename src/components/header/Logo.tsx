@@ -1,17 +1,15 @@
 
 import React from "react";
-import { Heading4 } from "@/components/common/Typography";
 
-const Logo = () => {
+const Logo: React.FC = () => {
   return (
-    <div className="flex items-center gap-md">
-      <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-        <span className="text-primary-foreground font-bold text-sm">DC</span>
-      </div>
-      <Heading4 className="text-foreground font-bold">
-        Drammen Kommune
-      </Heading4>
-    </div>
+    <a href="/" className="flex items-center">
+      <img 
+        src="https://www.drammen.kommune.no/Logos/logo-drammen-new.svg" 
+        alt="Drammen Kommune Logo" 
+        className="h-16 w-auto" 
+      />
+    </a>
   );
 };
 
