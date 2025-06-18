@@ -249,7 +249,7 @@ export const mockZones: Zone[] = [
       priceRules: [
         {
           id: "rule-5",
-          actorType: "kultur",
+          actorType: "lag-foreninger",
           timeSlot: "evening",
           dayType: "weekday",
           multiplier: 0.6,
