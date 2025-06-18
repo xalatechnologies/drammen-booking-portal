@@ -21,6 +21,7 @@ export function DescriptionTab({ description, capacity, address, zones = [] }: D
 
       {/* Location Map */}
       <div className="border-t border-gray-200 pt-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Lokasjon</h3>
         <div className="h-64 rounded-lg overflow-hidden border">
           <FacilityLocation address={address} />
         </div>
@@ -29,6 +30,7 @@ export function DescriptionTab({ description, capacity, address, zones = [] }: D
       {/* Availability Calendar */}
       {zones.length > 0 && (
         <div className="border-t border-gray-200 pt-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Tilgjengelighet</h3>
           <AvailabilityTab zones={zones} startDate={new Date()} showLegend={false} />
           
           {/* Legends moved here */}
