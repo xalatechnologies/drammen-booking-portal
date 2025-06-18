@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SelectedTimeSlot } from '@/utils/recurrenceEngine';
 import { usePriceCalculation } from '@/hooks/usePriceCalculation';
+import { CustomerType } from '@/types/pricing';
+import { Zone } from '@/components/booking/types';
 import { BookingSummaryStep } from './BookingSummaryStep';
 import { BookingDetailsStep } from './BookingDetailsStep';
 
@@ -19,15 +21,19 @@ interface BookingDrawerContentProps {
   selectedSlots: SelectedTimeSlot[];
   facilityId: string;
   facilityName: string;
+  zones?: Zone[];
 }
 
 export function BookingDrawerContent({
   selectedSlots,
   facilityId,
-  facilityName
+  facilityName,
+  zones = []
 }: BookingDrawerContentProps) {
   const navigate = useNavigate();
   const [step, setStep] = useState<'summary' | 'details'>('summary');
+  const [customerType, setCustomerType] = useState<CustomerType>('private');
+  const [purpose, setPurpose] = useState('');
   const [formData, setFormData] = useState<FormData>({
     name: '',
     email: '',
@@ -37,12 +43,12 @@ export function BookingDrawerContent({
     notes: ''
   });
 
-  // Calculate pricing for all selected slots
+  // Calculate pricing for all selected slots with current customer type
   const { calculation } = usePriceCalculation({
     facilityId,
     zoneId: selectedSlots[0]?.zoneId,
     startDate: selectedSlots[0]?.date,
-    customerType: 'private',
+    customerType,
     timeSlot: selectedSlots[0]?.timeSlot
   });
 
@@ -53,7 +59,11 @@ export function BookingDrawerContent({
     navigate(`/booking/${facilityId}/confirm`, {
       state: {
         selectedSlots,
-        formData,
+        formData: {
+          ...formData,
+          purpose
+        },
+        customerType,
         totalPrice
       }
     });
@@ -65,6 +75,11 @@ export function BookingDrawerContent({
         <BookingSummaryStep
           selectedSlots={selectedSlots}
           facilityName={facilityName}
+          zones={zones}
+          customerType={customerType}
+          onCustomerTypeChange={setCustomerType}
+          purpose={purpose}
+          onPurposeChange={setPurpose}
           calculation={calculation}
           totalPrice={totalPrice}
           onContinue={() => setStep('details')}

@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { SelectedTimeSlot } from '@/utils/recurrenceEngine';
+import { Zone } from '@/components/booking/types';
 import { BookingDrawerHeader } from './drawer/BookingDrawerHeader';
 import { BookingDrawerContent } from './drawer/BookingDrawerContent';
 
@@ -10,9 +11,17 @@ interface BookingDrawerProps {
   selectedSlots: SelectedTimeSlot[];
   facilityId: string;
   facilityName: string;
+  zones?: Zone[];
 }
 
-export function BookingDrawer({ isOpen, onClose, selectedSlots, facilityId, facilityName }: BookingDrawerProps) {
+export function BookingDrawer({ 
+  isOpen, 
+  onClose, 
+  selectedSlots, 
+  facilityId, 
+  facilityName,
+  zones = []
+}: BookingDrawerProps) {
   if (!isOpen) return null;
 
   return (
@@ -23,6 +32,7 @@ export function BookingDrawer({ isOpen, onClose, selectedSlots, facilityId, faci
           selectedSlots={selectedSlots}
           facilityId={facilityId}
           facilityName={facilityName}
+          zones={zones}
         />
       </div>
     </div>
