@@ -1,11 +1,12 @@
 
 import React from 'react';
-import { Calendar, CreditCard, MapPin, MessageSquare } from 'lucide-react';
+import { Calendar, CreditCard, MapPin, MessageSquare, Trophy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { SelectedTimeSlot } from '@/utils/recurrenceEngine';
 import { CustomerType } from '@/types/pricing';
 import { Zone } from '@/components/booking/types';
@@ -39,6 +40,7 @@ export function BookingSummaryStep({
   totalPrice,
   onContinue
 }: BookingSummaryStepProps) {
+  const [activityType, setActivityType] = React.useState<string>('');
   
   // Helper function to get zone name from zoneId
   const getZoneName = (zoneId: string) => {
@@ -57,7 +59,7 @@ export function BookingSummaryStep({
   }, {} as Record<string, SelectedTimeSlot[]>);
 
   // Validation
-  const isValid = purpose.trim().length > 0;
+  const isValid = purpose.trim().length > 0 && activityType.length > 0;
 
   return (
     <>
@@ -111,6 +113,34 @@ export function BookingSummaryStep({
             value={customerType}
             onChange={onCustomerTypeChange}
           />
+        </CardContent>
+      </Card>
+
+      {/* Activity Type Selection */}
+      <Card>
+        <CardContent className="p-4 space-y-3">
+          <Label className="text-base font-semibold text-gray-900 flex items-center gap-2">
+            <Trophy className="h-5 w-5 text-slate-600" />
+            Type aktivitet *
+          </Label>
+          <Select value={activityType} onValueChange={setActivityType}>
+            <SelectTrigger className="h-11 border-gray-300 focus:border-slate-700">
+              <SelectValue placeholder="Velg type aktivitet" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="sport">Sport og trening</SelectItem>
+              <SelectItem value="meeting">Møte og konferanse</SelectItem>
+              <SelectItem value="course">Kurs og utdanning</SelectItem>
+              <SelectItem value="cultural">Kulturell aktivitet</SelectItem>
+              <SelectItem value="celebration">Fest og feiring</SelectItem>
+              <SelectItem value="exhibition">Utstilling</SelectItem>
+              <SelectItem value="competition">Konkurranse og turnering</SelectItem>
+              <SelectItem value="other">Annet</SelectItem>
+            </SelectContent>
+          </Select>
+          {activityType.length === 0 && (
+            <p className="text-sm text-red-600">Dette feltet er påkrevd</p>
+          )}
         </CardContent>
       </Card>
 
