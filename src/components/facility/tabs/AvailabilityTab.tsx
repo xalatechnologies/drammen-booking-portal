@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { format, addDays, startOfWeek, isBefore, startOfDay } from "date-fns";
 import { nb } from "date-fns/locale";
@@ -13,9 +12,10 @@ import { ZoneConflictManager, ExistingBooking } from "@/utils/zoneConflictManage
 interface AvailabilityTabProps {
   zones: Zone[];
   startDate: Date;
+  showLegend?: boolean;
 }
 
-export function AvailabilityTab({ zones, startDate }: AvailabilityTabProps) {
+export function AvailabilityTab({ zones, startDate, showLegend = true }: AvailabilityTabProps) {
   const [currentWeekStart, setCurrentWeekStart] = useState(startOfWeek(startDate, { weekStartsOn: 1 }));
   
   // Mock existing bookings for demo
@@ -230,31 +230,33 @@ export function AvailabilityTab({ zones, startDate }: AvailabilityTabProps) {
 
   return (
     <div className="space-y-4">
-      {/* Compact Legend */}
-      <div className="p-3 bg-gray-50 rounded-lg">
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-2 text-xs">
-          <div className="flex items-center gap-1">
-            <div className="w-2 h-2 rounded bg-green-100 border border-green-200"></div>
-            <span>Ledig</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <div className="w-2 h-2 rounded bg-red-100 border border-red-200"></div>
-            <span>Opptatt</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <div className="w-2 h-2 rounded bg-red-200 border border-red-300"></div>
-            <span>Hele lokalet</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <div className="w-2 h-2 rounded bg-amber-100 border border-amber-200"></div>
-            <span>Helg/begrenset</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <div className="w-2 h-2 rounded bg-gray-200 border border-gray-300"></div>
-            <span>Utilgjengelig</span>
+      {/* Conditionally show legend only if showLegend is true */}
+      {showLegend && (
+        <div className="p-3 bg-gray-50 rounded-lg">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-2 text-xs">
+            <div className="flex items-center gap-1">
+              <div className="w-2 h-2 rounded bg-green-100 border border-green-200"></div>
+              <span>Ledig</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <div className="w-2 h-2 rounded bg-red-100 border border-red-200"></div>
+              <span>Opptatt</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <div className="w-2 h-2 rounded bg-red-200 border border-red-300"></div>
+              <span>Hele lokalet</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <div className="w-2 h-2 rounded bg-amber-100 border border-amber-200"></div>
+              <span>Helg/begrenset</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <div className="w-2 h-2 rounded bg-gray-200 border border-gray-300"></div>
+              <span>Utilgjengelig</span>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Enhanced Zone Tabs */}
       <Tabs defaultValue={zones[0]?.id} className="w-full">
