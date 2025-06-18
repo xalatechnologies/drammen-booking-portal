@@ -1,4 +1,3 @@
-
 import React from "react";
 import FacilityGrid from "./FacilityGrid";
 import FacilityListItem from "./facility/FacilityListItem";
@@ -15,7 +14,7 @@ const FacilityList: React.FC<FacilityListProps> = ({
   filters,
   viewMode
 }) => {
-  const { pagination, goToPage } = useFacilitiesPagination(1, 9);
+  const { pagination, goToPage } = useFacilitiesPagination(1, 6);
   const { facilities, pagination: paginationInfo, isLoading, error } = useFacilities({
     pagination,
     filters
