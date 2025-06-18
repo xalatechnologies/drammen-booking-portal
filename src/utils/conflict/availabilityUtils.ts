@@ -47,8 +47,4 @@ export class AvailabilityUtils extends ConflictChecker {
       );
     });
   }
-
-  private getConflictReason(conflict: BookingConflict): ConflictReason {
-    return super.getConflictReason(conflict);
-  }
 }

@@ -4,8 +4,8 @@ import { ExistingBooking } from "./types";
 
 export class ConflictChecker {
   constructor(
-    private zones: Zone[],
-    private existingBookings: ExistingBooking[]
+    protected zones: Zone[],
+    protected existingBookings: ExistingBooking[]
   ) {}
 
   /**
