@@ -1,436 +1,245 @@
 
-import { AdditionalService, ServiceCategory } from '@/types/additionalServices';
+import { AdditionalService } from '@/types/additionalServices';
 
 export const mockAdditionalServices: AdditionalService[] = [
-  // Cleaning Services
   {
-    id: 'cleaning-standard',
-    name: 'Standard rengjøring',
+    id: 'service-1',
+    name: 'Ekstra rengjøring',
     category: 'cleaning',
-    description: 'Grunnleggende rengjøring etter arrangementet',
-    shortDescription: 'Basis rengjøring',
+    description: 'Grundig rengjøring etter arrangement',
+    shortDescription: 'Profesjonell rengjøring',
     facilityIds: ['1', '2', '3'],
     pricing: {
-      basePrice: 800,
+      basePrice: 500,
       currency: 'NOK',
       pricingType: 'flat',
       actorTypeMultipliers: {
-        'lag-foreninger': 0.5,
-        'paraply': 0.3,
+        'private-person': 1.0,
+        'lag-foreninger': 0.8,
+        'paraply': 0.7,
         'private-firma': 1.2,
-        'kommunale-enheter': 0.0,
-        'private-person': 1.0
-      }
-    },
-    availability: {
-      isAlwaysAvailable: true,
-      leadTimeHours: 4,
-      maxAdvanceBookingDays: 30,
-      blackoutPeriods: []
-    },
-    requirements: {
-      requiresMainBooking: true,
-      equipmentProvided: ['Rengjøringsutstyr', 'Desinfeksjonsmidler'],
-      equipmentRequired: [],
-      minimumBookingDuration: 60
-    },
-    metadata: {
-      setupTimeMinutes: 0,
-      cleanupTimeMinutes: 60,
-      tags: ['rengjøring', 'standard', 'etterpå']
-    },
-    isActive: true,
-    createdAt: new Date('2024-01-01'),
-    updatedAt: new Date('2024-01-01')
-  },
-  {
-    id: 'cleaning-deep',
-    name: 'Dyprengjøring',
-    category: 'cleaning',
-    description: 'Grundig rengjøring inkludert gulvvask og desinfeksjon',
-    shortDescription: 'Dyprengjøring',
-    facilityIds: ['1', '2', '3'],
-    pricing: {
-      basePrice: 1500,
-      currency: 'NOK',
-      pricingType: 'flat',
-      actorTypeMultipliers: {
-        'lag-foreninger': 0.6,
-        'paraply': 0.4,
-        'private-firma': 1.2,
-        'kommunale-enheter': 0.0,
-        'private-person': 1.0
-      }
+        'kommunale-enheter': 0.6
+      },
+      timeBasedPricing: [
+        { timeSlot: 'evening', multiplier: 1.2, dayType: 'weekday' },
+        { timeSlot: 'night', multiplier: 1.5, dayType: 'weekday' }
+      ]
     },
     availability: {
       isAlwaysAvailable: false,
-      availableTimeSlots: [
-        { dayOfWeek: 1, startTime: '08:00', endTime: '16:00' },
-        { dayOfWeek: 2, startTime: '08:00', endTime: '16:00' },
-        { dayOfWeek: 3, startTime: '08:00', endTime: '16:00' },
-        { dayOfWeek: 4, startTime: '08:00', endTime: '16:00' },
-        { dayOfWeek: 5, startTime: '08:00', endTime: '16:00' }
-      ],
       leadTimeHours: 24,
-      maxAdvanceBookingDays: 60,
-      blackoutPeriods: []
+      maxAdvanceBookingDays: 90,
+      blackoutPeriods: [],
+      availableTimeSlots: [
+        { dayOfWeek: 1, startTime: '08:00', endTime: '18:00' },
+        { dayOfWeek: 2, startTime: '08:00', endTime: '18:00' },
+        { dayOfWeek: 3, startTime: '08:00', endTime: '18:00' },
+        { dayOfWeek: 4, startTime: '08:00', endTime: '18:00' },
+        { dayOfWeek: 5, startTime: '08:00', endTime: '18:00' }
+      ]
     },
     requirements: {
       requiresMainBooking: true,
-      equipmentProvided: ['Profesjonelt rengjøringsutstyr', 'Desinfeksjonsmidler', 'Gulvvaskutstyr'],
-      equipmentRequired: [],
-      minimumBookingDuration: 120
+      minimumBookingDuration: 60,
+      equipmentProvided: ['Støvsuger', 'Mopp', 'Rengjøringsmidler'],
+      equipmentRequired: []
     },
     metadata: {
+      provider: 'Drammen Renhold AS',
+      contactName: 'Kari Hansen',
+      contactPhone: '+47 123 45 678',
+      contactEmail: 'kari@drammenrenhold.no',
       setupTimeMinutes: 15,
-      cleanupTimeMinutes: 90,
-      tags: ['rengjøring', 'dyp', 'profesjonell']
+      cleanupTimeMinutes: 30,
+      tags: ['popular', 'essential'],
+      cancellationPolicy: {
+        freeUntilHours: 24,
+        partialRefundPercentage: 50,
+        noRefundAfterHours: 4
+      }
     },
     isActive: true,
     createdAt: new Date('2024-01-01'),
     updatedAt: new Date('2024-01-01')
   },
-
-  // Parking Services
   {
-    id: 'parking-reserved',
-    name: 'Reserverte parkeringsplasser',
-    category: 'parking',
-    description: 'Garanterte parkeringsplasser nær inngangen',
-    shortDescription: 'Reservert parkering',
-    facilityIds: ['1', '2', '3'],
+    id: 'service-2',
+    name: 'Basketballer (sett)',
+    category: 'equipment',
+    description: 'Profesjonelle basketballer for trening og kamp',
+    shortDescription: 'Basketballer for utlån',
+    facilityIds: ['1'],
     pricing: {
       basePrice: 50,
       currency: 'NOK',
-      pricingType: 'hourly',
-      minimumCharge: 100,
+      pricingType: 'per-item',
       actorTypeMultipliers: {
+        'private-person': 1.0,
         'lag-foreninger': 0.5,
         'paraply': 0.3,
         'private-firma': 1.0,
-        'kommunale-enheter': 0.0,
-        'private-person': 1.0
+        'kommunale-enheter': 0.0
       }
     },
     availability: {
       isAlwaysAvailable: true,
       leadTimeHours: 2,
-      maxAdvanceBookingDays: 90,
+      maxAdvanceBookingDays: 30,
       blackoutPeriods: [],
       capacity: 10
     },
     requirements: {
       requiresMainBooking: true,
-      equipmentProvided: ['Parkeringsskilt', 'Sperrebånd'],
-      equipmentRequired: [],
-      maximumAttendees: 10
+      equipmentProvided: ['Basketballer (5 stk)', 'Ballpumpe'],
+      equipmentRequired: []
     },
     metadata: {
-      setupTimeMinutes: 30,
-      cleanupTimeMinutes: 15,
-      tags: ['parkering', 'reservert', 'nær']
+      tags: ['popular', 'sports'],
+      instructions: 'Baller må returneres rengjort'
     },
     isActive: true,
     createdAt: new Date('2024-01-01'),
     updatedAt: new Date('2024-01-01')
   },
-
-  // Personnel Services
   {
-    id: 'personnel-security',
-    name: 'Sikkerhetspersonell',
-    category: 'personnel',
-    description: 'Profesjonelt sikkerhetspersonell for arrangementet',
-    shortDescription: 'Sikkerhetsvakt',
+    id: 'service-3',
+    name: 'Kaffe og kaker',
+    category: 'catering',
+    description: 'Servering av kaffe og hjemmebakte kaker',
+    shortDescription: 'Enkel servering',
     facilityIds: ['1', '2', '3'],
     pricing: {
-      basePrice: 650,
+      basePrice: 25,
       currency: 'NOK',
-      pricingType: 'hourly',
-      minimumCharge: 1300,
+      pricingType: 'per-person',
+      minimumCharge: 200,
       actorTypeMultipliers: {
-        'lag-foreninger': 0.7,
-        'paraply': 0.5,
-        'private-firma': 1.2,
-        'kommunale-enheter': 1.0,
-        'private-person': 1.0
-      }
+        'private-person': 1.0,
+        'lag-foreninger': 0.9,
+        'paraply': 0.8,
+        'private-firma': 1.1,
+        'kommunale-enheter': 0.8
+      },
+      volumeDiscounts: [
+        { minimumQuantity: 20, discountPercentage: 10 },
+        { minimumQuantity: 50, discountPercentage: 15 }
+      ]
     },
     availability: {
       isAlwaysAvailable: false,
       leadTimeHours: 48,
-      maxAdvanceBookingDays: 180,
-      blackoutPeriods: []
+      maxAdvanceBookingDays: 60,
+      blackoutPeriods: [],
+      availableTimeSlots: [
+        { dayOfWeek: 1, startTime: '10:00', endTime: '15:00' },
+        { dayOfWeek: 2, startTime: '10:00', endTime: '15:00' },
+        { dayOfWeek: 3, startTime: '10:00', endTime: '15:00' },
+        { dayOfWeek: 4, startTime: '10:00', endTime: '15:00' },
+        { dayOfWeek: 5, startTime: '10:00', endTime: '15:00' }
+      ]
     },
     requirements: {
       requiresMainBooking: true,
-      minimumAttendees: 50,
-      equipmentProvided: ['Kommunikasjonsutstyr', 'Refleksvest'],
-      equipmentRequired: [],
-      minimumBookingDuration: 120
+      minimumAttendees: 5,
+      maximumAttendees: 100,
+      equipmentProvided: ['Kaffemaskin', 'Tallerkener', 'Kopper'],
+      equipmentRequired: []
     },
     metadata: {
-      provider: 'Drammen Sikkerhet AS',
-      contactPhone: '+47 12 34 56 78',
-      contactEmail: 'booking@drammensikkerhet.no',
+      provider: 'Drammen Catering',
+      contactName: 'Ole Nordmann',
+      contactPhone: '+47 987 65 432',
       setupTimeMinutes: 30,
-      tags: ['sikkerhet', 'personell', 'profesjonell']
+      cleanupTimeMinutes: 45,
+      tags: ['catering', 'popular']
     },
     isActive: true,
     createdAt: new Date('2024-01-01'),
     updatedAt: new Date('2024-01-01')
   },
   {
-    id: 'personnel-technician',
-    name: 'Teknisk personell',
+    id: 'service-4',
+    name: 'Vaktmester tilstede',
     category: 'personnel',
-    description: 'Tekniker for lyd, lys og AV-utstyr',
-    shortDescription: 'Teknisk support',
+    description: 'Vaktmester på stedet under arrangementet',
+    shortDescription: 'Vaktmestertjeneste',
     facilityIds: ['1', '2', '3'],
     pricing: {
-      basePrice: 750,
+      basePrice: 350,
       currency: 'NOK',
       pricingType: 'hourly',
-      minimumCharge: 1500,
+      minimumCharge: 700,
       actorTypeMultipliers: {
-        'lag-foreninger': 0.6,
-        'paraply': 0.4,
-        'private-firma': 1.1,
-        'kommunale-enheter': 1.0,
-        'private-person': 1.0
-      }
+        'private-person': 1.0,
+        'lag-foreninger': 0.8,
+        'paraply': 0.7,
+        'private-firma': 1.0,
+        'kommunale-enheter': 0.5
+      },
+      timeBasedPricing: [
+        { timeSlot: 'evening', multiplier: 1.3, dayType: 'weekday' },
+        { timeSlot: 'night', multiplier: 1.5, dayType: 'weekday' },
+        { timeSlot: 'day', multiplier: 1.5, dayType: 'weekend' }
+      ]
     },
     availability: {
       isAlwaysAvailable: false,
-      availableTimeSlots: [
-        { dayOfWeek: 1, startTime: '09:00', endTime: '21:00' },
-        { dayOfWeek: 2, startTime: '09:00', endTime: '21:00' },
-        { dayOfWeek: 3, startTime: '09:00', endTime: '21:00' },
-        { dayOfWeek: 4, startTime: '09:00', endTime: '21:00' },
-        { dayOfWeek: 5, startTime: '09:00', endTime: '22:00' },
-        { dayOfWeek: 6, startTime: '10:00', endTime: '22:00' }
-      ],
-      leadTimeHours: 24,
-      maxAdvanceBookingDays: 120,
-      blackoutPeriods: []
-    },
-    requirements: {
-      requiresMainBooking: true,
-      equipmentProvided: ['Verktøykasse', 'Testinstrumenter'],
-      equipmentRequired: [],
-      minimumBookingDuration: 120
-    },
-    metadata: {
-      setupTimeMinutes: 45,
-      cleanupTimeMinutes: 30,
-      tags: ['teknisk', 'AV', 'support']
-    },
-    isActive: true,
-    createdAt: new Date('2024-01-01'),
-    updatedAt: new Date('2024-01-01')
-  },
-
-  // Equipment Services
-  {
-    id: 'equipment-av-basic',
-    name: 'Grunnleggende AV-utstyr',
-    category: 'equipment',
-    description: 'Mikrofon, høyttalere og projektor',
-    shortDescription: 'Basis AV-utstyr',
-    facilityIds: ['1', '2', '3'],
-    pricing: {
-      basePrice: 500,
-      currency: 'NOK',
-      pricingType: 'daily',
-      actorTypeMultipliers: {
-        'lag-foreninger': 0.4,
-        'paraply': 0.2,
-        'private-firma': 1.0,
-        'kommunale-enheter': 0.0,
-        'private-person': 0.8
-      }
-    },
-    availability: {
-      isAlwaysAvailable: true,
-      leadTimeHours: 4,
+      leadTimeHours: 72,
       maxAdvanceBookingDays: 90,
       blackoutPeriods: []
     },
     requirements: {
       requiresMainBooking: true,
-      equipmentProvided: ['Trådløs mikrofon', 'Høyttalere', 'Projektor', 'Kabler'],
-      equipmentRequired: [],
-      minimumBookingDuration: 60
+      minimumBookingDuration: 120,
+      equipmentProvided: ['Nøkler', 'Telefon', 'Førstehjelp'],
+      equipmentRequired: []
     },
     metadata: {
-      setupTimeMinutes: 30,
-      cleanupTimeMinutes: 20,
-      tags: ['AV', 'mikrofon', 'projektor']
+      tags: ['personnel', 'security'],
+      specialPermissions: ['Førstehjelp sertifikat'],
+      instructions: 'Vaktmester må bestilles minst 3 dager i forveien'
     },
     isActive: true,
     createdAt: new Date('2024-01-01'),
     updatedAt: new Date('2024-01-01')
   },
   {
-    id: 'equipment-sports-basic',
-    name: 'Grunnleggende sportsutstyr',
-    category: 'equipment',
-    description: 'Baller, matter og grunnleggende treningsutstyr',
-    shortDescription: 'Basis sportsutstyr',
-    facilityIds: ['1', '2', '3'],
+    id: 'service-5',
+    name: 'Ekstra parkeringsplasser',
+    category: 'parking',
+    description: 'Reserverte parkeringsplasser for arrangementet',
+    shortDescription: 'Ekstra parkering',
+    facilityIds: ['1', '2'],
     pricing: {
-      basePrice: 200,
+      basePrice: 100,
       currency: 'NOK',
-      pricingType: 'daily',
+      pricingType: 'per-item',
       actorTypeMultipliers: {
-        'lag-foreninger': 0.3,
-        'paraply': 0.2,
+        'private-person': 1.0,
+        'lag-foreninger': 0.5,
+        'paraply': 0.3,
         'private-firma': 1.0,
-        'kommunale-enheter': 0.0,
-        'private-person': 0.8
+        'kommunale-enheter': 0.0
       }
     },
     availability: {
       isAlwaysAvailable: true,
-      leadTimeHours: 2,
-      maxAdvanceBookingDays: 60,
-      blackoutPeriods: []
-    },
-    requirements: {
-      requiresMainBooking: true,
-      equipmentProvided: ['Fotballer', 'Håndballmål', 'Treningskegler', 'Yogamatter'],
-      equipmentRequired: [],
-      minimumBookingDuration: 60
-    },
-    metadata: {
-      setupTimeMinutes: 15,
-      cleanupTimeMinutes: 15,
-      tags: ['sport', 'trening', 'utstyr']
-    },
-    isActive: true,
-    createdAt: new Date('2024-01-01'),
-    updatedAt: new Date('2024-01-01')
-  },
-
-  // Catering Services
-  {
-    id: 'catering-coffee',
-    name: 'Kaffeservering',
-    category: 'catering',
-    description: 'Kaffe, te og enkle bakevarer',
-    shortDescription: 'Kaffe og kaker',
-    facilityIds: ['1', '2', '3'],
-    pricing: {
-      basePrice: 75,
-      currency: 'NOK',
-      pricingType: 'per-person',
-      minimumCharge: 750,
-      actorTypeMultipliers: {
-        'lag-foreninger': 0.8,
-        'paraply': 0.6,
-        'private-firma': 1.0,
-        'kommunale-enheter': 1.0,
-        'private-person': 1.0
-      }
-    },
-    availability: {
-      isAlwaysAvailable: false,
-      availableTimeSlots: [
-        { dayOfWeek: 1, startTime: '08:00', endTime: '16:00' },
-        { dayOfWeek: 2, startTime: '08:00', endTime: '16:00' },
-        { dayOfWeek: 3, startTime: '08:00', endTime: '16:00' },
-        { dayOfWeek: 4, startTime: '08:00', endTime: '16:00' },
-        { dayOfWeek: 5, startTime: '08:00', endTime: '16:00' }
-      ],
       leadTimeHours: 24,
-      maxAdvanceBookingDays: 30,
-      blackoutPeriods: []
+      maxAdvanceBookingDays: 60,
+      blackoutPeriods: [],
+      capacity: 20
     },
     requirements: {
       requiresMainBooking: true,
-      minimumAttendees: 10,
-      maximumAttendees: 100,
-      equipmentProvided: ['Kaffemaskin', 'Kopper', 'Tallerkener', 'Servise'],
-      equipmentRequired: [],
-      minimumBookingDuration: 60
+      equipmentProvided: ['Parkeringsskilt', 'Sperrebånd'],
+      equipmentRequired: []
     },
     metadata: {
-      provider: 'Drammen Catering',
-      contactPhone: '+47 98 76 54 32',
-      contactEmail: 'bestilling@drammencatering.no',
-      setupTimeMinutes: 45,
-      cleanupTimeMinutes: 30,
-      tags: ['kaffe', 'servering', 'møte']
-    },
-    isActive: true,
-    createdAt: new Date('2024-01-01'),
-    updatedAt: new Date('2024-01-01')
-  },
-  {
-    id: 'catering-lunch',
-    name: 'Lunsjservering',
-    category: 'catering',
-    description: 'Komplett lunsjmeny med varme og kalde retter',
-    shortDescription: 'Lunsjbuffet',
-    facilityIds: ['1', '2', '3'],
-    pricing: {
-      basePrice: 250,
-      currency: 'NOK',
-      pricingType: 'per-person',
-      minimumCharge: 2500,
-      actorTypeMultipliers: {
-        'lag-foreninger': 0.8,
-        'paraply': 0.6,
-        'private-firma': 1.0,
-        'kommunale-enheter': 1.0,
-        'private-person': 1.0
-      }
-    },
-    availability: {
-      isAlwaysAvailable: false,
-      availableTimeSlots: [
-        { dayOfWeek: 1, startTime: '11:00', endTime: '14:00' },
-        { dayOfWeek: 2, startTime: '11:00', endTime: '14:00' },
-        { dayOfWeek: 3, startTime: '11:00', endTime: '14:00' },
-        { dayOfWeek: 4, startTime: '11:00', endTime: '14:00' },
-        { dayOfWeek: 5, startTime: '11:00', endTime: '14:00' }
-      ],
-      leadTimeHours: 48,
-      maxAdvanceBookingDays: 30,
-      blackoutPeriods: []
-    },
-    requirements: {
-      requiresMainBooking: true,
-      minimumAttendees: 10,
-      maximumAttendees: 80,
-      equipmentProvided: ['Servering utstyr', 'Tallerkener', 'Bestikk', 'Varmeplater'],
-      equipmentRequired: [],
-      minimumBookingDuration: 180
-    },
-    metadata: {
-      provider: 'Drammen Catering',
-      contactPhone: '+47 98 76 54 32',
-      contactEmail: 'bestilling@drammencatering.no',
-      setupTimeMinutes: 60,
-      cleanupTimeMinutes: 45,
-      tags: ['lunsj', 'buffet', 'måltid']
+      tags: ['parking', 'logistics'],
+      instructions: 'Maks 20 ekstra plasser tilgjengelig'
     },
     isActive: true,
     createdAt: new Date('2024-01-01'),
     updatedAt: new Date('2024-01-01')
   }
 ];
-
-export const getServicesByCategory = (category: ServiceCategory): AdditionalService[] => {
-  return mockAdditionalServices.filter(service => service.category === category);
-};
-
-export const getServicesByFacility = (facilityId: string): AdditionalService[] => {
-  return mockAdditionalServices.filter(service => 
-    service.facilityIds.includes(facilityId) && service.isActive
-  );
-};
-
-export const getServiceById = (serviceId: string): AdditionalService | undefined => {
-  return mockAdditionalServices.find(service => service.id === serviceId);
-};

@@ -1,119 +1,83 @@
 
 import { ServiceCategory } from '@/types/additionalServices';
 
-export interface ServiceCategoryConfig {
+export interface ServiceCategoryInfo {
   id: ServiceCategory;
   name: string;
   description: string;
   icon: string;
   color: string;
-  isPopular: boolean;
-  sortOrder: number;
 }
 
-export const serviceCategoryConfigs: ServiceCategoryConfig[] = [
+export const serviceCategories: ServiceCategoryInfo[] = [
   {
     id: 'cleaning',
     name: 'Rengjøring',
-    description: 'Standard og dyprengjøring etter arrangementet',
+    description: 'Renhold og vedlikehold',
     icon: 'Sparkles',
-    color: 'bg-blue-50 text-blue-700 border-blue-200',
-    isPopular: true,
-    sortOrder: 1
+    color: 'blue'
   },
   {
     id: 'equipment',
     name: 'Utstyr',
-    description: 'AV-utstyr, sportsutstyr og møbler',
+    description: 'Sports- og aktivitetsutstyr',
     icon: 'Package',
-    color: 'bg-green-50 text-green-700 border-green-200',
-    isPopular: true,
-    sortOrder: 2
+    color: 'green'
   },
   {
     id: 'catering',
     name: 'Servering',
-    description: 'Kaffe, lunsj og fullstendig catering',
+    description: 'Mat og drikke',
     icon: 'Coffee',
-    color: 'bg-orange-50 text-orange-700 border-orange-200',
-    isPopular: true,
-    sortOrder: 3
+    color: 'orange'
   },
   {
     id: 'personnel',
     name: 'Personell',
-    description: 'Sikkerhet, teknisk support og arrangementsassistanse',
+    description: 'Vaktmester og assistanse',
     icon: 'Users',
-    color: 'bg-purple-50 text-purple-700 border-purple-200',
-    isPopular: false,
-    sortOrder: 4
+    color: 'purple'
   },
   {
     id: 'parking',
     name: 'Parkering',
-    description: 'Reserverte plasser og parkeringsservice',
+    description: 'Ekstra parkeringsplasser',
     icon: 'Car',
-    color: 'bg-gray-50 text-gray-700 border-gray-200',
-    isPopular: false,
-    sortOrder: 5
+    color: 'gray'
   },
   {
     id: 'security',
     name: 'Sikkerhet',
-    description: 'Tilgangskontroll og sikkerhetstjenester',
+    description: 'Vakt og sikkerhetstjenester',
     icon: 'Shield',
-    color: 'bg-red-50 text-red-700 border-red-200',
-    isPopular: false,
-    sortOrder: 6
+    color: 'red'
   },
   {
     id: 'technical',
     name: 'Teknisk',
-    description: 'Lyd, lys og video utstyr med support',
-    icon: 'Settings',
-    color: 'bg-indigo-50 text-indigo-700 border-indigo-200',
-    isPopular: false,
-    sortOrder: 7
+    description: 'AV-utstyr og teknisk støtte',
+    icon: 'Monitor',
+    color: 'indigo'
   },
   {
     id: 'decoration',
     name: 'Dekorasjon',
-    description: 'Blomster, belysning og arrangement dekorasjon',
-    icon: 'Flower',
-    color: 'bg-pink-50 text-pink-700 border-pink-200',
-    isPopular: false,
-    sortOrder: 8
+    description: 'Event-dekorasjon',
+    icon: 'Palette',
+    color: 'pink'
   },
   {
     id: 'transport',
     name: 'Transport',
-    description: 'Busstransport og kjøretjenester',
+    description: 'Transport og logistikk',
     icon: 'Truck',
-    color: 'bg-yellow-50 text-yellow-700 border-yellow-200',
-    isPopular: false,
-    sortOrder: 9
+    color: 'yellow'
   },
   {
     id: 'wellness',
-    name: 'Helse',
-    description: 'Førstehjelpstjenester og helsetjenester',
+    name: 'Velvære',
+    description: 'Helse og velvære',
     icon: 'Heart',
-    color: 'bg-teal-50 text-teal-700 border-teal-200',
-    isPopular: false,
-    sortOrder: 10
+    color: 'emerald'
   }
 ];
-
-export const getPopularCategories = (): ServiceCategoryConfig[] => {
-  return serviceCategoryConfigs
-    .filter(config => config.isPopular)
-    .sort((a, b) => a.sortOrder - b.sortOrder);
-};
-
-export const getAllCategories = (): ServiceCategoryConfig[] => {
-  return serviceCategoryConfigs.sort((a, b) => a.sortOrder - b.sortOrder);
-};
-
-export const getCategoryConfig = (category: ServiceCategory): ServiceCategoryConfig | undefined => {
-  return serviceCategoryConfigs.find(config => config.id === category);
-};
