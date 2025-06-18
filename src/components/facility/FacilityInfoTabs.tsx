@@ -71,7 +71,8 @@ export function FacilityInfoTabs({
         <DescriptionTab 
           description={description} 
           capacity={capacity} 
-          quickFacts={quickFacts} 
+          quickFacts={quickFacts}
+          address={address}
         />
       </TabsContent>
       

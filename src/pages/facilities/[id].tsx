@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Home, Heart, Share2 } from "lucide-react";
+import { Home } from "lucide-react";
 import GlobalHeader from "@/components/GlobalHeader";
 import GlobalFooter from "@/components/GlobalFooter";
 import { FacilityImageGallery } from "@/components/facility/FacilityImageGallery";
@@ -10,14 +10,10 @@ import { FacilityQuickFacts } from "@/components/facility/FacilityQuickFacts";
 import { FacilityInfoTabs } from "@/components/facility/FacilityInfoTabs";
 import { FacilitySidebar } from "@/components/facility/FacilitySidebar";
 import { SimilarFacilitiesSlider } from "@/components/facility/SimilarFacilitiesSlider";
-import { FacilityLocation } from "@/components/facility/FacilityLocation";
 import { Zone } from "@/components/booking/types";
-import { Card } from "@/components/ui/card";
-import { MapPin } from "lucide-react";
+
 const FacilityDetail = () => {
-  const {
-    id
-  } = useParams();
+  const { id } = useParams();
   const navigate = useNavigate();
   const [isFavorited, setIsFavorited] = useState(false);
 
@@ -256,6 +252,7 @@ const FacilityDetail = () => {
       }]
     }]
   };
+
   const handleShare = () => {
     if (navigator.share) {
       navigator.share({
@@ -266,11 +263,14 @@ const FacilityDetail = () => {
       navigator.clipboard.writeText(window.location.href);
     }
   };
+
   const handleBookingClick = () => {
     const bookingPath = `/booking/${id}`;
     navigate(bookingPath);
   };
-  return <div className="min-h-screen bg-white flex flex-col">
+
+  return (
+    <div className="min-h-screen bg-white flex flex-col">
       <GlobalHeader />
 
       {/* Breadcrumb Navigation */}
@@ -294,22 +294,9 @@ const FacilityDetail = () => {
             {/* Image Gallery */}
             <FacilityImageGallery images={facility.images} />
 
-            {/* Header with Action Buttons */}
-            <div className="flex justify-between items-start">
-              <div className="flex-1">
-                <FacilityHeader name={facility.name} address={facility.address} onShare={handleShare} isFavorited={isFavorited} onToggleFavorite={() => setIsFavorited(!isFavorited)} />
-              </div>
-              <div className="flex gap-3 mt-4">
-                <Button onClick={handleBookingClick} size="lg" className="text-white bg-blue-900 hover:bg-blue-800">
-                  Reserver nå
-                </Button>
-                <Button variant="outline" size="lg" onClick={() => setIsFavorited(!isFavorited)} className="px-3">
-                  <Heart className={`h-5 w-5 ${isFavorited ? 'fill-red-500 text-red-500' : ''}`} />
-                </Button>
-                <Button variant="outline" size="lg" onClick={handleShare} className="px-3">
-                  <Share2 className="h-5 w-5" />
-                </Button>
-              </div>
+            {/* Header */}
+            <div className="flex-1">
+              <FacilityHeader name={facility.name} address={facility.address} onShare={handleShare} isFavorited={isFavorited} onToggleFavorite={() => setIsFavorited(!isFavorited)} />
             </div>
 
             {/* Main Content Grid */}
@@ -319,67 +306,33 @@ const FacilityDetail = () => {
                 {/* Quick Facts */}
                 <FacilityQuickFacts capacity={facility.capacity} area={facility.area} openingHours={facility.openingHours} zoneCount={zones.length} />
 
-                {/* Auto Approval and Cancellation Policy */}
-                
-
                 {/* Tabbed Content */}
-                <FacilityInfoTabs description={facility.description} capacity={facility.capacity} equipment={facility.equipment} zones={zones} amenities={facility.amenities} address={facility.address} quickFacts={<></>} zoneCards={<></>} />
+                <FacilityInfoTabs 
+                  description={facility.description} 
+                  capacity={facility.capacity} 
+                  equipment={facility.equipment} 
+                  zones={zones} 
+                  amenities={facility.amenities} 
+                  address={facility.address} 
+                  quickFacts={<></>} 
+                  zoneCards={<></>} 
+                />
               </div>
 
               {/* Right Column - Sidebar */}
               <div className="lg:col-span-1">
-                <FacilitySidebar zones={zones} facilityName={facility.name} facilityId={id} hasAutoApproval={facility.hasAutoApproval} openingHours={facility.openingHours} onShare={handleShare} onToggleFavorite={() => setIsFavorited(!isFavorited)} isFavorited={isFavorited} />
+                <FacilitySidebar 
+                  zones={zones} 
+                  facilityName={facility.name} 
+                  facilityId={id} 
+                  hasAutoApproval={facility.hasAutoApproval} 
+                  openingHours={facility.openingHours} 
+                  onShare={handleShare} 
+                  onToggleFavorite={() => setIsFavorited(!isFavorited)} 
+                  isFavorited={isFavorited} 
+                />
               </div>
             </div>
-
-            {/* Location with Map */}
-            <Card className="p-6">
-              <div className="mb-6">
-                <h3 className="text-2xl font-semibold mb-2">Lokasjon</h3>
-                <p className="text-base text-gray-700 leading-relaxed">
-                  Finn veien til lokalet og se transportmuligheter og parkeringsalternativer.
-                </p>
-              </div>
-              
-              <div className="space-y-6">
-                <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
-                  <MapPin className="h-6 w-6 text-blue-600 flex-shrink-0" />
-                  <div>
-                    <p className="font-semibold text-lg">Knoffs gate 8, Drammen</p>
-                    <p className="text-base text-gray-600">Drammen Kommune</p>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="p-4 bg-gray-50 rounded-lg">
-                    <h4 className="font-semibold text-lg text-blue-600 mb-3">Kollektivtransport</h4>
-                    <div className="space-y-3 text-base">
-                      <div>
-                        <p className="font-semibold text-base">Buss</p>
-                        <p className="text-gray-700 leading-relaxed">Linje 102, 104 - Stopp: Brandengen skole (50m unna)</p>
-                      </div>
-                      <div>
-                        <p className="font-semibold text-base">Tog</p>
-                        <p className="text-gray-700 leading-relaxed">Drammen stasjon - 15 min med buss</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="p-4 bg-gray-50 rounded-lg">
-                    <h4 className="font-semibold text-lg text-green-600 mb-3">Parkering</h4>
-                    <div className="space-y-2 text-base">
-                      <p className="text-gray-700 leading-relaxed">Gratis parkering tilgjengelig</p>
-                      <p className="text-gray-700 leading-relaxed">20 plasser på skolens område</p>
-                      <p className="text-gray-700 leading-relaxed">Handicapparking: 2 plasser</p>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="h-64 rounded-lg overflow-hidden border" role="img" aria-label="Kart som viser lokasjon for Brandengen skole på Knoffs gate 8, Drammen">
-                  <FacilityLocation address="Knoffs gate 8, Drammen" />
-                </div>
-              </div>
-            </Card>
           </div>
 
           {/* Similar Facilities Section */}
@@ -390,6 +343,8 @@ const FacilityDetail = () => {
       </div>
 
       <GlobalFooter />
-    </div>;
+    </div>
+  );
 };
+
 export default FacilityDetail;
