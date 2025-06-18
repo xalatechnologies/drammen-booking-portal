@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { format, addDays, startOfWeek, isBefore, startOfDay } from "date-fns";
 import { nb } from "date-fns/locale";
@@ -134,25 +133,6 @@ export function AvailabilityTab({ zones, startDate, showLegend = true }: Availab
         </div>
       </div>
 
-      {/* Selection Info */}
-      {selectedSlots.filter(slot => slot.zoneId === zone.id).length > 0 && (
-        <div className="flex items-center justify-between p-3 bg-blue-50 border border-blue-200 rounded-lg">
-          <div className="text-sm text-blue-800">
-            <span className="font-medium">
-              {selectedSlots.filter(slot => slot.zoneId === zone.id).length} timer valgt
-            </span>
-          </div>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={clearSelection}
-            className="text-xs"
-          >
-            Fjern valg
-          </Button>
-        </div>
-      )}
-
       {/* Week Navigation - Larger fonts */}
       <div className="flex items-center justify-between mb-4">
         <Button
@@ -166,7 +146,7 @@ export function AvailabilityTab({ zones, startDate, showLegend = true }: Availab
           Forrige
         </Button>
         
-        <div className="flex items-center gap-2 text-sm font-medium bg-white px-4 py-2 rounded-lg border shadow-sm">
+        <div className="flex items-center gap-2 text-base font-medium bg-white px-4 py-2 rounded-lg border shadow-sm">
           <Calendar className="h-4 w-4" />
           {format(currentWeekStart, "dd.MM", { locale: nb })} - {format(addDays(currentWeekStart, 6), "dd.MM.yyyy", { locale: nb })}
         </div>
@@ -186,16 +166,16 @@ export function AvailabilityTab({ zones, startDate, showLegend = true }: Availab
       <Card>
         <CardContent className="p-4">
           <div className="grid grid-cols-8 gap-2 mb-4">
-            <div className="p-2 text-sm font-medium text-gray-500">Tid</div>
+            <div className="p-2 text-base font-medium text-gray-500">Tid</div>
             {weekDays.map((day, i) => {
               const holidayCheck = isNorwegianHoliday(day);
               const isToday = format(day, 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd');
               return (
                 <div key={i} className={`p-2 text-center rounded ${isToday ? 'bg-blue-100 border border-blue-300' : 'bg-gray-50'}`}>
-                  <div className={`text-sm font-medium ${isToday ? 'text-blue-800' : 'text-gray-700'}`}>
+                  <div className={`text-base font-medium ${isToday ? 'text-blue-800' : 'text-gray-700'}`}>
                     {format(day, "EEE", { locale: nb })}
                   </div>
-                  <div className={`text-sm font-bold ${isToday ? 'text-blue-900' : 'text-gray-900'}`}>
+                  <div className={`text-base font-bold ${isToday ? 'text-blue-900' : 'text-gray-900'}`}>
                     {format(day, "dd.MM", { locale: nb })}
                   </div>
                   {holidayCheck.isHoliday && (
@@ -212,7 +192,7 @@ export function AvailabilityTab({ zones, startDate, showLegend = true }: Availab
           <div className="space-y-2">
             {timeSlots.map((timeSlot) => (
               <div key={timeSlot} className="grid grid-cols-8 gap-2">
-                <div className="p-3 text-sm font-medium text-gray-700 flex items-center bg-gray-50 rounded">
+                <div className="p-3 text-base font-medium text-gray-700 flex items-center bg-gray-50 rounded">
                   {timeSlot}
                 </div>
                 {weekDays.map((day, dayIndex) => {
@@ -223,7 +203,7 @@ export function AvailabilityTab({ zones, startDate, showLegend = true }: Availab
                   return (
                     <div key={dayIndex} className="relative">
                       <button
-                        className={`w-full h-10 rounded-md border-2 transition-all duration-200 ${statusColor} ${
+                        className={`w-full h-12 rounded-md border-2 transition-all duration-200 ${statusColor} ${
                           availability === 'available' 
                             ? 'cursor-pointer shadow-sm hover:shadow-md transform hover:scale-105' 
                             : 'cursor-not-allowed opacity-75'
@@ -231,7 +211,6 @@ export function AvailabilityTab({ zones, startDate, showLegend = true }: Availab
                         disabled={availability !== 'available'}
                         onClick={() => handleSlotClick(zone.id, day, timeSlot, availability)}
                       >
-                        {/* No text content - just the colored button */}
                       </button>
                     </div>
                   );
@@ -246,31 +225,23 @@ export function AvailabilityTab({ zones, startDate, showLegend = true }: Availab
 
   return (
     <div className="space-y-6">
-      {/* Legend with larger fonts */}
+      {/* Legend moved below calendar */}
       {showLegend && (
         <div className="p-4 bg-gray-50 rounded-lg">
-          <div className="grid grid-cols-3 gap-6 text-sm">
+          <div className="grid grid-cols-3 gap-6 text-base">
             <div className="flex items-center gap-3">
-              <div className="w-5 h-5 rounded bg-green-100 border-2 border-green-400"></div>
+              <div className="w-6 h-6 rounded bg-green-100 border-2 border-green-400"></div>
               <span>Ledig</span>
             </div>
             <div className="flex items-center gap-3">
-              <div className="w-5 h-5 rounded bg-red-100 border-2 border-red-400"></div>
+              <div className="w-6 h-6 rounded bg-red-100 border-2 border-red-400"></div>
               <span>Opptatt</span>
             </div>
             <div className="flex items-center gap-3">
-              <div className="w-5 h-5 rounded bg-gray-100 border-2 border-gray-400"></div>
+              <div className="w-6 h-6 rounded bg-gray-100 border-2 border-gray-400"></div>
               <span>Ikke tilgjengelig</span>
             </div>
           </div>
-          {selectedSlots.length > 0 && (
-            <div className="mt-3 pt-3 border-t border-gray-200">
-              <div className="flex items-center gap-3">
-                <div className="w-5 h-5 rounded bg-blue-500 border-2 border-blue-600"></div>
-                <span>Valgt ({selectedSlots.length} timer)</span>
-              </div>
-            </div>
-          )}
         </div>
       )}
 
@@ -283,8 +254,8 @@ export function AvailabilityTab({ zones, startDate, showLegend = true }: Availab
               value={zone.id}
               className="flex flex-col items-center p-3 h-auto data-[state=active]:bg-[#1e3a8a] data-[state=active]:text-white hover:bg-[#1e40af] hover:text-white transition-colors rounded-md"
             >
-              <span className="font-medium text-sm">{zone.name}</span>
-              <div className="flex items-center gap-4 mt-2 text-xs opacity-75">
+              <span className="font-medium text-base">{zone.name}</span>
+              <div className="flex items-center gap-4 mt-2 text-sm opacity-75">
                 <div className="flex items-center gap-1">
                   <Users className="h-3 w-3" />
                   <span>{zone.capacity}</span>
