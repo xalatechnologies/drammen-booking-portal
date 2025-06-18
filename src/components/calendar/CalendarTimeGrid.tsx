@@ -24,7 +24,7 @@ export const CalendarTimeGrid: React.FC<CalendarTimeGridProps> = ({
       <div className="min-w-[800px]">
         {/* Day Headers */}
         <div className="grid grid-cols-8 border-b bg-white">
-          <div className="p-3 border-r bg-gray-50 flex items-center">
+          <div className="p-3 border-r border-white bg-gray-50 flex items-center">
             <Clock className="h-4 w-4 mr-2 text-gray-500" />
             <span className="font-medium text-gray-700">Tid</span>
           </div>
@@ -33,7 +33,7 @@ export const CalendarTimeGrid: React.FC<CalendarTimeGridProps> = ({
             const holidayCheck = isNorwegianHoliday(day);
             const isToday = format(day, 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd');
             
-            let headerClass = "p-3 border-r text-center ";
+            let headerClass = "p-3 border-r border-white text-center ";
             if (isToday) {
               headerClass += "bg-blue-100 border-l-4 border-l-blue-500";
             } else if (unavailableCheck.isUnavailable) {
@@ -71,15 +71,15 @@ export const CalendarTimeGrid: React.FC<CalendarTimeGridProps> = ({
 
         {/* Time Slot Rows */}
         {timeSlots.map((timeSlot, timeIndex) => (
-          <div key={timeSlot} className="grid grid-cols-8 border-b hover:bg-gray-50/50">
-            <div className="p-3 border-r bg-gray-50 font-medium text-gray-700 flex items-center">
+          <div key={timeSlot} className="grid grid-cols-8 border-b border-white hover:bg-gray-50/50">
+            <div className="p-3 border-r border-white bg-gray-50 font-medium text-gray-700 flex items-center">
               {timeSlot}
             </div>
             {days.map((day, dayIndex) => {
               const unavailableCheck = isDateUnavailable(new Date(day));
               const isBooked = isTimeSlotBooked(facility.id, new Date(day), parseInt(timeSlot.split(':')[0]));
               
-              let cellClass = "p-3 border-r text-center relative h-12 ";
+              let cellClass = "p-3 border-r border-2 border-white text-center relative h-12 ";
               let clickHandler = null;
 
               if (unavailableCheck.isUnavailable) {
