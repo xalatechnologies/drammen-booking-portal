@@ -41,21 +41,13 @@ export function EnhancedFacilitySidebar({
       capacity: "Kapasitet",
       area: "Areal",
       open: "Åpent",
-      zones: "Soner",
-      reserveNow: "Reserver nå",
-      suitableFor: "Egnet for",
-      freeCancellation: "Gratis avbestilling",
-      upTo24Hours: "Opptil 24 timer før reservert tid"
+      zones: "Soner"
     },
     EN: {
       capacity: "Capacity",
       area: "Area",
       open: "Open",
-      zones: "Zones",
-      reserveNow: "Reserve now",
-      suitableFor: "Suitable for",
-      freeCancellation: "Free cancellation",
-      upTo24Hours: "Up to 24 hours before reserved time"
+      zones: "Zones"
     }
   };
   
@@ -67,105 +59,92 @@ export function EnhancedFacilitySidebar({
   };
 
   return (
-    <div className="w-96 space-y-6 p-6 bg-gray-50/50">
-      {/* Action buttons - Larger and more prominent */}
-      <div className="flex gap-3">
+    <div className="space-y-4">
+      {/* Action Buttons - Match tab button height and font size */}
+      <div className="flex gap-2">
         <Button 
           onClick={handleBookingClick}
-          className="flex-1 bg-[#1e3a8a] hover:bg-[#1e40af] text-white font-semibold text-lg h-14 shadow-lg hover:shadow-xl transition-all duration-200"
+          className="flex-1 bg-[#1e3a8a] hover:bg-[#1e40af] text-white font-medium text-base h-auto p-3"
         >
-          {t.reserveNow}
+          Reserver nå
         </Button>
         <Button
           variant="outline"
           onClick={onToggleFavorite}
-          className="px-4 h-14 border-2 hover:bg-red-50"
+          className="px-3 h-auto p-3"
         >
-          <Heart className={`h-6 w-6 ${isFavorited ? 'fill-red-500 text-red-500' : 'text-gray-400'}`} />
+          <Heart className={`h-5 w-5 ${isFavorited ? 'fill-red-500 text-red-500' : ''}`} />
         </Button>
         <Button
           variant="outline"
           onClick={onShare}
-          className="px-4 h-14 border-2 hover:bg-blue-50"
+          className="px-3 h-auto p-3"
         >
-          <Share2 className="h-6 w-6 text-gray-600" />
+          <Share2 className="h-5 w-5" />
         </Button>
       </div>
 
-      {/* Enhanced Quick Facts with better spacing */}
-      <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200 shadow-sm">
-        <CardHeader className="pb-4">
-          <CardTitle className="text-lg font-semibold text-gray-800">Hurtigfakta</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
+      {/* Enhanced Quick Facts */}
+      <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">
+        <CardContent className="space-y-4 pt-6">
           <div className="grid grid-cols-2 gap-4">
-            <div className="flex items-center gap-4 p-4 bg-white rounded-xl shadow-sm border border-gray-100">
-              <div className="p-3 bg-blue-100 rounded-full">
-                <Users className="h-5 w-5 text-blue-600" />
+            <div className="flex items-center gap-3 p-3 bg-white rounded-lg shadow-sm border">
+              <div className="p-2 bg-blue-100 rounded-full">
+                <Users className="h-4 w-4 text-blue-600" />
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-500 uppercase tracking-wide">{t.capacity}</p>
-                <p className="text-xl font-bold text-gray-900">{capacity}</p>
+                <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">{t.capacity}</p>
+                <p className="text-lg font-bold text-gray-900">{capacity}</p>
               </div>
             </div>
             
-            <div className="flex items-center gap-4 p-4 bg-white rounded-xl shadow-sm border border-gray-100">
-              <div className="p-3 bg-green-100 rounded-full">
-                <Map className="h-5 w-5 text-green-600" />
+            <div className="flex items-center gap-3 p-3 bg-white rounded-lg shadow-sm border">
+              <div className="p-2 bg-green-100 rounded-full">
+                <Map className="h-4 w-4 text-green-600" />
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-500 uppercase tracking-wide">{t.area}</p>
-                <p className="text-xl font-bold text-gray-900">{area}</p>
+                <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">{t.area}</p>
+                <p className="text-lg font-bold text-gray-900">{area}</p>
               </div>
             </div>
             
-            <div className="flex items-center gap-4 p-4 bg-white rounded-xl shadow-sm border border-gray-100">
-              <div className="p-3 bg-purple-100 rounded-full">
-                <Clock className="h-5 w-5 text-purple-600" />
+            <div className="flex items-center gap-3 p-3 bg-white rounded-lg shadow-sm border">
+              <div className="p-2 bg-purple-100 rounded-full">
+                <Clock className="h-4 w-4 text-purple-600" />
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-500 uppercase tracking-wide">{t.open}</p>
-                <p className="text-base font-bold text-gray-900">06:00-23:00</p>
+                <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">{t.open}</p>
+                <p className="text-sm font-bold text-gray-900">06:00-23:00</p>
               </div>
             </div>
             
-            <div className="flex items-center gap-4 p-4 bg-white rounded-xl shadow-sm border border-gray-100">
-              <div className="p-3 bg-emerald-100 rounded-full">
-                <CheckCircle className="h-5 w-5 text-emerald-600" />
+            <div className="flex items-center gap-3 p-3 bg-white rounded-lg shadow-sm border">
+              <div className="p-2 bg-emerald-100 rounded-full">
+                <CheckCircle className="h-4 w-4 text-emerald-600" />
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-500 uppercase tracking-wide">{t.zones}</p>
-                <p className="text-xl font-bold text-emerald-600">{zoneCount}</p>
+                <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">{t.zones}</p>
+                <p className="text-lg font-bold text-emerald-600">{zoneCount}</p>
               </div>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Suitable For Card with better styling */}
-      <Card className="shadow-sm">
-        <CardHeader className="pb-4">
-          <CardTitle className="flex items-center gap-3 text-lg font-semibold">
-            <div className="p-2 bg-orange-100 rounded-lg">
-              <Tag className="h-5 w-5 text-orange-600" />
-            </div>
-            {t.suitableFor}
+      {/* Suitable For Card */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <Tag className="h-5 w-5" />
+            Egnet for
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-wrap gap-3">
-            <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 px-3 py-1.5 text-sm font-medium">
-              Idrett
-            </Badge>
-            <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 px-3 py-1.5 text-sm font-medium">
-              Trening
-            </Badge>
-            <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200 px-3 py-1.5 text-sm font-medium">
-              Arrangementer
-            </Badge>
-            <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200 px-3 py-1.5 text-sm font-medium">
-              Grupper
-            </Badge>
+          <div className="flex flex-wrap gap-2">
+            <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">Idrett</Badge>
+            <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">Trening</Badge>
+            <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">Arrangementer</Badge>
+            <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200">Grupper</Badge>
           </div>
         </CardContent>
       </Card>
@@ -173,19 +152,19 @@ export function EnhancedFacilitySidebar({
       {/* Auto Approval Policy Card */}
       {hasAutoApproval && <AutoApprovalCard hasAutoApproval={hasAutoApproval} />}
 
-      {/* Enhanced Cancellation Policy Card */}
-      <Card className="border-emerald-200 bg-emerald-50/50">
-        <CardContent className="p-5">
-          <div className="flex items-start gap-4">
-            <div className="p-3 bg-emerald-100 rounded-xl">
-              <CheckCircle className="h-6 w-6 text-emerald-600" />
+      {/* Cancellation Policy Card */}
+      <Card>
+        <CardContent className="p-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-emerald-100 rounded-md">
+              <XCircle className="h-5 w-5 text-emerald-600" />
             </div>
-            <div className="flex-1">
-              <h3 className="font-semibold text-emerald-800 text-lg mb-1">
-                {t.freeCancellation}
+            <div>
+              <h3 className="font-medium text-emerald-800">
+                Gratis avbestilling
               </h3>
-              <p className="text-sm text-emerald-700 leading-relaxed">
-                {t.upTo24Hours}
+              <p className="text-sm text-emerald-700">
+                Opptil 24 timer før reservert tid
               </p>
             </div>
           </div>
