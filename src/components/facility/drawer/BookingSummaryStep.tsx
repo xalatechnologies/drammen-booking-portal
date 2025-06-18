@@ -53,9 +53,7 @@ export function BookingSummaryStep({
     actorType={actorType} bookingType={bookingType} />
 
       {/* Approval Notice */}
-      {requiresApproval && <Card className="border-amber-200 bg-amber-50">
-          
-        </Card>}
+      {requiresApproval}
 
       <ActivityDetailsForm activityType={activityType} onActivityTypeChange={setActivityType} attendees={attendees} onAttendeesChange={setAttendees} />
 
