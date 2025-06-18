@@ -125,17 +125,14 @@ export function BookingSummaryStep({
           </Label>
           <Select value={activityType} onValueChange={setActivityType}>
             <SelectTrigger className="h-11 border-gray-300 focus:border-slate-700">
-              <SelectValue placeholder="Velg type aktivitet" />
+              <SelectValue placeholder="Velg" />
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="sport">Sport og trening</SelectItem>
-              <SelectItem value="meeting">Møte og konferanse</SelectItem>
-              <SelectItem value="course">Kurs og utdanning</SelectItem>
-              <SelectItem value="cultural">Kulturell aktivitet</SelectItem>
-              <SelectItem value="celebration">Fest og feiring</SelectItem>
-              <SelectItem value="exhibition">Utstilling</SelectItem>
-              <SelectItem value="competition">Konkurranse og turnering</SelectItem>
-              <SelectItem value="other">Annet</SelectItem>
+            <SelectContent className="bg-white border border-gray-200 shadow-lg z-50">
+              <SelectItem value="velg">Velg</SelectItem>
+              <SelectItem value="møter-foredrag">Møter, foredrag eller liknende</SelectItem>
+              <SelectItem value="øving">Øving (kor, korps, teater eller liknende)</SelectItem>
+              <SelectItem value="konsert-forestilling">Konsert eller forestilling</SelectItem>
+              <SelectItem value="annen-aktivitet">Annen aktivitet - beskriv under</SelectItem>
             </SelectContent>
           </Select>
           {activityType.length === 0 && (
@@ -149,12 +146,12 @@ export function BookingSummaryStep({
         <CardContent className="p-4 space-y-3">
           <Label className="text-base font-semibold text-gray-900 flex items-center gap-2">
             <MessageSquare className="h-5 w-5 text-slate-600" />
-            Formål med reservasjonen *
+            Formål med bookingen *
           </Label>
           <Textarea
             value={purpose}
             onChange={(e) => onPurposeChange(e.target.value)}
-            placeholder="Beskriv kort hva lokalet skal brukes til (f.eks. fotballtrening, møte, arrangement)..."
+            placeholder="Beskriv kort hva lokalet skal brukes til..."
             className="resize-none h-24 border-gray-300 focus:border-slate-700 text-base"
           />
           {purpose.trim().length === 0 && (
@@ -169,17 +166,39 @@ export function BookingSummaryStep({
           <CardHeader className="pb-3">
             <CardTitle className="text-lg flex items-center gap-2">
               <CreditCard className="h-5 w-5" />
-              Prising
+              Leiepriser
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <PriceBreakdown calculation={calculation} />
-            <div className="mt-3 pt-3 border-t">
-              <div className="flex justify-between items-center font-medium text-lg">
-                <span>Total ({selectedSlots.length} tidspunkt):</span>
-                <span className="text-xl text-blue-600">
-                  {totalPrice === 0 ? 'GRATIS' : `${totalPrice} kr`}
-                </span>
+            <div className="space-y-3">
+              <div className="text-sm text-blue-600 underline cursor-pointer">
+                Se hvordan prisen er beregnet på dine dager
+              </div>
+              <PriceBreakdown calculation={calculation} />
+              <div className="mt-3 pt-3 border-t">
+                <div className="flex justify-between items-center">
+                  <span className="text-base">Sum:</span>
+                  <span className="text-xl font-medium text-blue-600">
+                    {totalPrice === 0 ? '0*' : `${totalPrice}`} ,-
+                  </span>
+                </div>
+                <div className="text-xs text-gray-600 mt-1">
+                  * Prisen er et resultat av følgende prisfaktorer:
+                </div>
+                <div className="text-xs text-gray-600">
+                  {customerType === 'nonprofit' ? 
+                    '• Kommersielle aktører og private arrangement: Høyere pris' :
+                    '• Ikke-kommersielle aktører: Standard pris'
+                  }
+                </div>
+                {calculation?.breakdown?.some((item: any) => item.description.includes('torsdag')) && (
+                  <div className="text-xs text-gray-600">
+                    • Torsdag regnes timespris: {totalPrice} ,-
+                  </div>
+                )}
+                <div className="text-xs text-gray-600">
+                  • 0% MVA på booket tid
+                </div>
               </div>
             </div>
           </CardContent>
