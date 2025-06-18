@@ -33,7 +33,7 @@ export function AvailabilityTab({
   const [showConflictWizard, setShowConflictWizard] = useState(false);
   const [conflictResolutionData, setConflictResolutionData] = useState<any>(null);
   const [currentPattern, setCurrentPattern] = useState<RecurrencePattern>({
-    type: 'single',
+    type: 'weekly',
     weekdays: [],
     timeSlots: [],
     interval: 1
@@ -62,53 +62,58 @@ export function AvailabilityTab({
   const currentWeekStartDay = startOfDay(currentWeekStart);
   const canGoPrevious = !isBefore(addDays(currentWeekStartDay, -7), today);
 
-  // Check if we should show tabs or just render a single zone
   const shouldShowTabs = zones.length > 1;
 
-  // Handler for pattern application
+  // Handler for pattern application - simplified
   const handlePatternApply = (pattern: RecurrencePattern) => {
-    // Get the current active zone from tabs or use first zone
-    const activeZone = zones[0]; // For simplicity, using first zone
-    
-    if (pattern.timeSlots.length === 0) return;
+    if (pattern.timeSlots.length === 0 || pattern.weekdays.length === 0) return;
 
-    const startDateForPattern = currentWeekStart;
-    const zoneId = activeZone.id;
-    
-    if (pattern.type === 'single') {
-      // Handle single booking
-      const today = new Date();
-      const availableDays = Array(7).fill(0).map((_, i) => addDays(currentWeekStart, i));
-      const targetDate = availableDays.find(day => day >= today) || availableDays[0];
-      
-      const singleBookings = pattern.timeSlots.map(timeSlot => ({
-        zoneId,
-        date: targetDate,
-        timeSlot,
-        duration: 2
-      }));
-      
-      setSelectedSlots(singleBookings);
-      return;
-    }
-    
-    // Handle recurring patterns
-    if (pattern.weekdays.length === 0) return;
+    const zoneId = zones[0]?.id;
+    if (!zoneId) return;
     
     const occurrences = recurrenceEngine.generateOccurrences(
       pattern,
-      startDateForPattern,
+      currentWeekStart,
       zoneId,
       12
     );
 
-    setSelectedSlots(occurrences);
+    // Check for conflicts
+    const conflictedDates: Date[] = [];
+    const availableOccurrences: SelectedTimeSlot[] = [];
+    
+    occurrences.forEach(occurrence => {
+      const { status } = conflictManager.checkZoneConflict(occurrence.zoneId, occurrence.date, occurrence.timeSlot) 
+        ? { status: 'busy' } : { status: 'available' };
+      
+      if (status === 'available') {
+        availableOccurrences.push(occurrence);
+      } else {
+        conflictedDates.push(occurrence.date);
+      }
+    });
+
+    if (conflictedDates.length > 0) {
+      // Show conflict resolution
+      setConflictResolutionData({
+        conflictedDates,
+        availableDates: availableOccurrences.map(o => o.date),
+        alternativeTimeSlots: [],
+        suggestedZones: [],
+        originalZone: zones[0],
+        originalTimeSlot: pattern.timeSlots[0],
+        occurrences: availableOccurrences
+      });
+      setShowConflictWizard(true);
+    } else {
+      // No conflicts, add all occurrences
+      setSelectedSlots(availableOccurrences);
+    }
   };
 
   return (
     <div className="space-y-6 font-inter">
       {shouldShowTabs ? (
-        /* Enhanced Zone Tabs for multiple zones */
         <Tabs defaultValue={zones[0]?.id} className="w-full">
           <TabsList className="grid w-full grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1 h-auto p-1 bg-gray-100 rounded-lg">
             {zones.map((zone) => (
@@ -150,7 +155,6 @@ export function AvailabilityTab({
           ))}
         </Tabs>
       ) : (
-        /* Single zone - no tabs needed */
         zones.length > 0 && (
           <AvailabilityTabContent
             zone={zones[0]}
@@ -172,7 +176,7 @@ export function AvailabilityTab({
         )
       )}
 
-      {/* Pattern Builder Modal */}
+      {/* Simplified Pattern Builder Modal */}
       {showPatternBuilder && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <RecurrencePatternBuilder
