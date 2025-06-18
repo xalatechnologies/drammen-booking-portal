@@ -5,7 +5,6 @@ import { Zone } from "@/components/booking/types";
 import { getAmenityIcon } from "./utils/amenityIcons";
 import { DescriptionTab } from "./tabs/DescriptionTab";
 import { FeaturesTab } from "./tabs/FeaturesTab";
-import { AvailabilityTab } from "./tabs/AvailabilityTab";
 import { FaqTab } from "./tabs/FaqTab";
 import { RulesTab } from "./tabs/RulesTab";
 
@@ -28,8 +27,6 @@ export function FacilityInfoTabs({
   address,
   zoneCards
 }: FacilityInfoTabsProps) {
-  const [date] = useState<Date>(new Date());
-
   return (
     <Tabs defaultValue="description" className="bg-white rounded-lg shadow-sm border">
       <TabsList className="w-full border-b p-0 h-auto bg-gray-50 rounded-none">
@@ -44,12 +41,6 @@ export function FacilityInfoTabs({
           className="flex-1 py-4 px-6 rounded-none text-base font-medium data-[state=active]:bg-[#1e3a8a] data-[state=active]:text-white data-[state=active]:border-b-0 data-[state=active]:shadow-none hover:bg-[#1e40af] hover:text-white transition-colors"
         >
           Fasiliteter
-        </TabsTrigger>
-        <TabsTrigger 
-          value="availability" 
-          className="flex-1 py-4 px-6 rounded-none text-base font-medium data-[state=active]:bg-[#1e3a8a] data-[state=active]:text-white data-[state=active]:border-b-0 data-[state=active]:shadow-none hover:bg-[#1e40af] hover:text-white transition-colors"
-        >
-          Tilgjengelighet
         </TabsTrigger>
         <TabsTrigger 
           value="rules" 
@@ -70,6 +61,7 @@ export function FacilityInfoTabs({
           description={description} 
           capacity={capacity} 
           address={address}
+          zones={zones}
         />
       </TabsContent>
       
@@ -79,13 +71,6 @@ export function FacilityInfoTabs({
           equipment={equipment} 
           amenities={amenities}
           getAmenityIcon={getAmenityIcon}
-        />
-      </TabsContent>
-      
-      <TabsContent value="availability">
-        <AvailabilityTab 
-          zones={zones}
-          startDate={date} 
         />
       </TabsContent>
 

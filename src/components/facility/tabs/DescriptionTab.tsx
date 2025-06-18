@@ -1,88 +1,57 @@
 
 import React from "react";
-import { Card } from "@/components/ui/card";
+import { MapPin, Users } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Heart, MapPin } from "lucide-react";
-import { FacilityLocation } from "@/components/facility/FacilityLocation";
+import { AvailabilityTab } from "./AvailabilityTab";
+import { Zone } from "@/components/booking/types";
 
 interface DescriptionTabProps {
   description: string;
   capacity: number;
   address: string;
+  zones?: Zone[];
 }
 
-export function DescriptionTab({ description, capacity, address }: DescriptionTabProps) {
+export function DescriptionTab({ description, capacity, address, zones = [] }: DescriptionTabProps) {
   return (
-    <div className="p-6 space-y-8">
+    <div className="p-6 space-y-6">
+      {/* General Information */}
       <div>
-        <h2 className="text-2xl font-semibold mb-6">Om lokalet</h2>
-        <p className="text-lg text-gray-700 leading-relaxed">{description}</p>
-      </div>
-      
-      <Card className="p-6">
-        <h3 className="font-semibold text-xl mb-4 flex items-center gap-2">
-          <Heart className="h-6 w-6 text-red-500" />
-          Egnet for
-        </h3>
-        <div className="flex flex-wrap gap-3">
-          <Badge variant="outline" className="bg-[#1e3a8a] bg-opacity-10 text-[#1e3a8a] border-[#1e3a8a] border-[0.25px] text-base py-2 px-4 font-medium">Idrett</Badge>
-          <Badge variant="outline" className="bg-[#1e3a8a] bg-opacity-10 text-[#1e3a8a] border-[#1e3a8a] border-[0.25px] text-base py-2 px-4 font-medium">Trening</Badge>
-          <Badge variant="outline" className="bg-[#1e3a8a] bg-opacity-10 text-[#1e3a8a] border-[#1e3a8a] border-[0.25px] text-base py-2 px-4 font-medium">Arrangementer</Badge>
-          <Badge variant="outline" className="bg-[#1e3a8a] bg-opacity-10 text-[#1e3a8a] border-[#1e3a8a] border-[0.25px] text-base py-2 px-4 font-medium">Grupper</Badge>
-          <Badge variant="outline" className="bg-[#1e3a8a] bg-opacity-10 text-[#1e3a8a] border-[#1e3a8a] border-[0.25px] text-base py-2 px-4 font-medium">Dans</Badge>
-          <Badge variant="outline" className="bg-[#1e3a8a] bg-opacity-10 text-[#1e3a8a] border-[#1e3a8a] border-[0.25px] text-base py-2 px-4 font-medium">Ballsport</Badge>
-          <Badge variant="outline" className="bg-[#1e3a8a] bg-opacity-10 text-[#1e3a8a] border-[#1e3a8a] border-[0.25px] text-base py-2 px-4 font-medium">Presentasjoner</Badge>
-        </div>
-      </Card>
-
-      {/* Location with Map */}
-      <Card className="p-6">
-        <div className="mb-6">
-          <h3 className="text-2xl font-semibold mb-2">Lokasjon</h3>
-          <p className="text-base text-gray-700 leading-relaxed">
-            Finn veien til lokalet og se transportmuligheter og parkeringsalternativer.
-          </p>
-        </div>
-        
-        <div className="space-y-6">
-          <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
-            <MapPin className="h-6 w-6 text-blue-600 flex-shrink-0" />
-            <div>
-              <p className="font-semibold text-lg">{address}</p>
-              <p className="text-base text-gray-600">Drammen Kommune</p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="p-4 bg-gray-50 rounded-lg">
-              <h4 className="font-semibold text-lg text-blue-600 mb-3">Kollektivtransport</h4>
-              <div className="space-y-3 text-base">
-                <div>
-                  <p className="font-semibold text-base">Buss</p>
-                  <p className="text-gray-700 leading-relaxed">Linje 102, 104 - Stopp: Brandengen skole (50m unna)</p>
-                </div>
-                <div>
-                  <p className="font-semibold text-base">Tog</p>
-                  <p className="text-gray-700 leading-relaxed">Drammen stasjon - 15 min med buss</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="p-4 bg-gray-50 rounded-lg">
-              <h4 className="font-semibold text-lg text-green-600 mb-3">Parkering</h4>
-              <div className="space-y-2 text-base">
-                <p className="text-gray-700 leading-relaxed">Gratis parkering tilgjengelig</p>
-                <p className="text-gray-700 leading-relaxed">20 plasser på skolens område</p>
-                <p className="text-gray-700 leading-relaxed">Handicapparking: 2 plasser</p>
-              </div>
-            </div>
+        <h3 className="text-lg font-semibold mb-4">Generell informasjon</h3>
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 text-gray-700">
+            <MapPin className="h-4 w-4 text-gray-500" />
+            <span>{address}</span>
           </div>
           
-          <div className="h-64 rounded-lg overflow-hidden border" role="img" aria-label="Kart som viser lokasjon for Brandengen skole på Knoffs gate 8, Drammen">
-            <FacilityLocation address={address} />
+          <div className="flex items-center gap-2 text-gray-700">
+            <Users className="h-4 w-4 text-gray-500" />
+            <span>Kapasitet: {capacity} personer</span>
+          </div>
+          
+          <div>
+            <p className="text-gray-700 leading-relaxed">{description}</p>
+          </div>
+          
+          <div className="pt-4 border-t border-gray-100">
+            <h4 className="font-medium text-gray-900 mb-2">Egnet for</h4>
+            <div className="flex flex-wrap gap-2">
+              <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">Idrett</Badge>
+              <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">Trening</Badge>
+              <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">Arrangementer</Badge>
+              <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200">Grupper</Badge>
+            </div>
           </div>
         </div>
-      </Card>
+      </div>
+
+      {/* Availability Calendar */}
+      {zones.length > 0 && (
+        <div className="border-t border-gray-200 pt-6">
+          <h3 className="text-lg font-semibold mb-4">Tilgjengelighet</h3>
+          <AvailabilityTab zones={zones} startDate={new Date()} />
+        </div>
+      )}
     </div>
   );
 }
