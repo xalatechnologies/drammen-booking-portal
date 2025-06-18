@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef, useState } from 'react';
 import { Card } from './ui/card';
 import { MapPin } from 'lucide-react';
@@ -249,12 +250,12 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location }) => {
   return (
     <div className="relative w-full">
       <div className="mt-4">
-        <Card className="min-h-[400px] relative overflow-hidden">
+        <Card className="min-h-[600px] relative overflow-hidden">
           {isLoading && (
             <div className="absolute inset-0 bg-white/80 flex items-center justify-center z-10">
               <div className="text-center">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
-                <p className="text-sm text-gray-600">Loading map...</p>
+                <p className="text-base text-gray-600">Loading map...</p>
               </div>
             </div>
           )}
@@ -262,7 +263,7 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location }) => {
           {error && !isLoading && (
             <div className="absolute inset-0 bg-red-50 flex items-center justify-center z-10">
               <div className="text-center p-6">
-                <p className="text-red-600 mb-4">{error}</p>
+                <p className="text-red-600 mb-4 text-base">{error}</p>
                 <Button 
                   onClick={() => {
                     setError('');
@@ -270,6 +271,7 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location }) => {
                     initializeMap();
                   }}
                   variant="outline"
+                  className="text-base px-6 py-3"
                 >
                   Try Again
                 </Button>
@@ -277,48 +279,49 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location }) => {
             </div>
           )}
           
-          <div ref={mapContainer} className="h-[400px] w-full" />
+          <div ref={mapContainer} className="h-[600px] w-full" />
           
-          {/* Info overlay - More Compact */}
+          {/* Enhanced Info overlay */}
           {!error && !isLoading && (
-            <div className="absolute top-4 right-4 bg-white/95 backdrop-blur-md border border-gray-200 rounded-lg p-4 shadow-lg max-w-xs">
-              <div className="flex items-center gap-2 mb-3">
-                <div className="h-8 w-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <MapPin className="h-4 w-4 text-blue-600" />
+            <div className="absolute top-6 right-6 bg-white/95 backdrop-blur-md border border-gray-200 rounded-xl p-6 shadow-xl max-w-sm">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="h-10 w-10 bg-blue-100 rounded-xl flex items-center justify-center">
+                  <MapPin className="h-5 w-5 text-blue-600" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 text-sm">Drammen Kommune</h3>
-                  <p className="text-xs text-gray-600">Kommunale lokaler</p>
+                  <h3 className="font-bold text-gray-900 text-lg">Drammen Kommune</h3>
+                  <p className="text-sm text-gray-600">Kommunale lokaler</p>
                 </div>
               </div>
               
-              <div className="mb-3">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-medium text-gray-700">Viser lokaler</span>
-                  <span className="bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-1 rounded-full">
+              <div className="mb-4">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-base font-semibold text-gray-700">Viser lokaler</span>
+                  <span className="bg-blue-100 text-blue-800 text-base font-bold px-3 py-2 rounded-full">
                     {filteredFacilities.length}
                   </span>
                 </div>
               </div>
               
-              <div className="space-y-1 max-h-32 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
-                {filteredFacilities.slice(0, 3).map((facility, index) => {
+              <div className="space-y-2 max-h-48 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+                {filteredFacilities.slice(0, 4).map((facility, index) => {
                   const markerColor = markerColors[index % markerColors.length];
                   return (
-                    <div key={facility.id} className="flex items-start gap-2 p-1 rounded hover:bg-gray-50 transition-colors">
+                    <div key={facility.id} className="flex items-start gap-3 p-2 rounded-lg hover:bg-gray-50 transition-colors">
                       <div 
-                        className="h-3 w-3 mt-0.5 rounded-full flex-shrink-0 border border-white shadow-sm"
+                        className="h-4 w-4 mt-1 rounded-full flex-shrink-0 border-2 border-white shadow-md"
                         style={{ backgroundColor: markerColor }}
                       />
                       <div className="min-w-0 flex-1">
-                        <p className="text-xs font-medium text-gray-900 truncate">{facility.name}</p>
+                        <p className="text-sm font-semibold text-gray-900 truncate">{facility.name}</p>
+                        <p className="text-xs text-gray-600 truncate">{facility.address.split(',')[0]}</p>
                       </div>
                     </div>
                   );
                 })}
-                {filteredFacilities.length > 3 && (
-                  <p className="text-xs text-gray-500 text-center pt-1">
-                    +{filteredFacilities.length - 3} flere
+                {filteredFacilities.length > 4 && (
+                  <p className="text-sm text-gray-500 text-center pt-2 font-medium">
+                    +{filteredFacilities.length - 4} flere lokaler
                   </p>
                 )}
               </div>
