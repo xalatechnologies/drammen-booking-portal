@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { format, addDays, startOfWeek, isBefore, startOfDay } from "date-fns";
 import { Users, DollarSign } from "lucide-react";
@@ -224,38 +223,46 @@ export function AvailabilityTab({
     </div>
   );
 
+  // Check if we should show tabs or just render a single zone
+  const shouldShowTabs = zones.length > 1;
+
   return (
     <div className="space-y-6 font-inter">
-      {/* Enhanced Zone Tabs */}
-      <Tabs defaultValue={zones[0]?.id} className="w-full">
-        <TabsList className="grid w-full grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1 h-auto p-1 bg-gray-100 rounded-lg">
-          {zones.map((zone) => (
-            <TabsTrigger 
-              key={zone.id} 
-              value={zone.id}
-              className="flex flex-col items-center p-3 h-auto data-[state=active]:bg-[#1e3a8a] data-[state=active]:text-white hover:bg-[#1e40af] hover:text-white transition-colors rounded-md font-inter"
-            >
-              <span className="font-medium text-base">{zone.name}</span>
-              <div className="flex items-center gap-4 mt-2 text-sm opacity-75">
-                <div className="flex items-center gap-1">
-                  <Users className="h-3 w-3" />
-                  <span>{zone.capacity}</span>
+      {shouldShowTabs ? (
+        /* Enhanced Zone Tabs for multiple zones */
+        <Tabs defaultValue={zones[0]?.id} className="w-full">
+          <TabsList className="grid w-full grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1 h-auto p-1 bg-gray-100 rounded-lg">
+            {zones.map((zone) => (
+              <TabsTrigger 
+                key={zone.id} 
+                value={zone.id}
+                className="flex flex-col items-center p-3 h-auto data-[state=active]:bg-[#1e3a8a] data-[state=active]:text-white hover:bg-[#1e40af] hover:text-white transition-colors rounded-md font-inter"
+              >
+                <span className="font-medium text-base">{zone.name}</span>
+                <div className="flex items-center gap-4 mt-2 text-sm opacity-75">
+                  <div className="flex items-center gap-1">
+                    <Users className="h-3 w-3" />
+                    <span>{zone.capacity}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <DollarSign className="h-3 w-3" />
+                    <span>{zone.pricePerHour}kr</span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-1">
-                  <DollarSign className="h-3 w-3" />
-                  <span>{zone.pricePerHour}kr</span>
-                </div>
-              </div>
-            </TabsTrigger>
-          ))}
-        </TabsList>
+              </TabsTrigger>
+            ))}
+          </TabsList>
 
-        {zones.map((zone) => (
-          <TabsContent key={zone.id} value={zone.id} className="mt-6">
-            {renderZoneCalendar(zone)}
-          </TabsContent>
-        ))}
-      </Tabs>
+          {zones.map((zone) => (
+            <TabsContent key={zone.id} value={zone.id} className="mt-6">
+              {renderZoneCalendar(zone)}
+            </TabsContent>
+          ))}
+        </Tabs>
+      ) : (
+        /* Single zone - no tabs needed */
+        zones.length > 0 && renderZoneCalendar(zones[0])
+      )}
 
       {/* Pattern Builder Modal */}
       {showPatternBuilder && (
