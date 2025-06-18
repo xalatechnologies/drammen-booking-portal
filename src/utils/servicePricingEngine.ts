@@ -1,4 +1,3 @@
-
 import { AdditionalService, ServicePricing } from '@/types/additionalServices';
 import { ActorType } from '@/types/pricing';
 import { ApiResponse } from '@/types/api';
@@ -24,7 +23,7 @@ export interface ServiceDiscount {
 }
 
 export interface ServiceSurcharge {
-  type: 'time-based' | 'capacity' | 'rush';
+  type: 'time-based' | 'capacity' | 'rush' | 'seasonal';
   description: string;
   amount: number;
   percentage: number;

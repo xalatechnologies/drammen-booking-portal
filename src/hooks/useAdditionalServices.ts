@@ -20,7 +20,7 @@ export function useAdditionalServices(facilityId: string, category?: ServiceCate
           { facilityId, isActive: true }
         );
         if (result.success) {
-          return result.data?.items || [];
+          return result.data?.data || [];
         }
         throw new Error(result.error?.message || 'Failed to fetch services');
       }

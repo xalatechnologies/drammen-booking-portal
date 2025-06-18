@@ -65,7 +65,7 @@ export class AdditionalServicesService {
       );
       
       if (result.success && result.data) {
-        return { success: true, data: result.data.items };
+        return { success: true, data: result.data.data };
       }
       
       return result as any;
@@ -201,7 +201,7 @@ export class AdditionalServicesService {
       
       if (result.success && result.data) {
         // Filter by popular services (mock implementation)
-        const popularServices = result.data.items.filter(service => 
+        const popularServices = result.data.data.filter(service => 
           service.metadata.tags.includes('popular') || 
           service.category === 'cleaning' || 
           service.category === 'equipment'
