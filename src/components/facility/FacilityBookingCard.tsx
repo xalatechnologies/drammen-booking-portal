@@ -35,29 +35,30 @@ export function FacilityBookingCard({ facility, onBookClick }: FacilityBookingCa
         <Button
           variant="ghost"
           size="sm"
-          className="flex items-center gap-2"
+          className="flex items-center gap-2 hover:bg-purple-50"
           onClick={() => setIsFavorited(!isFavorited)}
         >
-          <Heart className={`h-4 w-4 ${isFavorited ? 'fill-red-500 text-red-500' : ''}`} />
+          <Heart className={`h-4 w-4 ${isFavorited ? 'fill-red-500 text-red-500' : 'text-navy-500'}`} />
         </Button>
         <Button 
           variant="ghost" 
           size="sm"
+          className="hover:bg-purple-50"
           onClick={handleShare}
         >
-          <Share2 className="h-4 w-4" />
+          <Share2 className="h-4 w-4 text-navy-500" />
         </Button>
       </div>
 
       {/* Price Card */}
-      <Card className="mb-6 shadow-sm border-blue-100">
+      <Card className="mb-6 glass border-0 shadow-medium">
         <CardContent className="p-6">
           <div className="text-center mb-4">
-            <div className="text-3xl font-bold text-gray-900">{facility.pricePerHour} kr</div>
-            <div className="text-gray-500">per time</div>
+            <div className="text-3xl font-bold text-navy-900">{facility.pricePerHour} kr</div>
+            <div className="text-navy-500">per time</div>
           </div>
           
-          <div className="p-4 bg-green-50 rounded-lg mb-4 text-center">
+          <div className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg mb-4 text-center border border-green-100">
             <p className="text-green-800 text-sm">
               <CheckCircle className="inline h-4 w-4 mr-1" />
               Tilgjengelig for umiddelbar booking
@@ -65,7 +66,7 @@ export function FacilityBookingCard({ facility, onBookClick }: FacilityBookingCa
           </div>
 
           <Button 
-            className="w-full bg-[#1e3a8a] hover:bg-[#1e40af] text-white font-medium shadow-sm h-12"
+            className="w-full bg-gradient-primary hover:opacity-90 text-white font-medium shadow-medium h-12 transition-all duration-200"
             onClick={onBookClick}
           >
             Reserver nå
@@ -74,15 +75,15 @@ export function FacilityBookingCard({ facility, onBookClick }: FacilityBookingCa
       </Card>
       
       {/* Additional info cards */}
-      <Card className="mb-6 shadow-sm">
+      <Card className="mb-6 glass border-0 shadow-soft">
         <CardContent className="p-4">
           <div className="flex items-center gap-3">
             <div className="bg-amber-100 p-2 rounded-md">
               <Info className="h-5 w-5 text-amber-600" />
             </div>
             <div>
-              <h3 className="font-medium">Avbestilling</h3>
-              <p className="text-sm text-gray-600">
+              <h3 className="font-medium text-navy-900">Avbestilling</h3>
+              <p className="text-sm text-navy-600">
                 Gratis avbestilling inntil 48 timer før
               </p>
             </div>
@@ -90,15 +91,15 @@ export function FacilityBookingCard({ facility, onBookClick }: FacilityBookingCa
         </CardContent>
       </Card>
       
-      <Card className="shadow-sm">
+      <Card className="glass border-0 shadow-soft">
         <CardContent className="p-4">
           <div className="flex items-center gap-3">
-            <div className="bg-blue-100 p-2 rounded-md">
-              <Clock className="h-5 w-5 text-blue-600" />
+            <div className="bg-purple-100 p-2 rounded-md">
+              <Clock className="h-5 w-5 text-purple-600" />
             </div>
             <div>
-              <h3 className="font-medium">Åpningstider</h3>
-              <p className="text-sm text-gray-600">
+              <h3 className="font-medium text-navy-900">Åpningstider</h3>
+              <p className="text-sm text-navy-600">
                 {facility.openingHours}
               </p>
             </div>
