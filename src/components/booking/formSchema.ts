@@ -24,7 +24,7 @@ export const bookingFormSchema = z.object({
   contactEmail: z.string().email("Ugyldig e-postadresse").default(""),
   contactPhone: z.string().min(8, "Telefonnummer må være minst 8 siffer").default(""),
   organization: z.string().optional(),
-  specialServices: z.array(z.string()).optional()
+  specialServices: z.array(z.string()).optional().default([])
 });
 
 export type BookingFormValues = z.infer<typeof bookingFormSchema>;

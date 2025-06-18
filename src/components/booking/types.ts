@@ -75,9 +75,19 @@ export interface BookingData {
   customerType?: string;
   eventType?: string;
   ageGroup?: string;
+  selectedServices?: string[];
+  servicesPricing?: {
+    totalServicesCost: number;
+    serviceBreakdown: Array<{
+      serviceId: string;
+      serviceName: string;
+      quantity: number;
+      totalPrice: number;
+    }>;
+  };
 }
 
-export type BookingStep = 'details' | 'contact' | 'confirm';
+export type BookingStep = 'details' | 'services' | 'contact' | 'confirm';
 
 export interface BookingFormProps {
   form: UseFormReturn<any>;

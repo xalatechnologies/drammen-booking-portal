@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "@/components/ui/form";
 import { BookingDetailsStep } from "./steps/BookingDetailsStep";
 import { BookingContactStep } from "./steps/BookingContactStep";
+import { BookingServicesStep } from "./steps/BookingServicesStep";
 import { BookingConfirmStep } from "./steps/BookingConfirmStep";
 import { BookingFormNav } from "./BookingFormNav";
 import { CollapsibleFormStepper } from "./CollapsibleFormStepper";
@@ -36,8 +37,13 @@ export function EnhancedBookingForm({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
 
-  const steps: BookingStep[] = ['details', 'contact', 'confirm'];
-  const stepTitles = ["Reservasjonsdetaljer", "Kontaktinformasjon", "Gjennomgå og bekreft"];
+  const steps: BookingStep[] = ['details', 'services', 'contact', 'confirm'];
+  const stepTitles = [
+    "Reservasjonsdetaljer", 
+    "Ekstra tjenester", 
+    "Kontaktinformasjon", 
+    "Gjennomgå og bekreft"
+  ];
 
   const form = useForm<BookingFormValues>({
     resolver: zodResolver(bookingFormSchema),
@@ -72,11 +78,13 @@ export function EnhancedBookingForm({
 
   const getFieldsForStep = (step: number): (keyof BookingFormValues)[] => {
     switch (step) {
-      case 0:
+      case 0: // Details
         return ['bookingMode', 'customerType', 'date', 'timeSlot', 'zoneId', 'purpose', 'eventType', 'attendees', 'ageGroup'];
-      case 1:
+      case 1: // Services
+        return []; // Services are optional
+      case 2: // Contact
         return ['contactName', 'contactEmail', 'contactPhone'];
-      case 2:
+      case 3: // Confirm
         return [];
       default:
         return [];
@@ -154,8 +162,17 @@ export function EnhancedBookingForm({
       case 0:
         return <BookingDetailsStep form={form} facility={facility} />;
       case 1:
-        return <BookingContactStep form={form} />;
+        return (
+          <BookingServicesStep 
+            form={form} 
+            facilityId={facility.id || '1'}
+            actorType={watchedValues.customerType}
+            attendees={watchedValues.attendees}
+          />
+        );
       case 2:
+        return <BookingContactStep form={form} />;
+      case 3:
         return <BookingConfirmStep 
           facilityName={facility.name} 
           facilityId={facility.id}
