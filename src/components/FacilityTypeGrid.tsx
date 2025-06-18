@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { 
@@ -38,8 +37,7 @@ const FacilityTypeGrid = () => {
       city: "Sentrum",
       plant: "Planten",
       gym: "Treningssenter",
-      hall: "Hall",
-      kitchen: "Kjøkken"
+      hall: "Hall"
     },
     EN: {
       gymnasium: "Gymnasium",
@@ -58,8 +56,7 @@ const FacilityTypeGrid = () => {
       city: "City",
       plant: "Plant",
       gym: "Gym",
-      hall: "Hall",
-      kitchen: "Kitchen"
+      hall: "Hall"
     }
   };
 
