@@ -2,150 +2,97 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { FacilityCard } from "./facility/FacilityCard";
-import { mockFacilities } from "@/data/mockFacilities";
-
-// Define the facility type
-interface Facility {
-  id: number;
-  name: string;
-  address: string;
-  type: string;
-  image: string;
-  nextAvailable: string;
-  capacity: number;
-  accessibility: string[];
-  area: string;
-  suitableFor: string[];
-  equipment: string[];
-  openingHours: string;
-  description: string;
-  availableTimes?: {
-    date: Date;
-    slots: {
-      start: string;
-      end: string;
-      available: boolean;
-    }[];
-  }[];
-}
+import { useFacilities } from "@/hooks/useFacilities";
+import { FacilityFilters } from "@/types/facility";
+import { PaginationParams } from "@/types/api";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface FacilityGridProps {
-  date?: Date;
-  facilityType?: string;
-  location?: string;
-  accessibility?: string;
-  capacity?: number[];
-  searchTerm?: string;
+  pagination: PaginationParams;
+  filters: FacilityFilters;
 }
 
 const FacilityGrid: React.FC<FacilityGridProps> = ({
-  date,
-  facilityType,
-  location,
-  accessibility,
-  capacity,
-  searchTerm
+  pagination,
+  filters
 }) => {
   const navigate = useNavigate();
   
-  // Use centralized mock data
-  const facilities = mockFacilities;
-
-  // Debug all facilities to make sure they exist
-  console.log("All facilities:", facilities);
-  console.log("Search term:", searchTerm);
-  
-  // Apply search filter first if searchTerm exists
-  let searchFilteredFacilities = facilities;
-  if (searchTerm && searchTerm.trim() !== "") {
-    searchFilteredFacilities = facilities.filter(facility =>
-      facility.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      facility.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      facility.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      facility.area.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      facility.suitableFor.some(activity => activity.toLowerCase().includes(searchTerm.toLowerCase()))
-    );
-  }
-  
-  // Then apply other filters
-  const filteredFacilities = searchFilteredFacilities.filter(facility => {
-    // Don't filter at all if all filter criteria are empty or default
-    const hasActiveFilters = 
-      (facilityType && facilityType !== "" && facilityType !== "all") ||
-      (location && location !== "" && location !== "all") ||
-      (accessibility && accessibility !== "" && accessibility !== "all") ||
-      (capacity && Array.isArray(capacity) && capacity[0] > 0);
-    
-    // If no active filters, show all facilities
-    if (!hasActiveFilters) return true;
-    
-    // Otherwise apply filters when criteria is provided
-    let matchesCriteria = true;
-    
-    if (facilityType && facilityType !== "" && facilityType !== "all") {
-      matchesCriteria = matchesCriteria && 
-        facility.type.toLowerCase().includes(facilityType.toLowerCase().replace("-", " "));
-    }
-    
-    if (location && location !== "" && location !== "all") {
-      matchesCriteria = matchesCriteria && 
-        facility.address.toLowerCase().includes(location.toLowerCase().replace("-", " "));
-    }
-    
-    if (accessibility && accessibility !== "" && accessibility !== "all") {
-      matchesCriteria = matchesCriteria && 
-        facility.accessibility.includes(accessibility);
-    }
-    
-    if (capacity && Array.isArray(capacity) && capacity.length === 2 && capacity[0] > 0) {
-      matchesCriteria = matchesCriteria && 
-        (facility.capacity >= capacity[0] && facility.capacity <= capacity[1]);
-    }
-    
-    return matchesCriteria;
+  const { facilities, isLoading, error } = useFacilities({
+    pagination,
+    filters
   });
 
-  console.log("Filtered facilities:", filteredFacilities.length, "out of", facilities.length);
-  console.log("Filter values:", { facilityType, location, accessibility, capacity, searchTerm });
-  
-  // Show filtered facilities
-  const facilitiesToDisplay = filteredFacilities;
+  console.log("FacilityGrid - Facilities:", facilities.length);
+  console.log("FacilityGrid - Filters:", filters);
+  console.log("FacilityGrid - Pagination:", pagination);
   
   // Function to handle address click - navigate to map view with filters
   const handleAddressClick = (e: React.MouseEvent, facility: any) => {
-    e.stopPropagation(); // Prevent card click from triggering
-    // Navigate to map view with current filters and focus on this facility
+    e.stopPropagation();
     const searchParams = new URLSearchParams();
-    if (facilityType) searchParams.set('facilityType', facilityType);
-    if (location) searchParams.set('location', location);
-    if (accessibility) searchParams.set('accessibility', accessibility);
-    if (capacity && Array.isArray(capacity)) {
-      searchParams.set('capacity', capacity.join(','));
+    if (filters.facilityType) searchParams.set('facilityType', filters.facilityType);
+    if (filters.location) searchParams.set('location', filters.location);
+    if (filters.accessibility) searchParams.set('accessibility', filters.accessibility);
+    if (filters.capacity && Array.isArray(filters.capacity)) {
+      searchParams.set('capacity', filters.capacity.join(','));
     }
+    if (filters.searchTerm) searchParams.set('searchTerm', filters.searchTerm);
     searchParams.set('viewMode', 'map');
     searchParams.set('focusFacility', facility.id.toString());
     
     navigate(`/?${searchParams.toString()}`);
   };
   
-  return (
-    <div className="mb-8">
-      {facilitiesToDisplay.length === 0 ? (
-        <div className="text-center py-10 bg-gray-50 rounded-lg">
-          <h3 className="text-xl font-medium mb-2">Ingen lokaler funnet</h3>
-          <p className="text-gray-500">Prøv å endre søkekriteriene dine</p>
-        </div>
-      ) : (
+  if (isLoading) {
+    return (
+      <div className="mb-8">
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {facilitiesToDisplay.map(facility => (
-            <FacilityCard 
-              key={facility.id} 
-              facility={facility} 
-              onAddressClick={handleAddressClick}
-            />
+          {Array.from({ length: pagination.limit }).map((_, index) => (
+            <div key={index} className="space-y-4">
+              <Skeleton className="h-48 w-full rounded-lg" />
+              <Skeleton className="h-6 w-3/4" />
+              <Skeleton className="h-4 w-1/2" />
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-2/3" />
+              </div>
+            </div>
           ))}
         </div>
-      )}
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-10 bg-red-50 rounded-lg border border-red-200">
+        <h3 className="text-xl font-medium mb-2 text-red-800">Noe gikk galt</h3>
+        <p className="text-red-600">Kunne ikke laste inn lokaler. Prøv igjen senere.</p>
+      </div>
+    );
+  }
+
+  if (facilities.length === 0) {
+    return (
+      <div className="text-center py-10 bg-gray-50 rounded-lg">
+        <h3 className="text-xl font-medium mb-2">Ingen lokaler funnet</h3>
+        <p className="text-gray-500">Prøv å endre søkekriteriene dine</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        {facilities.map(facility => (
+          <FacilityCard 
+            key={facility.id} 
+            facility={facility} 
+            onAddressClick={handleAddressClick}
+          />
+        ))}
+      </div>
     </div>
   );
 };

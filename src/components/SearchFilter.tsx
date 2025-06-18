@@ -24,6 +24,8 @@ interface SearchFilterProps {
   setAccessibility: (accessibility: string) => void;
   capacity: number[];
   setCapacity: (capacity: number[]) => void;
+  searchTerm: string;
+  setSearchTerm: (term: string) => void;
 }
 
 const SearchFilter: React.FC<SearchFilterProps> = ({
@@ -39,8 +41,9 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
   setAccessibility,
   capacity,
   setCapacity,
+  searchTerm,
+  setSearchTerm,
 }) => {
-  const [searchTerm, setSearchTerm] = useState("");
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [showAdvanced, setShowAdvanced] = useState(false);
 

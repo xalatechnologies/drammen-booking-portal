@@ -1,83 +1,61 @@
 
 import React from "react";
-import FacilityListItem from "@/components/facility/FacilityListItem";
-import { mockFacilities } from "@/data/mockFacilities";
+import FacilityGrid from "./FacilityGrid";
+import FacilityListItem from "./facility/FacilityListItem";
+import PaginationControls from "./PaginationControls";
+import { useFacilities, useFacilitiesPagination } from "@/hooks/useFacilities";
+import { FacilityFilters } from "@/types/facility";
 
 interface FacilityListProps {
-  date?: Date;
-  facilityType?: string;
-  location?: string;
-  accessibility?: string;
-  capacity?: number[];
+  filters: FacilityFilters;
+  viewMode: "grid" | "list";
 }
 
 const FacilityList: React.FC<FacilityListProps> = ({
-  date,
-  facilityType,
-  location,
-  accessibility,
-  capacity
+  filters,
+  viewMode
 }) => {
-  // Use centralized mock data
-  const facilities = mockFacilities;
-
-  // Filtering logic - same as FacilityGrid
-  const filteredFacilities = facilities.filter(facility => {
-    const hasActiveFilters = 
-      (facilityType && facilityType !== "") ||
-      (location && location !== "") ||
-      (accessibility && accessibility !== "") ||
-      (capacity && Array.isArray(capacity) && capacity[0] > 0);
-    
-    if (!hasActiveFilters) return true;
-    
-    let matchesCriteria = true;
-    
-    if (facilityType && facilityType !== "") {
-      matchesCriteria = matchesCriteria && 
-        facility.type.toLowerCase().includes(facilityType.toLowerCase().replace("-", " "));
-    }
-    
-    if (location && location !== "") {
-      matchesCriteria = matchesCriteria && 
-        facility.address.toLowerCase().includes(location.toLowerCase().replace("-", " "));
-    }
-    
-    if (accessibility && accessibility !== "") {
-      matchesCriteria = matchesCriteria && 
-        facility.accessibility.includes(accessibility);
-    }
-    
-    if (capacity && Array.isArray(capacity) && capacity.length === 2 && capacity[0] > 0) {
-      matchesCriteria = matchesCriteria && 
-        (facility.capacity >= capacity[0] && facility.capacity <= capacity[1]);
-    }
-    
-    return matchesCriteria;
+  const { pagination, goToPage } = useFacilitiesPagination(1, 9);
+  const { facilities, pagination: paginationInfo, isLoading, error } = useFacilities({
+    pagination,
+    filters
   });
 
-  const facilitiesToDisplay = filteredFacilities;
-
   return (
-    <div className="mb-8">
-      {facilitiesToDisplay.length === 0 ? (
-        <div className="text-center py-10 bg-gray-50 rounded-lg">
-          <h3 className="text-xl font-medium mb-2">Ingen lokaler funnet</h3>
-          <p className="text-gray-500">Prøv å endre søkekriteriene dine</p>
-        </div>
+    <div className="space-y-6">
+      {viewMode === "grid" ? (
+        <FacilityGrid pagination={pagination} filters={filters} />
       ) : (
         <div className="space-y-4">
-          {facilitiesToDisplay.map(facility => (
-            <FacilityListItem
-              key={facility.id}
-              facility={facility}
-              facilityType={facilityType}
-              location={location}
-              accessibility={accessibility}
-              capacity={capacity}
-            />
-          ))}
+          {isLoading ? (
+            <div>Loading...</div>
+          ) : error ? (
+            <div>Error loading facilities</div>
+          ) : facilities.length === 0 ? (
+            <div className="text-center py-10 bg-gray-50 rounded-lg">
+              <h3 className="text-xl font-medium mb-2">Ingen lokaler funnet</h3>
+              <p className="text-gray-500">Prøv å endre søkekriteriene dine</p>
+            </div>
+          ) : (
+            facilities.map(facility => (
+              <FacilityListItem 
+                key={facility.id} 
+                facility={facility}
+                facilityType={filters.facilityType}
+                location={filters.location}
+                accessibility={filters.accessibility}
+                capacity={filters.capacity}
+              />
+            ))
+          )}
         </div>
+      )}
+
+      {paginationInfo && (
+        <PaginationControls 
+          pagination={paginationInfo}
+          onPageChange={goToPage}
+        />
       )}
     </div>
   );
