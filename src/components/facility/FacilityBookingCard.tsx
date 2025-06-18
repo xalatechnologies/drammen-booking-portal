@@ -51,7 +51,7 @@ export function FacilityBookingCard({ facility, onBookClick }: FacilityBookingCa
       </div>
 
       {/* Price Card */}
-      <Card className="mb-6 glass border-0 shadow-medium">
+      <Card className="mb-6 glass border-0 shadow-medium bg-white/95 backdrop-blur-lg">
         <CardContent className="p-6">
           <div className="text-center mb-4">
             <div className="text-3xl font-bold text-navy-900">{facility.pricePerHour} kr</div>
@@ -66,7 +66,7 @@ export function FacilityBookingCard({ facility, onBookClick }: FacilityBookingCa
           </div>
 
           <Button 
-            className="w-full bg-gradient-primary hover:opacity-90 text-white font-medium shadow-medium h-12 transition-all duration-200"
+            className="w-full bg-gradient-to-r from-purple-600 to-navy-600 hover:from-purple-700 hover:to-navy-700 text-white font-medium shadow-medium h-12 transition-all duration-200"
             onClick={onBookClick}
           >
             Reserver nå
@@ -75,11 +75,11 @@ export function FacilityBookingCard({ facility, onBookClick }: FacilityBookingCa
       </Card>
       
       {/* Additional info cards */}
-      <Card className="mb-6 glass border-0 shadow-soft">
+      <Card className="mb-6 glass border-0 shadow-soft bg-white/90 backdrop-blur-sm">
         <CardContent className="p-4">
           <div className="flex items-center gap-3">
-            <div className="bg-amber-100 p-2 rounded-md">
-              <Info className="h-5 w-5 text-amber-600" />
+            <div className="bg-orange-100 p-2 rounded-md">
+              <Info className="h-5 w-5 text-orange-600" />
             </div>
             <div>
               <h3 className="font-medium text-navy-900">Avbestilling</h3>
@@ -91,7 +91,7 @@ export function FacilityBookingCard({ facility, onBookClick }: FacilityBookingCa
         </CardContent>
       </Card>
       
-      <Card className="glass border-0 shadow-soft">
+      <Card className="glass border-0 shadow-soft bg-white/90 backdrop-blur-sm">
         <CardContent className="p-4">
           <div className="flex items-center gap-3">
             <div className="bg-purple-100 p-2 rounded-md">

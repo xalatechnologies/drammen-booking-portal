@@ -44,10 +44,10 @@ export function FacilityCardTabs({ facility }: FacilityCardTabsProps) {
   return (
     <div onClick={handleTabsClick}>
       <Tabs defaultValue="overview" className="flex-grow">
-        <TabsList className="grid w-full grid-cols-3 mb-3 h-10 glass border-white/20">
-          <TabsTrigger value="overview" className="text-sm py-2 data-[state=active]:bg-gradient-primary data-[state=active]:text-white">Oversikt</TabsTrigger>
-          <TabsTrigger value="details" className="text-sm py-2 data-[state=active]:bg-gradient-primary data-[state=active]:text-white">Detaljer</TabsTrigger>
-          <TabsTrigger value="availability" className="text-sm py-2 data-[state=active]:bg-gradient-primary data-[state=active]:text-white">Ledighet</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-3 mb-3 h-10 glass border-white/30 bg-navy-50/50">
+          <TabsTrigger value="overview" className="text-sm py-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-navy-600 data-[state=active]:text-white">Oversikt</TabsTrigger>
+          <TabsTrigger value="details" className="text-sm py-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-navy-600 data-[state=active]:text-white">Detaljer</TabsTrigger>
+          <TabsTrigger value="availability" className="text-sm py-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-navy-600 data-[state=active]:text-white">Ledighet</TabsTrigger>
         </TabsList>
         
         <TabsContent value="overview" className="space-y-3 mt-0">
@@ -112,14 +112,14 @@ export function FacilityCardTabs({ facility }: FacilityCardTabsProps) {
         </TabsContent>
         
         <TabsContent value="availability" className="mt-0">
-          <div className="glass p-3 rounded-lg border border-white/20">
+          <div className="glass p-3 rounded-lg border border-white/30 bg-navy-50/30">
             <h4 className="text-base font-medium mb-2 flex items-center gap-1.5">
               <Calendar className="h-5 w-5 text-purple-600" />
               <span>Tilgjengelighet</span>
             </h4>
             
             {facility.availableTimes && facility.availableTimes[0]?.slots.map((slot, i) => (
-              <div key={i} className="flex justify-between items-center py-1 border-b last:border-0 border-white/10">
+              <div key={i} className="flex justify-between items-center py-1 border-b last:border-0 border-white/20">
                 <span className="text-sm">
                   {format(facility.availableTimes![0].date, "EEE d. MMM", { locale: nb })} • {slot.start}-{slot.end}
                 </span>
