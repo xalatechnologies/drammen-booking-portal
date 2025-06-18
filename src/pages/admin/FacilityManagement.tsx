@@ -1,5 +1,11 @@
-
 import React, { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -8,6 +14,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Tabs,
   TabsContent,
@@ -19,6 +33,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { Label } from "@/components/ui/label";
 import { Filter, Plus, Search, MoreHorizontal, MapPin, Clock } from "lucide-react";
 import {
   Pagination,
@@ -28,20 +43,6 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-
-import { Container, Grid } from "@/components/common/Layout";
-import { Heading1, Heading2, BodyMedium, BodySmall } from "@/components/common/Typography";
-import { ActionButton } from "@/components/common/ActionButton";
-import { InputField } from "@/components/common/FormField";
-import { StatusBadge } from "@/components/common/StatusBadge";
-import { AdminCard } from "@/components/admin/AdminCard";
-import { EmptyState } from "@/components/common/EmptyState";
 
 // Define facility type
 interface Facility {
@@ -111,6 +112,26 @@ const FacilityManagementPage = () => {
       lastBooking: "2025-05-10",
       nextAvailable: "Søndag, 12:00",
     },
+    {
+      id: 6,
+      name: "Åssiden Fotballhall",
+      address: "Buskerudveien 54, 3024 Drammen",
+      type: "Fotballhall",
+      status: "active",
+      capacity: 300,
+      lastBooking: "2025-05-19",
+      nextAvailable: "Lørdag, 18:30",
+    },
+    {
+      id: 7,
+      name: "Drammen Bibliotek - Møterom",
+      address: "Grønland 32, 3045 Drammen",
+      type: "Møterom",
+      status: "active",
+      capacity: 40,
+      lastBooking: "2025-05-21",
+      nextAvailable: "I morgen, 14:00",
+    },
   ];
 
   // Filter facilities based on search query and active filter
@@ -135,264 +156,454 @@ const FacilityManagementPage = () => {
     inactive: facilities.filter(f => f.status === "inactive").length,
   };
 
-  const getStatusBadgeType = (status: string) => {
-    switch (status) {
-      case "active": return "success";
-      case "maintenance": return "warning";
-      case "inactive": return "error";
-      default: return "info";
-    }
-  };
-
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case "active": return "Aktiv";
-      case "maintenance": return "Vedlikehold";
-      case "inactive": return "Inaktiv";
-      default: return status;
-    }
-  };
-
   return (
-    <Container className="space-y-spacing-xl">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-spacing-xl">
-        <div>
-          <Heading1 className="mb-spacing-md text-text-primary font-bold tracking-tight">
-            Lokaler
-          </Heading1>
-          <BodyMedium className="text-text-secondary leading-relaxed">
-            Administrer og overvåk alle kommunale lokaler
-          </BodyMedium>
-        </div>
-        <ActionButton 
-          variant="primary"
-          icon={<Plus className="h-5 w-5" />}
-          className="shadow-md hover:shadow-lg transition-all duration-200"
-        >
-          Legg til lokale
-        </ActionButton>
-      </div>
+    <div className="space-y-8 max-w-full" role="main" aria-labelledby="page-title">
+      {/* Skip to content link for screen readers */}
+      <a 
+        href="#main-content" 
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-blue-600 text-white px-4 py-2 rounded-md z-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+      >
+        Hopp til hovedinnhold
+      </a>
 
-      <Grid cols={4} gap="lg">
-        <AdminCard title="Totalt antall lokaler" className="text-center">
-          <div className="space-y-spacing-sm">
-            <div className="text-4xl font-bold text-text-primary">{stats.total}</div>
-            <BodySmall className="text-text-secondary">Alle typer lokaler</BodySmall>
-          </div>
-        </AdminCard>
-        
-        <AdminCard title="Aktive lokaler" className="text-center">
-          <div className="space-y-spacing-sm">
-            <div className="text-4xl font-bold text-text-primary">{stats.active}</div>
-            <BodySmall className="text-text-secondary">Tilgjengelig for booking</BodySmall>
-          </div>
-        </AdminCard>
-        
-        <AdminCard title="Under vedlikehold" className="text-center">
-          <div className="space-y-spacing-sm">
-            <div className="text-4xl font-bold text-text-primary">{stats.maintenance}</div>
-            <BodySmall className="text-text-secondary">Midlertidig utilgjengelig</BodySmall>
-          </div>
-        </AdminCard>
-        
-        <AdminCard title="Inaktive lokaler" className="text-center">
-          <div className="space-y-spacing-sm">
-            <div className="text-4xl font-bold text-text-primary">{stats.inactive}</div>
-            <BodySmall className="text-text-secondary">Ikke tilgjengelig</BodySmall>
-          </div>
-        </AdminCard>
-      </Grid>
+      {/* Header Section */}
+      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
+        <div>
+          <h1 id="page-title" className="text-4xl font-bold tracking-tight text-gray-900 mb-3">
+            Lokaler
+          </h1>
+          <p className="text-lg text-gray-700 leading-relaxed">
+            Administrer og overvåk alle kommunale lokaler
+          </p>
+        </div>
+        <Button 
+          className="gap-3 text-base px-6 py-3 min-h-[48px] shadow-sm focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          aria-label="Legg til nytt lokale"
+        >
+          <Plus className="h-5 w-5" aria-hidden="true" />
+          <span>Legg til lokale</span>
+        </Button>
+      </header>
+
+      {/* Statistics Cards - All using same neutral styling */}
+      <section aria-labelledby="statistics-heading">
+        <h2 id="statistics-heading" className="sr-only">Statistikk over lokaler</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <Card className="bg-white shadow-sm border-gray-300 focus-within:ring-2 focus-within:ring-blue-500">
+            <CardContent className="p-8">
+              <div className="flex flex-col space-y-3">
+                <p className="text-base font-semibold text-gray-700">Totalt antall lokaler</p>
+                <p className="text-4xl font-bold text-gray-900" aria-label={`${stats.total} totalt antall lokaler`}>
+                  {stats.total}
+                </p>
+                <p className="text-sm text-gray-600">Alle typer lokaler</p>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-white shadow-sm border-gray-300 focus-within:ring-2 focus-within:ring-blue-500">
+            <CardContent className="p-8">
+              <div className="flex flex-col space-y-3">
+                <p className="text-base font-semibold text-gray-700">Aktive lokaler</p>
+                <p className="text-4xl font-bold text-gray-900" aria-label={`${stats.active} aktive lokaler`}>
+                  {stats.active}
+                </p>
+                <p className="text-sm text-gray-600">Tilgjengelig for booking</p>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-white shadow-sm border-gray-300 focus-within:ring-2 focus-within:ring-blue-500">
+            <CardContent className="p-8">
+              <div className="flex flex-col space-y-3">
+                <p className="text-base font-semibold text-gray-700">Under vedlikehold</p>
+                <p className="text-4xl font-bold text-gray-900" aria-label={`${stats.maintenance} lokaler under vedlikehold`}>
+                  {stats.maintenance}
+                </p>
+                <p className="text-sm text-gray-600">Midlertidig utilgjengelig</p>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-white shadow-sm border-gray-300 focus-within:ring-2 focus-within:ring-blue-500">
+            <CardContent className="p-8">
+              <div className="flex flex-col space-y-3">
+                <p className="text-base font-semibold text-gray-700">Inaktive lokaler</p>
+                <p className="text-4xl font-bold text-gray-900" aria-label={`${stats.inactive} inaktive lokaler`}>
+                  {stats.inactive}
+                </p>
+                <p className="text-sm text-gray-600">Ikke tilgjengelig</p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
 
       <Tabs defaultValue="liste" className="w-full">
-        <TabsList className="mb-spacing-xl surface-secondary border border-primary rounded-lg">
+        <TabsList className="mb-8 bg-gray-100 p-2 rounded-lg" role="tablist" aria-label="Velg visningstype">
           <TabsTrigger 
             value="liste" 
-            className="px-spacing-xl py-spacing-md text-text-primary hover:surface-tertiary rounded-lg transition-all duration-200"
+            className="px-8 py-3 rounded-md text-base font-medium min-h-[48px]"
+            role="tab"
+            aria-controls="liste-panel"
+            aria-selected="true"
           >
             Liste
           </TabsTrigger>
           <TabsTrigger 
             value="kart" 
-            className="px-spacing-xl py-spacing-md text-text-primary hover:surface-tertiary rounded-lg transition-all duration-200"
+            className="px-8 py-3 rounded-md text-base font-medium min-h-[48px]"
+            role="tab"
+            aria-controls="kart-panel"
+            aria-selected="false"
           >
             Kart
           </TabsTrigger>
         </TabsList>
         
-        <TabsContent value="liste" className="space-y-spacing-xl">
-          <AdminCard title="Lokalsøk & Filtre" description="Søk etter lokaler etter navn, type, eller adresse">
-            <div className="flex flex-col sm:flex-row gap-spacing-xl mb-spacing-xl">
-              <InputField
-                placeholder="Søk etter lokaler..."
-                value={searchQuery}
-                onChange={setSearchQuery}
-                className="flex-grow"
-              />
-              
-              <Popover>
-                <PopoverTrigger asChild>
-                  <ActionButton 
-                    variant="secondary"
-                    icon={<Filter className="h-5 w-5" />}
-                    className="focus-ring"
-                  >
-                    Filter
-                  </ActionButton>
-                </PopoverTrigger>
-                <PopoverContent className="w-80 surface-primary border-primary shadow-lg rounded-xl">
-                  <div className="space-y-spacing-xl">
-                    <Heading2 className="text-lg font-semibold text-text-primary">Filtrer etter status</Heading2>
-                    <div className="space-y-spacing-lg">
-                      {[
-                        { id: "all", label: "Alle" },
-                        { id: "active", label: "Aktive" },
-                        { id: "maintenance", label: "Under vedlikehold" },
-                        { id: "inactive", label: "Inaktive" },
-                      ].map((filter) => (
-                        <div key={filter.id} className="flex items-center space-x-spacing-lg">
+        <TabsContent value="liste" className="space-y-8" id="liste-panel" role="tabpanel">
+          <Card className="shadow-sm border-gray-300">
+            <CardHeader className="bg-gray-50 border-b border-gray-300 rounded-t-lg pb-6">
+              <CardTitle className="text-2xl font-semibold text-gray-900">
+                Lokalsøk & Filtre
+              </CardTitle>
+              <CardDescription className="text-base text-gray-700 leading-relaxed">
+                Søk etter lokaler etter navn, type, eller adresse
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="p-8">
+              <div className="flex flex-col sm:flex-row gap-6 mb-8">
+                <div className="relative flex-grow">
+                  <Label htmlFor="facility-search" className="sr-only">
+                    Søk etter lokaler
+                  </Label>
+                  <Search 
+                    className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500" 
+                    aria-hidden="true" 
+                  />
+                  <Input
+                    id="facility-search"
+                    type="search"
+                    placeholder="Søk etter lokaler..."
+                    className="pl-12 h-12 text-base border-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    aria-describedby="search-help"
+                  />
+                  <div id="search-help" className="sr-only">
+                    Skriv inn navn, type eller adresse for å søke etter lokaler
+                  </div>
+                </div>
+                
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button 
+                      variant="outline" 
+                      className="gap-3 h-12 px-6 text-base border-gray-400 hover:border-gray-500 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 min-w-[120px]"
+                      aria-label="Åpne filtermeny"
+                      aria-haspopup="true"
+                      aria-expanded="false"
+                    >
+                      <Filter className="h-5 w-5" aria-hidden="true" />
+                      <span>Filter</span>
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[280px] p-6 shadow-lg border-gray-300" role="dialog" aria-label="Filtreringsalternativer">
+                    <div className="space-y-6">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                        Filtrer etter status
+                      </h3>
+                      <fieldset className="space-y-4" role="radiogroup" aria-labelledby="filter-legend">
+                        <legend id="filter-legend" className="sr-only">Velg status filter</legend>
+                        
+                        <div className="flex items-center space-x-4">
                           <input
                             type="radio"
-                            id={filter.id}
+                            id="all"
                             name="status"
-                            checked={activeFilter === filter.id}
-                            onChange={() => setActiveFilter(filter.id)}
-                            className="w-4 h-4 text-brand-primary focus:ring-brand-primary focus:ring-2 focus-ring"
+                            checked={activeFilter === "all"}
+                            onChange={() => setActiveFilter("all")}
+                            className="w-4 h-4 text-blue-600 focus:ring-blue-500 focus:ring-2 focus:ring-offset-2"
+                            aria-describedby="all-desc"
                           />
-                          <label htmlFor={filter.id} className="body-primary cursor-pointer font-medium text-text-primary">
-                            {filter.label}
-                          </label>
+                          <Label htmlFor="all" className="text-base font-medium cursor-pointer">
+                            Alle
+                          </Label>
+                          <span id="all-desc" className="sr-only">Vis alle lokaler uavhengig av status</span>
                         </div>
-                      ))}
+                        
+                        <div className="flex items-center space-x-4">
+                          <input
+                            type="radio"
+                            id="active"
+                            name="status"
+                            checked={activeFilter === "active"}
+                            onChange={() => setActiveFilter("active")}
+                            className="w-4 h-4 text-blue-600 focus:ring-blue-500 focus:ring-2 focus:ring-offset-2"
+                            aria-describedby="active-desc"
+                          />
+                          <Label htmlFor="active" className="text-base font-medium cursor-pointer">
+                            Aktive
+                          </Label>
+                          <span id="active-desc" className="sr-only">Vis kun aktive lokaler</span>
+                        </div>
+                        
+                        <div className="flex items-center space-x-4">
+                          <input
+                            type="radio"
+                            id="maintenance"
+                            name="status"
+                            checked={activeFilter === "maintenance"}
+                            onChange={() => setActiveFilter("maintenance")}
+                            className="w-4 h-4 text-blue-600 focus:ring-blue-500 focus:ring-2 focus:ring-offset-2"
+                            aria-describedby="maintenance-desc"
+                          />
+                          <Label htmlFor="maintenance" className="text-base font-medium cursor-pointer">
+                            Under vedlikehold
+                          </Label>
+                          <span id="maintenance-desc" className="sr-only">Vis kun lokaler under vedlikehold</span>
+                        </div>
+                        
+                        <div className="flex items-center space-x-4">
+                          <input
+                            type="radio"
+                            id="inactive"
+                            name="status"
+                            checked={activeFilter === "inactive"}
+                            onChange={() => setActiveFilter("inactive")}
+                            className="w-4 h-4 text-blue-600 focus:ring-blue-500 focus:ring-2 focus:ring-offset-2"
+                            aria-describedby="inactive-desc"
+                          />
+                          <Label htmlFor="inactive" className="text-base font-medium cursor-pointer">
+                            Inaktive
+                          </Label>
+                          <span id="inactive-desc" className="sr-only">Vis kun inaktive lokaler</span>
+                        </div>
+                      </fieldset>
                     </div>
-                  </div>
-                </PopoverContent>
-              </Popover>
-            </div>
+                  </PopoverContent>
+                </Popover>
+              </div>
 
-            <div className="rounded-xl border border-primary overflow-hidden">
-              <Table>
-                <TableHeader className="surface-secondary">
-                  <TableRow className="border-primary">
-                    <TableHead className="heading-secondary py-spacing-xl font-semibold text-text-primary">Lokale</TableHead>
-                    <TableHead className="heading-secondary py-spacing-xl font-semibold text-text-primary">Type</TableHead>
-                    <TableHead className="heading-secondary py-spacing-xl font-semibold text-text-primary">Status</TableHead>
-                    <TableHead className="heading-secondary py-spacing-xl font-semibold text-text-primary">Kapasitet</TableHead>
-                    <TableHead className="heading-secondary py-spacing-xl font-semibold text-text-primary">Neste ledig</TableHead>
-                    <TableHead className="heading-secondary py-spacing-xl sr-only">Handlinger</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredFacilities.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={6} className="py-spacing-3xl">
-                        <EmptyState 
-                          icon={<Search className="h-12 w-12" />}
-                          title="Ingen lokaler funnet"
-                          description="Prøv å endre søkekriteriene eller filteret"
-                        />
-                      </TableCell>
+              <div className="rounded-lg border-2 border-gray-300 overflow-hidden shadow-sm" id="main-content">
+                <Table role="table" aria-label="Lokaleliste">
+                  <TableHeader className="bg-gray-50">
+                    <TableRow className="border-gray-300">
+                      <TableHead className="font-semibold text-gray-900 py-6 text-base" scope="col">
+                        Lokale
+                      </TableHead>
+                      <TableHead className="font-semibold text-gray-900 py-6 text-base" scope="col">
+                        Type
+                      </TableHead>
+                      <TableHead className="font-semibold text-gray-900 py-6 text-base" scope="col">
+                        Status
+                      </TableHead>
+                      <TableHead className="font-semibold text-gray-900 py-6 text-base" scope="col">
+                        Kapasitet
+                      </TableHead>
+                      <TableHead className="font-semibold text-gray-900 py-6 text-base" scope="col">
+                        Neste ledig
+                      </TableHead>
+                      <TableHead className="font-semibold text-gray-900 py-6 text-base sr-only" scope="col">
+                        Handlinger
+                      </TableHead>
                     </TableRow>
-                  ) : (
-                    filteredFacilities.map((facility) => (
-                      <TableRow 
-                        key={facility.id} 
-                        className="border-primary hover:surface-secondary transition-colors"
-                      >
-                        <TableCell className="py-spacing-xl">
-                          <div>
-                            <BodyMedium className="font-semibold mb-spacing-sm text-text-primary">{facility.name}</BodyMedium>
-                            <div className="flex items-center text-text-secondary">
-                              <MapPin className="h-4 w-4 mr-spacing-sm flex-shrink-0" />
-                              <BodySmall>{facility.address}</BodySmall>
-                            </div>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredFacilities.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={6} className="text-center py-12 text-gray-600">
+                          <div className="flex flex-col items-center space-y-4">
+                            <Search className="h-12 w-12 text-gray-400" aria-hidden="true" />
+                            <p className="text-lg font-medium">Ingen lokaler funnet</p>
+                            <p className="text-base text-gray-500">Prøv å endre søkekriteriene eller filteret</p>
                           </div>
-                        </TableCell>
-                        <TableCell className="py-spacing-xl">
-                          <StatusBadge status="info" showIcon={false} className="bg-blue-100 text-blue-900 border-blue-200">
-                            {facility.type}
-                          </StatusBadge>
-                        </TableCell>
-                        <TableCell className="py-spacing-xl">
-                          <StatusBadge status={getStatusBadgeType(facility.status) as any}>
-                            {getStatusText(facility.status)}
-                          </StatusBadge>
-                        </TableCell>
-                        <TableCell className="py-spacing-xl">
-                          <BodyMedium className="font-semibold text-text-primary">{facility.capacity} personer</BodyMedium>
-                        </TableCell>
-                        <TableCell className="py-spacing-xl">
-                          <div className="flex items-center text-brand-primary font-semibold">
-                            <Clock className="h-4 w-4 mr-spacing-sm flex-shrink-0" />
-                            <BodySmall>{facility.nextAvailable}</BodySmall>
-                          </div>
-                        </TableCell>
-                        <TableCell className="py-spacing-xl">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <ActionButton 
-                                variant="ghost" 
-                                size="sm"
-                                icon={<MoreHorizontal className="h-5 w-5" />}
-                                className="h-10 w-10 p-0 focus-ring"
-                              >
-                                Meny
-                              </ActionButton>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="surface-primary border-primary shadow-lg rounded-xl">
-                              <DropdownMenuItem className="hover:surface-secondary rounded-lg">Se detaljer</DropdownMenuItem>
-                              <DropdownMenuItem className="hover:surface-secondary rounded-lg">Rediger</DropdownMenuItem>
-                              <DropdownMenuItem className="hover:surface-secondary rounded-lg">Endre status</DropdownMenuItem>
-                              <DropdownMenuItem className="text-semantic-error hover:bg-red-50 rounded-lg">Slett</DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
                         </TableCell>
                       </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
-            </div>
+                    ) : (
+                      filteredFacilities.map((facility) => (
+                        <TableRow 
+                          key={facility.id} 
+                          className="border-gray-200 hover:bg-gray-50 transition-colors focus-within:bg-gray-50"
+                        >
+                          <TableCell className="py-6">
+                            <div>
+                              <div className="font-semibold text-gray-900 mb-2 text-base leading-relaxed">
+                                {facility.name}
+                              </div>
+                              <div className="text-base text-gray-600 flex items-center leading-relaxed">
+                                <MapPin className="h-4 w-4 mr-2 text-gray-500 flex-shrink-0" aria-hidden="true" />
+                                <span>{facility.address}</span>
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell className="py-6">
+                            <span className="bg-blue-100 text-blue-900 px-3 py-2 rounded-md text-sm font-semibold border border-blue-200">
+                              {facility.type}
+                            </span>
+                          </TableCell>
+                          <TableCell className="py-6">
+                            <div className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold border-2
+                              ${facility.status === 'active' ? 'bg-green-100 text-green-900 border-green-300' : 
+                                facility.status === 'maintenance' ? 'bg-amber-100 text-amber-900 border-amber-300' : 
+                                'bg-red-100 text-red-900 border-red-300'}`}>
+                              <span className={`w-2 h-2 rounded-full mr-2 
+                                ${facility.status === 'active' ? 'bg-green-600' : 
+                                  facility.status === 'maintenance' ? 'bg-amber-600' : 
+                                  'bg-red-600'}`} 
+                                aria-hidden="true"
+                              ></span>
+                              {facility.status === 'active' ? 'Aktiv' : 
+                                facility.status === 'maintenance' ? 'Vedlikehold' : 
+                                'Inaktiv'}
+                            </div>
+                          </TableCell>
+                          <TableCell className="py-6 font-semibold text-gray-900 text-base">
+                            {facility.capacity} personer
+                          </TableCell>
+                          <TableCell className="py-6">
+                            <div className="flex items-center text-base text-blue-700 font-semibold">
+                              <Clock className="h-4 w-4 mr-2 flex-shrink-0" aria-hidden="true" />
+                              <span>{facility.nextAvailable}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell className="py-6">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm" 
+                                  className="h-10 w-10 p-0 hover:bg-gray-200 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" 
+                                  aria-label={`Handlinger for ${facility.name}`}
+                                  aria-haspopup="true"
+                                >
+                                  <MoreHorizontal className="h-5 w-5" aria-hidden="true" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent 
+                                align="end" 
+                                className="w-52 shadow-lg border-gray-300"
+                                role="menu"
+                                aria-label="Handlingsmeny"
+                              >
+                                <DropdownMenuItem 
+                                  className="py-3 text-base cursor-pointer focus:bg-gray-100"
+                                  role="menuitem"
+                                >
+                                  Se detaljer
+                                </DropdownMenuItem>
+                                <DropdownMenuItem 
+                                  className="py-3 text-base cursor-pointer focus:bg-gray-100"
+                                  role="menuitem"
+                                >
+                                  Rediger
+                                </DropdownMenuItem>
+                                <DropdownMenuItem 
+                                  className="py-3 text-base cursor-pointer focus:bg-gray-100"
+                                  role="menuitem"
+                                >
+                                  Endre status
+                                </DropdownMenuItem>
+                                <DropdownMenuItem 
+                                  className="text-red-700 py-3 text-base cursor-pointer focus:bg-red-50"
+                                  role="menuitem"
+                                >
+                                  Slett
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
 
-            <div className="mt-spacing-xl flex justify-center">
-              <Pagination>
-                <PaginationContent>
-                  <PaginationItem>
-                    <PaginationPrevious href="#" className="focus-ring" />
-                  </PaginationItem>
-                  <PaginationItem>
-                    <PaginationLink href="#" isActive className="focus-ring">1</PaginationLink>
-                  </PaginationItem>
-                  <PaginationItem>
-                    <PaginationLink href="#" className="focus-ring">2</PaginationLink>
-                  </PaginationItem>
-                  <PaginationItem>
-                    <PaginationLink href="#" className="focus-ring">3</PaginationLink>
-                  </PaginationItem>
-                  <PaginationItem>
-                    <PaginationNext href="#" className="focus-ring" />
-                  </PaginationItem>
-                </PaginationContent>
-              </Pagination>
-            </div>
-          </AdminCard>
+              <nav className="mt-8 flex justify-center" aria-label="Paginering for lokaleliste">
+                <Pagination>
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious 
+                        href="#" 
+                        className="text-base px-4 py-2 min-h-[44px] focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                        aria-label="Gå til forrige side"
+                      />
+                    </PaginationItem>
+                    <PaginationItem>
+                      <PaginationLink 
+                        href="#" 
+                        isActive 
+                        className="text-base px-4 py-2 min-h-[44px] focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                        aria-label="Side 1, nåværende side"
+                        aria-current="page"
+                      >
+                        1
+                      </PaginationLink>
+                    </PaginationItem>
+                    <PaginationItem>
+                      <PaginationLink 
+                        href="#" 
+                        className="text-base px-4 py-2 min-h-[44px] focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                        aria-label="Gå til side 2"
+                      >
+                        2
+                      </PaginationLink>
+                    </PaginationItem>
+                    <PaginationItem>
+                      <PaginationLink 
+                        href="#" 
+                        className="text-base px-4 py-2 min-h-[44px] focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                        aria-label="Gå til side 3"
+                      >
+                        3
+                      </PaginationLink>
+                    </PaginationItem>
+                    <PaginationItem>
+                      <PaginationNext 
+                        href="#" 
+                        className="text-base px-4 py-2 min-h-[44px] focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                        aria-label="Gå til neste side"
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+              </nav>
+            </CardContent>
+          </Card>
         </TabsContent>
         
-        <TabsContent value="kart">
-          <AdminCard title="Kartvisning" description="Lokaler vist på kart kommer snart">
-            <div className="h-[500px] flex items-center justify-center surface-secondary rounded-xl border-2 border-dashed border-primary">
-              <EmptyState 
-                icon={<MapPin className="h-20 w-20" />}
-                title="Kartvisning er under utvikling"
-                action={{
-                  label: "Få varsel når dette er klart",
-                  onClick: () => console.log("Registering for notifications")
-                }}
-              />
-            </div>
-          </AdminCard>
+        <TabsContent value="kart" id="kart-panel" role="tabpanel">
+          <Card className="shadow-sm border-gray-300">
+            <CardHeader className="bg-gray-50 border-b border-gray-300 rounded-t-lg pb-6">
+              <CardTitle className="text-2xl font-semibold text-gray-900">Kartvisning</CardTitle>
+              <CardDescription className="text-base text-gray-700 leading-relaxed">
+                Lokaler vist på kart kommer snart
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="p-12">
+              <div className="h-[500px] flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg border-2 border-dashed border-gray-400">
+                <div className="text-center space-y-6">
+                  <div className="w-20 h-20 bg-gray-300 rounded-full flex items-center justify-center mx-auto">
+                    <MapPin className="h-10 w-10 text-gray-500" aria-hidden="true" />
+                  </div>
+                  <div>
+                    <p className="text-gray-700 mb-4 font-semibold text-lg">Kartvisning er under utvikling</p>
+                    <Button 
+                      variant="outline" 
+                      className="shadow-sm text-base px-6 py-3 min-h-[48px] focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                      aria-label="Registrer deg for å få varsel når kartvisning er klar"
+                    >
+                      Få varsel når dette er klart
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
-    </Container>
+    </div>
   );
 };
 
