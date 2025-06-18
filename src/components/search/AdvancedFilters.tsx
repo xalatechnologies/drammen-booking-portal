@@ -23,24 +23,24 @@ const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
   setCapacity,
 }) => {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-6 mt-6 border-t border-gray-100">
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
       <div>
         <Select value={accessibility || "all"} onValueChange={setAccessibility}>
-          <SelectTrigger className="h-10 border-gray-200 hover:border-blue-500">
+          <SelectTrigger className="h-12 border-2 border-gray-200 hover:border-blue-500 text-lg">
             <SelectValue placeholder="Tilgjengelighet (alle)" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Alle</SelectItem>
-            <SelectItem value="wheelchair">Rullestoltilpasset</SelectItem>
-            <SelectItem value="hearing-loop">Teleslynge</SelectItem>
-            <SelectItem value="sign-language">Tegnspråktolking</SelectItem>
+            <SelectItem value="all" className="text-lg">Alle</SelectItem>
+            <SelectItem value="wheelchair" className="text-lg">Rullestoltilpasset</SelectItem>
+            <SelectItem value="hearing-loop" className="text-lg">Teleslynge</SelectItem>
+            <SelectItem value="sign-language" className="text-lg">Tegnspråktolking</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <span className="text-sm font-medium text-gray-700">
+          <span className="text-lg font-medium text-gray-700">
             Kapasitet: {capacity[0]} - {capacity[1]} personer
           </span>
         </div>
@@ -49,7 +49,7 @@ const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
           onValueChange={setCapacity}
           max={200}
           step={10}
-          className="mt-2"
+          className="mt-3"
         />
       </div>
     </div>
