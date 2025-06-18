@@ -144,9 +144,6 @@ export function EnhancedFacilitySidebar({
         </CardContent>
       </Card>
 
-      {/* Auto Approval Info */}
-      {hasAutoApproval && <AutoApprovalCard hasAutoApproval={hasAutoApproval} />}
-
       {/* Zones Section */}
       <Card>
         <CardHeader className="pb-3">
@@ -166,25 +163,34 @@ export function EnhancedFacilitySidebar({
               {index < zones.length - 1 && <Separator className="my-3" />}
             </div>
           ))}
-        </CardContent>
-      </Card>
+          
+          {/* Auto Approval Info under zones */}
+          {hasAutoApproval && (
+            <>
+              <Separator className="my-3" />
+              <AutoApprovalCard hasAutoApproval={hasAutoApproval} />
+            </>
+          )}
 
-      {/* Cancellation Policy Card */}
-      <Card className="shadow-sm">
-        <CardContent className="p-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-emerald-100 rounded-md">
-              <XCircle className="h-5 w-5 text-emerald-600" />
-            </div>
-            <div>
-              <h3 className="font-medium text-emerald-800">
-                Gratis avbestilling
-              </h3>
-              <p className="text-sm text-emerald-700">
-                Opptil 24 timer før reservert tid
-              </p>
-            </div>
-          </div>
+          {/* Cancellation Policy Card under zones */}
+          <Separator className="my-3" />
+          <Card className="shadow-sm">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-emerald-100 rounded-md">
+                  <XCircle className="h-5 w-5 text-emerald-600" />
+                </div>
+                <div>
+                  <h3 className="font-medium text-emerald-800">
+                    Gratis avbestilling
+                  </h3>
+                  <p className="text-sm text-emerald-700">
+                    Opptil 24 timer før reservert tid
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </CardContent>
       </Card>
     </div>
