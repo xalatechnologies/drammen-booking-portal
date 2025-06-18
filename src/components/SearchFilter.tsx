@@ -1,15 +1,9 @@
 
-
-import React, { useState } from "react";
-import { DateRange } from "react-day-picker";
-import { X } from "lucide-react";
+import React from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import SearchInput from "@/components/search/SearchInput";
-import DateRangePicker from "@/components/search/DateRangePicker";
-import FilterSelects from "@/components/search/FilterSelects";
-import ViewModeToggle from "@/components/search/ViewModeToggle";
-import ActiveFilters from "@/components/search/ActiveFilters";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Calendar, Grid, List, Map, CalendarDays } from "lucide-react";
 
 interface SearchFilterProps {
   date?: Date;
@@ -27,106 +21,75 @@ interface SearchFilterProps {
 }
 
 const SearchFilter: React.FC<SearchFilterProps> = ({
-  date,
-  setDate,
   facilityType,
   setFacilityType,
   location,
   setLocation,
   viewMode,
   setViewMode,
-  accessibility,
-  setAccessibility,
-  capacity,
-  setCapacity,
 }) => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [dateRange, setDateRange] = useState<DateRange | undefined>();
-
-  const clearFilters = () => {
-    setDate(undefined);
-    setDateRange(undefined);
-    setFacilityType("all");
-    setLocation("all");
-    setAccessibility("all");
-    setCapacity([0, 200]);
-    setSearchTerm("");
-  };
-
-  const hasActiveFilters = date || dateRange || (facilityType && facilityType !== "all") || (location && location !== "all") || (accessibility && accessibility !== "all") || capacity[0] > 0 || capacity[1] < 200 || searchTerm;
-
   return (
-    <div className="mb-6">
-      <Card className="border-0 shadow-sm bg-white/80 backdrop-blur-sm">
-        <CardContent className="p-6">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
-            <div className="lg:col-span-2">
-              <SearchInput 
-                searchTerm={searchTerm}
-                setSearchTerm={setSearchTerm}
-              />
-            </div>
+    <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <Select value={facilityType} onValueChange={setFacilityType}>
+          <SelectTrigger>
+            <SelectValue placeholder="Velg lokaltype" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Alle typer</SelectItem>
+            <SelectItem value="meeting">Møterom</SelectItem>
+            <SelectItem value="sports">Idrettshall</SelectItem>
+            <SelectItem value="cultural">Kultursal</SelectItem>
+          </SelectContent>
+        </Select>
 
-            <div className="lg:col-span-2">
-              <DateRangePicker 
-                dateRange={dateRange}
-                setDateRange={setDateRange}
-              />
-            </div>
+        <Select value={location} onValueChange={setLocation}>
+          <SelectTrigger>
+            <SelectValue placeholder="Velg område" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Alle områder</SelectItem>
+            <SelectItem value="sentrum">Sentrum</SelectItem>
+            <SelectItem value="stromso">Strømsø</SelectItem>
+            <SelectItem value="bragernes">Bragernes</SelectItem>
+          </SelectContent>
+        </Select>
 
-            <div className="lg:col-span-6">
-              <FilterSelects 
-                facilityType={facilityType}
-                setFacilityType={setFacilityType}
-                location={location}
-                setLocation={setLocation}
-                accessibility={accessibility}
-                setAccessibility={setAccessibility}
-                capacity={capacity}
-                setCapacity={setCapacity}
-              />
-            </div>
+        <Input placeholder="Søk etter lokaler..." />
 
-            <div className="lg:col-span-2 flex justify-center">
-              <ViewModeToggle 
-                viewMode={viewMode}
-                setViewMode={setViewMode}
-              />
-            </div>
-          </div>
-
-          <div className="flex justify-end">
-            {hasActiveFilters && (
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={clearFilters} 
-                className="h-10 w-10 p-0 hover:bg-red-50 hover:text-red-600"
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            )}
-          </div>
-
-          {hasActiveFilters && (
-            <ActiveFilters 
-              dateRange={dateRange}
-              setDateRange={setDateRange}
-              facilityType={facilityType}
-              setFacilityType={setFacilityType}
-              location={location}
-              setLocation={setLocation}
-              accessibility={accessibility}
-              setAccessibility={setAccessibility}
-              capacity={capacity}
-              setCapacity={setCapacity}
-            />
-          )}
-        </CardContent>
-      </Card>
+        <div className="flex gap-2">
+          <Button
+            variant={viewMode === "grid" ? "default" : "outline"}
+            size="sm"
+            onClick={() => setViewMode("grid")}
+          >
+            <Grid className="w-4 h-4" />
+          </Button>
+          <Button
+            variant={viewMode === "list" ? "default" : "outline"}
+            size="sm"
+            onClick={() => setViewMode("list")}
+          >
+            <List className="w-4 h-4" />
+          </Button>
+          <Button
+            variant={viewMode === "map" ? "default" : "outline"}
+            size="sm"
+            onClick={() => setViewMode("map")}
+          >
+            <Map className="w-4 h-4" />
+          </Button>
+          <Button
+            variant={viewMode === "calendar" ? "default" : "outline"}
+            size="sm"
+            onClick={() => setViewMode("calendar")}
+          >
+            <CalendarDays className="w-4 h-4" />
+          </Button>
+        </div>
+      </div>
     </div>
   );
 };
 
 export default SearchFilter;
-

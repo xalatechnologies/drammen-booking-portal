@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { DateRange } from "react-day-picker";
@@ -12,7 +11,11 @@ import PaginationControls from "@/components/PaginationControls";
 import MapView from "@/components/MapView";
 import CalendarView from "@/components/CalendarView";
 
+console.log("Index component loaded");
+
 const Index = () => {
+  console.log("Index component rendering");
+  
   const [searchParams, setSearchParams] = useSearchParams();
   const [date, setDate] = useState<Date>();
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
@@ -21,6 +24,8 @@ const Index = () => {
   const [viewMode, setViewMode] = useState<"grid" | "map" | "calendar" | "list">("grid");
   const [accessibility, setAccessibility] = useState<string>("all");
   const [capacity, setCapacity] = useState<number[]>([0, 200]);
+
+  console.log("State initialized", { facilityType, location, viewMode });
 
   // Initialize state from URL parameters
   useEffect(() => {
@@ -46,6 +51,8 @@ const Index = () => {
       setSearchParams({});
     }
   }, [searchParams, setSearchParams]);
+
+  console.log("About to render JSX");
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex flex-col">
