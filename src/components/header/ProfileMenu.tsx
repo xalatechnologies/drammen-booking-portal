@@ -14,14 +14,33 @@ interface ProfileMenuProps {
   isLoggedIn: boolean;
   handleLogin: () => void;
   handleLogout: () => void;
+  language: 'NO' | 'EN';
 }
 
 const ProfileMenu: React.FC<ProfileMenuProps> = ({ 
   isLoggedIn, 
   handleLogin, 
-  handleLogout 
+  handleLogout,
+  language
 }) => {
   const navigate = useNavigate();
+
+  const translations = {
+    NO: {
+      login: "Logg inn",
+      profile: "Min profil",
+      settings: "Innstillinger",
+      logout: "Logg ut"
+    },
+    EN: {
+      login: "Log in",
+      profile: "My profile",
+      settings: "Settings",
+      logout: "Log out"
+    }
+  };
+
+  const t = translations[language];
 
   if (!isLoggedIn) {
     return (
@@ -31,7 +50,7 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({
         onClick={handleLogin}
       >
         <LogIn className="w-4 h-4" />
-        <span>Logg inn</span>
+        <span>{t.login}</span>
       </Button>
     );
   }
@@ -46,13 +65,13 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuItem onClick={() => navigate("/profile")}>
-          Min profil
+          {t.profile}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => navigate("/settings")}>
-          Innstillinger
+          {t.settings}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={handleLogout}>
-          Logg ut
+          {t.logout}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

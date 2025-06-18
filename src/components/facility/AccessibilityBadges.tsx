@@ -5,13 +5,29 @@ import { cn } from "@/lib/utils";
 
 interface AccessibilityBadgesProps {
   accessibility: string[];
+  language?: 'NO' | 'EN';
 }
 
-export function AccessibilityBadges({ accessibility }: AccessibilityBadgesProps) {
+export function AccessibilityBadges({ accessibility, language = 'NO' }: AccessibilityBadgesProps) {
+  const translations = {
+    NO: {
+      wheelchair: "Rullestol",
+      "hearing-loop": "Teleslynge",
+      "sign-language": "Tegnspråk"
+    },
+    EN: {
+      wheelchair: "Wheelchair",
+      "hearing-loop": "Hearing loop",
+      "sign-language": "Sign language"
+    }
+  };
+
+  const t = translations[language];
+
   const badges = {
-    "wheelchair": { label: "Rullestol", color: "bg-[#1e3a8a] bg-opacity-10 text-[#1e3a8a] border-[#1e3a8a]" },
-    "hearing-loop": { label: "Teleslynge", color: "bg-green-50 text-green-700 border-green-200" },
-    "sign-language": { label: "Tegnspråk", color: "bg-purple-50 text-purple-700 border-purple-200" }
+    "wheelchair": { label: t.wheelchair, color: "bg-[#1e3a8a] bg-opacity-10 text-[#1e3a8a] border-[#1e3a8a]" },
+    "hearing-loop": { label: t["hearing-loop"], color: "bg-green-50 text-green-700 border-green-200" },
+    "sign-language": { label: t["sign-language"], color: "bg-purple-50 text-purple-700 border-purple-200" }
   };
   
   return (
