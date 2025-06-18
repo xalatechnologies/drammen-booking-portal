@@ -2,12 +2,13 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu } from "lucide-react";
+import { Menu, Search } from "lucide-react";
 import Logo from "@/components/header/Logo";
 import LanguageToggle from "@/components/header/LanguageToggle";
 import ProfileMenu from "@/components/header/ProfileMenu";
 import MobileMenu from "@/components/header/MobileMenu";
 import { useLanguage } from "@/contexts/LanguageContext";
+import GlobalSearch from "@/components/header/GlobalSearch";
 
 const GlobalHeader = () => {
   const navigate = useNavigate();
@@ -38,7 +39,14 @@ const GlobalHeader = () => {
       <div className="container mx-auto flex justify-between items-center">
         {/* Logo (left) */}
         <div className="flex items-center">
-          <Logo />
+          <div className="mr-4">
+            <Logo />
+          </div>
+          
+          {/* Global Search - Desktop */}
+          <div className="hidden md:block flex-grow max-w-xl">
+            <GlobalSearch />
+          </div>
         </div>
 
         {/* Mobile Menu Button */}
@@ -51,7 +59,7 @@ const GlobalHeader = () => {
         </Button>
 
         {/* Right side: Language toggle & Login/Profile */}
-        <div className="hidden lg:flex items-center space-x-2">
+        <div className="hidden lg:flex items-center space-x-4">
           {/* Language toggle */}
           <LanguageToggle 
             language={language} 
@@ -66,6 +74,11 @@ const GlobalHeader = () => {
             language={language}
           />
         </div>
+      </div>
+      
+      {/* Global Search - Mobile (below header) */}
+      <div className="md:hidden border-t border-gray-200 py-2 px-4">
+        <GlobalSearch />
       </div>
 
       {/* Mobile Menu */}

@@ -1,5 +1,3 @@
-
-
 import React, { useState } from "react";
 import { DateRange } from "react-day-picker";
 import { X, ChevronDown, ChevronUp, Sliders } from "lucide-react";
@@ -124,14 +122,14 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
           {hasActiveFilters && (
             <div className="mt-4 pt-4 border-t border-gray-100">
               <div className="flex justify-between items-center mb-2">
-                <h3 className="text-sm font-medium text-gray-500">Aktive filtre</h3>
+                <h3 className="text-base font-medium text-gray-500">Aktive filtre</h3>
                 <Button 
                   variant="ghost" 
                   size="sm" 
-                  onClick={clearFilters} 
-                  className="h-8 text-xs hover:bg-red-50 hover:text-red-600 transition-all duration-200 flex items-center gap-1"
+                  onClick={clearFilters}
+                  className="h-9 text-sm hover:bg-red-50 hover:text-red-600 transition-all duration-200 flex items-center gap-1"
                 >
-                  <X className="h-3 w-3" />
+                  <X className="h-4 w-4" />
                   <span>Fjern alle</span>
                 </Button>
               </div>
@@ -156,4 +154,3 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
 };
 
 export default SearchFilter;
-

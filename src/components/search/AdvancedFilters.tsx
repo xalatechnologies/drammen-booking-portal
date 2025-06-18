@@ -56,30 +56,30 @@ const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
 
   return (
     <div className="space-y-4">
-      <Label className="text-sm font-medium text-gray-700">Avanserte filtre</Label>
+      <Label className="text-base font-medium text-gray-700">Avanserte filtre</Label>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         <Select value={accessibility || "all"} onValueChange={setAccessibility}>
-          <SelectTrigger className="h-12 border-2 border-gray-200 hover:border-blue-600 focus:border-blue-600 focus:ring-blue-100 rounded-xl text-base shadow-sm transition-all duration-200 bg-white">
+          <SelectTrigger className="h-14 border-2 border-gray-200 hover:border-blue-600 focus:border-blue-600 focus:ring-blue-100 text-lg shadow-sm transition-all duration-200 bg-white">
             <SelectValue placeholder="Velg tilgjengelighet" />
           </SelectTrigger>
           <SelectContent className="rounded-lg border-gray-200 shadow-lg bg-white">
-            <SelectItem value="all">Alle</SelectItem>
-            <SelectItem value="wheelchair">Rullestoltilpasset</SelectItem>
-            <SelectItem value="hearing-loop">Teleslynge</SelectItem>
-            <SelectItem value="sign-language">Tegnspråktolking</SelectItem>
+            <SelectItem value="all" className="text-base py-3">Alle</SelectItem>
+            <SelectItem value="wheelchair" className="text-base py-3">Rullestoltilpasset</SelectItem>
+            <SelectItem value="hearing-loop" className="text-base py-3">Teleslynge</SelectItem>
+            <SelectItem value="sign-language" className="text-base py-3">Tegnspråktolking</SelectItem>
           </SelectContent>
         </Select>
         
         <Select value={getCapacityValue()} onValueChange={handleCapacityChange}>
-          <SelectTrigger className="h-12 border-2 border-gray-200 hover:border-blue-600 focus:border-blue-600 focus:ring-blue-100 rounded-xl text-base shadow-sm transition-all duration-200 bg-white">
+          <SelectTrigger className="h-14 border-2 border-gray-200 hover:border-blue-600 focus:border-blue-600 focus:ring-blue-100 text-lg shadow-sm transition-all duration-200 bg-white">
             <SelectValue placeholder="Velg kapasitet" />
           </SelectTrigger>
           <SelectContent className="rounded-lg border-gray-200 shadow-lg bg-white">
-            <SelectItem value="all">Alle størrelser</SelectItem>
-            <SelectItem value="1-50">1-50 personer</SelectItem>
-            <SelectItem value="51-100">51-100 personer</SelectItem>
-            <SelectItem value="101-200">101-200 personer</SelectItem>
-            <SelectItem value="200+">200+ personer</SelectItem>
+            <SelectItem value="all" className="text-base py-3">Alle størrelser</SelectItem>
+            <SelectItem value="1-50" className="text-base py-3">1-50 personer</SelectItem>
+            <SelectItem value="51-100" className="text-base py-3">51-100 personer</SelectItem>
+            <SelectItem value="101-200" className="text-base py-3">101-200 personer</SelectItem>
+            <SelectItem value="200+" className="text-base py-3">200+ personer</SelectItem>
           </SelectContent>
         </Select>
       </div>

@@ -26,9 +26,9 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
       <PopoverTrigger asChild>
         <Button
           variant="outline"
-          className="w-full h-12 justify-start text-left font-normal border-2 border-gray-200 hover:border-blue-600 focus:border-blue-600 focus:ring-blue-100 rounded-full text-base shadow-sm transition-all duration-200 px-4 bg-white"
+          className="w-full h-14 justify-start text-left font-normal border-2 border-gray-200 hover:border-blue-600 focus:border-blue-600 focus:ring-blue-100 text-lg shadow-sm transition-all duration-200 px-4 bg-white"
         >
-          <CalendarIcon className="mr-3 h-5 w-5 text-gray-500" />
+          <CalendarIcon className="mr-3 h-6 w-6 text-gray-500" />
           {dateRange?.from ? (
             dateRange.to ? (
               <>
@@ -43,7 +43,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-0 z-50 rounded-xl shadow-xl border-gray-200 bg-white" align="start">
+      <PopoverContent className="w-auto p-0 z-50 shadow-xl border-gray-200 bg-white" align="start">
         <Calendar
           initialFocus
           mode="range"

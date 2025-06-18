@@ -3,6 +3,7 @@ import React from "react";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
+// Larger, more prominent search input for the main search page
 interface SearchInputProps {
   searchTerm: string;
   setSearchTerm: (term: string) => void;
@@ -19,15 +20,15 @@ const SearchInput: React.FC<SearchInputProps> = ({
       </label>
       <div className="relative group">
         <Search 
-          className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5 group-focus-within:text-blue-600 transition-colors duration-200"
+          className="absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-400 h-6 w-6 group-focus-within:text-blue-600 transition-colors duration-200"
           aria-hidden="true"
         />
         <Input
           id="facility-search"
-          placeholder="Søk etter lokaler, adresser eller områder"
+          placeholder="Søk etter lokaler, adresser eller områder..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="pl-12 h-12 border-2 border-gray-200 focus:border-blue-600 focus:ring-blue-100 rounded-full text-base shadow-sm hover:border-gray-300 transition-all duration-200 w-full"
+          className="pl-14 h-16 border-2 border-gray-200 focus:border-blue-600 focus:ring-blue-100 text-lg shadow-sm hover:border-gray-300 transition-all duration-200 w-full"
           aria-describedby="search-help"
           autoComplete="off"
           role="searchbox"

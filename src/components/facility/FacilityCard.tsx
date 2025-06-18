@@ -75,7 +75,7 @@ export function FacilityCard({ facility, onAddressClick }: FacilityCardProps) {
           }}
         />
         <div className="absolute top-4 left-4">
-          <Badge className="bg-white/95 backdrop-blur-sm text-gray-800 border-0 font-semibold px-3 py-1.5 shadow-md text-sm rounded-full transition-all duration-300 hover:bg-white">
+          <Badge className="bg-white/95 backdrop-blur-sm text-gray-800 border-0 font-semibold px-4 py-2 shadow-md text-base transition-all duration-300 hover:bg-white">
             {facility.type}
           </Badge>
         </div>
@@ -83,12 +83,12 @@ export function FacilityCard({ facility, onAddressClick }: FacilityCardProps) {
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent h-24 flex items-end">
           <div className="p-4 w-full">
             <div className="flex justify-between items-center">
-              <p className="text-white font-medium text-sm bg-blue-600/90 px-2 py-1 rounded-md">
+              <p className="text-white font-medium text-base bg-blue-600/90 px-3 py-1.5">
                 {facility.nextAvailable}
               </p>
-              <div className="flex items-center gap-1 bg-white/90 px-2 py-1 rounded-md">
-                <Star className="h-3.5 w-3.5 text-yellow-500 fill-yellow-500" />
-                <span className="text-xs font-semibold text-gray-800">4.8</span>
+              <div className="flex items-center gap-1.5 bg-white/90 px-3 py-1.5">
+                <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                <span className="text-sm font-semibold text-gray-800">4.8</span>
               </div>
             </div>
           </div>
@@ -97,8 +97,8 @@ export function FacilityCard({ facility, onAddressClick }: FacilityCardProps) {
       
       <CardContent className="p-5 flex flex-col flex-grow bg-white">
         <div className="mb-3">
-          <h3 className="font-bold text-lg mb-2 text-gray-900 line-clamp-1 group-hover:text-blue-700 transition-colors">{facility.name}</h3>
-          <div className="flex items-start gap-2 text-sm text-gray-600">
+          <h3 className="font-bold text-xl mb-2 text-gray-900 line-clamp-1 group-hover:text-blue-700 transition-colors">{facility.name}</h3>
+          <div className="flex items-start gap-2 text-base text-gray-600">
             <MapPin className="h-5 w-5 text-blue-600 shrink-0 mt-0.5" />
             <span 
               className="line-clamp-1 hover:text-blue-700 hover:underline cursor-pointer transition-colors"
@@ -108,8 +108,8 @@ export function FacilityCard({ facility, onAddressClick }: FacilityCardProps) {
               {facility.address}
             </span>
           </div>
-          <div className="flex items-center gap-2 mt-2 text-sm text-gray-500">
-            <Badge variant="outline" className="bg-gray-50 text-gray-700 border-gray-200 font-medium px-2 py-0.5 text-xs rounded-md">
+          <div className="flex items-center gap-2 mt-2 text-base text-gray-500">
+            <Badge variant="outline" className="bg-gray-50 text-gray-700 border-gray-200 font-medium px-2.5 py-1 text-sm">
               {facility.area}
             </Badge>
             <span>•</span>

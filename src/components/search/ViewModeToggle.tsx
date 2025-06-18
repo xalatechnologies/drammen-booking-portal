@@ -20,7 +20,7 @@ const ViewModeToggle: React.FC<ViewModeToggleProps> = ({
   };
 
   return (
-    <fieldset className="border-2 border-gray-200 bg-white rounded-full p-1 shadow-sm">
+    <fieldset className="border-2 border-gray-200 bg-white p-1 shadow-sm">
       <legend className="sr-only">Velg visningstype for lokaler</legend>
       <ToggleGroup 
         type="single" 
@@ -32,39 +32,39 @@ const ViewModeToggle: React.FC<ViewModeToggleProps> = ({
       >
         <ToggleGroupItem 
           value="grid" 
-          className="h-9 w-9 p-0 rounded-full data-[state=on]:bg-blue-600 data-[state=on]:text-white hover:bg-gray-100 transition-all duration-200"
+          className="h-11 w-11 p-0 data-[state=on]:bg-blue-600 data-[state=on]:text-white hover:bg-gray-100 transition-all duration-200"
           aria-label={`${viewModeLabels.grid}${viewMode === 'grid' ? ' (valgt)' : ''}`}
           role="radio"
           aria-checked={viewMode === 'grid'}
         >
-          <Grid3X3 className="h-5 w-5" aria-hidden="true" />
+          <Grid3X3 className="h-6 w-6" aria-hidden="true" />
         </ToggleGroupItem>
         <ToggleGroupItem 
           value="list" 
-          className="h-9 w-9 p-0 rounded-full data-[state=on]:bg-blue-600 data-[state=on]:text-white hover:bg-gray-100 transition-all duration-200"
+          className="h-11 w-11 p-0 data-[state=on]:bg-blue-600 data-[state=on]:text-white hover:bg-gray-100 transition-all duration-200"
           aria-label={`${viewModeLabels.list}${viewMode === 'list' ? ' (valgt)' : ''}`}
           role="radio"
           aria-checked={viewMode === 'list'}
         >
-          <List className="h-5 w-5" aria-hidden="true" />
+          <List className="h-6 w-6" aria-hidden="true" />
         </ToggleGroupItem>
         <ToggleGroupItem 
           value="map" 
-          className="h-9 w-9 p-0 rounded-full data-[state=on]:bg-blue-600 data-[state=on]:text-white hover:bg-gray-100 transition-all duration-200"
+          className="h-11 w-11 p-0 data-[state=on]:bg-blue-600 data-[state=on]:text-white hover:bg-gray-100 transition-all duration-200"
           aria-label={`${viewModeLabels.map}${viewMode === 'map' ? ' (valgt)' : ''}`}
           role="radio"
           aria-checked={viewMode === 'map'}
         >
-          <Map className="h-5 w-5" aria-hidden="true" />
+          <Map className="h-6 w-6" aria-hidden="true" />
         </ToggleGroupItem>
         <ToggleGroupItem 
           value="calendar" 
-          className="h-9 w-9 p-0 rounded-full data-[state=on]:bg-blue-600 data-[state=on]:text-white hover:bg-gray-100 transition-all duration-200"
+          className="h-11 w-11 p-0 data-[state=on]:bg-blue-600 data-[state=on]:text-white hover:bg-gray-100 transition-all duration-200"
           aria-label={`${viewModeLabels.calendar}${viewMode === 'calendar' ? ' (valgt)' : ''}`}
           role="radio"
           aria-checked={viewMode === 'calendar'}
         >
-          <CalendarView className="h-5 w-5" aria-hidden="true" />
+          <CalendarView className="h-6 w-6" aria-hidden="true" />
         </ToggleGroupItem>
       </ToggleGroup>
     </fieldset>

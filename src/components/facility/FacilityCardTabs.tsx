@@ -69,21 +69,21 @@ export function FacilityCardTabs({ facility }: FacilityCardTabsProps) {
 
   return (
     <div onClick={handleTabsClick}>
-      <Tabs defaultValue="overview" className="flex-grow mt-3">
-        <TabsList className="grid w-full grid-cols-2 mb-3 h-9 bg-gray-50 p-1 rounded-lg">
-          <TabsTrigger value="overview" className="text-xs py-1.5 rounded-md data-[state=active]:bg-white data-[state=active]:text-blue-700 data-[state=active]:shadow-sm">{t.overview}</TabsTrigger>
-          <TabsTrigger value="details" className="text-xs py-1.5 rounded-md data-[state=active]:bg-white data-[state=active]:text-blue-700 data-[state=active]:shadow-sm">{t.details}</TabsTrigger>
+      <Tabs defaultValue="overview" className="flex-grow mt-4">
+        <TabsList className="grid w-full grid-cols-2 mb-3 h-10 bg-gray-50 p-1 rounded-lg">
+          <TabsTrigger value="overview" className="text-sm py-2 rounded-md data-[state=active]:bg-white data-[state=active]:text-blue-700 data-[state=active]:shadow-sm">{t.overview}</TabsTrigger>
+          <TabsTrigger value="details" className="text-sm py-2 rounded-md data-[state=active]:bg-white data-[state=active]:text-blue-700 data-[state=active]:shadow-sm">{t.details}</TabsTrigger>
         </TabsList>
         
         <TabsContent value="overview" className="space-y-4 mt-0">
           <div className="text-sm text-gray-700 bg-gray-50 p-3 rounded-lg">
-            <p className="line-clamp-2 leading-relaxed text-gray-700 text-xs">{facility.description}</p>
+            <p className="line-clamp-2 leading-relaxed text-gray-700 text-sm">{facility.description}</p>
           </div>
         </TabsContent>
         
         <TabsContent value="details" className="space-y-4 mt-0">
           <div>
-            <h4 className="text-xs font-medium mb-2 text-gray-900 flex items-center gap-2">
+            <h4 className="text-sm font-medium mb-2 text-gray-900 flex items-center gap-2">
               <span className="w-1.5 h-1.5 bg-blue-600 rounded-full"></span>
               {t.accessibility}
             </h4>
@@ -91,18 +91,18 @@ export function FacilityCardTabs({ facility }: FacilityCardTabsProps) {
           </div>
 
           <div>
-            <h4 className="text-xs font-medium mb-2 flex items-center gap-2 text-gray-900">
+            <h4 className="text-sm font-medium mb-2 flex items-center gap-2 text-gray-900">
               <span className="w-1.5 h-1.5 bg-blue-600 rounded-full"></span>
               <span>{t.equipment}</span>
             </h4>
             <div className="flex flex-wrap gap-1.5">
               {facility.equipment.slice(0, 4).map((item, i) => (
-                <Badge key={i} variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 text-xs py-0.5 px-2 rounded-full">
+                <Badge key={i} variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 text-sm py-1 px-2.5">
                   {item}
                 </Badge>
               ))}
               {facility.equipment.length > 4 && (
-                <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 text-xs py-0.5 px-2 rounded-full">
+                <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 text-sm py-1 px-2.5">
                   +{facility.equipment.length - 4} {t.more}
                 </Badge>
               )}
