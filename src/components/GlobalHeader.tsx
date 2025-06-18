@@ -69,7 +69,6 @@ const GlobalHeader = () => {
             isLoggedIn={isLoggedIn} 
             handleLogin={handleLogin} 
             handleLogout={handleLogout}
-            language={language}
           />
         </div>
       </div>
@@ -82,7 +81,6 @@ const GlobalHeader = () => {
       {/* Mobile Menu */}
       <MobileMenu 
         isOpen={mobileMenuOpen}
-        language={language}
         isLoggedIn={isLoggedIn}
         setLanguage={(lang) => {
           if (lang === 'NO' || lang === 'EN') {
