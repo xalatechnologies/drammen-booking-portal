@@ -7,6 +7,7 @@ import Logo from "@/components/header/Logo";
 import LanguageToggle from "@/components/header/LanguageToggle";
 import ProfileMenu from "@/components/header/ProfileMenu";
 import MobileMenu from "@/components/header/MobileMenu";
+import GlobalSearch from "@/components/header/GlobalSearch";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 const GlobalHeader = () => {
@@ -34,24 +35,29 @@ const GlobalHeader = () => {
   };
 
   return (
-    <header className="bg-white dark:bg-gray-900 py-2 px-4 shadow-md sticky top-0 z-10 border-b border-gray-200 dark:border-gray-700">
-      <div className="container mx-auto flex justify-between items-center">
+    <header className="bg-white dark:bg-gray-900 py-3 px-4 shadow-md sticky top-0 z-10 border-b border-gray-200 dark:border-gray-700">
+      <div className="container mx-auto flex justify-between items-center gap-4">
         {/* Logo (left) */}
-        <div className="flex items-center">
+        <div className="flex items-center flex-shrink-0">
           <Logo />
+        </div>
+
+        {/* Global Search (center) - Hidden on mobile */}
+        <div className="hidden md:flex flex-1 justify-center max-w-lg">
+          <GlobalSearch />
         </div>
 
         {/* Mobile Menu Button */}
         <Button 
           variant="ghost" 
-          className="lg:hidden p-2" 
+          className="md:hidden p-2" 
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
         >
           <Menu className="h-6 w-6" />
         </Button>
 
         {/* Right side: Language toggle & Login/Profile */}
-        <div className="hidden lg:flex items-center space-x-2">
+        <div className="hidden md:flex items-center space-x-2 flex-shrink-0">
           {/* Language toggle */}
           <LanguageToggle 
             language={language} 
@@ -66,6 +72,11 @@ const GlobalHeader = () => {
             language={language}
           />
         </div>
+      </div>
+
+      {/* Mobile Search Bar - Shown only on mobile */}
+      <div className="md:hidden mt-3 px-2">
+        <GlobalSearch />
       </div>
 
       {/* Mobile Menu */}
