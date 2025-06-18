@@ -8,13 +8,13 @@ import { FacilityImageGallery } from "@/components/facility/FacilityImageGallery
 import { FacilityHeader } from "@/components/facility/FacilityHeader";
 import { FacilityQuickFacts } from "@/components/facility/FacilityQuickFacts";
 import { FacilityInfoTabs } from "@/components/facility/FacilityInfoTabs";
+import { FacilitySidebar } from "@/components/facility/FacilitySidebar";
 import { SimilarFacilitiesSlider } from "@/components/facility/SimilarFacilitiesSlider";
-import { AutoApprovalCard } from "@/components/facility/AutoApprovalCard";
-import { ZoneBookingCard } from "@/components/facility/ZoneBookingCard";
 import { FacilityLocation } from "@/components/facility/FacilityLocation";
 import { Zone } from "@/components/booking/types";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { MapPin, Car, Users, Map, Clock, CheckCircle } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { MapPin } from "lucide-react";
+
 const FacilityDetail = () => {
   const {
     id
@@ -271,7 +271,8 @@ const FacilityDetail = () => {
     const bookingPath = `/booking/${id}`;
     navigate(bookingPath);
   };
-  return <div className="min-h-screen bg-white flex flex-col">
+  return (
+    <div className="min-h-screen bg-white flex flex-col">
       <GlobalHeader />
 
       {/* Breadcrumb Navigation */}
@@ -319,50 +320,70 @@ const FacilityDetail = () => {
               </div>
             </div>
 
-            {/* Auto Approval and Cancellation Policy */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {facility.hasAutoApproval && <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
-                      <div className="w-2 h-2 bg-green-600 rounded-full"></div>
-                    </div>
-                    <div>
-                      <span className="font-medium text-green-800">Automatisk godkjenning</span>
-                      <span className="text-sm text-green-700 ml-2">• Reservasjonen godkjennes umiddelbart</span>
-                    </div>
-                  </div>
-                </div>}
+            {/* Main Content Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* Left Column - Main Content */}
+              <div className="lg:col-span-2 space-y-6">
+                {/* Quick Facts */}
+                <FacilityQuickFacts 
+                  capacity={facility.capacity} 
+                  area={facility.area} 
+                  openingHours={facility.openingHours} 
+                  zoneCount={zones.length} 
+                />
 
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <p className="text-sm text-blue-800">
-                  <strong>Gratis avbestilling</strong> opptil 24 timer før reservert tid
-                </p>
+                {/* Auto Approval and Cancellation Policy */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {facility.hasAutoApproval && (
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
+                          <div className="w-2 h-2 bg-green-600 rounded-full"></div>
+                        </div>
+                        <div>
+                          <span className="font-medium text-green-800">Automatisk godkjenning</span>
+                          <span className="text-sm text-green-700 ml-2">• Reservasjonen godkjennes umiddelbart</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <p className="text-sm text-blue-800">
+                      <strong>Gratis avbestilling</strong> opptil 24 timer før reservert tid
+                    </p>
+                  </div>
+                </div>
+
+                {/* Tabbed Content */}
+                <FacilityInfoTabs 
+                  description={facility.description} 
+                  capacity={facility.capacity} 
+                  equipment={facility.equipment} 
+                  zones={zones} 
+                  amenities={facility.amenities} 
+                  address={facility.address} 
+                  quickFacts={<></>}
+                  zoneCards={<></>}
+                />
+              </div>
+
+              {/* Right Column - Sidebar */}
+              <div className="lg:col-span-1">
+                <FacilitySidebar
+                  zones={zones}
+                  facilityName={facility.name}
+                  facilityId={id}
+                  hasAutoApproval={facility.hasAutoApproval}
+                  openingHours={facility.openingHours}
+                  onShare={handleShare}
+                  onToggleFavorite={() => setIsFavorited(!isFavorited)}
+                  isFavorited={isFavorited}
+                />
               </div>
             </div>
 
-            {/* Tabbed Content */}
-            <FacilityInfoTabs 
-              description={facility.description} 
-              capacity={facility.capacity} 
-              equipment={facility.equipment} 
-              zones={zones} 
-              amenities={facility.amenities} 
-              address={facility.address} 
-              quickFacts={<FacilityQuickFacts capacity={facility.capacity} area={facility.area} openingHours={facility.openingHours} zoneCount={zones.length} />} 
-              zoneCards={<Card>
-                  <CardHeader className="pb-4">
-                    <CardTitle className="flex items-center gap-2 text-lg">
-                      <MapPin className="h-5 w-5" />
-                      Tilgjengelige soner
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    {zones.map(zone => <ZoneBookingCard key={zone.id} zone={zone} facilityName={facility.name} onBookClick={() => navigate(`/booking/${id}?zone=${zone.id}`)} />)}
-                  </CardContent>
-                </Card>} 
-            />
-
-            {/* Location with Map - Improved WCAG compliance */}
+            {/* Location with Map */}
             <Card className="p-6">
               <div className="mb-6">
                 <h3 className="text-2xl font-semibold mb-2">Lokasjon</h3>
@@ -420,6 +441,8 @@ const FacilityDetail = () => {
       </div>
 
       <GlobalFooter />
-    </div>;
+    </div>
+  );
 };
+
 export default FacilityDetail;
