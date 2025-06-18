@@ -35,6 +35,9 @@ export interface FacilityFilters {
   accessibility?: string;
   capacity?: number[];
   date?: Date;
+  priceRange?: { min: number; max: number };
+  availableNow?: boolean;
+  amenities?: string[];
 }
 
 export interface FacilitySortOptions {

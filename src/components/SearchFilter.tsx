@@ -26,6 +26,18 @@ interface SearchFilterProps {
   setCapacity: (capacity: number[]) => void;
   searchTerm: string;
   setSearchTerm: (term: string) => void;
+  priceRange: number[];
+  setPriceRange: (range: number[]) => void;
+  availableNow: boolean;
+  setAvailableNow: (available: boolean) => void;
+  hasEquipment: boolean;
+  setHasEquipment: (has: boolean) => void;
+  hasParking: boolean;
+  setHasParking: (has: boolean) => void;
+  hasWifi: boolean;
+  setHasWifi: (has: boolean) => void;
+  allowsPhotography: boolean;
+  setAllowsPhotography: (allows: boolean) => void;
 }
 
 const SearchFilter: React.FC<SearchFilterProps> = ({
@@ -43,6 +55,18 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
   setCapacity,
   searchTerm,
   setSearchTerm,
+  priceRange,
+  setPriceRange,
+  availableNow,
+  setAvailableNow,
+  hasEquipment,
+  setHasEquipment,
+  hasParking,
+  setHasParking,
+  hasWifi,
+  setHasWifi,
+  allowsPhotography,
+  setAllowsPhotography,
 }) => {
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [showAdvanced, setShowAdvanced] = useState(false);
@@ -55,10 +79,16 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
     setAccessibility("all");
     setCapacity([0, 200]);
     setSearchTerm("");
+    setPriceRange([0, 5000]);
+    setAvailableNow(false);
+    setHasEquipment(false);
+    setHasParking(false);
+    setHasWifi(false);
+    setAllowsPhotography(false);
   };
 
-  const hasActiveFilters = date || dateRange || (facilityType && facilityType !== "all") || (location && location !== "all") || (accessibility && accessibility !== "all") || capacity[0] > 0 || capacity[1] < 200 || searchTerm;
-  const hasAdvancedFilters = dateRange || (accessibility && accessibility !== "all") || capacity[0] > 0 || capacity[1] < 200;
+  const hasActiveFilters = date || dateRange || (facilityType && facilityType !== "all") || (location && location !== "all") || (accessibility && accessibility !== "all") || capacity[0] > 0 || capacity[1] < 200 || searchTerm || priceRange[0] > 0 || priceRange[1] < 5000 || availableNow || hasEquipment || hasParking || hasWifi || allowsPhotography;
+  const hasAdvancedFilters = dateRange || (accessibility && accessibility !== "all") || capacity[0] > 0 || capacity[1] < 200 || priceRange[0] > 0 || priceRange[1] < 5000 || availableNow || hasEquipment || hasParking || hasWifi || allowsPhotography;
 
   return (
     <div className="mb-8">
@@ -146,6 +176,18 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
               setAccessibility={setAccessibility}
               capacity={capacity}
               setCapacity={setCapacity}
+              priceRange={priceRange}
+              setPriceRange={setPriceRange}
+              availableNow={availableNow}
+              setAvailableNow={setAvailableNow}
+              hasEquipment={hasEquipment}
+              setHasEquipment={setHasEquipment}
+              hasParking={hasParking}
+              setHasParking={setHasParking}
+              hasWifi={hasWifi}
+              setHasWifi={setHasWifi}
+              allowsPhotography={allowsPhotography}
+              setAllowsPhotography={setAllowsPhotography}
             />
           </div>
         )}

@@ -21,6 +21,14 @@ const Index = () => {
   const [accessibility, setAccessibility] = useState<string>("all");
   const [capacity, setCapacity] = useState<number[]>([0, 200]);
   const [searchTerm, setSearchTerm] = useState<string>("");
+  
+  // Advanced filter states
+  const [priceRange, setPriceRange] = useState<number[]>([0, 5000]);
+  const [availableNow, setAvailableNow] = useState<boolean>(false);
+  const [hasEquipment, setHasEquipment] = useState<boolean>(false);
+  const [hasParking, setHasParking] = useState<boolean>(false);
+  const [hasWifi, setHasWifi] = useState<boolean>(false);
+  const [allowsPhotography, setAllowsPhotography] = useState<boolean>(false);
 
   // Initialize state from URL parameters
   useEffect(() => {
@@ -49,6 +57,14 @@ const Index = () => {
     }
   }, [searchParams, setSearchParams]);
 
+  // Create amenities array from individual boolean states
+  const amenities = [
+    ...(hasEquipment ? ['av-equipment'] : []),
+    ...(hasParking ? ['parking'] : []),
+    ...(hasWifi ? ['wifi'] : []),
+    ...(allowsPhotography ? ['photography'] : [])
+  ];
+
   // Create filters object
   const filters: FacilityFilters = {
     searchTerm: searchTerm || undefined,
@@ -57,6 +73,9 @@ const Index = () => {
     accessibility: accessibility !== "all" ? accessibility : undefined,
     capacity: capacity[0] > 0 || capacity[1] < 200 ? capacity : undefined,
     date: date || undefined,
+    priceRange: priceRange[0] > 0 || priceRange[1] < 5000 ? { min: priceRange[0], max: priceRange[1] } : undefined,
+    availableNow: availableNow || undefined,
+    amenities: amenities.length > 0 ? amenities : undefined,
   };
 
   const renderContent = () => {
@@ -128,6 +147,18 @@ const Index = () => {
             setCapacity={setCapacity}
             searchTerm={searchTerm}
             setSearchTerm={setSearchTerm}
+            priceRange={priceRange}
+            setPriceRange={setPriceRange}
+            availableNow={availableNow}
+            setAvailableNow={setAvailableNow}
+            hasEquipment={hasEquipment}
+            setHasEquipment={setHasEquipment}
+            hasParking={hasParking}
+            setHasParking={setHasParking}
+            hasWifi={hasWifi}
+            setHasWifi={setHasWifi}
+            allowsPhotography={allowsPhotography}
+            setAllowsPhotography={setAllowsPhotography}
           />
 
           {renderContent()}

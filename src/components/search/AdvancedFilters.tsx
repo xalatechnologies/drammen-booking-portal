@@ -17,6 +17,18 @@ interface AdvancedFiltersProps {
   setAccessibility: (accessibility: string) => void;
   capacity: number[];
   setCapacity: (capacity: number[]) => void;
+  priceRange: number[];
+  setPriceRange: (range: number[]) => void;
+  availableNow: boolean;
+  setAvailableNow: (available: boolean) => void;
+  hasEquipment: boolean;
+  setHasEquipment: (has: boolean) => void;
+  hasParking: boolean;
+  setHasParking: (has: boolean) => void;
+  hasWifi: boolean;
+  setHasWifi: (has: boolean) => void;
+  allowsPhotography: boolean;
+  setAllowsPhotography: (allows: boolean) => void;
 }
 
 const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
@@ -24,14 +36,19 @@ const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
   setAccessibility,
   capacity,
   setCapacity,
+  priceRange,
+  setPriceRange,
+  availableNow,
+  setAvailableNow,
+  hasEquipment,
+  setHasEquipment,
+  hasParking,
+  setHasParking,
+  hasWifi,
+  setHasWifi,
+  allowsPhotography,
+  setAllowsPhotography,
 }) => {
-  const [priceRange, setPriceRange] = React.useState<number[]>([0, 5000]);
-  const [availableNow, setAvailableNow] = React.useState(false);
-  const [hasEquipment, setHasEquipment] = React.useState(false);
-  const [hasParking, setHasParking] = React.useState(false);
-  const [hasWifi, setHasWifi] = React.useState(false);
-  const [allowsPhotography, setAllowsPhotography] = React.useState(false);
-
   return (
     <div className="space-y-8">
       {/* First Row - Capacity and Accessibility */}

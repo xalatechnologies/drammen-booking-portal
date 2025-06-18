@@ -111,6 +111,57 @@ export class FacilityRepository extends BaseRepository<Facility, FacilityFilters
         }
       }
 
+      // Price range filter
+      if (filters.priceRange) {
+        const facilityPrice = facility.pricePerHour || 0;
+        if (facilityPrice < filters.priceRange.min || facilityPrice > filters.priceRange.max) {
+          return false;
+        }
+      }
+
+      // Available now filter (simplified check)
+      if (filters.availableNow) {
+        // For now, we'll check if the facility has availableTimes
+        // In a real implementation, this would check current time availability
+        if (!facility.availableTimes || facility.availableTimes.length === 0) {
+          return false;
+        }
+      }
+
+      // Amenities filter
+      if (filters.amenities && filters.amenities.length > 0) {
+        const facilityAmenities = [
+          ...(facility.amenities || []),
+          ...(facility.equipment || [])
+        ].map(amenity => amenity.toLowerCase());
+
+        const hasRequiredAmenities = filters.amenities.every(requiredAmenity => {
+          switch (requiredAmenity) {
+            case 'av-equipment':
+              return facilityAmenities.some(amenity => 
+                amenity.includes('projektor') || 
+                amenity.includes('lyd') || 
+                amenity.includes('mikrofon') ||
+                amenity.includes('av')
+              );
+            case 'parking':
+              return facilityAmenities.some(amenity => amenity.includes('parkering'));
+            case 'wifi':
+              return facilityAmenities.some(amenity => 
+                amenity.includes('wifi') || amenity.includes('internett')
+              );
+            case 'photography':
+              return facilityAmenities.some(amenity => 
+                amenity.includes('foto') || amenity.includes('kamera')
+              );
+            default:
+              return facilityAmenities.includes(requiredAmenity.toLowerCase());
+          }
+        });
+
+        if (!hasRequiredAmenities) return false;
+      }
+
       return true;
     });
   }
