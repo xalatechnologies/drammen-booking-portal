@@ -45,64 +45,70 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
   const startItem = (page - 1) * pagination.limit + 1;
   const endItem = Math.min(page * pagination.limit, total);
 
+  if (totalPages <= 1) {
+    return null;
+  }
+
   return (
-    <div className="flex flex-col items-center gap-4 mt-8 mb-8">
-      {/* Results info */}
-      <p className="text-sm text-gray-600">
-        Viser {startItem}-{endItem} av {total} lokaler
-      </p>
-
-      {/* Only show pagination controls if more than 1 page */}
-      {totalPages > 1 && (
-        <div className="flex justify-center items-center gap-1">
-          {/* Previous button */}
-          <button
-            onClick={() => onPageChange(page - 1)}
-            disabled={!hasPrev}
-            className={`
-              h-10 w-10 flex items-center justify-center rounded-lg border transition-all duration-200
-              ${!hasPrev 
-                ? 'text-gray-300 border-gray-200 cursor-not-allowed bg-white' 
-                : 'text-gray-600 border-gray-300 bg-white hover:bg-gray-50 hover:border-gray-400'
-              }
-            `}
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </button>
-
-          {/* Page numbers */}
-          {getVisiblePages().map((pageNum) => (
-            <button
-              key={pageNum}
-              onClick={() => onPageChange(pageNum)}
-              className={`
-                h-10 w-10 flex items-center justify-center text-sm font-medium transition-all duration-200 rounded-lg border
-                ${page === pageNum
-                  ? 'bg-black text-white border-black'
-                  : 'text-gray-700 border-gray-300 bg-white hover:bg-gray-50 hover:border-gray-400'
-                }
-              `}
-            >
-              {pageNum}
-            </button>
-          ))}
-
-          {/* Next button */}
-          <button
-            onClick={() => onPageChange(page + 1)}
-            disabled={!hasNext}
-            className={`
-              h-10 w-10 flex items-center justify-center rounded-lg border transition-all duration-200
-              ${!hasNext 
-                ? 'text-gray-300 border-gray-200 cursor-not-allowed bg-white' 
-                : 'text-gray-600 border-gray-300 bg-white hover:bg-gray-50 hover:border-gray-400'
-              }
-            `}
-          >
-            <ChevronRight className="h-4 w-4" />
-          </button>
+    <div className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6">
+      <div className="flex flex-1 justify-between sm:hidden">
+        <button
+          onClick={() => onPageChange(page - 1)}
+          disabled={!hasPrev}
+          className="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Previous
+        </button>
+        <button
+          onClick={() => onPageChange(page + 1)}
+          disabled={!hasNext}
+          className="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Next
+        </button>
+      </div>
+      <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+        <div>
+          <p className="text-sm text-gray-700">
+            Showing <span className="font-medium">{startItem}</span> to{' '}
+            <span className="font-medium">{endItem}</span> of{' '}
+            <span className="font-medium">{total}</span> results
+          </p>
         </div>
-      )}
+        <div>
+          <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+            <button
+              onClick={() => onPageChange(page - 1)}
+              disabled={!hasPrev}
+              className="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <span className="sr-only">Previous</span>
+              <ChevronLeft className="h-5 w-5" aria-hidden="true" />
+            </button>
+            {getVisiblePages().map((pageNum) => (
+              <button
+                key={pageNum}
+                onClick={() => onPageChange(pageNum)}
+                className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${
+                  page === pageNum
+                    ? 'z-10 bg-indigo-600 text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600'
+                    : 'text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0'
+                }`}
+              >
+                {pageNum}
+              </button>
+            ))}
+            <button
+              onClick={() => onPageChange(page + 1)}
+              disabled={!hasNext}
+              className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <span className="sr-only">Next</span>
+              <ChevronRight className="h-5 w-5" aria-hidden="true" />
+            </button>
+          </nav>
+        </div>
+      </div>
     </div>
   );
 };
