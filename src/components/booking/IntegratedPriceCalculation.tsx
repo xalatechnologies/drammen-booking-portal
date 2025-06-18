@@ -4,7 +4,6 @@ import { SelectedTimeSlot } from '@/utils/recurrenceEngine';
 import { ActorType, BookingType } from '@/types/pricing';
 import { PriceBreakdown } from './PriceBreakdown';
 import { usePriceCalculation } from '@/hooks/usePriceCalculation';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Calculator } from 'lucide-react';
 
 interface IntegratedPriceCalculationProps {
@@ -40,14 +39,13 @@ export function IntegratedPriceCalculation({
   }
 
   return (
-    <Card className="border-2 border-blue-200 bg-blue-50">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-lg flex items-center gap-2 text-blue-900">
+    <div className="border-2 border-blue-200 bg-blue-50 rounded-xl">
+      <div className="p-4">
+        <div className="flex items-center gap-2 text-blue-900 mb-4">
           <Calculator className="h-5 w-5" />
-          Prisberegning
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
+          <h3 className="text-lg font-semibold">Prisberegning</h3>
+        </div>
+        
         {calculation && (
           <>
             <PriceBreakdown 
@@ -70,7 +68,7 @@ export function IntegratedPriceCalculation({
             )}
           </>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

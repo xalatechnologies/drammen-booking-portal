@@ -1,8 +1,9 @@
 
 import React from 'react';
-import { Users } from 'lucide-react';
+import { Users, AlertTriangle } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { ActorType } from '@/types/pricing';
 
 interface EnhancedCustomerTypeSelectorProps {
@@ -15,31 +16,36 @@ const actorTypeOptions = [
     value: 'lag-foreninger' as ActorType,
     label: 'Lag og foreninger (frivillige)',
     description: 'Gratis eller redusert pris - krever godkjenning',
-    color: 'text-green-600'
+    color: 'text-green-600',
+    requiresApproval: true
   },
   {
     value: 'paraply' as ActorType,
     label: 'Paraplyorganisasjoner',
     description: 'Spesiell rabatt - krever godkjenning',
-    color: 'text-blue-600'
+    color: 'text-blue-600',
+    requiresApproval: true
   },
   {
     value: 'private-firma' as ActorType,
     label: 'Private firmaer',
     description: 'Full markedspris',
-    color: 'text-red-600'
+    color: 'text-red-600',
+    requiresApproval: false
   },
   {
     value: 'kommunale-enheter' as ActorType,
     label: 'Kommunale enheter',
     description: 'Redusert pris for kommunale aktører',
-    color: 'text-blue-600'
+    color: 'text-blue-600',
+    requiresApproval: false
   },
   {
     value: 'private-person' as ActorType,
     label: 'Private personer',
     description: 'Standard pris for privatpersoner',
-    color: 'text-gray-500'
+    color: 'text-gray-500',
+    requiresApproval: false
   }
 ];
 
@@ -78,12 +84,13 @@ export function EnhancedCustomerTypeSelector({ value, onChange }: EnhancedCustom
         </SelectContent>
       </Select>
 
-      {selectedOption && (
-        <div className="mt-2 p-3 bg-slate-50 border border-slate-200 rounded-lg">
-          <div className={`text-sm font-medium ${selectedOption.color}`}>
-            {selectedOption.description}
-          </div>
-        </div>
+      {selectedOption?.requiresApproval && (
+        <Alert className="border-amber-200 bg-amber-50">
+          <AlertTriangle className="h-4 w-4 text-amber-600" />
+          <AlertDescription className="text-amber-800">
+            Krever godkjenning
+          </AlertDescription>
+        </Alert>
       )}
     </div>
   );
