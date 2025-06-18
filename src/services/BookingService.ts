@@ -321,7 +321,10 @@ export class BookingService {
       const result = await bookingRepository.checkBookingConflicts(zoneId, startDate, endDate);
       
       if (!result.success) {
-        return result;
+        return {
+          success: false,
+          error: result.error
+        };
       }
 
       return {

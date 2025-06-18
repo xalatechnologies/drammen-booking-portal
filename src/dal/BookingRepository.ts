@@ -124,7 +124,7 @@ export class BookingRepository extends BaseRepository<Booking, BookingFilters, B
       contactEmail: request.contactEmail,
       contactPhone: request.contactPhone,
       
-      additionalServices: [],
+      additionalServices: [], // Fixed: Always use BookingService[] type
       pricing: {
         basePrice: 0,
         servicesCost: 0,
@@ -151,6 +151,16 @@ export class BookingRepository extends BaseRepository<Booking, BookingFilters, B
     return {
       ...existing,
       ...request,
+      // Handle additionalServices properly
+      additionalServices: request.additionalServices 
+        ? request.additionalServices.map(serviceId => ({
+            serviceId,
+            serviceName: `Service ${serviceId}`,
+            quantity: 1,
+            unitPrice: 0,
+            totalPrice: 0
+          }))
+        : existing.additionalServices,
       updatedAt: new Date()
     };
   }
@@ -193,9 +203,12 @@ export class BookingRepository extends BaseRepository<Booking, BookingFilters, B
 
       // Check for conflicts with sub-zones if booking main zone
       let subZoneConflicts: Booking[] = [];
-      if (zone.isMainZone && zone.subZones) {
+      // Find sub-zones by checking if any zones have this zone as parent
+      const subZones = this.zones.filter(z => z.parentZoneId === zoneId);
+      if (zone.isMainZone && subZones.length > 0) {
+        const subZoneIds = subZones.map(z => z.id);
         subZoneConflicts = this.data.filter(booking =>
-          zone.subZones?.includes(booking.zoneId) &&
+          subZoneIds.includes(booking.zoneId) &&
           booking.id !== excludeBookingId &&
           booking.status !== 'cancelled' &&
           booking.status !== 'rejected' &&

@@ -3,6 +3,12 @@ import { ZoneConflictManager, ExistingBooking } from "./zoneConflictManager";
 import { Zone } from "@/components/booking/types";
 import { BookingService } from "@/services/BookingService";
 
+export interface AlternativeZoneSuggestion {
+  zone: Zone;
+  reason: string;
+  score: number;
+}
+
 export class EnhancedZoneConflictManager extends ZoneConflictManager {
   constructor(zones: Zone[], existingBookings: ExistingBooking[] = []) {
     super(zones, existingBookings);
