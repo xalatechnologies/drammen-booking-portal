@@ -51,7 +51,7 @@ const FacilityList: React.FC<FacilityListProps> = ({
         </div>
       )}
 
-      {paginationInfo && (
+      {paginationInfo && paginationInfo.totalPages > 1 && (
         <PaginationControls 
           pagination={paginationInfo}
           onPageChange={goToPage}
