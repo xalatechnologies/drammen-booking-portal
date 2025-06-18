@@ -1,6 +1,7 @@
+
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { CheckCircle2, MapPin, Users, Map, Share2, Heart, Clock, CheckCircle, XCircle } from "lucide-react";
+import { CheckCircle2, MapPin, Users, Map, Share2, Heart, Clock, CheckCircle, XCircle, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -122,6 +123,24 @@ export function EnhancedFacilitySidebar({
                 <p className="text-lg font-bold text-emerald-600">{zoneCount}</p>
               </div>
             </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Suitable For Card */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <Tag className="h-5 w-5" />
+            Egnet for
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-wrap gap-2">
+            <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">Idrett</Badge>
+            <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">Trening</Badge>
+            <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">Arrangementer</Badge>
+            <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200">Grupper</Badge>
           </div>
         </CardContent>
       </Card>

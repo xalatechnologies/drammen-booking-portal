@@ -1,7 +1,6 @@
 
 import React from "react";
 import { MapPin, Users } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { AvailabilityTab } from "./AvailabilityTab";
 import { FacilityLocation } from "../FacilityLocation";
 import { Zone } from "@/components/booking/types";
@@ -32,16 +31,6 @@ export function DescriptionTab({ description, capacity, address, zones = [] }: D
           
           <div>
             <p className="text-gray-700 leading-relaxed">{description}</p>
-          </div>
-          
-          <div className="pt-4 border-t border-gray-100">
-            <h4 className="font-medium text-gray-900 mb-2">Egnet for</h4>
-            <div className="flex flex-wrap gap-2">
-              <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">Idrett</Badge>
-              <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">Trening</Badge>
-              <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">Arrangementer</Badge>
-              <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200">Grupper</Badge>
-            </div>
           </div>
         </div>
       </div>
