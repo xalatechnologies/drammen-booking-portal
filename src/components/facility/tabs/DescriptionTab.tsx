@@ -10,9 +10,10 @@ interface DescriptionTabProps {
   capacity: number;
   address: string;
   zones?: Zone[];
+  facilityId?: string;
 }
 
-export function DescriptionTab({ description, capacity, address, zones = [] }: DescriptionTabProps) {
+export function DescriptionTab({ description, capacity, address, zones = [], facilityId }: DescriptionTabProps) {
   return (
     <div className="p-6 space-y-6">
       {/* General Information */}
@@ -39,7 +40,12 @@ export function DescriptionTab({ description, capacity, address, zones = [] }: D
       {zones.length > 0 && (
         <div className="border-t border-gray-200 pt-6">
           <h3 className="text-lg font-semibold mb-4">Tilgjengelighet</h3>
-          <AvailabilityTab zones={zones} startDate={new Date()} showLegend={false} />
+          <AvailabilityTab 
+            zones={zones} 
+            startDate={new Date()} 
+            showLegend={false} 
+            facilityId={facilityId}
+          />
           
           {/* Legends moved here */}
           <div className="mt-4 p-3 bg-gray-50 rounded-lg">

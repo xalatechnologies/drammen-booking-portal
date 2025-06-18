@@ -1,7 +1,9 @@
+
 import React, { useState } from "react";
 import { format, addDays, startOfWeek, isBefore, startOfDay } from "date-fns";
 import { nb } from "date-fns/locale";
 import { ChevronLeft, ChevronRight, Calendar, Users, DollarSign } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -13,10 +15,12 @@ interface AvailabilityTabProps {
   zones: Zone[];
   startDate: Date;
   showLegend?: boolean;
+  facilityId?: string;
 }
 
-export function AvailabilityTab({ zones, startDate, showLegend = true }: AvailabilityTabProps) {
+export function AvailabilityTab({ zones, startDate, showLegend = true, facilityId }: AvailabilityTabProps) {
   const [currentWeekStart, setCurrentWeekStart] = useState(startOfWeek(startDate, { weekStartsOn: 1 }));
+  const navigate = useNavigate();
   
   // Mock existing bookings for demo
   const existingBookings: ExistingBooking[] = [
@@ -43,6 +47,13 @@ export function AvailabilityTab({ zones, startDate, showLegend = true }: Availab
   const today = startOfDay(new Date());
   const currentWeekStartDay = startOfDay(currentWeekStart);
   const canGoPrevious = !isBefore(addDays(currentWeekStartDay, -7), today);
+
+  const handleBookingClick = (zoneId: string, date: Date, timeSlot: string) => {
+    if (!facilityId) return;
+    
+    const bookingPath = `/booking/${facilityId}?zone=${zoneId}&date=${format(date, 'yyyy-MM-dd')}&time=${timeSlot}`;
+    navigate(bookingPath);
+  };
 
   const getAvailabilityStatus = (zoneId: string, date: Date, timeSlot: string) => {
     const unavailableCheck = isDateUnavailable(date);
@@ -211,7 +222,7 @@ export function AvailabilityTab({ zones, startDate, showLegend = true }: Availab
                         title={availability.details || statusText}
                         onClick={() => {
                           if (availability.status === 'available') {
-                            console.log(`Booking ${zone.name} on ${format(day, 'dd.MM.yyyy')} at ${timeSlot}`);
+                            handleBookingClick(zone.id, day, timeSlot);
                           }
                         }}
                       >

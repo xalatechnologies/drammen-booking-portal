@@ -1,12 +1,13 @@
 
-import React, { useState } from "react";
+import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Zone } from "@/components/booking/types";
-import { getAmenityIcon } from "./utils/amenityIcons";
+import { Info, Calendar, List, HelpCircle, Shield } from "lucide-react";
 import { DescriptionTab } from "./tabs/DescriptionTab";
+import { AvailabilityTab } from "./tabs/AvailabilityTab";
 import { FeaturesTab } from "./tabs/FeaturesTab";
 import { FaqTab } from "./tabs/FaqTab";
 import { RulesTab } from "./tabs/RulesTab";
+import { Zone } from "@/components/booking/types";
 
 interface FacilityInfoTabsProps {
   description: string;
@@ -16,70 +17,60 @@ interface FacilityInfoTabsProps {
   amenities: string[];
   address: string;
   zoneCards: React.ReactNode;
+  facilityId?: string;
 }
 
-export function FacilityInfoTabs({ 
-  description, 
-  capacity, 
-  equipment, 
-  zones, 
-  amenities, 
+export function FacilityInfoTabs({
+  description,
+  capacity,
+  equipment,
+  zones,
+  amenities,
   address,
-  zoneCards
+  zoneCards,
+  facilityId
 }: FacilityInfoTabsProps) {
   return (
-    <Tabs defaultValue="description" className="bg-white rounded-lg shadow-sm border">
-      <TabsList className="w-full border-b p-0 h-auto bg-gray-50 rounded-none">
-        <TabsTrigger 
-          value="description" 
-          className="flex-1 py-4 px-6 rounded-none text-base font-medium data-[state=active]:bg-[#1e3a8a] data-[state=active]:text-white data-[state=active]:border-b-0 data-[state=active]:shadow-none hover:bg-[#1e40af] hover:text-white transition-colors"
-        >
+    <Tabs defaultValue="about" className="w-full">
+      <TabsList className="grid w-full grid-cols-4 mb-6">
+        <TabsTrigger value="about" className="flex items-center gap-2">
+          <Info className="h-4 w-4" />
           Om lokalet
         </TabsTrigger>
-        <TabsTrigger 
-          value="features" 
-          className="flex-1 py-4 px-6 rounded-none text-base font-medium data-[state=active]:bg-[#1e3a8a] data-[state=active]:text-white data-[state=active]:border-b-0 data-[state=active]:shadow-none hover:bg-[#1e40af] hover:text-white transition-colors"
-        >
+        <TabsTrigger value="features" className="flex items-center gap-2">
+          <List className="h-4 w-4" />
           Fasiliteter
         </TabsTrigger>
-        <TabsTrigger 
-          value="rules" 
-          className="flex-1 py-4 px-6 rounded-none text-base font-medium data-[state=active]:bg-[#1e3a8a] data-[state=active]:text-white data-[state=active]:border-b-0 data-[state=active]:shadow-none hover:bg-[#1e40af] hover:text-white transition-colors"
-        >
+        <TabsTrigger value="faq" className="flex items-center gap-2">
+          <HelpCircle className="h-4 w-4" />
+          Ofte spurte spørsmål
+        </TabsTrigger>
+        <TabsTrigger value="rules" className="flex items-center gap-2">
+          <Shield className="h-4 w-4" />
           Regler
         </TabsTrigger>
-        <TabsTrigger 
-          value="faq" 
-          className="flex-1 py-4 px-6 rounded-none text-base font-medium data-[state=active]:bg-[#1e3a8a] data-[state=active]:text-white data-[state=active]:border-b-0 data-[state=active]:shadow-none hover:bg-[#1e40af] hover:text-white transition-colors"
-        >
-          FAQ
-        </TabsTrigger>
       </TabsList>
-      
-      <TabsContent value="description">
+
+      <TabsContent value="about">
         <DescriptionTab 
           description={description} 
           capacity={capacity} 
-          address={address}
+          address={address} 
           zones={zones}
-        />
-      </TabsContent>
-      
-      <TabsContent value="features">
-        <FeaturesTab 
-          capacity={capacity} 
-          equipment={equipment} 
-          amenities={amenities}
-          getAmenityIcon={getAmenityIcon}
+          facilityId={facilityId}
         />
       </TabsContent>
 
-      <TabsContent value="rules">
-        <RulesTab />
+      <TabsContent value="features">
+        <FeaturesTab equipment={equipment} amenities={amenities} />
       </TabsContent>
 
       <TabsContent value="faq">
         <FaqTab />
+      </TabsContent>
+
+      <TabsContent value="rules">
+        <RulesTab />
       </TabsContent>
     </Tabs>
   );
