@@ -7,7 +7,7 @@ const Logo: React.FC = () => {
       <img 
         src="https://www.drammen.kommune.no/Logos/logo-drammen-new.svg" 
         alt="Drammen Kommune Logo" 
-        className="h-16 w-auto" 
+        className="h-20 w-auto" 
       />
     </a>
   );
