@@ -8,6 +8,7 @@ import { FeaturesTab } from "./tabs/FeaturesTab";
 import { FaqTab } from "./tabs/FaqTab";
 import { RulesTab } from "./tabs/RulesTab";
 import { Zone } from "@/components/booking/types";
+import { getAmenityIcon } from "./utils/amenityIcons";
 
 interface FacilityInfoTabsProps {
   description: string;
@@ -62,7 +63,12 @@ export function FacilityInfoTabs({
       </TabsContent>
 
       <TabsContent value="features">
-        <FeaturesTab equipment={equipment} amenities={amenities} />
+        <FeaturesTab 
+          capacity={capacity}
+          equipment={equipment} 
+          amenities={amenities}
+          getAmenityIcon={getAmenityIcon}
+        />
       </TabsContent>
 
       <TabsContent value="faq">
