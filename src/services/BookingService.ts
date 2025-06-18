@@ -1,7 +1,7 @@
 
 import { Booking, BookingCreateRequest, BookingUpdateRequest, BookingFilters, BookingStatus } from '@/types/booking';
 import { PaginatedResponse, PaginationParams, ApiResponse } from '@/types/api';
-import { bookingRepository } from '@/dal/BookingRepository';
+import { bookingRepository } from '@/dal/repositories';
 import { ActorType, BookingType } from '@/types/pricing';
 
 // Simulate API delay
