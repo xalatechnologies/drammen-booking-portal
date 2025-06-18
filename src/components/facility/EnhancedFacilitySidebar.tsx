@@ -1,7 +1,7 @@
 
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { CheckCircle2, MapPin, Users, Map, Share2, Heart, Clock, CheckCircle } from "lucide-react";
+import { CheckCircle2, MapPin, Users, Map, Share2, Heart, Clock, CheckCircle, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -169,12 +169,24 @@ export function EnhancedFacilitySidebar({
         </CardContent>
       </Card>
 
-      {/* Cancellation Policy */}
-      <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-        <p className="text-xs text-green-800">
-          <strong>Gratis avbestilling</strong> opptil 24 timer før reservert tid
-        </p>
-      </div>
+      {/* Cancellation Policy Card */}
+      <Card className="shadow-sm">
+        <CardContent className="p-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-emerald-100 rounded-md">
+              <XCircle className="h-5 w-5 text-emerald-600" />
+            </div>
+            <div>
+              <h3 className="font-medium text-emerald-800">
+                Gratis avbestilling
+              </h3>
+              <p className="text-sm text-emerald-700">
+                Opptil 24 timer før reservert tid
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
