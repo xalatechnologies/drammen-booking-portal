@@ -6,7 +6,8 @@ import { MapMarkers } from './map/MapMarkers';
 import { MapInfoOverlay } from './map/MapInfoOverlay';
 import { MapLoadingState } from './map/MapLoadingState';
 import { MapErrorState } from './map/MapErrorState';
-import { facilityLocations } from './map/facilityData';
+import { useFacilities } from '@/hooks/useFacilities';
+import { FacilityFilters } from '@/types/facility';
 import mapboxgl from 'mapbox-gl';
 
 // Default token provided by user
@@ -23,12 +24,26 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location }) => {
   const [error, setError] = useState<string>('');
   const [isInitialized, setIsInitialized] = useState<boolean>(false);
 
-  // Filter facilities based on selected filters
-  const filteredFacilities = facilityLocations.filter(facility => {
-    const matchesType = !facilityType || facilityType === "";
-    const matchesLocation = !location || location === "" || facility.address.toLowerCase().includes(location.toLowerCase());
-    return matchesType && matchesLocation;
+  // Create filters from props
+  const filters: FacilityFilters = {
+    facilityType: facilityType !== "all" ? facilityType : undefined,
+    location: location !== "all" ? location : undefined,
+  };
+
+  // Use the centralized facilities service
+  const { facilities, isLoading: facilitiesLoading, error: facilitiesError } = useFacilities({
+    pagination: { page: 1, limit: 100 }, // Get all facilities for map
+    filters
   });
+
+  // Convert facilities to map format
+  const facilityLocations = facilities.map(facility => ({
+    id: facility.id,
+    name: facility.name,
+    address: facility.address,
+    lat: 59.7440 + (Math.random() - 0.5) * 0.02, // Spread around Drammen
+    lng: 10.2052 + (Math.random() - 0.5) * 0.02
+  }));
 
   const handleMapLoad = (mapInstance: mapboxgl.Map) => {
     setMap(mapInstance);
@@ -50,11 +65,11 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location }) => {
     <div className="relative w-full">
       <div className="mt-4">
         <Card className="min-h-[600px] relative overflow-hidden">
-          <MapLoadingState isLoading={isLoading} />
+          <MapLoadingState isLoading={isLoading || facilitiesLoading} />
           
           <MapErrorState 
-            error={error} 
-            isLoading={isLoading} 
+            error={error || (facilitiesError ? 'Failed to load facilities' : '')} 
+            isLoading={isLoading || facilitiesLoading} 
             onRetry={handleRetry} 
           />
           
@@ -65,10 +80,10 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location }) => {
             mapboxToken={DEFAULT_MAPBOX_TOKEN}
           />
           
-          <MapMarkers map={map} facilities={filteredFacilities} />
+          <MapMarkers map={map} facilities={facilityLocations} />
           
-          {!error && !isLoading && (
-            <MapInfoOverlay facilities={filteredFacilities} />
+          {!error && !isLoading && !facilitiesLoading && (
+            <MapInfoOverlay facilities={facilityLocations} />
           )}
         </Card>
       </div>
