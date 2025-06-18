@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
 import Logo from "@/components/header/Logo";
 import LanguageToggle from "@/components/header/LanguageToggle";
+import ThemeToggle from "@/components/header/ThemeToggle";
 import ProfileMenu from "@/components/header/ProfileMenu";
 import MobileMenu from "@/components/header/MobileMenu";
 
@@ -38,7 +39,7 @@ const GlobalHeader = () => {
   };
 
   return (
-    <header className="bg-white py-2 px-4 shadow-md sticky top-0 z-10">
+    <header className="bg-white dark:bg-gray-900 py-2 px-4 shadow-md sticky top-0 z-10 border-b border-gray-200 dark:border-gray-700">
       <div className="container mx-auto flex justify-between items-center">
         {/* Logo (left) */}
         <div className="flex items-center">
@@ -54,8 +55,11 @@ const GlobalHeader = () => {
           <Menu className="h-6 w-6" />
         </Button>
 
-        {/* Right side: Language toggle & Login/Profile */}
-        <div className="hidden lg:flex items-center space-x-4">
+        {/* Right side: Theme toggle, Language toggle & Login/Profile */}
+        <div className="hidden lg:flex items-center space-x-2">
+          {/* Theme toggle */}
+          <ThemeToggle />
+          
           {/* Language toggle */}
           <LanguageToggle 
             language={language} 
