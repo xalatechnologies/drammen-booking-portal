@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Calculator, Tag, TrendingUp, TrendingDown, Gift } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -37,7 +38,6 @@ export function PriceBreakdown({
   // Check if this is a free booking for nonprofit
   const isFreeForNonprofit = calculation.finalPrice === 0 && calculation.breakdown.some(item => item.description.includes('frivillige organisasjoner'));
   return <Card className={`border ${isFreeForNonprofit ? 'border-green-200 bg-green-50' : 'border-blue-200 bg-blue-50'}`}>
-      
       <CardContent className="space-y-4">
         {/* Final Price Display */}
         <div className={`bg-white border rounded-lg p-4 ${isFreeForNonprofit ? 'border-green-200' : 'border-blue-200'}`}>
