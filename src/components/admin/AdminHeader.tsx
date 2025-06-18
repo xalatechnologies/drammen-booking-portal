@@ -19,47 +19,47 @@ import Logo from "@/components/header/Logo";
 const AdminHeader = () => {
   return (
     <header className="surface-primary sticky top-0 z-50 border-b border-primary shadow-md">
-      <div className="flex h-20 items-center px-8 gap-6">
-        <div className="flex items-center gap-6 min-w-0">
+      <div className="flex h-20 items-center px-spacing-xl gap-spacing-xl">
+        <div className="flex items-center gap-spacing-xl min-w-0">
           <Logo />
-          <div className="hidden md:flex items-center gap-2 text-sm">
+          <div className="hidden md:flex items-center gap-spacing-sm">
             <BodySmall className="text-text-tertiary">Admin</BodySmall>
             <span className="text-text-tertiary">/</span>
-            <BodySmall className="text-text-primary font-medium">Dashboard</BodySmall>
+            <BodySmall className="text-text-primary font-semibold">Dashboard</BodySmall>
           </div>
         </div>
         
-        <div className="flex-1 flex justify-center px-8">
+        <div className="flex-1 flex justify-center px-spacing-xl">
           <div className="relative w-full max-w-xl">
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-text-tertiary" />
+            <Search className="absolute left-spacing-lg top-1/2 transform -translate-y-1/2 h-5 w-5 text-text-tertiary" />
             <Input
               placeholder="Søk i alt innhold..."
-              className="input-primary pl-12 h-12 text-base"
+              className="input-primary pl-12 h-12 text-base rounded-lg"
               aria-label="Søk i systemet"
             />
           </div>
         </div>
 
-        <div className="flex items-center gap-4 flex-shrink-0">
+        <div className="flex items-center gap-spacing-lg flex-shrink-0">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <ActionButton 
                 variant="ghost" 
                 size="md"
                 icon={<img src="/lovable-uploads/97431924-b9fd-4ccd-b558-a9e90506c716.png" alt="NO" className="w-5 h-4 rounded-sm" />}
-                className="text-text-primary"
+                className="text-text-primary focus-ring"
                 aria-label="Velg språk"
               >
                 Norsk
               </ActionButton>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="surface-primary border-primary shadow-lg">
-              <DropdownMenuItem className="hover:bg-surface-secondary">
-                <img src="/lovable-uploads/97431924-b9fd-4ccd-b558-a9e90506c716.png" alt="NO" className="w-5 h-4 mr-3 rounded-sm" />
+              <DropdownMenuItem className="hover:surface-secondary">
+                <img src="/lovable-uploads/97431924-b9fd-4ccd-b558-a9e90506c716.png" alt="NO" className="w-5 h-4 mr-spacing-md rounded-sm" />
                 Norsk
               </DropdownMenuItem>
-              <DropdownMenuItem className="hover:bg-surface-secondary">
-                <img src="/lovable-uploads/b12bcda3-d611-4e9e-bbcc-d53d2db38af9.png" alt="EN" className="w-5 h-4 mr-3 rounded-sm" />
+              <DropdownMenuItem className="hover:surface-secondary">
+                <img src="/lovable-uploads/b12bcda3-d611-4e9e-bbcc-d53d2db38af9.png" alt="EN" className="w-5 h-4 mr-spacing-md rounded-sm" />
                 English
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -71,7 +71,7 @@ const AdminHeader = () => {
                 variant="ghost" 
                 size="md"
                 icon={<Bell className="h-5 w-5" />}
-                className="relative text-text-primary"
+                className="relative text-text-primary focus-ring"
                 aria-label="Varsler - 3 uleste"
               >
                 <StatusBadge 
@@ -87,9 +87,9 @@ const AdminHeader = () => {
               <DropdownMenuLabel>
                 <Heading5>Varsler</Heading5>
               </DropdownMenuLabel>
-              <DropdownMenuSeparator className="bg-primary" />
-              <DropdownMenuItem className="py-4 cursor-pointer hover:bg-surface-secondary">
-                <div className="flex flex-col gap-2">
+              <DropdownMenuSeparator className="border-primary" />
+              <DropdownMenuItem className="py-spacing-lg cursor-pointer hover:surface-secondary">
+                <div className="flex flex-col gap-spacing-sm">
                   <BodySmall className="font-semibold text-text-primary">Ny forespørsel om lokale</BodySmall>
                   <BodySmall className="text-text-secondary">Brandengen Skole ba om godkjenning</BodySmall>
                   <BodySmall className="text-text-tertiary">2 minutter siden</BodySmall>
@@ -103,7 +103,7 @@ const AdminHeader = () => {
               <ActionButton 
                 variant="ghost" 
                 size="md"
-                className="gap-3 text-text-primary"
+                className="gap-spacing-md text-text-primary focus-ring"
                 aria-label="Brukerprofil og innstillinger"
               >
                 <Avatar className="h-8 w-8">
@@ -120,11 +120,11 @@ const AdminHeader = () => {
               <DropdownMenuLabel>
                 <BodySmall className="font-semibold text-text-primary">Min Konto</BodySmall>
               </DropdownMenuLabel>
-              <DropdownMenuSeparator className="bg-primary" />
-              <DropdownMenuItem className="hover:bg-surface-secondary">Profil</DropdownMenuItem>
-              <DropdownMenuItem className="hover:bg-surface-secondary">Innstillinger</DropdownMenuItem>
-              <DropdownMenuSeparator className="bg-primary" />
-              <DropdownMenuItem className="hover:bg-surface-secondary text-semantic-error">Logg ut</DropdownMenuItem>
+              <DropdownMenuSeparator className="border-primary" />
+              <DropdownMenuItem className="hover:surface-secondary">Profil</DropdownMenuItem>
+              <DropdownMenuItem className="hover:surface-secondary">Innstillinger</DropdownMenuItem>
+              <DropdownMenuSeparator className="border-primary" />
+              <DropdownMenuItem className="hover:surface-secondary text-semantic-error">Logg ut</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

@@ -19,22 +19,24 @@ export function AdminCard({
   variant = "primary" 
 }: AdminCardProps) {
   const variantClasses = {
-    primary: "card-primary border border-primary",
-    secondary: "card-secondary border border-secondary", 
-    glass: "card-glass border border-white/20"
+    primary: "surface-primary border border-primary shadow-md hover:shadow-lg transition-all duration-200",
+    secondary: "surface-secondary border border-secondary shadow-sm hover:shadow-md transition-all duration-200", 
+    glass: "glass-effect shadow-glass border border-white/20 backdrop-blur-lg"
   };
 
   return (
-    <Card className={cn(variantClasses[variant], "shadow-md hover:shadow-lg transition-all duration-200", className)}>
-      <CardHeader className="pb-4">
-        <CardTitle className="heading-primary text-xl">{title}</CardTitle>
+    <Card className={cn(variantClasses[variant], "rounded-xl", className)}>
+      <CardHeader className="pb-spacing-lg p-spacing-xl">
+        <CardTitle className="heading-primary text-xl font-bold text-text-primary tracking-tight">
+          {title}
+        </CardTitle>
         {description && (
-          <CardDescription className="body-secondary text-base">
+          <CardDescription className="body-secondary text-base text-text-secondary leading-relaxed">
             {description}
           </CardDescription>
         )}
       </CardHeader>
-      <CardContent className="pt-0">
+      <CardContent className="pt-0 p-spacing-xl">
         {children}
       </CardContent>
     </Card>

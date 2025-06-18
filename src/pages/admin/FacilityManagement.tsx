@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import {
   Table,
@@ -153,18 +154,20 @@ const FacilityManagementPage = () => {
   };
 
   return (
-    <Container className="space-y-8">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
+    <Container className="space-y-spacing-xl">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-spacing-xl">
         <div>
-          <Heading1 className="mb-3">Lokaler</Heading1>
-          <BodyMedium className="text-text-secondary">
+          <Heading1 className="mb-spacing-md text-text-primary font-bold tracking-tight">
+            Lokaler
+          </Heading1>
+          <BodyMedium className="text-text-secondary leading-relaxed">
             Administrer og overvåk alle kommunale lokaler
           </BodyMedium>
         </div>
         <ActionButton 
           variant="primary"
           icon={<Plus className="h-5 w-5" />}
-          className="shadow-sm"
+          className="shadow-md hover:shadow-lg transition-all duration-200"
         >
           Legg til lokale
         </ActionButton>
@@ -172,28 +175,28 @@ const FacilityManagementPage = () => {
 
       <Grid cols={4} gap="lg">
         <AdminCard title="Totalt antall lokaler" className="text-center">
-          <div className="space-y-2">
+          <div className="space-y-spacing-sm">
             <div className="text-4xl font-bold text-text-primary">{stats.total}</div>
             <BodySmall className="text-text-secondary">Alle typer lokaler</BodySmall>
           </div>
         </AdminCard>
         
         <AdminCard title="Aktive lokaler" className="text-center">
-          <div className="space-y-2">
+          <div className="space-y-spacing-sm">
             <div className="text-4xl font-bold text-text-primary">{stats.active}</div>
             <BodySmall className="text-text-secondary">Tilgjengelig for booking</BodySmall>
           </div>
         </AdminCard>
         
         <AdminCard title="Under vedlikehold" className="text-center">
-          <div className="space-y-2">
+          <div className="space-y-spacing-sm">
             <div className="text-4xl font-bold text-text-primary">{stats.maintenance}</div>
             <BodySmall className="text-text-secondary">Midlertidig utilgjengelig</BodySmall>
           </div>
         </AdminCard>
         
         <AdminCard title="Inaktive lokaler" className="text-center">
-          <div className="space-y-2">
+          <div className="space-y-spacing-sm">
             <div className="text-4xl font-bold text-text-primary">{stats.inactive}</div>
             <BodySmall className="text-text-secondary">Ikke tilgjengelig</BodySmall>
           </div>
@@ -201,14 +204,24 @@ const FacilityManagementPage = () => {
       </Grid>
 
       <Tabs defaultValue="liste" className="w-full">
-        <TabsList className="mb-8 bg-surface-secondary">
-          <TabsTrigger value="liste" className="px-8 py-3">Liste</TabsTrigger>
-          <TabsTrigger value="kart" className="px-8 py-3">Kart</TabsTrigger>
+        <TabsList className="mb-spacing-xl surface-secondary border border-primary rounded-lg">
+          <TabsTrigger 
+            value="liste" 
+            className="px-spacing-xl py-spacing-md text-text-primary hover:surface-tertiary rounded-lg transition-all duration-200"
+          >
+            Liste
+          </TabsTrigger>
+          <TabsTrigger 
+            value="kart" 
+            className="px-spacing-xl py-spacing-md text-text-primary hover:surface-tertiary rounded-lg transition-all duration-200"
+          >
+            Kart
+          </TabsTrigger>
         </TabsList>
         
-        <TabsContent value="liste" className="space-y-8">
+        <TabsContent value="liste" className="space-y-spacing-xl">
           <AdminCard title="Lokalsøk & Filtre" description="Søk etter lokaler etter navn, type, eller adresse">
-            <div className="flex flex-col sm:flex-row gap-6 mb-8">
+            <div className="flex flex-col sm:flex-row gap-spacing-xl mb-spacing-xl">
               <InputField
                 placeholder="Søk etter lokaler..."
                 value={searchQuery}
@@ -221,30 +234,31 @@ const FacilityManagementPage = () => {
                   <ActionButton 
                     variant="secondary"
                     icon={<Filter className="h-5 w-5" />}
+                    className="focus-ring"
                   >
                     Filter
                   </ActionButton>
                 </PopoverTrigger>
-                <PopoverContent className="w-80 surface-primary border-primary shadow-lg">
-                  <div className="space-y-6">
-                    <Heading2 className="text-lg">Filtrer etter status</Heading2>
-                    <div className="space-y-4">
+                <PopoverContent className="w-80 surface-primary border-primary shadow-lg rounded-xl">
+                  <div className="space-y-spacing-xl">
+                    <Heading2 className="text-lg font-semibold text-text-primary">Filtrer etter status</Heading2>
+                    <div className="space-y-spacing-lg">
                       {[
                         { id: "all", label: "Alle" },
                         { id: "active", label: "Aktive" },
                         { id: "maintenance", label: "Under vedlikehold" },
                         { id: "inactive", label: "Inaktive" },
                       ].map((filter) => (
-                        <div key={filter.id} className="flex items-center space-x-4">
+                        <div key={filter.id} className="flex items-center space-x-spacing-lg">
                           <input
                             type="radio"
                             id={filter.id}
                             name="status"
                             checked={activeFilter === filter.id}
                             onChange={() => setActiveFilter(filter.id)}
-                            className="w-4 h-4 text-brand-primary focus:ring-brand-primary focus:ring-2"
+                            className="w-4 h-4 text-brand-primary focus:ring-brand-primary focus:ring-2 focus-ring"
                           />
-                          <label htmlFor={filter.id} className="body-primary cursor-pointer font-medium">
+                          <label htmlFor={filter.id} className="body-primary cursor-pointer font-medium text-text-primary">
                             {filter.label}
                           </label>
                         </div>
@@ -255,22 +269,22 @@ const FacilityManagementPage = () => {
               </Popover>
             </div>
 
-            <div className="rounded-lg border border-primary overflow-hidden">
+            <div className="rounded-xl border border-primary overflow-hidden">
               <Table>
-                <TableHeader className="bg-surface-secondary">
+                <TableHeader className="surface-secondary">
                   <TableRow className="border-primary">
-                    <TableHead className="heading-secondary py-6">Lokale</TableHead>
-                    <TableHead className="heading-secondary py-6">Type</TableHead>
-                    <TableHead className="heading-secondary py-6">Status</TableHead>
-                    <TableHead className="heading-secondary py-6">Kapasitet</TableHead>
-                    <TableHead className="heading-secondary py-6">Neste ledig</TableHead>
-                    <TableHead className="heading-secondary py-6 sr-only">Handlinger</TableHead>
+                    <TableHead className="heading-secondary py-spacing-xl font-semibold text-text-primary">Lokale</TableHead>
+                    <TableHead className="heading-secondary py-spacing-xl font-semibold text-text-primary">Type</TableHead>
+                    <TableHead className="heading-secondary py-spacing-xl font-semibold text-text-primary">Status</TableHead>
+                    <TableHead className="heading-secondary py-spacing-xl font-semibold text-text-primary">Kapasitet</TableHead>
+                    <TableHead className="heading-secondary py-spacing-xl font-semibold text-text-primary">Neste ledig</TableHead>
+                    <TableHead className="heading-secondary py-spacing-xl sr-only">Handlinger</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredFacilities.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={6} className="py-12">
+                      <TableCell colSpan={6} className="py-spacing-3xl">
                         <EmptyState 
                           icon={<Search className="h-12 w-12" />}
                           title="Ingen lokaler funnet"
@@ -282,53 +296,53 @@ const FacilityManagementPage = () => {
                     filteredFacilities.map((facility) => (
                       <TableRow 
                         key={facility.id} 
-                        className="border-primary hover:bg-surface-secondary transition-colors"
+                        className="border-primary hover:surface-secondary transition-colors"
                       >
-                        <TableCell className="py-6">
+                        <TableCell className="py-spacing-xl">
                           <div>
-                            <BodyMedium className="font-semibold mb-2">{facility.name}</BodyMedium>
+                            <BodyMedium className="font-semibold mb-spacing-sm text-text-primary">{facility.name}</BodyMedium>
                             <div className="flex items-center text-text-secondary">
-                              <MapPin className="h-4 w-4 mr-2 flex-shrink-0" />
+                              <MapPin className="h-4 w-4 mr-spacing-sm flex-shrink-0" />
                               <BodySmall>{facility.address}</BodySmall>
                             </div>
                           </div>
                         </TableCell>
-                        <TableCell className="py-6">
+                        <TableCell className="py-spacing-xl">
                           <StatusBadge status="info" showIcon={false} className="bg-blue-100 text-blue-900 border-blue-200">
                             {facility.type}
                           </StatusBadge>
                         </TableCell>
-                        <TableCell className="py-6">
+                        <TableCell className="py-spacing-xl">
                           <StatusBadge status={getStatusBadgeType(facility.status) as any}>
                             {getStatusText(facility.status)}
                           </StatusBadge>
                         </TableCell>
-                        <TableCell className="py-6">
-                          <BodyMedium className="font-semibold">{facility.capacity} personer</BodyMedium>
+                        <TableCell className="py-spacing-xl">
+                          <BodyMedium className="font-semibold text-text-primary">{facility.capacity} personer</BodyMedium>
                         </TableCell>
-                        <TableCell className="py-6">
+                        <TableCell className="py-spacing-xl">
                           <div className="flex items-center text-brand-primary font-semibold">
-                            <Clock className="h-4 w-4 mr-2 flex-shrink-0" />
+                            <Clock className="h-4 w-4 mr-spacing-sm flex-shrink-0" />
                             <BodySmall>{facility.nextAvailable}</BodySmall>
                           </div>
                         </TableCell>
-                        <TableCell className="py-6">
+                        <TableCell className="py-spacing-xl">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <ActionButton 
                                 variant="ghost" 
                                 size="sm"
                                 icon={<MoreHorizontal className="h-5 w-5" />}
-                                className="h-10 w-10 p-0"
+                                className="h-10 w-10 p-0 focus-ring"
                               >
                                 Meny
                               </ActionButton>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="surface-primary border-primary shadow-lg">
-                              <DropdownMenuItem className="hover:bg-surface-secondary">Se detaljer</DropdownMenuItem>
-                              <DropdownMenuItem className="hover:bg-surface-secondary">Rediger</DropdownMenuItem>
-                              <DropdownMenuItem className="hover:bg-surface-secondary">Endre status</DropdownMenuItem>
-                              <DropdownMenuItem className="text-semantic-error hover:bg-red-50">Slett</DropdownMenuItem>
+                            <DropdownMenuContent align="end" className="surface-primary border-primary shadow-lg rounded-xl">
+                              <DropdownMenuItem className="hover:surface-secondary rounded-lg">Se detaljer</DropdownMenuItem>
+                              <DropdownMenuItem className="hover:surface-secondary rounded-lg">Rediger</DropdownMenuItem>
+                              <DropdownMenuItem className="hover:surface-secondary rounded-lg">Endre status</DropdownMenuItem>
+                              <DropdownMenuItem className="text-semantic-error hover:bg-red-50 rounded-lg">Slett</DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </TableCell>
@@ -339,23 +353,23 @@ const FacilityManagementPage = () => {
               </Table>
             </div>
 
-            <div className="mt-8 flex justify-center">
+            <div className="mt-spacing-xl flex justify-center">
               <Pagination>
                 <PaginationContent>
                   <PaginationItem>
-                    <PaginationPrevious href="#" />
+                    <PaginationPrevious href="#" className="focus-ring" />
                   </PaginationItem>
                   <PaginationItem>
-                    <PaginationLink href="#" isActive>1</PaginationLink>
+                    <PaginationLink href="#" isActive className="focus-ring">1</PaginationLink>
                   </PaginationItem>
                   <PaginationItem>
-                    <PaginationLink href="#">2</PaginationLink>
+                    <PaginationLink href="#" className="focus-ring">2</PaginationLink>
                   </PaginationItem>
                   <PaginationItem>
-                    <PaginationLink href="#">3</PaginationLink>
+                    <PaginationLink href="#" className="focus-ring">3</PaginationLink>
                   </PaginationItem>
                   <PaginationItem>
-                    <PaginationNext href="#" />
+                    <PaginationNext href="#" className="focus-ring" />
                   </PaginationItem>
                 </PaginationContent>
               </Pagination>
@@ -365,7 +379,7 @@ const FacilityManagementPage = () => {
         
         <TabsContent value="kart">
           <AdminCard title="Kartvisning" description="Lokaler vist på kart kommer snart">
-            <div className="h-[500px] flex items-center justify-center bg-surface-secondary rounded-lg border-2 border-dashed border-primary">
+            <div className="h-[500px] flex items-center justify-center surface-secondary rounded-xl border-2 border-dashed border-primary">
               <EmptyState 
                 icon={<MapPin className="h-20 w-20" />}
                 title="Kartvisning er under utvikling"

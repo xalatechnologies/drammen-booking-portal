@@ -39,26 +39,26 @@ export function AdminDashboard() {
   ];
 
   return (
-    <Container className="space-y-8">
-      <div className="text-center space-y-4">
-        <Heading1>Dashboard</Heading1>
-        <BodyMedium className="text-text-secondary max-w-2xl mx-auto">
+    <Container className="space-y-spacing-xl">
+      <div className="text-center space-y-spacing-lg">
+        <Heading1 className="text-text-primary font-bold tracking-tight">Dashboard</Heading1>
+        <BodyMedium className="text-text-secondary max-w-2xl mx-auto leading-relaxed">
           Oversikt over booking-systemet for Drammen Kommune
         </BodyMedium>
       </div>
 
-      <Grid cols={4} gap="lg" className="mb-8">
+      <Grid cols={4} gap="lg" className="mb-spacing-xl">
         {stats.map((stat) => (
           <AdminCard 
             key={stat.title}
             title={stat.title}
             className="text-center"
           >
-            <div className="space-y-4">
+            <div className="space-y-spacing-lg">
               <div className="mx-auto w-12 h-12 rounded-xl bg-brand-primary/10 flex items-center justify-center">
                 <stat.icon className="h-6 w-6 text-brand-primary" />
               </div>
-              <div className="space-y-2">
+              <div className="space-y-spacing-sm">
                 <div className="text-3xl font-bold text-text-primary">
                   {stat.value}
                 </div>
@@ -80,15 +80,15 @@ export function AdminDashboard() {
           title="Nylige aktiviteter"
           description="Siste handlinger i systemet"
         >
-          <div className="space-y-4">
+          <div className="space-y-spacing-lg">
             {[
               { action: "Ny booking", user: "John Doe", time: "2 min siden", status: "success" },
               { action: "Booking avvist", user: "Jane Smith", time: "5 min siden", status: "error" },
               { action: "Lokale oppdatert", user: "Admin", time: "10 min siden", status: "info" },
             ].map((activity, index) => (
-              <div key={index} className="flex items-center justify-between py-3 border-b border-primary last:border-0">
+              <div key={index} className="flex items-center justify-between py-spacing-md border-b border-primary last:border-0">
                 <div>
-                  <BodyMedium className="font-medium">{activity.action}</BodyMedium>
+                  <BodyMedium className="font-semibold text-text-primary">{activity.action}</BodyMedium>
                   <BodyMedium className="text-text-secondary text-sm">av {activity.user}</BodyMedium>
                 </div>
                 <div className="text-right">
@@ -105,16 +105,16 @@ export function AdminDashboard() {
           title="System status"
           description="Oversikt over systemets tilstand"
         >
-          <div className="space-y-4">
+          <div className="space-y-spacing-lg">
             {[
               { service: "API Server", status: "success", uptime: "99.9%" },
               { service: "Database", status: "success", uptime: "99.8%" },
               { service: "Email Service", status: "warning", uptime: "98.5%" },
               { service: "SMS Service", status: "success", uptime: "99.2%" },
             ].map((service, index) => (
-              <div key={index} className="flex items-center justify-between py-3 border-b border-primary last:border-0">
-                <BodyMedium className="font-medium">{service.service}</BodyMedium>
-                <div className="flex items-center gap-3">
+              <div key={index} className="flex items-center justify-between py-spacing-md border-b border-primary last:border-0">
+                <BodyMedium className="font-semibold text-text-primary">{service.service}</BodyMedium>
+                <div className="flex items-center gap-spacing-md">
                   <BodyMedium className="text-text-secondary text-sm">{service.uptime}</BodyMedium>
                   <StatusBadge status={service.status as any} showIcon>
                     {service.status === "success" ? "Aktiv" : "Advarsel"}
