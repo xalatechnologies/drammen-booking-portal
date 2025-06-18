@@ -1,12 +1,13 @@
 
 import React from 'react';
-import { Calendar, CreditCard, MapPin, MessageSquare, Trophy, AlertTriangle } from 'lucide-react';
+import { Calendar, CreditCard, MapPin, MessageSquare, Trophy, AlertTriangle, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
 import { SelectedTimeSlot } from '@/utils/recurrenceEngine';
 import { ActorType, BookingType } from '@/types/pricing';
 import { Zone } from '@/components/booking/types';
@@ -46,6 +47,7 @@ export function BookingSummaryStep({
   onContinue
 }: BookingSummaryStepProps) {
   const [activityType, setActivityType] = React.useState<string>('');
+  const [attendees, setAttendees] = React.useState<number>(1);
   
   // Helper function to get zone name from zoneId
   const getZoneName = (zoneId: string) => {
@@ -68,7 +70,7 @@ export function BookingSummaryStep({
     ['lag-foreninger', 'paraply'].includes(actorType);
 
   // Validation
-  const isValid = purpose.trim().length > 0 && activityType.length > 0;
+  const isValid = purpose.trim().length > 0 && activityType.length > 0 && attendees > 0;
 
   return (
     <>
@@ -153,28 +155,49 @@ export function BookingSummaryStep({
         </Card>
       )}
 
-      {/* Activity Type Selection */}
+      {/* Activity Type and Attendees */}
       <Card>
-        <CardContent className="p-4 space-y-3">
-          <Label className="text-base font-semibold text-gray-900 flex items-center gap-2">
-            <Trophy className="h-5 w-5 text-slate-600" />
-            Type aktivitet *
-          </Label>
-          <Select value={activityType} onValueChange={setActivityType}>
-            <SelectTrigger className="h-11 border-gray-300 focus:border-slate-700">
-              <SelectValue placeholder="Velg" />
-            </SelectTrigger>
-            <SelectContent className="bg-white border border-gray-200 shadow-lg z-50">
-              <SelectItem value="velg">Velg</SelectItem>
-              <SelectItem value="møter-foredrag">Møter, foredrag eller liknende</SelectItem>
-              <SelectItem value="øving">Øving (kor, korps, teater eller liknende)</SelectItem>
-              <SelectItem value="konsert-forestilling">Konsert eller forestilling</SelectItem>
-              <SelectItem value="annen-aktivitet">Annen aktivitet - beskriv under</SelectItem>
-            </SelectContent>
-          </Select>
-          {activityType.length === 0 && (
-            <p className="text-sm text-red-600">Dette feltet er påkrevd</p>
-          )}
+        <CardContent className="p-4 space-y-4">
+          <div className="space-y-3">
+            <Label className="text-base font-semibold text-gray-900 flex items-center gap-2">
+              <Trophy className="h-5 w-5 text-slate-600" />
+              Type aktivitet *
+            </Label>
+            <Select value={activityType} onValueChange={setActivityType}>
+              <SelectTrigger className="h-11 border-gray-300 focus:border-slate-700">
+                <SelectValue placeholder="Velg" />
+              </SelectTrigger>
+              <SelectContent className="bg-white border border-gray-200 shadow-lg z-50">
+                <SelectItem value="velg">Velg</SelectItem>
+                <SelectItem value="møter-foredrag">Møter, foredrag eller liknende</SelectItem>
+                <SelectItem value="øving">Øving (kor, korps, teater eller liknende)</SelectItem>
+                <SelectItem value="konsert-forestilling">Konsert eller forestilling</SelectItem>
+                <SelectItem value="annen-aktivitet">Annen aktivitet - beskriv under</SelectItem>
+              </SelectContent>
+            </Select>
+            {activityType.length === 0 && (
+              <p className="text-sm text-red-600">Dette feltet er påkrevd</p>
+            )}
+          </div>
+
+          <div className="space-y-3">
+            <Label className="text-base font-semibold text-gray-900 flex items-center gap-2">
+              <Users className="h-5 w-5 text-slate-600" />
+              Antall personer *
+            </Label>
+            <Input
+              type="number"
+              value={attendees}
+              onChange={(e) => setAttendees(Number(e.target.value))}
+              min="1"
+              max="1000"
+              className="h-11 border-gray-300 focus:border-slate-700"
+              placeholder="Antall deltakere"
+            />
+            {attendees <= 0 && (
+              <p className="text-sm text-red-600">Minimum 1 person</p>
+            )}
+          </div>
         </CardContent>
       </Card>
 
@@ -236,6 +259,7 @@ export function BookingSummaryStep({
                     <div>• Helgetillegg: Ekstra kostnad for helger</div>
                   )}
                   <div>• 0% MVA på booket tid</div>
+                  <div>• Antall personer: {attendees}</div>
                 </div>
               </div>
             </div>

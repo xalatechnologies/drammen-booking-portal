@@ -9,6 +9,27 @@ import { PriceBreakdown } from "./PriceBreakdown";
 import { usePriceCalculation } from "@/hooks/usePriceCalculation";
 import { format } from "date-fns";
 
+// Export BookingData interface for other components to use
+export interface BookingData {
+  date: Date;
+  bookingMode: "one-time" | "date-range" | "recurring";
+  timeSlot: string;
+  purpose: string;
+  attendees: number;
+  contactName: string;
+  contactEmail: string;
+  contactPhone: string;
+  organization?: string;
+  endDate?: Date;
+  recurrenceRule?: string;
+  recurrenceDescription?: string;
+  zoneId?: string;
+  zoneName?: string;
+  customerType?: string;
+  eventType?: string;
+  ageGroup?: string;
+}
+
 interface BookingSummaryProps {
   data: BookingFormValues;
   facilityName: string;
