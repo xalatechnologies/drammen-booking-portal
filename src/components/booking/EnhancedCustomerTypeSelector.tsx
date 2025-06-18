@@ -88,7 +88,11 @@ export function EnhancedCustomerTypeSelector({ value, onChange }: EnhancedCustom
         <Alert className="border-amber-200 bg-amber-50">
           <AlertTriangle className="h-4 w-4 text-amber-600" />
           <AlertDescription className="text-amber-800">
-            Krever godkjenning
+            <div className="font-medium mb-1">Krever godkjenning</div>
+            <div className="text-sm">
+              Denne bookingen krever godkjenning fra kommunen på grunn av aktørtype eller spesielle betingelser. 
+              Du vil motta en bekreftelse når bookingen er behandlet.
+            </div>
           </AlertDescription>
         </Alert>
       )}
