@@ -108,8 +108,8 @@ export function PriceBreakdown({ calculation, isLoading = false, showDetailed = 
                     }`}
                   >
                     {isFreeForNonprofit ? 'Gratis' : 
-                     item.total === 0 ? 'Gratis' :
-                     `${item.total >= 0 ? '' : '-'}${Math.abs(item.total).toFixed(2)} kr`}
+                     item.amount === 0 ? 'Gratis' :
+                     `${item.amount >= 0 ? '' : '-'}${Math.abs(item.amount).toFixed(2)} kr`}
                   </span>
                 </div>
               ))}

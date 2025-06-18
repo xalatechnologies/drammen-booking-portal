@@ -34,7 +34,13 @@ export function EnhancedZoneSelector({
     const conflict = conflictManager.checkZoneConflict(zone.id, selectedDate, selectedTimeSlot);
     return {
       isAvailable: !conflict && zone.isActive,
-      conflict
+      conflict: conflict ? {
+        id: `conflict-${zone.id}`,
+        zoneId: zone.id,
+        date: selectedDate,
+        timeSlot: selectedTimeSlot,
+        bookedBy: conflict.bookedBy || 'Ukjent'
+      } as ExistingBooking : null
     };
   };
 
