@@ -1,4 +1,5 @@
 
+
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -7,7 +8,7 @@ import { LanguageProvider } from "@/contexts/LanguageContext";
 import Index from "./pages/Index";
 import FacilityPage from "./pages/facilities/[id]";
 import BookingPage from "./pages/booking/[facilityId]";
-import BookingSuccessPage from "./components/facility/booking/BookingSuccessPage";
+import { BookingSuccessPage } from "./components/facility/booking/BookingSuccessPage";
 import BookingsPage from "./pages/bookings/index";
 import LoginPage from "./pages/LoginSelection";
 import ProfilePage from "./pages/profile/index";
@@ -38,3 +39,4 @@ const App = () => (
 );
 
 export default App;
+
