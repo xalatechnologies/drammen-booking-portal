@@ -46,7 +46,10 @@ export class BookingService {
       // Validate the booking request
       const validation = await BookingValidationService.validateBookingRequest(request);
       if (!validation.success) {
-        return validation;
+        return {
+          success: false,
+          error: validation.error
+        };
       }
 
       // Check for conflicts

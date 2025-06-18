@@ -1,4 +1,3 @@
-
 import { AdditionalService } from '@/types/additionalServices';
 
 export const mockAdditionalServices: AdditionalService[] = [
@@ -196,7 +195,6 @@ export const mockAdditionalServices: AdditionalService[] = [
     },
     metadata: {
       tags: ['personnel', 'security'],
-      specialPermissions: ['Førstehjelp sertifikat'],
       instructions: 'Vaktmester må bestilles minst 3 dager i forveien'
     },
     isActive: true,
