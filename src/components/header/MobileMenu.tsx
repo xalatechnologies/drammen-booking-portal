@@ -2,7 +2,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { LogIn } from "lucide-react";
-import { useTranslation } from "@/i18n";
+import { useTranslation } from "@/i18n/hooks/useTranslation";
 
 interface MobileMenuProps {
   isOpen: boolean;
