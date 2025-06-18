@@ -1,8 +1,7 @@
-
 import React from "react";
 import { MapPin, Users, Wrench } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import AccessibilityBadges from "./AccessibilityBadges";
+import { AccessibilityBadges } from "./AccessibilityBadges";
 
 interface FacilityMainInfoProps {
   name: string;
