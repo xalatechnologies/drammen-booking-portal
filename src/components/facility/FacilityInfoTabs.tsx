@@ -61,7 +61,6 @@ export function FacilityInfoTabs({
           description={description} 
           capacity={capacity} 
           address={address}
-          zones={zones}
         />
       </TabsContent>
       

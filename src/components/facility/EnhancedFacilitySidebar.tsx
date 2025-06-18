@@ -5,14 +5,10 @@ import { CheckCircle2, MapPin, Users, Map, Share2, Heart, Clock, CheckCircle, XC
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { ZoneBookingCard } from "./ZoneBookingCard";
 import { AutoApprovalCard } from "./AutoApprovalCard";
-import { Zone } from "@/components/booking/types";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 interface EnhancedFacilitySidebarProps {
-  zones: Zone[];
   facilityName: string;
   facilityId?: string;
   hasAutoApproval: boolean;
@@ -20,14 +16,12 @@ interface EnhancedFacilitySidebarProps {
   capacity: number;
   area: string;
   zoneCount: number;
-  onZoneBookClick?: (zoneId: string) => void;
   onShare?: () => void;
   onToggleFavorite?: () => void;
   isFavorited?: boolean;
 }
 
 export function EnhancedFacilitySidebar({
-  zones,
   facilityName,
   facilityId,
   hasAutoApproval,
@@ -35,15 +29,13 @@ export function EnhancedFacilitySidebar({
   capacity,
   area,
   zoneCount,
-  onZoneBookClick,
   onShare,
   onToggleFavorite,
   isFavorited = false
 }: EnhancedFacilitySidebarProps) {
   const navigate = useNavigate();
-  const {
-    language
-  } = useLanguage();
+  const { language } = useLanguage();
+  
   const translations = {
     NO: {
       capacity: "Kapasitet",
@@ -58,31 +50,46 @@ export function EnhancedFacilitySidebar({
       zones: "Zones"
     }
   };
+  
   const t = translations[language];
-  const handleBookingClick = (zoneId?: string) => {
-    const bookingPath = `/booking/${facilityId}${zoneId ? `?zone=${zoneId}` : ''}`;
+
+  const handleBookingClick = () => {
+    const bookingPath = `/booking/${facilityId}`;
     navigate(bookingPath);
   };
-  return <div className="space-y-4">
+
+  return (
+    <div className="space-y-4">
       {/* Action Buttons */}
       <div className="flex gap-2">
-        <Button onClick={() => handleBookingClick()} className="flex-1 bg-[#1e3a8a] hover:bg-[#1e40af] text-white" size="lg">
+        <Button 
+          onClick={handleBookingClick}
+          className="flex-1 bg-[#1e3a8a] hover:bg-[#1e40af] text-white" 
+          size="lg"
+        >
           Reserver nå
         </Button>
-        <Button variant="outline" size="lg" onClick={onToggleFavorite} className="px-3">
+        <Button
+          variant="outline"
+          size="lg"
+          onClick={onToggleFavorite}
+          className="px-3"
+        >
           <Heart className={`h-5 w-5 ${isFavorited ? 'fill-red-500 text-red-500' : ''}`} />
         </Button>
-        <Button variant="outline" size="lg" onClick={onShare} className="px-3">
+        <Button
+          variant="outline"
+          size="lg"
+          onClick={onShare}
+          className="px-3"
+        >
           <Share2 className="h-5 w-5" />
         </Button>
       </div>
 
       {/* Enhanced Quick Facts */}
       <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">
-        <CardHeader className="pb-3">
-          
-        </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 pt-6">
           <div className="grid grid-cols-2 gap-4">
             <div className="flex items-center gap-3 p-3 bg-white rounded-lg shadow-sm border">
               <div className="p-2 bg-blue-100 rounded-full">
@@ -145,13 +152,6 @@ export function EnhancedFacilitySidebar({
         </CardContent>
       </Card>
 
-      {/* Zones Section - Individual Cards */}
-      {zones.map(zone => <Card key={zone.id}>
-          <CardContent className="p-0">
-            <ZoneBookingCard zone={zone} facilityName={facilityName} onBookClick={() => handleBookingClick(zone.id)} />
-          </CardContent>
-        </Card>)}
-
       {/* Auto Approval Policy Card */}
       {hasAutoApproval && <AutoApprovalCard hasAutoApproval={hasAutoApproval} />}
 
@@ -173,5 +173,6 @@ export function EnhancedFacilitySidebar({
           </div>
         </CardContent>
       </Card>
-    </div>;
+    </div>
+  );
 }

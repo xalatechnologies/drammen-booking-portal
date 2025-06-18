@@ -10,6 +10,7 @@ import { FacilityHeader } from "@/components/facility/FacilityHeader";
 import { FacilityInfoTabs } from "@/components/facility/FacilityInfoTabs";
 import { EnhancedFacilitySidebar } from "@/components/facility/EnhancedFacilitySidebar";
 import { SimilarFacilitiesSlider } from "@/components/facility/SimilarFacilitiesSlider";
+import { AvailabilityTab } from "@/components/facility/tabs/AvailabilityTab";
 import { Zone } from "@/components/booking/types";
 
 const FacilityDetail = () => {
@@ -139,7 +140,6 @@ const FacilityDetail = () => {
     isActive: true
   }];
 
-  // Mock facility data with zones - in a real app this would be fetched based on id
   const facility = {
     id,
     name: `Gymsal ${id} - Brandengen skole`,
@@ -318,7 +318,6 @@ const FacilityDetail = () => {
               {/* Right Column - Sidebar */}
               <div className="lg:col-span-1">
                 <EnhancedFacilitySidebar 
-                  zones={zones} 
                   facilityName={facility.name} 
                   facilityId={id} 
                   hasAutoApproval={facility.hasAutoApproval} 
@@ -330,6 +329,14 @@ const FacilityDetail = () => {
                   onToggleFavorite={() => setIsFavorited(!isFavorited)} 
                   isFavorited={isFavorited} 
                 />
+              </div>
+            </div>
+
+            {/* Full-width Availability Calendar Section */}
+            <div className="bg-white rounded-lg shadow-sm border">
+              <div className="p-6">
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">Tilgjengelighet</h2>
+                <AvailabilityTab zones={zones} startDate={new Date()} showLegend={true} />
               </div>
             </div>
           </div>
