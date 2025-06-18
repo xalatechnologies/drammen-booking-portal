@@ -91,14 +91,14 @@ const AdminSidebar = () => {
   };
 
   const renderMenuGroup = (items: any[], groupLabel: string) => (
-    <SidebarGroup className="mb-spacing-xl">
-      <SidebarGroupLabel className="px-spacing-lg mb-spacing-lg">
-        <Caption className="text-text-tertiary uppercase tracking-wide font-medium">
+    <SidebarGroup className="mb-xl">
+      <SidebarGroupLabel className="px-lg mb-lg">
+        <Caption className="text-muted-foreground uppercase tracking-wide font-medium">
           {groupLabel}
         </Caption>
       </SidebarGroupLabel>
       <SidebarGroupContent>
-        <SidebarMenu className="space-y-spacing-sm">
+        <SidebarMenu className="space-y-sm">
           {items.map((item) => (
             <SidebarMenuItem key={item.path}>
               <SidebarMenuButton
@@ -107,19 +107,19 @@ const AdminSidebar = () => {
                 className={`
                   group relative flex items-center justify-between w-full font-semibold rounded-xl transition-all duration-200 cursor-pointer
                   ${isActive(item.path) 
-                    ? 'gradient-primary text-text-inverse shadow-md px-spacing-xl py-spacing-lg' 
-                    : 'text-text-primary hover:surface-secondary px-spacing-lg py-spacing-lg'
+                    ? 'bg-primary text-primary-foreground shadow-md px-xl py-lg' 
+                    : 'text-foreground hover:bg-accent hover:text-accent-foreground px-lg py-lg'
                   }
                   focus-ring
-                  group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-spacing-md
+                  group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-md
                 `}
               >
-                <div className="flex items-center gap-spacing-lg group-data-[collapsible=icon]:gap-0">
+                <div className="flex items-center gap-lg group-data-[collapsible=icon]:gap-0">
                   <div className={`
-                    relative p-spacing-md rounded-xl transition-all duration-200
+                    relative p-md rounded-xl transition-all duration-200
                     ${isActive(item.path) 
-                      ? 'bg-white/20 text-text-inverse' 
-                      : 'surface-secondary text-text-secondary group-hover:surface-tertiary'
+                      ? 'bg-primary-foreground/20 text-primary-foreground' 
+                      : 'bg-secondary text-muted-foreground group-hover:bg-accent group-hover:text-accent-foreground'
                     }
                   `}>
                     <item.icon className="h-5 w-5" strokeWidth={2} />
@@ -131,8 +131,8 @@ const AdminSidebar = () => {
                 <ChevronRight className={`
                   h-4 w-4 transition-all duration-200 group-data-[collapsible=icon]:hidden
                   ${isActive(item.path) 
-                    ? 'text-text-inverse opacity-100' 
-                    : 'text-text-tertiary opacity-0 group-hover:opacity-100'
+                    ? 'text-primary-foreground opacity-100' 
+                    : 'text-muted-foreground opacity-0 group-hover:opacity-100'
                   }
                 `} strokeWidth={2} />
               </SidebarMenuButton>
@@ -144,21 +144,21 @@ const AdminSidebar = () => {
   );
 
   return (
-    <Sidebar className="surface-primary border-r border-primary shadow-md" collapsible="icon">
-      <SidebarContent className="px-spacing-md pt-spacing-xl pb-spacing-xl space-y-spacing-lg">
+    <Sidebar className="bg-sidebar border-r border-sidebar-border shadow-md" collapsible="icon">
+      <SidebarContent className="px-md pt-xl pb-xl space-y-lg">
         {renderMenuGroup(overviewItems, "OVERSIKT")}
         {renderMenuGroup(bookingItems, "BOOKING")}
         {renderMenuGroup(managementItems, "ADMINISTRASJON")}
         {renderMenuGroup(systemItems, "SYSTEM")}
       </SidebarContent>
 
-      <SidebarFooter className="p-spacing-xl border-t border-primary group-data-[collapsible=icon]:p-spacing-md">
-        <div className="surface-secondary flex items-center gap-spacing-lg p-spacing-xl rounded-xl border border-primary shadow-sm hover:shadow-md transition-all duration-200 group-data-[collapsible=icon]:p-spacing-md group-data-[collapsible=icon]:justify-center">
-          <div className="flex items-center gap-spacing-md group-data-[collapsible=icon]:gap-0">
+      <SidebarFooter className="p-xl border-t border-sidebar-border group-data-[collapsible=icon]:p-md">
+        <div className="bg-secondary flex items-center gap-lg p-xl rounded-xl border border-border shadow-sm hover:shadow-md transition-all duration-200 group-data-[collapsible=icon]:p-md group-data-[collapsible=icon]:justify-center">
+          <div className="flex items-center gap-md group-data-[collipsible=icon]:gap-0">
             <StatusBadge status="success" showIcon={false} className="w-3 h-3 p-0">
               <span className="sr-only">System Status Online</span>
             </StatusBadge>
-            <BodySmall className="font-bold text-text-primary group-data-[collapsible=icon]:hidden">
+            <BodySmall className="font-bold text-foreground group-data-[collapsible=icon]:hidden">
               System Status
             </BodySmall>
           </div>

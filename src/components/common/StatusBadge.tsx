@@ -13,23 +13,23 @@ interface StatusBadgeProps {
 
 const statusConfig = {
   success: {
-    className: "bg-semantic-success text-white border-semantic-success",
+    className: "bg-success text-success-foreground border-success",
     icon: CheckCircle
   },
   pending: {
-    className: "bg-semantic-warning text-white border-semantic-warning",
+    className: "bg-warning text-warning-foreground border-warning",
     icon: Clock
   },
   error: {
-    className: "bg-semantic-error text-white border-semantic-error",
+    className: "bg-error text-error-foreground border-error",
     icon: XCircle
   },
   warning: {
-    className: "bg-semantic-warning text-white border-semantic-warning",
+    className: "bg-warning text-warning-foreground border-warning",
     icon: AlertTriangle
   },
   info: {
-    className: "bg-semantic-info text-white border-semantic-info",
+    className: "bg-info text-info-foreground border-info",
     icon: Info
   }
 };

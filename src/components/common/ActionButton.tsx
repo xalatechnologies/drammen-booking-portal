@@ -33,7 +33,7 @@ export function ActionButton({
     primary: "btn-primary",
     secondary: "btn-secondary",
     ghost: "btn-ghost",
-    destructive: "bg-semantic-error hover:bg-semantic-error-dark text-white"
+    destructive: "bg-destructive hover:bg-destructive/90 text-destructive-foreground"
   };
 
   const sizeClasses = {

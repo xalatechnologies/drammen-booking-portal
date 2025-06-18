@@ -8,7 +8,7 @@ interface AdminCardProps {
   description?: string;
   children: React.ReactNode;
   className?: string;
-  variant?: "primary" | "secondary" | "glass";
+  variant?: "primary" | "secondary" | "accent";
 }
 
 export function AdminCard({ 
@@ -19,24 +19,24 @@ export function AdminCard({
   variant = "primary" 
 }: AdminCardProps) {
   const variantClasses = {
-    primary: "surface-primary border border-primary shadow-md hover:shadow-lg transition-all duration-200",
-    secondary: "surface-secondary border border-secondary shadow-sm hover:shadow-md transition-all duration-200", 
-    glass: "glass-effect shadow-glass border border-white/20 backdrop-blur-lg"
+    primary: "bg-card text-card-foreground border border-border shadow-sm hover:shadow-md",
+    secondary: "bg-secondary text-secondary-foreground border border-border shadow-sm hover:shadow-md", 
+    accent: "bg-accent text-accent-foreground border border-border shadow-sm hover:shadow-md"
   };
 
   return (
-    <Card className={cn(variantClasses[variant], "rounded-xl", className)}>
-      <CardHeader className="pb-spacing-lg p-spacing-xl">
-        <CardTitle className="heading-primary text-xl font-bold text-text-primary tracking-tight">
+    <Card className={cn(variantClasses[variant], "rounded-xl transition-all duration-200", className)}>
+      <CardHeader className="pb-lg p-xl">
+        <CardTitle className="text-xl font-bold text-foreground tracking-tight">
           {title}
         </CardTitle>
         {description && (
-          <CardDescription className="body-secondary text-base text-text-secondary leading-relaxed">
+          <CardDescription className="text-base text-muted-foreground leading-relaxed">
             {description}
           </CardDescription>
         )}
       </CardHeader>
-      <CardContent className="pt-0 p-spacing-xl">
+      <CardContent className="pt-0 p-xl">
         {children}
       </CardContent>
     </Card>

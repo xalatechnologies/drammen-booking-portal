@@ -39,27 +39,27 @@ export function AdminDashboard() {
   ];
 
   return (
-    <Container className="space-y-spacing-xl">
-      <div className="text-center space-y-spacing-lg">
-        <Heading1 className="text-text-primary font-bold tracking-tight">Dashboard</Heading1>
-        <BodyMedium className="text-text-secondary max-w-2xl mx-auto leading-relaxed">
+    <Container className="space-y-xl">
+      <div className="text-center space-y-lg">
+        <Heading1 className="text-foreground font-bold tracking-tight">Dashboard</Heading1>
+        <BodyMedium className="text-muted-foreground max-w-2xl mx-auto leading-relaxed">
           Oversikt over booking-systemet for Drammen Kommune
         </BodyMedium>
       </div>
 
-      <Grid cols={4} gap="lg" className="mb-spacing-xl">
+      <Grid cols={4} gap="lg" className="mb-xl">
         {stats.map((stat) => (
           <AdminCard 
             key={stat.title}
             title={stat.title}
             className="text-center"
           >
-            <div className="space-y-spacing-lg">
-              <div className="mx-auto w-12 h-12 rounded-xl bg-brand-primary/10 flex items-center justify-center">
-                <stat.icon className="h-6 w-6 text-brand-primary" />
+            <div className="space-y-lg">
+              <div className="mx-auto w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                <stat.icon className="h-6 w-6 text-primary" />
               </div>
-              <div className="space-y-spacing-sm">
-                <div className="text-3xl font-bold text-text-primary">
+              <div className="space-y-sm">
+                <div className="text-3xl font-bold text-foreground">
                   {stat.value}
                 </div>
                 <StatusBadge 
@@ -80,16 +80,16 @@ export function AdminDashboard() {
           title="Nylige aktiviteter"
           description="Siste handlinger i systemet"
         >
-          <div className="space-y-spacing-lg">
+          <div className="space-y-lg">
             {[
               { action: "Ny booking", user: "John Doe", time: "2 min siden", status: "success" },
               { action: "Booking avvist", user: "Jane Smith", time: "5 min siden", status: "error" },
               { action: "Lokale oppdatert", user: "Admin", time: "10 min siden", status: "info" },
             ].map((activity, index) => (
-              <div key={index} className="flex items-center justify-between py-spacing-md border-b border-primary last:border-0">
+              <div key={index} className="flex items-center justify-between py-md border-b border-border last:border-0">
                 <div>
-                  <BodyMedium className="font-semibold text-text-primary">{activity.action}</BodyMedium>
-                  <BodyMedium className="text-text-secondary text-sm">av {activity.user}</BodyMedium>
+                  <BodyMedium className="font-semibold text-foreground">{activity.action}</BodyMedium>
+                  <BodyMedium className="text-muted-foreground text-sm">av {activity.user}</BodyMedium>
                 </div>
                 <div className="text-right">
                   <StatusBadge status={activity.status as any} showIcon={false} className="text-xs">
@@ -105,17 +105,17 @@ export function AdminDashboard() {
           title="System status"
           description="Oversikt over systemets tilstand"
         >
-          <div className="space-y-spacing-lg">
+          <div className="space-y-lg">
             {[
               { service: "API Server", status: "success", uptime: "99.9%" },
               { service: "Database", status: "success", uptime: "99.8%" },
               { service: "Email Service", status: "warning", uptime: "98.5%" },
               { service: "SMS Service", status: "success", uptime: "99.2%" },
             ].map((service, index) => (
-              <div key={index} className="flex items-center justify-between py-spacing-md border-b border-primary last:border-0">
-                <BodyMedium className="font-semibold text-text-primary">{service.service}</BodyMedium>
-                <div className="flex items-center gap-spacing-md">
-                  <BodyMedium className="text-text-secondary text-sm">{service.uptime}</BodyMedium>
+              <div key={index} className="flex items-center justify-between py-md border-b border-border last:border-0">
+                <BodyMedium className="font-semibold text-foreground">{service.service}</BodyMedium>
+                <div className="flex items-center gap-md">
+                  <BodyMedium className="text-muted-foreground text-sm">{service.uptime}</BodyMedium>
                   <StatusBadge status={service.status as any} showIcon>
                     {service.status === "success" ? "Aktiv" : "Advarsel"}
                   </StatusBadge>
