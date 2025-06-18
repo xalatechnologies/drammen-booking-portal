@@ -8,16 +8,12 @@ import { FacilityLocation } from "@/components/facility/FacilityLocation";
 interface DescriptionTabProps {
   description: string;
   capacity: number;
-  quickFacts: React.ReactNode;
   address: string;
 }
 
-export function DescriptionTab({ description, capacity, quickFacts, address }: DescriptionTabProps) {
+export function DescriptionTab({ description, capacity, address }: DescriptionTabProps) {
   return (
     <div className="p-6 space-y-8">
-      {/* Quick facts */}
-      {quickFacts}
-
       <div>
         <h2 className="text-2xl font-semibold mb-6">Om lokalet</h2>
         <p className="text-lg text-gray-700 leading-relaxed">{description}</p>

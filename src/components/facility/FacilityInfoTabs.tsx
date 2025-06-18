@@ -16,7 +16,6 @@ interface FacilityInfoTabsProps {
   zones: Zone[];
   amenities: string[];
   address: string;
-  quickFacts: React.ReactNode;
   zoneCards: React.ReactNode;
 }
 
@@ -27,7 +26,6 @@ export function FacilityInfoTabs({
   zones, 
   amenities, 
   address,
-  quickFacts,
   zoneCards
 }: FacilityInfoTabsProps) {
   const [date] = useState<Date>(new Date());
@@ -71,7 +69,6 @@ export function FacilityInfoTabs({
         <DescriptionTab 
           description={description} 
           capacity={capacity} 
-          quickFacts={quickFacts}
           address={address}
         />
       </TabsContent>

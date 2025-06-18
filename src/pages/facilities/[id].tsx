@@ -6,9 +6,8 @@ import GlobalHeader from "@/components/GlobalHeader";
 import GlobalFooter from "@/components/GlobalFooter";
 import { FacilityImageGallery } from "@/components/facility/FacilityImageGallery";
 import { FacilityHeader } from "@/components/facility/FacilityHeader";
-import { FacilityQuickFacts } from "@/components/facility/FacilityQuickFacts";
 import { FacilityInfoTabs } from "@/components/facility/FacilityInfoTabs";
-import { FacilitySidebar } from "@/components/facility/FacilitySidebar";
+import { EnhancedFacilitySidebar } from "@/components/facility/EnhancedFacilitySidebar";
 import { SimilarFacilitiesSlider } from "@/components/facility/SimilarFacilitiesSlider";
 import { Zone } from "@/components/booking/types";
 
@@ -304,9 +303,6 @@ const FacilityDetail = () => {
               {/* Left Column - Main Content */}
               <div className="lg:col-span-2 space-y-6">
                 {/* Quick Facts */}
-                <FacilityQuickFacts capacity={facility.capacity} area={facility.area} openingHours={facility.openingHours} zoneCount={zones.length} />
-
-                {/* Tabbed Content */}
                 <FacilityInfoTabs 
                   description={facility.description} 
                   capacity={facility.capacity} 
@@ -321,7 +317,7 @@ const FacilityDetail = () => {
 
               {/* Right Column - Sidebar */}
               <div className="lg:col-span-1">
-                <FacilitySidebar 
+                <EnhancedFacilitySidebar 
                   zones={zones} 
                   facilityName={facility.name} 
                   facilityId={id} 
