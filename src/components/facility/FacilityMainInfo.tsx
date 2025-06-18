@@ -1,6 +1,7 @@
 
+
 import React from "react";
-import { MapPin, Users, Wrench } from "lucide-react";
+import { MapPin, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AccessibilityBadges } from "./AccessibilityBadges";
 
@@ -73,29 +74,6 @@ const FacilityMainInfo: React.FC<FacilityMainInfoProps> = ({
           </div>
         </div>
 
-        {/* Equipment */}
-        <div className="space-y-3">
-          <div className="flex items-center text-slate-700">
-            <Wrench className="h-5 w-5 mr-2 text-slate-500" />
-            <span className="font-semibold text-base">Utstyr</span>
-          </div>
-          <div className="flex flex-wrap gap-2 ml-7">
-            {equipment.slice(0, 3).map((item, index) => (
-              <span
-                key={index}
-                className="px-3 py-1.5 bg-green-100 text-green-800 rounded-full text-sm font-medium"
-              >
-                {item}
-              </span>
-            ))}
-            {equipment.length > 3 && (
-              <span className="px-3 py-1.5 bg-slate-100 text-slate-600 rounded-full text-sm">
-                +{equipment.length - 3} flere
-              </span>
-            )}
-          </div>
-        </div>
-
         {/* Accessibility */}
         {accessibility && accessibility.length > 0 && (
           <div className="space-y-3">
@@ -110,3 +88,4 @@ const FacilityMainInfo: React.FC<FacilityMainInfoProps> = ({
 };
 
 export default FacilityMainInfo;
+

@@ -21,8 +21,6 @@ const FacilityDetails: React.FC<FacilityDetailsProps> = ({
       {/* Quick Stats */}
       <div className="space-y-6">
         <div className="space-y-4">
-          <h4 className="font-bold text-slate-900 text-lg mb-4">Tilgjengelighet</h4>
-          
           <div className="space-y-4">
             <div className="flex items-start space-x-3">
               <Calendar className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
@@ -66,3 +64,4 @@ const FacilityDetails: React.FC<FacilityDetailsProps> = ({
 };
 
 export default FacilityDetails;
+
