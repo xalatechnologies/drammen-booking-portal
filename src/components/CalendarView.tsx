@@ -272,33 +272,27 @@ const CalendarView: React.FC<CalendarViewProps> = ({
                             const unavailableCheck = isDateUnavailable(new Date(day));
                             const isBooked = isTimeSlotBooked(facility.id, new Date(day), parseInt(timeSlot.split(':')[0]));
                             
-                            let cellClass = "p-3 border-r text-center relative ";
-                            let content = null;
+                            let cellClass = "p-3 border-r text-center relative h-12 ";
                             let clickHandler = null;
 
                             if (unavailableCheck.isUnavailable) {
-                              cellClass += "bg-gray-100";
-                              content = (
-                                <span className="text-gray-500 text-sm font-medium">
-                                  {unavailableCheck.reason === 'past' ? 'Fortid' : 
-                                   unavailableCheck.reason === 'weekend' ? 'Helg' :
-                                   unavailableCheck.reason === 'holiday' ? 'Helligdag' : 'Stengt'}
-                                </span>
-                              );
+                              switch (unavailableCheck.reason) {
+                                case 'past':
+                                  cellClass += "bg-gray-200";
+                                  break;
+                                case 'weekend':
+                                  cellClass += "bg-amber-100";
+                                  break;
+                                case 'holiday':
+                                  cellClass += "bg-red-200";
+                                  break;
+                                default:
+                                  cellClass += "bg-gray-100";
+                              }
                             } else if (isBooked) {
-                              cellClass += "bg-red-100";
-                              content = (
-                                <Badge variant="destructive" className="text-xs">
-                                  Opptatt
-                                </Badge>
-                              );
+                              cellClass += "bg-red-300";
                             } else {
-                              cellClass += "bg-green-100 hover:bg-green-200 cursor-pointer transition-colors";
-                              content = (
-                                <Badge className="bg-green-600 hover:bg-green-700 text-white text-xs">
-                                  Ledig
-                                </Badge>
-                              );
+                              cellClass += "bg-green-200 hover:bg-green-300 cursor-pointer transition-colors";
                               clickHandler = () => window.location.href = `/facilities/${facility.id}?date=${format(day, 'yyyy-MM-dd')}&time=${timeSlot}`;
                             }
                             
@@ -307,9 +301,10 @@ const CalendarView: React.FC<CalendarViewProps> = ({
                                 key={dayIndex} 
                                 className={cellClass}
                                 onClick={clickHandler}
-                                title={unavailableCheck.isUnavailable ? unavailableCheck.details : undefined}
+                                title={unavailableCheck.isUnavailable ? unavailableCheck.details : 
+                                       isBooked ? 'Opptatt' : 'Ledig - klikk for å booke'}
                               >
-                                {content}
+                                {/* Empty cell - only color coding */}
                               </div>
                             );
                           })}
