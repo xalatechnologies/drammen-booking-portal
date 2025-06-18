@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { CheckCircle2, MapPin, Users, Map, Share2, Heart, Clock, CheckCircle, XCircle } from "lucide-react";
@@ -10,7 +9,6 @@ import { ZoneBookingCard } from "./ZoneBookingCard";
 import { AutoApprovalCard } from "./AutoApprovalCard";
 import { Zone } from "@/components/booking/types";
 import { useLanguage } from "@/contexts/LanguageContext";
-
 interface EnhancedFacilitySidebarProps {
   zones: Zone[];
   facilityName: string;
@@ -25,12 +23,11 @@ interface EnhancedFacilitySidebarProps {
   onToggleFavorite?: () => void;
   isFavorited?: boolean;
 }
-
-export function EnhancedFacilitySidebar({ 
-  zones, 
-  facilityName, 
+export function EnhancedFacilitySidebar({
+  zones,
+  facilityName,
   facilityId,
-  hasAutoApproval, 
+  hasAutoApproval,
   openingHours,
   capacity,
   area,
@@ -41,8 +38,9 @@ export function EnhancedFacilitySidebar({
   isFavorited = false
 }: EnhancedFacilitySidebarProps) {
   const navigate = useNavigate();
-  const { language } = useLanguage();
-
+  const {
+    language
+  } = useLanguage();
   const translations = {
     NO: {
       capacity: "Kapasitet",
@@ -57,39 +55,21 @@ export function EnhancedFacilitySidebar({
       zones: "Zones"
     }
   };
-
   const t = translations[language];
-
   const handleBookingClick = (zoneId?: string) => {
     const bookingPath = `/booking/${facilityId}${zoneId ? `?zone=${zoneId}` : ''}`;
     navigate(bookingPath);
   };
-
-  return (
-    <div className="space-y-4">
+  return <div className="space-y-4">
       {/* Action Buttons */}
       <div className="flex gap-2">
-        <Button 
-          onClick={() => handleBookingClick()}
-          className="flex-1 bg-[#1e3a8a] hover:bg-[#1e40af] text-white"
-          size="lg"
-        >
+        <Button onClick={() => handleBookingClick()} className="flex-1 bg-[#1e3a8a] hover:bg-[#1e40af] text-white" size="lg">
           Reserver nå
         </Button>
-        <Button
-          variant="outline"
-          size="lg"
-          onClick={onToggleFavorite}
-          className="px-3"
-        >
+        <Button variant="outline" size="lg" onClick={onToggleFavorite} className="px-3">
           <Heart className={`h-5 w-5 ${isFavorited ? 'fill-red-500 text-red-500' : ''}`} />
         </Button>
-        <Button
-          variant="outline"
-          size="lg"
-          onClick={onShare}
-          className="px-3"
-        >
+        <Button variant="outline" size="lg" onClick={onShare} className="px-3">
           <Share2 className="h-5 w-5" />
         </Button>
       </div>
@@ -97,7 +77,7 @@ export function EnhancedFacilitySidebar({
       {/* Enhanced Quick Facts */}
       <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">
         <CardHeader className="pb-3">
-          <CardTitle className="text-lg text-blue-800">Oversikt</CardTitle>
+          
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
@@ -145,17 +125,11 @@ export function EnhancedFacilitySidebar({
       </Card>
 
       {/* Zones Section - Individual Cards */}
-      {zones.map((zone) => (
-        <Card key={zone.id}>
+      {zones.map(zone => <Card key={zone.id}>
           <CardContent className="p-0">
-            <ZoneBookingCard
-              zone={zone}
-              facilityName={facilityName}
-              onBookClick={() => handleBookingClick(zone.id)}
-            />
+            <ZoneBookingCard zone={zone} facilityName={facilityName} onBookClick={() => handleBookingClick(zone.id)} />
           </CardContent>
-        </Card>
-      ))}
+        </Card>)}
 
       {/* Policy Information Card */}
       <Card>
@@ -182,6 +156,5 @@ export function EnhancedFacilitySidebar({
           </div>
         </CardContent>
       </Card>
-    </div>
-  );
+    </div>;
 }
