@@ -1,4 +1,3 @@
-
 export interface MockFacility {
   id: number;
   name: string;
@@ -231,6 +230,211 @@ export const mockFacilities: MockFacility[] = [
         date: new Date(2025, 4, 28),
         slots: [
           { start: "20:00", end: "24:00", available: true }
+        ]
+      }
+    ]
+  },
+  {
+    id: 9,
+    name: "Konnerud Kultursenter - Studio",
+    address: "Konnerudgata 15, 3036 Drammen",
+    type: "Studio",
+    area: "Konnerud",
+    image: "/lovable-uploads/b12bcda3-d611-4e9e-bbcc-d53d2db38af9.png",
+    nextAvailable: "Tirsdag, 16:00",
+    capacity: 40,
+    accessibility: ["wheelchair", "hearing-loop"],
+    suitableFor: ["Musikk", "Dans", "Yoga", "Teater"],
+    equipment: ["Speil", "Lydanlegg", "Piano", "Yogamatter", "Belysning"],
+    openingHours: "Man-Fre: 09:00-22:00, Lør: 10:00-20:00, Søn: 12:00-18:00",
+    description: "Fleksibelt studio med høy standard. Perfekt for kreative aktiviteter og treningsgrupper.",
+    lat: 59.7356,
+    lng: 10.1923,
+    availableTimes: [
+      {
+        date: new Date(2025, 5, 3),
+        slots: [
+          { start: "16:00", end: "18:00", available: true },
+          { start: "18:00", end: "20:00", available: true }
+        ]
+      }
+    ]
+  },
+  {
+    id: 10,
+    name: "Tangen Skole - Klasserom",
+    address: "Tangenvegen 45, 3047 Drammen",
+    type: "Klasserom",
+    area: "Tangen",
+    image: "/lovable-uploads/13aee1f6-e9d9-474b-9ed7-c656d703d19b.png",
+    nextAvailable: "Onsdag, 17:00",
+    capacity: 30,
+    accessibility: ["wheelchair"],
+    suitableFor: ["Undervisning", "Kurs", "Studiegrupper", "Seminarer"],
+    equipment: ["Tavle", "Projektor", "WiFi", "Stoler", "Bord"],
+    openingHours: "Man-Fre: 16:00-21:00, Lør: 10:00-16:00, Søn: Stengt",
+    description: "Praktisk klasserom med god belysning og moderne undervisningsutstyr.",
+    lat: 59.7512,
+    lng: 10.2234,
+    availableTimes: [
+      {
+        date: new Date(2025, 5, 4),
+        slots: [
+          { start: "17:00", end: "19:00", available: true },
+          { start: "19:00", end: "21:00", available: false }
+        ]
+      }
+    ]
+  },
+  {
+    id: 11,
+    name: "Ytterkollen Idrettshall",
+    address: "Ytterkollveien 78, 3037 Drammen",
+    type: "Idrettshall",
+    area: "Konnerud",
+    image: "/lovable-uploads/a72ba2e2-f0a3-4561-bff6-17fa721a0c02.png",
+    nextAvailable: "Torsdag, 15:00",
+    capacity: 350,
+    accessibility: ["wheelchair", "hearing-loop"],
+    suitableFor: ["Fotball", "Håndball", "Basketball", "Turnering"],
+    equipment: ["Kunstgress", "Tribuner", "Lydanlegg", "Garderober", "Kantine"],
+    openingHours: "Man-Søn: 06:00-23:30",
+    description: "Stor idrettshall med tribuner og moderne fasiliteter. Ideell for store idrettsarrangementer.",
+    lat: 59.7234,
+    lng: 10.1678,
+    availableTimes: [
+      {
+        date: new Date(2025, 5, 5),
+        slots: [
+          { start: "15:00", end: "17:00", available: true },
+          { start: "17:00", end: "19:00", available: true }
+        ]
+      }
+    ]
+  },
+  {
+    id: 12,
+    name: "Buskerud Rådhus - Forsamlingssal",
+    address: "Gamle Kirkeplass 3, 3012 Drammen",
+    type: "Forsamlingssal",
+    area: "Bragernes",
+    image: "/lovable-uploads/b692664c-737a-4a20-8673-25a401789f82.png",
+    nextAvailable: "Fredag, 14:00",
+    capacity: 100,
+    accessibility: ["wheelchair", "hearing-loop", "sign-language"],
+    suitableFor: ["Offentlige møter", "Konferanser", "Presentasjoner", "Debatter"],
+    equipment: ["Mikrofoner", "Projektor", "Lyd-/videoutstyr", "Wifi", "Tolketjenester"],
+    openingHours: "Man-Fre: 08:00-16:00, Lør-Søn: Kun ved avtale",
+    description: "Representativ forsamlingssal i rådhuset med full teknisk utrustning for offentlige arrangementer.",
+    lat: 59.7445,
+    lng: 10.2089,
+    availableTimes: [
+      {
+        date: new Date(2025, 5, 6),
+        slots: [
+          { start: "14:00", end: "16:00", available: true }
+        ]
+      }
+    ]
+  },
+  {
+    id: 13,
+    name: "Svelvik Kulturhus - Teatersal",
+    address: "Rådhusgata 12, 3060 Svelvik",
+    type: "Teatersal",
+    area: "Svelvik",
+    image: "/lovable-uploads/1d336434-5d93-4af7-8f92-32867c579c2a.png",
+    nextAvailable: "Lørdag, 19:30",
+    capacity: 220,
+    accessibility: ["wheelchair", "hearing-loop"],
+    suitableFor: ["Teater", "Konserter", "Stand-up", "Forestillinger"],
+    equipment: ["Scene", "Lysrigg", "Lydanlegg", "Kostymeavdeling", "Billettluke"],
+    openingHours: "Man-Søn: 18:00-23:00, eller ved arrangement",
+    description: "Profesjonell teatersal med fullt utstyrt scene og god akustikk for kulturelle opplevelser.",
+    lat: 59.6123,
+    lng: 10.4056,
+    availableTimes: [
+      {
+        date: new Date(2025, 5, 7),
+        slots: [
+          { start: "19:30", end: "22:00", available: true }
+        ]
+      }
+    ]
+  },
+  {
+    id: 14,
+    name: "Drammen Ungdomshus - Aktivitetsrom",
+    address: "Øvre Sund 15, 3017 Drammen",
+    type: "Aktivitetsrom",
+    area: "Strømsø",
+    image: "/lovable-uploads/07eaca70-1e9b-4e73-ab4e-6b9b7f1ca27e.png",
+    nextAvailable: "Mandag, 18:00",
+    capacity: 60,
+    accessibility: ["wheelchair"],
+    suitableFor: ["Ungdomsaktiviteter", "Gaming", "Musikk", "Sosiale treff"],
+    equipment: ["Gaming-setup", "Lydanlegg", "Instrumenter", "Spillkonsoll", "WiFi"],
+    openingHours: "Man-Fre: 15:00-22:00, Lør: 12:00-20:00, Søn: Stengt",
+    description: "Moderne ungdomslokale med gaming og musikk-utstyr. Perfekt for ungdomsgrupper og sosiale aktiviteter.",
+    lat: 59.7398,
+    lng: 10.2178,
+    availableTimes: [
+      {
+        date: new Date(2025, 5, 8),
+        slots: [
+          { start: "18:00", end: "20:00", available: true },
+          { start: "20:00", end: "22:00", available: true }
+        ]
+      }
+    ]
+  },
+  {
+    id: 15,
+    name: "Bragernes Kirke - Menighetsal",
+    address: "Bragernes Torg 3, 3017 Drammen",
+    type: "Menighetsal",
+    area: "Bragernes",
+    image: "/lovable-uploads/08e8f8d5-4126-4805-a56e-e4337f97dbd0.png",
+    nextAvailable: "Søndag, 14:00",
+    capacity: 90,
+    accessibility: ["wheelchair", "hearing-loop"],
+    suitableFor: ["Religiøse møter", "Konserter", "Begravelser", "Bryllup"],
+    equipment: ["Orgel", "Lydanlegg", "Lysanlegg", "Kjøkken", "Servering"],
+    openingHours: "Man-Fre: 10:00-16:00, Søn: 08:00-15:00, Lør: Kun ved avtale",
+    description: "Vakker menighetsal med historisk atmosfære og flott akustikk for konserter og seremonier.",
+    lat: 59.7434,
+    lng: 10.2067,
+    availableTimes: [
+      {
+        date: new Date(2025, 5, 9),
+        slots: [
+          { start: "14:00", end: "16:00", available: true }
+        ]
+      }
+    ]
+  },
+  {
+    id: 16,
+    name: "Holmestrand Svømmehall",
+    address: "Storgata 25, 3080 Holmestrand",
+    type: "Svømmehall",
+    area: "Holmestrand",
+    image: "/lovable-uploads/740258a0-d4f7-49b6-a8a6-9c994e75baae.png",
+    nextAvailable: "Tirsdag, 07:00",
+    capacity: 180,
+    accessibility: ["wheelchair", "hearing-loop"],
+    suitableFor: ["Svømming", "Vanngymnastikk", "Barneskole", "Kurs"],
+    equipment: ["25m basseng", "Varmbasseng", "Badstue", "Garderober", "Kafeteria"],
+    openingHours: "Man-Fre: 06:00-21:00, Lør-Søn: 09:00-18:00",
+    description: "Moderne svømmeanlegg med varmebasseng og badstue. Familievennlig med gode fasiliteter.",
+    lat: 59.4894,
+    lng: 10.3123,
+    availableTimes: [
+      {
+        date: new Date(2025, 5, 10),
+        slots: [
+          { start: "07:00", end: "09:00", available: true },
+          { start: "09:00", end: "11:00", available: true }
         ]
       }
     ]
