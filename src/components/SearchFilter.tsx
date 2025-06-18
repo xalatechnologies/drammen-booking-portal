@@ -58,126 +58,115 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
   const hasAdvancedFilters = dateRange || (accessibility && accessibility !== "all") || capacity[0] > 0 || capacity[1] < 200;
 
   return (
-    <div className="mb-8">
-      <Card className="border-0 shadow-lg bg-white overflow-hidden">
-        <CardContent className="p-0">
-          {/* Main Search Bar */}
-          <div className="border-b border-gray-100">
-            <div className="p-8">
-              {/* Primary Search Row */}
-              <div className="flex flex-col lg:flex-row gap-6 items-stretch mb-6">
-                {/* Search Input - Takes most space */}
-                <div className="lg:flex-1">
-                  <SearchInput 
-                    searchTerm={searchTerm}
-                    setSearchTerm={setSearchTerm}
-                  />
-                </div>
-
-                {/* Date Range Picker */}
-                <div className="lg:w-72">
-                  <DateRangePicker 
-                    dateRange={dateRange}
-                    setDateRange={setDateRange}
-                  />
-                </div>
-
-                {/* Filters Button */}
-                <Button
-                  variant="outline"
-                  onClick={() => setShowAdvanced(!showAdvanced)}
-                  className={`h-14 px-8 border-2 transition-all text-lg font-medium ${
-                    showAdvanced || hasAdvancedFilters
-                      ? 'border-gray-900 bg-gray-900 text-white hover:bg-gray-800' 
-                      : 'border-gray-300 hover:border-gray-400'
-                  }`}
-                >
-                  <Filter className="h-6 w-6 mr-3" />
-                  Filtre
-                </Button>
-
-                {/* View Mode Toggle */}
-                <ViewModeToggle 
-                  viewMode={viewMode}
-                  setViewMode={setViewMode}
-                />
-              </div>
-
-              {/* Quick Filters Row */}
-              <div className="flex flex-col lg:flex-row gap-4 items-stretch">
-                <div className="lg:flex-1">
-                  <FilterSelects 
-                    facilityType={facilityType}
-                    setFacilityType={setFacilityType}
-                    location={location}
-                    setLocation={setLocation}
-                    accessibility={accessibility}
-                    setAccessibility={setAccessibility}
-                    capacity={capacity}
-                    setCapacity={setCapacity}
-                    showOnlyMain={true}
-                  />
-                </div>
-
-                {/* Search Button */}
-                <Button className="h-14 px-10 bg-pink-600 hover:bg-pink-700 text-white font-semibold shadow-sm text-lg">
-                  <Search className="h-6 w-6 mr-3" />
-                  Søk
-                </Button>
-              </div>
-
-              {/* Clear Filters */}
-              {hasActiveFilters && (
-                <div className="flex justify-end mt-6">
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={clearFilters} 
-                    className="text-gray-500 hover:text-red-600 hover:bg-red-50 text-lg"
-                  >
-                    <X className="h-5 w-5 mr-2" />
-                    Nullstill filtre
-                  </Button>
-                </div>
-              )}
-            </div>
+    <Card className="mb-8 shadow-lg">
+      <CardContent className="p-6">
+        {/* Main Search Row */}
+        <div className="flex flex-col lg:flex-row gap-4 items-stretch mb-4">
+          {/* Search Input */}
+          <div className="lg:flex-1">
+            <SearchInput 
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
+            />
           </div>
 
-          {/* Advanced Filters - Expandable */}
-          {showAdvanced && (
-            <div className="border-b border-gray-100 bg-gray-50">
-              <div className="p-8">
-                <h3 className="font-semibold text-gray-900 mb-6 text-xl">Avanserte filtre</h3>
-                <AdvancedFilters 
-                  accessibility={accessibility}
-                  setAccessibility={setAccessibility}
-                  capacity={capacity}
-                  setCapacity={setCapacity}
-                />
-              </div>
-            </div>
-          )}
+          {/* Date Range Picker */}
+          <div className="lg:w-64">
+            <DateRangePicker 
+              dateRange={dateRange}
+              setDateRange={setDateRange}
+            />
+          </div>
 
-          {/* Active Filters */}
-          {hasActiveFilters && (
-            <div className="p-8 pt-6">
-              <ActiveFilters 
-                dateRange={dateRange}
-                setDateRange={setDateRange}
-                facilityType={facilityType}
-                setFacilityType={setFacilityType}
-                location={location}
-                setLocation={setLocation}
-                accessibility={accessibility}
-                setAccessibility={setAccessibility}
-                capacity={capacity}
-                setCapacity={setCapacity}
-              />
-            </div>
-          )}
-        </CardContent>
-      </Card>
-    </div>
+          {/* Search Button */}
+          <Button className="h-14 px-8 bg-pink-600 hover:bg-pink-700 text-white font-semibold text-lg">
+            <Search className="h-5 w-5 mr-2" />
+            Søk
+          </Button>
+        </div>
+
+        {/* Filters Row */}
+        <div className="flex flex-col lg:flex-row gap-4 items-stretch mb-4">
+          <div className="lg:flex-1">
+            <FilterSelects 
+              facilityType={facilityType}
+              setFacilityType={setFacilityType}
+              location={location}
+              setLocation={setLocation}
+              accessibility={accessibility}
+              setAccessibility={setAccessibility}
+              capacity={capacity}
+              setCapacity={setCapacity}
+              showOnlyMain={true}
+            />
+          </div>
+
+          {/* Advanced Filters Button */}
+          <Button
+            variant="outline"
+            onClick={() => setShowAdvanced(!showAdvanced)}
+            className={`h-14 px-6 border-2 text-lg font-medium ${
+              showAdvanced || hasAdvancedFilters
+                ? 'border-gray-900 bg-gray-900 text-white hover:bg-gray-800' 
+                : 'border-gray-300 hover:border-gray-400'
+            }`}
+          >
+            <Filter className="h-5 w-5 mr-2" />
+            Filtre
+          </Button>
+
+          {/* View Mode Toggle */}
+          <ViewModeToggle 
+            viewMode={viewMode}
+            setViewMode={setViewMode}
+          />
+        </div>
+
+        {/* Advanced Filters - Expandable */}
+        {showAdvanced && (
+          <div className="border-t border-gray-200 pt-4 mt-4">
+            <h3 className="font-semibold text-gray-900 mb-4 text-lg">Avanserte filtre</h3>
+            <AdvancedFilters 
+              accessibility={accessibility}
+              setAccessibility={setAccessibility}
+              capacity={capacity}
+              setCapacity={setCapacity}
+            />
+          </div>
+        )}
+
+        {/* Clear Filters */}
+        {hasActiveFilters && (
+          <div className="flex justify-end mt-4">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={clearFilters} 
+              className="text-gray-500 hover:text-red-600 hover:bg-red-50"
+            >
+              <X className="h-4 w-4 mr-1" />
+              Nullstill filtre
+            </Button>
+          </div>
+        )}
+
+        {/* Active Filters */}
+        {hasActiveFilters && (
+          <ActiveFilters 
+            dateRange={dateRange}
+            setDateRange={setDateRange}
+            facilityType={facilityType}
+            setFacilityType={setFacilityType}
+            location={location}
+            setLocation={setLocation}
+            accessibility={accessibility}
+            setAccessibility={setAccessibility}
+            capacity={capacity}
+            setCapacity={setCapacity}
+          />
+        )}
+      </CardContent>
+    </Card>
   );
 };
 
