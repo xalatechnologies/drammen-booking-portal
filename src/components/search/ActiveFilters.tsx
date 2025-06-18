@@ -3,7 +3,7 @@ import React from "react";
 import { DateRange } from "react-day-picker";
 import { format } from "date-fns";
 import { nb } from "date-fns/locale";
-import { CalendarIcon, MapPin, Users, X } from "lucide-react";
+import { CalendarIcon, MapPin, Users, X, DollarSign, Clock, Zap, Wifi, Car, Camera } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 interface ActiveFiltersProps {
@@ -17,6 +17,18 @@ interface ActiveFiltersProps {
   setAccessibility: (accessibility: string) => void;
   capacity: number[];
   setCapacity: (capacity: number[]) => void;
+  priceRange: number[];
+  setPriceRange: (range: number[]) => void;
+  availableNow: boolean;
+  setAvailableNow: (available: boolean) => void;
+  hasEquipment: boolean;
+  setHasEquipment: (has: boolean) => void;
+  hasParking: boolean;
+  setHasParking: (has: boolean) => void;
+  hasWifi: boolean;
+  setHasWifi: (has: boolean) => void;
+  allowsPhotography: boolean;
+  setAllowsPhotography: (allows: boolean) => void;
 }
 
 const ActiveFilters: React.FC<ActiveFiltersProps> = ({
@@ -30,6 +42,18 @@ const ActiveFilters: React.FC<ActiveFiltersProps> = ({
   setAccessibility,
   capacity,
   setCapacity,
+  priceRange,
+  setPriceRange,
+  availableNow,
+  setAvailableNow,
+  hasEquipment,
+  setHasEquipment,
+  hasParking,
+  setHasParking,
+  hasWifi,
+  setHasWifi,
+  allowsPhotography,
+  setAllowsPhotography,
 }) => {
   return (
     <div className="flex flex-wrap gap-2 pt-4 mt-4 border-t border-gray-100">
@@ -81,6 +105,66 @@ const ActiveFilters: React.FC<ActiveFiltersProps> = ({
           <X 
             className="h-3 w-3 ml-1 cursor-pointer hover:text-red-600" 
             onClick={() => setCapacity([0, 200])}
+          />
+        </Badge>
+      )}
+      {(priceRange[0] > 0 || priceRange[1] < 5000) && (
+        <Badge variant="secondary" className="flex items-center bg-emerald-50 text-emerald-700 border-emerald-200">
+          <DollarSign className="h-3 w-3 mr-1" />
+          {priceRange[0]} - {priceRange[1]} kr/time
+          <X 
+            className="h-3 w-3 ml-1 cursor-pointer hover:text-red-600" 
+            onClick={() => setPriceRange([0, 5000])}
+          />
+        </Badge>
+      )}
+      {availableNow && (
+        <Badge variant="secondary" className="flex items-center bg-green-50 text-green-700 border-green-200">
+          <Clock className="h-3 w-3 mr-1" />
+          Ledig nå
+          <X 
+            className="h-3 w-3 ml-1 cursor-pointer hover:text-red-600" 
+            onClick={() => setAvailableNow(false)}
+          />
+        </Badge>
+      )}
+      {hasEquipment && (
+        <Badge variant="secondary" className="flex items-center bg-blue-50 text-blue-700 border-blue-200">
+          <Zap className="h-3 w-3 mr-1" />
+          AV-utstyr
+          <X 
+            className="h-3 w-3 ml-1 cursor-pointer hover:text-red-600" 
+            onClick={() => setHasEquipment(false)}
+          />
+        </Badge>
+      )}
+      {hasParking && (
+        <Badge variant="secondary" className="flex items-center bg-slate-50 text-slate-700 border-slate-200">
+          <Car className="h-3 w-3 mr-1" />
+          Parkering
+          <X 
+            className="h-3 w-3 ml-1 cursor-pointer hover:text-red-600" 
+            onClick={() => setHasParking(false)}
+          />
+        </Badge>
+      )}
+      {hasWifi && (
+        <Badge variant="secondary" className="flex items-center bg-purple-50 text-purple-700 border-purple-200">
+          <Wifi className="h-3 w-3 mr-1" />
+          WiFi
+          <X 
+            className="h-3 w-3 ml-1 cursor-pointer hover:text-red-600" 
+            onClick={() => setHasWifi(false)}
+          />
+        </Badge>
+      )}
+      {allowsPhotography && (
+        <Badge variant="secondary" className="flex items-center bg-orange-50 text-orange-700 border-orange-200">
+          <Camera className="h-3 w-3 mr-1" />
+          Fotografering
+          <X 
+            className="h-3 w-3 ml-1 cursor-pointer hover:text-red-600" 
+            onClick={() => setAllowsPhotography(false)}
           />
         </Badge>
       )}

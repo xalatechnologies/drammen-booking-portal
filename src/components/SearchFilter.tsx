@@ -110,12 +110,6 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
               setDateRange={setDateRange}
             />
           </div>
-
-          {/* Search Button */}
-          <Button className="h-14 px-10 bg-white text-slate-900 hover:bg-slate-50 font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 rounded-xl">
-            <Search className="h-5 w-5 mr-3" />
-            Søk Lokaler
-          </Button>
         </div>
       </div>
 
@@ -206,6 +200,18 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
               setAccessibility={setAccessibility}
               capacity={capacity}
               setCapacity={setCapacity}
+              priceRange={priceRange}
+              setPriceRange={setPriceRange}
+              availableNow={availableNow}
+              setAvailableNow={setAvailableNow}
+              hasEquipment={hasEquipment}
+              setHasEquipment={setHasEquipment}
+              hasParking={hasParking}
+              setHasParking={setHasParking}
+              hasWifi={hasWifi}
+              setHasWifi={setHasWifi}
+              allowsPhotography={allowsPhotography}
+              setAllowsPhotography={setAllowsPhotography}
             />
           </div>
         )}
