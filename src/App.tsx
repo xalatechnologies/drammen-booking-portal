@@ -6,7 +6,7 @@ import FacilityDetail from "@/pages/facilities/[id]";
 import BookingPage from "@/pages/booking/[facilityId]";
 import CheckoutPage from "@/pages/checkout";
 import ConfirmationPage from "@/pages/confirmation";
-import { LocalizationContext } from "@/contexts/LocalizationContext";
+import { LocalizationProvider } from "@/contexts/LocalizationContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { QueryClient } from "@/contexts/QueryClient";
 import { CartProvider } from "@/contexts/CartContext";
@@ -16,7 +16,7 @@ function App() {
     <CartProvider>
       <QueryClient>
         <Router>
-          <LocalizationContext>
+          <LocalizationProvider>
             <LanguageProvider>
               <div className="flex flex-col min-h-screen w-full">
                 <Routes>
@@ -28,7 +28,7 @@ function App() {
                 </Routes>
               </div>
             </LanguageProvider>
-          </LocalizationContext>
+          </LocalizationProvider>
         </Router>
       </QueryClient>
     </CartProvider>
