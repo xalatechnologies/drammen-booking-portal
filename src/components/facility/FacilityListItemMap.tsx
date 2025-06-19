@@ -27,7 +27,7 @@ export function FacilityListItemMap({ address, facilityName }: FacilityListItemM
     
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
-      style: "mapbox://styles/mapbox/light-v11",
+      style: "mapbox://styles/mapbox/streets-v12",
       center: coordinates,
       zoom: 14,
       interactive: false,
@@ -40,7 +40,7 @@ export function FacilityListItemMap({ address, facilityName }: FacilityListItemM
     markerElement.style.cssText = `
       width: 30px;
       height: 30px;
-      background-color: #ef4444;
+      background-color: #3b82f6;
       border: 2px solid white;
       border-radius: 50%;
       cursor: pointer;
