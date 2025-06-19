@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -11,15 +12,29 @@ import { EnhancedFacilitySidebar } from "@/components/facility/EnhancedFacilityS
 import { SimilarFacilitiesSlider } from "@/components/facility/SimilarFacilitiesSlider";
 import { AvailabilityTab } from "@/components/facility/tabs/AvailabilityTab";
 import { Zone } from "@/components/booking/types";
-import { useFacility } from "@/hooks/useFacility";
+import { useQuery } from "@tanstack/react-query";
+import { LocalizedFacilityService } from "@/services/LocalizedFacilityService";
+import { useLocalizedServices } from "@/hooks/useLocalizedServices";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useTranslation } from "@/i18n/hooks/useTranslation";
 
 const FacilityDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [isFavorited, setIsFavorited] = useState(false);
+  const { t } = useTranslation();
 
-  const { facility, isLoading, error, notFound } = useFacility(id || "");
+  // Ensure localized services are properly initialized
+  useLocalizedServices();
+
+  const { data: facilityResponse, isLoading, error } = useQuery({
+    queryKey: ['facility', id],
+    queryFn: () => LocalizedFacilityService.getFacilityById(Number(id)),
+    enabled: !!id
+  });
+
+  const facility = facilityResponse?.success ? facilityResponse.data : null;
+  const notFound = facilityResponse?.success === false && facilityResponse.error?.message?.includes('not found');
 
   // Enhanced zones with full zone management capabilities
   const zones: Zone[] = [{

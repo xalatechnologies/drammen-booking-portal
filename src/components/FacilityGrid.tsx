@@ -2,7 +2,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { FacilityCard } from "./facility/FacilityCard";
-import { useFacilities } from "@/hooks/useFacilities";
+import { useLocalizedFacilities } from "@/hooks/useLocalizedFacilities";
 import { FacilityFilters } from "@/types/facility";
 import { PaginationParams } from "@/types/api";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -18,7 +18,7 @@ const FacilityGrid: React.FC<FacilityGridProps> = ({
 }) => {
   const navigate = useNavigate();
   
-  const { facilities, isLoading, error } = useFacilities({
+  const { facilities, isLoading, error } = useLocalizedFacilities({
     pagination,
     filters
   });

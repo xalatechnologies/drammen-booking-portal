@@ -30,14 +30,14 @@ export function useLocalizedFacilities({
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
-  const facilities = response?.success ? response.data.items : [];
+  const facilities = response?.success ? response.data.data : [];
   const paginationInfo = response?.success ? {
-    page: response.data.page,
-    limit: response.data.limit,
-    total: response.data.total,
-    totalPages: response.data.totalPages,
-    hasNext: response.data.hasNext,
-    hasPrev: response.data.hasPrev
+    page: response.data.pagination.page,
+    limit: response.data.pagination.limit,
+    total: response.data.pagination.total,
+    totalPages: response.data.pagination.totalPages,
+    hasNext: response.data.pagination.hasNext,
+    hasPrev: response.data.pagination.hasPrev
   } : null;
 
   return {
