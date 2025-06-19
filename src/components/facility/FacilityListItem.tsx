@@ -94,9 +94,9 @@ const FacilityListItem: React.FC<FacilityListItemProps> = ({
       }}
     >
       <CardContent className="p-0">
-        <div className="grid grid-cols-12" style={{ height: '300px' }}>
-          {/* Image Section - 3 columns */}
-          <div className="col-span-3">
+        <div className="grid grid-cols-3" style={{ height: '350px' }}>
+          {/* Image Section - Column 1 */}
+          <div className="col-span-1">
             <FacilityListItemImage
               image={facility.image}
               facilityName={facility.name}
@@ -105,8 +105,8 @@ const FacilityListItem: React.FC<FacilityListItemProps> = ({
             />
           </div>
           
-          {/* Main Content - 6 columns */}
-          <div className="col-span-6">
+          {/* Main Content - Column 2 */}
+          <div className="col-span-1">
             <FacilityListItemContent
               facility={facility}
               isFavorited={isFavorited}
@@ -116,8 +116,8 @@ const FacilityListItem: React.FC<FacilityListItemProps> = ({
             />
           </div>
 
-          {/* Map Section - 3 columns */}
-          <div className="col-span-3">
+          {/* Map Section - Column 3 */}
+          <div className="col-span-1">
             <FacilityListItemMap 
               address={facility.address} 
               facilityName={facility.name} 
