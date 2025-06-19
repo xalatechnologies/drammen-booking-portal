@@ -59,6 +59,12 @@ export function useTranslation() {
         }
       }
 
+      // Ensure we return a string, never an object
+      if (typeof value === 'object' && value !== null) {
+        console.warn(`Translation path "${path}" returned an object instead of a string. This will cause React rendering errors.`);
+        return defaultValue || path;
+      }
+
       // Handle parameter substitution
       if (typeof value === 'string' && params) {
         Object.entries(params).forEach(([key, val]) => {
