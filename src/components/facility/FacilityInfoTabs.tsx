@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useTranslation } from "@/i18n";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -88,6 +87,10 @@ export function FacilityInfoTabs({
             address={address}
             area={area}
             capacity={capacity}
+            openingHours="08:00-22:00"
+            zones={zones}
+            hasAutoApproval={true}
+            amenities={amenities}
           />
         </TabsContent>
 

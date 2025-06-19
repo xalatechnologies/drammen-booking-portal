@@ -10,7 +10,7 @@ export interface AlternativeZoneSuggestion {
 }
 
 export class EnhancedZoneConflictManager extends ZoneConflictManager {
-  constructor(zones: Zone[], existingBookings: ExistingBooking[] = []) {
+  constructor(zones: Zone[] = [], existingBookings: ExistingBooking[] = []) {
     super(zones, existingBookings);
   }
 

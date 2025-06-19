@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -38,12 +37,12 @@ export function AvailabilityTab({
   const [currentPattern, setCurrentPattern] = useState<RecurrencePattern>({
     type: 'weekly',
     weekdays: [],
-    timeSlot: '08:00',
+    timeSlots: ['08:00'],
     duration: 2,
     endDate: new Date(),
   });
 
-  const conflictManager = new EnhancedZoneConflictManager();
+  const conflictManager = new EnhancedZoneConflictManager(zones);
 
   const selectedZone = zones.find(zone => zone.id === selectedZoneId);
 
