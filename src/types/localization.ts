@@ -27,7 +27,7 @@ export interface LocalizedFacility extends Omit<Facility, 'name' | 'description'
   };
 }
 
-export interface LocalizedAdditionalService extends Omit<AdditionalService, 'name' | 'description' | 'shortDescription'> {
+export interface LocalizedAdditionalService extends Omit<AdditionalService, 'name' | 'description' | 'shortDescription' | 'metadata'> {
   name: {
     [K in Language]: string;
   };
@@ -37,7 +37,7 @@ export interface LocalizedAdditionalService extends Omit<AdditionalService, 'nam
   shortDescription?: {
     [K in Language]: string;
   };
-  metadata: AdditionalService['metadata'] & {
+  metadata: Omit<AdditionalService['metadata'], 'instructions'> & {
     instructions?: {
       [K in Language]: string;
     };
