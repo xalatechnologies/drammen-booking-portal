@@ -1,4 +1,3 @@
-
 import { useLanguage } from '@/contexts/LanguageContext';
 import { bookingTranslations } from '../translations/booking';
 import { commonTranslations } from '../translations/common';
@@ -6,6 +5,7 @@ import { facilityTranslations } from '../translations/facility';
 import { errorTranslations } from '../translations/errors';
 import { navigationTranslations } from '../translations/navigation';
 import { adminTranslations } from '../translations/admin';
+import { enumTranslations } from '../translations/enums';
 import { TranslationParams, TranslationFunction } from '../types';
 
 type TranslationPath = string;
@@ -19,7 +19,8 @@ export function useTranslation() {
     facility: facilityTranslations[language],
     error: errorTranslations[language],
     navigation: navigationTranslations[language],
-    admin: adminTranslations[language]
+    admin: adminTranslations[language],
+    enum: enumTranslations[language]
   };
 
   const t: TranslationFunction = (path: TranslationPath, params?: TranslationParams, defaultValue?: string): string => {
@@ -27,8 +28,10 @@ export function useTranslation() {
       const pathParts = path.split('.');
       let value: any = null;
 
-      // Navigate through nested translation object
-      if (pathParts.length >= 2) {
+      // Handle enum translations specially
+      if (pathParts[0] === 'enum' && pathParts.length === 2) {
+        value = enumTranslations[language][pathParts[1]];
+      } else if (pathParts.length >= 2) {
         const namespace = pathParts[0];
         const translationObj = translations[namespace as keyof typeof translations];
         
