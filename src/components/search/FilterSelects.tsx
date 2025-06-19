@@ -29,24 +29,25 @@ const FilterSelects: React.FC<FilterSelectsProps> = ({
 }) => {
   const { t } = useTranslation();
 
-  // Use the actual facility type values from the data
+  // Use the actual facility type values from the console logs
   const facilityTypeOptions = [
     { value: "all", label: t('forms.facilityTypes.all') },
-    { value: "sports-center", label: t('forms.facilityTypes.sportsHall') },
-    { value: "community-center", label: t('forms.facilityTypes.meetingRoom') },
-    { value: "conference-center", label: t('forms.facilityTypes.conferenceRoom') },
-    { value: "cultural-center", label: t('forms.facilityTypes.auditorium') },
-    { value: "school", label: t('forms.facilityTypes.gym') }
+    { value: "Gymsal", label: t('forms.facilityTypes.gym') },
+    { value: "Aktivitetshall", label: t('forms.facilityTypes.sportsHall') },
+    { value: "Auditorium", label: t('forms.facilityTypes.auditorium') },
+    { value: "Møterom", label: t('forms.facilityTypes.meetingRoom') },
+    { value: "Konferanserom", label: t('forms.facilityTypes.conferenceRoom') }
   ];
 
-  // Use the actual location values from the data
+  // Use the actual location values from the console logs  
   const locationOptions = [
     { value: "all", label: t('forms.locations.all') },
-    { value: "drammen-sentrum", label: t('forms.locations.drammenSentrum') },
-    { value: "bragernes", label: t('forms.locations.bragernes') },
-    { value: "stromsø", label: t('forms.locations.stromsø') },
-    { value: "konnerud", label: t('forms.locations.konnerud') },
-    { value: "åssiden", label: t('forms.locations.åssiden') }
+    { value: "Bragernes", label: t('forms.locations.bragernes') },
+    { value: "Konnerud", label: t('forms.locations.konnerud') },
+    { value: "Gulskogen", label: "Gulskogen" },
+    { value: "Strømsø", label: t('forms.locations.stromsø') },
+    { value: "Åssiden", label: t('forms.locations.åssiden') },
+    { value: "Drammen Sentrum", label: t('forms.locations.drammenSentrum') }
   ];
 
   // Define accessibility mappings
