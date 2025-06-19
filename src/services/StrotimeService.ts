@@ -1,9 +1,10 @@
-
 import { StrøtimeSlot, StrøtimeBooking, StrøtimeFilters } from '@/types/booking/strøtimer';
 import { ApiResponse } from '@/types/api';
+import { addDays, isSameDay } from 'date-fns';
 
-// Mock data for demo
+// Mock data for demo - expanded to cover multiple weeks
 const mockStrøtimeSlots: StrøtimeSlot[] = [
+  // Current week (June 19, 2025)
   {
     id: 'stro-1',
     facilityId: '2',
@@ -50,6 +51,37 @@ const mockStrøtimeSlots: StrøtimeSlot[] = [
     bookedBy: 'john.doe@example.com',
     bookedAt: new Date(),
     pricePerSlot: 80
+  },
+  // Next week (June 26, 2025)
+  {
+    id: 'stro-4',
+    facilityId: '2',
+    facilityName: 'Gymsal 2 - Brandengen skole',
+    zoneId: 'zone-1',
+    zoneName: 'Sone A (Nord)',
+    date: new Date(2025, 5, 26),
+    startTime: '14:00',
+    endTime: '15:00',
+    duration: 60,
+    isAvailable: true,
+    publishedAt: new Date(),
+    publishedBy: 'admin',
+    pricePerSlot: 150
+  },
+  {
+    id: 'stro-5',
+    facilityId: '2',
+    facilityName: 'Gymsal 2 - Brandengen skole',
+    zoneId: 'zone-2',
+    zoneName: 'Sone B (Sør)',
+    date: new Date(2025, 5, 27),
+    startTime: '10:00',
+    endTime: '11:00',
+    duration: 60,
+    isAvailable: true,
+    publishedAt: new Date(),
+    publishedBy: 'admin',
+    pricePerSlot: 150
   }
 ];
 
@@ -71,7 +103,12 @@ export class StrotimeService {
         }
         if (filters.date) {
           filteredSlots = filteredSlots.filter(slot => 
-            slot.date.toDateString() === filters.date!.toDateString()
+            isSameDay(slot.date, filters.date!)
+          );
+        }
+        if (filters.startDate && filters.endDate) {
+          filteredSlots = filteredSlots.filter(slot => 
+            slot.date >= filters.startDate! && slot.date <= filters.endDate!
           );
         }
         if (filters.duration) {
