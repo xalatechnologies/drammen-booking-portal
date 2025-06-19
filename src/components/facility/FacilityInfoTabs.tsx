@@ -7,6 +7,7 @@ import { DescriptionTab } from "./tabs/DescriptionTab";
 import { FeaturesTab } from "./tabs/FeaturesTab";
 import { FaqTab } from "./tabs/FaqTab";
 import { RulesTab } from "./tabs/RulesTab";
+import { EnhancedAboutTab } from "./tabs/EnhancedAboutTab";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 interface FacilityInfoTabsProps {
@@ -16,6 +17,9 @@ interface FacilityInfoTabsProps {
   zones: Zone[];
   amenities: string[];
   address: string;
+  openingHours: string;
+  area: string;
+  hasAutoApproval: boolean;
   zoneCards: React.ReactNode;
 }
 
@@ -26,6 +30,9 @@ export function FacilityInfoTabs({
   zones, 
   amenities, 
   address,
+  openingHours,
+  area,
+  hasAutoApproval,
   zoneCards
 }: FacilityInfoTabsProps) {
   const { language } = useLanguage();
@@ -48,10 +55,10 @@ export function FacilityInfoTabs({
   const t = translations[language];
 
   return (
-    <Tabs defaultValue="description" className="bg-white rounded-lg shadow-sm border">
+    <Tabs defaultValue="about" className="bg-white rounded-lg shadow-sm border">
       <TabsList className="w-full border-b p-0 h-auto bg-gray-50 rounded-none">
         <TabsTrigger 
-          value="description" 
+          value="about" 
           className="flex-1 py-4 px-6 rounded-none text-base font-medium data-[state=active]:bg-[#1e3a8a] data-[state=active]:text-white data-[state=active]:border-b-0 data-[state=active]:shadow-none hover:bg-[#1e40af] hover:text-white transition-colors"
         >
           {t.about}
@@ -76,11 +83,16 @@ export function FacilityInfoTabs({
         </TabsTrigger>
       </TabsList>
       
-      <TabsContent value="description">
-        <DescriptionTab 
-          description={description} 
-          capacity={capacity} 
+      <TabsContent value="about">
+        <EnhancedAboutTab 
+          description={description}
+          capacity={capacity}
           address={address}
+          openingHours={openingHours}
+          area={area}
+          zones={zones}
+          hasAutoApproval={hasAutoApproval}
+          amenities={amenities}
         />
       </TabsContent>
       

@@ -1,21 +1,21 @@
 
-
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Home, AlertCircle } from "lucide-react";
 import GlobalHeader from "@/components/GlobalHeader";
 import GlobalFooter from "@/components/GlobalFooter";
-import { FacilityImageGallery } from "@/components/facility/FacilityImageGallery";
+import { EnhancedImageGallery } from "@/components/facility/EnhancedImageGallery";
 import { FacilityHeader } from "@/components/facility/FacilityHeader";
 import { FacilityInfoTabs } from "@/components/facility/FacilityInfoTabs";
-import { EnhancedFacilitySidebar } from "@/components/facility/EnhancedFacilitySidebar";
+import { PersistentBookingSidebar } from "@/components/facility/PersistentBookingSidebar";
 import { SimilarFacilitiesSlider } from "@/components/facility/SimilarFacilitiesSlider";
 import { AvailabilityTab } from "@/components/facility/tabs/AvailabilityTab";
 import { Zone } from "@/components/booking/types";
 import { useOptimizedFacility } from "@/hooks/useOptimizedFacility";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useTranslation } from "@/i18n/hooks/useTranslation";
+import { CartProvider } from "@/contexts/CartContext";
 
 const FacilityDetail = () => {
   const { id } = useParams();
@@ -79,62 +79,61 @@ const FacilityDetail = () => {
     }
   };
 
-  const handleBookingClick = () => {
-    const bookingPath = `/booking/${id}`;
-    navigate(bookingPath);
-  };
-
   // Loading state
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-white flex flex-col">
-        <GlobalHeader />
-        <div className="flex-grow">
-          <div className="container mx-auto px-4 py-6 max-w-7xl">
-            <div className="space-y-6">
-              <Skeleton className="h-96 w-full rounded-lg" />
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div className="lg:col-span-2 space-y-6">
-                  <Skeleton className="h-64 w-full rounded-lg" />
-                  <Skeleton className="h-96 w-full rounded-lg" />
-                </div>
-                <div className="lg:col-span-1">
-                  <Skeleton className="h-80 w-full rounded-lg" />
+      <CartProvider>
+        <div className="min-h-screen bg-white flex flex-col">
+          <GlobalHeader />
+          <div className="flex-grow">
+            <div className="container mx-auto px-4 py-6 max-w-7xl">
+              <div className="space-y-6">
+                <Skeleton className="h-96 w-full rounded-lg" />
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                  <div className="lg:col-span-2 space-y-6">
+                    <Skeleton className="h-64 w-full rounded-lg" />
+                    <Skeleton className="h-96 w-full rounded-lg" />
+                  </div>
+                  <div className="lg:col-span-1">
+                    <Skeleton className="h-80 w-full rounded-lg" />
+                  </div>
                 </div>
               </div>
             </div>
           </div>
+          <GlobalFooter />
         </div>
-        <GlobalFooter />
-      </div>
+      </CartProvider>
     );
   }
 
   // Error state
   if (error || notFound) {
     return (
-      <div className="min-h-screen bg-white flex flex-col">
-        <GlobalHeader />
-        <div className="flex-grow flex items-center justify-center">
-          <div className="text-center max-w-md mx-auto px-4">
-            <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-6" />
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">
-              {notFound ? t('facility.errors.notFound') : t('facility.errors.loadError')}
-            </h1>
-            <p className="text-gray-600 mb-8">
-              {notFound 
-                ? t('facility.errors.notFoundDescription')
-                : t('facility.errors.loadErrorDescription')
-              }
-            </p>
-            <Button onClick={() => navigate("/")} className="mb-4">
-              <Home className="h-4 w-4 mr-2" />
-              {t('common.navigation.backToHome')}
-            </Button>
+      <CartProvider>
+        <div className="min-h-screen bg-white flex flex-col">
+          <GlobalHeader />
+          <div className="flex-grow flex items-center justify-center">
+            <div className="text-center max-w-md mx-auto px-4">
+              <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-6" />
+              <h1 className="text-3xl font-bold text-gray-900 mb-4">
+                {notFound ? t('facility.errors.notFound') : t('facility.errors.loadError')}
+              </h1>
+              <p className="text-gray-600 mb-8">
+                {notFound 
+                  ? t('facility.errors.notFoundDescription')
+                  : t('facility.errors.loadErrorDescription')
+                }
+              </p>
+              <Button onClick={() => navigate("/")} className="mb-4">
+                <Home className="h-4 w-4 mr-2" />
+                {t('common.navigation.backToHome')}
+              </Button>
+            </div>
           </div>
+          <GlobalFooter />
         </div>
-        <GlobalFooter />
-      </div>
+      </CartProvider>
     );
   }
 
@@ -142,45 +141,59 @@ const FacilityDetail = () => {
   if (!facility) return null;
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
-      <GlobalHeader />
+    <CartProvider>
+      <div className="min-h-screen bg-white flex flex-col">
+        <GlobalHeader />
 
-      {/* Breadcrumb Navigation */}
-      <div className="bg-gray-50 border-b border-gray-200">
-        <div className="container mx-auto px-4 py-4 max-w-7xl">
-          <nav className="flex items-center space-x-2 text-sm">
-            <Button variant="ghost" size="sm" className="text-gray-600 hover:text-gray-900 p-0 h-auto font-normal" onClick={() => navigate("/")}>
-              <Home className="h-4 w-4 mr-1" />
-              {t('common.navigation.home')}
-            </Button>
-            <span className="text-gray-400">/</span>
-            <span className="text-gray-900 font-medium">{facility.name}</span>
-          </nav>
+        {/* Breadcrumb Navigation */}
+        <div className="bg-gray-50 border-b border-gray-200">
+          <div className="container mx-auto px-4 py-4 max-w-7xl">
+            <nav className="flex items-center space-x-2 text-sm">
+              <Button variant="ghost" size="sm" className="text-gray-600 hover:text-gray-900 p-0 h-auto font-normal" onClick={() => navigate("/")}>
+                <Home className="h-4 w-4 mr-1" />
+                {t('common.navigation.home')}
+              </Button>
+              <span className="text-gray-400">/</span>
+              <span className="text-gray-900 font-medium">{facility.name}</span>
+            </nav>
+          </div>
         </div>
-      </div>
 
-      {/* Main Content */}
-      <div className="flex-grow">
-        <div className="container mx-auto px-4 py-6 max-w-7xl">
-          <div className="space-y-6">
-            {/* Image Gallery */}
-            <FacilityImageGallery images={[facility.image]} />
-
-            {/* Header */}
-            <div className="flex-1">
-              <FacilityHeader 
-                name={facility.name} 
-                address={facility.address} 
-                onShare={handleShare} 
-                isFavorited={isFavorited} 
-                onToggleFavorite={() => setIsFavorited(!isFavorited)} 
-              />
-            </div>
-
-            {/* Main Content Grid */}
+        {/* Main Content */}
+        <div className="flex-grow">
+          <div className="container mx-auto px-4 py-6 max-w-7xl">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              {/* Left Column - Main Content */}
+              {/* Left Column - Main Content (2/3 width) */}
               <div className="lg:col-span-2 space-y-6">
+                {/* Enhanced Image Gallery */}
+                <EnhancedImageGallery 
+                  images={[facility.image]} 
+                  facilityName={facility.name}
+                />
+
+                {/* Facility Header */}
+                <FacilityHeader 
+                  name={facility.name} 
+                  address={facility.address} 
+                  onShare={handleShare} 
+                  isFavorited={isFavorited} 
+                  onToggleFavorite={() => setIsFavorited(!isFavorited)} 
+                />
+
+                {/* Main Calendar - Moved from tabs to main content */}
+                <div className="bg-white rounded-lg shadow-sm border">
+                  <div className="p-6">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-6">{t('facility.availability.title')}</h2>
+                    <AvailabilityTab 
+                      zones={zones} 
+                      startDate={new Date()} 
+                      showLegend={true}
+                      facilityId={id}
+                      facilityName={facility.name}
+                    />
+                  </div>
+                </div>
+
                 {/* Facility Info Tabs */}
                 <FacilityInfoTabs 
                   description={facility.description} 
@@ -188,54 +201,39 @@ const FacilityDetail = () => {
                   equipment={facility.equipment || []} 
                   zones={zones} 
                   amenities={facility.amenities || []} 
-                  address={facility.address} 
+                  address={facility.address}
+                  openingHours={facility.openingHours}
+                  area={facility.area}
+                  hasAutoApproval={facility.hasAutoApproval || true}
                   zoneCards={<></>} 
                 />
               </div>
 
-              {/* Right Column - Sidebar */}
+              {/* Right Column - Persistent Booking Sidebar (1/3 width) */}
               <div className="lg:col-span-1">
-                <EnhancedFacilitySidebar 
-                  facilityName={facility.name} 
-                  facilityId={id} 
-                  hasAutoApproval={facility.hasAutoApproval || true} 
-                  openingHours={facility.openingHours} 
-                  capacity={facility.capacity}
-                  area={facility.area}
-                  zoneCount={zones.length}
-                  onShare={handleShare} 
-                  onToggleFavorite={() => setIsFavorited(!isFavorited)} 
-                  isFavorited={isFavorited} 
-                />
+                <div className="sticky top-6">
+                  <PersistentBookingSidebar
+                    facilityName={facility.name}
+                    facilityId={id || ""}
+                    capacity={facility.capacity}
+                    area={facility.area}
+                    openingHours={facility.openingHours}
+                  />
+                </div>
               </div>
             </div>
 
-            {/* Enhanced Availability Calendar Section */}
-            <div className="bg-white rounded-lg shadow-sm border">
-              <div className="p-6">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">{t('facility.availability.title')}</h2>
-                <AvailabilityTab 
-                  zones={zones} 
-                  startDate={new Date()} 
-                  showLegend={true}
-                  facilityId={id}
-                  facilityName={facility.name}
-                />
-              </div>
+            {/* Similar Facilities Section */}
+            <div className="mt-12">
+              <SimilarFacilitiesSlider currentFacilityId={id || ""} />
             </div>
-          </div>
-
-          {/* Similar Facilities Section */}
-          <div className="mt-12">
-            <SimilarFacilitiesSlider currentFacilityId={id || ""} />
           </div>
         </div>
-      </div>
 
-      <GlobalFooter />
-    </div>
+        <GlobalFooter />
+      </div>
+    </CartProvider>
   );
 };
 
 export default FacilityDetail;
-
