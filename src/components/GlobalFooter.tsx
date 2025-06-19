@@ -3,9 +3,11 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { Mail, Phone, MapPin } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "@/i18n";
 
 const GlobalFooter = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const handleQuickLinkClick = (path: string) => {
     navigate(path);
@@ -19,7 +21,7 @@ const GlobalFooter = () => {
           <div className="col-span-1 md:col-span-2">
             <h3 className="text-xl font-bold mb-4">Drammen Kommune</h3>
             <p className="text-gray-300 mb-4 max-w-md">
-              Moderne booking system for kommunale lokaler og ressurser. Enkel reservasjon for innbyggere og organisasjoner.
+              {t('footer.description')}
             </p>
             <div className="flex items-center gap-4">
               <Button variant="ghost" className="rounded-full p-2 h-10 w-10 bg-gray-800 hover:bg-gray-700 text-white">
@@ -47,38 +49,38 @@ const GlobalFooter = () => {
 
           {/* Quick Links */}
           <div>
-            <h4 className="text-lg font-semibold mb-4">Hurtiglenker</h4>
+            <h4 className="text-lg font-semibold mb-4">{t('footer.quickLinks')}</h4>
             <div className="space-y-2">
               <button 
                 onClick={() => handleQuickLinkClick('/bookings')}
                 className="block text-gray-300 hover:text-white font-normal text-sm text-left transition-colors"
               >
-                Mine reservasjoner
+                {t('footer.myReservations')}
               </button>
               <button 
                 onClick={() => handleQuickLinkClick('/')}
                 className="block text-gray-300 hover:text-white font-normal text-sm text-left transition-colors"
               >
-                Søk lokaler
+                {t('footer.searchFacilities')}
               </button>
               <button 
                 onClick={() => handleQuickLinkClick('/priser')}
                 className="block text-gray-300 hover:text-white font-normal text-sm text-left transition-colors"
               >
-                Priser og vilkår
+                {t('footer.pricesTerms')}
               </button>
               <button 
                 onClick={() => handleQuickLinkClick('/hjelp')}
                 className="block text-gray-300 hover:text-white font-normal text-sm text-left transition-colors"
               >
-                Hjelp og støtte
+                {t('footer.helpSupport')}
               </button>
             </div>
           </div>
 
           {/* Contact Information */}
           <div>
-            <h4 className="text-lg font-semibold mb-4">Kontakt oss</h4>
+            <h4 className="text-lg font-semibold mb-4">{t('footer.contactUs')}</h4>
             <div className="space-y-3">
               <div className="flex items-center gap-2">
                 <Phone className="h-4 w-4 text-gray-400" />
@@ -107,29 +109,29 @@ const GlobalFooter = () => {
                 onClick={() => handleQuickLinkClick('/om-oss')}
                 className="text-gray-400 hover:text-white font-normal text-sm transition-colors"
               >
-                Om oss
+                {t('footer.aboutUs')}
               </button>
               <button 
                 onClick={() => handleQuickLinkClick('/personvern')}
                 className="text-gray-400 hover:text-white font-normal text-sm transition-colors"
               >
-                Personvern
+                {t('footer.privacy')}
               </button>
               <button 
                 onClick={() => handleQuickLinkClick('/tilgjengelighet')}
                 className="text-gray-400 hover:text-white font-normal text-sm transition-colors"
               >
-                Tilgjengelighetserklæring
+                {t('footer.accessibility')}
               </button>
               <button 
                 onClick={() => handleQuickLinkClick('/cookies')}
                 className="text-gray-400 hover:text-white font-normal text-sm transition-colors"
               >
-                Informasjonskapsler
+                {t('footer.cookies')}
               </button>
             </div>
             <div className="text-gray-500 text-sm">
-              © 2025 Drammen Kommune. Alle rettigheter forbeholdt.
+              {t('footer.copyright')}
             </div>
           </div>
         </div>

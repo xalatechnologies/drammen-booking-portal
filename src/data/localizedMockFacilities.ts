@@ -90,5 +90,54 @@ export const localizedMockFacilities: LocalizedFacility[] = [
         ]
       }
     ]
+  },
+  {
+    id: 3,
+    name: {
+      NO: "Strømsø Idrettshall",
+      EN: "Strømsø Sports Hall"
+    },
+    address: "Strømsø torg 8, Drammen",
+    type: "Idrettshall",
+    area: "Strømsø",
+    image: "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?auto=format&fit=crop&w=600&q=80",
+    nextAvailable: "I dag 16:00",
+    capacity: 50,
+    accessibility: ["wheelchair", "hearing-loop", "visual-guidance"],
+    suitableFor: {
+      NO: ["Idrett", "Ballsport", "Turneringer", "Arrangementer"],
+      EN: ["Sports", "Ball games", "Tournaments", "Events"]
+    },
+    equipment: {
+      NO: ["Projektor", "Lydanlegg", "Basketkurver", "Volleyballnett", "Håndballmål", "Tribuner"],
+      EN: ["Projector", "Sound system", "Basketball hoops", "Volleyball net", "Handball goals", "Stands"]
+    },
+    openingHours: "Man-Søn: 06:00-23:00",
+    description: {
+      NO: "Stor idrettshall med tribuner og profesjonelt utstyr for alle typer ballsport.",
+      EN: "Large sports hall with stands and professional equipment for all types of ball sports."
+    },
+    rating: 4.8,
+    reviewCount: 42,
+    pricePerHour: 750,
+    amenities: {
+      NO: ["Projektor", "Lydanlegg", "Basketkurver", "Volleyballnett", "Håndballmål", "Tribuner"],
+      EN: ["Projector", "Sound system", "Basketball hoops", "Volleyball net", "Handball goals", "Stands"]
+    },
+    hasAutoApproval: true,
+    availableTimes: [
+      {
+        date: new Date(),
+        slots: [
+          { start: "08:00", end: "10:00", available: true },
+          { start: "10:00", end: "12:00", available: true },
+          { start: "12:00", end: "14:00", available: true },
+          { start: "14:00", end: "16:00", available: true },
+          { start: "16:00", end: "18:00", available: true },
+          { start: "18:00", end: "20:00", available: true },
+          { start: "20:00", end: "22:00", available: true },
+        ]
+      }
+    ]
   }
 ];
