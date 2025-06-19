@@ -25,7 +25,7 @@ export function FacilityCardImage({ facility, isFavorited, onFavorite, onShare }
     <div className="relative h-48 overflow-hidden">
       <img 
         src={facility.image} 
-        alt={t('facility.image.alt', { name: facility.name })}
+        alt={`Bilde av ${facility.name}`}
         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
         onError={(e) => {
           const target = e.target as HTMLImageElement;
@@ -44,7 +44,7 @@ export function FacilityCardImage({ facility, isFavorited, onFavorite, onShare }
           size="sm"
           className="bg-white/20 backdrop-blur-md hover:bg-white/30 text-white border-0 h-12 w-12 p-0 rounded-full focus:ring-2 focus:ring-white focus:ring-offset-2"
           onClick={onFavorite}
-          aria-label={isFavorited ? t('facility.actions.removeFromFavorites') : t('facility.actions.addToFavorites')}
+          aria-label={isFavorited ? "Fjern fra favoritter" : "Legg til i favoritter"}
         >
           <Heart className={`h-5 w-5 ${isFavorited ? 'fill-red-500 text-red-500' : ''}`} />
         </Button>
@@ -53,7 +53,7 @@ export function FacilityCardImage({ facility, isFavorited, onFavorite, onShare }
           size="sm"
           className="bg-white/20 backdrop-blur-md hover:bg-white/30 text-white border-0 h-12 w-12 p-0 rounded-full focus:ring-2 focus:ring-white focus:ring-offset-2"
           onClick={onShare}
-          aria-label={t('facility.actions.shareFacility')}
+          aria-label="Del lokale"
         >
           <Share2 className="h-5 w-5" />
         </Button>
@@ -62,7 +62,7 @@ export function FacilityCardImage({ facility, isFavorited, onFavorite, onShare }
       {/* Type and Area Badges */}
       <div className="absolute top-4 left-4 flex flex-col gap-2">
         <Badge className="bg-white/95 backdrop-blur-sm text-gray-800 border-0 font-semibold px-4 py-2 text-base shadow-lg">
-          {t(`facility.types.${facility.type}`, {}, facility.type)}
+          {facility.type}
         </Badge>
         <Badge variant="outline" className="bg-black/20 backdrop-blur-sm text-white border-white/30 font-medium px-4 py-2 text-base">
           {facility.area}
