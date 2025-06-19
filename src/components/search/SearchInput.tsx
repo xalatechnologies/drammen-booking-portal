@@ -22,7 +22,7 @@ const SearchInput: React.FC<SearchInputProps> = ({ searchTerm, setSearchTerm }) 
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
         placeholder={t('search.placeholders.searchText')}
-        className="pl-12 h-14 text-lg font-medium border-0 bg-white/90 backdrop-blur-sm shadow-lg hover:shadow-xl focus:shadow-xl rounded-xl transition-all duration-300 focus:ring-2 focus:ring-slate-500 focus:ring-offset-2"
+        className="pl-12 h-14 text-lg font-medium border-0 bg-white/90 backdrop-blur-sm shadow-lg hover:shadow-xl focus:shadow-xl rounded-xl transition-all duration-300 focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 placeholder:text-lg placeholder:font-medium"
         aria-label={t('search.labels.searchFacilities')}
       />
     </div>
