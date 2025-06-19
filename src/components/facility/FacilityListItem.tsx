@@ -212,8 +212,8 @@ const FacilityListItem: React.FC<FacilityListItemProps> = ({
             </div>
           </div>
 
-          {/* Map Section */}
-          <div className="w-40 flex-shrink-0 p-6 flex items-center justify-center">
+          {/* Enhanced Map Section */}
+          <div className="w-56 flex-shrink-0 p-6 flex items-center justify-center">
             <FacilityListItemMap 
               address={facility.address} 
               facilityName={facility.name} 

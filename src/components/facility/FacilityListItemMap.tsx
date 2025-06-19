@@ -27,16 +27,55 @@ export function FacilityListItemMap({ address, facilityName }: FacilityListItemM
     
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
-      style: "mapbox://styles/mapbox/streets-v11",
+      style: "mapbox://styles/mapbox/light-v11",
       center: coordinates,
-      zoom: 13,
-      interactive: false // Disable interactions in the small map
+      zoom: 14,
+      interactive: false,
+      attributionControl: false
     });
 
-    // Add marker for the facility location
-    new mapboxgl.Marker({ color: "#0B3D91" })
+    // Add custom marker with better styling
+    const markerElement = document.createElement('div');
+    markerElement.className = 'custom-marker';
+    markerElement.style.cssText = `
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, #3B82F6, #1D4ED8);
+      border: 3px solid white;
+      border-radius: 50%;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    `;
+
+    // Add pulse animation
+    const pulseElement = document.createElement('div');
+    pulseElement.style.cssText = `
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: rgba(59, 130, 246, 0.3);
+      animation: pulse 2s infinite;
+    `;
+    markerElement.appendChild(pulseElement);
+
+    new mapboxgl.Marker(markerElement)
       .setLngLat(coordinates)
       .addTo(map.current);
+
+    // Add subtle animation on load
+    map.current.on('load', () => {
+      if (map.current) {
+        map.current.easeTo({
+          center: coordinates,
+          zoom: 14,
+          duration: 1000
+        });
+      }
+    });
 
     return () => {
       if (map.current) {
@@ -46,8 +85,40 @@ export function FacilityListItemMap({ address, facilityName }: FacilityListItemM
   }, [address, facilityName]);
 
   return (
-    <div className="w-32 h-24 rounded-lg overflow-hidden border border-gray-200 bg-gray-100 flex-shrink-0">
-      <div ref={mapContainer} className="w-full h-full" />
+    <div className="group">
+      <div className="w-48 h-36 rounded-xl overflow-hidden border-2 border-gray-200 bg-gray-100 flex-shrink-0 shadow-md hover:shadow-xl transition-all duration-300 group-hover:border-blue-300 relative">
+        <div ref={mapContainer} className="w-full h-full" />
+        
+        {/* Overlay gradient for better text readability */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        
+        {/* Location label */}
+        <div className="absolute bottom-2 left-2 right-2">
+          <div className="bg-white/95 backdrop-blur-sm rounded-lg px-3 py-1 shadow-sm opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
+            <p className="text-xs font-semibold text-gray-800 truncate">
+              📍 {facilityName}
+            </p>
+          </div>
+        </div>
+      </div>
+      
+      {/* Add CSS for pulse animation */}
+      <style jsx>{`
+        @keyframes pulse {
+          0% {
+            transform: scale(1);
+            opacity: 0.7;
+          }
+          50% {
+            transform: scale(1.3);
+            opacity: 0.3;
+          }
+          100% {
+            transform: scale(1.6);
+            opacity: 0;
+          }
+        }
+      `}</style>
     </div>
   );
 }
