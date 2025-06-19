@@ -6,6 +6,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import { useCart } from "@/contexts/CartContext";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "@/i18n/hooks/useTranslation";
@@ -14,10 +18,6 @@ import { SelectedTimeSlot } from "@/utils/recurrenceEngine";
 import { Zone } from "@/components/booking/types";
 import { ActorType } from "@/types/pricing";
 import { BookingSessionService } from "@/services/BookingSessionService";
-import { CustomerTypeSection } from "../drawer/CustomerTypeSection";
-import { ActivityDetailsForm } from "../drawer/ActivityDetailsForm";
-import { PurposeForm } from "../drawer/PurposeForm";
-import { BookingDetailsStep } from "../drawer/BookingDetailsStep";
 
 interface EnhancedBookingSidebarProps {
   facilityName: string;
@@ -192,23 +192,89 @@ export function EnhancedBookingSidebar({
             </CollapsibleTrigger>
             <CollapsibleContent>
               <CardContent className="space-y-4">
-                <CustomerTypeSection value={actorType} onChange={setActorType} />
-                
-                <ActivityDetailsForm 
-                  activityType={activityType}
-                  onActivityTypeChange={setActivityType}
-                  attendees={attendees}
-                  onAttendeesChange={setAttendees}
-                />
-                
-                <PurposeForm purpose={purpose} onPurposeChange={setPurpose} />
-                
-                <BookingDetailsStep
-                  formData={formData}
-                  onFormDataChange={setFormData}
-                  onBack={() => {}}
-                  onSubmit={handleCompleteBooking}
-                />
+                {/* Customer Type */}
+                <div className="space-y-2">
+                  <Label>Kundetype</Label>
+                  <Select value={actorType} onValueChange={(value: ActorType) => setActorType(value)}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="private-person">Privatperson</SelectItem>
+                      <SelectItem value="business">Bedrift</SelectItem>
+                      <SelectItem value="organization">Organisasjon</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Activity Type */}
+                <div className="space-y-2">
+                  <Label>Aktivitetstype</Label>
+                  <Select value={activityType} onValueChange={setActivityType}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Velg aktivitet" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="sport">Sport</SelectItem>
+                      <SelectItem value="meeting">Møte</SelectItem>
+                      <SelectItem value="event">Arrangement</SelectItem>
+                      <SelectItem value="training">Trening</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Purpose */}
+                <div className="space-y-2">
+                  <Label>Formål</Label>
+                  <Textarea
+                    value={purpose}
+                    onChange={(e) => setPurpose(e.target.value)}
+                    placeholder="Beskriv formålet med bookingen..."
+                    rows={3}
+                  />
+                </div>
+
+                {/* Contact Information */}
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label>Navn</Label>
+                    <Input
+                      value={formData.name}
+                      onChange={(e) => setFormData({...formData, name: e.target.value})}
+                      placeholder="Ditt navn"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label>E-post</Label>
+                    <Input
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => setFormData({...formData, email: e.target.value})}
+                      placeholder="din@epost.no"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label>Telefon</Label>
+                    <Input
+                      value={formData.phone}
+                      onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                      placeholder="Telefonnummer"
+                    />
+                  </div>
+
+                  {actorType !== 'private-person' && (
+                    <div className="space-y-2">
+                      <Label>Organisasjon</Label>
+                      <Input
+                        value={formData.organization}
+                        onChange={(e) => setFormData({...formData, organization: e.target.value})}
+                        placeholder="Organisasjonsnavn"
+                      />
+                    </div>
+                  )}
+                </div>
                 
                 <Button 
                   onClick={handleCompleteBooking}

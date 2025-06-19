@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -35,7 +36,8 @@ export function AvailabilityTab({
   const [showConflictWizard, setShowConflictWizard] = useState(false);
   const [conflictResolutionData, setConflictResolutionData] = useState<any>(null);
   const [currentPattern, setCurrentPattern] = useState<RecurrencePattern>({
-    days: [],
+    type: 'weekly',
+    weekdays: [],
     timeSlot: '08:00',
     duration: 2,
     endDate: new Date(),
