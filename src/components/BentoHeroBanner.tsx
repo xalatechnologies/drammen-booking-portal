@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Search, Calendar, Check, Clock, Shield, Zap } from "lucide-react";
+import { Search, Calendar, Check, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useTranslation } from "@/i18n/hooks/useTranslation";
@@ -11,22 +11,26 @@ const BentoHeroBanner = () => {
   return (
     <div className="w-full mb-8">
       <div className="content-center py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 h-auto lg:h-[500px]">
-          {/* Main Hero Card - Spans 2 columns on large screens */}
-          <Card className="md:col-span-2 lg:col-span-2 lg:row-span-2 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-700 border-none shadow-2xl overflow-hidden relative group hover:shadow-3xl transition-all duration-500 animate-fade-in">
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 via-purple-600/10 to-transparent"></div>
-            <CardContent className="p-8 h-full flex flex-col justify-center relative z-10">
-              <div className="space-y-6">
-                <h1 className="text-4xl lg:text-5xl font-bold text-white leading-tight">
-                  {t('hero.title')}
-                </h1>
-                <p className="text-xl text-gray-200 leading-relaxed max-w-lg">
-                  {t('hero.subtitle')}
-                </p>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 h-auto lg:h-[600px]">
+          {/* Main Hero Card - Spans 2 columns and 2 rows on large screens */}
+          <Card className="lg:col-span-2 lg:row-span-2 bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900 border-none shadow-2xl overflow-hidden relative group hover:shadow-3xl transition-all duration-700 animate-fade-in">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-600/30 via-purple-600/20 to-transparent opacity-80"></div>
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.1),transparent_70%)]"></div>
+            <CardContent className="p-12 h-full flex flex-col justify-center relative z-10">
+              <div className="space-y-8">
+                <div className="space-y-4">
+                  <h1 className="text-5xl lg:text-6xl font-bold text-white leading-tight tracking-tight">
+                    {t('hero.title')}
+                  </h1>
+                  <p className="text-xl lg:text-2xl text-gray-200 leading-relaxed max-w-2xl font-light">
+                    {t('hero.subtitle')}
+                  </p>
+                </div>
                 <Button 
                   size="lg" 
-                  className="bg-white text-slate-900 hover:bg-gray-100 text-lg px-8 py-6 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                  className="bg-white text-slate-900 hover:bg-gray-100 text-xl px-12 py-8 rounded-2xl font-bold shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 hover:-translate-y-1"
                 >
+                  <Zap className="h-6 w-6 mr-3" />
                   {t('hero.cta')}
                 </Button>
               </div>
@@ -34,80 +38,62 @@ const BentoHeroBanner = () => {
           </Card>
 
           {/* Step 1: Search Card */}
-          <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 group animate-fade-in" style={{ animationDelay: '0.1s' }}>
-            <CardContent className="p-6 h-full flex flex-col justify-center text-center">
-              <div className="w-16 h-16 bg-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-blue-600 transition-colors duration-300">
-                <Search className="h-8 w-8 text-white" />
+          <Card className="bg-gradient-to-br from-emerald-50 via-emerald-100 to-teal-100 border-emerald-200 shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-105 hover:-translate-y-2 group animate-fade-in" style={{ animationDelay: '0.2s' }}>
+            <CardContent className="p-8 h-full flex flex-col justify-center text-center">
+              <div className="w-20 h-20 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-3xl flex items-center justify-center mx-auto mb-6 group-hover:rotate-12 group-hover:scale-110 transition-all duration-500 shadow-lg">
+                <Search className="h-10 w-10 text-white" />
               </div>
-              <h3 className="text-lg font-bold text-blue-900 mb-2">
-                {t('hero.steps.search.title')}
-              </h3>
-              <p className="text-sm font-semibold text-blue-700 mb-2">
-                {t('hero.steps.search.subtitle')}
-              </p>
-              <p className="text-xs text-blue-600">
-                {t('hero.steps.search.description')}
-              </p>
+              <div className="space-y-3">
+                <div className="text-sm font-bold text-emerald-600 uppercase tracking-wider">
+                  {t('hero.steps.search.title')}
+                </div>
+                <h3 className="text-xl font-bold text-emerald-900">
+                  {t('hero.steps.search.subtitle')}
+                </h3>
+                <p className="text-sm text-emerald-700 leading-relaxed">
+                  {t('hero.steps.search.description')}
+                </p>
+              </div>
             </CardContent>
           </Card>
 
           {/* Step 2: Select Card */}
-          <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 group animate-fade-in" style={{ animationDelay: '0.2s' }}>
-            <CardContent className="p-6 h-full flex flex-col justify-center text-center">
-              <div className="w-16 h-16 bg-green-500 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-green-600 transition-colors duration-300">
-                <Calendar className="h-8 w-8 text-white" />
+          <Card className="bg-gradient-to-br from-blue-50 via-blue-100 to-indigo-100 border-blue-200 shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-105 hover:-translate-y-2 group animate-fade-in" style={{ animationDelay: '0.4s' }}>
+            <CardContent className="p-8 h-full flex flex-col justify-center text-center">
+              <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-3xl flex items-center justify-center mx-auto mb-6 group-hover:rotate-12 group-hover:scale-110 transition-all duration-500 shadow-lg">
+                <Calendar className="h-10 w-10 text-white" />
               </div>
-              <h3 className="text-lg font-bold text-green-900 mb-2">
-                {t('hero.steps.select.title')}
-              </h3>
-              <p className="text-sm font-semibold text-green-700 mb-2">
-                {t('hero.steps.select.subtitle')}
-              </p>
-              <p className="text-xs text-green-600">
-                {t('hero.steps.select.description')}
-              </p>
+              <div className="space-y-3">
+                <div className="text-sm font-bold text-blue-600 uppercase tracking-wider">
+                  {t('hero.steps.select.title')}
+                </div>
+                <h3 className="text-xl font-bold text-blue-900">
+                  {t('hero.steps.select.subtitle')}
+                </h3>
+                <p className="text-sm text-blue-700 leading-relaxed">
+                  {t('hero.steps.select.description')}
+                </p>
+              </div>
             </CardContent>
           </Card>
 
           {/* Step 3: Reserve Card */}
-          <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 group animate-fade-in" style={{ animationDelay: '0.3s' }}>
-            <CardContent className="p-6 h-full flex flex-col justify-center text-center">
-              <div className="w-16 h-16 bg-purple-500 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-purple-600 transition-colors duration-300">
-                <Check className="h-8 w-8 text-white" />
+          <Card className="bg-gradient-to-br from-purple-50 via-purple-100 to-pink-100 border-purple-200 shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-105 hover:-translate-y-2 group animate-fade-in" style={{ animationDelay: '0.6s' }}>
+            <CardContent className="p-8 h-full flex flex-col justify-center text-center">
+              <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-500 rounded-3xl flex items-center justify-center mx-auto mb-6 group-hover:rotate-12 group-hover:scale-110 transition-all duration-500 shadow-lg">
+                <Check className="h-10 w-10 text-white" />
               </div>
-              <h3 className="text-lg font-bold text-purple-900 mb-2">
-                {t('hero.steps.reserve.title')}
-              </h3>
-              <p className="text-sm font-semibold text-purple-700 mb-2">
-                {t('hero.steps.reserve.subtitle')}
-              </p>
-              <p className="text-xs text-purple-600">
-                {t('hero.steps.reserve.description')}
-              </p>
-            </CardContent>
-          </Card>
-
-          {/* Feature Card 1: Instant Confirmation */}
-          <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 group animate-fade-in" style={{ animationDelay: '0.4s' }}>
-            <CardContent className="p-6 h-full flex flex-col justify-center text-center">
-              <div className="w-12 h-12 bg-orange-500 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:bg-orange-600 transition-colors duration-300">
-                <Zap className="h-6 w-6 text-white" />
+              <div className="space-y-3">
+                <div className="text-sm font-bold text-purple-600 uppercase tracking-wider">
+                  {t('hero.steps.reserve.title')}
+                </div>
+                <h3 className="text-xl font-bold text-purple-900">
+                  {t('hero.steps.reserve.subtitle')}
+                </h3>
+                <p className="text-sm text-purple-700 leading-relaxed">
+                  {t('hero.steps.reserve.description')}
+                </p>
               </div>
-              <h4 className="text-sm font-bold text-orange-900 mb-1">
-                {t('hero.features.instant')}
-              </h4>
-            </CardContent>
-          </Card>
-
-          {/* Feature Card 2: 24/7 Availability */}
-          <Card className="bg-gradient-to-br from-teal-50 to-teal-100 border-teal-200 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 group animate-fade-in" style={{ animationDelay: '0.5s' }}>
-            <CardContent className="p-6 h-full flex flex-col justify-center text-center">
-              <div className="w-12 h-12 bg-teal-500 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:bg-teal-600 transition-colors duration-300">
-                <Clock className="h-6 w-6 text-white" />
-              </div>
-              <h4 className="text-sm font-bold text-teal-900 mb-1">
-                {t('hero.features.available')}
-              </h4>
             </CardContent>
           </Card>
         </div>
