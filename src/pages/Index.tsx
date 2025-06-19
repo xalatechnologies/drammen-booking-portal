@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { DateRange } from "react-day-picker";
@@ -64,18 +65,20 @@ const Index = () => {
     ...(allowsPhotography ? ['photography'] : [])
   ];
 
-  // Create filters object
+  // Create filters object with proper handling
   const filters: FacilityFilters = {
-    searchTerm: searchTerm || undefined,
-    facilityType: facilityType !== "all" ? facilityType : undefined,
-    location: location !== "all" ? location : undefined,
-    accessibility: accessibility !== "all" ? accessibility : undefined,
-    capacity: capacity[0] > 0 || capacity[1] < 200 ? capacity : undefined,
-    date: date || undefined,
-    priceRange: priceRange[0] > 0 || priceRange[1] < 5000 ? { min: priceRange[0], max: priceRange[1] } : undefined,
-    availableNow: availableNow || undefined,
-    amenities: amenities.length > 0 ? amenities : undefined,
+    ...(searchTerm && searchTerm.trim() !== "" ? { searchTerm: searchTerm.trim() } : {}),
+    ...(facilityType && facilityType !== "all" ? { facilityType } : {}),
+    ...(location && location !== "all" ? { location } : {}),
+    ...(accessibility && accessibility !== "all" ? { accessibility } : {}),
+    ...(capacity && (capacity[0] > 0 || capacity[1] < 200) ? { capacity } : {}),
+    ...(date ? { date } : {}),
+    ...(priceRange && (priceRange[0] > 0 || priceRange[1] < 5000) ? { priceRange: { min: priceRange[0], max: priceRange[1] } } : {}),
+    ...(availableNow ? { availableNow } : {}),
+    ...(amenities.length > 0 ? { amenities } : {}),
   };
+
+  console.log("Index.tsx - Created filters:", filters);
 
   const renderContent = () => {
     switch (viewMode) {
