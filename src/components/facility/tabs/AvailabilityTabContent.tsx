@@ -99,6 +99,10 @@ export function AvailabilityTabContent({
     setSelectedSlots([]);
   };
 
+  console.log('AvailabilityTabContent - Strøtimer data:', strøtimer);
+  console.log('AvailabilityTabContent - FacilityId:', facilityId);
+  console.log('AvailabilityTabContent - Current week start:', currentWeekStart);
+
   return (
     <div className="space-y-4">
       <WeekNavigation
