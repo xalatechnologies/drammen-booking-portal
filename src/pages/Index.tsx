@@ -129,6 +129,7 @@ const Index = () => {
       <GlobalHeader />
 
       <main id="main-content" className="flex-1">
+        {/* Hero and Search Filter in container */}
         <div className="container mx-auto px-4 py-6">
           <HeroBanner />
           
@@ -160,9 +161,18 @@ const Index = () => {
             allowsPhotography={allowsPhotography}
             setAllowsPhotography={setAllowsPhotography}
           />
-
-          {renderContent()}
         </div>
+
+        {/* Content area - conditional container */}
+        {viewMode === "list" ? (
+          <div className="px-4">
+            {renderContent()}
+          </div>
+        ) : (
+          <div className="container mx-auto px-4 pb-6">
+            {renderContent()}
+          </div>
+        )}
       </main>
 
       <GlobalFooter />

@@ -81,7 +81,7 @@ const FacilityListItem: React.FC<FacilityListItemProps> = ({
 
   return (
     <Card 
-      className="group overflow-hidden hover:shadow-2xl transition-all duration-500 hover:translate-y-[-4px] border border-slate-200/60 shadow-lg bg-white cursor-pointer mb-6 focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-opacity-50" 
+      className="group overflow-hidden hover:shadow-xl transition-all duration-500 hover:translate-y-[-2px] border border-slate-200/60 shadow-md bg-white cursor-pointer mb-3 focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-opacity-50" 
       onClick={() => navigate(`/facilities/${facility.id}`)} 
       role="button" 
       tabIndex={0} 
@@ -94,7 +94,7 @@ const FacilityListItem: React.FC<FacilityListItemProps> = ({
       }}
     >
       <CardContent className="p-0">
-        <div className="grid grid-cols-12" style={{ height: '300px' }}>
+        <div className="grid grid-cols-12" style={{ height: '280px' }}>
           {/* Image Section - 3 columns */}
           <div className="col-span-3">
             <FacilityListItemImage
