@@ -1,13 +1,14 @@
+
 import React, { useState } from "react";
-import { useTranslation } from "@/i18n";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { EnhancedAboutTab } from "./tabs/EnhancedAboutTab";
-import { AvailabilityTab } from "./tabs/AvailabilityTab";
-import { EnhancedFeaturesTab } from "./tabs/EnhancedFeaturesTab";
-import { EnhancedRulesTab } from "./tabs/EnhancedRulesTab";
-import { ZonesTab } from "./tabs/ZonesTab";
 import { Zone } from "@/components/booking/types";
-import { SelectedTimeSlot } from "@/utils/recurrenceEngine";
+import { getAmenityIcon } from "./utils/amenityIcons";
+import { FeaturesTab } from "./tabs/FeaturesTab";
+import { FaqTab } from "./tabs/FaqTab";
+import { RulesTab } from "./tabs/RulesTab";
+import { GeneralInfoTab } from "./tabs/GeneralInfoTab";
+import { ZonesTab } from "./tabs/ZonesTab";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface FacilityInfoTabsProps {
   description: string;
@@ -19,9 +20,7 @@ interface FacilityInfoTabsProps {
   area: string;
   suitableFor: string[];
   facilityId?: string;
-  facilityName: string;
-  selectedSlots: SelectedTimeSlot[];
-  onSlotsChange: (slots: SelectedTimeSlot[]) => void;
+  facilityName?: string;
 }
 
 export function FacilityInfoTabs({ 
@@ -33,89 +32,101 @@ export function FacilityInfoTabs({
   address,
   area,
   suitableFor,
-  facilityId,
-  facilityName,
-  selectedSlots,
-  onSlotsChange
+  facilityId = "",
+  facilityName = ""
 }: FacilityInfoTabsProps) {
-  const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState("description");
+  const { language } = useLanguage();
 
-  const handleTabChange = (value: string) => {
-    setActiveTab(value);
+  const translations = {
+    NO: {
+      general: "Generell info",
+      zones: "Soner",
+      facilities: "Fasiliteter", 
+      rules: "Regler",
+      faq: "FAQ"
+    },
+    EN: {
+      general: "General info",
+      zones: "Zones",
+      facilities: "Facilities",
+      rules: "Rules", 
+      faq: "FAQ"
+    }
   };
 
+  const t = translations[language];
+
   return (
-    <div className="w-full">
-      <Tabs defaultValue="description" className="w-full">
-        <TabsList className="grid w-full grid-cols-5 h-auto p-1 bg-gray-100 rounded-lg mb-6">
-          <TabsTrigger 
-            value="description" 
-            className="data-[state=active]:bg-white data-[state=active]:shadow-sm font-medium text-base py-3 px-4"
-          >
-            {t('facility.tabs.description')}
-          </TabsTrigger>
-          <TabsTrigger 
-            value="availability" 
-            className="data-[state=active]:bg-white data-[state=active]:shadow-sm font-medium text-base py-3 px-4"
-          >
-            {t('facility.tabs.availability')}
-          </TabsTrigger>
-          <TabsTrigger 
-            value="zones" 
-            className="data-[state=active]:bg-white data-[state=active]:shadow-sm font-medium text-base py-3 px-4"
-          >
-            {t('facility.tabs.zones')}
-          </TabsTrigger>
-          <TabsTrigger 
-            value="features" 
-            className="data-[state=active]:bg-white data-[state=active]:shadow-sm font-medium text-base py-3 px-4"
-          >
-            {t('facility.tabs.features')}
-          </TabsTrigger>
-          <TabsTrigger 
-            value="rules" 
-            className="data-[state=active]:bg-white data-[state=active]:shadow-sm font-medium text-base py-3 px-4"
-          >
-            {t('facility.tabs.rules')}
-          </TabsTrigger>
-        </TabsList>
+    <Tabs defaultValue="general" className="bg-white rounded-lg shadow-sm border">
+      <TabsList className="w-full border-b p-0 h-auto bg-gray-50 rounded-none">
+        <TabsTrigger 
+          value="general" 
+          className="flex-1 py-4 px-6 rounded-none text-base font-medium data-[state=active]:bg-[#1e3a8a] data-[state=active]:text-white data-[state=active]:border-b-0 data-[state=active]:shadow-none hover:bg-[#1e40af] hover:text-white transition-colors"
+        >
+          {t.general}
+        </TabsTrigger>
+        <TabsTrigger 
+          value="zones" 
+          className="flex-1 py-4 px-6 rounded-none text-base font-medium data-[state=active]:bg-[#1e3a8a] data-[state=active]:text-white data-[state=active]:border-b-0 data-[state=active]:shadow-none hover:bg-[#1e40af] hover:text-white transition-colors"
+        >
+          {t.zones}
+        </TabsTrigger>
+        <TabsTrigger 
+          value="facilities" 
+          className="flex-1 py-4 px-6 rounded-none text-base font-medium data-[state=active]:bg-[#1e3a8a] data-[state=active]:text-white data-[state=active]:border-b-0 data-[state=active]:shadow-none hover:bg-[#1e40af] hover:text-white transition-colors"
+        >
+          {t.facilities}
+        </TabsTrigger>
+        <TabsTrigger 
+          value="rules" 
+          className="flex-1 py-4 px-6 rounded-none text-base font-medium data-[state=active]:bg-[#1e3a8a] data-[state=active]:text-white data-[state=active]:border-b-0 data-[state=active]:shadow-none hover:bg-[#1e40af] hover:text-white transition-colors"
+        >
+          {t.rules}
+        </TabsTrigger>
+        <TabsTrigger 
+          value="faq" 
+          className="flex-1 py-4 px-6 rounded-none text-base font-medium data-[state=active]:bg-[#1e3a8a] data-[state=active]:text-white data-[state=active]:border-b-0 data-[state=active]:shadow-none hover:bg-[#1e40af] hover:text-white transition-colors"
+        >
+          {t.faq}
+        </TabsTrigger>
+      </TabsList>
+      
+      <TabsContent value="general">
+        <GeneralInfoTab 
+          description={description}
+          capacity={capacity}
+          address={address}
+          area={area}
+          suitableFor={suitableFor}
+          zones={zones}
+          facilityId={facilityId}
+          facilityName={facilityName}
+        />
+      </TabsContent>
+      
+      <TabsContent value="zones">
+        <ZonesTab 
+          zones={zones}
+          facilityId={facilityId}
+        />
+      </TabsContent>
+      
+      <TabsContent value="facilities">
+        <FeaturesTab 
+          capacity={capacity} 
+          equipment={equipment} 
+          amenities={amenities}
+          getAmenityIcon={getAmenityIcon}
+        />
+      </TabsContent>
 
-        <TabsContent value="description" className="mt-0">
-          <EnhancedAboutTab 
-            description={description} 
-            address={address}
-            area={area}
-            capacity={capacity}
-            openingHours="08:00-22:00"
-            zones={zones}
-            hasAutoApproval={true}
-            amenities={amenities}
-          />
-        </TabsContent>
+      <TabsContent value="rules">
+        <RulesTab />
+      </TabsContent>
 
-        <TabsContent value="availability" className="mt-0">
-          <AvailabilityTab 
-            zones={zones} 
-            facilityId={facilityId} 
-            facilityName={facilityName}
-            selectedSlots={selectedSlots}
-            onSlotsChange={onSlotsChange}
-          />
-        </TabsContent>
-
-        <TabsContent value="zones" className="mt-0">
-          <ZonesTab zones={zones} />
-        </TabsContent>
-
-        <TabsContent value="features" className="mt-0">
-          <EnhancedFeaturesTab amenities={amenities} equipment={equipment} />
-        </TabsContent>
-
-        <TabsContent value="rules" className="mt-0">
-          <EnhancedRulesTab />
-        </TabsContent>
-      </Tabs>
-    </div>
+      <TabsContent value="faq">
+        <FaqTab />
+      </TabsContent>
+    </Tabs>
   );
 }
