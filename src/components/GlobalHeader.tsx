@@ -2,18 +2,24 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu } from "lucide-react";
+import { Menu, ShoppingCart } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import Logo from "@/components/header/Logo";
 import LanguageToggle from "@/components/header/LanguageToggle";
 import ProfileMenu from "@/components/header/ProfileMenu";
 import MobileMenu from "@/components/header/MobileMenu";
 import GlobalSearch from "@/components/header/GlobalSearch";
+import { CartDropdown } from "@/components/header/CartDropdown";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useCart } from "@/contexts/CartContext";
 
 const GlobalHeader = () => {
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [cartOpen, setCartOpen] = useState(false);
   const { language, toggleLanguage } = useLanguage();
+  const { getItemCount } = useCart();
   
   // Add state to track if user is logged in (we'll use localStorage to persist this between refreshes)
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
@@ -33,6 +39,8 @@ const GlobalHeader = () => {
     localStorage.setItem("isLoggedIn", "false");
     setIsLoggedIn(false);
   };
+
+  const itemCount = getItemCount();
 
   return (
     <header className="bg-white dark:bg-gray-900 py-3 shadow-md sticky top-0 z-10 border-b border-gray-200 dark:border-gray-700 w-full">
@@ -56,8 +64,27 @@ const GlobalHeader = () => {
           <Menu className="h-6 w-6" />
         </Button>
 
-        {/* Right side: Language toggle & Login/Profile */}
+        {/* Right side: Cart, Language toggle & Login/Profile */}
         <div className="hidden md:flex items-center space-x-2 flex-shrink-0">
+          {/* Cart Icon with Dropdown */}
+          <Popover open={cartOpen} onOpenChange={setCartOpen}>
+            <PopoverTrigger asChild>
+              <Button variant="ghost" className="relative p-2">
+                <ShoppingCart className="h-6 w-6" />
+                {itemCount > 0 && (
+                  <Badge 
+                    className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center text-xs bg-red-500 text-white rounded-full"
+                  >
+                    {itemCount}
+                  </Badge>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-96 p-0" align="end">
+              <CartDropdown onClose={() => setCartOpen(false)} />
+            </PopoverContent>
+          </Popover>
+          
           {/* Language toggle */}
           <LanguageToggle 
             language={language} 

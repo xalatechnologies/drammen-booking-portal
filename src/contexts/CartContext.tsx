@@ -36,7 +36,13 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const savedCart = localStorage.getItem('facilityCart');
     if (savedCart) {
       try {
-        setCartItems(JSON.parse(savedCart));
+        const parsedCart = JSON.parse(savedCart);
+        // Convert date strings back to Date objects
+        const restoredCart = parsedCart.map((item: any) => ({
+          ...item,
+          date: new Date(item.date)
+        }));
+        setCartItems(restoredCart);
       } catch (error) {
         console.error('Error loading cart from localStorage:', error);
       }
@@ -66,7 +72,10 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const getTotalPrice = () => {
-    return cartItems.reduce((total, item) => total + (item.pricePerHour * 2), 0); // Assuming 2-hour slots
+    return cartItems.reduce((total, item) => {
+      const duration = item.duration || 2; // Default to 2 hours if not specified
+      return total + (item.pricePerHour * duration);
+    }, 0);
   };
 
   const getItemCount = () => {
