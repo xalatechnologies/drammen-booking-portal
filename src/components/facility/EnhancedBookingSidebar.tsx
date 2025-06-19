@@ -1,4 +1,3 @@
-
 import React, { useEffect } from "react";
 import { ShoppingCart, X, CreditCard, Calendar, CheckCircle2, User, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -29,7 +28,7 @@ export function EnhancedBookingSidebar({
   selectedSlots = [],
   onClearSlots
 }: EnhancedBookingSidebarProps) {
-  const { cartItems, removeFromCart, getTotalPrice, getItemCount } = useCart();
+  const { items, removeFromCart, getTotalPrice, getItemCount } = useCart();
   const { state, actions, businessLogic } = useBookingState();
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -41,7 +40,7 @@ export function EnhancedBookingSidebar({
     }
   }, [selectedSlots, actions]);
 
-  const facilityCartItems = cartItems.filter(item => item.facilityId === facilityId);
+  const facilityCartItems = items.filter(item => item.facilityId === facilityId);
   const hasSelectedSlots = state.selectedSlots.length > 0;
   const hasCartItems = facilityCartItems.length > 0;
 

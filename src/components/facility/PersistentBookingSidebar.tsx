@@ -9,36 +9,42 @@ import { useCart } from "@/contexts/CartContext";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "@/i18n/hooks/useTranslation";
 import { format } from "date-fns";
+
 interface PersistentBookingSidebarProps {
   facilityName: string;
   facilityId: string;
 }
+
 export function PersistentBookingSidebar({
   facilityName,
   facilityId
 }: PersistentBookingSidebarProps) {
   const {
-    cartItems,
+    items,
     removeFromCart,
     getTotalPrice,
     getItemCount
   } = useCart();
   const navigate = useNavigate();
-  const {
-    t
-  } = useTranslation();
+  const { t } = useTranslation();
   const [customerType, setCustomerType] = useState<string>('private');
-  const facilityCartItems = cartItems.filter(item => item.facilityId === facilityId);
+
+  const facilityCartItems = items.filter(item => item.facilityId === facilityId);
+
   const handleProceedToCheckout = () => {
     navigate('/checkout');
   };
+
   const addTimeSlot = (item: any) => {
     console.log('Add time slot for:', item);
   };
+
   const removeTimeSlot = (item: any) => {
     console.log('Remove time slot for:', item);
   };
-  return <div className="space-y-6">
+
+  return (
+    <div className="space-y-6">
       {/* Customer Type Selection */}
       
 
@@ -51,12 +57,16 @@ export function PersistentBookingSidebar({
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {facilityCartItems.length === 0 ? <div className="text-center py-8 text-gray-500">
+          {facilityCartItems.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">
               <ShoppingCart className="h-12 w-12 mx-auto mb-4 text-gray-300" />
               <p className="text-sm font-medium">{t('booking.cart.empty')}</p>
               <p className="text-xs mt-1 text-gray-400">{t('booking.cart.selectSlots')}</p>
-            </div> : <div className="space-y-4">
-              {facilityCartItems.map((item, index) => <div key={item.id} className="border rounded-lg p-4 bg-gray-50 hover:bg-gray-100 transition-colors">
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {facilityCartItems.map((item, index) => (
+                <div key={item.id} className="border rounded-lg p-4 bg-gray-50 hover:bg-gray-100 transition-colors">
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
@@ -90,7 +100,8 @@ export function PersistentBookingSidebar({
                   </div>
                   
                   {index < facilityCartItems.length - 1 && <Separator className="mt-4" />}
-                </div>)}
+                </div>
+              ))}
               
               <Separator className="my-4" />
               
@@ -114,8 +125,10 @@ export function PersistentBookingSidebar({
                 <CreditCard className="h-5 w-5 mr-2" />
                 {t('booking.cart.proceedToCheckout')}
               </Button>
-            </div>}
+            </div>
+          )}
         </CardContent>
       </Card>
-    </div>;
+    </div>
+  );
 }

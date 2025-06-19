@@ -16,7 +16,7 @@ import { format } from 'date-fns';
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
-  const { cartItems, getTotalPrice, clearCart } = useCart();
+  const { items, getTotalPrice, clearCart } = useCart();
   const [step, setStep] = useState<'review' | 'details' | 'confirm'>('review');
   const [formData, setFormData] = useState({
     name: '',
@@ -36,7 +36,7 @@ const CheckoutPage = () => {
     navigate('/confirmation', {
       state: {
         bookingReference: `BK-${Date.now().toString(36).toUpperCase()}`,
-        items: cartItems,
+        items: items,
         contactInfo: formData,
         totalPrice: getTotalPrice()
       }
@@ -45,7 +45,7 @@ const CheckoutPage = () => {
 
   const totalWithTax = getTotalPrice() + Math.round(getTotalPrice() * 0.25);
 
-  if (cartItems.length === 0) {
+  if (items.length === 0) {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col">
         <GlobalHeader />
@@ -88,11 +88,11 @@ const CheckoutPage = () => {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <ShoppingCart className="h-5 w-5" />
-                      Gjennomgå reservasjoner ({cartItems.length})
+                      Gjennomgå reservasjoner ({items.length})
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    {cartItems.map((item) => (
+                    {items.map((item) => (
                       <div key={item.id} className="border rounded-lg p-4">
                         <div className="flex justify-between items-start mb-2">
                           <div>

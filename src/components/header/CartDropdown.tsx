@@ -14,7 +14,7 @@ interface CartDropdownProps {
 
 export function CartDropdown({ onClose }: CartDropdownProps) {
   const navigate = useNavigate();
-  const { cartItems, removeFromCart, clearCart, getTotalPrice, getItemCount } = useCart();
+  const { items, removeFromCart, clearCart, getTotalPrice, getItemCount } = useCart();
 
   const handleProceedToCheckout = () => {
     onClose();
@@ -26,7 +26,7 @@ export function CartDropdown({ onClose }: CartDropdownProps) {
     onClose();
   };
 
-  if (cartItems.length === 0) {
+  if (items.length === 0) {
     return (
       <div className="p-6 text-center">
         <ShoppingCart className="h-12 w-12 mx-auto mb-4 text-gray-300" />
@@ -56,7 +56,7 @@ export function CartDropdown({ onClose }: CartDropdownProps) {
 
       {/* Cart Items */}
       <div className="p-4 space-y-3 max-h-64 overflow-y-auto">
-        {cartItems.map((item) => (
+        {items.map((item) => (
           <div key={item.id} className="border rounded-lg p-3 bg-gray-50 hover:bg-gray-100 transition-colors">
             <div className="flex items-start justify-between mb-2">
               <div className="flex-1 min-w-0">
