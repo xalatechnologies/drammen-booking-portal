@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { 
   Card, 
@@ -8,12 +7,6 @@ import {
   CardDescription,
   CardFooter
 } from "@/components/ui/card";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
 import {
   Table,
   TableBody,
@@ -30,46 +23,168 @@ import {
   Clock, 
   XCircle, 
   AlertCircle, 
-  Filter, 
-  ChevronDown 
+  Filter,
+  Search,
+  MapPin
 } from "lucide-react";
 import { toast } from "sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+interface ApprovalRequest {
+  id: string;
+  facility: string;
+  requestedBy: string;
+  date: string;
+  status: "ventende" | "behandling" | "godkjent" | "avslått";
+  urgency?: "høy" | "medium" | "lav";
+  facilityType?: string;
+  details?: {
+    type: string;
+    duration: string;
+    participants: number;
+    purpose: string;
+  };
+  assignedTo?: string;
+  completedBy?: string;
+  completedDate?: string;
+  reason?: string;
+}
 
 const ApprovalWorkflowsPage = () => {
-  const [activeTab, setActiveTab] = useState<string>("ventende");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [urgencyFilter, setUrgencyFilter] = useState("all");
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
+  const [selectedRequest, setSelectedRequest] = useState<ApprovalRequest | null>(null);
+  const [reviewNotes, setReviewNotes] = useState("");
+  const [reviewDecision, setReviewDecision] = useState<"approve" | "reject" | null>(null);
 
-  // Sample data for approval requests
-  const approvalData = {
-    ventende: [
-      { id: "AP-3291", facility: "Mjøndalen Skole Gymsal", requestedBy: "Thomas Hansen", date: "20. mai 2025", status: "ventende", urgency: "høy" },
-      { id: "AP-3290", facility: "Brandengen Kulturhus", requestedBy: "Maria Olsen", date: "20. mai 2025", status: "ventende", urgency: "medium" },
-      { id: "AP-3289", facility: "Strømsø Idrettsanlegg", requestedBy: "Kari Nordmann", date: "19. mai 2025", status: "ventende", urgency: "lav" },
-      { id: "AP-3287", facility: "Gulskogen Skole Auditorium", requestedBy: "Per Nilsen", date: "18. mai 2025", status: "ventende", urgency: "medium" },
-      { id: "AP-3285", facility: "Åssiden Svømmehall", requestedBy: "Lars Johansen", date: "17. mai 2025", status: "ventende", urgency: "lav" },
-    ],
-    behandling: [
-      { id: "AP-3286", facility: "Drammen Bibliotek Møterom", requestedBy: "Anne Pedersen", date: "17. mai 2025", status: "behandling", assignedTo: "Ola Admin" },
-      { id: "AP-3284", facility: "Fjell Samfunnshus", requestedBy: "Jon Olsen", date: "16. mai 2025", status: "behandling", assignedTo: "Ola Admin" },
-      { id: "AP-3282", facility: "Konnerud IL Klubbhus", requestedBy: "Silje Berg", date: "15. mai 2025", status: "behandling", assignedTo: "Eva Saksbehandler" },
-    ],
-    ferdig: [
-      { id: "AP-3279", facility: "Drammen Tennisklubb", requestedBy: "Trond Hansen", date: "14. mai 2025", status: "godkjent", completedBy: "Eva Saksbehandler", completedDate: "16. mai 2025" },
-      { id: "AP-3276", facility: "Marienlyst Stadion", requestedBy: "Nina Eriksen", date: "12. mai 2025", status: "avslått", completedBy: "Ola Admin", completedDate: "15. mai 2025", reason: "Manglende dokumentasjon" },
-      { id: "AP-3275", facility: "Bragernes Kulturscene", requestedBy: "Erik Lund", date: "11. mai 2025", status: "godkjent", completedBy: "Eva Saksbehandler", completedDate: "14. mai 2025" },
-    ],
-  };
+  // Sample data for approval requests - now in a single array
+  const [approvalRequests, setApprovalRequests] = useState<ApprovalRequest[]>([
+    { id: "AP-3291", facility: "Mjøndalen Skole Gymsal", requestedBy: "Thomas Hansen", date: "20. mai 2025", status: "ventende", urgency: "høy", facilityType: "Gymsal", details: { type: "Engangslån", duration: "2 timer", participants: 25, purpose: "Håndballtrening" } },
+    { id: "AP-3290", facility: "Brandengen Kulturhus", requestedBy: "Maria Olsen", date: "20. mai 2025", status: "ventende", urgency: "medium" },
+    { id: "AP-3289", facility: "Strømsø Idrettsanlegg", requestedBy: "Kari Nordmann", date: "19. mai 2025", status: "ventende", urgency: "lav" },
+    { id: "AP-3286", facility: "Drammen Bibliotek Møterom", requestedBy: "Anne Pedersen", date: "17. mai 2025", status: "behandling", assignedTo: "Ola Admin" },
+    { id: "AP-3284", facility: "Fjell Samfunnshus", requestedBy: "Jon Olsen", date: "16. mai 2025", status: "behandling", assignedTo: "Ola Admin" },
+    { id: "AP-3279", facility: "Drammen Tennisklubb", requestedBy: "Trond Hansen", date: "14. mai 2025", status: "godkjent", completedBy: "Eva Saksbehandler", completedDate: "16. mai 2025" },
+    { id: "AP-3276", facility: "Marienlyst Stadion", requestedBy: "Nina Eriksen", date: "12. mai 2025", status: "avslått", completedBy: "Ola Admin", completedDate: "15. mai 2025", reason: "Manglende dokumentasjon" },
+  ]);
 
   const handleApprove = (id: string) => {
-    toast.success(`Forespørsel ${id} godkjent!`);
+    const request = approvalRequests.find(r => r.id === id);
+    if (request) {
+      const updatedRequests = approvalRequests.map(r => {
+        if (r.id === id) {
+          const updatedRequest: ApprovalRequest = {
+            ...r,
+            status: "godkjent",
+            completedBy: "Ola Admin",
+            completedDate: new Date().toLocaleDateString("no")
+          };
+          return updatedRequest;
+        }
+        return r;
+      });
+      setApprovalRequests(updatedRequests);
+    }
   };
 
   const handleReject = (id: string) => {
-    toast.error(`Forespørsel ${id} avslått!`);
+    const request = approvalRequests.find(r => r.id === id);
+    if (request) {
+      const updatedRequests = approvalRequests.map(r => {
+        if (r.id === id) {
+          const updatedRequest: ApprovalRequest = {
+            ...r,
+            status: "avslått",
+            completedBy: "Ola Admin",
+            completedDate: new Date().toLocaleDateString("no"),
+            reason: reviewNotes || "Ingen begrunnelse oppgitt"
+          };
+          return updatedRequest;
+        }
+        return r;
+      });
+      setApprovalRequests(updatedRequests);
+    }
   };
 
   const handleReview = (id: string) => {
-    toast.info(`Starter gjennomgang av forespørsel ${id}`);
+    const request = approvalRequests.find(r => r.id === id);
+    if (request) {
+      setSelectedRequest(request);
+      setReviewModalOpen(true);
+    }
   };
+
+  const handleSubmitReview = () => {
+    if (!selectedRequest || !reviewDecision) return;
+
+    if (reviewDecision === "approve") {
+      handleApprove(selectedRequest.id);
+    } else {
+      handleReject(selectedRequest.id);
+    }
+
+    setReviewModalOpen(false);
+    setSelectedRequest(null);
+    setReviewNotes("");
+    setReviewDecision(null);
+  };
+
+  const handleExportCSV = () => {
+    const headers = ["ID", "Fasilitet", "Forespurt av", "Dato", "Status", "Hastegrad"];
+    const csvContent = [
+      headers.join(","),
+      ...approvalRequests.map(item => [
+        item.id,
+        item.facility,
+        item.requestedBy,
+        item.date,
+        item.status,
+        item.urgency || "-"
+      ].join(","))
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `godkjenninger_${new Date().toISOString().split("T")[0]}.csv`;
+    link.click();
+  };
+
+  // Filter functionality
+  const filteredRequests = approvalRequests.filter(item => {
+    const searchTerm = searchQuery.toLowerCase();
+    const matchesSearch = 
+      item.id.toLowerCase().includes(searchTerm) ||
+      item.facility.toLowerCase().includes(searchTerm) ||
+      item.requestedBy.toLowerCase().includes(searchTerm) ||
+      (item.completedBy?.toLowerCase() || "").includes(searchTerm) ||
+      (item.assignedTo?.toLowerCase() || "").includes(searchTerm);
+    
+    const matchesStatus = statusFilter === "all" || item.status === statusFilter;
+    const matchesUrgency = urgencyFilter === "all" || item.urgency === urgencyFilter;
+    
+    return matchesSearch && matchesStatus && matchesUrgency;
+  });
 
   // Helper for rendering status badges
   const StatusBadge = ({ status, urgency }: { status: string; urgency?: string }) => {
@@ -109,293 +224,231 @@ const ApprovalWorkflowsPage = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 w-full">
       <div className="flex justify-between items-center">
         <h2 className="text-3xl font-bold tracking-tight">Godkjenningsprosesser</h2>
-        <Button variant="outline" size="sm" className="gap-1">
-          <Filter className="h-4 w-4" />
-          Filtrer
-          <ChevronDown className="h-4 w-4" />
-        </Button>
       </div>
 
-      <div className="grid gap-6">
-        <Card>
-          <CardHeader>
-            <div className="flex justify-between items-center">
-              <div>
-                <CardTitle>Godkjenningsforespørsler</CardTitle>
-                <CardDescription>
-                  Administrer og behandle forespørsler om tilgang til fasiliteter
-                </CardDescription>
+      {/* Review Modal */}
+      <Dialog open={reviewModalOpen} onOpenChange={setReviewModalOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Vurder forespørsel {selectedRequest?.id}</DialogTitle>
+            <DialogDescription>
+              Gjennomgå detaljer og ta en beslutning
+            </DialogDescription>
+          </DialogHeader>
+          {selectedRequest && (
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>Fasilitet</Label>
+                  <p className="mt-1">{selectedRequest.facility}</p>
+                </div>
+                <div>
+                  <Label>Forespurt av</Label>
+                  <p className="mt-1">{selectedRequest.requestedBy}</p>
+                </div>
+                {selectedRequest.details && (
+                  <>
+                    <div>
+                      <Label>Type booking</Label>
+                      <p className="mt-1">{selectedRequest.details.type}</p>
+                    </div>
+                    <div>
+                      <Label>Varighet</Label>
+                      <p className="mt-1">{selectedRequest.details.duration}</p>
+                    </div>
+                    <div>
+                      <Label>Antall deltakere</Label>
+                      <p className="mt-1">{selectedRequest.details.participants}</p>
+                    </div>
+                    <div>
+                      <Label>Formål</Label>
+                      <p className="mt-1">{selectedRequest.details.purpose}</p>
+                    </div>
+                  </>
+                )}
               </div>
-              <span className="bg-amber-100 text-amber-800 px-2 py-1 rounded-md text-sm font-medium">
-                {approvalData.ventende.length} ventende
-              </span>
+              <div className="space-y-2">
+                <Label>Vurderingsnotat</Label>
+                <Textarea
+                  value={reviewNotes}
+                  onChange={(e) => setReviewNotes(e.target.value)}
+                  placeholder="Skriv inn eventuelle kommentarer eller begrunnelse..."
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Beslutning</Label>
+                <div className="flex gap-4">
+                  <Button
+                    variant={reviewDecision === "approve" ? "default" : "outline"}
+                    onClick={() => setReviewDecision("approve")}
+                  >
+                    <CheckCircle className="h-4 w-4 mr-2" />
+                    Godkjenn
+                  </Button>
+                  <Button
+                    variant={reviewDecision === "reject" ? "destructive" : "outline"}
+                    onClick={() => setReviewDecision("reject")}
+                  >
+                    <XCircle className="h-4 w-4 mr-2" />
+                    Avslå
+                  </Button>
+                </div>
+              </div>
             </div>
-          </CardHeader>
-          <CardContent>
-            <Tabs defaultValue="ventende" value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid w-full grid-cols-3 mb-6">
-                <TabsTrigger value="ventende" className="relative">
-                  Ventende
-                  {approvalData.ventende.length > 0 && (
-                    <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-amber-500 text-[10px] text-white">
-                      {approvalData.ventende.length}
-                    </span>
-                  )}
-                </TabsTrigger>
-                <TabsTrigger value="behandling" className="relative">
-                  Under behandling
-                  {approvalData.behandling.length > 0 && (
-                    <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-purple-500 text-[10px] text-white">
-                      {approvalData.behandling.length}
-                    </span>
-                  )}
-                </TabsTrigger>
-                <TabsTrigger value="ferdig">
-                  Ferdigstilte
-                </TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="ventende" className="space-y-4">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>ID</TableHead>
-                      <TableHead>Fasilitet</TableHead>
-                      <TableHead>Forespurt av</TableHead>
-                      <TableHead>Dato</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead className="text-right">Handling</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {approvalData.ventende.map((item) => (
-                      <TableRow key={item.id}>
-                        <TableCell className="font-medium">{item.id}</TableCell>
-                        <TableCell>{item.facility}</TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <Avatar className="h-6 w-6">
-                              <AvatarImage src={`/placeholder.svg`} alt={item.requestedBy} />
-                              <AvatarFallback>{item.requestedBy.charAt(0)}</AvatarFallback>
-                            </Avatar>
-                            {item.requestedBy}
-                          </div>
-                        </TableCell>
-                        <TableCell>{item.date}</TableCell>
-                        <TableCell>
-                          <StatusBadge status={item.status} urgency={item.urgency} />
-                        </TableCell>
-                        <TableCell className="text-right flex gap-2 justify-end">
-                          <Button variant="outline" size="sm" onClick={() => handleReview(item.id)}>
-                            Vurder
-                          </Button>
-                          <Button variant="default" size="sm" onClick={() => handleApprove(item.id)}>
-                            Godkjenn
-                          </Button>
-                          <Button variant="destructive" size="sm" onClick={() => handleReject(item.id)}>
-                            Avslå
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TabsContent>
-
-              <TabsContent value="behandling" className="space-y-4">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>ID</TableHead>
-                      <TableHead>Fasilitet</TableHead>
-                      <TableHead>Forespurt av</TableHead>
-                      <TableHead>Tildelt til</TableHead>
-                      <TableHead>Dato</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead className="text-right">Handling</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {approvalData.behandling.map((item) => (
-                      <TableRow key={item.id}>
-                        <TableCell className="font-medium">{item.id}</TableCell>
-                        <TableCell>{item.facility}</TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <Avatar className="h-6 w-6">
-                              <AvatarImage src={`/placeholder.svg`} alt={item.requestedBy} />
-                              <AvatarFallback>{item.requestedBy.charAt(0)}</AvatarFallback>
-                            </Avatar>
-                            {item.requestedBy}
-                          </div>
-                        </TableCell>
-                        <TableCell>{item.assignedTo}</TableCell>
-                        <TableCell>{item.date}</TableCell>
-                        <TableCell><StatusBadge status={item.status} /></TableCell>
-                        <TableCell className="text-right flex gap-2 justify-end">
-                          <Button variant="default" size="sm" onClick={() => handleApprove(item.id)}>
-                            Godkjenn
-                          </Button>
-                          <Button variant="destructive" size="sm" onClick={() => handleReject(item.id)}>
-                            Avslå
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TabsContent>
-
-              <TabsContent value="ferdig" className="space-y-4">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>ID</TableHead>
-                      <TableHead>Fasilitet</TableHead>
-                      <TableHead>Forespurt av</TableHead>
-                      <TableHead>Behandlet av</TableHead>
-                      <TableHead>Dato behandlet</TableHead>
-                      <TableHead>Status</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {approvalData.ferdig.map((item) => (
-                      <TableRow key={item.id}>
-                        <TableCell className="font-medium">{item.id}</TableCell>
-                        <TableCell>{item.facility}</TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <Avatar className="h-6 w-6">
-                              <AvatarImage src={`/placeholder.svg`} alt={item.requestedBy} />
-                              <AvatarFallback>{item.requestedBy.charAt(0)}</AvatarFallback>
-                            </Avatar>
-                            {item.requestedBy}
-                          </div>
-                        </TableCell>
-                        <TableCell>{item.completedBy}</TableCell>
-                        <TableCell>{item.completedDate}</TableCell>
-                        <TableCell><StatusBadge status={item.status} /></TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TabsContent>
-            </Tabs>
-          </CardContent>
-          <CardFooter className="flex justify-between">
-            <div className="text-sm text-muted-foreground">
-              Viser {activeTab === "ventende" ? approvalData.ventende.length : 
-                     activeTab === "behandling" ? approvalData.behandling.length : 
-                     approvalData.ferdig.length} forespørsler
-            </div>
-            <Button variant="outline" size="sm">
-              Eksporter til CSV
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setReviewModalOpen(false)}>
+              Avbryt
             </Button>
-          </CardFooter>
-        </Card>
+            <Button 
+              onClick={handleSubmitReview}
+              disabled={!reviewDecision}
+            >
+              Lagre beslutning
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
-        <div className="grid gap-6 md:grid-cols-2">
-          <Card>
-            <CardHeader>
-              <CardTitle>Siste Aktivitet</CardTitle>
-              <CardDescription>Nylige handlinger i godkjenningsprosessen</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-start space-x-4">
-                  <div className="relative mt-0.5">
-                    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 size-2 rounded-full bg-green-500" />
-                    <CheckCircle className="h-5 w-5 text-green-500" />
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium">Forespørsel AP-3279 godkjent</p>
-                    <p className="text-xs text-muted-foreground">Behandlet av Eva Saksbehandler • 16. mai 2025</p>
-                  </div>
-                </div>
-                <div className="flex items-start space-x-4">
-                  <div className="relative mt-0.5">
-                    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 size-2 rounded-full bg-red-500" />
-                    <XCircle className="h-5 w-5 text-red-500" />
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium">Forespørsel AP-3276 avslått</p>
-                    <p className="text-xs text-muted-foreground">Behandlet av Ola Admin • 15. mai 2025</p>
-                  </div>
-                </div>
-                <div className="flex items-start space-x-4">
-                  <div className="relative mt-0.5">
-                    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 size-2 rounded-full bg-purple-500" />
-                    <AlertCircle className="h-5 w-5 text-purple-500" />
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium">Forespørsel AP-3282 under behandling</p>
-                    <p className="text-xs text-muted-foreground">Tildelt til Eva Saksbehandler • 15. mai 2025</p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-            <CardFooter>
-              <Button variant="ghost" className="w-full">Vis alle aktiviteter</Button>
-            </CardFooter>
-          </Card>
+      <Card className="w-full">
+        <CardHeader className="bg-gray-50 border-b border-gray-300 rounded-t-lg pb-6">
+          <CardTitle className="text-2xl font-semibold text-gray-900">
+            Godkjenningsforespørsler
+          </CardTitle>
+          <CardDescription className="text-base text-gray-700 leading-relaxed">
+            Administrer og behandle forespørsler om tilgang til fasiliteter
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="p-8">
+          <div className="flex flex-col sm:flex-row gap-6 mb-8">
+            <div className="relative flex-grow">
+              <Search 
+                className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500" 
+                aria-hidden="true" 
+              />
+              <Input
+                type="search"
+                placeholder="Søk i forespørsler..."
+                className="pl-12 h-12 text-base border-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-[180px] h-12">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Alle statuser</SelectItem>
+                <SelectItem value="ventende">Ventende</SelectItem>
+                <SelectItem value="behandling">Under behandling</SelectItem>
+                <SelectItem value="godkjent">Godkjent</SelectItem>
+                <SelectItem value="avslått">Avslått</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={urgencyFilter} onValueChange={setUrgencyFilter}>
+              <SelectTrigger className="w-[180px] h-12">
+                <SelectValue placeholder="Hastegrad" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Alle hastegrader</SelectItem>
+                <SelectItem value="høy">Høy</SelectItem>
+                <SelectItem value="medium">Medium</SelectItem>
+                <SelectItem value="lav">Lav</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Godkjenningsstatistikk</CardTitle>
-              <CardDescription>Oversikt over godkjenningsprosessene</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium text-muted-foreground">Gjennomsnittlig behandlingstid</p>
-                    <p className="text-2xl font-bold">2.3 dager</p>
-                  </div>
-                  <Clock className="h-8 w-8 text-muted-foreground" />
-                </div>
-                
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between text-sm">
-                    <div>Ventende godkjenninger</div>
-                    <div className="font-medium">{approvalData.ventende.length}</div>
-                  </div>
-                  <div className="h-2 w-full overflow-hidden rounded-full bg-gray-100">
-                    <div className="h-full bg-amber-500" style={{ width: '35%' }} />
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between text-sm">
-                    <div>Under behandling</div>
-                    <div className="font-medium">{approvalData.behandling.length}</div>
-                  </div>
-                  <div className="h-2 w-full overflow-hidden rounded-full bg-gray-100">
-                    <div className="h-full bg-purple-500" style={{ width: '20%' }} />
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between text-sm">
-                    <div>Ferdigstilte denne måneden</div>
-                    <div className="font-medium">{approvalData.ferdig.length}</div>
-                  </div>
-                  <div className="h-2 w-full overflow-hidden rounded-full bg-gray-100">
-                    <div className="h-full bg-green-500" style={{ width: '45%' }} />
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-            <CardFooter>
-              <Button variant="outline" className="w-full">
-                Last ned fullstendig rapport
-              </Button>
-            </CardFooter>
-          </Card>
-        </div>
-      </div>
+          <div className="rounded-lg border-2 border-gray-300 overflow-hidden shadow-sm">
+            <Table>
+              <TableHeader className="bg-gray-50">
+                <TableRow>
+                  <TableHead>ID</TableHead>
+                  <TableHead>Fasilitet</TableHead>
+                  <TableHead>Forespurt av</TableHead>
+                  <TableHead>Dato</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Behandlet av</TableHead>
+                  <TableHead className="text-right">Handling</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredRequests.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={7} className="text-center py-12 text-gray-600">
+                      <div className="flex flex-col items-center space-y-4">
+                        <Search className="h-12 w-12 text-gray-400" aria-hidden="true" />
+                        <p className="text-lg font-medium">Ingen forespørsler funnet</p>
+                        <p className="text-base text-gray-500">Prøv å endre søkekriteriene eller filteret</p>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  filteredRequests.map((request) => (
+                    <TableRow key={request.id}>
+                      <TableCell className="font-medium">{request.id}</TableCell>
+                      <TableCell>
+                        <div>
+                          <div className="font-semibold text-gray-900 mb-1">{request.facility}</div>
+                          {request.facilityType && (
+                            <Badge variant="outline" className="bg-blue-100 text-blue-800">
+                              {request.facilityType}
+                            </Badge>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Avatar className="h-6 w-6">
+                            <AvatarImage src={`/placeholder.svg`} alt={request.requestedBy} />
+                            <AvatarFallback>{request.requestedBy.charAt(0)}</AvatarFallback>
+                          </Avatar>
+                          {request.requestedBy}
+                        </div>
+                      </TableCell>
+                      <TableCell>{request.date}</TableCell>
+                      <TableCell>
+                        <StatusBadge status={request.status} urgency={request.urgency} />
+                      </TableCell>
+                      <TableCell>
+                        {request.completedBy || request.assignedTo || "-"}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex gap-2 justify-end">
+                          {(request.status === "ventende" || request.status === "behandling") && (
+                            <>
+                              <Button variant="outline" size="sm" onClick={() => handleReview(request.id)}>
+                                Vurder
+                              </Button>
+                              <Button variant="default" size="sm" onClick={() => handleApprove(request.id)}>
+                                Godkjenn
+                              </Button>
+                              <Button variant="destructive" size="sm" onClick={() => handleReject(request.id)}>
+                                Avslå
+                              </Button>
+                            </>
+                          )}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        </CardContent>
+        <CardFooter className="flex justify-between border-t border-gray-200 p-6">
+          <div className="text-sm text-muted-foreground">
+            Viser {filteredRequests.length} forespørsler
+          </div>
+          <Button variant="outline" size="sm" onClick={handleExportCSV}>
+            Eksporter til CSV
+          </Button>
+        </CardFooter>
+      </Card>
     </div>
   );
 };

@@ -49,10 +49,9 @@ const AuthProvidersPage: React.FC = () => {
   }
 
   return (
-    <div className="space-y-8 max-w-5xl mx-auto p-8" role="main" aria-labelledby="page-title">
+    <div className="space-y-8 w-full p-8" role="main" aria-labelledby="page-title">
       <header className="mb-6">
-        <h1 id="page-title" className="text-3xl font-bold tracking-tight text-gray-900 mb-2 flex items-center gap-3">
-          <Shield className="h-8 w-8 text-blue-700" />
+        <h1 id="page-title" className="text-3xl font-bold tracking-tight text-gray-900 mb-2">
           Autentisering
         </h1>
         <p className="text-lg text-gray-700 leading-relaxed">

@@ -147,8 +147,10 @@ const UsersRolesPage = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <h2 className="text-3xl font-bold tracking-tight">Brukere & Roller</h2>
+    <div className="space-y-8 w-full p-8" role="main" aria-labelledby="page-title">
+      <header className="mb-6">
+        <h2 className="text-3xl font-bold tracking-tight">Brukere & Roller</h2>
+      </header>
 
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-2">
         <div className="relative w-full sm:w-auto order-1 sm:order-none">

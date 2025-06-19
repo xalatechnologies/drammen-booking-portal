@@ -122,8 +122,8 @@ const SLAConfiguration: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 p-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-8 w-full p-8" role="main" aria-labelledby="page-title">
+      <header className="mb-6">
         <div>
           <h1 className="text-3xl font-bold">SLA Konfigurasjon</h1>
           <p className="text-gray-600 mt-1">
@@ -134,7 +134,7 @@ const SLAConfiguration: React.FC = () => {
           <Save className="h-4 w-4" />
           Lagre endringer
         </Button>
-      </div>
+      </header>
 
       {/* SLA Levels */}
       <Card>

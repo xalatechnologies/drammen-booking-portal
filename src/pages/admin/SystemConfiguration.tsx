@@ -117,19 +117,15 @@ const SystemConfiguration: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 p-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Systemkonfigurasjon</h1>
-          <p className="text-gray-600 mt-1">
-            Administrer forretningsregler, priser og terskelverdier
-          </p>
-        </div>
-        <Button className="gap-2" onClick={handleSaveChanges}>
-          <Save className="h-4 w-4" />
-          Lagre endringer
-        </Button>
-      </div>
+    <div className="space-y-8 w-full p-8" role="main" aria-labelledby="page-title">
+      <header className="mb-6">
+        <h1 className="text-3xl font-bold tracking-tight text-gray-900 mb-2">
+          Systemkonfigurasjon
+        </h1>
+        <p className="text-lg text-gray-700 leading-relaxed">
+          Administrer systeminnstillinger, priser og regler for booking
+        </p>
+      </header>
 
       <Tabs defaultValue="pricing">
         <TabsList className="grid w-full grid-cols-3">

@@ -55,14 +55,13 @@ const AuditLogsPage: React.FC = () => {
   }
 
   return (
-    <div className="space-y-8 max-w-5xl mx-auto p-8" role="main" aria-labelledby="page-title">
+    <div className="space-y-8 w-full p-8" role="main" aria-labelledby="page-title">
       <header className="mb-6">
-        <h1 id="page-title" className="text-3xl font-bold tracking-tight text-gray-900 mb-2 flex items-center gap-3">
-          <ClipboardList className="h-8 w-8 text-blue-700" />
+        <h1 id="page-title" className="text-3xl font-bold tracking-tight text-gray-900 mb-2">
           Revisjonslogger
         </h1>
         <p className="text-lg text-gray-700 leading-relaxed">
-          Se og eksporter alle handlinger i systemet for GDPR og sikkerhetsrevisjon. <span title="Logger alle endringer og pålogginger."><Info className="inline h-4 w-4 text-gray-400 align-text-bottom ml-1" /></span>
+          Se og analyser systemhendelser og brukeraktivitet
         </p>
       </header>
       <Card>

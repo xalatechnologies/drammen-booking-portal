@@ -101,7 +101,15 @@ const RoleAssignmentsPage = () => {
   };
 
   return (
-    <div className="max-w-3xl mx-auto py-4 sm:py-8 px-2 sm:px-4">
+    <div className="space-y-8 w-full p-8" role="main" aria-labelledby="page-title">
+      <header className="mb-6">
+        <h1 className="text-3xl font-bold tracking-tight text-gray-900 mb-2">
+          Rolletildelinger
+        </h1>
+        <p className="text-lg text-gray-700 leading-relaxed">
+          Tildel roller til brukere og grupper
+        </p>
+      </header>
       <Card>
         <CardHeader>
           <CardTitle>Tildel roller</CardTitle>

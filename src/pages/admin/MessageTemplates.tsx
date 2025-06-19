@@ -112,7 +112,7 @@ const MessageTemplates: React.FC = () => {
   }
 
   return (
-    <div className="space-y-8 max-w-3xl mx-auto p-8" role="main" aria-labelledby="page-title">
+    <div className="space-y-8 w-full p-8" role="main" aria-labelledby="page-title">
       <header className="mb-6">
         <h1 id="page-title" className="text-3xl font-bold tracking-tight text-gray-900 mb-2">
           Meldingsmaler & Triggere

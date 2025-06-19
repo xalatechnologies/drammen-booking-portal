@@ -239,6 +239,24 @@ const FacilityManagementPage = () => {
     { facilityId: 1, org: "Drammen IF", weekday: "Mandag", from: "16:00", to: "18:00", periodFrom: "2025-08-01", periodTo: "2025-12-31", delegation: true },
     { facilityId: 1, org: "Åssiden FK", weekday: "Mandag", from: "17:00", to: "19:00", periodFrom: "2025-08-01", periodTo: "2025-12-31", delegation: false },
   ]);
+  const [addFacilityModalOpen, setAddFacilityModalOpen] = useState(false);
+  const [newFacility, setNewFacility] = useState({
+    name: "",
+    address: "",
+    type: "",
+    capacity: "",
+    allowedBookingTypes: [] as string[],
+    openingHours: WEEKDAYS.map(day => ({ day, open: "08:00", close: "22:00", closed: false })),
+    bookingInterval: "30",
+    season: { from: "", to: "" }
+  });
+  const [detailsModalOpen, setDetailsModalOpen] = useState(false);
+  const [selectedFacility, setSelectedFacility] = useState<Facility | null>(null);
+  const [statusModalOpen, setStatusModalOpen] = useState(false);
+  const [newStatus, setNewStatus] = useState<"active" | "maintenance" | "inactive">("active");
+  const [newCapacity, setNewCapacity] = useState("");
+  const [editDetailsModalOpen, setEditDetailsModalOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState("bookingtyper");
   
   // Mock paraplyorganisasjoner
   const umbrellaOrgs = [
@@ -361,6 +379,10 @@ const FacilityManagementPage = () => {
       <DropdownMenuItem 
         className="py-3 text-base cursor-pointer focus:bg-gray-100"
         role="menuitem"
+        onClick={() => {
+          setSelectedFacility(facility);
+          setDetailsModalOpen(true);
+        }}
       >
         Se detaljer
       </DropdownMenuItem>
@@ -368,82 +390,24 @@ const FacilityManagementPage = () => {
         className="py-3 text-base cursor-pointer focus:bg-gray-100"
         role="menuitem"
         onClick={() => {
+          setSelectedFacility(facility);
           setEditFacility(facility);
           setEditBookingTypes(facility.allowedBookingTypes);
-          setModalOpen(true);
-        }}
-      >
-        Rediger bookingtyper
-      </DropdownMenuItem>
-      <DropdownMenuItem 
-        className="py-3 text-base cursor-pointer focus:bg-gray-100"
-        role="menuitem"
-      >
-        Endre status
-      </DropdownMenuItem>
-      <DropdownMenuItem 
-        className="py-3 text-base cursor-pointer focus:bg-gray-100"
-        role="menuitem"
-        onClick={() => {
-          setEditRulesFacility(facility);
+          setNewStatus(facility.status);
+          setNewCapacity(facility.capacity.toString());
           setEditOpeningHours(facility.openingHours);
           setEditBookingInterval(facility.bookingInterval);
           setEditSeason(facility.season);
-          setRulesModalOpen(true);
+          setEditDetailsModalOpen(true);
         }}
       >
-        Rediger åpningstider/bookingregler
-      </DropdownMenuItem>
-      <DropdownMenuItem 
-        className="py-3 text-base cursor-pointer focus:bg-gray-100"
-        role="menuitem"
-        onClick={() => {
-          setEditingZonesFacility(facility);
-          setZoneModalOpen(true);
-        }}
-      >
-        Administrer soner
-      </DropdownMenuItem>
-      <DropdownMenuItem 
-        className="py-3 text-base cursor-pointer focus:bg-gray-100 flex items-center gap-2"
-        role="menuitem"
-        onClick={() => {
-          setBlockFacility(facility);
-          setBlockType("maintenance");
-          setBlockFrom("");
-          setBlockTo("");
-          setBlockReason("");
-          setBlockNotify(true);
-          setBlockOverride(false);
-          setBlockModalOpen(true);
-        }}
-      >
-        <CalendarX className="h-5 w-5 text-amber-600" />
-        Blokker tid for vedlikehold/internt
-      </DropdownMenuItem>
-      <DropdownMenuItem 
-        className="py-3 text-base cursor-pointer focus:bg-gray-100 flex items-center gap-2"
-        role="menuitem"
-        onClick={() => {
-          setRammetidFacility(facility);
-          setRammetidOrg("");
-          setRammetidWeekday("Mandag");
-          setRammetidFrom("");
-          setRammetidTo("");
-          setRammetidPeriodFrom("");
-          setRammetidPeriodTo("");
-          setRammetidDelegation(false);
-          setRammetidModalOpen(true);
-        }}
-      >
-        <Users className="h-5 w-5 text-blue-600" />
-        Tildel rammetid (paraply)
+        Rediger detaljer
       </DropdownMenuItem>
     </DropdownMenuContent>
   );
 
   return (
-    <div className="space-y-8 max-w-full" role="main" aria-labelledby="page-title">
+    <div className="space-y-8 w-full p-8" role="main" aria-labelledby="page-title">
       {/* Skip to content link for screen readers */}
       <a 
         href="#main-content" 
@@ -462,13 +426,6 @@ const FacilityManagementPage = () => {
             Administrer og overvåk alle kommunale lokaler
           </p>
         </div>
-        <Button 
-          className="gap-3 text-base px-6 py-3 min-h-[48px] shadow-sm focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-          aria-label="Legg til nytt lokale"
-        >
-          <Plus className="h-5 w-5" aria-hidden="true" />
-          <span>Legg til lokale</span>
-        </Button>
       </header>
 
       {/* Statistics Cards - All using same neutral styling */}
@@ -580,7 +537,14 @@ const FacilityManagementPage = () => {
                     Skriv inn navn, type eller adresse for å søke etter lokaler
                   </div>
                 </div>
-                
+                <Button 
+                  className="gap-3 h-12 px-6 text-base min-w-[160px] shadow-sm focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  aria-label="Legg til nytt lokale"
+                  onClick={() => setAddFacilityModalOpen(true)}
+                >
+                  <Plus className="h-5 w-5" aria-hidden="true" />
+                  <span>Legg til lokale</span>
+                </Button>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button 
@@ -732,8 +696,8 @@ const FacilityManagementPage = () => {
                             </span>
                           </TableCell>
                           <TableCell className="py-6">
-                            <div className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold border-2
-                              ${facility.status === 'active' ? 'bg-green-100 text-green-900 border-green-300' : 
+                            <div className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium border-2
+                              ${facility.status === 'active' ? 'bg-green-100 text-green-900 border border-green-300' : 
                                 facility.status === 'maintenance' ? 'bg-amber-100 text-amber-900 border-amber-300' : 
                                 'bg-red-100 text-red-900 border-red-300'}`}>
                               <span className={`w-2 h-2 rounded-full mr-2 
@@ -879,446 +843,859 @@ const FacilityManagementPage = () => {
         </TabsContent>
       </Tabs>
 
-      {modalOpen && editFacility && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-          <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md">
-            <h2 className="text-xl font-bold mb-4">Rediger bookingtyper for {editFacility.name}</h2>
-            <div className="space-y-3 mb-6">
-              {BOOKING_TYPES.map(bt => (
-                <label key={bt.value} className="flex items-center gap-3">
-                  <input
-                    type="checkbox"
-                    checked={editBookingTypes.includes(bt.value)}
-                    onChange={e => {
-                      if (e.target.checked) {
-                        setEditBookingTypes([...editBookingTypes, bt.value]);
-                      } else {
-                        setEditBookingTypes(editBookingTypes.filter(val => val !== bt.value));
-                      }
-                    }}
-                  />
-                  <span>{bt.label}</span>
-                </label>
-              ))}
-            </div>
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setModalOpen(false)}>Avbryt</Button>
-              <Button
-                onClick={() => {
-                  setFacilities(facilities.map(f =>
-                    f.id === editFacility.id ? { ...f, allowedBookingTypes: editBookingTypes } : f
-                  ));
-                  setModalOpen(false);
-                }}
-              >
-                Lagre
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {rulesModalOpen && editRulesFacility && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-          <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-2xl">
-            <h2 className="text-2xl font-bold mb-6">Rediger åpningstider og bookingregler for {editRulesFacility.name}</h2>
-            <div className="mb-6">
-              <h3 className="font-semibold mb-2 text-lg">Åpningstider</h3>
-              <div className="grid grid-cols-1 gap-2">
-                {editOpeningHours.map((oh, idx) => (
-                  <div key={oh.day} className="flex flex-wrap items-center gap-4 py-2 border-b border-gray-100 last:border-b-0">
-                    <span className="w-28 font-medium text-base">{oh.day}</span>
-                    <input
-                      type="time"
-                      value={oh.open}
-                      disabled={oh.closed}
-                      onChange={e => {
-                        const newHours = [...editOpeningHours];
-                        newHours[idx].open = e.target.value;
-                        setEditOpeningHours(newHours);
-                      }}
-                      className="border rounded px-2 py-1 text-base w-28"
-                    />
-                    <span className="mx-1">-</span>
-                    <input
-                      type="time"
-                      value={oh.close}
-                      disabled={oh.closed}
-                      onChange={e => {
-                        const newHours = [...editOpeningHours];
-                        newHours[idx].close = e.target.value;
-                        setEditOpeningHours(newHours);
-                      }}
-                      className="border rounded px-2 py-1 text-base w-28"
-                    />
-                    <label className="ml-2 flex items-center gap-1 text-base">
-                      <input
-                        type="checkbox"
-                        checked={oh.closed}
-                        onChange={e => {
-                          const newHours = [...editOpeningHours];
-                          newHours[idx].closed = e.target.checked;
-                          setEditOpeningHours(newHours);
-                        }}
-                        className="w-4 h-4"
-                      />
-                      Stengt
-                    </label>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="mb-6">
-              <h3 className="font-semibold mb-2 text-lg">Bookingintervall</h3>
-              <div className="flex flex-col gap-2 w-48">
-                <select
-                  value={editBookingInterval}
-                  onChange={e => setEditBookingInterval(e.target.value)}
-                  className="border rounded px-2 py-2 text-base"
-                >
-                  {BOOKING_INTERVALS.map(opt => (
-                    <option key={opt.value} value={opt.value}>{opt.label}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-            <div className="mb-6">
-              <h3 className="font-semibold mb-2 text-lg">Sesong (tilgjengelighet)</h3>
-              <div className="flex flex-col sm:flex-row gap-3 items-center">
-                <input
-                  type="date"
-                  value={editSeason.from}
-                  onChange={e => setEditSeason({ ...editSeason, from: e.target.value })}
-                  className="border rounded px-2 py-2 text-base w-40"
-                />
-                <span className="text-gray-500 text-base">til</span>
-                <input
-                  type="date"
-                  value={editSeason.to}
-                  onChange={e => setEditSeason({ ...editSeason, to: e.target.value })}
-                  className="border rounded px-2 py-2 text-base w-40"
-                />
-              </div>
-            </div>
-            <div className="flex justify-end gap-4 mt-6">
-              <Button variant="outline" size="default" onClick={() => setRulesModalOpen(false)}>Avbryt</Button>
-              <Button size="default"
-                onClick={() => {
-                  setFacilities(facilities.map(f =>
-                    f.id === editRulesFacility.id
-                      ? { ...f, openingHours: editOpeningHours, bookingInterval: editBookingInterval, season: editSeason }
-                      : f
-                  ));
-                  setRulesModalOpen(false);
-                }}
-              >
-                Lagre
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Zone Management Modal */}
-      <Dialog open={zoneModalOpen} onOpenChange={setZoneModalOpen}>
+      {/* Modal for å redigere alle detaljer */}
+      <Dialog open={editDetailsModalOpen} onOpenChange={setEditDetailsModalOpen}>
         <DialogContent className="max-w-4xl">
           <DialogHeader>
-            <DialogTitle>
-              Administrer soner for {editingZonesFacility?.name}
-            </DialogTitle>
+            <DialogTitle>Rediger {selectedFacility?.name}</DialogTitle>
           </DialogHeader>
-          {editingZonesFacility && (
-            <ZoneManagement
-              facilityId={editingZonesFacility.id.toString()}
-              zones={editingZonesFacility.zones || []}
-              onZoneCreate={(zone) => handleZoneCreate(editingZonesFacility.id.toString(), zone)}
-              onZoneUpdate={(zone) => handleZoneUpdate(editingZonesFacility.id.toString(), zone)}
-              onZoneDelete={(zoneId) => handleZoneDelete(editingZonesFacility.id.toString(), zoneId)}
-              onConflictRuleCreate={(rule) => handleConflictRuleCreate(editingZonesFacility.id.toString(), rule)}
-              onConflictRuleDelete={(ruleId) => handleConflictRuleDelete(editingZonesFacility.id.toString(), ruleId)}
-            />
+          {selectedFacility && (
+            <div className="space-y-6">
+              <Tabs defaultValue="bookingtyper" value={activeTab} onValueChange={setActiveTab}>
+                <TabsList className="w-full border-b justify-start mb-6">
+                  <TabsTrigger value="bookingtyper" className="px-4 py-2">
+                    Bookingtyper
+                  </TabsTrigger>
+                  <TabsTrigger value="status" className="px-4 py-2">
+                    Status og kapasitet
+                  </TabsTrigger>
+                  <TabsTrigger value="apningstider" className="px-4 py-2">
+                    Åpningstider og regler
+                  </TabsTrigger>
+                  <TabsTrigger value="soner" className="px-4 py-2">
+                    Soner
+                  </TabsTrigger>
+                  <TabsTrigger value="blokkering" className="px-4 py-2">
+                    Blokkering
+                  </TabsTrigger>
+                  <TabsTrigger value="rammetid" className="px-4 py-2">
+                    Rammetid
+                  </TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="bookingtyper" className="space-y-4">
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold">Tillatte bookingtyper</h3>
+                    <div className="space-y-3">
+                      {BOOKING_TYPES.map(bt => (
+                        <label key={bt.value} className="flex items-center gap-3">
+                          <input
+                            type="checkbox"
+                            checked={editBookingTypes.includes(bt.value)}
+                            onChange={e => {
+                              if (e.target.checked) {
+                                setEditBookingTypes([...editBookingTypes, bt.value]);
+                              } else {
+                                setEditBookingTypes(editBookingTypes.filter(val => val !== bt.value));
+                              }
+                            }}
+                            className="w-4 h-4"
+                          />
+                          <span>{bt.label}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="status" className="space-y-6">
+                  <div>
+                    <Label className="text-lg font-semibold mb-4 block">Status</Label>
+                    <div className="space-y-3">
+                      <label className="flex items-center gap-3">
+                        <input
+                          type="radio"
+                          name="status"
+                          value="active"
+                          checked={newStatus === "active"}
+                          onChange={(e) => setNewStatus("active")}
+                          className="w-4 h-4 text-blue-600"
+                        />
+                        <span className="flex items-center gap-2">
+                          <span className="w-2 h-2 rounded-full bg-green-600"></span>
+                          Aktiv
+                        </span>
+                      </label>
+                      <label className="flex items-center gap-3">
+                        <input
+                          type="radio"
+                          name="status"
+                          value="maintenance"
+                          checked={newStatus === "maintenance"}
+                          onChange={(e) => setNewStatus("maintenance")}
+                          className="w-4 h-4 text-blue-600"
+                        />
+                        <span className="flex items-center gap-2">
+                          <span className="w-2 h-2 rounded-full bg-amber-600"></span>
+                          Under vedlikehold
+                        </span>
+                      </label>
+                      <label className="flex items-center gap-3">
+                        <input
+                          type="radio"
+                          name="status"
+                          value="inactive"
+                          checked={newStatus === "inactive"}
+                          onChange={(e) => setNewStatus("inactive")}
+                          className="w-4 h-4 text-blue-600"
+                        />
+                        <span className="flex items-center gap-2">
+                          <span className="w-2 h-2 rounded-full bg-red-600"></span>
+                          Inaktiv
+                        </span>
+                      </label>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="capacity" className="text-lg font-semibold">
+                      Kapasitet
+                    </Label>
+                    <div className="flex items-center gap-2">
+                      <Input
+                        id="capacity"
+                        type="number"
+                        min="1"
+                        value={newCapacity}
+                        onChange={(e) => setNewCapacity(e.target.value)}
+                        className="w-32"
+                      />
+                      <span className="text-gray-600">personer</span>
+                    </div>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="apningstider" className="space-y-6">
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4">Åpningstider</h3>
+                    <div className="grid grid-cols-1 gap-2">
+                      {editOpeningHours.map((oh, idx) => (
+                        <div key={oh.day} className="flex flex-wrap items-center gap-4 py-2 border-b border-gray-100 last:border-0">
+                          <span className="w-28 font-medium">{oh.day}</span>
+                          <input
+                            type="time"
+                            value={oh.open}
+                            disabled={oh.closed}
+                            onChange={e => {
+                              const newHours = [...editOpeningHours];
+                              newHours[idx].open = e.target.value;
+                              setEditOpeningHours(newHours);
+                            }}
+                            className="border rounded px-2 py-1 w-28"
+                          />
+                          <span className="mx-1">-</span>
+                          <input
+                            type="time"
+                            value={oh.close}
+                            disabled={oh.closed}
+                            onChange={e => {
+                              const newHours = [...editOpeningHours];
+                              newHours[idx].close = e.target.value;
+                              setEditOpeningHours(newHours);
+                            }}
+                            className="border rounded px-2 py-1 w-28"
+                          />
+                          <label className="flex items-center gap-2">
+                            <input
+                              type="checkbox"
+                              checked={oh.closed}
+                              onChange={e => {
+                                const newHours = [...editOpeningHours];
+                                newHours[idx].closed = e.target.checked;
+                                setEditOpeningHours(newHours);
+                              }}
+                              className="w-4 h-4"
+                            />
+                            Stengt
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4">Bookingintervall</h3>
+                    <select
+                      value={editBookingInterval}
+                      onChange={e => setEditBookingInterval(e.target.value)}
+                      className="border rounded px-3 py-2"
+                    >
+                      {BOOKING_INTERVALS.map(opt => (
+                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4">Sesong</h3>
+                    <div className="flex items-center gap-4">
+                      <div>
+                        <Label>Fra dato</Label>
+                        <Input
+                          type="date"
+                          value={editSeason.from}
+                          onChange={e => setEditSeason({ ...editSeason, from: e.target.value })}
+                          className="mt-1"
+                        />
+                      </div>
+                      <div>
+                        <Label>Til dato</Label>
+                        <Input
+                          type="date"
+                          value={editSeason.to}
+                          onChange={e => setEditSeason({ ...editSeason, to: e.target.value })}
+                          className="mt-1"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="soner">
+                  <ZoneManagement
+                    facilityId={selectedFacility.id.toString()}
+                    zones={selectedFacility.zones || []}
+                    onZoneCreate={(zone) => handleZoneCreate(selectedFacility.id.toString(), zone)}
+                    onZoneUpdate={(zone) => handleZoneUpdate(selectedFacility.id.toString(), zone)}
+                    onZoneDelete={(zoneId) => handleZoneDelete(selectedFacility.id.toString(), zoneId)}
+                    onConflictRuleCreate={(rule) => handleConflictRuleCreate(selectedFacility.id.toString(), rule)}
+                    onConflictRuleDelete={(ruleId) => handleConflictRuleDelete(selectedFacility.id.toString(), ruleId)}
+                  />
+                </TabsContent>
+
+                <TabsContent value="blokkering" className="space-y-6">
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4">Blokker tid</h3>
+                    <form className="space-y-4">
+                      <div>
+                        <Label>Type blokkering</Label>
+                        <select
+                          className="w-full border rounded px-3 py-2 mt-1"
+                          value={blockType}
+                          onChange={e => setBlockType(e.target.value)}
+                          required
+                        >
+                          <option value="maintenance">Vedlikehold</option>
+                          <option value="internal">Internt arrangement</option>
+                          <option value="other">Annet</option>
+                        </select>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label>Fra</Label>
+                          <Input
+                            type="datetime-local"
+                            value={blockFrom}
+                            onChange={e => setBlockFrom(e.target.value)}
+                            className="mt-1"
+                            required
+                          />
+                        </div>
+                        <div>
+                          <Label>Til</Label>
+                          <Input
+                            type="datetime-local"
+                            value={blockTo}
+                            onChange={e => setBlockTo(e.target.value)}
+                            className="mt-1"
+                            required
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <Label>Årsak/merknad</Label>
+                        <Input
+                          type="text"
+                          value={blockReason}
+                          onChange={e => setBlockReason(e.target.value)}
+                          placeholder="F.eks. årlig service, intern samling..."
+                          className="mt-1"
+                          required
+                        />
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={blockNotify}
+                          onChange={e => setBlockNotify(e.target.checked)}
+                          id="block-notify"
+                          className="w-4 h-4"
+                        />
+                        <Label htmlFor="block-notify">Varsle berørte brukere</Label>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={blockOverride}
+                          onChange={e => setBlockOverride(e.target.checked)}
+                          id="block-override"
+                          className="w-4 h-4"
+                        />
+                        <Label htmlFor="block-override">Tillat booking likevel (override)</Label>
+                      </div>
+                    </form>
+                  </div>
+
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4">Eksisterende blokkerte perioder</h3>
+                    <div className="bg-gray-50 border rounded p-4 max-h-48 overflow-y-auto">
+                      {blockedPeriods.filter(b => b.facilityId === selectedFacility.id).length === 0 ? (
+                        <p className="text-gray-500">Ingen blokkerte perioder</p>
+                      ) : (
+                        <ul className="space-y-2">
+                          {blockedPeriods
+                            .filter(b => b.facilityId === selectedFacility.id)
+                            .map((b, i) => (
+                              <li key={i} className="flex justify-between items-center py-2 border-b last:border-0">
+                                <div>
+                                  <span className="font-medium">
+                                    {b.type === "maintenance" ? "Vedlikehold" : 
+                                     b.type === "internal" ? "Internt" : "Annet"}
+                                  </span>
+                                  <p className="text-sm text-gray-600">{b.reason}</p>
+                                </div>
+                                <div className="text-sm text-gray-600">
+                                  {new Date(b.from).toLocaleString('no')} - {new Date(b.to).toLocaleString('no')}
+                                </div>
+                              </li>
+                            ))}
+                        </ul>
+                      )}
+                    </div>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="rammetid" className="space-y-6">
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4">Tildel rammetid</h3>
+                    <form className="space-y-4">
+                      <div>
+                        <Label>Paraplyorganisasjon</Label>
+                        <select
+                          className="w-full border rounded px-3 py-2 mt-1"
+                          value={rammetidOrg}
+                          onChange={e => setRammetidOrg(e.target.value)}
+                          required
+                        >
+                          <option value="">Velg organisasjon</option>
+                          {umbrellaOrgs.map(org => (
+                            <option key={org} value={org}>{org}</option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div className="grid grid-cols-3 gap-4">
+                        <div>
+                          <Label>Ukedag</Label>
+                          <select
+                            className="w-full border rounded px-3 py-2 mt-1"
+                            value={rammetidWeekday}
+                            onChange={e => setRammetidWeekday(e.target.value)}
+                            required
+                          >
+                            {WEEKDAYS.map(day => (
+                              <option key={day} value={day}>{day}</option>
+                            ))}
+                          </select>
+                        </div>
+                        <div>
+                          <Label>Fra kl.</Label>
+                          <Input
+                            type="time"
+                            value={rammetidFrom}
+                            onChange={e => setRammetidFrom(e.target.value)}
+                            className="mt-1"
+                            required
+                          />
+                        </div>
+                        <div>
+                          <Label>Til kl.</Label>
+                          <Input
+                            type="time"
+                            value={rammetidTo}
+                            onChange={e => setRammetidTo(e.target.value)}
+                            className="mt-1"
+                            required
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label>Periode fra</Label>
+                          <Input
+                            type="date"
+                            value={rammetidPeriodFrom}
+                            onChange={e => setRammetidPeriodFrom(e.target.value)}
+                            className="mt-1"
+                            required
+                          />
+                        </div>
+                        <div>
+                          <Label>Periode til</Label>
+                          <Input
+                            type="date"
+                            value={rammetidPeriodTo}
+                            onChange={e => setRammetidPeriodTo(e.target.value)}
+                            className="mt-1"
+                            required
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={rammetidDelegation}
+                          onChange={e => setRammetidDelegation(e.target.checked)}
+                          id="rammetid-delegation"
+                          className="w-4 h-4"
+                        />
+                        <Label htmlFor="rammetid-delegation">
+                          Tillat delegasjon (paraply kan fordele/gi slipp på rammetid)
+                        </Label>
+                      </div>
+                    </form>
+                  </div>
+
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4">Eksisterende rammetider</h3>
+                    <div className="bg-gray-50 border rounded p-4 max-h-48 overflow-y-auto">
+                      {rammetidAllocations.filter(a => a.facilityId === selectedFacility.id).length === 0 ? (
+                        <p className="text-gray-500">Ingen tildelte rammetider</p>
+                      ) : (
+                        <ul className="space-y-2">
+                          {rammetidAllocations
+                            .filter(a => a.facilityId === selectedFacility.id)
+                            .map((a, i) => (
+                              <li key={i} className="flex justify-between items-center py-2 border-b last:border-0">
+                                <div>
+                                  <span className="font-medium">{a.org}</span>
+                                  <p className="text-sm text-gray-600">
+                                    {a.weekday} {a.from}-{a.to}
+                                    {a.delegation && <span className="ml-2 text-blue-600">[Delegasjon]</span>}
+                                  </p>
+                                </div>
+                                <div className="text-sm text-gray-600">
+                                  {new Date(a.periodFrom).toLocaleDateString('no')} - {new Date(a.periodTo).toLocaleDateString('no')}
+                                </div>
+                              </li>
+                            ))}
+                        </ul>
+                      )}
+                    </div>
+                  </div>
+                </TabsContent>
+              </Tabs>
+
+              <div className="flex justify-end gap-4 pt-6 border-t">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setEditDetailsModalOpen(false)}
+                >
+                  Avbryt
+                </Button>
+                <Button
+                  onClick={() => {
+                    // Lagre alle endringer
+                    setFacilities(facilities.map(f => {
+                      if (f.id === selectedFacility.id) {
+                        return {
+                          ...f,
+                          status: newStatus,
+                          capacity: parseInt(newCapacity) || f.capacity,
+                          allowedBookingTypes: editBookingTypes,
+                          openingHours: editOpeningHours,
+                          bookingInterval: editBookingInterval,
+                          season: editSeason
+                        };
+                      }
+                      return f;
+                    }));
+                    setEditDetailsModalOpen(false);
+                  }}
+                >
+                  Lagre alle endringer
+                </Button>
+              </div>
+            </div>
           )}
         </DialogContent>
       </Dialog>
 
-      {/* Modal for blokkering av tid */}
-      {blockFacility && (
-        <Dialog open={blockModalOpen} onOpenChange={setBlockModalOpen}>
-          <DialogContent className="max-w-lg">
-            <DialogHeader>
-              <DialogTitle>Blokker tid for {blockFacility.name}</DialogTitle>
-            </DialogHeader>
-            <form
-              onSubmit={e => {
-                e.preventDefault();
-                setBlockedPeriods([
-                  ...blockedPeriods,
-                  {
-                    facilityId: blockFacility.id,
-                    type: blockType,
-                    from: blockFrom,
-                    to: blockTo,
-                    reason: blockReason,
-                  },
-                ]);
-                setBlockModalOpen(false);
-              }}
-              className="space-y-4"
-            >
+      {/* Modal for å legge til nytt lokale */}
+      <Dialog open={addFacilityModalOpen} onOpenChange={setAddFacilityModalOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Legg til nytt lokale</DialogTitle>
+          </DialogHeader>
+          <form
+            onSubmit={e => {
+              e.preventDefault();
+              const newId = Math.max(...facilities.map(f => f.id)) + 1;
+              setFacilities([
+                ...facilities,
+                {
+                  id: newId,
+                  name: newFacility.name,
+                  address: newFacility.address,
+                  type: newFacility.type,
+                  status: "active",
+                  capacity: parseInt(newFacility.capacity),
+                  lastBooking: "",
+                  nextAvailable: "Nå",
+                  allowedBookingTypes: newFacility.allowedBookingTypes,
+                  openingHours: newFacility.openingHours,
+                  bookingInterval: newFacility.bookingInterval,
+                  season: newFacility.season
+                }
+              ]);
+              setAddFacilityModalOpen(false);
+              setNewFacility({
+                name: "",
+                address: "",
+                type: "",
+                capacity: "",
+                allowedBookingTypes: [],
+                openingHours: WEEKDAYS.map(day => ({ day, open: "08:00", close: "22:00", closed: false })),
+                bookingInterval: "30",
+                season: { from: "", to: "" }
+              });
+            }}
+            className="space-y-6"
+          >
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block font-medium mb-1">Type blokkering</label>
-                <select
-                  className="w-full border rounded px-3 py-2"
-                  value={blockType}
-                  onChange={e => setBlockType(e.target.value)}
-                  required
-                >
-                  <option value="maintenance">Vedlikehold</option>
-                  <option value="internal">Internt arrangement</option>
-                  <option value="other">Annet</option>
-                </select>
-              </div>
-              <div className="flex gap-4">
-                <div className="flex-1">
-                  <label className="block font-medium mb-1">Fra</label>
-                  <input
-                    type="datetime-local"
-                    className="w-full border rounded px-3 py-2"
-                    value={blockFrom}
-                    onChange={e => setBlockFrom(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="flex-1">
-                  <label className="block font-medium mb-1">Til</label>
-                  <input
-                    type="datetime-local"
-                    className="w-full border rounded px-3 py-2"
-                    value={blockTo}
-                    onChange={e => setBlockTo(e.target.value)}
-                    required
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="block font-medium mb-1">Årsak/merknad</label>
-                <input
-                  type="text"
-                  className="w-full border rounded px-3 py-2"
-                  value={blockReason}
-                  onChange={e => setBlockReason(e.target.value)}
-                  placeholder="F.eks. årlig service, intern samling..."
+                <Label htmlFor="facility-name">Navn på lokale</Label>
+                <Input
+                  id="facility-name"
+                  value={newFacility.name}
+                  onChange={e => setNewFacility({ ...newFacility, name: e.target.value })}
+                  className="mt-1"
                   required
                 />
               </div>
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={blockNotify}
-                  onChange={e => setBlockNotify(e.target.checked)}
-                  id="block-notify"
+              <div>
+                <Label htmlFor="facility-type">Type lokale</Label>
+                <Input
+                  id="facility-type"
+                  value={newFacility.type}
+                  onChange={e => setNewFacility({ ...newFacility, type: e.target.value })}
+                  className="mt-1"
+                  required
                 />
-                <label htmlFor="block-notify">Varsle berørte brukere</label>
-              </div>
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={blockOverride}
-                  onChange={e => setBlockOverride(e.target.checked)}
-                  id="block-override"
-                />
-                <label htmlFor="block-override">Tillat booking likevel (override)</label>
               </div>
               <div>
-                <label className="block font-medium mb-1">Eksisterende blokkerte perioder</label>
-                <ul className="bg-gray-50 border rounded p-2 max-h-32 overflow-y-auto text-sm">
-                  {blockedPeriods.filter(b => b.facilityId === blockFacility.id).length === 0 ? (
-                    <li className="text-gray-400">Ingen blokkerte perioder</li>
-                  ) : (
-                    blockedPeriods.filter(b => b.facilityId === blockFacility.id).map((b, i) => (
-                      <li key={i} className="mb-1">
-                        <span className="font-semibold">{b.type === "maintenance" ? "Vedlikehold" : b.type === "internal" ? "Internt" : "Annet"}</span>: {b.from.replace("T", " ")} - {b.to.replace("T", " ")} ({b.reason})
-                      </li>
-                    ))
-                  )}
-                </ul>
+                <Label htmlFor="facility-address">Adresse</Label>
+                <Input
+                  id="facility-address"
+                  value={newFacility.address}
+                  onChange={e => setNewFacility({ ...newFacility, address: e.target.value })}
+                  className="mt-1"
+                  required
+                />
               </div>
-              <div className="flex justify-end gap-2 mt-4">
-                <button
-                  type="button"
-                  className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 text-gray-800"
-                  onClick={() => setBlockModalOpen(false)}
-                >
-                  Avbryt
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white font-semibold"
-                >
-                  Blokker tid
-                </button>
+              <div>
+                <Label htmlFor="facility-capacity">Kapasitet (personer)</Label>
+                <Input
+                  id="facility-capacity"
+                  type="number"
+                  min="1"
+                  value={newFacility.capacity}
+                  onChange={e => setNewFacility({ ...newFacility, capacity: e.target.value })}
+                  className="mt-1"
+                  required
+                />
               </div>
-            </form>
-          </DialogContent>
-        </Dialog>
-      )}
+            </div>
 
-      {/* Modal for tildeling av rammetid */}
-      {rammetidFacility && (
-        <Dialog open={rammetidModalOpen} onOpenChange={setRammetidModalOpen}>
-          <DialogContent className="max-w-lg">
-            <DialogHeader>
-              <DialogTitle>Tildel rammetid for {rammetidFacility.name}</DialogTitle>
-            </DialogHeader>
-            <form
-              onSubmit={e => {
-                e.preventDefault();
-                setRammetidAllocations([
-                  ...rammetidAllocations,
-                  {
-                    facilityId: rammetidFacility.id,
-                    org: rammetidOrg,
-                    weekday: rammetidWeekday,
-                    from: rammetidFrom,
-                    to: rammetidTo,
-                    periodFrom: rammetidPeriodFrom,
-                    periodTo: rammetidPeriodTo,
-                    delegation: rammetidDelegation,
-                  },
-                ]);
-                setRammetidModalOpen(false);
-              }}
-              className="space-y-4"
-            >
+            <div>
+              <Label>Tillatte bookingtyper</Label>
+              <div className="mt-2 space-y-2">
+                {BOOKING_TYPES.map(type => (
+                  <label key={type.value} className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={newFacility.allowedBookingTypes.includes(type.value)}
+                      onChange={e => {
+                        if (e.target.checked) {
+                          setNewFacility({
+                            ...newFacility,
+                            allowedBookingTypes: [...newFacility.allowedBookingTypes, type.value]
+                          });
+                        } else {
+                          setNewFacility({
+                            ...newFacility,
+                            allowedBookingTypes: newFacility.allowedBookingTypes.filter(t => t !== type.value)
+                          });
+                        }
+                      }}
+                      className="w-4 h-4"
+                    />
+                    <span>{type.label}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <Label>Sesong</Label>
+              <div className="grid grid-cols-2 gap-4 mt-2">
+                <div>
+                  <Label htmlFor="season-from">Fra dato</Label>
+                  <Input
+                    id="season-from"
+                    type="date"
+                    min={new Date().toISOString().split('T')[0]}
+                    value={newFacility.season.from}
+                    onChange={e => {
+                      const fromDate = e.target.value;
+                      setNewFacility({
+                        ...newFacility,
+                        season: { 
+                          ...newFacility.season, 
+                          from: fromDate,
+                          // Hvis til-dato er før fra-dato, oppdater til-dato
+                          to: newFacility.season.to && fromDate > newFacility.season.to ? fromDate : newFacility.season.to
+                        }
+                      });
+                    }}
+                    className="mt-1"
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="season-to">Til dato</Label>
+                  <Input
+                    id="season-to"
+                    type="date"
+                    min={newFacility.season.from || new Date().toISOString().split('T')[0]}
+                    value={newFacility.season.to}
+                    onChange={e => setNewFacility({
+                      ...newFacility,
+                      season: { ...newFacility.season, to: e.target.value }
+                    })}
+                    className="mt-1"
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setAddFacilityModalOpen(false)}
+              >
+                Avbryt
+              </Button>
+              <Button type="submit">
+                Legg til lokale
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal for å vise detaljer */}
+      <Dialog open={detailsModalOpen} onOpenChange={setDetailsModalOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Detaljer for {selectedFacility?.name}</DialogTitle>
+          </DialogHeader>
+          {selectedFacility && (
+            <div className="space-y-6">
+              <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+                <div>
+                  <Label className="font-semibold">Navn</Label>
+                  <p className="mt-1">{selectedFacility.name}</p>
+                </div>
+                <div>
+                  <Label className="font-semibold">Type</Label>
+                  <p className="mt-1">{selectedFacility.type}</p>
+                </div>
+                <div>
+                  <Label className="font-semibold">Adresse</Label>
+                  <p className="mt-1">{selectedFacility.address}</p>
+                </div>
+                <div>
+                  <Label className="font-semibold">Kapasitet</Label>
+                  <p className="mt-1">{selectedFacility.capacity} personer</p>
+                </div>
+                <div>
+                  <Label className="font-semibold">Status</Label>
+                  <p className="mt-1">
+                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
+                      ${selectedFacility.status === 'active' ? 'bg-green-100 text-green-800 border border-green-300' : 
+                        selectedFacility.status === 'maintenance' ? 'bg-amber-100 text-amber-800 border border-amber-300' : 
+                        'bg-red-100 text-red-800 border border-red-300'}`}>
+                      {selectedFacility.status === 'active' ? 'Aktiv' : 
+                        selectedFacility.status === 'maintenance' ? 'Under vedlikehold' : 
+                        'Inaktiv'}
+                    </span>
+                  </p>
+                </div>
+                <div>
+                  <Label className="font-semibold">Bookingintervall</Label>
+                  <p className="mt-1">
+                    {selectedFacility.bookingInterval === 'daily' ? 'Daglig' : 
+                      `${selectedFacility.bookingInterval} minutter`}
+                  </p>
+                </div>
+              </div>
+
               <div>
-                <label className="block font-medium mb-1">Paraplyorganisasjon</label>
-                <select
-                  className="w-full border rounded px-3 py-2"
-                  value={rammetidOrg}
-                  onChange={e => setRammetidOrg(e.target.value)}
-                  required
-                >
-                  <option value="">Velg organisasjon</option>
-                  {umbrellaOrgs.map(org => (
-                    <option key={org} value={org}>{org}</option>
+                <Label className="font-semibold">Tillatte bookingtyper</Label>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {selectedFacility.allowedBookingTypes.map(type => {
+                    const bookingType = BOOKING_TYPES.find(bt => bt.value === type);
+                    return bookingType ? (
+                      <span key={type} className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm border border-blue-200">
+                        {bookingType.label}
+                      </span>
+                    ) : null;
+                  })}
+                </div>
+              </div>
+
+              <div>
+                <Label className="font-semibold">Åpningstider</Label>
+                <div className="mt-2 grid grid-cols-2 gap-4">
+                  {selectedFacility.openingHours.map(oh => (
+                    <div key={oh.day} className="flex justify-between items-center py-1 border-b border-gray-100 last:border-0">
+                      <span className="font-medium">{oh.day}:</span>
+                      <span>
+                        {oh.closed ? 'Stengt' : `${oh.open} - ${oh.close}`}
+                      </span>
+                    </div>
                   ))}
-                </select>
-              </div>
-              <div className="flex gap-4">
-                <div className="flex-1">
-                  <label className="block font-medium mb-1">Ukedag</label>
-                  <select
-                    className="w-full border rounded px-3 py-2"
-                    value={rammetidWeekday}
-                    onChange={e => setRammetidWeekday(e.target.value)}
-                    required
-                  >
-                    {WEEKDAYS.map(day => (
-                      <option key={day} value={day}>{day}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="flex-1">
-                  <label className="block font-medium mb-1">Fra</label>
-                  <input
-                    type="time"
-                    className="w-full border rounded px-3 py-2"
-                    value={rammetidFrom}
-                    onChange={e => setRammetidFrom(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="flex-1">
-                  <label className="block font-medium mb-1">Til</label>
-                  <input
-                    type="time"
-                    className="w-full border rounded px-3 py-2"
-                    value={rammetidTo}
-                    onChange={e => setRammetidTo(e.target.value)}
-                    required
-                  />
                 </div>
               </div>
-              <div className="flex gap-4">
-                <div className="flex-1">
-                  <label className="block font-medium mb-1">Periode fra</label>
-                  <input
-                    type="date"
-                    className="w-full border rounded px-3 py-2"
-                    value={rammetidPeriodFrom}
-                    onChange={e => setRammetidPeriodFrom(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="flex-1">
-                  <label className="block font-medium mb-1">Periode til</label>
-                  <input
-                    type="date"
-                    className="w-full border rounded px-3 py-2"
-                    value={rammetidPeriodTo}
-                    onChange={e => setRammetidPeriodTo(e.target.value)}
-                    required
-                  />
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={rammetidDelegation}
-                  onChange={e => setRammetidDelegation(e.target.checked)}
-                  id="rammetid-delegation"
-                />
-                <label htmlFor="rammetid-delegation">Tillat delegasjon (paraply kan fordele/gi slipp på rammetid)</label>
-              </div>
+
               <div>
-                <label className="block font-medium mb-1">Eksisterende tildelinger (overlapper vises i rødt)</label>
-                <ul className="bg-gray-50 border rounded p-2 max-h-32 overflow-y-auto text-sm">
-                  {rammetidAllocations.filter(a => a.facilityId === rammetidFacility.id).length === 0 ? (
-                    <li className="text-gray-400">Ingen tildelinger</li>
-                  ) : (
-                    rammetidAllocations.filter(a => a.facilityId === rammetidFacility.id).map((a, i) => {
-                      // Sjekk overlapper (mock, kun ukedag og tid)
-                      const overlap =
-                        a.weekday === rammetidWeekday &&
-                        ((rammetidFrom && rammetidTo && a.from < rammetidTo && rammetidFrom < a.to) || false);
-                      return (
-                        <li key={i} className={overlap ? "text-red-600 font-semibold" : ""}>
-                          {a.org}: {a.weekday} {a.from}-{a.to} ({a.periodFrom} til {a.periodTo})
-                          {a.delegation && (
-                            <span className="ml-2 text-blue-600">[Delegasjon]</span>
-                          )}
-                          {overlap && " (overlapp!)"}
-                        </li>
-                      );
-                    })
-                  )}
-                </ul>
+                <Label className="font-semibold">Sesong</Label>
+                <p className="mt-1">
+                  {new Date(selectedFacility.season.from).toLocaleDateString('no')} - {new Date(selectedFacility.season.to).toLocaleDateString('no')}
+                </p>
               </div>
-              {rammetidDelegation && (
-                <div className="bg-blue-50 border border-blue-200 rounded p-3 mt-2 text-sm">
-                  <b>Delegasjon aktivert:</b> Paraplyrepresentant kan fordele eller gi slipp på rammetid. <br />
-                  <span className="text-blue-700">Mock: Disse tidene vil kunne bli synlige som drop-in for undergrupper.</span>
+
+              <div className="flex justify-end">
+                <Button onClick={() => setDetailsModalOpen(false)}>
+                  Lukk
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal for å endre status og kapasitet */}
+      <Dialog open={statusModalOpen} onOpenChange={setStatusModalOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Endre status og kapasitet for {selectedFacility?.name}</DialogTitle>
+          </DialogHeader>
+          {selectedFacility && (
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              setFacilities(facilities.map(f => 
+                f.id === selectedFacility.id 
+                  ? { 
+                      ...f, 
+                      status: newStatus,
+                      capacity: parseInt(newCapacity) || f.capacity
+                    } 
+                  : f
+              ));
+              setStatusModalOpen(false);
+            }} className="space-y-6">
+              <div>
+                <Label htmlFor="status" className="text-base font-semibold">Status</Label>
+                <div className="mt-3 space-y-3">
+                  <label className="flex items-center gap-3">
+                    <input
+                      type="radio"
+                      name="status"
+                      value="active"
+                      checked={newStatus === "active"}
+                      onChange={(e) => setNewStatus("active")}
+                      className="w-4 h-4 text-blue-600"
+                    />
+                    <span className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-green-600"></span>
+                      Aktiv
+                    </span>
+                  </label>
+                  <label className="flex items-center gap-3">
+                    <input
+                      type="radio"
+                      name="status"
+                      value="maintenance"
+                      checked={newStatus === "maintenance"}
+                      onChange={(e) => setNewStatus("maintenance")}
+                      className="w-4 h-4 text-blue-600"
+                    />
+                    <span className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-amber-600"></span>
+                      Under vedlikehold
+                    </span>
+                  </label>
+                  <label className="flex items-center gap-3">
+                    <input
+                      type="radio"
+                      name="status"
+                      value="inactive"
+                      checked={newStatus === "inactive"}
+                      onChange={(e) => setNewStatus("inactive")}
+                      className="w-4 h-4 text-blue-600"
+                    />
+                    <span className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-red-600"></span>
+                      Inaktiv
+                    </span>
+                  </label>
                 </div>
-              )}
-              <div className="flex justify-end gap-2 mt-4">
-                <button
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="capacity" className="text-base font-semibold">
+                  Kapasitet
+                </Label>
+                <div className="flex items-center gap-2">
+                  <Input
+                    id="capacity"
+                    type="number"
+                    min="1"
+                    value={newCapacity}
+                    onChange={(e) => setNewCapacity(e.target.value)}
+                    placeholder={selectedFacility.capacity.toString()}
+                    className="w-32"
+                  />
+                  <span className="text-gray-600">personer</span>
+                </div>
+                <p className="text-sm text-gray-500">
+                  Nåværende kapasitet: {selectedFacility.capacity} personer
+                </p>
+              </div>
+
+              <div className="flex justify-end gap-4">
+                <Button
                   type="button"
-                  className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 text-gray-800"
-                  onClick={() => setRammetidModalOpen(false)}
+                  variant="outline"
+                  onClick={() => setStatusModalOpen(false)}
                 >
                   Avbryt
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white font-semibold"
-                >
-                  Tildel rammetid
-                </button>
+                </Button>
+                <Button type="submit">
+                  Lagre endringer
+                </Button>
               </div>
             </form>
-          </DialogContent>
-        </Dialog>
-      )}
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

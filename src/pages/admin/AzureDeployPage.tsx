@@ -60,14 +60,13 @@ const AzureDeployPage: React.FC = () => {
   }
 
   return (
-    <div className="space-y-10 max-w-5xl mx-auto p-8" role="main" aria-labelledby="page-title">
+    <div className="space-y-8 w-full p-8" role="main" aria-labelledby="page-title">
       <header className="mb-6">
-        <h1 id="page-title" className="text-3xl font-bold tracking-tight text-gray-900 mb-2 flex items-center gap-3">
-          <Activity className="h-8 w-8 text-blue-700" />
-          Azure & Deploy
+        <h1 id="page-title" className="text-3xl font-bold tracking-tight text-gray-900 mb-2">
+          Azure/Deploy
         </h1>
         <p className="text-lg text-gray-700 leading-relaxed">
-          Administrer miljøer, deployment-strategier og backup for høy tilgjengelighet og sikkerhet. <span title="Gjelder Azure dev/test/prod, blue/green deploy og backup."><Info className="inline h-4 w-4 text-gray-400 align-text-bottom ml-1" /></span>
+          Administrer Azure-ressurser og deployment-innstillinger
         </p>
       </header>
       {/* Miljøkonfigurasjon */}
