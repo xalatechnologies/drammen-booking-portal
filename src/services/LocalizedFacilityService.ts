@@ -1,7 +1,9 @@
+
 import { Facility, FacilityFilters, FacilitySortOptions } from "@/types/facility";
 import { Zone } from "@/types/zone";
 import { PaginatedResponse, PaginationParams, ApiResponse } from "@/types/api";
 import { LocalizedFacilityRepository } from "@/dal/repositories/LocalizedFacilityRepository";
+import { LocalizedFacility } from "@/types/localization";
 import { Language } from "@/i18n/types";
 import { localizedMockFacilities } from "@/data/localizedMockFacilities";
 
@@ -25,6 +27,34 @@ export class LocalizedFacilityService {
       await delay(300); // Simulate network delay
 
       const result = await localizedFacilityRepository.findAll(
+        pagination,
+        filters,
+        sort?.field,
+        sort?.direction
+      );
+
+      return result;
+    } catch (error) {
+      return {
+        success: false,
+        error: {
+          message: "Failed to fetch facilities",
+          details: error,
+        },
+      };
+    }
+  }
+
+  // New method for raw facilities
+  static async getRawFacilities(
+    pagination: PaginationParams,
+    filters?: FacilityFilters,
+    sort?: FacilitySortOptions
+  ): Promise<ApiResponse<PaginatedResponse<LocalizedFacility>>> {
+    try {
+      await delay(300);
+
+      const result = await localizedFacilityRepository.findAllRaw(
         pagination,
         filters,
         sort?.field,

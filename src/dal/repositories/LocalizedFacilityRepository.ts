@@ -1,3 +1,4 @@
+
 import { BaseRepository } from "@/dal/BaseRepository";
 import { Facility, FacilityFilters } from "@/types/facility";
 import { Zone } from "@/types/zone";
@@ -287,18 +288,6 @@ export class LocalizedFacilityRepository extends BaseRepository<Facility> {
     }
   }
 
-  async create(item: Partial<Facility>): Promise<ApiResponse<Facility>> {
-    throw new Error("Create operation not implemented for mock data");
-  }
-
-  async update(id: string, item: Partial<Facility>): Promise<ApiResponse<Facility>> {
-    throw new Error("Update operation not implemented for mock data");
-  }
-
-  async delete(id: string): Promise<ApiResponse<boolean>> {
-    throw new Error("Delete operation not implemented for mock data");
-  }
-
   // New raw methods for optimized architecture
   async findAllRaw(
     pagination: { page: number; limit: number },
@@ -315,7 +304,7 @@ export class LocalizedFacilityRepository extends BaseRepository<Facility> {
           const searchLower = filters.searchTerm.toLowerCase();
           facilities = facilities.filter(facility =>
             Object.values(facility.name).some(name => name.toLowerCase().includes(searchLower)) ||
-            Object.values(facility.address).some(addr => addr?.toLowerCase?.includes?.(searchLower)) ||
+            Object.values(facility.address).some(addr => typeof addr === 'string' && addr.toLowerCase().includes(searchLower)) ||
             Object.values(facility.description).some(desc => desc.toLowerCase().includes(searchLower))
           );
         }
@@ -493,16 +482,3 @@ export class LocalizedFacilityRepository extends BaseRepository<Facility> {
       };
     }
   }
-
-  async create(item: Partial<LocalizedFacility>): Promise<ApiResponse<LocalizedFacility>> {
-    throw new Error("Create operation not implemented for mock data");
-  }
-
-  async update(id: string, item: Partial<LocalizedFacility>): Promise<ApiResponse<LocalizedFacility>> {
-    throw new Error("Update operation not implemented for mock data");
-  }
-
-  async delete(id: string): Promise<ApiResponse<boolean>> {
-    throw new Error("Delete operation not implemented for mock data");
-  }
-}

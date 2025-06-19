@@ -1,4 +1,3 @@
-
 import { BaseRepository } from "@/dal/BaseRepository";
 import { Facility, FacilityFilters } from "@/types/facility";
 import { Zone } from "@/types/zone";
@@ -46,7 +45,7 @@ export class OptimizedLocalizedFacilityRepository extends BaseRepository<Localiz
           const searchLower = filters.searchTerm.toLowerCase();
           facilities = facilities.filter(facility =>
             Object.values(facility.name).some(name => name.toLowerCase().includes(searchLower)) ||
-            Object.values(facility.address).some(addr => addr?.toLowerCase?.includes?.(searchLower)) ||
+            Object.values(facility.address).some(addr => typeof addr === 'string' && addr.toLowerCase().includes(searchLower)) ||
             Object.values(facility.description).some(desc => desc.toLowerCase().includes(searchLower))
           );
         }
