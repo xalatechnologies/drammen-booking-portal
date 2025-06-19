@@ -38,16 +38,32 @@ export function EnhancedFacilitySidebar({
   
   const translations = {
     NO: {
+      reserveNow: "Reserver nå",
       capacity: "Kapasitet",
       area: "Areal (m²)",
       open: "Åpent",
-      zones: "Soner"
+      zones: "Soner",
+      suitableFor: "Egnet for",
+      sports: "Idrett",
+      training: "Trening", 
+      events: "Arrangementer",
+      groups: "Grupper",
+      freeCancellation: "Gratis avbestilling",
+      cancellationPolicy: "Opptil 24 timer før reservert tid"
     },
     EN: {
+      reserveNow: "Reserve now",
       capacity: "Capacity",
       area: "Area (m²)",
       open: "Open",
-      zones: "Zones"
+      zones: "Zones",
+      suitableFor: "Suitable for",
+      sports: "Sports",
+      training: "Training",
+      events: "Events", 
+      groups: "Groups",
+      freeCancellation: "Free cancellation",
+      cancellationPolicy: "Up to 24 hours before reserved time"
     }
   };
   
@@ -66,7 +82,7 @@ export function EnhancedFacilitySidebar({
           onClick={handleBookingClick}
           className="flex-1 bg-[#1e3a8a] hover:bg-[#1e40af] text-white font-medium text-base h-auto p-3"
         >
-          Reserver nå
+          {t.reserveNow}
         </Button>
         <Button
           variant="outline"
@@ -136,15 +152,15 @@ export function EnhancedFacilitySidebar({
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-lg">
             <Tag className="h-5 w-5" />
-            Egnet for
+            {t.suitableFor}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap gap-2">
-            <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">Idrett</Badge>
-            <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">Trening</Badge>
-            <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">Arrangementer</Badge>
-            <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200">Grupper</Badge>
+            <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">{t.sports}</Badge>
+            <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">{t.training}</Badge>
+            <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">{t.events}</Badge>
+            <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200">{t.groups}</Badge>
           </div>
         </CardContent>
       </Card>
@@ -161,10 +177,10 @@ export function EnhancedFacilitySidebar({
             </div>
             <div>
               <h3 className="font-medium text-emerald-800">
-                Gratis avbestilling
+                {t.freeCancellation}
               </h3>
               <p className="text-sm text-emerald-700">
-                Opptil 24 timer før reservert tid
+                {t.cancellationPolicy}
               </p>
             </div>
           </div>

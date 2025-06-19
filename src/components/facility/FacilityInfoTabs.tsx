@@ -7,6 +7,7 @@ import { DescriptionTab } from "./tabs/DescriptionTab";
 import { FeaturesTab } from "./tabs/FeaturesTab";
 import { FaqTab } from "./tabs/FaqTab";
 import { RulesTab } from "./tabs/RulesTab";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface FacilityInfoTabsProps {
   description: string;
@@ -27,6 +28,25 @@ export function FacilityInfoTabs({
   address,
   zoneCards
 }: FacilityInfoTabsProps) {
+  const { language } = useLanguage();
+
+  const translations = {
+    NO: {
+      about: "Om lokalet",
+      facilities: "Fasiliteter", 
+      rules: "Regler",
+      faq: "FAQ"
+    },
+    EN: {
+      about: "About the facility",
+      facilities: "Facilities",
+      rules: "Rules", 
+      faq: "FAQ"
+    }
+  };
+
+  const t = translations[language];
+
   return (
     <Tabs defaultValue="description" className="bg-white rounded-lg shadow-sm border">
       <TabsList className="w-full border-b p-0 h-auto bg-gray-50 rounded-none">
@@ -34,25 +54,25 @@ export function FacilityInfoTabs({
           value="description" 
           className="flex-1 py-4 px-6 rounded-none text-base font-medium data-[state=active]:bg-[#1e3a8a] data-[state=active]:text-white data-[state=active]:border-b-0 data-[state=active]:shadow-none hover:bg-[#1e40af] hover:text-white transition-colors"
         >
-          Om lokalet
+          {t.about}
         </TabsTrigger>
         <TabsTrigger 
           value="features" 
           className="flex-1 py-4 px-6 rounded-none text-base font-medium data-[state=active]:bg-[#1e3a8a] data-[state=active]:text-white data-[state=active]:border-b-0 data-[state=active]:shadow-none hover:bg-[#1e40af] hover:text-white transition-colors"
         >
-          Fasiliteter
+          {t.facilities}
         </TabsTrigger>
         <TabsTrigger 
           value="rules" 
           className="flex-1 py-4 px-6 rounded-none text-base font-medium data-[state=active]:bg-[#1e3a8a] data-[state=active]:text-white data-[state=active]:border-b-0 data-[state=active]:shadow-none hover:bg-[#1e40af] hover:text-white transition-colors"
         >
-          Regler
+          {t.rules}
         </TabsTrigger>
         <TabsTrigger 
           value="faq" 
           className="flex-1 py-4 px-6 rounded-none text-base font-medium data-[state=active]:bg-[#1e3a8a] data-[state=active]:text-white data-[state=active]:border-b-0 data-[state=active]:shadow-none hover:bg-[#1e40af] hover:text-white transition-colors"
         >
-          FAQ
+          {t.faq}
         </TabsTrigger>
       </TabsList>
       
