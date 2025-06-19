@@ -3,7 +3,8 @@ import React from 'react';
 import { ArrowLeft, User, LogIn } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { SelectedTimeSlot } from '@/utils/recurrenceEngine';
-import { ActorType, BookingType } from '@/types/pricing';
+import { ActorType } from '@/types/cart';
+import { BookingType } from '@/types/pricing';
 import { Zone } from '@/components/booking/types';
 import { BookingOverviewCard } from './BookingOverviewCard';
 import { CustomerTypeSection } from './CustomerTypeSection';
@@ -50,17 +51,33 @@ export function BookingPricingStep({
 
   const handleAddToCart = () => {
     try {
-      // Add selected slots to cart
+      // Add selected slots to cart with complete cart item structure
       selectedSlots.forEach(slot => {
         const zone = zones.find(z => z.id === slot.zoneId);
+        const pricePerHour = zone?.pricePerHour || 450;
+        const duration = slot.duration || 2;
+        
         addToCart({
           facilityId,
           facilityName,
           zoneId: slot.zoneId,
           date: slot.date,
           timeSlot: slot.timeSlot,
-          duration: slot.duration || 2,
-          pricePerHour: zone?.pricePerHour || 450
+          duration,
+          pricePerHour,
+          // Required new fields with defaults
+          purpose: 'Generell booking',
+          expectedAttendees: 1,
+          organizationType: actorType,
+          additionalServices: [],
+          timeSlots: [slot],
+          pricing: {
+            baseFacilityPrice: pricePerHour * duration,
+            servicesPrice: 0,
+            discounts: 0,
+            vatAmount: 0,
+            totalPrice: pricePerHour * duration
+          }
         });
       });
 

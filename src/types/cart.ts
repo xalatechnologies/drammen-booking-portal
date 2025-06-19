@@ -1,6 +1,9 @@
 
 import { SelectedTimeSlot } from '@/utils/recurrenceEngine';
-import { ActorType, EventType, AgeGroup } from '@/types/booking';
+import { EventType, AgeGroup } from '@/types/booking';
+
+// Define ActorType locally since it's not exported from booking types
+export type ActorType = 'private' | 'business' | 'organization';
 
 export interface AdditionalServiceItem {
   serviceId: string;

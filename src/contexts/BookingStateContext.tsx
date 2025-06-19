@@ -349,13 +349,38 @@ export const BookingStateProvider: React.FC<BookingStateProviderProps> = ({ chil
         return false;
       }
 
-      // Add slots to cart
+      // Add slots to cart with complete cart item structure
       state.selectedSlots.forEach(slot => {
+        const pricePerHour = 225; // Default price, should come from facility data
+        const duration = slot.duration || 2;
+        
         addToCart({
-          ...slot,
           facilityId,
           facilityName,
-          pricePerHour: 225 // Default price, should come from facility data
+          zoneId: slot.zoneId,
+          date: slot.date,
+          timeSlot: slot.timeSlot,
+          duration,
+          pricePerHour,
+          // Required new fields
+          purpose: state.formData.purpose || 'Generell booking',
+          expectedAttendees: state.formData.attendees || 1,
+          organizationType: state.formData.customerType,
+          additionalServices: [],
+          timeSlots: [slot],
+          customerInfo: {
+            name: state.formData.contactName,
+            email: state.formData.contactEmail,
+            phone: state.formData.contactPhone,
+            organization: state.formData.organization
+          },
+          pricing: {
+            baseFacilityPrice: pricePerHour * duration,
+            servicesPrice: 0,
+            discounts: 0,
+            vatAmount: 0,
+            totalPrice: pricePerHour * duration
+          }
         });
       });
 
