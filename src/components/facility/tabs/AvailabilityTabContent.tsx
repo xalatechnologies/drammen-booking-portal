@@ -1,10 +1,9 @@
 
-import React, { useEffect, useState } from 'react';
-import { format, addDays } from 'date-fns';
+import React from 'react';
+import { addDays } from 'date-fns';
 import { Zone } from '@/components/booking/types';
-import { SelectedTimeSlot, RecurrencePattern, recurrenceEngine } from '@/utils/recurrenceEngine';
+import { SelectedTimeSlot, RecurrencePattern } from '@/utils/recurrenceEngine';
 import { EnhancedZoneConflictManager } from '@/utils/enhancedZoneConflictManager';
-import { isDateUnavailable } from '@/utils/holidaysAndAvailability';
 import { useTranslation } from '@/i18n';
 import { WeekNavigation } from './WeekNavigation';
 import { ZoneInfoHeader } from './ZoneInfoHeader';
@@ -12,9 +11,11 @@ import { ResponsiveCalendarGrid } from './ResponsiveCalendarGrid';
 import { SelectedSlotsDisplay } from './SelectedSlotsDisplay';
 import { LegendDisplay } from './LegendDisplay';
 import { StrotimeDisplay } from './StrotimeDisplay';
-import { isSlotSelected, addSlotToSelection, removeSlotFromSelection } from './AvailabilityTabUtils';
-import { StrotimeService } from '@/services/StrotimeService';
-import { StrøtimeSlot } from '@/types/booking/strøtimer';
+import { AvailabilityStatusManager } from './AvailabilityStatusManager';
+import { useStrotimer } from '@/hooks/useStrotimer';
+import { useSlotSelection } from '@/hooks/useSlotSelection';
+import { parseOpeningHours } from '@/utils/openingHoursParser';
+import { isSlotSelected } from './AvailabilityTabUtils';
 
 interface AvailabilityTabContentProps {
   zone: Zone;
@@ -57,76 +58,21 @@ export function AvailabilityTabContent({
   facilityName = "",
   openingHours = "08:00-22:00"
 }: AvailabilityTabContentProps) {
-  // Parse opening hours to generate time slots
-  const parseOpeningHours = (hours: string) => {
-    try {
-      const [start, end] = hours.split('-');
-      const startHour = parseInt(start.split(':')[0]);
-      const endHour = parseInt(end.split(':')[0]);
-      
-      const slots = [];
-      for (let hour = startHour; hour < endHour; hour++) {
-        slots.push(`${hour.toString().padStart(2, '0')}:00`);
-      }
-      return slots;
-    } catch (error) {
-      // Fallback to default hours if parsing fails
-      return [
-        "08:00", "09:00", "10:00", "11:00", "12:00", "13:00", 
-        "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", 
-        "20:00", "21:00", "22:00"
-      ];
-    }
-  };
-
   const timeSlots = parseOpeningHours(openingHours);
   const { t } = useTranslation();
 
-  // Add state for strøtimer
-  const [strøtimer, setStrøtimer] = useState<StrøtimeSlot[]>([]);
-  const [loadingStrøtimer, setLoadingStrøtimer] = useState(false);
+  // Use custom hooks for separated concerns
+  const { strøtimer, handleStrøtimeBookingComplete } = useStrotimer({
+    facilityId,
+    currentWeekStart
+  });
 
-  // Fetch strøtimer for the current week
-  useEffect(() => {
-    const fetchStrøtimer = async () => {
-      if (!facilityId) return;
-      
-      setLoadingStrøtimer(true);
-      try {
-        const response = await StrotimeService.getAvailableStrøtimer({
-          facilityId,
-          startDate: currentWeekStart,
-          endDate: addDays(currentWeekStart, 6)
-        });
-        
-        if (response.success) {
-          setStrøtimer(response.data || []);
-        }
-      } catch (error) {
-        console.error('Failed to fetch strøtimer:', error);
-      } finally {
-        setLoadingStrøtimer(false);
-      }
-    };
+  const { handleSlotClick: internalHandleSlotClick, clearSelection } = useSlotSelection();
 
-    fetchStrøtimer();
-  }, [facilityId, currentWeekStart]);
+  // Create availability status manager
+  const availabilityStatusManager = new AvailabilityStatusManager(conflictManager);
 
   const weekDays = Array(7).fill(0).map((_, i) => addDays(currentWeekStart, i));
-
-  const getAvailabilityStatus = (zoneId: string, date: Date, timeSlot: string) => {
-    const unavailableCheck = isDateUnavailable(date);
-    if (unavailableCheck.isUnavailable) {
-      return { status: 'unavailable', conflict: null };
-    }
-
-    const conflict = conflictManager.checkZoneConflict(zoneId, date, timeSlot);
-    if (conflict) {
-      return { status: 'busy', conflict };
-    }
-
-    return { status: 'available', conflict: null };
-  };
 
   const handleSlotClick = (zoneId: string, date: Date, timeSlot: string, availability: string) => {
     if (availability !== 'available') return;
@@ -134,38 +80,23 @@ export function AvailabilityTabContent({
     const isSelected = isSlotSelected(selectedSlots, zoneId, date, timeSlot);
 
     if (isSelected) {
-      setSelectedSlots(prev => removeSlotFromSelection(prev, zoneId, date, timeSlot));
+      setSelectedSlots(prev => prev.filter(slot => 
+        !(slot.zoneId === zoneId && 
+          slot.date.toDateString() === date.toDateString() && 
+          slot.timeSlot === timeSlot)
+      ));
     } else {
-      // Only add to local selection, not to cart yet
-      setSelectedSlots(prev => addSlotToSelection(prev, zoneId, date, timeSlot));
+      setSelectedSlots(prev => [...prev, {
+        zoneId,
+        date: new Date(date),
+        timeSlot,
+        duration: 2 // Default 2 hours
+      }]);
     }
   };
 
-  const clearSelection = () => {
+  const clearSelectionHandler = () => {
     setSelectedSlots([]);
-  };
-
-  const handleStrøtimeBookingComplete = (booking: any) => {
-    // Refresh strøtimer after booking
-    const fetchStrøtimer = async () => {
-      if (!facilityId) return;
-      
-      try {
-        const response = await StrotimeService.getAvailableStrøtimer({
-          facilityId,
-          startDate: currentWeekStart,
-          endDate: addDays(currentWeekStart, 6)
-        });
-        
-        if (response.success) {
-          setStrøtimer(response.data || []);
-        }
-      } catch (error) {
-        console.error('Failed to refresh strøtimer:', error);
-      }
-    };
-
-    fetchStrøtimer();
   };
 
   return (
@@ -191,7 +122,9 @@ export function AvailabilityTabContent({
         currentWeekStart={currentWeekStart}
         timeSlots={timeSlots}
         selectedSlots={selectedSlots}
-        getAvailabilityStatus={getAvailabilityStatus}
+        getAvailabilityStatus={(zoneId, date, timeSlot) => 
+          availabilityStatusManager.getAvailabilityStatus(zoneId, date, timeSlot)
+        }
         isSlotSelected={(zoneId, date, timeSlot) => isSlotSelected(selectedSlots, zoneId, date, timeSlot)}
         onSlotClick={handleSlotClick}
       />
@@ -202,7 +135,7 @@ export function AvailabilityTabContent({
         zone={zone}
         selectedSlots={selectedSlots}
         onPatternBuilderOpen={onPatternBuilderOpen}
-        onClearSelection={clearSelection}
+        onClearSelection={clearSelectionHandler}
         onBookingDrawerOpen={onBookingDrawerOpen}
         zones={zones}
       />
