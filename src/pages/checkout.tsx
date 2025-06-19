@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import GlobalHeader from '@/components/GlobalHeader';
@@ -32,12 +31,11 @@ const CheckoutPage = () => {
 
   // Group cart items by facility for better display
   const groupedReservations = items.reduce((acc, item) => {
-    const key = `${item.facilityId}-${item.purpose || 'general'}`;
+    const key = `${item.facilityId}`;
     if (!acc[key]) {
       acc[key] = {
         facilityId: item.facilityId,
         facilityName: item.facilityName,
-        purpose: item.purpose || 'Generell booking',
         customerType: 'private',
         items: [],
         totalPrice: 0
@@ -154,7 +152,6 @@ const CheckoutPage = () => {
                               <MapPin className="h-5 w-5 text-blue-600" />
                               {reservation.facilityName}
                             </h3>
-                            <p className="text-gray-600 mt-1">{reservation.purpose}</p>
                             <Badge variant="outline" className="mt-2">
                               {reservation.items.length} tidspunkt
                             </Badge>
