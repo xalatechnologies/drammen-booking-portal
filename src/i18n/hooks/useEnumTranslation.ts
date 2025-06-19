@@ -19,11 +19,13 @@ export function useEnumTranslation() {
     }
 
     // Fallback to static translations
-    return enumTranslations[language][key] || key;
+    const translation = enumTranslations[language]?.[key];
+    return translation || key;
   };
 
   const translateEnumSync = (key: string): string => {
-    return enumTranslations[language][key] || key;
+    const translation = enumTranslations[language]?.[key];
+    return translation || key;
   };
 
   return {

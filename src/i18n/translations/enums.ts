@@ -1,14 +1,8 @@
 
 import { Language } from '../types';
 
-interface EnumTranslations {
-  [key: string]: {
-    [enumKey: string]: string;
-  };
-}
-
-// Fallback translations for enum types when database is not available
-export const enumTranslations: Record<Language, EnumTranslations> = {
+// Flat structure for direct key-value enum translations
+export const enumTranslations: Record<Language, Record<string, string>> = {
   NO: {
     // User Roles
     'system-admin': 'Systemadministrator',
