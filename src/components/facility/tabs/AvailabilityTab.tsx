@@ -77,6 +77,11 @@ export function AvailabilityTab({
     onPatternApplied: () => {}, // Not used anymore since we use external state
   });
 
+  const handlePatternApplyWrapper = () => {
+    handlePatternApply();
+    setShowPatternBuilder(false);
+  };
+
   const shouldShowTabs = zones.length > 1;
 
   const renderZoneTab = (zone: Zone) => (
@@ -148,7 +153,7 @@ export function AvailabilityTab({
         onConflictWizardClose={() => setShowConflictWizard(false)}
         onBookingDrawerClose={() => {}}
         onPatternChange={setCurrentPattern}
-        onPatternApply={handlePatternApply}
+        onPatternApply={handlePatternApplyWrapper}
       />
     </div>
   );

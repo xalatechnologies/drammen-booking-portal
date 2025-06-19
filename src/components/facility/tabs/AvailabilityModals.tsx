@@ -36,21 +36,27 @@ export function AvailabilityModals({
   return (
     <>
       {/* Pattern Builder Modal */}
-      <RecurrencePatternBuilder
-        isOpen={showPatternBuilder}
-        onClose={onPatternBuilderClose}
-        pattern={currentPattern}
-        onPatternChange={onPatternChange}
-        onApply={onPatternApply}
-      />
+      {showPatternBuilder && (
+        <RecurrencePatternBuilder
+          pattern={currentPattern}
+          onPatternChange={onPatternChange}
+          onClose={onPatternBuilderClose}
+          onApplyPattern={onPatternApply}
+        />
+      )}
 
       {/* Conflict Resolution Wizard */}
       {showConflictWizard && conflictResolutionData && (
         <ConflictResolutionWizard
           isOpen={showConflictWizard}
           onClose={onConflictWizardClose}
-          conflictData={conflictResolutionData}
-          onResolve={(resolution) => {
+          conflictedDates={conflictResolutionData.conflictedDates || []}
+          availableDates={conflictResolutionData.availableDates || []}
+          alternativeTimeSlots={conflictResolutionData.alternativeTimeSlots || []}
+          suggestedZones={conflictResolutionData.suggestedZones || []}
+          originalZone={conflictResolutionData.originalZone}
+          originalTimeSlot={conflictResolutionData.originalTimeSlot || ""}
+          onResolutionSelect={(resolution) => {
             console.log('Conflict resolved:', resolution);
             onConflictWizardClose();
           }}

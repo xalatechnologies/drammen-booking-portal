@@ -86,7 +86,6 @@ export function FacilityInfoTabs({
         <EnhancedAboutTab 
           description={description}
           capacity={capacity}
-          equipment={equipment}
           amenities={amenities}
           address={address}
           area={area}

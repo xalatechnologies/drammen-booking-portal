@@ -68,10 +68,9 @@ export function AvailabilityTabContent({
     "14:00-16:00", "16:00-18:00", "18:00-20:00", "20:00-22:00"
   ];
 
-  const handleSlotClick = (date: Date, timeSlot: string) => {
+  const handleSlotClick = (zoneId: string, date: Date, timeSlot: string, availability: string) => {
     if (onSlotClick) {
-      const availability = Math.random() > 0.3 ? 'available' : 'booked'; // Mock availability
-      onSlotClick(zone.id, date, timeSlot, availability);
+      onSlotClick(zoneId, date, timeSlot, availability);
     }
   };
 
@@ -113,7 +112,7 @@ export function AvailabilityTabContent({
       {/* Week Navigation */}
       <WeekNavigation
         currentWeekStart={currentWeekStart}
-        setCurrentWeekStart={setCurrentWeekStart}
+        onWeekChange={setCurrentWeekStart}
         canGoPrevious={canGoPrevious}
       />
 
@@ -149,7 +148,7 @@ export function AvailabilityTabContent({
       </div>
 
       {/* Legend */}
-      {showLegend && <LegendDisplay />}
+      <LegendDisplay showLegend={showLegend} />
 
       {/* Selected Slots Display - Only show if there are selections */}
       <SelectedSlotsDisplay selectedSlots={selectedSlots} />
