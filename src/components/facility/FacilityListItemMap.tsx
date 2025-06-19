@@ -105,8 +105,8 @@ export function FacilityListItemMap({ address, facilityName }: FacilityListItemM
           }
         `}
       </style>
-      <div className="group h-full">
-        <div className="w-full h-full rounded-xl overflow-hidden border-2 border-gray-200 bg-gray-100 shadow-md hover:shadow-xl transition-all duration-300 group-hover:border-blue-300 relative">
+      <div className="h-full w-full">
+        <div className="w-full h-full bg-gray-100 shadow-md hover:shadow-xl transition-all duration-300 group-hover:border-blue-300 relative">
           <div ref={mapContainer} className="w-full h-full" />
           
           {/* Overlay gradient for better text readability */}

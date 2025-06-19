@@ -94,26 +94,30 @@ const FacilityListItem: React.FC<FacilityListItemProps> = ({
       }}
     >
       <CardContent className="p-0">
-        <div className="flex" style={{ height: '350px' }}>
-          {/* Image Section */}
-          <FacilityListItemImage
-            image={facility.image}
-            facilityName={facility.name}
-            facilityType={facility.type}
-            area={facility.area}
-          />
+        <div className="grid grid-cols-3" style={{ height: '350px' }}>
+          {/* Image Section - Column 1 */}
+          <div className="col-span-1">
+            <FacilityListItemImage
+              image={facility.image}
+              facilityName={facility.name}
+              facilityType={facility.type}
+              area={facility.area}
+            />
+          </div>
           
-          {/* Main Content */}
-          <FacilityListItemContent
-            facility={facility}
-            isFavorited={isFavorited}
-            onAddressClick={handleAddressClick}
-            onFavorite={handleFavorite}
-            onShare={handleShare}
-          />
+          {/* Main Content - Column 2 */}
+          <div className="col-span-1">
+            <FacilityListItemContent
+              facility={facility}
+              isFavorited={isFavorited}
+              onAddressClick={handleAddressClick}
+              onFavorite={handleFavorite}
+              onShare={handleShare}
+            />
+          </div>
 
-          {/* Map Section */}
-          <div className="w-80 flex-shrink-0 p-6 flex items-center justify-center">
+          {/* Map Section - Column 3 */}
+          <div className="col-span-1">
             <FacilityListItemMap 
               address={facility.address} 
               facilityName={facility.name} 

@@ -16,7 +16,7 @@ export function FacilityListItemImage({
   area
 }: FacilityListItemImageProps) {
   return (
-    <div className="w-80 flex-shrink-0 relative overflow-hidden">
+    <div className="h-full w-full relative overflow-hidden">
       <img 
         src={image} 
         alt={`Bilde av ${facilityName}`} 
