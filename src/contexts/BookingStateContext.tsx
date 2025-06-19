@@ -12,9 +12,6 @@ export interface BookingFormData {
   organization: string;
   purpose?: string;
   eventType?: string;
-  ageGroup?: string;
-  participants?: string;
-  specialRequirements?: string;
   attendees?: number;
 }
 

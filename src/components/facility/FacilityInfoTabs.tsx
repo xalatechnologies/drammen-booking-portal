@@ -1,15 +1,14 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { DescriptionTab } from "./tabs/DescriptionTab";
-import { EnhancedAboutTab } from "./tabs/EnhancedAboutTab";
-import { AvailabilityTab } from "./tabs/AvailabilityTab";
-import { ZonesTab } from "./tabs/ZonesTab";
-import { RulesTab } from "./tabs/RulesTab";
-import { FaqTab } from "./tabs/FaqTab";
 import { Zone } from "@/components/booking/types";
+import { getAmenityIcon } from "./utils/amenityIcons";
+import { FeaturesTab } from "./tabs/FeaturesTab";
+import { FaqTab } from "./tabs/FaqTab";
+import { RulesTab } from "./tabs/RulesTab";
+import { GeneralInfoTab } from "./tabs/GeneralInfoTab";
+import { ZonesTab } from "./tabs/ZonesTab";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { SelectedTimeSlot } from "@/utils/recurrenceEngine";
 
 interface FacilityInfoTabsProps {
   description: string;
@@ -22,8 +21,6 @@ interface FacilityInfoTabsProps {
   suitableFor: string[];
   facilityId?: string;
   facilityName?: string;
-  selectedSlots?: SelectedTimeSlot[];
-  onSlotClick?: (zoneId: string, date: Date, timeSlot: string, availability: string) => void;
 }
 
 export function FacilityInfoTabs({ 
@@ -35,75 +32,99 @@ export function FacilityInfoTabs({
   address,
   area,
   suitableFor,
-  facilityId,
-  facilityName,
-  selectedSlots = [],
-  onSlotClick
+  facilityId = "",
+  facilityName = ""
 }: FacilityInfoTabsProps) {
   const { language } = useLanguage();
-  
+
   const translations = {
     NO: {
-      availability: "Tilgjengelighet",
-      about: "Om lokalet", 
+      general: "Generell info",
       zones: "Soner",
+      facilities: "Fasiliteter", 
       rules: "Regler",
-      faq: "Spørsmål og svar"
+      faq: "FAQ"
     },
     EN: {
-      availability: "Availability",
-      about: "About",
-      zones: "Zones", 
-      rules: "Rules",
+      general: "General info",
+      zones: "Zones",
+      facilities: "Facilities",
+      rules: "Rules", 
       faq: "FAQ"
     }
   };
-  
+
   const t = translations[language];
 
   return (
-    <Tabs defaultValue="availability" className="w-full">
-      <TabsList className="grid w-full grid-cols-5 mb-6 h-12 text-base">
-        <TabsTrigger value="availability" className="text-base font-medium">{t.availability}</TabsTrigger>
-        <TabsTrigger value="about" className="text-base font-medium">{t.about}</TabsTrigger>
-        <TabsTrigger value="zones" className="text-base font-medium">{t.zones}</TabsTrigger>
-        <TabsTrigger value="rules" className="text-base font-medium">{t.rules}</TabsTrigger>
-        <TabsTrigger value="faq" className="text-base font-medium">{t.faq}</TabsTrigger>
+    <Tabs defaultValue="general" className="bg-white rounded-lg shadow-sm border">
+      <TabsList className="w-full border-b p-0 h-auto bg-gray-50 rounded-none">
+        <TabsTrigger 
+          value="general" 
+          className="flex-1 py-4 px-6 rounded-none text-base font-medium data-[state=active]:bg-[#1e3a8a] data-[state=active]:text-white data-[state=active]:border-b-0 data-[state=active]:shadow-none hover:bg-[#1e40af] hover:text-white transition-colors"
+        >
+          {t.general}
+        </TabsTrigger>
+        <TabsTrigger 
+          value="zones" 
+          className="flex-1 py-4 px-6 rounded-none text-base font-medium data-[state=active]:bg-[#1e3a8a] data-[state=active]:text-white data-[state=active]:border-b-0 data-[state=active]:shadow-none hover:bg-[#1e40af] hover:text-white transition-colors"
+        >
+          {t.zones}
+        </TabsTrigger>
+        <TabsTrigger 
+          value="facilities" 
+          className="flex-1 py-4 px-6 rounded-none text-base font-medium data-[state=active]:bg-[#1e3a8a] data-[state=active]:text-white data-[state=active]:border-b-0 data-[state=active]:shadow-none hover:bg-[#1e40af] hover:text-white transition-colors"
+        >
+          {t.facilities}
+        </TabsTrigger>
+        <TabsTrigger 
+          value="rules" 
+          className="flex-1 py-4 px-6 rounded-none text-base font-medium data-[state=active]:bg-[#1e3a8a] data-[state=active]:text-white data-[state=active]:border-b-0 data-[state=active]:shadow-none hover:bg-[#1e40af] hover:text-white transition-colors"
+        >
+          {t.rules}
+        </TabsTrigger>
+        <TabsTrigger 
+          value="faq" 
+          className="flex-1 py-4 px-6 rounded-none text-base font-medium data-[state=active]:bg-[#1e3a8a] data-[state=active]:text-white data-[state=active]:border-b-0 data-[state=active]:shadow-none hover:bg-[#1e40af] hover:text-white transition-colors"
+        >
+          {t.faq}
+        </TabsTrigger>
       </TabsList>
       
-      <TabsContent value="availability" className="space-y-6 text-base">
-        <AvailabilityTab 
-          zones={zones} 
-          startDate={new Date()}
-          facilityId={facilityId}
-          facilityName={facilityName}
-          selectedSlots={selectedSlots}
-          onSlotClick={onSlotClick}
-        />
-      </TabsContent>
-      
-      <TabsContent value="about" className="space-y-6 text-base">
-        <EnhancedAboutTab 
+      <TabsContent value="general">
+        <GeneralInfoTab 
           description={description}
           capacity={capacity}
-          amenities={amenities}
           address={address}
-          openingHours="08:00-22:00"
           area={area}
+          suitableFor={suitableFor}
           zones={zones}
-          hasAutoApproval={true}
+          facilityId={facilityId}
+          facilityName={facilityName}
         />
       </TabsContent>
       
-      <TabsContent value="zones" className="space-y-6 text-base">
-        <ZonesTab zones={zones} />
+      <TabsContent value="zones">
+        <ZonesTab 
+          zones={zones}
+          facilityId={facilityId}
+        />
       </TabsContent>
       
-      <TabsContent value="rules" className="space-y-6 text-base">
+      <TabsContent value="facilities">
+        <FeaturesTab 
+          capacity={capacity} 
+          equipment={equipment} 
+          amenities={amenities}
+          getAmenityIcon={getAmenityIcon}
+        />
+      </TabsContent>
+
+      <TabsContent value="rules">
         <RulesTab />
       </TabsContent>
-      
-      <TabsContent value="faq" className="space-y-6 text-base">
+
+      <TabsContent value="faq">
         <FaqTab />
       </TabsContent>
     </Tabs>

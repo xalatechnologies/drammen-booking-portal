@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -8,7 +7,7 @@ import GlobalFooter from "@/components/GlobalFooter";
 import { AirBnbStyleGallery } from "@/components/facility/AirBnbStyleGallery";
 import { FacilityHeader } from "@/components/facility/FacilityHeader";
 import { FacilityInfoTabs } from "@/components/facility/FacilityInfoTabs";
-import { EnhancedBookingSidebar } from "@/components/facility/EnhancedBookingSidebar";
+import { PersistentBookingSidebar } from "@/components/facility/PersistentBookingSidebar";
 import { SimilarFacilitiesSlider } from "@/components/facility/SimilarFacilitiesSlider";
 import { AvailabilityTab } from "@/components/facility/tabs/AvailabilityTab";
 import { Zone } from "@/components/booking/types";
@@ -17,14 +16,12 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useTranslation } from "@/i18n";
 import { CartProvider } from "@/contexts/CartContext";
 import { MobileBookingPanel } from "@/components/facility/MobileBookingPanel";
-import { useSlotSelection } from "@/hooks/useSlotSelection";
 
 const FacilityDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [isFavorited, setIsFavorited] = useState(false);
   const { t } = useTranslation();
-  const { selectedSlots, setSelectedSlots, handleSlotClick, clearSelection } = useSlotSelection();
 
   const { facility, isLoading, error, notFound } = useOptimizedFacility(Number(id));
 
@@ -92,12 +89,12 @@ const FacilityDetail = () => {
             <div className="container mx-auto px-4 py-6 max-w-7xl">
               <div className="space-y-6">
                 <Skeleton className="h-96 w-full rounded-lg" />
-                <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-                  <div className="lg:col-span-3 space-y-6">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                  <div className="lg:col-span-2 space-y-6">
                     <Skeleton className="h-64 w-full rounded-lg" />
                     <Skeleton className="h-96 w-full rounded-lg" />
                   </div>
-                  <div className="lg:col-span-2">
+                  <div className="lg:col-span-1">
                     <Skeleton className="h-80 w-full rounded-lg" />
                   </div>
                 </div>
@@ -189,10 +186,10 @@ const FacilityDetail = () => {
               />
             </div>
 
-            {/* Main Content Layout - 60% / 40% */}
-            <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-              {/* Left Column - Tabs Content (60%) */}
-              <div className="lg:col-span-3 space-y-6">
+            {/* Main Content Layout - 70% / 30% */}
+            <div className="grid grid-cols-1 lg:grid-cols-10 gap-8">
+              {/* Left Column - Tabs Content (70%) */}
+              <div className="lg:col-span-7 space-y-6">
                 <FacilityInfoTabs 
                   description={facility.description} 
                   capacity={facility.capacity} 
@@ -204,19 +201,15 @@ const FacilityDetail = () => {
                   suitableFor={facility.suitableFor || []}
                   facilityId={id}
                   facilityName={facility.name}
-                  selectedSlots={selectedSlots}
-                  onSlotClick={handleSlotClick}
                 />
               </div>
 
-              {/* Right Column - Enhanced Booking Sidebar (40%) */}
-              <div className="lg:col-span-2 hidden lg:block">
+              {/* Right Column - Simplified Cart Sidebar (30%) */}
+              <div className="lg:col-span-3 hidden lg:block">
                 <div className="sticky top-6">
-                  <EnhancedBookingSidebar
+                  <PersistentBookingSidebar
                     facilityName={facility.name}
                     facilityId={id || ""}
-                    selectedSlots={selectedSlots}
-                    onClearSlots={clearSelection}
                   />
                 </div>
               </div>

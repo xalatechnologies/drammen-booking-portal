@@ -17,8 +17,6 @@ interface AvailabilityTabProps {
   facilityId?: string;
   facilityName?: string;
   openingHours?: string;
-  selectedSlots?: SelectedTimeSlot[];
-  onSlotClick?: (zoneId: string, date: Date, timeSlot: string, availability: string) => void;
 }
 
 export function AvailabilityTab({ 
@@ -27,12 +25,12 @@ export function AvailabilityTab({
   showLegend = true,
   facilityId = "",
   facilityName = "",
-  openingHours = "08:00-22:00",
-  selectedSlots = [],
-  onSlotClick
+  openingHours = "08:00-22:00"
 }: AvailabilityTabProps) {
   const [currentWeekStart, setCurrentWeekStart] = useState(startOfWeek(startDate, { weekStartsOn: 1 }));
+  const [selectedSlots, setSelectedSlots] = useState<SelectedTimeSlot[]>([]);
   const [showPatternBuilder, setShowPatternBuilder] = useState(false);
+  const [showBookingDrawer, setShowBookingDrawer] = useState(false);
   const [showConflictWizard, setShowConflictWizard] = useState(false);
   const [conflictResolutionData, setConflictResolutionData] = useState<any>(null);
   const [currentPattern, setCurrentPattern] = useState<RecurrencePattern>({
@@ -74,13 +72,8 @@ export function AvailabilityTab({
       setConflictResolutionData(data);
       setShowConflictWizard(true);
     },
-    onPatternApplied: () => {}, // Not used anymore since we use external state
+    onPatternApplied: setSelectedSlots,
   });
-
-  const handlePatternApplyWrapper = () => {
-    handlePatternApply(currentPattern);
-    setShowPatternBuilder(false);
-  };
 
   const shouldShowTabs = zones.length > 1;
 
@@ -93,11 +86,11 @@ export function AvailabilityTab({
       setCurrentWeekStart={setCurrentWeekStart}
       canGoPrevious={canGoPrevious}
       selectedSlots={selectedSlots}
-      setSelectedSlots={() => {}} // Not used anymore
+      setSelectedSlots={setSelectedSlots}
       conflictManager={conflictManager}
       showLegend={showLegend}
       onPatternBuilderOpen={() => setShowPatternBuilder(true)}
-      onBookingDrawerOpen={() => {}} // Not used anymore since we use sidebar
+      onBookingDrawerOpen={() => setShowBookingDrawer(true)}
       setShowConflictWizard={setShowConflictWizard}
       setConflictResolutionData={setConflictResolutionData}
       currentPattern={currentPattern}
@@ -105,7 +98,6 @@ export function AvailabilityTab({
       facilityId={facilityId}
       facilityName={facilityName}
       openingHours={openingHours}
-      onSlotClick={onSlotClick}
     />
   );
 
@@ -143,7 +135,7 @@ export function AvailabilityTab({
       <AvailabilityModals
         showPatternBuilder={showPatternBuilder}
         showConflictWizard={showConflictWizard}
-        showBookingDrawer={false}
+        showBookingDrawer={showBookingDrawer}
         currentPattern={currentPattern}
         conflictResolutionData={conflictResolutionData}
         selectedSlots={selectedSlots}
@@ -151,9 +143,9 @@ export function AvailabilityTab({
         facilityName={facilityName}
         onPatternBuilderClose={() => setShowPatternBuilder(false)}
         onConflictWizardClose={() => setShowConflictWizard(false)}
-        onBookingDrawerClose={() => {}}
+        onBookingDrawerClose={() => setShowBookingDrawer(false)}
         onPatternChange={setCurrentPattern}
-        onPatternApply={handlePatternApplyWrapper}
+        onPatternApply={handlePatternApply}
       />
     </div>
   );
