@@ -4,7 +4,7 @@ import { UseFormReturn } from "react-hook-form";
 import { Users } from "lucide-react";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { BookingFormValues } from "../../types";
-import { CustomerTypeSection } from "./CustomerTypeSection";
+import { CustomerTypeSection } from "../CustomerTypeSection";
 import { useModelTranslation } from "@/hooks/useModelTranslation";
 
 interface CustomerInfoSectionProps {

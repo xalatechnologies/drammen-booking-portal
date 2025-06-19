@@ -51,8 +51,8 @@ export function BookingDetailsStep({ form, facility }: BookingDetailsStepProps) 
     ageGroup: watchedValues.ageGroup
   });
 
-  // Show pricing when we have minimum required info
-  const shouldShowPricing = watchedValues.customerType && watchedValues.zoneId && watchedValues.date;
+  // Show pricing when we have minimum required info - fix the boolean check
+  const shouldShowPricing = watchedValues.customerType && watchedValues.zoneId && !!watchedValues.date;
 
   return (
     <div className="space-y-8">
