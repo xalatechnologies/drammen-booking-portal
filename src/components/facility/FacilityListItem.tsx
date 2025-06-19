@@ -4,6 +4,7 @@ import { MapPin, Users, Heart, Share2, Projector, Volume2, FileText, ChefHat, Ca
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { FacilityListItemMap } from "./FacilityListItemMap";
 interface Facility {
   id: number;
   name: string;
@@ -192,12 +193,8 @@ const FacilityListItem: React.FC<FacilityListItemProps> = ({
               <span className="font-medium text-lg">{facility.capacity} personer</span>
             </div>
 
-            {/* Equipment and Suitable For aligned */}
+            {/* Suitable For */}
             <div className="space-y-4">
-              {/* Equipment */}
-              {facility.equipment.length > 0}
-
-              {/* Suitable For */}
               <div className="space-y-2">
                 <div className="flex items-center text-slate-700">
                   <span className="font-semibold text-base">Egnet for</span>
@@ -213,6 +210,14 @@ const FacilityListItem: React.FC<FacilityListItemProps> = ({
                 </div>
               </div>
             </div>
+          </div>
+
+          {/* Map Section */}
+          <div className="w-40 flex-shrink-0 p-6 flex items-center justify-center">
+            <FacilityListItemMap 
+              address={facility.address} 
+              facilityName={facility.name} 
+            />
           </div>
         </div>
       </CardContent>
