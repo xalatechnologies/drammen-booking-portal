@@ -9,6 +9,7 @@ import { Separator } from "@/components/ui/separator";
 import { ZoneBookingCard } from "./ZoneBookingCard";
 import { AutoApprovalCard } from "./AutoApprovalCard";
 import { Zone } from "@/components/booking/types";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface FacilitySidebarProps {
   zones: Zone[];
@@ -34,6 +35,24 @@ export function FacilitySidebar({
   isFavorited = false
 }: FacilitySidebarProps) {
   const navigate = useNavigate();
+  const { language } = useLanguage();
+
+  const translations = {
+    NO: {
+      reserveNow: "Reserver nå",
+      availableZones: "Tilgjengelige soner",
+      freeCancellation: "Gratis avbestilling",
+      cancellationPolicy: "opptil 24 timer før reservert tid"
+    },
+    EN: {
+      reserveNow: "Reserve now",
+      availableZones: "Available zones",
+      freeCancellation: "Free cancellation",
+      cancellationPolicy: "up to 24 hours before reserved time"
+    }
+  };
+
+  const t = translations[language];
 
   const handleBookingClick = (zoneId?: string) => {
     const bookingPath = `/booking/${facilityId}${zoneId ? `?zone=${zoneId}` : ''}`;
@@ -49,7 +68,7 @@ export function FacilitySidebar({
           className="flex-1 bg-[#1e3a8a] hover:bg-[#1e40af] text-white"
           size="lg"
         >
-          Reserver nå
+          {t.reserveNow}
         </Button>
         <Button
           variant="outline"
@@ -77,7 +96,7 @@ export function FacilitySidebar({
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-lg">
             <MapPin className="h-5 w-5" />
-            Tilgjengelige soner
+            {t.availableZones}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
@@ -97,7 +116,7 @@ export function FacilitySidebar({
       {/* Cancellation Policy */}
       <div className="bg-green-50 border border-green-200 rounded-lg p-3">
         <p className="text-xs text-green-800">
-          <strong>Gratis avbestilling</strong> opptil 24 timer før reservert tid
+          <strong>{t.freeCancellation}</strong> {t.cancellationPolicy}
         </p>
       </div>
     </div>

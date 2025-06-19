@@ -11,6 +11,7 @@ import { FacilityInfoTabs } from "@/components/facility/FacilityInfoTabs";
 import { EnhancedFacilitySidebar } from "@/components/facility/EnhancedFacilitySidebar";
 import { SimilarFacilitiesSlider } from "@/components/facility/SimilarFacilitiesSlider";
 import { AvailabilityTab } from "@/components/facility/tabs/AvailabilityTab";
+import { LocalizationTestComprehensive } from "@/components/localization/LocalizationTestComprehensive";
 import { Zone } from "@/components/booking/types";
 import { useQuery } from "@tanstack/react-query";
 import { LocalizedFacilityService } from "@/services/LocalizedFacilityService";
@@ -22,6 +23,7 @@ const FacilityDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [isFavorited, setIsFavorited] = useState(false);
+  const [showLocalizationTest, setShowLocalizationTest] = useState(false);
   const { t } = useTranslation();
 
   // Ensure localized services are properly initialized
@@ -174,6 +176,28 @@ const FacilityDetail = () => {
     navigate(bookingPath);
   };
 
+  // Show localization test in development mode
+  if (showLocalizationTest) {
+    return (
+      <div className="min-h-screen bg-white flex flex-col">
+        <GlobalHeader />
+        <div className="flex-grow">
+          <div className="container mx-auto px-4 py-6">
+            <Button 
+              onClick={() => setShowLocalizationTest(false)}
+              variant="outline"
+              className="mb-4"
+            >
+              ← Back to Facility
+            </Button>
+            <LocalizationTestComprehensive />
+          </div>
+        </div>
+        <GlobalFooter />
+      </div>
+    );
+  }
+
   // Loading state
   if (isLoading) {
     return (
@@ -245,6 +269,20 @@ const FacilityDetail = () => {
             </Button>
             <span className="text-gray-400">/</span>
             <span className="text-gray-900 font-medium">{facility.name}</span>
+            {/* Development localization test button */}
+            {process.env.NODE_ENV === 'development' && (
+              <>
+                <span className="text-gray-400">/</span>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => setShowLocalizationTest(true)}
+                  className="text-blue-600 hover:text-blue-900 p-0 h-auto font-normal"
+                >
+                  🌍 Test Localization
+                </Button>
+              </>
+            )}
           </nav>
         </div>
       </div>

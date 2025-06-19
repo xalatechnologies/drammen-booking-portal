@@ -1,6 +1,7 @@
 
 import React from "react";
 import { FacilityLocation } from "../FacilityLocation";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface DescriptionTabProps {
   description: string;
@@ -9,6 +10,19 @@ interface DescriptionTabProps {
 }
 
 export function DescriptionTab({ description, capacity, address }: DescriptionTabProps) {
+  const { language } = useLanguage();
+
+  const translations = {
+    NO: {
+      location: "Lokasjon"
+    },
+    EN: {
+      location: "Location"
+    }
+  };
+
+  const t = translations[language];
+
   return (
     <div className="p-6 space-y-6">
       {/* Description only */}
@@ -18,7 +32,7 @@ export function DescriptionTab({ description, capacity, address }: DescriptionTa
 
       {/* Location Map */}
       <div className="border-t border-gray-200 pt-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Lokasjon</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">{t.location}</h3>
         <div className="h-64 rounded-lg overflow-hidden border">
           <FacilityLocation address={address} />
         </div>

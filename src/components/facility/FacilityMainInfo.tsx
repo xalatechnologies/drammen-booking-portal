@@ -1,9 +1,9 @@
 
-
 import React from "react";
 import { MapPin, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AccessibilityBadges } from "./AccessibilityBadges";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface FacilityMainInfoProps {
   name: string;
@@ -26,6 +26,21 @@ const FacilityMainInfo: React.FC<FacilityMainInfoProps> = ({
   accessibility,
   onAddressClick,
 }) => {
+  const { language } = useLanguage();
+
+  const translations = {
+    NO: {
+      suitableFor: "Egnet for",
+      more: "flere"
+    },
+    EN: {
+      suitableFor: "Suitable for",
+      more: "more"
+    }
+  };
+
+  const t = translations[language];
+
   return (
     <div className="h-full flex flex-col justify-between py-2">
       {/* Header Section */}
@@ -55,7 +70,7 @@ const FacilityMainInfo: React.FC<FacilityMainInfoProps> = ({
         <div className="space-y-3">
           <div className="flex items-center text-slate-700">
             <Users className="h-5 w-5 mr-2 text-slate-500" />
-            <span className="font-semibold text-base">Egnet for</span>
+            <span className="font-semibold text-base">{t.suitableFor}</span>
           </div>
           <div className="flex flex-wrap gap-2 ml-7">
             {suitableFor.slice(0, 4).map((activity, index) => (
@@ -68,7 +83,7 @@ const FacilityMainInfo: React.FC<FacilityMainInfoProps> = ({
             ))}
             {suitableFor.length > 4 && (
               <span className="px-3 py-1.5 bg-slate-100 text-slate-600 rounded-full text-sm">
-                +{suitableFor.length - 4} flere
+                +{suitableFor.length - 4} {t.more}
               </span>
             )}
           </div>
@@ -88,4 +103,3 @@ const FacilityMainInfo: React.FC<FacilityMainInfoProps> = ({
 };
 
 export default FacilityMainInfo;
-
