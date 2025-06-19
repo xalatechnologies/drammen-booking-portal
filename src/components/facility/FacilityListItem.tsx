@@ -80,54 +80,52 @@ const FacilityListItem: React.FC<FacilityListItemProps> = ({
   };
 
   return (
-    <div className="w-full max-w-none">
-      <Card 
-        className="group overflow-hidden hover:shadow-xl transition-all duration-500 hover:translate-y-[-2px] border border-slate-200/60 shadow-md bg-white cursor-pointer mb-3 focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-opacity-50 w-full" 
-        onClick={() => navigate(`/facilities/${facility.id}`)} 
-        role="button" 
-        tabIndex={0} 
-        aria-label={`Se detaljer for ${facility.name} på ${facility.address}`} 
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            navigate(`/facilities/${facility.id}`);
-          }
-        }}
-      >
-        <CardContent className="p-0">
-          <div className="grid grid-cols-12 min-h-[280px] w-full">
-            {/* Image Section - 3 columns */}
-            <div className="col-span-3 min-w-0">
-              <FacilityListItemImage
-                image={facility.image}
-                facilityName={facility.name}
-                facilityType={facility.type}
-                area={facility.area}
-              />
-            </div>
-            
-            {/* Main Content - 6 columns */}
-            <div className="col-span-6 min-w-0">
-              <FacilityListItemContent
-                facility={facility}
-                isFavorited={isFavorited}
-                onAddressClick={handleAddressClick}
-                onFavorite={handleFavorite}
-                onShare={handleShare}
-              />
-            </div>
-
-            {/* Map Section - 3 columns */}
-            <div className="col-span-3 min-w-0">
-              <FacilityListItemMap 
-                address={facility.address} 
-                facilityName={facility.name} 
-              />
-            </div>
+    <Card 
+      className="group overflow-hidden hover:shadow-2xl transition-all duration-500 hover:translate-y-[-4px] border border-slate-200/60 shadow-lg bg-white cursor-pointer mb-6 focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-opacity-50" 
+      onClick={() => navigate(`/facilities/${facility.id}`)} 
+      role="button" 
+      tabIndex={0} 
+      aria-label={`Se detaljer for ${facility.name} på ${facility.address}`} 
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          navigate(`/facilities/${facility.id}`);
+        }
+      }}
+    >
+      <CardContent className="p-0">
+        <div className="grid grid-cols-12" style={{ height: '300px' }}>
+          {/* Image Section - 3 columns */}
+          <div className="col-span-3">
+            <FacilityListItemImage
+              image={facility.image}
+              facilityName={facility.name}
+              facilityType={facility.type}
+              area={facility.area}
+            />
           </div>
-        </CardContent>
-      </Card>
-    </div>
+          
+          {/* Main Content - 6 columns */}
+          <div className="col-span-6">
+            <FacilityListItemContent
+              facility={facility}
+              isFavorited={isFavorited}
+              onAddressClick={handleAddressClick}
+              onFavorite={handleFavorite}
+              onShare={handleShare}
+            />
+          </div>
+
+          {/* Map Section - 3 columns */}
+          <div className="col-span-3">
+            <FacilityListItemMap 
+              address={facility.address} 
+              facilityName={facility.name} 
+            />
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 
