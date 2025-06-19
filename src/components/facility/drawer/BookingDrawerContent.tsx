@@ -5,7 +5,8 @@ import { SelectedTimeSlot } from '@/utils/recurrenceEngine';
 import { ActorType, BookingType } from '@/types/pricing';
 import { Zone } from '@/components/booking/types';
 import { useCart } from '@/contexts/CartContext';
-import { BookingSummaryStep } from './BookingSummaryStep';
+import { BookingActivityStep } from './BookingActivityStep';
+import { BookingPricingStep } from './BookingPricingStep';
 import { BookingDetailsStep } from './BookingDetailsStep';
 
 interface FormData {
@@ -32,8 +33,10 @@ export function BookingDrawerContent({
 }: BookingDrawerContentProps) {
   const navigate = useNavigate();
   const { addToCart } = useCart();
-  const [step, setStep] = useState<'summary' | 'details'>('summary');
+  const [step, setStep] = useState<'activity' | 'pricing' | 'details'>('activity');
   const [actorType, setActorType] = useState<ActorType>('private-person');
+  const [activityType, setActivityType] = useState<string>('');
+  const [attendees, setAttendees] = useState<number>(1);
   const [purpose, setPurpose] = useState('');
   const [formData, setFormData] = useState<FormData>({
     name: '',
@@ -99,6 +102,27 @@ export function BookingDrawerContent({
     });
   };
 
+  const handleAddToCart = () => {
+    // Add selected slots to cart
+    selectedSlots.forEach(slot => {
+      const zone = zones.find(z => z.id === slot.zoneId);
+      addToCart({
+        facilityId,
+        facilityName,
+        zoneId: slot.zoneId,
+        date: slot.date,
+        timeSlot: slot.timeSlot,
+        duration: slot.duration || 2,
+        pricePerHour: zone?.pricePerHour || 450
+      });
+    });
+
+    console.log('Added slots to cart:', selectedSlots);
+    
+    // Navigate to cart or show success message
+    navigate('/checkout');
+  };
+
   // Show message if no slots are selected
   if (selectedSlots.length === 0) {
     return (
@@ -115,26 +139,37 @@ export function BookingDrawerContent({
 
   return (
     <div className="p-6 space-y-8">
-      {step === 'summary' ? (
-        <BookingSummaryStep
+      {step === 'activity' ? (
+        <BookingActivityStep
           selectedSlots={selectedSlots}
+          facilityName={facilityName}
+          zones={zones}
+          activityType={activityType}
+          onActivityTypeChange={setActivityType}
+          attendees={attendees}
+          onAttendeesChange={setAttendees}
+          purpose={purpose}
+          onPurposeChange={setPurpose}
+          onNext={() => setStep('pricing')}
+        />
+      ) : step === 'pricing' ? (
+        <BookingPricingStep
+          selectedSlots={selectedSlots}
+          facilityId={facilityId}
           facilityName={facilityName}
           zones={zones}
           actorType={actorType}
           onActorTypeChange={setActorType}
           bookingType={bookingType}
-          onBookingTypeChange={() => {}} // No longer needed as it's auto-determined
-          purpose={purpose}
-          onPurposeChange={setPurpose}
-          calculation={null} // Will be calculated in IntegratedPriceCalculation
-          totalPrice={0} // Will be calculated in IntegratedPriceCalculation
-          onContinue={() => setStep('details')}
+          onBack={() => setStep('activity')}
+          onComplete={handleSubmit}
+          onAddToCart={handleAddToCart}
         />
       ) : (
         <BookingDetailsStep
           formData={formData}
           onFormDataChange={setFormData}
-          onBack={() => setStep('summary')}
+          onBack={() => setStep('pricing')}
           onSubmit={handleSubmit}
         />
       )}
