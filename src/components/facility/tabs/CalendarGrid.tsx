@@ -85,7 +85,7 @@ export function CalendarGrid({
     <Card>
       <CardContent className="p-2">
         <div className="grid grid-cols-8 gap-0.5 mb-2">
-          <div className="p-1 text-sm font-medium text-gray-500 font-inter">Tid</div>
+          <div className="p-1 text-sm font-medium text-gray-500 font-inter w-16">Tid</div>
           {weekDays.map((day, i) => {
             const holidayCheck = isNorwegianHoliday(day);
             const isToday = format(day, 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd');
@@ -111,8 +111,8 @@ export function CalendarGrid({
         <div className="space-y-0.5">
           {timeSlots.map((timeSlot) => (
             <div key={timeSlot} className="grid grid-cols-8 gap-0.5">
-              <div className="p-1 text-sm font-medium text-gray-700 flex items-center bg-gray-50 rounded font-inter">
-                <span className="truncate">{timeSlot}</span>
+              <div className="p-1 text-sm font-medium text-gray-700 flex items-center bg-gray-50 rounded font-inter w-16 truncate">
+                {timeSlot}
               </div>
               {weekDays.map((day, dayIndex) => {
                 const button = renderSlotButton(day, timeSlot, dayIndex);

@@ -87,7 +87,7 @@ export function ResponsiveCalendarGrid({
         {/* Desktop Grid Layout */}
         <div className="hidden md:block">
           <div className="grid grid-cols-8 gap-0.5 mb-2">
-            <div className="p-1 text-sm font-medium text-gray-500 font-inter">Tid</div>
+            <div className="p-1 text-sm font-medium text-gray-500 font-inter w-16">Tid</div>
             {weekDays.map((day, i) => {
               const holidayCheck = isNorwegianHoliday(day);
               const isToday = format(day, 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd');
@@ -112,8 +112,8 @@ export function ResponsiveCalendarGrid({
           <div className="space-y-0.5">
             {timeSlots.map((timeSlot) => (
               <div key={timeSlot} className="grid grid-cols-8 gap-0.5">
-                <div className="p-1 text-sm font-medium text-gray-700 flex items-center bg-gray-50 rounded font-inter">
-                  <span className="truncate">{timeSlot}</span>
+                <div className="p-1 text-sm font-medium text-gray-700 flex items-center bg-gray-50 rounded font-inter w-16 truncate">
+                  {timeSlot}
                 </div>
                 {weekDays.map((day, dayIndex) => (
                   <div key={dayIndex} className="relative">
@@ -152,8 +152,8 @@ export function ResponsiveCalendarGrid({
           <div className="space-y-1">
             {timeSlots.map((timeSlot) => (
               <div key={timeSlot} className="space-y-0.5">
-                <div className="text-sm font-medium text-gray-700 bg-gray-50 p-1 rounded">
-                  <span className="truncate">{timeSlot}</span>
+                <div className="text-xs font-medium text-gray-700 bg-gray-50 p-1 rounded w-16 truncate">
+                  {timeSlot}
                 </div>
                 <div className="grid grid-cols-7 gap-0.5">
                   {weekDays.map((day, dayIndex) => (
