@@ -25,6 +25,9 @@ export interface LocalizedFacility extends Omit<Facility, 'name' | 'description'
   amenities?: {
     [K in Language]: string[];
   };
+  // Ensure lat/lng are always present for localized facilities
+  lat: number;
+  lng: number;
 }
 
 export interface LocalizedAdditionalService extends Omit<AdditionalService, 'name' | 'description' | 'shortDescription' | 'metadata'> {

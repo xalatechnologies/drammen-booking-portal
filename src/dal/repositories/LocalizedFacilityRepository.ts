@@ -1,236 +1,295 @@
-import { BaseRepository } from '../BaseRepository';
-import { Facility, FacilityFilters } from '@/types/facility';
-import { LocalizedFacility } from '@/types/localization';
-import { Zone } from '@/types/zone';
-import { localizedMockFacilities } from '@/data/localizedMockFacilities';
-import { mockZones, getZonesByFacilityId } from '@/data/mockZones';
-import { getLocalizedFacility } from '@/utils/localizationHelper';
-import { Language } from '@/i18n/types';
 
-interface FacilityCreateRequest {
-  name: string;
-  address: string;
-  type: string;
-  area: string;
-  description: string;
-  capacity: number;
-  accessibility: string[];
-  suitableFor: string[];
-  equipment: string[];
-  openingHours: string;
-  image: string;
-}
+import { BaseRepository } from "@/dal/BaseRepository";
+import { Facility, FacilityFilters } from "@/types/facility";
+import { Zone } from "@/types/zone";
+import { PaginatedResponse, ApiResponse } from "@/types/api";
+import { Language } from "@/i18n/types";
+import { localizedMockFacilities } from "@/data/localizedMockFacilities";
+import { mockZones } from "@/data/mockZones";
+import { getLocalizedFacility } from "@/utils/localizationHelper";
 
-interface FacilityUpdateRequest extends Partial<FacilityCreateRequest> {
-  nextAvailable?: string;
-  rating?: number;
-  reviewCount?: number;
-  pricePerHour?: number;
-  amenities?: string[];
-  hasAutoApproval?: boolean;
-}
-
-export class LocalizedFacilityRepository extends BaseRepository<Facility, FacilityFilters, FacilityCreateRequest, FacilityUpdateRequest> {
-  private localizedData: LocalizedFacility[];
-  private zones: Zone[] = [];
+export class LocalizedFacilityRepository extends BaseRepository<Facility> {
   private currentLanguage: Language = 'NO';
-
-  constructor() {
-    super([]);
-    this.localizedData = [...localizedMockFacilities];
-    this.zones = [...mockZones];
-    this.updateLocalizedData();
-  }
 
   setLanguage(language: Language) {
     this.currentLanguage = language;
-    this.updateLocalizedData();
   }
 
-  private updateLocalizedData() {
-    this.data = this.localizedData.map(facility => 
-      getLocalizedFacility(facility, this.currentLanguage)
-    );
-  }
+  async findAll(
+    pagination: { page: number; limit: number },
+    filters?: FacilityFilters,
+    sortField?: string,
+    sortDirection?: 'asc' | 'desc'
+  ): Promise<ApiResponse<PaginatedResponse<Facility>>> {
+    try {
+      // Convert localized facilities to current language
+      let facilities = localizedMockFacilities.map(facility => 
+        getLocalizedFacility(facility, this.currentLanguage)
+      );
 
-  protected getId(facility: Facility): string {
-    return facility.id.toString();
-  }
-
-  protected applyFilters(facilities: Facility[], filters: FacilityFilters): Facility[] {
-    return facilities.filter(facility => {
-      // Search term filter
-      if (filters.searchTerm && filters.searchTerm.trim() !== "") {
-        const searchLower = filters.searchTerm.toLowerCase();
-        const matchesSearch = 
-          facility.name.toLowerCase().includes(searchLower) ||
-          facility.description.toLowerCase().includes(searchLower) ||
-          facility.type.toLowerCase().includes(searchLower) ||
-          facility.area.toLowerCase().includes(searchLower) ||
-          facility.suitableFor.some(activity => 
-            activity.toLowerCase().includes(searchLower)
+      // Apply filters
+      if (filters) {
+        if (filters.search) {
+          const searchLower = filters.search.toLowerCase();
+          facilities = facilities.filter(facility =>
+            facility.name.toLowerCase().includes(searchLower) ||
+            facility.address.toLowerCase().includes(searchLower) ||
+            facility.description.toLowerCase().includes(searchLower)
           );
-        
-        if (!matchesSearch) return false;
-      }
-
-      // Facility type filter
-      if (filters.facilityType && filters.facilityType !== "all") {
-        const typeMatch = facility.type.toLowerCase().includes(
-          filters.facilityType.toLowerCase().replace("-", " ")
-        );
-        if (!typeMatch) return false;
-      }
-
-      // Location filter
-      if (filters.location && filters.location !== "all") {
-        const locationMatch = facility.area.toLowerCase().includes(
-          filters.location.toLowerCase().replace("-", " ")
-        );
-        if (!locationMatch) return false;
-      }
-
-      // Other filters remain the same
-      if (filters.accessibility && filters.accessibility !== "all") {
-        const accessibilityMatch = facility.accessibility.includes(filters.accessibility);
-        if (!accessibilityMatch) return false;
-      }
-
-      if (filters.capacity && Array.isArray(filters.capacity) && filters.capacity[0] > 0) {
-        const [minCapacity, maxCapacity] = filters.capacity;
-        if (facility.capacity < minCapacity || facility.capacity > maxCapacity) {
-          return false;
         }
-      }
 
-      if (filters.priceRange) {
-        const facilityPrice = facility.pricePerHour || 0;
-        if (facilityPrice < filters.priceRange.min || facilityPrice > filters.priceRange.max) {
-          return false;
+        if (filters.type && filters.type.length > 0) {
+          facilities = facilities.filter(facility =>
+            filters.type!.includes(facility.type)
+          );
         }
-      }
 
-      if (filters.availableNow) {
-        if (!facility.availableTimes || facility.availableTimes.length === 0) {
-          return false;
+        if (filters.area && filters.area.length > 0) {
+          facilities = facilities.filter(facility =>
+            filters.area!.includes(facility.area)
+          );
         }
-      }
 
-      if (filters.amenities && filters.amenities.length > 0) {
-        const facilityAmenities = [
-          ...(facility.amenities || []),
-          ...(facility.equipment || [])
-        ].map(amenity => amenity.toLowerCase());
-
-        const hasRequiredAmenities = filters.amenities.every(requiredAmenity => {
-          switch (requiredAmenity) {
-            case 'av-equipment':
-              return facilityAmenities.some(amenity => 
-                amenity.includes('projektor') || 
-                amenity.includes('lyd') || 
-                amenity.includes('mikrofon') ||
-                amenity.includes('av')
-              );
-            case 'parking':
-              return facilityAmenities.some(amenity => amenity.includes('parkering'));
-            case 'wifi':
-              return facilityAmenities.some(amenity => 
-                amenity.includes('wifi') || amenity.includes('internett')
-              );
-            case 'photography':
-              return facilityAmenities.some(amenity => 
-                amenity.includes('foto') || amenity.includes('kamera')
-              );
-            default:
-              return facilityAmenities.includes(requiredAmenity.toLowerCase());
+        if (filters.capacity) {
+          if (filters.capacity.min !== undefined) {
+            facilities = facilities.filter(facility => facility.capacity >= filters.capacity!.min!);
           }
+          if (filters.capacity.max !== undefined) {
+            facilities = facilities.filter(facility => facility.capacity <= filters.capacity!.max!);
+          }
+        }
+
+        if (filters.equipment && filters.equipment.length > 0) {
+          facilities = facilities.filter(facility =>
+            filters.equipment!.some(eq => facility.equipment.includes(eq))
+          );
+        }
+
+        if (filters.accessibility && filters.accessibility.length > 0) {
+          facilities = facilities.filter(facility =>
+            filters.accessibility!.every(acc => facility.accessibility.includes(acc))
+          );
+        }
+
+        if (filters.suitableFor && filters.suitableFor.length > 0) {
+          facilities = facilities.filter(facility =>
+            filters.suitableFor!.some(sf => facility.suitableFor.includes(sf))
+          );
+        }
+
+        if (filters.availability) {
+          const { date, startTime, endTime } = filters.availability;
+          if (date && startTime && endTime) {
+            facilities = facilities.filter(facility => {
+              const availableTimes = facility.availableTimes?.find(at => 
+                at.date.toDateString() === date.toDateString()
+              );
+              return availableTimes?.slots.some(slot => 
+                slot.available && slot.start >= startTime && slot.end <= endTime
+              );
+            });
+          }
+        }
+      }
+
+      // Apply sorting
+      if (sortField && sortDirection) {
+        facilities.sort((a, b) => {
+          let aValue: any, bValue: any;
+          
+          switch (sortField) {
+            case 'name':
+              aValue = a.name;
+              bValue = b.name;
+              break;
+            case 'capacity':
+              aValue = a.capacity;
+              bValue = b.capacity;
+              break;
+            case 'area':
+              aValue = a.area;
+              bValue = b.area;
+              break;
+            case 'type':
+              aValue = a.type;
+              bValue = b.type;
+              break;
+            default:
+              return 0;
+          }
+
+          if (typeof aValue === 'string' && typeof bValue === 'string') {
+            aValue = aValue.toLowerCase();
+            bValue = bValue.toLowerCase();
+          }
+
+          if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
+          if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
+          return 0;
         });
-
-        if (!hasRequiredAmenities) return false;
       }
 
-      return true;
-    });
-  }
+      // Apply pagination
+      const total = facilities.length;
+      const totalPages = Math.ceil(total / pagination.limit);
+      const start = (pagination.page - 1) * pagination.limit;
+      const paginatedFacilities = facilities.slice(start, start + pagination.limit);
 
-  protected createEntity(request: FacilityCreateRequest): Facility {
-    const newId = parseInt(this.generateId());
-    
-    return {
-      id: newId,
-      name: request.name,
-      address: request.address,
-      type: request.type,
-      image: "/lovable-uploads/13aee1f6-e9d9-474b-9ed7-c656d703d19b.png",
-      nextAvailable: "I dag, 18:00",
-      capacity: request.capacity,
-      accessibility: request.accessibility,
-      area: request.area,
-      suitableFor: request.suitableFor,
-      equipment: request.equipment,
-      openingHours: request.openingHours,
-      description: request.description,
-      rating: 4.0,
-      reviewCount: 0,
-      pricePerHour: 500,
-      amenities: request.equipment,
-      hasAutoApproval: false
-    };
-  }
-
-  protected updateEntity(existing: Facility, request: FacilityUpdateRequest): Facility {
-    return {
-      ...existing,
-      ...request
-    };
-  }
-
-  // Zone-specific methods
-  async getZonesByFacilityId(facilityId: string) {
-    try {
-      const zones = getZonesByFacilityId(facilityId);
-      return { success: true, data: zones };
+      return {
+        success: true,
+        data: {
+          data: paginatedFacilities,
+          pagination: {
+            page: pagination.page,
+            limit: pagination.limit,
+            total,
+            totalPages,
+            hasNext: pagination.page < totalPages,
+            hasPrev: pagination.page > 1,
+          },
+        },
+      };
     } catch (error) {
-      return { success: false, error: { message: 'Failed to fetch zones', details: error } };
+      return {
+        success: false,
+        error: {
+          message: "Failed to fetch facilities",
+          details: error,
+        },
+      };
     }
   }
 
-  async getZoneById(zoneId: string) {
+  async findById(id: string): Promise<ApiResponse<Facility>> {
     try {
-      const zone = this.zones.find(z => z.id === zoneId);
+      const facilityId = parseInt(id, 10);
+      const localizedFacility = localizedMockFacilities.find(f => f.id === facilityId);
+      
+      if (!localizedFacility) {
+        return {
+          success: false,
+          error: {
+            message: `Facility with id ${id} not found`,
+            code: 'NOT_FOUND',
+          },
+        };
+      }
+
+      const facility = getLocalizedFacility(localizedFacility, this.currentLanguage);
+
+      return {
+        success: true,
+        data: facility,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: {
+          message: "Failed to fetch facility",
+          details: error,
+        },
+      };
+    }
+  }
+
+  async getZonesByFacilityId(facilityId: string): Promise<ApiResponse<Zone[]>> {
+    try {
+      const zones = mockZones.filter(zone => zone.facilityId === facilityId);
+      return {
+        success: true,
+        data: zones,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: {
+          message: "Failed to fetch zones",
+          details: error,
+        },
+      };
+    }
+  }
+
+  async getZoneById(zoneId: string): Promise<ApiResponse<Zone>> {
+    try {
+      const zone = mockZones.find(z => z.id === zoneId);
+      
       if (!zone) {
-        return { success: false, error: { message: 'Zone not found', code: 'NOT_FOUND' } };
+        return {
+          success: false,
+          error: {
+            message: `Zone with id ${zoneId} not found`,
+            code: 'NOT_FOUND',
+          },
+        };
       }
-      return { success: true, data: zone };
+
+      return {
+        success: true,
+        data: zone,
+      };
     } catch (error) {
-      return { success: false, error: { message: 'Failed to fetch zone', details: error } };
+      return {
+        success: false,
+        error: {
+          message: "Failed to fetch zone",
+          details: error,
+        },
+      };
     }
   }
 
-  async getMainZones() {
+  async getFacilitiesByType(type: string): Promise<ApiResponse<Facility[]>> {
     try {
-      const mainZones = this.zones.filter(zone => zone.isMainZone);
-      return { success: true, data: mainZones };
+      const facilities = localizedMockFacilities
+        .filter(f => f.type === type)
+        .map(facility => getLocalizedFacility(facility, this.currentLanguage));
+
+      return {
+        success: true,
+        data: facilities,
+      };
     } catch (error) {
-      return { success: false, error: { message: 'Failed to fetch main zones', details: error } };
+      return {
+        success: false,
+        error: {
+          message: "Failed to fetch facilities by type",
+          details: error,
+        },
+      };
     }
   }
 
-  async getFacilitiesByType(type: string) {
+  async getFacilitiesByArea(area: string): Promise<ApiResponse<Facility[]>> {
     try {
-      const facilities = this.data.filter(f => f.type.toLowerCase().includes(type.toLowerCase()));
-      return { success: true, data: facilities };
+      const facilities = localizedMockFacilities
+        .filter(f => f.area === area)
+        .map(facility => getLocalizedFacility(facility, this.currentLanguage));
+
+      return {
+        success: true,
+        data: facilities,
+      };
     } catch (error) {
-      return { success: false, error: { message: 'Failed to fetch facilities by type', details: error } };
+      return {
+        success: false,
+        error: {
+          message: "Failed to fetch facilities by area",
+          details: error,
+        },
+      };
     }
   }
 
-  async getFacilitiesByArea(area: string) {
-    try {
-      const facilities = this.data.filter(f => f.area.toLowerCase().includes(area.toLowerCase()));
-      return { success: true, data: facilities };
-    } catch (error) {
-      return { success: false, error: { message: 'Failed to fetch facilities by area', details: error } };
-    }
+  async create(item: Partial<Facility>): Promise<ApiResponse<Facility>> {
+    throw new Error("Create operation not implemented for mock data");
+  }
+
+  async update(id: string, item: Partial<Facility>): Promise<ApiResponse<Facility>> {
+    throw new Error("Update operation not implemented for mock data");
+  }
+
+  async delete(id: string): Promise<ApiResponse<void>> {
+    throw new Error("Delete operation not implemented for mock data");
   }
 }
