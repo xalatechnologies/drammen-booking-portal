@@ -5,6 +5,8 @@ import { Zone } from '@/components/booking/types';
 import { SelectedTimeSlot, RecurrencePattern, recurrenceEngine } from '@/utils/recurrenceEngine';
 import { EnhancedZoneConflictManager } from '@/utils/enhancedZoneConflictManager';
 import { isDateUnavailable } from '@/utils/holidaysAndAvailability';
+import { useCart } from '@/contexts/CartContext';
+import { useTranslation } from '@/i18n';
 import { WeekNavigation } from './WeekNavigation';
 import { ZoneInfoHeader } from './ZoneInfoHeader';
 import { CalendarGrid } from './CalendarGrid';
@@ -28,6 +30,8 @@ interface AvailabilityTabContentProps {
   setConflictResolutionData: (data: any) => void;
   currentPattern: RecurrencePattern;
   setCurrentPattern: (pattern: RecurrencePattern) => void;
+  facilityId?: string;
+  facilityName?: string;
 }
 
 export function AvailabilityTabContent({
@@ -45,9 +49,13 @@ export function AvailabilityTabContent({
   setShowConflictWizard,
   setConflictResolutionData,
   currentPattern,
-  setCurrentPattern
+  setCurrentPattern,
+  facilityId = "",
+  facilityName = ""
 }: AvailabilityTabContentProps) {
   const timeSlots = ["08:00-10:00", "10:00-12:00", "12:00-14:00", "14:00-16:00", "16:00-18:00", "18:00-20:00", "20:00-22:00"];
+  const { addToCart } = useCart();
+  const { t } = useTranslation();
 
   const getAvailabilityStatus = (zoneId: string, date: Date, timeSlot: string) => {
     const unavailableCheck = isDateUnavailable(date);
@@ -71,7 +79,19 @@ export function AvailabilityTabContent({
     if (isSelected) {
       setSelectedSlots(prev => removeSlotFromSelection(prev, zoneId, date, timeSlot));
     } else {
+      // Add to both local selection and global cart
+      const newSlot = { zoneId, date, timeSlot };
       setSelectedSlots(prev => addSlotToSelection(prev, zoneId, date, timeSlot));
+      
+      // Add to global cart
+      addToCart({
+        facilityId,
+        facilityName,
+        zoneId,
+        date,
+        timeSlot,
+        pricePerHour: zone.pricePerHour
+      });
     }
   };
 

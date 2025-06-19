@@ -1,7 +1,6 @@
-
 import { Language } from '../types';
 
-export const facilityTranslations: Record<Language, any> = {
+export const facilityTranslations = {
   NO: {
     types: {
       'Idrettsanlegg': 'Idrettsanlegg',
@@ -90,8 +89,78 @@ export const facilityTranslations: Record<Language, any> = {
       airconditioning: 'Klimaanlegg',
       rullestolvennlig: 'Rullestolvennlig',
       wheelchairaccessible: 'Rullestolvennlig'
+    },
+    
+    // Enhanced booking and cart translations
+    cart: {
+      title: "Handlekurv",
+      empty: "Handlekurven er tom",
+      selectSlots: "Velg tidspunkter fra kalenderen for å legge til reservasjoner",
+      subtotal: "Sum",
+      vat: "MVA (25%)",
+      total: "Totalt",
+      proceedToCheckout: "Gå til betaling",
+      items: "elementer"
+    },
+    
+    cancellation: {
+      title: "Gratis avbestilling",
+      policy: "Opptil 24 timer før reservert tid"
+    },
+    
+    customerType: "Kundetype",
+    customerTypes: {
+      private: "Privatperson",
+      business: "Bedrift",
+      organization: "Organisasjon"
+    },
+    
+    name: "Navn",
+    address: "Adresse", 
+    capacity: "Kapasitet",
+    area: "Areal",
+    openingHours: "Åpningstider",
+    description: "Beskrivelse",
+    equipment: "Utstyr",
+    amenities: "Fasiliteter",
+    location: "Lokasjon",
+    quickFacts: "Viktige fakta",
+    suitableFor: "Egnet for",
+    autoApproval: "Automatisk godkjenning",
+    
+    details: {
+      location: "Lokasjon",
+      capacity: "Kapasitet", 
+      area: "Areal",
+      openingHours: "Åpningstider",
+      equipment: "Utstyr",
+      amenities: "Fasiliteter"
+    },
+    
+    booking: {
+      wholeVenue: "Hele lokalet",
+      wholeVenueDescription: "Book hele anlegget for maksimal fleksibilitet",
+      mainZoneInstructions: "Hovedsonen inkluderer alle fasiliteter og utstyr",
+      reserveNow: "Reserver nå",
+      checkAvailability: "Sjekk tilgjengelighet"
+    },
+    
+    image: {
+      alt: "Bilde av {name}",
+      gallery: "Bildegalleri",
+      viewAll: "Se alle bilder"
+    },
+    
+    card: {
+      viewDetails: "Se detaljer",
+      from: "Fra",
+      perHour: "per time",
+      capacity: "Kapasitet",
+      area: "Areal",
+      autoApproval: "Automatisk godkjenning"
     }
   },
+  
   EN: {
     types: {
       'Idrettsanlegg': 'Sports Facility',
@@ -180,6 +249,75 @@ export const facilityTranslations: Record<Language, any> = {
       airconditioning: 'Air Conditioning',
       rullestolvennlig: 'Wheelchair Accessible',
       wheelchairaccessible: 'Wheelchair Accessible'
+    },
+    
+    // Enhanced booking and cart translations  
+    cart: {
+      title: "Shopping Cart",
+      empty: "Your cart is empty", 
+      selectSlots: "Select time slots from the calendar to add reservations",
+      subtotal: "Subtotal",
+      vat: "VAT (25%)",
+      total: "Total",
+      proceedToCheckout: "Proceed to Checkout", 
+      items: "items"
+    },
+    
+    cancellation: {
+      title: "Free cancellation",
+      policy: "Up to 24 hours before reserved time"
+    },
+    
+    customerType: "Customer Type",
+    customerTypes: {
+      private: "Private Person", 
+      business: "Business",
+      organization: "Organization"
+    },
+    
+    name: "Name",
+    address: "Address",
+    capacity: "Capacity", 
+    area: "Area",
+    openingHours: "Opening Hours",
+    description: "Description",
+    equipment: "Equipment",
+    amenities: "Amenities", 
+    location: "Location",
+    quickFacts: "Quick Facts",
+    suitableFor: "Suitable For",
+    autoApproval: "Auto Approval",
+    
+    details: {
+      location: "Location",
+      capacity: "Capacity",
+      area: "Area", 
+      openingHours: "Opening Hours",
+      equipment: "Equipment",
+      amenities: "Amenities"
+    },
+    
+    booking: {
+      wholeVenue: "Whole Venue",
+      wholeVenueDescription: "Book the entire facility for maximum flexibility", 
+      mainZoneInstructions: "Main zone includes all facilities and equipment",
+      reserveNow: "Reserve Now",
+      checkAvailability: "Check Availability"
+    },
+    
+    image: {
+      alt: "Image of {name}",
+      gallery: "Image Gallery", 
+      viewAll: "View All Images"
+    },
+    
+    card: {
+      viewDetails: "View Details",
+      from: "From",
+      perHour: "per hour",
+      capacity: "Capacity",
+      area: "Area", 
+      autoApproval: "Auto Approval"
     }
   }
 };
