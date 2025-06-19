@@ -3,7 +3,6 @@ import React from "react";
 import { MapPin, Users } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useTranslation } from "@/i18n";
-import { FlatAmenitiesGrid } from "./FlatAmenitiesGrid";
 
 interface Facility {
   id: number;
@@ -46,17 +45,6 @@ export function FacilityCardContent({ facility, onAddressClick }: FacilityCardCo
         <Users className="h-5 w-5" />
         <span className="text-base font-medium">{t('facility.details.capacity')}: {facility.capacity}</span>
       </div>
-
-      {/* Flat Equipment Grid */}
-      {facility.equipment && facility.equipment.length > 0 && (
-        <div className="mb-6">
-          <FlatAmenitiesGrid 
-            amenities={facility.equipment} 
-            title={t('facility.amenities.equipment', {}, 'Equipment')}
-            maxItems={4}
-          />
-        </div>
-      )}
 
       {/* Suitable For Tags */}
       <div className="mb-6">
