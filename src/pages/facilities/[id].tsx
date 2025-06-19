@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -13,9 +12,7 @@ import { SimilarFacilitiesSlider } from "@/components/facility/SimilarFacilities
 import { AvailabilityTab } from "@/components/facility/tabs/AvailabilityTab";
 import { LocalizationTestComprehensive } from "@/components/localization/LocalizationTestComprehensive";
 import { Zone } from "@/components/booking/types";
-import { useQuery } from "@tanstack/react-query";
-import { LocalizedFacilityService } from "@/services/LocalizedFacilityService";
-import { useLocalizedServices } from "@/hooks/useLocalizedServices";
+import { useOptimizedFacility } from "@/hooks/useOptimizedFacility";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useTranslation } from "@/i18n/hooks/useTranslation";
 
@@ -26,17 +23,7 @@ const FacilityDetail = () => {
   const [showLocalizationTest, setShowLocalizationTest] = useState(false);
   const { t } = useTranslation();
 
-  // Ensure localized services are properly initialized
-  useLocalizedServices();
-
-  const { data: facilityResponse, isLoading, error } = useQuery({
-    queryKey: ['facility', id],
-    queryFn: () => LocalizedFacilityService.getFacilityById(Number(id)),
-    enabled: !!id
-  });
-
-  const facility = facilityResponse?.success ? facilityResponse.data : null;
-  const notFound = facilityResponse?.success === false && facilityResponse.error?.message?.includes('not found');
+  const { facility, isLoading, error, notFound } = useOptimizedFacility(Number(id));
 
   // Enhanced zones with full zone management capabilities
   const zones: Zone[] = [{

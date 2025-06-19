@@ -4,7 +4,7 @@ import FacilityGrid from "./FacilityGrid";
 import FacilityListItem from "./facility/FacilityListItem";
 import PaginationControls from "./PaginationControls";
 import { useFacilitiesPagination } from "@/hooks/useFacilities";
-import { useLocalizedFacilities } from "@/hooks/useLocalizedFacilities";
+import { useOptimizedFacilities } from "@/hooks/useOptimizedFacilities";
 import { FacilityFilters } from "@/types/facility";
 
 interface FacilityListProps {
@@ -17,7 +17,7 @@ const FacilityList: React.FC<FacilityListProps> = ({
   viewMode
 }) => {
   const { pagination, goToPage } = useFacilitiesPagination(1, 6);
-  const { facilities, pagination: paginationInfo, isLoading, error } = useLocalizedFacilities({
+  const { facilities, pagination: paginationInfo, isLoading, error } = useOptimizedFacilities({
     pagination,
     filters
   });
