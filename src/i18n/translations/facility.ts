@@ -1,3 +1,4 @@
+
 import { Language } from '../types';
 
 export const facilityTranslations = {
@@ -8,14 +9,6 @@ export const facilityTranslations = {
       'Møterom': 'Møterom',
       'Auditorium': 'Auditorium'
     },
-    details: {
-      capacity: 'Kapasitet',
-      bookNow: 'Reserver nå',
-      location: 'Lokasjon',
-      area: 'Areal',
-      openingHours: 'Åpningstider',
-      zones: 'Soner'
-    },
     actions: {
       viewDetails: 'Se detaljer for {name} på {address}',
       addToFavorites: 'Legg til i favoritter',
@@ -23,7 +16,9 @@ export const facilityTranslations = {
       shareFacility: 'Del lokale'
     },
     image: {
-      alt: 'Bilde av {name}'
+      alt: 'Bilde av {name}',
+      gallery: 'Bildegalleri',
+      viewAll: 'Se alle bilder'
     },
     search: {
       noResults: 'Ingen resultater funnet'
@@ -65,13 +60,6 @@ export const facilityTranslations = {
           pets: 'Kjæledyr er ikke tillatt med mindre det er tjenestehund'
         }
       }
-    },
-    booking: {
-      wholeVenue: 'Hele lokalet',
-      partialBooking: 'Delvis booking',
-      selectZone: 'Velg sone',
-      wholeVenueDescription: 'Komplett lokale med full tilgang til alt utstyr og alle soner',
-      mainZoneInstructions: 'Hele lokalet inkluderer begge soner og all tilgjengelig utstyr'
     },
     amenities: {
       equipment: 'Utstyr',
@@ -122,7 +110,6 @@ export const facilityTranslations = {
     openingHours: "Åpningstider",
     description: "Beskrivelse",
     equipment: "Utstyr",
-    amenities: "Fasiliteter",
     location: "Lokasjon",
     quickFacts: "Viktige fakta",
     suitableFor: "Egnet for",
@@ -134,21 +121,19 @@ export const facilityTranslations = {
       area: "Areal",
       openingHours: "Åpningstider",
       equipment: "Utstyr",
-      amenities: "Fasiliteter"
+      amenities: "Fasiliteter",
+      bookNow: "Reserver nå",
+      zones: "Soner"
     },
     
     booking: {
       wholeVenue: "Hele lokalet",
+      partialBooking: "Delvis booking",
+      selectZone: "Velg sone",
       wholeVenueDescription: "Book hele anlegget for maksimal fleksibilitet",
       mainZoneInstructions: "Hovedsonen inkluderer alle fasiliteter og utstyr",
       reserveNow: "Reserver nå",
       checkAvailability: "Sjekk tilgjengelighet"
-    },
-    
-    image: {
-      alt: "Bilde av {name}",
-      gallery: "Bildegalleri",
-      viewAll: "Se alle bilder"
     },
     
     card: {
@@ -168,14 +153,6 @@ export const facilityTranslations = {
       'Møterom': 'Meeting Room',
       'Auditorium': 'Auditorium'
     },
-    details: {
-      capacity: 'Capacity',
-      bookNow: 'Book now',
-      location: 'Location',
-      area: 'Area',
-      openingHours: 'Opening hours',
-      zones: 'Zones'
-    },
     actions: {
       viewDetails: 'View details for {name} at {address}',
       addToFavorites: 'Add to favorites',
@@ -183,7 +160,9 @@ export const facilityTranslations = {
       shareFacility: 'Share facility'
     },
     image: {
-      alt: 'Image of {name}'
+      alt: 'Image of {name}',
+      gallery: 'Image Gallery', 
+      viewAll: 'View All Images'
     },
     search: {
       noResults: 'No results found'
@@ -225,13 +204,6 @@ export const facilityTranslations = {
           pets: 'Pets are not allowed unless it is a service dog'
         }
       }
-    },
-    booking: {
-      wholeVenue: 'Whole venue',
-      partialBooking: 'Partial booking',
-      selectZone: 'Select zone',
-      wholeVenueDescription: 'Complete facility with full access to all equipment and zones',
-      mainZoneInstructions: 'The whole venue includes both zones and all available equipment'
     },
     amenities: {
       equipment: 'Equipment',
@@ -282,7 +254,6 @@ export const facilityTranslations = {
     openingHours: "Opening Hours",
     description: "Description",
     equipment: "Equipment",
-    amenities: "Amenities", 
     location: "Location",
     quickFacts: "Quick Facts",
     suitableFor: "Suitable For",
@@ -294,21 +265,19 @@ export const facilityTranslations = {
       area: "Area", 
       openingHours: "Opening Hours",
       equipment: "Equipment",
-      amenities: "Amenities"
+      amenities: "Amenities",
+      bookNow: "Book now",
+      zones: "Zones"
     },
     
     booking: {
       wholeVenue: "Whole Venue",
+      partialBooking: "Partial booking",
+      selectZone: "Select zone",
       wholeVenueDescription: "Book the entire facility for maximum flexibility", 
       mainZoneInstructions: "Main zone includes all facilities and equipment",
       reserveNow: "Reserve Now",
       checkAvailability: "Check Availability"
-    },
-    
-    image: {
-      alt: "Image of {name}",
-      gallery: "Image Gallery", 
-      viewAll: "View All Images"
     },
     
     card: {

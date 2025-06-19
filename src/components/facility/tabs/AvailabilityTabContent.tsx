@@ -83,13 +83,14 @@ export function AvailabilityTabContent({
       const newSlot = { zoneId, date, timeSlot };
       setSelectedSlots(prev => addSlotToSelection(prev, zoneId, date, timeSlot));
       
-      // Add to global cart
+      // Add to global cart with required duration property
       addToCart({
         facilityId,
         facilityName,
         zoneId,
         date,
         timeSlot,
+        duration: 2, // Default 2-hour duration for time slots
         pricePerHour: zone.pricePerHour
       });
     }
