@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { startOfWeek, isBefore, startOfDay, addDays } from "date-fns";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -17,6 +16,7 @@ interface AvailabilityTabProps {
   showLegend?: boolean;
   facilityId?: string;
   facilityName?: string;
+  openingHours?: string;
 }
 
 export function AvailabilityTab({ 
@@ -24,7 +24,8 @@ export function AvailabilityTab({
   startDate, 
   showLegend = true,
   facilityId = "",
-  facilityName = ""
+  facilityName = "",
+  openingHours = "08:00-22:00"
 }: AvailabilityTabProps) {
   const [currentWeekStart, setCurrentWeekStart] = useState(startOfWeek(startDate, { weekStartsOn: 1 }));
   const [selectedSlots, setSelectedSlots] = useState<SelectedTimeSlot[]>([]);
@@ -150,6 +151,9 @@ export function AvailabilityTab({
                 setConflictResolutionData={setConflictResolutionData}
                 currentPattern={currentPattern}
                 setCurrentPattern={setCurrentPattern}
+                facilityId={facilityId}
+                facilityName={facilityName}
+                openingHours={openingHours}
               />
             </TabsContent>
           ))}
@@ -172,6 +176,9 @@ export function AvailabilityTab({
             setConflictResolutionData={setConflictResolutionData}
             currentPattern={currentPattern}
             setCurrentPattern={setCurrentPattern}
+            facilityId={facilityId}
+            facilityName={facilityName}
+            openingHours={openingHours}
           />
         )
       )}
