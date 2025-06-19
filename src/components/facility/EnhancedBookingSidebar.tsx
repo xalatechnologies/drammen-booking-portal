@@ -168,7 +168,8 @@ export function EnhancedBookingSidebar({
                 <ShoppingCart className="h-5 w-5" />
                 {t('booking.cart.title')} ({getItemCount()})
               </CardTitle>
-            </CollapsibleTrigger>
+            </CardHeader>
+          </CollapsibleTrigger>
           <CollapsibleContent>
             <CardContent>
               {!hasCartItems ? (
