@@ -2,11 +2,57 @@ import { StrøtimeSlot, StrøtimeBooking, StrøtimeFilters } from '@/types/booki
 import { ApiResponse } from '@/types/api';
 import { addDays, isSameDay } from 'date-fns';
 
-// Mock data for demo - expanded to cover multiple weeks
+// Mock data for demo - expanded to cover multiple weeks and facility ID "1"
 const mockStrøtimeSlots: StrøtimeSlot[] = [
-  // Current week (June 19, 2025)
+  // Facility ID "1" slots (Current week - June 19, 2025)
   {
-    id: 'stro-1',
+    id: 'stro-1-1',
+    facilityId: '1',
+    facilityName: 'Drammen kulturhus - Storstudio',
+    zoneId: 'whole-facility',
+    zoneName: 'Hele lokalet',
+    date: new Date(2025, 5, 19),
+    startTime: '14:00',
+    endTime: '15:00',
+    duration: 60,
+    isAvailable: true,
+    publishedAt: new Date(),
+    publishedBy: 'admin',
+    pricePerSlot: 200
+  },
+  {
+    id: 'stro-1-2',
+    facilityId: '1',
+    facilityName: 'Drammen kulturhus - Storstudio',
+    zoneId: 'whole-facility',
+    zoneName: 'Hele lokalet',
+    date: new Date(2025, 5, 19),
+    startTime: '17:30',
+    endTime: '18:00',
+    duration: 30,
+    isAvailable: true,
+    publishedAt: new Date(),
+    publishedBy: 'admin',
+    pricePerSlot: 100
+  },
+  {
+    id: 'stro-1-3',
+    facilityId: '1',
+    facilityName: 'Drammen kulturhus - Storstudio',
+    zoneId: 'whole-facility',
+    zoneName: 'Hele lokalet',
+    date: new Date(2025, 5, 20),
+    startTime: '13:00',
+    endTime: '14:00',
+    duration: 60,
+    isAvailable: true,
+    publishedAt: new Date(),
+    publishedBy: 'admin',
+    pricePerSlot: 200
+  },
+  // Facility ID "2" slots (existing data)
+  {
+    id: 'stro-2',
     facilityId: '2',
     facilityName: 'Gymsal 2 - Brandengen skole',
     zoneId: 'zone-1',
@@ -21,7 +67,7 @@ const mockStrøtimeSlots: StrøtimeSlot[] = [
     pricePerSlot: 150
   },
   {
-    id: 'stro-2',
+    id: 'stro-3',
     facilityId: '2',
     facilityName: 'Gymsal 2 - Brandengen skole',
     zoneId: 'zone-1',
@@ -36,7 +82,7 @@ const mockStrøtimeSlots: StrøtimeSlot[] = [
     pricePerSlot: 80
   },
   {
-    id: 'stro-3',
+    id: 'stro-4',
     facilityId: '2',
     facilityName: 'Gymsal 2 - Brandengen skole',
     zoneId: 'zone-2',
@@ -54,7 +100,7 @@ const mockStrøtimeSlots: StrøtimeSlot[] = [
   },
   // Next week (June 26, 2025)
   {
-    id: 'stro-4',
+    id: 'stro-5',
     facilityId: '2',
     facilityName: 'Gymsal 2 - Brandengen skole',
     zoneId: 'zone-1',
@@ -69,7 +115,7 @@ const mockStrøtimeSlots: StrøtimeSlot[] = [
     pricePerSlot: 150
   },
   {
-    id: 'stro-5',
+    id: 'stro-6',
     facilityId: '2',
     facilityName: 'Gymsal 2 - Brandengen skole',
     zoneId: 'zone-2',
@@ -92,10 +138,13 @@ export class StrotimeService {
     try {
       await delay(200);
       
+      console.log('StrotimeService - Getting strøtimer with filters:', filters);
+      
       let filteredSlots = mockStrøtimeSlots.filter(slot => slot.isAvailable);
       
       if (filters) {
         if (filters.facilityId) {
+          console.log(`StrotimeService - Filtering by facilityId: ${filters.facilityId}`);
           filteredSlots = filteredSlots.filter(slot => slot.facilityId === filters.facilityId);
         }
         if (filters.zoneId) {
@@ -116,11 +165,14 @@ export class StrotimeService {
         }
       }
       
+      console.log('StrotimeService - Returning slots:', filteredSlots);
+      
       return {
         success: true,
         data: filteredSlots
       };
     } catch (error) {
+      console.error('StrotimeService - Error:', error);
       return {
         success: false,
         error: { message: 'Failed to fetch strøtimer', details: error }

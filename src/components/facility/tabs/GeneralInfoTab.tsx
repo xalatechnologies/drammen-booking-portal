@@ -3,6 +3,7 @@ import React from "react";
 import { MapPin, Clock, Square, Users, CheckCircle } from "lucide-react";
 import { Zone } from "@/components/booking/types";
 import { FlatAmenitiesGrid } from "../FlatAmenitiesGrid";
+import { FacilityLocation } from "../FacilityLocation";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 interface GeneralInfoTabProps {
@@ -32,6 +33,7 @@ export function GeneralInfoTab({
       quickFacts: "Nøkkelinformasjon",
       guests: "gjester",
       suitableFor: "Egnet for",
+      location: "Plassering",
       instantApproval: "Øyeblikkelig godkjenning",
       requiresApproval: "Krever godkjenning",
       instantApprovalDesc: "Book øyeblikkelig uten å vente på godkjenning",
@@ -42,6 +44,7 @@ export function GeneralInfoTab({
       quickFacts: "Space details",
       guests: "guests",
       suitableFor: "Suitable for",
+      location: "Location",
       instantApproval: "Instant booking",
       requiresApproval: "Requires approval",
       instantApprovalDesc: "Book instantly without waiting for approval",
@@ -101,6 +104,16 @@ export function GeneralInfoTab({
           </div>
         </div>
       )}
+
+      {/* Location Section with Map */}
+      <div>
+        <h3 className="text-xl font-semibold text-gray-900 mb-4">
+          {t.location}
+        </h3>
+        <div className="h-80 w-full rounded-lg overflow-hidden border border-gray-200">
+          <FacilityLocation address={address} />
+        </div>
+      </div>
 
       {/* Approval Process */}
       <div className="bg-green-50 rounded-lg p-6">
