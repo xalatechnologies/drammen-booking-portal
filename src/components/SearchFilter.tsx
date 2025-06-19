@@ -10,6 +10,7 @@ import FilterSelects from "@/components/search/FilterSelects";
 import ViewModeToggle from "@/components/search/ViewModeToggle";
 import ActiveFilters from "@/components/search/ActiveFilters";
 import AdvancedFilters from "@/components/search/AdvancedFilters";
+import { useTranslation } from "@/i18n/hooks/useTranslation";
 
 interface SearchFilterProps {
   date?: Date;
@@ -68,6 +69,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
   allowsPhotography,
   setAllowsPhotography,
 }) => {
+  const { t } = useTranslation();
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [showAdvanced, setShowAdvanced] = useState(false);
 
@@ -144,7 +146,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
               }`}
             >
               <Settings className="h-5 w-5 mr-2" />
-              Mer filtre
+              {t('search.actions.moreFilters')}
               {hasAdvancedFilters && (
                 <div className="ml-2 h-2 w-2 bg-slate-500 rounded-full"></div>
               )}
@@ -163,7 +165,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
           <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm animate-fade-in">
             <div className="flex items-center mb-6">
               <Settings className="h-5 w-5 text-slate-600 mr-3" />
-              <h3 className="font-bold text-slate-900 text-lg">Avanserte innstillinger</h3>
+              <h3 className="font-bold text-slate-900 text-lg">{t('search.labels.advancedFilters')}</h3>
             </div>
             <AdvancedFilters 
               accessibility={accessibility}
@@ -226,7 +228,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
               className="text-slate-500 hover:text-red-600 hover:bg-red-50 font-medium transition-colors duration-200"
             >
               <X className="h-4 w-4 mr-2" />
-              Nullstill alle filtre
+              {t('search.actions.clearFilters')}
             </Button>
           </div>
         )}

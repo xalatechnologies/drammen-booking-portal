@@ -1,73 +1,43 @@
 
 import React from "react";
-import { Grid3X3, Map, Calendar as CalendarView, List } from "lucide-react";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Grid3X3, List, Map, Calendar } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useTranslation } from "@/i18n/hooks/useTranslation";
 
 interface ViewModeToggleProps {
   viewMode: "grid" | "map" | "calendar" | "list";
   setViewMode: (mode: "grid" | "map" | "calendar" | "list") => void;
 }
 
-const ViewModeToggle: React.FC<ViewModeToggleProps> = ({
-  viewMode,
-  setViewMode,
-}) => {
-  const viewModeLabels = {
-    grid: "Rutenettoversikt",
-    list: "Listeoversikt", 
-    map: "Kartoversikt",
-    calendar: "Kalenderoversikt"
-  };
+const ViewModeToggle: React.FC<ViewModeToggleProps> = ({ viewMode, setViewMode }) => {
+  const { t } = useTranslation();
+
+  const viewModes = [
+    { key: "grid" as const, icon: Grid3X3, label: t('search.viewModes.grid') },
+    { key: "list" as const, icon: List, label: t('search.viewModes.list') },
+    { key: "map" as const, icon: Map, label: t('search.viewModes.map') },
+    { key: "calendar" as const, icon: Calendar, label: t('search.viewModes.calendar') },
+  ];
 
   return (
-    <fieldset className="border-2 border-slate-200 bg-slate-50 rounded-xl p-2 h-14 flex items-center">
-      <legend className="sr-only">Velg visningstype for lokaler</legend>
-      <ToggleGroup 
-        type="single" 
-        value={viewMode} 
-        onValueChange={(value) => value && setViewMode(value as "grid" | "map" | "calendar" | "list")}
-        className="gap-2 h-full"
-        role="radiogroup"
-        aria-label="Visningstype for søkeresultater"
-      >
-        <ToggleGroupItem 
-          value="grid" 
-          className="h-10 w-10 p-0 rounded-lg data-[state=on]:bg-slate-600 data-[state=on]:text-white hover:bg-slate-200 transition-all duration-200"
-          aria-label={`${viewModeLabels.grid}${viewMode === 'grid' ? ' (valgt)' : ''}`}
-          role="radio"
-          aria-checked={viewMode === 'grid'}
+    <div className="flex border border-slate-300 rounded-xl overflow-hidden bg-white shadow-sm">
+      {viewModes.map(({ key, icon: Icon, label }) => (
+        <Button
+          key={key}
+          variant={viewMode === key ? "default" : "ghost"}
+          onClick={() => setViewMode(key)}
+          className={`h-14 px-4 rounded-none border-0 text-base font-medium transition-all duration-200 ${
+            viewMode === key
+              ? 'bg-slate-700 text-white shadow-md'
+              : 'text-gray-600 hover:bg-slate-50 hover:text-slate-700'
+          }`}
+          aria-label={label}
+          title={label}
         >
-          <Grid3X3 className="h-5 w-5" aria-hidden="true" />
-        </ToggleGroupItem>
-        <ToggleGroupItem 
-          value="list" 
-          className="h-10 w-10 p-0 rounded-lg data-[state=on]:bg-slate-600 data-[state=on]:text-white hover:bg-slate-200 transition-all duration-200"
-          aria-label={`${viewModeLabels.list}${viewMode === 'list' ? ' (valgt)' : ''}`}
-          role="radio"
-          aria-checked={viewMode === 'list'}
-        >
-          <List className="h-5 w-5" aria-hidden="true" />
-        </ToggleGroupItem>
-        <ToggleGroupItem 
-          value="map" 
-          className="h-10 w-10 p-0 rounded-lg data-[state=on]:bg-slate-600 data-[state=on]:text-white hover:bg-slate-200 transition-all duration-200"
-          aria-label={`${viewModeLabels.map}${viewMode === 'map' ? ' (valgt)' : ''}`}
-          role="radio"
-          aria-checked={viewMode === 'map'}
-        >
-          <Map className="h-5 w-5" aria-hidden="true" />
-        </ToggleGroupItem>
-        <ToggleGroupItem 
-          value="calendar" 
-          className="h-10 w-10 p-0 rounded-lg data-[state=on]:bg-slate-600 data-[state=on]:text-white hover:bg-slate-200 transition-all duration-200"
-          aria-label={`${viewModeLabels.calendar}${viewMode === 'calendar' ? ' (valgt)' : ''}`}
-          role="radio"
-          aria-checked={viewMode === 'calendar'}
-        >
-          <CalendarView className="h-5 w-5" aria-hidden="true" />
-        </ToggleGroupItem>
-      </ToggleGroup>
-    </fieldset>
+          <Icon className="h-5 w-5" />
+        </Button>
+      ))}
+    </div>
   );
 };
 

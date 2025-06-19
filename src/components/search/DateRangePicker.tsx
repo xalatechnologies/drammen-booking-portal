@@ -11,6 +11,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { useTranslation } from "@/i18n/hooks/useTranslation";
 
 interface DateRangePickerProps {
   dateRange: DateRange | undefined;
@@ -21,25 +22,29 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
   dateRange,
   setDateRange,
 }) => {
+  const { t, language } = useTranslation();
+  const locale = language === 'NO' ? nb : undefined;
+
   return (
     <Popover>
       <PopoverTrigger asChild>
         <Button
           variant="outline"
           className="w-full h-14 justify-start text-left font-medium border-0 bg-white/90 backdrop-blur-sm shadow-lg hover:shadow-xl hover:bg-white text-lg rounded-xl transition-all duration-300"
+          aria-label={t('search.labels.selectPeriod')}
         >
           <CalendarIcon className="mr-3 h-5 w-5 text-gray-500" />
           {dateRange?.from ? (
             dateRange.to ? (
               <>
-                {format(dateRange.from, "dd.MM", { locale: nb })} -{" "}
-                {format(dateRange.to, "dd.MM.yy", { locale: nb })}
+                {format(dateRange.from, "dd.MM", { locale })} -{" "}
+                {format(dateRange.to, "dd.MM.yy", { locale })}
               </>
             ) : (
-              format(dateRange.from, "dd.MM.yyyy", { locale: nb })
+              format(dateRange.from, "dd.MM.yyyy", { locale })
             )
           ) : (
-            <span className="text-gray-500 text-base">Velg periode</span>
+            <span className="text-gray-500 text-base">{t('search.placeholders.selectPeriod')}</span>
           )}
         </Button>
       </PopoverTrigger>

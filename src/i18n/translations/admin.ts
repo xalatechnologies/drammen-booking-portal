@@ -33,6 +33,24 @@ export const adminTranslations = {
       usage: "Bruksstatistikk",
       revenue: "Inntekter",
       export: "Eksporter"
+    },
+    search: {
+      searchFacilities: "Søk i lokaler...",
+      searchPlaceholder: "Skriv inn søkeord",
+      filterByType: "Filtrer etter type",
+      filterByLocation: "Filtrer etter sted",
+      noResults: "Ingen resultater funnet",
+      showingResults: "Viser {count} resultater",
+      clearFilters: "Nullstill filtre"
+    },
+    actions: {
+      edit: "Rediger",
+      delete: "Slett",
+      view: "Vis",
+      approve: "Godkjenn",
+      reject: "Avvis",
+      export: "Eksporter",
+      import: "Importer"
     }
   },
   EN: {
@@ -68,6 +86,24 @@ export const adminTranslations = {
       usage: "Usage Statistics",
       revenue: "Revenue",
       export: "Export"
+    },
+    search: {
+      searchFacilities: "Search facilities...",
+      searchPlaceholder: "Enter search terms",
+      filterByType: "Filter by type",
+      filterByLocation: "Filter by location",
+      noResults: "No results found",
+      showingResults: "Showing {count} results",
+      clearFilters: "Clear filters"
+    },
+    actions: {
+      edit: "Edit",
+      delete: "Delete",
+      view: "View",
+      approve: "Approve",
+      reject: "Reject",
+      export: "Export",
+      import: "Import"
     }
   }
 };

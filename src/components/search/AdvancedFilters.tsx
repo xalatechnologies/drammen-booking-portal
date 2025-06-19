@@ -1,16 +1,10 @@
 
 import React from "react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Slider } from "@/components/ui/slider";
-import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Users, Clock, Zap, Wifi, Car, Camera } from "lucide-react";
+import { Slider } from "@/components/ui/slider";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useTranslation } from "@/i18n/hooks/useTranslation";
 
 interface AdvancedFiltersProps {
   accessibility: string;
@@ -49,149 +43,140 @@ const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
   allowsPhotography,
   setAllowsPhotography,
 }) => {
+  const { t, formatCurrency } = useTranslation();
+
   return (
-    <div className="space-y-8">
-      {/* First Row - Capacity and Accessibility */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Capacity */}
-        <div className="space-y-4">
-          <div className="flex items-center space-x-2">
-            <Users className="h-5 w-5 text-slate-600" />
-            <Label className="text-base font-semibold text-slate-800">
-              Kapasitet: {capacity[0]} - {capacity[1]} personer
-            </Label>
-          </div>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {/* Accessibility */}
+      <div className="space-y-3">
+        <Label className="text-base font-semibold text-slate-900">
+          {t('search.labels.accessibility')}
+        </Label>
+        <Select value={accessibility} onValueChange={setAccessibility}>
+          <SelectTrigger className="h-12 border-slate-300 focus:border-slate-500">
+            <SelectValue placeholder={t('search.placeholders.anyAccessibility')} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">{t('search.placeholders.anyAccessibility')}</SelectItem>
+            <SelectItem value="wheelchair">{t('search.filters.wheelchairAccessible')}</SelectItem>
+            <SelectItem value="hearing-loop">{t('search.filters.hearingLoop')}</SelectItem>
+            <SelectItem value="visual-guidance">{t('search.filters.visualGuidance')}</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Capacity Range */}
+      <div className="space-y-3">
+        <Label className="text-base font-semibold text-slate-900">
+          {t('search.labels.capacity')}: {capacity[0]}-{capacity[1]} {t('common.labels.people', {}, 'personer')}
+        </Label>
+        <div className="px-3">
           <Slider
             value={capacity}
             onValueChange={setCapacity}
-            max={500}
-            step={10}
-            className="mt-3"
+            max={200}
+            min={0}
+            step={5}
+            className="w-full"
           />
-          <div className="flex justify-between text-sm text-slate-500">
-            <span>0</span>
-            <span>500+</span>
-          </div>
-        </div>
-
-        {/* Accessibility */}
-        <div className="space-y-4">
-          <Label className="text-base font-semibold text-slate-800">Tilgjengelighet</Label>
-          <Select value={accessibility || "all"} onValueChange={setAccessibility}>
-            <SelectTrigger className="h-12 border-2 border-gray-200 hover:border-blue-500 text-base">
-              <SelectValue placeholder="Tilgjengelighet (alle)" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all" className="text-base">Alle</SelectItem>
-              <SelectItem value="wheelchair" className="text-base">Rullestoltilpasset</SelectItem>
-              <SelectItem value="hearing-loop" className="text-base">Teleslynge</SelectItem>
-              <SelectItem value="sign-language" className="text-base">Tegnspråktolking</SelectItem>
-              <SelectItem value="visual-aids" className="text-base">Synshjelpemidler</SelectItem>
-            </SelectContent>
-          </Select>
         </div>
       </div>
 
-      {/* Second Row - Price Range and Availability */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Price Range */}
-        <div className="space-y-4">
-          <Label className="text-base font-semibold text-slate-800">
-            Prisområde: {priceRange[0]} - {priceRange[1]} kr/time
-          </Label>
+      {/* Price Range */}
+      <div className="space-y-3">
+        <Label className="text-base font-semibold text-slate-900">
+          {t('search.labels.priceRange')}: {formatCurrency(priceRange[0])}-{formatCurrency(priceRange[1])}
+        </Label>
+        <div className="px-3">
           <Slider
             value={priceRange}
             onValueChange={setPriceRange}
             max={5000}
+            min={0}
             step={100}
-            className="mt-3"
+            className="w-full"
           />
-          <div className="flex justify-between text-sm text-slate-500">
-            <span>Gratis</span>
-            <span>5000+ kr</span>
-          </div>
         </div>
+      </div>
 
-        {/* Quick Availability */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg border border-slate-200">
-            <div className="flex items-center space-x-3">
-              <Clock className="h-5 w-5 text-green-600" />
-              <div>
-                <Label className="text-base font-medium text-slate-800">Ledig nå</Label>
-                <p className="text-sm text-slate-600">Vis kun lokaler som er tilgjengelige akkurat nå</p>
-              </div>
-            </div>
-            <Switch
-              checked={availableNow}
+      {/* Quick Availability */}
+      <div className="space-y-4">
+        <Label className="text-base font-semibold text-slate-900">
+          {t('search.labels.quickFilters', {}, 'Hurtigfiltre')}
+        </Label>
+        <div className="space-y-3">
+          <div className="flex items-center space-x-3">
+            <Checkbox 
+              id="available-now" 
+              checked={availableNow} 
               onCheckedChange={setAvailableNow}
+              className="border-slate-300"
             />
+            <Label htmlFor="available-now" className="text-sm font-medium cursor-pointer">
+              {t('search.filters.availableNow')}
+            </Label>
           </div>
         </div>
       </div>
 
-      {/* Third Row - Features and Amenities */}
-      <div>
-        <Label className="text-base font-semibold text-slate-800 mb-4 block">Fasiliteter og utstyr</Label>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Equipment */}
-          <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg border border-slate-200">
-            <div className="flex items-center space-x-3">
-              <Zap className="h-5 w-5 text-blue-600" />
-              <div>
-                <Label className="text-base font-medium text-slate-800">AV-utstyr</Label>
-                <p className="text-sm text-slate-600">Projektor, lyd, mikrofon</p>
-              </div>
-            </div>
-            <Switch
-              checked={hasEquipment}
+      {/* Equipment & Amenities */}
+      <div className="space-y-4">
+        <Label className="text-base font-semibold text-slate-900">
+          {t('search.labels.equipment', {}, 'Utstyr og fasiliteter')}
+        </Label>
+        <div className="space-y-3">
+          <div className="flex items-center space-x-3">
+            <Checkbox 
+              id="has-equipment" 
+              checked={hasEquipment} 
               onCheckedChange={setHasEquipment}
+              className="border-slate-300"
             />
+            <Label htmlFor="has-equipment" className="text-sm font-medium cursor-pointer">
+              {t('search.filters.hasEquipment')}
+            </Label>
           </div>
-
-          {/* Parking */}
-          <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg border border-slate-200">
-            <div className="flex items-center space-x-3">
-              <Car className="h-5 w-5 text-slate-600" />
-              <div>
-                <Label className="text-base font-medium text-slate-800">Parkering</Label>
-                <p className="text-sm text-slate-600">Tilgjengelig parkering</p>
-              </div>
-            </div>
-            <Switch
-              checked={hasParking}
+          <div className="flex items-center space-x-3">
+            <Checkbox 
+              id="has-parking" 
+              checked={hasParking} 
               onCheckedChange={setHasParking}
+              className="border-slate-300"
             />
+            <Label htmlFor="has-parking" className="text-sm font-medium cursor-pointer">
+              {t('search.filters.hasParking')}
+            </Label>
           </div>
-
-          {/* WiFi */}
-          <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg border border-slate-200">
-            <div className="flex items-center space-x-3">
-              <Wifi className="h-5 w-5 text-purple-600" />
-              <div>
-                <Label className="text-base font-medium text-slate-800">WiFi</Label>
-                <p className="text-sm text-slate-600">Gratis trådløst internett</p>
-              </div>
-            </div>
-            <Switch
-              checked={hasWifi}
+          <div className="flex items-center space-x-3">
+            <Checkbox 
+              id="has-wifi" 
+              checked={hasWifi} 
               onCheckedChange={setHasWifi}
+              className="border-slate-300"
             />
+            <Label htmlFor="has-wifi" className="text-sm font-medium cursor-pointer">
+              {t('search.filters.hasWifi')}
+            </Label>
           </div>
+        </div>
+      </div>
 
-          {/* Photography */}
-          <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg border border-slate-200">
-            <div className="flex items-center space-x-3">
-              <Camera className="h-5 w-5 text-orange-600" />
-              <div>
-                <Label className="text-base font-medium text-slate-800">Fotografering</Label>
-                <p className="text-sm text-slate-600">Tillater foto/video</p>
-              </div>
-            </div>
-            <Switch
-              checked={allowsPhotography}
+      {/* Policies */}
+      <div className="space-y-4">
+        <Label className="text-base font-semibold text-slate-900">
+          {t('search.labels.policies', {}, 'Retningslinjer')}
+        </Label>
+        <div className="space-y-3">
+          <div className="flex items-center space-x-3">
+            <Checkbox 
+              id="allows-photography" 
+              checked={allowsPhotography} 
               onCheckedChange={setAllowsPhotography}
+              className="border-slate-300"
             />
+            <Label htmlFor="allows-photography" className="text-sm font-medium cursor-pointer">
+              {t('search.filters.allowsPhotography')}
+            </Label>
           </div>
         </div>
       </div>

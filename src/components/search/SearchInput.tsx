@@ -2,39 +2,29 @@
 import React from "react";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { useTranslation } from "@/i18n/hooks/useTranslation";
 
 interface SearchInputProps {
   searchTerm: string;
   setSearchTerm: (term: string) => void;
 }
 
-const SearchInput: React.FC<SearchInputProps> = ({
-  searchTerm,
-  setSearchTerm,
-}) => {
+const SearchInput: React.FC<SearchInputProps> = ({ searchTerm, setSearchTerm }) => {
+  const { t } = useTranslation();
+
   return (
     <div className="relative">
-      <label htmlFor="facility-search" className="sr-only">
-        Søk etter lokaler
-      </label>
-      <Search 
-        className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-600 h-5 w-5 z-10 pointer-events-none" 
-        aria-hidden="true"
-      />
+      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+        <Search className="h-5 w-5 text-gray-400" aria-hidden="true" />
+      </div>
       <Input
-        id="facility-search"
-        placeholder="Søk etter lokaler, aktiviteter eller områder..."
+        type="text"
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
-        className="pl-12 h-14 border-0 bg-white/90 backdrop-blur-sm shadow-lg focus:shadow-xl focus:bg-white focus:ring-4 focus:ring-white/50 text-lg font-medium placeholder:text-gray-500 placeholder:font-normal placeholder:text-base rounded-xl transition-all duration-300"
-        aria-describedby="search-help"
-        autoComplete="off"
-        role="searchbox"
-        aria-label="Søk etter lokaler ved navn eller beskrivelse"
+        placeholder={t('search.placeholders.searchText')}
+        className="pl-12 h-14 text-lg font-medium border-0 bg-white/90 backdrop-blur-sm shadow-lg hover:shadow-xl focus:shadow-xl rounded-xl transition-all duration-300 focus:ring-2 focus:ring-slate-500 focus:ring-offset-2"
+        aria-label={t('search.labels.searchFacilities')}
       />
-      <div id="search-help" className="sr-only">
-        Skriv inn navn på lokale eller annen beskrivelse for å søke
-      </div>
     </div>
   );
 };
