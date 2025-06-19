@@ -52,13 +52,14 @@ export function FacilityListItemMap({ address, facilityName }: FacilityListItemM
 
     // Add pulse animation
     const pulseElement = document.createElement('div');
+    pulseElement.className = 'map-pulse';
     pulseElement.style.cssText = `
       position: absolute;
       width: 100%;
       height: 100%;
       border-radius: 50%;
       background: rgba(59, 130, 246, 0.3);
-      animation: pulse 2s infinite;
+      animation: map-pulse 2s infinite;
     `;
     markerElement.appendChild(pulseElement);
 
@@ -85,40 +86,42 @@ export function FacilityListItemMap({ address, facilityName }: FacilityListItemM
   }, [address, facilityName]);
 
   return (
-    <div className="group">
-      <div className="w-48 h-36 rounded-xl overflow-hidden border-2 border-gray-200 bg-gray-100 flex-shrink-0 shadow-md hover:shadow-xl transition-all duration-300 group-hover:border-blue-300 relative">
-        <div ref={mapContainer} className="w-full h-full" />
-        
-        {/* Overlay gradient for better text readability */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-        
-        {/* Location label */}
-        <div className="absolute bottom-2 left-2 right-2">
-          <div className="bg-white/95 backdrop-blur-sm rounded-lg px-3 py-1 shadow-sm opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
-            <p className="text-xs font-semibold text-gray-800 truncate">
-              📍 {facilityName}
-            </p>
+    <>
+      <style>
+        {`
+          @keyframes map-pulse {
+            0% {
+              transform: scale(1);
+              opacity: 0.7;
+            }
+            50% {
+              transform: scale(1.3);
+              opacity: 0.3;
+            }
+            100% {
+              transform: scale(1.6);
+              opacity: 0;
+            }
+          }
+        `}
+      </style>
+      <div className="group h-full">
+        <div className="w-full h-full rounded-xl overflow-hidden border-2 border-gray-200 bg-gray-100 shadow-md hover:shadow-xl transition-all duration-300 group-hover:border-blue-300 relative">
+          <div ref={mapContainer} className="w-full h-full" />
+          
+          {/* Overlay gradient for better text readability */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          
+          {/* Location label */}
+          <div className="absolute bottom-2 left-2 right-2">
+            <div className="bg-white/95 backdrop-blur-sm rounded-lg px-3 py-1 shadow-sm opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
+              <p className="text-xs font-semibold text-gray-800 truncate">
+                📍 {facilityName}
+              </p>
+            </div>
           </div>
         </div>
       </div>
-      
-      {/* Add CSS for pulse animation */}
-      <style jsx>{`
-        @keyframes pulse {
-          0% {
-            transform: scale(1);
-            opacity: 0.7;
-          }
-          50% {
-            transform: scale(1.3);
-            opacity: 0.3;
-          }
-          100% {
-            transform: scale(1.6);
-            opacity: 0;
-          }
-        }
-      `}</style>
-    </div>
+    </>
   );
 }

@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { FacilityListItemMap } from "./FacilityListItemMap";
+
 interface Facility {
   id: number;
   name: string;
@@ -28,6 +29,7 @@ interface Facility {
     }[];
   }[];
 }
+
 interface FacilityListItemProps {
   facility: Facility;
   facilityType?: string;
@@ -35,6 +37,7 @@ interface FacilityListItemProps {
   accessibility?: string;
   capacity?: number[];
 }
+
 const FacilityListItem: React.FC<FacilityListItemProps> = ({
   facility,
   facilityType,
@@ -44,6 +47,7 @@ const FacilityListItem: React.FC<FacilityListItemProps> = ({
 }) => {
   const navigate = useNavigate();
   const [isFavorited, setIsFavorited] = useState(false);
+
   const handleAddressClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     const searchParams = new URLSearchParams();
@@ -57,6 +61,7 @@ const FacilityListItem: React.FC<FacilityListItemProps> = ({
     searchParams.set('focusFacility', facility.id.toString());
     navigate(`/?${searchParams.toString()}`);
   };
+
   const handleShare = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (navigator.share) {
@@ -68,10 +73,12 @@ const FacilityListItem: React.FC<FacilityListItemProps> = ({
       navigator.clipboard.writeText(window.location.href);
     }
   };
+
   const handleFavorite = (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsFavorited(!isFavorited);
   };
+
   const getAmenityIcons = () => {
     const amenityMap: {
       [key: string]: React.ElementType;
@@ -85,6 +92,7 @@ const FacilityListItem: React.FC<FacilityListItemProps> = ({
       'klimaanlegg': Snowflake,
       'rullestolvennlig': Accessibility
     };
+
     return facility.equipment.slice(0, 4).map((item, index) => {
       const IconComponent = amenityMap[item.toLowerCase()] || FileText;
       return <div key={index} className="flex items-center gap-1">
@@ -93,6 +101,7 @@ const FacilityListItem: React.FC<FacilityListItemProps> = ({
         </div>;
     });
   };
+
   const getSuitableForIcon = (activity: string) => {
     const activityMap: {
       [key: string]: React.ElementType;
@@ -115,9 +124,11 @@ const FacilityListItem: React.FC<FacilityListItemProps> = ({
       'trening': Trophy,
       'sport': Trophy
     };
+
     const IconComponent = activityMap[activity.toLowerCase()] || Trophy;
     return <IconComponent className="h-4 w-4" />;
   };
+
   return <Card className="group overflow-hidden hover:shadow-2xl transition-all duration-500 hover:translate-y-[-4px] border border-slate-200/60 shadow-lg bg-white cursor-pointer mb-6 focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-opacity-50" onClick={() => navigate(`/facilities/${facility.id}`)} role="button" tabIndex={0} aria-label={`Se detaljer for ${facility.name} på ${facility.address}`} onKeyDown={e => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
@@ -156,27 +167,28 @@ const FacilityListItem: React.FC<FacilityListItemProps> = ({
           
           {/* Main Content */}
           <div className="flex-1 p-8 flex flex-col">
-            {/* Header with Actions */}
-            <div className="flex justify-between items-start mb-5">
-              <div className="flex-1">
-                <h3 className="text-3xl font-bold text-gray-900 mb-4 group-hover:text-blue-600 transition-colors line-clamp-1">
-                  {facility.name}
-                </h3>
-                
-                <div className="flex items-center gap-3 text-gray-600 hover:text-blue-600 transition-colors cursor-pointer mb-4" onClick={handleAddressClick}>
+            {/* Header Section */}
+            <div className="mb-5">
+              <h3 className="text-3xl font-bold text-gray-900 mb-4 group-hover:text-blue-600 transition-colors line-clamp-1">
+                {facility.name}
+              </h3>
+              
+              {/* Address and Action Buttons */}
+              <div className="flex items-center justify-between gap-4 mb-4">
+                <div className="flex items-center gap-3 text-gray-600 hover:text-blue-600 transition-colors cursor-pointer flex-1" onClick={handleAddressClick}>
                   <MapPin className="h-5 w-5" />
                   <span className="text-base font-medium line-clamp-1">{facility.address}</span>
                 </div>
-              </div>
 
-              {/* Action Buttons */}
-              <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-4 group-hover:translate-x-0">
-                <Button variant="ghost" size="sm" className="h-12 w-12 p-0 hover:bg-gray-100 rounded-full focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" onClick={handleFavorite} aria-label={isFavorited ? "Fjern fra favoritter" : "Legg til favoritter"}>
-                  <Heart className={`h-5 w-5 ${isFavorited ? 'fill-red-500 text-red-500' : 'text-gray-400'}`} />
-                </Button>
-                <Button variant="ghost" size="sm" className="h-12 w-12 p-0 hover:bg-gray-100 rounded-full focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" onClick={handleShare} aria-label="Del lokale">
-                  <Share2 className="h-5 w-5 text-gray-400" />
-                </Button>
+                {/* Action Buttons */}
+                <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-4 group-hover:translate-x-0">
+                  <Button variant="ghost" size="sm" className="h-10 w-10 p-0 hover:bg-gray-100 rounded-full focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" onClick={handleFavorite} aria-label={isFavorited ? "Fjern fra favoritter" : "Legg til favoritter"}>
+                    <Heart className={`h-4 w-4 ${isFavorited ? 'fill-red-500 text-red-500' : 'text-gray-400'}`} />
+                  </Button>
+                  <Button variant="ghost" size="sm" className="h-10 w-10 p-0 hover:bg-gray-100 rounded-full focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" onClick={handleShare} aria-label="Del lokale">
+                    <Share2 className="h-4 w-4 text-gray-400" />
+                  </Button>
+                </div>
               </div>
             </div>
 
@@ -212,8 +224,8 @@ const FacilityListItem: React.FC<FacilityListItemProps> = ({
             </div>
           </div>
 
-          {/* Enhanced Map Section */}
-          <div className="w-56 flex-shrink-0 p-6 flex items-center justify-center">
+          {/* Full-size Map Section */}
+          <div className="w-80 flex-shrink-0 p-6 flex items-center justify-center">
             <FacilityListItemMap 
               address={facility.address} 
               facilityName={facility.name} 
@@ -223,4 +235,5 @@ const FacilityListItem: React.FC<FacilityListItemProps> = ({
       </CardContent>
     </Card>;
 };
+
 export default FacilityListItem;
