@@ -1,14 +1,14 @@
+
 import React, { useState } from "react";
 import { startOfWeek, isBefore, startOfDay, addDays } from "date-fns";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Zone } from "@/components/booking/types";
 import { ExistingBooking } from "@/utils/zoneConflictManager";
 import { EnhancedZoneConflictManager } from "@/utils/enhancedZoneConflictManager";
-import { RecurrencePatternBuilder } from "@/components/facility/RecurrencePatternBuilder";
-import { BookingDrawer } from "@/components/facility/BookingDrawer";
-import { ConflictResolutionWizard } from "@/components/facility/ConflictResolutionWizard";
-import { RecurrencePattern, SelectedTimeSlot, recurrenceEngine } from "@/utils/recurrenceEngine";
+import { RecurrencePattern, SelectedTimeSlot } from "@/utils/recurrenceEngine";
 import { AvailabilityTabContent } from "./AvailabilityTabContent";
+import { AvailabilityModals } from "./AvailabilityModals";
+import { usePatternHandler } from "./PatternHandler";
 
 interface AvailabilityTabProps {
   zones: Zone[];
@@ -63,54 +63,43 @@ export function AvailabilityTab({
   const currentWeekStartDay = startOfDay(currentWeekStart);
   const canGoPrevious = !isBefore(addDays(currentWeekStartDay, -7), today);
 
+  const { handlePatternApply } = usePatternHandler({
+    pattern: currentPattern,
+    zones,
+    currentWeekStart,
+    conflictManager,
+    onConflictDetected: (data) => {
+      setConflictResolutionData(data);
+      setShowConflictWizard(true);
+    },
+    onPatternApplied: setSelectedSlots,
+  });
+
   const shouldShowTabs = zones.length > 1;
 
-  // Handler for pattern application - simplified
-  const handlePatternApply = (pattern: RecurrencePattern) => {
-    if (pattern.timeSlots.length === 0 || pattern.weekdays.length === 0) return;
-
-    const zoneId = zones[0]?.id;
-    if (!zoneId) return;
-    
-    const occurrences = recurrenceEngine.generateOccurrences(
-      pattern,
-      currentWeekStart,
-      zoneId,
-      12
-    );
-
-    // Check for conflicts
-    const conflictedDates: Date[] = [];
-    const availableOccurrences: SelectedTimeSlot[] = [];
-    
-    occurrences.forEach(occurrence => {
-      const { status } = conflictManager.checkZoneConflict(occurrence.zoneId, occurrence.date, occurrence.timeSlot) 
-        ? { status: 'busy' } : { status: 'available' };
-      
-      if (status === 'available') {
-        availableOccurrences.push(occurrence);
-      } else {
-        conflictedDates.push(occurrence.date);
-      }
-    });
-
-    if (conflictedDates.length > 0) {
-      // Show conflict resolution
-      setConflictResolutionData({
-        conflictedDates,
-        availableDates: availableOccurrences.map(o => o.date),
-        alternativeTimeSlots: [],
-        suggestedZones: [],
-        originalZone: zones[0],
-        originalTimeSlot: pattern.timeSlots[0],
-        occurrences: availableOccurrences
-      });
-      setShowConflictWizard(true);
-    } else {
-      // No conflicts, add all occurrences
-      setSelectedSlots(availableOccurrences);
-    }
-  };
+  const renderZoneTab = (zone: Zone) => (
+    <AvailabilityTabContent
+      key={zone.id}
+      zone={zone}
+      zones={zones}
+      currentWeekStart={currentWeekStart}
+      setCurrentWeekStart={setCurrentWeekStart}
+      canGoPrevious={canGoPrevious}
+      selectedSlots={selectedSlots}
+      setSelectedSlots={setSelectedSlots}
+      conflictManager={conflictManager}
+      showLegend={showLegend}
+      onPatternBuilderOpen={() => setShowPatternBuilder(true)}
+      onBookingDrawerOpen={() => setShowBookingDrawer(true)}
+      setShowConflictWizard={setShowConflictWizard}
+      setConflictResolutionData={setConflictResolutionData}
+      currentPattern={currentPattern}
+      setCurrentPattern={setCurrentPattern}
+      facilityId={facilityId}
+      facilityName={facilityName}
+      openingHours={openingHours}
+    />
+  );
 
   return (
     <div className="space-y-6 font-inter">
@@ -135,88 +124,28 @@ export function AvailabilityTab({
 
           {zones.map((zone) => (
             <TabsContent key={zone.id} value={zone.id} className="mt-6">
-              <AvailabilityTabContent
-                zone={zone}
-                zones={zones}
-                currentWeekStart={currentWeekStart}
-                setCurrentWeekStart={setCurrentWeekStart}
-                canGoPrevious={canGoPrevious}
-                selectedSlots={selectedSlots}
-                setSelectedSlots={setSelectedSlots}
-                conflictManager={conflictManager}
-                showLegend={showLegend}
-                onPatternBuilderOpen={() => setShowPatternBuilder(true)}
-                onBookingDrawerOpen={() => setShowBookingDrawer(true)}
-                setShowConflictWizard={setShowConflictWizard}
-                setConflictResolutionData={setConflictResolutionData}
-                currentPattern={currentPattern}
-                setCurrentPattern={setCurrentPattern}
-                facilityId={facilityId}
-                facilityName={facilityName}
-                openingHours={openingHours}
-              />
+              {renderZoneTab(zone)}
             </TabsContent>
           ))}
         </Tabs>
       ) : (
-        zones.length > 0 && (
-          <AvailabilityTabContent
-            zone={zones[0]}
-            zones={zones}
-            currentWeekStart={currentWeekStart}
-            setCurrentWeekStart={setCurrentWeekStart}
-            canGoPrevious={canGoPrevious}
-            selectedSlots={selectedSlots}
-            setSelectedSlots={setSelectedSlots}
-            conflictManager={conflictManager}
-            showLegend={showLegend}
-            onPatternBuilderOpen={() => setShowPatternBuilder(true)}
-            onBookingDrawerOpen={() => setShowBookingDrawer(true)}
-            setShowConflictWizard={setShowConflictWizard}
-            setConflictResolutionData={setConflictResolutionData}
-            currentPattern={currentPattern}
-            setCurrentPattern={setCurrentPattern}
-            facilityId={facilityId}
-            facilityName={facilityName}
-            openingHours={openingHours}
-          />
-        )
+        zones.length > 0 && renderZoneTab(zones[0])
       )}
 
-      {/* Simplified Pattern Builder Modal */}
-      {showPatternBuilder && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <RecurrencePatternBuilder
-            pattern={currentPattern}
-            onPatternChange={setCurrentPattern}
-            onClose={() => setShowPatternBuilder(false)}
-            onApplyPattern={handlePatternApply}
-          />
-        </div>
-      )}
-
-      {/* Conflict Resolution Wizard */}
-      {showConflictWizard && conflictResolutionData && (
-        <ConflictResolutionWizard
-          isOpen={showConflictWizard}
-          onClose={() => setShowConflictWizard(false)}
-          conflictedDates={conflictResolutionData.conflictedDates}
-          availableDates={conflictResolutionData.availableDates}
-          alternativeTimeSlots={conflictResolutionData.alternativeTimeSlots}
-          suggestedZones={conflictResolutionData.suggestedZones}
-          originalZone={conflictResolutionData.originalZone}
-          originalTimeSlot={conflictResolutionData.originalTimeSlot}
-          onResolutionSelect={() => setShowConflictWizard(false)}
-        />
-      )}
-
-      {/* Booking Drawer */}
-      <BookingDrawer
-        isOpen={showBookingDrawer}
-        onClose={() => setShowBookingDrawer(false)}
+      <AvailabilityModals
+        showPatternBuilder={showPatternBuilder}
+        showConflictWizard={showConflictWizard}
+        showBookingDrawer={showBookingDrawer}
+        currentPattern={currentPattern}
+        conflictResolutionData={conflictResolutionData}
         selectedSlots={selectedSlots}
         facilityId={facilityId}
         facilityName={facilityName}
+        onPatternBuilderClose={() => setShowPatternBuilder(false)}
+        onConflictWizardClose={() => setShowConflictWizard(false)}
+        onBookingDrawerClose={() => setShowBookingDrawer(false)}
+        onPatternChange={setCurrentPattern}
+        onPatternApply={handlePatternApply}
       />
     </div>
   );
