@@ -28,6 +28,7 @@ function App() {
                     <Routes>
                       <Route path="/" element={<Index />} />
                       <Route path="/facility/:id" element={<FacilityDetailsPage />} />
+                      <Route path="/facilities/:id" element={<FacilityDetailsPage />} />
                       <Route path="/booking/:facilityId/confirm" element={<BookingConfirmationPage />} />
                       <Route path="/checkout" element={<CheckoutPage />} />
                       <Route path="/login" element={<LoginPage />} />
