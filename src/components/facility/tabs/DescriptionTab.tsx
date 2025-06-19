@@ -21,7 +21,7 @@ export function DescriptionTab({ description, capacity, address }: DescriptionTa
 
       {/* Location Map */}
       <div className="border-t border-gray-200 pt-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('facility.labels.location')}</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('facility.details.location')}</h3>
         <div className="h-64 rounded-lg overflow-hidden border">
           <FacilityLocation address={address} />
         </div>

@@ -1,148 +1,93 @@
+
 export const facilityTranslations = {
   NO: {
-    labels: {
-      name: "Navn",
-      description: "Beskrivelse",
-      capacity: "Kapasitet",
-      pricePerHour: "Pris per time",
-      location: "Lokasjon",
-      address: "Adresse",
-      openingHours: "Åpningstider",
-      equipment: "Utstyr",
-      amenities: "Fasiliteter",
-      accessibility: "Tilgjengelighet",
-      suitableFor: "Egnet for",
-      area: "Areal",
-      zones: "Soner",
-      availability: "Tilgjengelighet",
-      bookingRules: "Booking regler"
-    },
-    types: {
-      "Gymsal": "Gymsal",
-      "Idrettshall": "Idrettshall",
-      "Svømmehall": "Svømmehall",
-      "Møterom": "Møterom",
-      "Auditorium": "Auditorium",
-      "Konferansesal": "Konferansesal"
-    },
     details: {
       capacity: "Kapasitet",
-      area: "Areal",
-      nextAvailable: "Neste ledige",
-      openingHours: "Åpningstider",
-      zones: "Soner",
+      pricePerHour: "Pris per time",
+      bookNow: "Bestill nå",
+      viewDetails: "Se detaljer",
+      location: "Lokasjon",
+      features: "Funksjoner",
       equipment: "Utstyr",
       amenities: "Fasiliteter",
+      description: "Beskrivelse",
       accessibility: "Tilgjengelighet",
-      suitableFor: "Egnet for",
-      bookNow: "Reserver nå",
-      viewDetails: "Se detaljer og book",
-      shareText: "Del lokalet",
-      favoriteText: "Legg til favoritter"
-    },
-    accessibility: {
-      wheelchair: "Rullestoltilgjengelig",
-      hearingLoop: "Teleslynge",
-      visualGuidance: "Visuell veiledning",
-      elevator: "Heis",
-      parking: "Tilgjengelig parkering"
-    },
-    equipment: {
-      projector: "Projektor",
-      soundSystem: "Lydanlegg",
-      whiteboard: "Whiteboard",
-      basketball: "Basketkurv",
-      volleyball: "Volleyballnett",
-      handball: "Håndballmål",
-      climateControl: "Klimaanlegg",
-      security: "Sikkerhetskameraer"
-    },
-    booking: {
-      wholeHall: "Hele lokalet",
-      partialBooking: "Delbooking",
-      autoApproval: "Automatisk godkjenning",
-      manualApproval: "Manuell godkjenning",
-      availableNow: "Tilgjengelig nå",
-      bookingRequired: "Reservasjon påkrevd"
+      policies: "Retningslinjer",
+      contact: "Kontakt",
+      availability: "Tilgjengelighet",
+      bookingRules: "Booking regler",
+      gallery: "Galleri"
     },
     search: {
       noResults: "Ingen lokaler funnet",
-      tryDifferent: "Prøv å endre søkekriteriene dine",
-      loading: "Laster lokaler...",
-      error: "Feil ved lasting av lokaler"
+      searchPlaceholder: "Søk etter lokaler...",
+      filters: "Filtrer",
+      sortBy: "Sorter etter",
+      showingResults: "Viser {count} av {total} lokaler"
+    },
+    booking: {
+      selectTimeSlot: "Velg tidspunkt",
+      duration: "Varighet",
+      recurring: "Gjentakende",
+      oneTime: "En gang"
+    },
+    zones: {
+      wholeVenue: "Hele lokalet",
+      partialBooking: "Delvis booking",
+      selectZone: "Velg sone"
+    },
+    actions: {
+      book: "Bestill",
+      cancel: "Avbryt",
+      edit: "Rediger",
+      view: "Vis",
+      share: "Del",
+      favorite: "Favoritt"
     }
   },
   EN: {
-    labels: {
-      name: "Name",
-      description: "Description",
-      capacity: "Capacity",
-      pricePerHour: "Price per hour",
-      location: "Location",
-      address: "Address",
-      openingHours: "Opening hours",
-      equipment: "Equipment",
-      amenities: "Amenities",
-      accessibility: "Accessibility",
-      suitableFor: "Suitable for",
-      area: "Area",
-      zones: "Zones",
-      availability: "Availability",
-      bookingRules: "Booking rules"
-    },
-    types: {
-      "Gymsal": "Gymnasium",
-      "Idrettshall": "Sports Hall",
-      "Svømmehall": "Swimming Pool",
-      "Møterom": "Meeting Room",
-      "Auditorium": "Auditorium",
-      "Konferansesal": "Conference Hall"
-    },
     details: {
       capacity: "Capacity",
-      area: "Area",
-      nextAvailable: "Next available",
-      openingHours: "Opening hours",
-      zones: "Zones",
+      pricePerHour: "Price per hour",
+      bookNow: "Book now",
+      viewDetails: "View details",
+      location: "Location",
+      features: "Features",
       equipment: "Equipment",
       amenities: "Amenities",
+      description: "Description",
       accessibility: "Accessibility",
-      suitableFor: "Suitable for",
-      bookNow: "Book now",
-      viewDetails: "View details and book",
-      shareText: "Share facility",
-      favoriteText: "Add to favorites"
-    },
-    accessibility: {
-      wheelchair: "Wheelchair accessible",
-      hearingLoop: "Hearing loop",
-      visualGuidance: "Visual guidance",
-      elevator: "Elevator",
-      parking: "Accessible parking"
-    },
-    equipment: {
-      projector: "Projector",
-      soundSystem: "Sound system",
-      whiteboard: "Whiteboard",
-      basketball: "Basketball hoop",
-      volleyball: "Volleyball net",
-      handball: "Handball goal",
-      climateControl: "Climate control",
-      security: "Security cameras"
-    },
-    booking: {
-      wholeHall: "Entire facility",
-      partialBooking: "Partial booking",
-      autoApproval: "Auto approval",
-      manualApproval: "Manual approval",
-      availableNow: "Available now",
-      bookingRequired: "Booking required"
+      policies: "Policies",
+      contact: "Contact",
+      availability: "Availability",
+      bookingRules: "Booking rules",
+      gallery: "Gallery"
     },
     search: {
       noResults: "No facilities found",
-      tryDifferent: "Try changing your search criteria",
-      loading: "Loading facilities...",
-      error: "Error loading facilities"
+      searchPlaceholder: "Search for facilities...",
+      filters: "Filter",
+      sortBy: "Sort by",
+      showingResults: "Showing {count} of {total} facilities"
+    },
+    booking: {
+      selectTimeSlot: "Select time slot",
+      duration: "Duration",
+      recurring: "Recurring",
+      oneTime: "One time"
+    },
+    zones: {
+      wholeVenue: "Whole venue",
+      partialBooking: "Partial booking",
+      selectZone: "Select zone"
+    },
+    actions: {
+      book: "Book",
+      cancel: "Cancel",
+      edit: "Edit",
+      view: "View",
+      share: "Share",
+      favorite: "Favorite"
     }
   }
 };

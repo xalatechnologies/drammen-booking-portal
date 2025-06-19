@@ -1,17 +1,9 @@
 
-// Simple translation system for Norwegian/English
-export const useTranslation = () => {
-  const t = (key: string, params?: Record<string, any>, fallback?: string) => {
-    // For now, return the fallback or key
-    return fallback || key;
-  };
+// Re-export the main translation hook for backward compatibility
+export { useTranslation } from './hooks/useTranslation';
 
-  const formatCurrency = (amount: number, currency: string = 'NOK') => {
-    return new Intl.NumberFormat('nb-NO', {
-      style: 'currency',
-      currency: currency
-    }).format(amount);
-  };
+// Export types for convenience
+export type { Language, TranslationFunction, TranslationParams } from './types';
 
-  return { t, formatCurrency };
-};
+// Export the language context for direct access if needed
+export { useLanguage, LanguageProvider } from '@/contexts/LanguageContext';

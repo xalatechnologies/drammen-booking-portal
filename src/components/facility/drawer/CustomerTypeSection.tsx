@@ -35,9 +35,9 @@ export function CustomerTypeSection({ value, onChange }: CustomerTypeSectionProp
         <Alert className="border-amber-200 bg-amber-50">
           <AlertTriangle className="h-4 w-4 text-amber-600" />
           <AlertDescription className="text-amber-800">
-            <div className="font-medium mb-1">{t('forms.messages.requiresApproval')}</div>
+            <div className="font-medium mb-1">{t('booking.approval.required')}</div>
             <div className="text-sm">
-              {t('forms.descriptions.approvalProcess')}
+              {t('booking.approval.description')}
             </div>
           </AlertDescription>
         </Alert>

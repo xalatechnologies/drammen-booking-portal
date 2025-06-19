@@ -8,6 +8,7 @@ import { BookingFormSteps } from "./BookingFormSteps";
 import { validateCurrentStep, canContinueToNextStep } from "./BookingFormValidation";
 import { Zone, BookingStep } from "./types";
 import { BookingFormValues } from "./formSchema";
+import { useTranslation } from "@/i18n/hooks/useTranslation";
 
 interface EnhancedBookingFormProps {
   facility: {
@@ -27,6 +28,7 @@ interface EnhancedBookingFormProps {
 }
 
 function BookingFormContent({ facility, onBookingComplete }: EnhancedBookingFormProps) {
+  const { t } = useTranslation();
   const {
     form,
     currentStep,
@@ -38,10 +40,10 @@ function BookingFormContent({ facility, onBookingComplete }: EnhancedBookingForm
 
   const steps: BookingStep[] = ['details', 'services', 'contact', 'confirm'];
   const stepTitles = [
-    "Reservasjonsdetaljer", 
-    "Ekstra tjenester", 
-    "Kontaktinformasjon", 
-    "Gjennomgå og bekreft"
+    t('forms.headings.bookingDetails'),
+    t('forms.headings.additionalServices'),
+    t('forms.headings.contactInformation'),
+    t('forms.buttons.submit')
   ];
 
   const isFirstStep = currentStep === 0;
@@ -82,7 +84,7 @@ function BookingFormContent({ facility, onBookingComplete }: EnhancedBookingForm
   };
 
   return (
-    <div className="bg-white shadow-sm border border-gray-200 rounded-lg overflow-hidden" role="main" aria-label="Booking form">
+    <div className="bg-white shadow-sm border border-gray-200 rounded-lg overflow-hidden" role="main" aria-label={t('forms.headings.bookingDetails')}>
       {/* Clean Header */}
       <div className="bg-gradient-to-r from-slate-50 to-white px-6 py-4 border-b border-gray-200">
         <CollapsibleFormStepper 
@@ -90,7 +92,7 @@ function BookingFormContent({ facility, onBookingComplete }: EnhancedBookingForm
           steps={stepTitles} 
           onStepClick={setCurrentStep} 
           canNavigateToStep={stepIndex => stepIndex <= currentStep} 
-          aria-label="Booking progress" 
+          aria-label={t('common.navigation.progress', {}, 'Booking progress')} 
         />
       </div>
       
