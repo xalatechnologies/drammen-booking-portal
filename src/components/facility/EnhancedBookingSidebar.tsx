@@ -1,6 +1,6 @@
 
 import React, { useEffect } from "react";
-import { ShoppingCart, X, CreditCard, Calendar, CheckCircle2, User } from "lucide-react";
+import { ShoppingCart, X, CreditCard, Calendar, CheckCircle2, User, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -29,8 +29,8 @@ export function EnhancedBookingSidebar({
   selectedSlots = [],
   onClearSlots
 }: EnhancedBookingSidebarProps) {
-  const { cartItems, removeFromCart, getTotalPrice, getItemCount, addToCart } = useCart();
-  const { state, actions } = useBookingState();
+  const { cartItems, removeFromCart, getTotalPrice, getItemCount } = useCart();
+  const { state, actions, businessLogic } = useBookingState();
   const navigate = useNavigate();
   const { t } = useTranslation();
 
@@ -50,37 +50,25 @@ export function EnhancedBookingSidebar({
   };
 
   const handleBookSlots = () => {
-    actions.setCurrentStep('booking');
+    if (hasSelectedSlots) {
+      actions.setCurrentStep('booking');
+    } else {
+      actions.addBookingError('Velg minst ett tidspunkt før booking');
+    }
   };
 
   const handleContinueBooking = () => {
-    // Basic validation
-    if (!state.formData.contactName || !state.formData.contactEmail || !state.formData.contactPhone) {
-      actions.addBookingError('Vennligst fyll ut alle obligatoriske felt');
-      return;
-    }
-
-    actions.clearBookingErrors();
     actions.setBookingInProgress(true);
-
-    // Create booking and add to cart
+    
     try {
-      state.selectedSlots.forEach(slot => {
-        addToCart({
-          ...slot,
-          facilityId,
-          facilityName,
-          pricePerHour: 225 // Default price, should come from facility data
-        });
-      });
-
-      // Move to cart step
-      actions.setCurrentStep('cart');
-      actions.clearSelectedSlots();
+      const success = actions.addToCartAndContinue(facilityId, facilityName);
       
-      // Clear external selected slots
-      if (onClearSlots) {
-        onClearSlots();
+      if (success) {
+        // Clear external selected slots
+        if (onClearSlots) {
+          onClearSlots();
+        }
+        actions.saveToStorage(); // Ensure state is saved
       }
     } catch (error) {
       actions.addBookingError('Feil ved opprettelse av booking');
@@ -96,8 +84,24 @@ export function EnhancedBookingSidebar({
     }
   };
 
+  const handleFormFieldChange = (field: string, value: string) => {
+    actions.updateFormData({ [field]: value });
+  };
+
+  const getFieldError = (field: keyof typeof state.validationErrors) => {
+    return state.validationErrors[field];
+  };
+
   return (
     <div className="space-y-4">
+      {/* Auto-save indicator */}
+      {state.isDirty && (
+        <div className="text-xs text-gray-500 flex items-center gap-1">
+          <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
+          Lagrer automatisk...
+        </div>
+      )}
+
       {/* Selected Time Slots Section */}
       {hasSelectedSlots && (
         <Collapsible open={state.currentStep === 'selection'} onOpenChange={(open) => 
@@ -140,11 +144,23 @@ export function EnhancedBookingSidebar({
                     </div>
                   </div>
                 ))}
+
+                {/* Price display */}
+                <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-medium text-green-700">Estimert pris:</span>
+                    <span className="font-bold text-green-800">{businessLogic.calculateTotalPrice()} kr</span>
+                  </div>
+                  {businessLogic.requiresApproval() && (
+                    <p className="text-xs text-green-600 mt-1">Krever godkjenning</p>
+                  )}
+                </div>
                 
                 <div className="flex gap-2 pt-2">
                   <Button
                     onClick={handleBookSlots}
                     className="flex-1 bg-[#1e3a8a] hover:bg-[#1e40af] text-white"
+                    disabled={!businessLogic.canProceedToNextStep()}
                   >
                     <CheckCircle2 className="h-4 w-4 mr-2" />
                     Book valgte tidspunkt
@@ -173,12 +189,16 @@ export function EnhancedBookingSidebar({
               <CardTitle className="flex items-center gap-2 text-lg">
                 <User className="h-5 w-5" />
                 Booking detaljer
+                {!businessLogic.isFormValid() && (
+                  <AlertTriangle className="h-4 w-4 text-yellow-500" />
+                )}
               </CardTitle>
             </CardHeader>
           </CollapsibleTrigger>
           <CollapsibleContent>
             <CardContent>
               <div className="space-y-4">
+                {/* General errors */}
                 {state.bookingErrors.length > 0 && (
                   <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
                     {state.bookingErrors.map((error, index) => (
@@ -202,8 +222,8 @@ export function EnhancedBookingSidebar({
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="private">Privatperson</SelectItem>
-                      <SelectItem value="business">Bedrift</SelectItem>
-                      <SelectItem value="organization">Organisasjon</SelectItem>
+                      <SelectItem value="business">Bedrift (-10%)</SelectItem>
+                      <SelectItem value="organization">Organisasjon (-20%)</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -215,10 +235,13 @@ export function EnhancedBookingSidebar({
                     </Label>
                     <Input
                       value={state.formData.contactName}
-                      onChange={(e) => actions.updateFormData({ contactName: e.target.value })}
+                      onChange={(e) => handleFormFieldChange('contactName', e.target.value)}
                       placeholder="Skriv inn fullt navn"
-                      required
+                      className={getFieldError('contactName') ? 'border-red-500' : ''}
                     />
+                    {getFieldError('contactName') && (
+                      <p className="text-xs text-red-600 mt-1">{getFieldError('contactName')}</p>
+                    )}
                   </div>
 
                   <div>
@@ -228,10 +251,13 @@ export function EnhancedBookingSidebar({
                     <Input
                       type="email"
                       value={state.formData.contactEmail}
-                      onChange={(e) => actions.updateFormData({ contactEmail: e.target.value })}
+                      onChange={(e) => handleFormFieldChange('contactEmail', e.target.value)}
                       placeholder="din@epost.no"
-                      required
+                      className={getFieldError('contactEmail') ? 'border-red-500' : ''}
                     />
+                    {getFieldError('contactEmail') && (
+                      <p className="text-xs text-red-600 mt-1">{getFieldError('contactEmail')}</p>
+                    )}
                   </div>
 
                   <div>
@@ -241,10 +267,13 @@ export function EnhancedBookingSidebar({
                     <Input
                       type="tel"
                       value={state.formData.contactPhone}
-                      onChange={(e) => actions.updateFormData({ contactPhone: e.target.value })}
+                      onChange={(e) => handleFormFieldChange('contactPhone', e.target.value)}
                       placeholder="+47 123 45 678"
-                      required
+                      className={getFieldError('contactPhone') ? 'border-red-500' : ''}
                     />
+                    {getFieldError('contactPhone') && (
+                      <p className="text-xs text-red-600 mt-1">{getFieldError('contactPhone')}</p>
+                    )}
                   </div>
 
                   <div>
@@ -253,9 +282,24 @@ export function EnhancedBookingSidebar({
                     </Label>
                     <Input
                       value={state.formData.organization}
-                      onChange={(e) => actions.updateFormData({ organization: e.target.value })}
+                      onChange={(e) => handleFormFieldChange('organization', e.target.value)}
                       placeholder="Organisasjonsnavn"
                     />
+                  </div>
+
+                  <div>
+                    <Label className="text-sm font-medium text-gray-700 mb-2 block">
+                      Formål (valgfritt)
+                    </Label>
+                    <Input
+                      value={state.formData.purpose || ''}
+                      onChange={(e) => handleFormFieldChange('purpose', e.target.value)}
+                      placeholder="Beskriv formålet med bookingen"
+                      className={getFieldError('purpose') ? 'border-red-500' : ''}
+                    />
+                    {getFieldError('purpose') && (
+                      <p className="text-xs text-red-600 mt-1">{getFieldError('purpose')}</p>
+                    )}
                   </div>
                 </div>
 
@@ -263,9 +307,10 @@ export function EnhancedBookingSidebar({
                   <Button 
                     onClick={handleContinueBooking}
                     className="flex-1 bg-[#1e3a8a] hover:bg-[#1e40af]"
-                    disabled={!hasSelectedSlots || !state.formData.contactName || !state.formData.contactEmail || !state.formData.contactPhone || state.isBookingInProgress}
+                    disabled={!businessLogic.canProceedToNextStep() || state.isBookingInProgress}
                   >
-                    {state.isBookingInProgress ? 'Behandler...' : 'Fortsett med booking'}
+                    {state.isBookingInProgress ? 'Behandler...' : 
+                     businessLogic.requiresApproval() ? 'Send til godkjenning' : 'Fortsett med booking'}
                   </Button>
                   <Button
                     variant="outline"
@@ -282,7 +327,7 @@ export function EnhancedBookingSidebar({
         </Card>
       </Collapsible>
 
-      {/* Cart Section */}
+      {/* Cart Section - Enhanced with better integration */}
       <Collapsible open={state.currentStep === 'cart'} onOpenChange={(open) => 
         open ? actions.setCurrentStep('cart') : null
       }>
