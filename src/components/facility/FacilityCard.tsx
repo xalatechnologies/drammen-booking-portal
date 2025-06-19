@@ -198,7 +198,7 @@ export function FacilityCard({ facility, onAddressClick }: FacilityCardProps) {
                 key={index}
                 className="bg-blue-50 text-blue-700 border-blue-200 font-medium px-4 py-2 text-base hover:bg-blue-100 transition-colors"
               >
-                {t('facility.activity')}
+                  {t(`facility.types.${facility.suitableFor}`, {}, activity)}
               </Badge>
             ))}
             {facility.suitableFor.length > 2 && (
