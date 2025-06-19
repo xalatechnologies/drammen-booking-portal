@@ -13,6 +13,7 @@ import GlobalSearch from "@/components/header/GlobalSearch";
 import { CartDropdown } from "@/components/header/CartDropdown";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useCart } from "@/contexts/CartContext";
+import { useAuth } from "@/contexts/AuthContext";
 
 const GlobalHeader = () => {
   const navigate = useNavigate();
@@ -20,24 +21,16 @@ const GlobalHeader = () => {
   const [cartOpen, setCartOpen] = useState(false);
   const { language, toggleLanguage } = useLanguage();
   const { getItemCount } = useCart();
-  
-  // Add state to track if user is logged in (we'll use localStorage to persist this between refreshes)
-  const [isLoggedIn, setIsLoggedIn] = useState(() => {
-    // Check localStorage for login status on component mount
-    return localStorage.getItem("isLoggedIn") === "true";
-  });
+  const { isAuthenticated, logout } = useAuth();
 
-  // Function to handle login
+  // Function to handle login navigation
   const handleLogin = () => {
-    localStorage.setItem("isLoggedIn", "true");
-    setIsLoggedIn(true);
-    navigate("/login");
+    navigate("/login-selection");
   };
 
   // Function to handle logout
   const handleLogout = () => {
-    localStorage.setItem("isLoggedIn", "false");
-    setIsLoggedIn(false);
+    logout();
   };
 
   const itemCount = getItemCount();
@@ -69,13 +62,13 @@ const GlobalHeader = () => {
           {/* Cart Icon with Dropdown */}
           <Popover open={cartOpen} onOpenChange={setCartOpen}>
             <PopoverTrigger asChild>
-              <Button variant="ghost" className="relative p-2">
+              <Button variant="ghost" className="relative p-2 hover:bg-gray-100">
                 <ShoppingCart className="h-6 w-6" />
                 {itemCount > 0 && (
                   <Badge 
-                    className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center text-xs bg-red-500 text-white rounded-full"
+                    className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center text-xs bg-red-500 text-white rounded-full animate-pulse"
                   >
-                    {itemCount}
+                    {itemCount > 99 ? '99+' : itemCount}
                   </Badge>
                 )}
               </Button>
@@ -93,7 +86,7 @@ const GlobalHeader = () => {
           
           {/* Profile menu (login button or dropdown) */}
           <ProfileMenu 
-            isLoggedIn={isLoggedIn} 
+            isLoggedIn={isAuthenticated} 
             handleLogin={handleLogin} 
             handleLogout={handleLogout}
           />
@@ -108,10 +101,9 @@ const GlobalHeader = () => {
       {/* Mobile Menu */}
       <MobileMenu 
         isOpen={mobileMenuOpen}
-        isLoggedIn={isLoggedIn}
+        isLoggedIn={isAuthenticated}
         setLanguage={(lang) => {
           if (lang === 'NO' || lang === 'EN') {
-            // Use the context's setLanguage method
             const event = new CustomEvent('setLanguage', { detail: lang });
             window.dispatchEvent(event);
           }

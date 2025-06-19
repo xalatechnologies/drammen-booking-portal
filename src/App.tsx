@@ -1,40 +1,46 @@
-
-import React from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import Index from "@/pages/Index";
-import FacilityDetail from "@/pages/facilities/[id]";
-import BookingPage from "@/pages/booking/[facilityId]";
-import CheckoutPage from "@/pages/checkout";
-import ConfirmationPage from "@/pages/confirmation";
-import { LocalizationProvider } from "@/contexts/LocalizationContext";
-import { LanguageProvider } from "@/contexts/LanguageContext";
-import { QueryClient } from "@/contexts/QueryClient";
-import { CartProvider } from "@/contexts/CartContext";
-import { BookingStateProvider } from "@/contexts/BookingStateContext";
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { QueryClient } from 'react-query';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { LanguageProvider } from '@/contexts/LanguageContext';
+import { CartProvider } from '@/contexts/CartContext';
+import { BookingStateProvider } from '@/contexts/BookingStateContext';
+import FacilityList from '@/pages/FacilityList';
+import FacilityDetailsPage from '@/pages/FacilityDetailsPage';
+import BookingConfirmationPage from '@/pages/BookingConfirmationPage';
+import CheckoutPage from '@/pages/checkout';
+import LoginPage from '@/pages/LoginPage';
+import LoginSelectionPage from '@/pages/LoginSelectionPage';
+import { Toaster } from "@/components/ui/toaster"
+import { AuthProvider } from "@/contexts/AuthContext";
 
 function App() {
   return (
-    <CartProvider>
-      <BookingStateProvider>
-        <QueryClient>
-          <Router>
-            <LanguageProvider>
-              <LocalizationProvider>
-                <div className="flex flex-col min-h-screen w-full">
-                  <Routes>
-                    <Route path="/" element={<Index />} />
-                    <Route path="/facilities/:id" element={<FacilityDetail />} />
-                    <Route path="/booking/:id" element={<BookingPage />} />
-                    <Route path="/checkout" element={<CheckoutPage />} />
-                    <Route path="/confirmation" element={<ConfirmationPage />} />
-                  </Routes>
-                </div>
-              </LocalizationProvider>
-            </LanguageProvider>
-          </Router>
-        </QueryClient>
-      </BookingStateProvider>
-    </CartProvider>
+    <Router>
+      <QueryClient>
+        <LocalizationProvider>
+          <LanguageProvider>
+            <AuthProvider>
+              <CartProvider>
+                <BookingStateProvider>
+                  <div className="App">
+                    <Routes>
+                      <Route path="/" element={<FacilityList />} />
+                      <Route path="/facility/:id" element={<FacilityDetailsPage />} />
+                      <Route path="/booking/:facilityId/confirm" element={<BookingConfirmationPage />} />
+                      <Route path="/checkout" element={<CheckoutPage />} />
+                      <Route path="/login" element={<LoginPage />} />
+                      <Route path="/login-selection" element={<LoginSelectionPage />} />
+                    </Routes>
+                    <Toaster />
+                  </div>
+                </BookingStateProvider>
+              </CartProvider>
+            </AuthProvider>
+          </LanguageProvider>
+        </LocalizationProvider>
+      </QueryClient>
+    </Router>
   );
 }
 

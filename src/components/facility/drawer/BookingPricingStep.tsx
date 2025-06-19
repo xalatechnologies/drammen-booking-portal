@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, User, LogIn } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { SelectedTimeSlot } from '@/utils/recurrenceEngine';
 import { ActorType, BookingType } from '@/types/pricing';
@@ -12,6 +12,7 @@ import { useTranslation } from '@/i18n/hooks/useTranslation';
 import { useCart } from '@/contexts/CartContext';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface BookingPricingStepProps {
   selectedSlots: SelectedTimeSlot[];
@@ -42,12 +43,10 @@ export function BookingPricingStep({
   const { addToCart } = useCart();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
 
   // Check if booking requires approval
   const requiresApproval = ['lag-foreninger', 'paraply'].includes(actorType);
-
-  // Check authentication status from localStorage (simple implementation)
-  const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
 
   const handleAddToCart = () => {
     try {
@@ -82,7 +81,7 @@ export function BookingPricingStep({
   };
 
   const handleComplete = () => {
-    if (!isLoggedIn) {
+    if (!isAuthenticated) {
       // Store current booking state for post-login redirect
       sessionStorage.setItem('pending_booking', JSON.stringify({
         selectedSlots,
@@ -97,7 +96,7 @@ export function BookingPricingStep({
         description: "Du må logge inn for å fullføre reservasjonen",
       });
       
-      navigate('/login');
+      navigate('/login-selection');
       return;
     }
 
@@ -140,7 +139,19 @@ export function BookingPricingStep({
           className="flex-1 text-lg py-6" 
           size="lg"
         >
-          {requiresApproval ? t('forms.buttons.submitForApproval', {}, 'Fullfør') : t('forms.buttons.complete', {}, 'Fullfør')}
+          {!isAuthenticated ? (
+            <>
+              <LogIn className="h-4 w-4 mr-2" />
+              Logg inn og fullfør
+            </>
+          ) : requiresApproval ? (
+            <>
+              <User className="h-4 w-4 mr-2" />
+              Send til godkjenning
+            </>
+          ) : (
+            t('forms.buttons.complete', {}, 'Fullfør')
+          )}
         </Button>
       </div>
     </>

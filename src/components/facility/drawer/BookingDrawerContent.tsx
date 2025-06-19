@@ -22,7 +22,7 @@ interface BookingDrawerContentProps {
   facilityId: string;
   facilityName: string;
   zones?: Zone[];
-  onSlotsCleared?: () => void; // Callback to clear slots in parent
+  onSlotsCleared?: () => void;
 }
 
 export function BookingDrawerContent({
@@ -59,8 +59,6 @@ export function BookingDrawerContent({
     }
     
     // Check if slots are recurring pattern or just multiple single bookings
-    // For now, if multiple slots, assume it's fastlån
-    // TODO: Could be enhanced to detect actual recurring patterns
     return selectedSlots.length > 3 ? 'fastlan' : 'engangs';
   }, [selectedSlots]);
 
