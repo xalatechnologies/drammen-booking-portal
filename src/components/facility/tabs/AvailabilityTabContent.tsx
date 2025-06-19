@@ -16,6 +16,8 @@ import { useStrotimer } from '@/hooks/useStrotimer';
 import { useSlotSelection } from '@/hooks/useSlotSelection';
 import { parseOpeningHours } from '@/utils/openingHoursParser';
 import { isSlotSelected } from './AvailabilityTabUtils';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Zap } from 'lucide-react';
 
 interface AvailabilityTabContentProps {
   zone: Zone;
@@ -99,6 +101,11 @@ export function AvailabilityTabContent({
     setSelectedSlots([]);
   };
 
+  // Check if there are any strøtimer for the current week
+  const hasStrøtimer = strøtimer.length > 0;
+
+  console.log('AvailabilityTabContent - Opening hours:', openingHours);
+  console.log('AvailabilityTabContent - Generated time slots:', timeSlots);
   console.log('AvailabilityTabContent - Strøtimer data:', strøtimer);
   console.log('AvailabilityTabContent - FacilityId:', facilityId);
   console.log('AvailabilityTabContent - Current week start:', currentWeekStart);
@@ -111,15 +118,36 @@ export function AvailabilityTabContent({
         canGoPrevious={canGoPrevious}
       />
 
-      {/* Show strøtimer for each day of the week */}
-      {weekDays.map(day => (
-        <StrotimeDisplay
-          key={day.toISOString()}
-          strøtimer={strøtimer}
-          date={day}
-          onBookingComplete={handleStrøtimeBookingComplete}
-        />
-      ))}
+      {/* Strøtimer Accordion - Only show if there are strøtimer */}
+      {hasStrøtimer && (
+        <Accordion type="single" collapsible className="w-full">
+          <AccordionItem value="strotimer">
+            <AccordionTrigger className="hover:no-underline">
+              <div className="flex items-center gap-3">
+                <Zap className="h-6 w-6 text-orange-600" />
+                <div className="text-left">
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    Strøtimer - Ledige tider
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    {strøtimer.length} ledige tider tilgjengelig for drop-in booking
+                  </p>
+                </div>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="space-y-4 pt-4">
+              {weekDays.map(day => (
+                <StrotimeDisplay
+                  key={day.toISOString()}
+                  strøtimer={strøtimer}
+                  date={day}
+                  onBookingComplete={handleStrøtimeBookingComplete}
+                />
+              ))}
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+      )}
 
       <ResponsiveCalendarGrid
         zone={zone}
