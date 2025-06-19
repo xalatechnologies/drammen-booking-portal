@@ -102,10 +102,21 @@
     min-width: 100%;
     margin: 0;
     padding: 0;
+    /* Hide scrollbar for webkit browsers */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+  }
+
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar,
+  #root::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
   }
 
   body {
     @apply bg-background text-foreground;
+    /* Ensure scrolling is still possible */
+    overflow-y: auto;
   }
 }
 
