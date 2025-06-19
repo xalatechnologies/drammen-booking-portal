@@ -130,13 +130,13 @@ const Index = () => {
 
       <main id="main-content" className="flex-1">
         <div className="w-full py-6">
-          {/* Hero Banner - Centered */}
-          <div className="max-w-7xl mx-auto px-4">
+          {/* Hero Banner - Full width */}
+          <div className="w-full px-4">
             <HeroBanner />
           </div>
           
-          {/* Search Filter - Centered */}
-          <div className="max-w-7xl mx-auto px-4">
+          {/* Search Filter - Full width */}
+          <div className="w-full px-4">
             <SearchFilter
               date={date}
               setDate={setDate}
@@ -167,13 +167,13 @@ const Index = () => {
             />
           </div>
 
-          {/* Content - Conditional container based on view mode */}
+          {/* Content - Full width for list view, contained for others */}
           {(viewMode === "list") ? (
             <div className="w-full px-6">
               {renderContent()}
             </div>
           ) : (
-            <div className="max-w-7xl mx-auto px-4">
+            <div className="w-full px-4">
               {renderContent()}
             </div>
           )}
