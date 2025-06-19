@@ -10,7 +10,7 @@ import { LocalizationProvider } from "@/contexts/LocalizationContext";
 import Index from "@/pages/Index";
 import FacilityDetail from "@/pages/facilities/[id]";
 import BookingPage from "@/pages/booking/[facilityId]";
-import BookingSuccessPage from "@/components/facility/booking/BookingSuccessPage";
+import { BookingSuccessPage } from "@/components/facility/booking/BookingSuccessPage";
 import BookingsPage from "@/pages/bookings/index";
 import LoginPage from "@/pages/LoginSelection";
 import ProfilePage from "@/pages/profile/index";
