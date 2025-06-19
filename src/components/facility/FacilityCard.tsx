@@ -149,14 +149,14 @@ export function FacilityCard({ facility, onAddressClick }: FacilityCardProps) {
             {t(`facility.types.${facility.type}`, {}, facility.type)}
           </Badge>
           <Badge variant="outline" className="bg-black/20 backdrop-blur-sm text-white border-white/30 font-medium px-4 py-2 text-base">
-            {facility.area}
+            {t('facility.area')}
           </Badge>
         </div>
 
         {/* Facility Name Overlay */}
         <div className="absolute bottom-4 left-4 right-4">
           <h3 className="text-3xl font-bold text-white mb-2 drop-shadow-lg">
-            {facility.name}
+            {t('facility.name')}
           </h3>
         </div>
       </div>
@@ -175,7 +175,7 @@ export function FacilityCard({ facility, onAddressClick }: FacilityCardProps) {
 
         {/* Description */}
         <p className="text-gray-700 text-base leading-relaxed mb-5 line-clamp-2">
-          {facility.description}
+         {t('facility.description')}
         </p>
 
         {/* Capacity and Amenities Row */}
@@ -198,7 +198,7 @@ export function FacilityCard({ facility, onAddressClick }: FacilityCardProps) {
                 key={index}
                 className="bg-blue-50 text-blue-700 border-blue-200 font-medium px-4 py-2 text-base hover:bg-blue-100 transition-colors"
               >
-                {activity}
+                {t('facility.activity')}
               </Badge>
             ))}
             {facility.suitableFor.length > 2 && (
