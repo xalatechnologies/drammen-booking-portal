@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -17,14 +16,21 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useTranslation } from "@/i18n";
 import { CartProvider } from "@/contexts/CartContext";
 import { MobileBookingPanel } from "@/components/facility/MobileBookingPanel";
-
 const FacilityDetail = () => {
-  const { id } = useParams();
+  const {
+    id
+  } = useParams();
   const navigate = useNavigate();
   const [isFavorited, setIsFavorited] = useState(false);
-  const { t } = useTranslation();
-
-  const { facility, isLoading, error, notFound } = useOptimizedFacility(Number(id));
+  const {
+    t
+  } = useTranslation();
+  const {
+    facility,
+    isLoading,
+    error,
+    notFound
+  } = useOptimizedFacility(Number(id));
 
   // Enhanced zones with full zone management capabilities
   const zones: Zone[] = [{
@@ -68,7 +74,6 @@ const FacilityDetail = () => {
     features: ["Klimaanlegg", "Moderne lyd", "LED-belysning", "Sikkerhetskameraer"],
     isActive: true
   }];
-
   const handleShare = () => {
     if (navigator.share) {
       navigator.share({
@@ -82,8 +87,7 @@ const FacilityDetail = () => {
 
   // Loading state
   if (isLoading) {
-    return (
-      <CartProvider>
+    return <CartProvider>
         <div className="min-h-screen bg-white flex flex-col">
           <GlobalHeader />
           <div className="flex-grow">
@@ -104,14 +108,12 @@ const FacilityDetail = () => {
           </div>
           <GlobalFooter />
         </div>
-      </CartProvider>
-    );
+      </CartProvider>;
   }
 
   // Error state
   if (error || notFound) {
-    return (
-      <CartProvider>
+    return <CartProvider>
         <div className="min-h-screen bg-white flex flex-col">
           <GlobalHeader />
           <div className="flex-grow flex items-center justify-center">
@@ -121,10 +123,7 @@ const FacilityDetail = () => {
                 {notFound ? "Lokale ikke funnet" : "Feil ved lasting"}
               </h1>
               <p className="text-gray-600 mb-8">
-                {notFound 
-                  ? "Det forespurte lokalet kunne ikke finnes."
-                  : "Det oppstod en feil ved lasting av lokalet."
-                }
+                {notFound ? "Det forespurte lokalet kunne ikke finnes." : "Det oppstod en feil ved lasting av lokalet."}
               </p>
               <Button onClick={() => navigate("/")} className="mb-4">
                 <Home className="h-4 w-4 mr-2" />
@@ -134,15 +133,12 @@ const FacilityDetail = () => {
           </div>
           <GlobalFooter />
         </div>
-      </CartProvider>
-    );
+      </CartProvider>;
   }
 
   // Success state with facility data
   if (!facility) return null;
-
-  return (
-    <CartProvider>
+  return <CartProvider>
       <div className="min-h-screen bg-white flex flex-col">
         <GlobalHeader />
 
@@ -165,75 +161,32 @@ const FacilityDetail = () => {
           <div className="container mx-auto px-4 py-6 max-w-7xl">
             {/* Full Width Gallery Section */}
             <div className="w-full mb-8">
-              <AirBnbStyleGallery 
-                images={[
-                  facility.image,
-                  "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&auto=format&fit=crop",
-                  "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=800&auto=format&fit=crop",
-                  "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&auto=format&fit=crop"
-                ]} 
-                facilityName={facility.name}
-              />
+              <AirBnbStyleGallery images={[facility.image, "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&auto=format&fit=crop", "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=800&auto=format&fit=crop", "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&auto=format&fit=crop"]} facilityName={facility.name} />
             </div>
 
             {/* Facility Header - Title, Tags, Address */}
             <div className="mb-8">
-              <FacilityHeader 
-                name={facility.name} 
-                address={facility.address} 
-                onShare={handleShare} 
-                isFavorited={isFavorited} 
-                onToggleFavorite={() => setIsFavorited(!isFavorited)} 
-              />
+              <FacilityHeader name={facility.name} address={facility.address} onShare={handleShare} isFavorited={isFavorited} onToggleFavorite={() => setIsFavorited(!isFavorited)} />
             </div>
 
             {/* Main Content Layout - 70% / 30% */}
             <div className="grid grid-cols-1 lg:grid-cols-10 gap-8 mb-12">
               {/* Left Column - Tabs Content (70%) */}
               <div className="lg:col-span-7 space-y-6">
-                <FacilityInfoTabs 
-                  description={facility.description} 
-                  capacity={facility.capacity} 
-                  equipment={facility.equipment || []} 
-                  zones={zones} 
-                  amenities={facility.amenities || []} 
-                  address={facility.address}
-                  area={facility.area}
-                  suitableFor={facility.suitableFor || []}
-                  facilityId={id}
-                  facilityName={facility.name}
-                />
+                <FacilityInfoTabs description={facility.description} capacity={facility.capacity} equipment={facility.equipment || []} zones={zones} amenities={facility.amenities || []} address={facility.address} area={facility.area} suitableFor={facility.suitableFor || []} facilityId={id} facilityName={facility.name} />
               </div>
 
               {/* Right Column - Contact Info Sidebar (30%) */}
               <div className="lg:col-span-3 hidden lg:block">
                 <div className="sticky top-6">
-                  <FacilityContactInfo
-                    facilityName={facility.name}
-                    address={facility.address}
-                    openingHours={facility.openingHours}
-                    capacity={facility.capacity}
-                    area={facility.area}
-                  />
+                  <FacilityContactInfo facilityName={facility.name} address={facility.address} openingHours={facility.openingHours} capacity={facility.capacity} area={facility.area} />
                 </div>
               </div>
             </div>
 
             {/* Full Width Calendar Section */}
             <div className="w-full mb-12">
-              <div className="bg-white rounded-lg shadow-sm border p-6">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">
-                  Tilgjengelighet og booking
-                </h2>
-                <AvailabilityTab 
-                  zones={zones} 
-                  startDate={new Date()} 
-                  showLegend={true}
-                  facilityId={id}
-                  facilityName={facility.name}
-                  openingHours={facility.openingHours}
-                />
-              </div>
+              
             </div>
 
             {/* Similar Facilities Section */}
@@ -244,18 +197,10 @@ const FacilityDetail = () => {
         </div>
 
         {/* Mobile Booking Panel */}
-        <MobileBookingPanel
-          facilityName={facility.name}
-          facilityId={id || ""}
-          capacity={facility.capacity}
-          area={facility.area}
-          openingHours={facility.openingHours}
-        />
+        <MobileBookingPanel facilityName={facility.name} facilityId={id || ""} capacity={facility.capacity} area={facility.area} openingHours={facility.openingHours} />
 
         <GlobalFooter />
       </div>
-    </CartProvider>
-  );
+    </CartProvider>;
 };
-
 export default FacilityDetail;
