@@ -29,26 +29,6 @@ const FilterSelects: React.FC<FilterSelectsProps> = ({
 }) => {
   const { t } = useTranslation();
 
-  // Define consistent facility type mappings that match database values
-  const facilityTypeOptions = [
-    { value: "all", labelKey: "search.placeholders.allTypes" },
-    { value: "gymsal", labelKey: "forms.facilityTypes.sportsHall" },
-    { value: "møterom", labelKey: "forms.facilityTypes.meetingRoom" },
-    { value: "konferanserom", labelKey: "forms.facilityTypes.conferenceRoom" },
-    { value: "auditorium", labelKey: "forms.facilityTypes.auditorium" },
-    { value: "treningssenter", labelKey: "forms.facilityTypes.gym" },
-  ];
-
-  // Define location mappings that match database values
-  const locationOptions = [
-    { value: "all", labelKey: "search.placeholders.allLocations" },
-    { value: "drammen-sentrum", labelKey: "forms.locations.drammenSentrum" },
-    { value: "bragernes", labelKey: "forms.locations.bragernes" },
-    { value: "stromsø", labelKey: "forms.locations.stromsø" },
-    { value: "konnerud", labelKey: "forms.locations.konnerud" },
-    { value: "åssiden", labelKey: "forms.locations.åssiden" },
-  ];
-
   if (showOnlyMain) {
     return (
       <div className="flex gap-4">
@@ -60,11 +40,12 @@ const FilterSelects: React.FC<FilterSelectsProps> = ({
               <SelectValue placeholder={t('search.labels.facilityType')} />
             </SelectTrigger>
             <SelectContent>
-              {facilityTypeOptions.map((option) => (
-                <SelectItem key={option.value} value={option.value} className="text-lg">
-                  {t(option.labelKey)}
-                </SelectItem>
-              ))}
+              <SelectItem value="all" className="text-lg">{t('forms.facilityTypes.all')}</SelectItem>
+              <SelectItem value="sports-hall" className="text-lg">{t('forms.facilityTypes.sportsHall')}</SelectItem>
+              <SelectItem value="meeting-room" className="text-lg">{t('forms.facilityTypes.meetingRoom')}</SelectItem>
+              <SelectItem value="conference-room" className="text-lg">{t('forms.facilityTypes.conferenceRoom')}</SelectItem>
+              <SelectItem value="auditorium" className="text-lg">{t('forms.facilityTypes.auditorium')}</SelectItem>
+              <SelectItem value="gym" className="text-lg">{t('forms.facilityTypes.gym')}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -77,11 +58,12 @@ const FilterSelects: React.FC<FilterSelectsProps> = ({
               <SelectValue placeholder={t('search.labels.location')} />
             </SelectTrigger>
             <SelectContent>
-              {locationOptions.map((option) => (
-                <SelectItem key={option.value} value={option.value} className="text-lg">
-                  {t(option.labelKey)}
-                </SelectItem>
-              ))}
+              <SelectItem value="all" className="text-lg">{t('forms.locations.all')}</SelectItem>
+              <SelectItem value="drammen-sentrum" className="text-lg">{t('forms.locations.drammenSentrum')}</SelectItem>
+              <SelectItem value="bragernes" className="text-lg">{t('forms.locations.bragernes')}</SelectItem>
+              <SelectItem value="stromsø" className="text-lg">{t('forms.locations.stromsø')}</SelectItem>
+              <SelectItem value="konnerud" className="text-lg">{t('forms.locations.konnerud')}</SelectItem>
+              <SelectItem value="åssiden" className="text-lg">{t('forms.locations.åssiden')}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -93,42 +75,44 @@ const FilterSelects: React.FC<FilterSelectsProps> = ({
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       {/* Facility Type */}
       <Select value={facilityType} onValueChange={setFacilityType}>
-        <SelectTrigger className="w-full h-12 border-gray-300 focus:border-gray-900">
+        <SelectTrigger className="w-full h-14 border-2 border-gray-300 focus:border-gray-900 text-lg font-medium">
           <SelectValue placeholder={t('search.labels.facilityType')} />
         </SelectTrigger>
         <SelectContent>
-          {facilityTypeOptions.map((option) => (
-            <SelectItem key={option.value} value={option.value}>
-              {t(option.labelKey)}
-            </SelectItem>
-          ))}
+          <SelectItem value="all" className="text-lg">{t('forms.facilityTypes.all')}</SelectItem>
+          <SelectItem value="sports-hall" className="text-lg">{t('forms.facilityTypes.sportsHall')}</SelectItem>
+          <SelectItem value="meeting-room" className="text-lg">{t('forms.facilityTypes.meetingRoom')}</SelectItem>
+          <SelectItem value="conference-room" className="text-lg">{t('forms.facilityTypes.conferenceRoom')}</SelectItem>
+          <SelectItem value="auditorium" className="text-lg">{t('forms.facilityTypes.auditorium')}</SelectItem>
+          <SelectItem value="gym" className="text-lg">{t('forms.facilityTypes.gym')}</SelectItem>
         </SelectContent>
       </Select>
 
       {/* Location */}
       <Select value={location} onValueChange={setLocation}>
-        <SelectTrigger className="w-full h-12 border-gray-300 focus:border-gray-900">
+        <SelectTrigger className="w-full h-14 border-2 border-gray-300 focus:border-gray-900 text-lg font-medium">
           <SelectValue placeholder={t('search.labels.location')} />
         </SelectTrigger>
         <SelectContent>
-          {locationOptions.map((option) => (
-            <SelectItem key={option.value} value={option.value}>
-              {t(option.labelKey)}
-            </SelectItem>
-          ))}
+          <SelectItem value="all" className="text-lg">{t('forms.locations.all')}</SelectItem>
+          <SelectItem value="drammen-sentrum" className="text-lg">{t('forms.locations.drammenSentrum')}</SelectItem>
+          <SelectItem value="bragernes" className="text-lg">{t('forms.locations.bragernes')}</SelectItem>
+          <SelectItem value="stromsø" className="text-lg">{t('forms.locations.stromsø')}</SelectItem>
+          <SelectItem value="konnerud" className="text-lg">{t('forms.locations.konnerud')}</SelectItem>
+          <SelectItem value="åssiden" className="text-lg">{t('forms.locations.åssiden')}</SelectItem>
         </SelectContent>
       </Select>
 
       {/* Accessibility */}
       <Select value={accessibility} onValueChange={setAccessibility}>
-        <SelectTrigger className="w-full h-12 border-gray-300 focus:border-gray-900">
+        <SelectTrigger className="w-full h-14 border-2 border-gray-300 focus:border-gray-900 text-lg font-medium">
           <SelectValue placeholder={t('search.labels.accessibility')} />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="all">{t('search.placeholders.anyAccessibility')}</SelectItem>
-          <SelectItem value="wheelchair">{t('search.filters.wheelchairAccessible')}</SelectItem>
-          <SelectItem value="hearing-loop">{t('search.filters.hearingLoop')}</SelectItem>
-          <SelectItem value="visual-guidance">{t('search.filters.visualGuidance')}</SelectItem>
+          <SelectItem value="all" className="text-lg">{t('forms.accessibility.all')}</SelectItem>
+          <SelectItem value="wheelchair" className="text-lg">{t('forms.accessibility.wheelchair')}</SelectItem>
+          <SelectItem value="hearing-loop" className="text-lg">{t('forms.accessibility.hearingLoop')}</SelectItem>
+          <SelectItem value="visual-aids" className="text-lg">{t('forms.accessibility.visualAids')}</SelectItem>
         </SelectContent>
       </Select>
 
@@ -137,15 +121,15 @@ const FilterSelects: React.FC<FilterSelectsProps> = ({
         const [min, max] = value.split("-").map(Number);
         setCapacity([min, max]);
       }}>
-        <SelectTrigger className="w-full h-12 border-gray-300 focus:border-gray-900">
+        <SelectTrigger className="w-full h-14 border-2 border-gray-300 focus:border-gray-900 text-lg font-medium">
           <SelectValue placeholder={t('search.labels.capacity')} />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="0-20">0-20 {t('common.labels.people', {}, 'personer')}</SelectItem>
-          <SelectItem value="20-50">20-50 {t('common.labels.people', {}, 'personer')}</SelectItem>
-          <SelectItem value="50-100">50-100 {t('common.labels.people', {}, 'personer')}</SelectItem>
-          <SelectItem value="100-200">100-200 {t('common.labels.people', {}, 'personer')}</SelectItem>
-          <SelectItem value="200-500">200+ {t('common.labels.people', {}, 'personer')}</SelectItem>
+          <SelectItem value="0-20" className="text-lg">{t('forms.capacity.range1')}</SelectItem>
+          <SelectItem value="20-50" className="text-lg">{t('forms.capacity.range2')}</SelectItem>
+          <SelectItem value="50-100" className="text-lg">{t('forms.capacity.range3')}</SelectItem>
+          <SelectItem value="100-200" className="text-lg">{t('forms.capacity.range4')}</SelectItem>
+          <SelectItem value="200-500" className="text-lg">{t('forms.capacity.range5')}</SelectItem>
         </SelectContent>
       </Select>
     </div>
