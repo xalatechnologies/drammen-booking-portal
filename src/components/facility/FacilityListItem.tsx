@@ -1,7 +1,8 @@
 
+
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { MapPin, Users, Heart, Share2, Projector, Volume2, FileText, ChefHat, Car, Wifi, Snowflake, Accessibility } from "lucide-react";
+import { MapPin, Users, Heart, Share2, Projector, Volume2, FileText, ChefHat, Car, Wifi, Snowflake, Accessibility, Trophy, Target, Zap } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -102,6 +103,31 @@ const FacilityListItem: React.FC<FacilityListItemProps> = ({
         />
       );
     });
+  };
+
+  const getSuitableForIcon = (activity: string) => {
+    const activityMap: { [key: string]: React.ElementType } = {
+      'football': Trophy,
+      'fotball': Trophy,
+      'futsal': Target,
+      'floorball': Zap,
+      'basketball': Trophy,
+      'volleyball': Trophy,
+      'handball': Trophy,
+      'tennis': Trophy,
+      'badminton': Trophy,
+      'yoga': Users,
+      'dans': Users,
+      'møter': Users,
+      'konferanse': Users,
+      'seminar': Users,
+      'kurs': Users,
+      'trening': Trophy,
+      'sport': Trophy,
+    };
+    
+    const IconComponent = activityMap[activity.toLowerCase()] || Trophy;
+    return <IconComponent className="h-4 w-4" />;
   };
 
   return (
@@ -208,14 +234,15 @@ const FacilityListItem: React.FC<FacilityListItemProps> = ({
               </div>
             </div>
 
-            {/* Suitable For Tags */}
+            {/* Suitable For Tags with Icons */}
             <div className="mb-2">
               <div className="flex flex-wrap gap-2">
                 {facility.suitableFor.slice(0, 3).map((activity, index) => (
                   <Badge
                     key={index}
-                    className="bg-blue-50 text-blue-700 border-blue-200 font-medium px-4 py-2 text-base hover:bg-blue-100 transition-colors"
+                    className="bg-blue-50 text-blue-700 border-blue-200 font-medium px-4 py-2 text-base hover:bg-blue-100 transition-colors flex items-center gap-2"
                   >
+                    {getSuitableForIcon(activity)}
                     {activity}
                   </Badge>
                 ))}
@@ -237,3 +264,4 @@ const FacilityListItem: React.FC<FacilityListItemProps> = ({
 };
 
 export default FacilityListItem;
+
