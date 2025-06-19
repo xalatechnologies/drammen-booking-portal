@@ -63,7 +63,7 @@ export function SimilarFacilitiesSlider({ currentFacilityId }: SimilarFacilities
         </CarouselContent>
         <CarouselPrevious className="hidden md:flex" />
         <CarouselNext className="hidden md:flex" />
-      </CarouselContent>
+      </Carousel>
     </div>
   );
 }
