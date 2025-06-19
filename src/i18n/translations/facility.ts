@@ -73,6 +73,23 @@ export const facilityTranslations: Record<Language, any> = {
       selectZone: 'Velg sone',
       wholeVenueDescription: 'Komplett lokale med full tilgang til alt utstyr og alle soner',
       mainZoneInstructions: 'Hele lokalet inkluderer begge soner og all tilgjengelig utstyr'
+    },
+    amenities: {
+      equipment: 'Utstyr',
+      projektor: 'Projektor',
+      projector: 'Projektor',
+      lydanlegg: 'Lydanlegg',
+      soundsystem: 'Lydanlegg',
+      whiteboard: 'Whiteboard',
+      kjøkken: 'Kjøkken',
+      kitchen: 'Kjøkken',
+      parkering: 'Parkering',
+      parking: 'Parkering',
+      wifi: 'WiFi',
+      klimaanlegg: 'Klimaanlegg',
+      airconditioning: 'Klimaanlegg',
+      rullestolvennlig: 'Rullestolvennlig',
+      wheelchairaccessible: 'Rullestolvennlig'
     }
   },
   EN: {
@@ -146,6 +163,23 @@ export const facilityTranslations: Record<Language, any> = {
       selectZone: 'Select zone',
       wholeVenueDescription: 'Complete facility with full access to all equipment and zones',
       mainZoneInstructions: 'The whole venue includes both zones and all available equipment'
+    },
+    amenities: {
+      equipment: 'Equipment',
+      projektor: 'Projector',
+      projector: 'Projector',
+      lydanlegg: 'Sound System',
+      soundsystem: 'Sound System',
+      whiteboard: 'Whiteboard',
+      kjøkken: 'Kitchen',
+      kitchen: 'Kitchen',
+      parkering: 'Parking',
+      parking: 'Parking',
+      wifi: 'WiFi',
+      klimaanlegg: 'Air Conditioning',
+      airconditioning: 'Air Conditioning',
+      rullestolvennlig: 'Wheelchair Accessible',
+      wheelchairaccessible: 'Wheelchair Accessible'
     }
   }
 };

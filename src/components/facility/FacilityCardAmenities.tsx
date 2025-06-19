@@ -1,12 +1,15 @@
 
 import React from "react";
 import { Projector, Volume2, FileText, ChefHat, Car, Wifi, Snowflake, Accessibility } from "lucide-react";
+import { useTranslation } from "@/i18n";
 
 interface FacilityCardAmenitiesProps {
   equipment: string[];
 }
 
 export function FacilityCardAmenities({ equipment }: FacilityCardAmenitiesProps) {
+  const { t } = useTranslation();
+
   const amenityMap: { [key: string]: React.ElementType } = {
     'projektor': Projector,
     'projector': Projector,
@@ -28,14 +31,18 @@ export function FacilityCardAmenities({ equipment }: FacilityCardAmenitiesProps)
   const equipmentArray = Array.isArray(equipment) ? equipment : [];
   
   return (
-    <div className="flex gap-3" aria-label="Equipment">
+    <div className="flex gap-3" aria-label={t('facility.amenities.equipment', {}, 'Equipment')}>
       {equipmentArray.slice(0, 4).map((item, index) => {
         const IconComponent = amenityMap[item.toLowerCase()] || FileText;
+        
+        // Try to get localized name, fallback to original
+        const localizedName = t(`facility.amenities.${item.toLowerCase().replace(/\s+/g, '')}`, {}, item);
+        
         return (
           <IconComponent 
             key={index}
             className="h-5 w-5 text-gray-600" 
-            aria-label={item}
+            aria-label={localizedName}
           />
         );
       })}

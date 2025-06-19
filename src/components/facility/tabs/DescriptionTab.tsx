@@ -1,7 +1,7 @@
 
 import React from "react";
 import { FacilityLocation } from "../FacilityLocation";
-import { useTranslation } from "@/i18n/hooks/useTranslation";
+import { useTranslation } from "@/i18n";
 
 interface DescriptionTabProps {
   description: string;
@@ -14,7 +14,7 @@ export function DescriptionTab({ description, capacity, address }: DescriptionTa
 
   return (
     <div className="p-6 space-y-6">
-      {/* Description only */}
+      {/* Description */}
       <div>
         <p className="text-gray-700 leading-relaxed">{description}</p>
       </div>
