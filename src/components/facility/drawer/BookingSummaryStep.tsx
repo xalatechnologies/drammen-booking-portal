@@ -46,9 +46,12 @@ export function BookingSummaryStep({
   // Check if booking requires approval
   const requiresApproval = ['lag-foreninger', 'paraply'].includes(actorType);
 
-  // Validation
-  const isValid = purpose.trim().length > 0 && activityType.length > 0 && attendees > 0;
+  // Validation - ensure we have selected slots and required form data
+  const isValid = selectedSlots.length > 0 && purpose.trim().length > 0 && activityType.length > 0 && attendees > 0;
   
+  console.log('BookingSummaryStep - Selected slots:', selectedSlots);
+  console.log('BookingSummaryStep - Validation state:', { isValid, slotsCount: selectedSlots.length, purpose, activityType, attendees });
+
   return (
     <>
       <BookingOverviewCard selectedSlots={selectedSlots} facilityName={facilityName} zones={zones} />
@@ -72,13 +75,27 @@ export function BookingSummaryStep({
 
       <PurposeForm purpose={purpose} onPurposeChange={onPurposeChange} />
 
+      {/* Show validation message if slots are missing */}
+      {selectedSlots.length === 0 && (
+        <Card className="border-orange-200 bg-orange-50">
+          <CardContent className="pt-4">
+            <div className="flex items-center gap-2 text-orange-800">
+              <AlertTriangle className="h-5 w-5" />
+              <p className="text-sm font-medium">
+                Velg tidspunkt i kalenderen først for å fortsette med booking.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       <Button 
         onClick={onContinue} 
         className="w-full text-lg py-6" 
         size="lg" 
         disabled={!isValid}
       >
-        {requiresApproval ? t('forms.buttons.submitForApproval') : t('forms.buttons.continueToContact')}
+        {requiresApproval ? t('forms.buttons.submitForApproval', {}, 'Send til godkjenning') : t('forms.buttons.continueToContact', {}, 'Fortsett til kontaktinfo')}
       </Button>
     </>
   );

@@ -1,5 +1,5 @@
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SelectedTimeSlot } from '@/utils/recurrenceEngine';
 import { ActorType, BookingType } from '@/types/pricing';
@@ -44,6 +44,11 @@ export function BookingDrawerContent({
     notes: ''
   });
 
+  // Log selected slots for debugging
+  useEffect(() => {
+    console.log('BookingDrawerContent - Received selected slots:', selectedSlots);
+  }, [selectedSlots]);
+
   // Auto-determine booking type based on selected slots
   const bookingType: BookingType = useMemo(() => {
     if (selectedSlots.length <= 1) {
@@ -57,6 +62,12 @@ export function BookingDrawerContent({
   }, [selectedSlots]);
 
   const handleSubmit = () => {
+    // Validate that we have selected slots
+    if (selectedSlots.length === 0) {
+      console.error('No slots selected for booking');
+      return;
+    }
+
     // Add selected slots to cart when booking is completed
     selectedSlots.forEach(slot => {
       const zone = zones.find(z => z.id === slot.zoneId);
@@ -66,10 +77,12 @@ export function BookingDrawerContent({
         zoneId: slot.zoneId,
         date: slot.date,
         timeSlot: slot.timeSlot,
-        duration: slot.duration || 1, // Default to 1 hour if not specified
+        duration: slot.duration || 2, // Default to 2 hours if not specified
         pricePerHour: zone?.pricePerHour || 450 // Use zone price or default
       });
     });
+
+    console.log('Added slots to cart:', selectedSlots);
 
     // Navigate to booking confirmation
     navigate(`/booking/${facilityId}/confirm`, {
@@ -85,6 +98,20 @@ export function BookingDrawerContent({
       }
     });
   };
+
+  // Show message if no slots are selected
+  if (selectedSlots.length === 0) {
+    return (
+      <div className="p-6 text-center">
+        <h3 className="text-lg font-semibold text-gray-900 mb-2">
+          Ingen tidspunkt valgt
+        </h3>
+        <p className="text-gray-600">
+          Velg tidspunkt i kalenderen først for å starte booking prosessen.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 space-y-8">

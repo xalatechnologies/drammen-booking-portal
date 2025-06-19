@@ -22,6 +22,14 @@ export function BookingDrawer({
   facilityName,
   zones = []
 }: BookingDrawerProps) {
+  console.log('BookingDrawer - Props received:', { 
+    isOpen, 
+    selectedSlotsCount: selectedSlots.length, 
+    facilityId, 
+    facilityName,
+    zonesCount: zones.length 
+  });
+
   if (!isOpen) return null;
 
   return (

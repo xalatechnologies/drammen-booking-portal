@@ -13,7 +13,6 @@ import { LegendDisplay } from './LegendDisplay';
 import { StrotimeDisplay } from './StrotimeDisplay';
 import { AvailabilityStatusManager } from './AvailabilityStatusManager';
 import { useStrotimer } from '@/hooks/useStrotimer';
-import { useSlotSelection } from '@/hooks/useSlotSelection';
 import { parseOpeningHours } from '@/utils/openingHoursParser';
 import { isSlotSelected } from './AvailabilityTabUtils';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
@@ -69,8 +68,6 @@ export function AvailabilityTabContent({
     currentWeekStart
   });
 
-  const { handleSlotClick: internalHandleSlotClick, clearSelection } = useSlotSelection();
-
   // Create availability status manager
   const availabilityStatusManager = new AvailabilityStatusManager(conflictManager);
 
@@ -101,6 +98,17 @@ export function AvailabilityTabContent({
     setSelectedSlots([]);
   };
 
+  // Enhanced booking handler that properly passes selected slots
+  const handleBookingClick = () => {
+    if (selectedSlots.length === 0) {
+      // Show a message that user needs to select slots first
+      console.log('No slots selected');
+      return;
+    }
+    console.log('Opening booking drawer with selected slots:', selectedSlots);
+    onBookingDrawerOpen();
+  };
+
   // Check if there are any strøtimer for the current week
   const hasStrøtimer = strøtimer.length > 0;
 
@@ -109,6 +117,7 @@ export function AvailabilityTabContent({
   console.log('AvailabilityTabContent - Strøtimer data:', strøtimer);
   console.log('AvailabilityTabContent - FacilityId:', facilityId);
   console.log('AvailabilityTabContent - Current week start:', currentWeekStart);
+  console.log('AvailabilityTabContent - Selected slots:', selectedSlots);
 
   return (
     <div className="space-y-4">
@@ -168,7 +177,7 @@ export function AvailabilityTabContent({
         selectedSlots={selectedSlots}
         onPatternBuilderOpen={onPatternBuilderOpen}
         onClearSelection={clearSelectionHandler}
-        onBookingDrawerOpen={onBookingDrawerOpen}
+        onBookingDrawerOpen={handleBookingClick}
         zones={zones}
       />
 
