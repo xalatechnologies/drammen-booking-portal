@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -16,21 +17,13 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useTranslation } from "@/i18n";
 import { CartProvider } from "@/contexts/CartContext";
 import { MobileBookingPanel } from "@/components/facility/MobileBookingPanel";
+
 const FacilityDetail = () => {
-  const {
-    id
-  } = useParams();
+  const { id } = useParams();
   const navigate = useNavigate();
   const [isFavorited, setIsFavorited] = useState(false);
-  const {
-    t
-  } = useTranslation();
-  const {
-    facility,
-    isLoading,
-    error,
-    notFound
-  } = useOptimizedFacility(Number(id));
+  const { t } = useTranslation();
+  const { facility, isLoading, error, notFound } = useOptimizedFacility(Number(id));
 
   // Enhanced zones with full zone management capabilities
   const zones: Zone[] = [{
@@ -74,6 +67,7 @@ const FacilityDetail = () => {
     features: ["Klimaanlegg", "Moderne lyd", "LED-belysning", "Sikkerhetskameraer"],
     isActive: true
   }];
+
   const handleShare = () => {
     if (navigator.share) {
       navigator.share({
@@ -184,9 +178,18 @@ const FacilityDetail = () => {
               </div>
             </div>
 
-            {/* Full Width Calendar Section */}
+            {/* Full Width Calendar Section - Moved outside tabs */}
             <div className="w-full mb-12">
-              
+              <div className="bg-white border border-gray-200 rounded-lg p-6">
+                <h2 className="text-2xl font-bold mb-6">Tilgjengelighet og booking</h2>
+                <AvailabilityTab 
+                  zones={zones} 
+                  startDate={new Date()} 
+                  facilityId={id} 
+                  facilityName={facility.name}
+                  openingHours={facility.openingHours}
+                />
+              </div>
             </div>
 
             {/* Similar Facilities Section */}
