@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { MapPin, Users, Heart, Share2, Projector, Volume2, FileText, ChefHat, Car, Wifi, Snowflake, Accessibility } from "lucide-react";
@@ -119,7 +118,7 @@ const FacilityListItem: React.FC<FacilityListItemProps> = ({
       }}
     >
       <CardContent className="p-0">
-        <div className="flex h-80">
+        <div className="flex h-96">
           {/* Enhanced Image Section */}
           <div className="w-80 flex-shrink-0 relative overflow-hidden">
             <img 
@@ -190,9 +189,11 @@ const FacilityListItem: React.FC<FacilityListItemProps> = ({
             </div>
 
             {/* Description */}
-            <p className="text-gray-700 leading-relaxed mb-5 line-clamp-2 flex-grow text-base">
-              {facility.description}
-            </p>
+            <div className="mb-6 flex-grow">
+              <p className="text-gray-700 leading-relaxed text-base line-clamp-3">
+                {facility.description}
+              </p>
+            </div>
 
             {/* Capacity and Amenities */}
             <div className="flex items-center justify-between mb-5">
@@ -207,7 +208,7 @@ const FacilityListItem: React.FC<FacilityListItemProps> = ({
             </div>
 
             {/* Suitable For Tags */}
-            <div className="mb-6">
+            <div className="mb-2">
               <div className="flex flex-wrap gap-2">
                 {facility.suitableFor.slice(0, 3).map((activity, index) => (
                   <Badge
