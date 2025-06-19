@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-import { ShoppingCart, X, Clock, Users, MapPin, CreditCard, Plus, Minus } from "lucide-react";
+import { ShoppingCart, X, CreditCard, Plus, Minus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -14,17 +14,11 @@ import { format } from "date-fns";
 interface PersistentBookingSidebarProps {
   facilityName: string;
   facilityId: string;
-  capacity: number;
-  area: string;
-  openingHours: string;
 }
 
 export function PersistentBookingSidebar({
   facilityName,
-  facilityId,
-  capacity,
-  area,
-  openingHours
+  facilityId
 }: PersistentBookingSidebarProps) {
   const { cartItems, removeFromCart, getTotalPrice, getItemCount } = useCart();
   const navigate = useNavigate();
@@ -38,57 +32,15 @@ export function PersistentBookingSidebar({
   };
 
   const addTimeSlot = (item: any) => {
-    // Logic to add another time slot could be implemented here
     console.log('Add time slot for:', item);
   };
 
   const removeTimeSlot = (item: any) => {
-    // Logic to remove a time slot could be implemented here
     console.log('Remove time slot for:', item);
   };
 
   return (
     <div className="space-y-6">
-      {/* Quick Facts */}
-      <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg text-blue-900">{t('facility.quickFacts')}</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 gap-3">
-            <div className="flex items-center gap-3 p-3 bg-white rounded-lg shadow-sm">
-              <div className="p-2 bg-blue-100 rounded-full">
-                <Users className="h-4 w-4 text-blue-600" />
-              </div>
-              <div>
-                <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">{t('facility.capacity')}</p>
-                <p className="font-bold text-gray-900">{capacity} {t('common.people')}</p>
-              </div>
-            </div>
-            
-            <div className="flex items-center gap-3 p-3 bg-white rounded-lg shadow-sm">
-              <div className="p-2 bg-green-100 rounded-full">
-                <MapPin className="h-4 w-4 text-green-600" />
-              </div>
-              <div>
-                <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">{t('facility.area')}</p>
-                <p className="font-bold text-gray-900">{area}</p>
-              </div>
-            </div>
-            
-            <div className="flex items-center gap-3 p-3 bg-white rounded-lg shadow-sm">
-              <div className="p-2 bg-purple-100 rounded-full">
-                <Clock className="h-4 w-4 text-purple-600" />
-              </div>
-              <div>
-                <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">{t('facility.openingHours')}</p>
-                <p className="font-bold text-gray-900">{openingHours}</p>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
       {/* Customer Type Selection */}
       <Card>
         <CardHeader className="pb-3">
@@ -108,7 +60,7 @@ export function PersistentBookingSidebar({
         </CardContent>
       </Card>
 
-      {/* Enhanced Booking Cart */}
+      {/* Booking Cart */}
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-lg">
@@ -196,25 +148,6 @@ export function PersistentBookingSidebar({
               </Button>
             </div>
           )}
-        </CardContent>
-      </Card>
-
-      {/* Cancellation Policy */}
-      <Card className="border-green-200 bg-green-50">
-        <CardContent className="p-4">
-          <div className="flex items-start gap-3">
-            <div className="p-2 bg-green-100 rounded-md flex-shrink-0">
-              <Clock className="h-5 w-5 text-green-600" />
-            </div>
-            <div>
-              <h4 className="font-medium text-green-800 mb-1">
-                {t('facility.cancellation.title')}
-              </h4>
-              <p className="text-sm text-green-700">
-                {t('facility.cancellation.policy')}
-              </p>
-            </div>
-          </div>
         </CardContent>
       </Card>
     </div>

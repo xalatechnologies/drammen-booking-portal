@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -176,38 +175,21 @@ const FacilityDetail = () => {
               />
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              {/* Left Column - Main Content (2/3 width) */}
-              <div className="lg:col-span-2 space-y-6">
-                {/* Facility Header */}
-                <FacilityHeader 
-                  name={facility.name} 
-                  address={facility.address} 
-                  onShare={handleShare} 
-                  isFavorited={isFavorited} 
-                  onToggleFavorite={() => setIsFavorited(!isFavorited)} 
-                />
+            {/* Facility Header - Title, Tags, Address */}
+            <div className="mb-8">
+              <FacilityHeader 
+                name={facility.name} 
+                address={facility.address} 
+                onShare={handleShare} 
+                isFavorited={isFavorited} 
+                onToggleFavorite={() => setIsFavorited(!isFavorited)} 
+              />
+            </div>
 
-                {/* Main Calendar - Primary Feature */}
-                <div className="bg-white rounded-lg shadow-sm border">
-                  <div className="p-4 md:p-6">
-                    <div className="flex items-center justify-between mb-6">
-                      <h2 className="text-xl md:text-2xl font-bold text-gray-900">Tilgjengelighet og booking</h2>
-                      <div className="text-sm text-gray-500">
-                        Velg tidspunkt for å booke
-                      </div>
-                    </div>
-                    <AvailabilityTab 
-                      zones={zones} 
-                      startDate={new Date()} 
-                      showLegend={true}
-                      facilityId={id}
-                      facilityName={facility.name}
-                    />
-                  </div>
-                </div>
-
-                {/* Facility Info Tabs */}
+            {/* Main Content Layout - 70% / 30% */}
+            <div className="grid grid-cols-1 lg:grid-cols-10 gap-8">
+              {/* Left Column - Tabs Content (70%) */}
+              <div className="lg:col-span-7 space-y-6">
                 <FacilityInfoTabs 
                   description={facility.description} 
                   capacity={facility.capacity} 
@@ -215,22 +197,19 @@ const FacilityDetail = () => {
                   zones={zones} 
                   amenities={facility.amenities || []} 
                   address={facility.address}
-                  openingHours={facility.openingHours}
                   area={facility.area}
-                  hasAutoApproval={facility.hasAutoApproval || true}
-                  zoneCards={<></>} 
+                  suitableFor={facility.suitableFor || []}
+                  facilityId={id}
+                  facilityName={facility.name}
                 />
               </div>
 
-              {/* Right Column - Desktop Persistent Booking Panel (1/3 width) */}
-              <div className="lg:col-span-1 hidden lg:block">
+              {/* Right Column - Simplified Cart Sidebar (30%) */}
+              <div className="lg:col-span-3 hidden lg:block">
                 <div className="sticky top-6">
                   <PersistentBookingSidebar
                     facilityName={facility.name}
                     facilityId={id || ""}
-                    capacity={facility.capacity}
-                    area={facility.area}
-                    openingHours={facility.openingHours}
                   />
                 </div>
               </div>
