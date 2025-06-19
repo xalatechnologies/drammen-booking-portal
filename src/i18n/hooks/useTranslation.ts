@@ -1,4 +1,3 @@
-
 import { useLanguage } from '@/contexts/LanguageContext';
 import { bookingTranslations } from '../translations/booking';
 import { commonTranslations } from '../translations/common';
@@ -14,6 +13,7 @@ import { validationTranslations } from '../translations/validation';
 import { accessibilityTranslations } from '../translations/accessibility';
 import { paymentTranslations } from '../translations/payment';
 import { searchTranslations } from '../translations/search';
+import { heroTranslations } from '../translations/hero';
 import { TranslationParams, TranslationFunction } from '../types';
 
 type TranslationPath = string;
@@ -35,7 +35,8 @@ export function useTranslation() {
     validation: validationTranslations[language],
     accessibility: accessibilityTranslations[language],
     payment: paymentTranslations[language],
-    search: searchTranslations[language]
+    search: searchTranslations[language],
+    hero: heroTranslations[language]
   };
 
   const t: TranslationFunction = (path: TranslationPath, params?: TranslationParams, defaultValue?: string): string => {

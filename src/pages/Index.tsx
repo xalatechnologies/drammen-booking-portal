@@ -1,10 +1,9 @@
-
 import React, { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { DateRange } from "react-day-picker";
 import GlobalHeader from "@/components/GlobalHeader";
 import GlobalFooter from "@/components/GlobalFooter";
-import HeroBanner from "@/components/HeroBanner";
+import BentoHeroBanner from "@/components/BentoHeroBanner";
 import SearchFilter from "@/components/SearchFilter";
 import FacilityList from "@/components/FacilityList";
 import MapView from "@/components/MapView";
@@ -131,8 +130,8 @@ const Index = () => {
       <GlobalHeader />
 
       <main id="main-content" className="flex-1 w-full">
-        {/* Hero Banner - Full Width */}
-        <HeroBanner />
+        {/* Bento Grid Hero Banner - Full Width */}
+        <BentoHeroBanner />
         
         {/* Content Area - Centered */}
         <div className="content-center py-6">
