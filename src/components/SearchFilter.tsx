@@ -116,9 +116,9 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
       </div>
 
       {/* Filters Section */}
-      <div className="mt-6 bg-white/95 backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg p-6">
+      <div className="mt-6 bg-white/95 backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg py-8 px-6">
         {/* Quick Filters Row */}
-        <div className="flex flex-col lg:flex-row gap-6 items-stretch mb-6">
+        <div className="flex flex-col lg:flex-row gap-6 items-center mb-6">
           <div className="lg:flex-1">
             <FilterSelects 
               facilityType={facilityType}
