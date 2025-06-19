@@ -26,7 +26,7 @@ const FacilityList: React.FC<FacilityListProps> = ({
   console.log("FacilityList - facilities count:", facilities.length);
 
   return (
-    <div className="space-y-6">
+    <div className={viewMode === "list" ? "space-y-4" : "space-y-6"}>
       {viewMode === "grid" ? (
         <FacilityGrid pagination={pagination} filters={filters} />
       ) : (
