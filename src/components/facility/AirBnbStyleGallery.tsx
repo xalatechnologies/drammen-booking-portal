@@ -62,8 +62,11 @@ export function AirBnbStyleGallery({ images, facilityName }: AirBnbStyleGalleryP
         <GalleryGrid
           images={images}
           facilityName={facilityName}
+          activeImageIndex={activeImageIndex}
           onImageClick={openModal}
           onShowAllClick={() => openModal()}
+          onPrevImage={prevImage}
+          onNextImage={nextImage}
         />
 
         <MobileGallery
@@ -74,7 +77,7 @@ export function AirBnbStyleGallery({ images, facilityName }: AirBnbStyleGalleryP
           onPrevImage={prevImage}
           onNextImage={nextImage}
           onShowAllClick={() => openModal()}
-          onDotClick={setActiveImageIndex}
+          onThumbnailClick={setActiveImageIndex}
         />
 
         <GalleryControls

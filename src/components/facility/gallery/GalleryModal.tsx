@@ -82,21 +82,27 @@ export function GalleryModal({
         )}
       </div>
       
-      {/* Dots Navigation - only show if more than 1 image */}
+      {/* Thumbnail Navigation - only show if more than 1 image */}
       {images.length > 1 && (
         <div className="px-6 pb-6">
           <div className="flex gap-3 justify-center overflow-x-auto pb-2">
-            {images.map((_, index) => (
+            {images.map((image, index) => (
               <button
                 key={index}
                 onClick={() => onImageSelect(index)}
-                className={`flex-shrink-0 w-3 h-3 rounded-full border-2 transition-all duration-300 hover:scale-125 ${
+                className={`flex-shrink-0 w-20 h-14 rounded-lg overflow-hidden border-2 transition-all duration-300 hover:scale-110 ${
                   index === activeImageIndex 
-                    ? 'bg-white border-white scale-125' 
-                    : 'bg-transparent border-white/50 hover:border-white/80'
+                    ? 'border-white shadow-lg scale-110' 
+                    : 'border-white/50 hover:border-white/80'
                 }`}
                 aria-label={`View image ${index + 1}`}
-              />
+              >
+                <img 
+                  src={image} 
+                  alt={`${facilityName} thumbnail ${index + 1}`}
+                  className="w-full h-full object-cover"
+                />
+              </button>
             ))}
           </div>
         </div>

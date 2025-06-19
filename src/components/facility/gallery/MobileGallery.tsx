@@ -11,7 +11,7 @@ interface MobileGalleryProps {
   onPrevImage: () => void;
   onNextImage: () => void;
   onShowAllClick: () => void;
-  onDotClick: (index: number) => void;
+  onThumbnailClick: (index: number) => void;
 }
 
 export function MobileGallery({ 
@@ -22,10 +22,10 @@ export function MobileGallery({
   onPrevImage, 
   onNextImage, 
   onShowAllClick,
-  onDotClick 
+  onThumbnailClick 
 }: MobileGalleryProps) {
   return (
-    <div className="md:hidden h-64 relative cursor-pointer w-full rounded-xl overflow-hidden shadow-lg" onClick={onImageClick}>
+    <div className="md:hidden h-64 relative cursor-pointer w-full rounded-2xl overflow-hidden shadow-xl" onClick={onImageClick}>
       <img 
         src={images[activeImageIndex]} 
         alt={`${facilityName} - Image ${activeImageIndex + 1}`}
@@ -63,7 +63,7 @@ export function MobileGallery({
       
       {/* Mobile show all button - only show if more than 1 image */}
       {images.length > 1 && (
-        <div className="absolute bottom-4 right-4">
+        <div className="absolute top-4 right-4">
           <Button
             variant="secondary"
             size="sm"
@@ -74,29 +74,41 @@ export function MobileGallery({
             }}
           >
             <Grid3x3 className="h-4 w-4 mr-2" />
-            {images.length} photos
+            {images.length}
           </Button>
         </div>
       )}
       
-      {/* Mobile dots indicator - only show if more than 1 image */}
+      {/* Mobile thumbnail indicator - only show if more than 1 image */}
       {images.length > 1 && (
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-          {images.map((_, index) => (
+          {images.slice(0, 4).map((image, index) => (
             <button
               key={index}
               onClick={(e) => {
                 e.stopPropagation();
-                onDotClick(index);
+                onThumbnailClick(index);
               }}
-              className={`w-2.5 h-2.5 rounded-full transition-all duration-300 backdrop-blur-sm ${
+              className={`w-12 h-9 rounded-md overflow-hidden border-2 transition-all duration-300 hover:scale-110 ${
                 index === activeImageIndex 
-                  ? 'bg-white scale-125 shadow-lg' 
-                  : 'bg-white/60 hover:bg-white/80 hover:scale-110'
+                  ? 'border-white shadow-lg scale-110' 
+                  : 'border-white/60 hover:border-white/80'
               }`}
-              aria-label={`View image ${index + 1}`}
-            />
+            >
+              <img 
+                src={image} 
+                alt={`${facilityName} thumbnail ${index + 1}`}
+                className="w-full h-full object-cover"
+              />
+            </button>
           ))}
+          {images.length > 4 && (
+            <div className="flex items-center justify-center w-12 h-9 bg-black/30 backdrop-blur-sm rounded-md border-2 border-white/60">
+              <span className="text-white text-xs font-medium">
+                +{images.length - 4}
+              </span>
+            </div>
+          )}
         </div>
       )}
     </div>
