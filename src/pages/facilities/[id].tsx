@@ -28,11 +28,11 @@ const FacilityDetail = () => {
   // Enhanced zones with full zone management capabilities
   const zones: Zone[] = [{
     id: "whole-facility",
-    name: t('facility.zones.wholeVenue'),
+    name: "Hele lokalet",
     capacity: facility?.capacity || 30,
-    equipment: facility?.equipment || [t('common.equipment.projector'), t('common.equipment.sound'), t('common.equipment.whiteboard')],
+    equipment: facility?.equipment || ["Projektor", "Lydanlegg", "Whiteboard"],
     pricePerHour: facility?.pricePerHour || 450,
-    description: t('facility.zones.wholeVenueDescription'),
+    description: "Komplett lokale med full tilgang til alt utstyr og alle soner",
     area: facility?.area || "120 m²",
     isMainZone: true,
     subZones: ["zone-1", "zone-2"],
@@ -47,9 +47,9 @@ const FacilityDetail = () => {
     adminInfo: {
       contactPersonName: "Lars Hansen",
       contactPersonEmail: "lars.hansen@drammen.kommune.no",
-      specialInstructions: t('facility.zones.mainZoneInstructions'),
+      specialInstructions: "Hele lokalet inkluderer begge soner og all tilgjengelig utstyr",
       maintenanceSchedule: [{
-        day: t('common.weekdays.monday'),
+        day: "Mandag",
         startTime: "06:00",
         endTime: "08:00"
       }]
@@ -61,10 +61,10 @@ const FacilityDetail = () => {
         width: 120,
         height: 80
       },
-      entryPoints: [t('common.entrances.main'), t('common.entrances.equipment'), t('common.entrances.emergency')]
+      entryPoints: ["Hovedinngang", "Utstyrsinngaang", "Nødutgang vest"]
     },
     accessibility: ["wheelchair", "hearing-loop", "visual-guidance"],
-    features: [t('common.features.airConditioning'), t('common.features.modernSound'), t('common.features.ledLighting'), t('common.features.securityCameras')],
+    features: ["Klimaanlegg", "Moderne lyd", "LED-belysning", "Sikkerhetskameraer"],
     isActive: true
   }];
 
@@ -117,17 +117,17 @@ const FacilityDetail = () => {
             <div className="text-center max-w-md mx-auto px-4">
               <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-6" />
               <h1 className="text-3xl font-bold text-gray-900 mb-4">
-                {notFound ? t('facility.errors.notFound') : t('facility.errors.loadError')}
+                {notFound ? "Lokale ikke funnet" : "Feil ved lasting"}
               </h1>
               <p className="text-gray-600 mb-8">
                 {notFound 
-                  ? t('facility.errors.notFoundDescription')
-                  : t('facility.errors.loadErrorDescription')
+                  ? "Det forespurte lokalet kunne ikke finnes."
+                  : "Det oppstod en feil ved lasting av lokalet."
                 }
               </p>
               <Button onClick={() => navigate("/")} className="mb-4">
                 <Home className="h-4 w-4 mr-2" />
-                {t('common.navigation.backToHome')}
+                Tilbake til forsiden
               </Button>
             </div>
           </div>
@@ -151,7 +151,7 @@ const FacilityDetail = () => {
             <nav className="flex items-center space-x-2 text-sm">
               <Button variant="ghost" size="sm" className="text-gray-600 hover:text-gray-900 p-0 h-auto font-normal" onClick={() => navigate("/")}>
                 <Home className="h-4 w-4 mr-1" />
-                {t('common.navigation.home')}
+                Hjem
               </Button>
               <span className="text-gray-400">/</span>
               <span className="text-gray-900 font-medium">{facility.name}</span>
@@ -183,7 +183,7 @@ const FacilityDetail = () => {
                 {/* Main Calendar - Moved from tabs to main content */}
                 <div className="bg-white rounded-lg shadow-sm border">
                   <div className="p-6">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-6">{t('facility.availability.title')}</h2>
+                    <h2 className="text-2xl font-bold text-gray-900 mb-6">Tilgjengelighet</h2>
                     <AvailabilityTab 
                       zones={zones} 
                       startDate={new Date()} 
