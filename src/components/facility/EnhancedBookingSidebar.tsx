@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ShoppingCart, X, CreditCard, Plus, Minus, User, Calendar, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,11 +7,14 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useCart } from "@/contexts/CartContext";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "@/i18n/hooks/useTranslation";
 import { format } from "date-fns";
 import { SelectedTimeSlot } from "@/utils/recurrenceEngine";
+import { BookingSessionService, BookingSessionData } from "@/services/BookingSessionService";
 
 interface EnhancedBookingSidebarProps {
   facilityName: string;
@@ -35,8 +38,37 @@ export function EnhancedBookingSidebar({
   const [bookingDetailsOpen, setBookingDetailsOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(true);
   
-  // Basic form state
+  // Session-backed form state
   const [customerType, setCustomerType] = useState<string>('private');
+  const [contactName, setContactName] = useState<string>('');
+  const [contactEmail, setContactEmail] = useState<string>('');
+  const [contactPhone, setContactPhone] = useState<string>('');
+  const [organization, setOrganization] = useState<string>('');
+
+  // Load session data on component mount
+  useEffect(() => {
+    const sessionData = BookingSessionService.getSessionData();
+    if (sessionData) {
+      setCustomerType(sessionData.customerType || 'private');
+      setContactName(sessionData.contactName || '');
+      setContactEmail(sessionData.contactEmail || '');
+      setContactPhone(sessionData.contactPhone || '');
+      setOrganization(sessionData.organization || '');
+    }
+  }, []);
+
+  // Save to session whenever form data changes
+  useEffect(() => {
+    if (contactName || contactEmail || contactPhone || organization) {
+      BookingSessionService.saveSessionData({
+        customerType,
+        contactName,
+        contactEmail,
+        contactPhone,
+        organization
+      });
+    }
+  }, [customerType, contactName, contactEmail, contactPhone, organization]);
 
   const facilityCartItems = cartItems.filter(item => item.facilityId === facilityId);
   const hasSelectedSlots = selectedSlots.length > 0;
@@ -50,6 +82,40 @@ export function EnhancedBookingSidebar({
     // For now, just expand the booking details section
     setBookingDetailsOpen(true);
     setSelectedSlotsOpen(false);
+  };
+
+  const handleContinueBooking = () => {
+    // Basic validation
+    if (!contactName || !contactEmail || !contactPhone) {
+      alert('Vennligst fyll ut alle obligatoriske felt');
+      return;
+    }
+
+    // Here we would normally create the booking
+    console.log('Creating booking with:', {
+      customerType,
+      contactName,
+      contactEmail,
+      contactPhone,
+      organization,
+      selectedSlots
+    });
+
+    // For now, just show success message
+    alert('Booking opprettet! Går til handlekurv...');
+    
+    // Reset form and close booking details
+    setBookingDetailsOpen(false);
+    setCartOpen(true);
+  };
+
+  const clearSession = () => {
+    BookingSessionService.clearSessionData();
+    setCustomerType('private');
+    setContactName('');
+    setContactEmail('');
+    setContactPhone('');
+    setOrganization('');
   };
 
   return (
@@ -132,9 +198,9 @@ export function EnhancedBookingSidebar({
             <CardContent>
               <div className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-700 mb-2 block">
+                  <Label className="text-sm font-medium text-gray-700 mb-2 block">
                     Kunde type
-                  </label>
+                  </Label>
                   <Select value={customerType} onValueChange={setCustomerType}>
                     <SelectTrigger>
                       <SelectValue />
@@ -146,13 +212,75 @@ export function EnhancedBookingSidebar({
                     </SelectContent>
                   </Select>
                 </div>
-                
-                <Button 
-                  className="w-full bg-[#1e3a8a] hover:bg-[#1e40af]"
-                  disabled={!hasSelectedSlots}
-                >
-                  Fortsett med booking
-                </Button>
+
+                <div className="grid grid-cols-1 gap-4">
+                  <div>
+                    <Label className="text-sm font-medium text-gray-700 mb-2 block">
+                      Kontaktnavn *
+                    </Label>
+                    <Input
+                      value={contactName}
+                      onChange={(e) => setContactName(e.target.value)}
+                      placeholder="Skriv inn fullt navn"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <Label className="text-sm font-medium text-gray-700 mb-2 block">
+                      E-post *
+                    </Label>
+                    <Input
+                      type="email"
+                      value={contactEmail}
+                      onChange={(e) => setContactEmail(e.target.value)}
+                      placeholder="din@epost.no"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <Label className="text-sm font-medium text-gray-700 mb-2 block">
+                      Telefon *
+                    </Label>
+                    <Input
+                      type="tel"
+                      value={contactPhone}
+                      onChange={(e) => setContactPhone(e.target.value)}
+                      placeholder="+47 123 45 678"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <Label className="text-sm font-medium text-gray-700 mb-2 block">
+                      Organisasjon (valgfritt)
+                    </Label>
+                    <Input
+                      value={organization}
+                      onChange={(e) => setOrganization(e.target.value)}
+                      placeholder="Organisasjonsnavn"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex gap-2 pt-4">
+                  <Button 
+                    onClick={handleContinueBooking}
+                    className="flex-1 bg-[#1e3a8a] hover:bg-[#1e40af]"
+                    disabled={!hasSelectedSlots || !contactName || !contactEmail || !contactPhone}
+                  >
+                    Fortsett med booking
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={clearSession}
+                    size="sm"
+                    className="px-3"
+                  >
+                    Nullstill
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </CollapsibleContent>
