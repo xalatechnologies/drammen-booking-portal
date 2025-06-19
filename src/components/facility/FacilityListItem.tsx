@@ -1,5 +1,4 @@
 
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { MapPin, Users, Heart, Share2, Projector, Volume2, FileText, ChefHat, Car, Wifi, Snowflake, Accessibility, Trophy, Target, Zap } from "lucide-react";
@@ -93,14 +92,13 @@ const FacilityListItem: React.FC<FacilityListItemProps> = ({
       'rullestolvennlig': Accessibility,
     };
     
-    return facility.equipment.slice(0, 6).map((item, index) => {
+    return facility.equipment.slice(0, 4).map((item, index) => {
       const IconComponent = amenityMap[item.toLowerCase()] || FileText;
       return (
-        <IconComponent 
-          key={index}
-          className="h-6 w-6 text-gray-600" 
-          aria-label={item}
-        />
+        <div key={index} className="flex items-center gap-1">
+          <IconComponent className="h-4 w-4 text-slate-500" />
+          <span className="text-sm text-slate-600">{item}</span>
+        </div>
       );
     });
   };
@@ -222,38 +220,55 @@ const FacilityListItem: React.FC<FacilityListItemProps> = ({
               </p>
             </div>
 
-            {/* Capacity and Amenities */}
-            <div className="flex items-center justify-between mb-5">
-              <div className="flex items-center gap-3 text-gray-600">
-                <Users className="h-6 w-6" />
-                <span className="font-medium text-lg">{facility.capacity} personer</span>
-              </div>
-              
-              <div className="flex gap-3" aria-label="Tilgjengelig utstyr">
-                {getAmenityIcons()}
-              </div>
+            {/* Capacity */}
+            <div className="flex items-center gap-3 text-gray-600 mb-6">
+              <Users className="h-6 w-6" />
+              <span className="font-medium text-lg">{facility.capacity} personer</span>
             </div>
 
-            {/* Suitable For Tags with Icons */}
-            <div className="mb-2">
-              <div className="flex flex-wrap gap-2">
-                {facility.suitableFor.slice(0, 3).map((activity, index) => (
-                  <Badge
-                    key={index}
-                    className="bg-blue-50 text-blue-700 border-blue-200 font-medium px-4 py-2 text-base hover:bg-blue-100 transition-colors flex items-center gap-2"
-                  >
-                    {getSuitableForIcon(activity)}
-                    {activity}
-                  </Badge>
-                ))}
-                {facility.suitableFor.length > 3 && (
-                  <Badge 
-                    variant="outline" 
-                    className="bg-gray-50 text-gray-600 border-gray-300 font-medium px-4 py-2 text-base"
-                  >
-                    +{facility.suitableFor.length - 3} flere
-                  </Badge>
-                )}
+            {/* Equipment and Suitable For aligned */}
+            <div className="space-y-4">
+              {/* Equipment */}
+              {facility.equipment.length > 0 && (
+                <div className="space-y-2">
+                  <div className="flex items-center text-slate-700">
+                    <span className="font-semibold text-base">Utstyr</span>
+                  </div>
+                  <div className="flex flex-wrap gap-3 ml-0">
+                    {getAmenityIcons()}
+                    {facility.equipment.length > 4 && (
+                      <span className="text-sm text-slate-500">
+                        +{facility.equipment.length - 4} flere
+                      </span>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Suitable For */}
+              <div className="space-y-2">
+                <div className="flex items-center text-slate-700">
+                  <span className="font-semibold text-base">Egnet for</span>
+                </div>
+                <div className="flex flex-wrap gap-2 ml-0">
+                  {facility.suitableFor.slice(0, 3).map((activity, index) => (
+                    <Badge
+                      key={index}
+                      className="bg-blue-50 text-blue-700 border-blue-200 font-medium px-4 py-2 text-base hover:bg-blue-100 transition-colors flex items-center gap-2"
+                    >
+                      {getSuitableForIcon(activity)}
+                      {activity}
+                    </Badge>
+                  ))}
+                  {facility.suitableFor.length > 3 && (
+                    <Badge 
+                      variant="outline" 
+                      className="bg-gray-50 text-gray-600 border-gray-300 font-medium px-4 py-2 text-base"
+                    >
+                      +{facility.suitableFor.length - 3} flere
+                    </Badge>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -264,4 +279,3 @@ const FacilityListItem: React.FC<FacilityListItemProps> = ({
 };
 
 export default FacilityListItem;
-
