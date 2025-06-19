@@ -1,11 +1,12 @@
+
 import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Index from "@/pages/Index";
 import FacilityDetail from "@/pages/facilities/[id]";
-import BookingPage from "@/pages/booking/[id]";
+import BookingPage from "@/pages/booking/[facilityId]";
 import CheckoutPage from "@/pages/checkout";
 import ConfirmationPage from "@/pages/confirmation";
-import { LocalizationContext } from "@/i18n/LocalizationContext";
+import { LocalizationContext } from "@/contexts/LocalizationContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { QueryClient } from "@/contexts/QueryClient";
 import { CartProvider } from "@/contexts/CartContext";

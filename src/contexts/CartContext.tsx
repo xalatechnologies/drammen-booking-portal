@@ -3,6 +3,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { SelectedTimeSlot } from '@/utils/recurrenceEngine';
 
 interface CartItem extends SelectedTimeSlot {
+  id: string;
   facilityId: string;
   facilityName: string;
   pricePerHour: number;
@@ -10,7 +11,7 @@ interface CartItem extends SelectedTimeSlot {
 
 interface CartContextType {
   cartItems: CartItem[];
-  addToCart: (item: CartItem) => void;
+  addToCart: (item: Omit<CartItem, 'id'>) => void;
   removeFromCart: (itemId: string) => void;
   clearCart: () => void;
   getTotalPrice: () => number;
@@ -47,11 +48,9 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem('facilityCart', JSON.stringify(cartItems));
   }, [cartItems]);
 
-  const addToCart = (item: CartItem) => {
+  const addToCart = (item: Omit<CartItem, 'id'>) => {
     const itemId = `${item.facilityId}-${item.zoneId}-${item.date.toISOString()}-${item.timeSlot}`;
-    const existingItem = cartItems.find(cartItem => 
-      `${cartItem.facilityId}-${cartItem.zoneId}-${cartItem.date.toISOString()}-${cartItem.timeSlot}` === itemId
-    );
+    const existingItem = cartItems.find(cartItem => cartItem.id === itemId);
 
     if (!existingItem) {
       setCartItems(prev => [...prev, { ...item, id: itemId }]);
