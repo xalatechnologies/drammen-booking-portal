@@ -32,7 +32,7 @@ export const formsTranslations = {
       selectActorType: "Velg aktørtype"
     },
     buttons: {
-      submit: "Send inn",
+      submit: "Send søknad",
       cancel: "Avbryt",
       back: "Tilbake",
       continue: "Fortsett",
@@ -51,6 +51,35 @@ export const formsTranslations = {
       bookingDetails: "Booking detaljer",
       activityDetails: "Aktivitetsdetaljer",
       additionalServices: "Tilleggstjenester"
+    },
+    facilityTypes: {
+      all: "Alle typer",
+      sportsHall: "Idrettshall",
+      meetingRoom: "Møterom",
+      conferenceRoom: "Konferanserom",
+      auditorium: "Auditorium",
+      gym: "Gymsal"
+    },
+    locations: {
+      all: "Alle områder",
+      drammenSentrum: "Drammen Sentrum",
+      bragernes: "Bragernes",
+      stromsø: "Strømsø",
+      konnerud: "Konnerud",
+      åssiden: "Åssiden"
+    },
+    accessibility: {
+      all: "Alle",
+      wheelchair: "Rullestolvennlig",
+      hearingLoop: "Hørselsløkke",
+      visualAids: "Synshjelpemidler"
+    },
+    capacity: {
+      range1: "0-20",
+      range2: "20-50", 
+      range3: "50-100",
+      range4: "100-200",
+      range5: "200+"
     }
   },
   EN: {
@@ -85,7 +114,7 @@ export const formsTranslations = {
       selectActorType: "Select actor type"
     },
     buttons: {
-      submit: "Submit",
+      submit: "Submit application",
       cancel: "Cancel",
       back: "Back",
       continue: "Continue",
@@ -104,6 +133,35 @@ export const formsTranslations = {
       bookingDetails: "Booking details",
       activityDetails: "Activity details",
       additionalServices: "Additional services"
+    },
+    facilityTypes: {
+      all: "All types",
+      sportsHall: "Sports hall",
+      meetingRoom: "Meeting room",
+      conferenceRoom: "Conference room",
+      auditorium: "Auditorium",
+      gym: "Gym"
+    },
+    locations: {
+      all: "All areas",
+      drammenSentrum: "Drammen Center",
+      bragernes: "Bragernes",
+      stromsø: "Strømsø",
+      konnerud: "Konnerud",
+      åssiden: "Åssiden"
+    },
+    accessibility: {
+      all: "All",
+      wheelchair: "Wheelchair accessible",
+      hearingLoop: "Hearing loop",
+      visualAids: "Visual aids"
+    },
+    capacity: {
+      range1: "0-20",
+      range2: "20-50",
+      range3: "50-100", 
+      range4: "100-200",
+      range5: "200+"
     }
   }
 };
