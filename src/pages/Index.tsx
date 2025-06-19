@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { DateRange } from "react-day-picker";
@@ -116,7 +115,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex flex-col">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex flex-col w-full">
       {/* Skip to main content link for screen readers */}
       <a 
         href="#main-content" 
@@ -128,10 +127,12 @@ const Index = () => {
 
       <GlobalHeader />
 
-      <main id="main-content" className="flex-1">
-        <div className="container mx-auto px-4 py-6">
-          <HeroBanner />
-          
+      <main id="main-content" className="flex-1 w-full">
+        {/* Hero Banner - Full Width */}
+        <HeroBanner />
+        
+        {/* Content Area - Centered */}
+        <div className="content-center py-6">
           <SearchFilter
             date={date}
             setDate={setDate}

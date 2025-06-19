@@ -35,8 +35,8 @@ const GlobalHeader = () => {
   };
 
   return (
-    <header className="bg-white dark:bg-gray-900 py-3 px-4 shadow-md sticky top-0 z-10 border-b border-gray-200 dark:border-gray-700">
-      <div className="container mx-auto flex justify-between items-center gap-4">
+    <header className="bg-white dark:bg-gray-900 py-3 shadow-md sticky top-0 z-10 border-b border-gray-200 dark:border-gray-700 w-full">
+      <div className="content-center flex justify-between items-center gap-4">
         {/* Logo (left) */}
         <div className="flex items-center flex-shrink-0">
           <Logo />
@@ -74,7 +74,7 @@ const GlobalHeader = () => {
       </div>
 
       {/* Mobile Search Bar - Shown only on mobile */}
-      <div className="md:hidden mt-3 px-2">
+      <div className="md:hidden mt-3 px-6">
         <GlobalSearch />
       </div>
 

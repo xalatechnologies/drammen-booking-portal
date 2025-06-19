@@ -94,9 +94,33 @@
 @layer base {
   * {
     @apply border-border;
+    box-sizing: border-box;
+  }
+
+  html, body, #root {
+    width: 100%;
+    min-width: 100%;
+    margin: 0;
+    padding: 0;
   }
 
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .content-center {
+    @apply max-w-7xl mx-auto px-4;
+  }
+  
+  .content-wide {
+    @apply max-w-screen-2xl mx-auto px-4;
+  }
+  
+  .full-width {
+    width: 100%;
+    margin-left: calc(-50vw + 50%);
+    margin-right: calc(-50vw + 50%);
   }
 }

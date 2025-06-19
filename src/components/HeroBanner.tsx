@@ -19,15 +19,15 @@ const HeroBanner = () => {
   const t = translations[language];
   
   return (
-    <div className="mb-8 rounded-3xl overflow-hidden shadow-2xl">
-      <div className="relative">
+    <div className="w-full mb-8">
+      <div className="relative w-full">
         <img 
           src="/lovable-uploads/5a43abf2-1c2e-44cb-96a6-6509c7fe3281.png" 
           alt="Drammen by med elv og broer" 
           className="w-full h-[200px] md:h-[240px] object-cover" 
         />
         <div className="absolute inset-0 bg-gradient-to-r from-gray-900/90 via-gray-900/60 to-transparent flex items-center">
-          <div className="container mx-auto px-8 py-8">
+          <div className="content-center py-8 w-full">
             <div className="max-w-2xl">
               <p className="font-semibold mb-2 text-gray-50 text-5xl">
                 {t.subtitle}

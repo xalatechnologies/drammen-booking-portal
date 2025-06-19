@@ -14,8 +14,8 @@ const GlobalFooter = () => {
   };
 
   return (
-    <footer className="bg-gray-900 text-white py-12 px-4 border-t mt-auto">
-      <div className="container mx-auto">
+    <footer className="bg-gray-900 text-white border-t mt-auto w-full">
+      <div className="content-center py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Logo and Description */}
           <div className="col-span-1 md:col-span-2">
