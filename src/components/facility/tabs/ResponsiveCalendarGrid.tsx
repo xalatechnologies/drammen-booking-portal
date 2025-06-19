@@ -53,7 +53,7 @@ export function ResponsiveCalendarGrid({
     
     const button = (
       <button
-        className={`w-full h-10 md:h-12 rounded-md border-2 transition-all duration-200 font-inter text-xs md:text-sm ${statusColor} ${
+        className={`w-full h-7 md:h-8 rounded border transition-all duration-200 font-inter text-xs ${statusColor} ${
           status === 'available' 
             ? 'cursor-pointer shadow-sm hover:shadow-md transform active:scale-95 md:hover:scale-105' 
             : 'cursor-not-allowed opacity-75'
@@ -65,7 +65,7 @@ export function ResponsiveCalendarGrid({
           <div className="text-xs font-medium">✓</div>
         )}
         {status === 'busy' && (
-          <AlertTriangle className="h-3 w-3 mx-auto text-red-500" />
+          <AlertTriangle className="h-2.5 w-2.5 mx-auto text-red-500" />
         )}
       </button>
     );
@@ -83,56 +83,16 @@ export function ResponsiveCalendarGrid({
 
   return (
     <Card>
-      <CardContent className="p-2 md:p-4">
+      <CardContent className="p-2 md:p-3">
         {/* Desktop Grid Layout */}
         <div className="hidden md:block">
-          <div className="grid grid-cols-8 gap-2 mb-4">
-            <div className="p-2 text-base font-medium text-gray-500 font-inter">Tid</div>
+          <div className="grid grid-cols-8 gap-1 mb-3">
+            <div className="p-1.5 text-sm font-medium text-gray-500 font-inter">Tid</div>
             {weekDays.map((day, i) => {
               const holidayCheck = isNorwegianHoliday(day);
               const isToday = format(day, 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd');
               return (
-                <div key={i} className={`p-2 text-center rounded font-inter ${isToday ? 'bg-blue-100 border border-blue-300' : 'bg-gray-50'}`}>
-                  <div className={`text-base font-medium ${isToday ? 'text-blue-800' : 'text-gray-700'}`}>
-                    {format(day, "EEE", { locale: nb })}
-                  </div>
-                  <div className={`text-base font-bold ${isToday ? 'text-blue-900' : 'text-gray-900'}`}>
-                    {format(day, "dd.MM", { locale: nb })}
-                  </div>
-                  {holidayCheck.isHoliday && (
-                    <div className="text-xs text-red-600 truncate font-inter" title={holidayCheck.name}>
-                      {holidayCheck.name?.substring(0, 8)}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-
-          <div className="space-y-2">
-            {timeSlots.map((timeSlot) => (
-              <div key={timeSlot} className="grid grid-cols-8 gap-2">
-                <div className="p-3 text-base font-medium text-gray-700 flex items-center bg-gray-50 rounded font-inter">
-                  {timeSlot}
-                </div>
-                {weekDays.map((day, dayIndex) => (
-                  <div key={dayIndex} className="relative">
-                    {renderSlotButton(day, timeSlot, dayIndex)}
-                  </div>
-                ))}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Mobile Scrollable Layout */}
-        <div className="md:hidden">
-          <div className="flex gap-2 overflow-x-auto pb-4 mb-4">
-            {weekDays.map((day, i) => {
-              const holidayCheck = isNorwegianHoliday(day);
-              const isToday = format(day, 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd');
-              return (
-                <div key={i} className={`flex-shrink-0 w-20 p-2 text-center rounded font-inter ${isToday ? 'bg-blue-100 border border-blue-300' : 'bg-gray-50'}`}>
+                <div key={i} className={`p-1.5 text-center rounded font-inter ${isToday ? 'bg-blue-100 border border-blue-300' : 'bg-gray-50'}`}>
                   <div className={`text-sm font-medium ${isToday ? 'text-blue-800' : 'text-gray-700'}`}>
                     {format(day, "EEE", { locale: nb })}
                   </div>
@@ -149,10 +109,50 @@ export function ResponsiveCalendarGrid({
             })}
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-1">
             {timeSlots.map((timeSlot) => (
-              <div key={timeSlot} className="space-y-2">
-                <div className="text-sm font-medium text-gray-700 bg-gray-50 p-2 rounded">
+              <div key={timeSlot} className="grid grid-cols-8 gap-1">
+                <div className="p-1.5 text-sm font-medium text-gray-700 flex items-center bg-gray-50 rounded font-inter truncate">
+                  {timeSlot}
+                </div>
+                {weekDays.map((day, dayIndex) => (
+                  <div key={dayIndex} className="relative">
+                    {renderSlotButton(day, timeSlot, dayIndex)}
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Mobile Scrollable Layout */}
+        <div className="md:hidden">
+          <div className="flex gap-1 overflow-x-auto pb-3 mb-3">
+            {weekDays.map((day, i) => {
+              const holidayCheck = isNorwegianHoliday(day);
+              const isToday = format(day, 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd');
+              return (
+                <div key={i} className={`flex-shrink-0 w-16 p-1.5 text-center rounded font-inter ${isToday ? 'bg-blue-100 border border-blue-300' : 'bg-gray-50'}`}>
+                  <div className={`text-xs font-medium ${isToday ? 'text-blue-800' : 'text-gray-700'}`}>
+                    {format(day, "EEE", { locale: nb })}
+                  </div>
+                  <div className={`text-xs font-bold ${isToday ? 'text-blue-900' : 'text-gray-900'}`}>
+                    {format(day, "dd.MM", { locale: nb })}
+                  </div>
+                  {holidayCheck.isHoliday && (
+                    <div className="text-xs text-red-600 truncate font-inter" title={holidayCheck.name}>
+                      {holidayCheck.name?.substring(0, 4)}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="space-y-2">
+            {timeSlots.map((timeSlot) => (
+              <div key={timeSlot} className="space-y-1">
+                <div className="text-xs font-medium text-gray-700 bg-gray-50 p-1.5 rounded truncate">
                   {timeSlot}
                 </div>
                 <div className="grid grid-cols-7 gap-1">
