@@ -13,7 +13,8 @@ import { WeekNavigation } from "./WeekNavigation";
 import { ResponsiveCalendarGrid } from "./ResponsiveCalendarGrid";
 import { LegendDisplay } from "./LegendDisplay";
 import { SelectedSlotsDisplay } from "./SelectedSlotsDisplay";
-import { isSlotSelected } from "./AvailabilityTabUtils";
+import { StrotimeDisplay } from "./StrotimeDisplay";
+import { StrøtimeSlot } from "@/types/booking/strøtimer";
 
 interface AvailabilityTabContentProps {
   zone: Zone;
@@ -62,10 +63,39 @@ export function AvailabilityTabContent({
   // Generate week dates
   const weekDates = Array.from({ length: 7 }, (_, i) => addDays(currentWeekStart, i));
 
-  // Generate time slots based on opening hours
+  // Generate single hour time slots based on opening hours (8-22)
   const timeSlots = [
-    "08:00-10:00", "10:00-12:00", "12:00-14:00", 
-    "14:00-16:00", "16:00-18:00", "18:00-20:00", "20:00-22:00"
+    "08:00", "09:00", "10:00", "11:00", "12:00", "13:00", 
+    "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", 
+    "20:00", "21:00", "22:00"
+  ];
+
+  // Mock strøtimer data
+  const strøtimer: StrøtimeSlot[] = [
+    {
+      id: "strotime-1",
+      date: addDays(currentWeekStart, 1),
+      startTime: "14:00",
+      endTime: "15:00",
+      duration: 60,
+      zoneName: zone.name,
+      zoneId: zone.id,
+      pricePerSlot: 150,
+      isAvailable: true,
+      maxParticipants: zone.capacity
+    },
+    {
+      id: "strotime-2", 
+      date: addDays(currentWeekStart, 3),
+      startTime: "16:00",
+      endTime: "17:00",
+      duration: 60,
+      zoneName: zone.name,
+      zoneId: zone.id,
+      pricePerSlot: 150,
+      isAvailable: true,
+      maxParticipants: zone.capacity
+    }
   ];
 
   const handleSlotClick = (zoneId: string, date: Date, timeSlot: string, availability: string) => {
@@ -75,7 +105,6 @@ export function AvailabilityTabContent({
   };
 
   const getAvailabilityStatus = (zoneId: string, date: Date, timeSlot: string) => {
-    // Use the checkZoneConflict method from the base class
     const conflict = conflictManager.checkZoneConflict(zoneId, date, timeSlot);
     return {
       status: conflict ? 'busy' : 'available',
@@ -131,6 +160,13 @@ export function AvailabilityTabContent({
         currentWeekStart={currentWeekStart}
         onWeekChange={setCurrentWeekStart}
         canGoPrevious={canGoPrevious}
+      />
+
+      {/* Strøtimer Display */}
+      <StrotimeDisplay 
+        strøtimer={strøtimer}
+        date={weekDates[0]}
+        onBookingComplete={(booking) => console.log('Strøtime booking:', booking)}
       />
 
       {/* Calendar Grid */}
