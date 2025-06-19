@@ -30,7 +30,7 @@ const FacilityList: React.FC<FacilityListProps> = ({
       {viewMode === "grid" ? (
         <FacilityGrid pagination={pagination} filters={filters} />
       ) : (
-        <div className="max-w-7xl mx-auto space-y-3">
+        <div className="space-y-4">
           {isLoading ? (
             <div>Loading...</div>
           ) : error ? (
@@ -56,12 +56,10 @@ const FacilityList: React.FC<FacilityListProps> = ({
       )}
 
       {paginationInfo && (
-        <div className={viewMode === "list" ? "max-w-7xl mx-auto" : ""}>
-          <PaginationControls 
-            pagination={paginationInfo}
-            onPageChange={goToPage}
-          />
-        </div>
+        <PaginationControls 
+          pagination={paginationInfo}
+          onPageChange={goToPage}
+        />
       )}
     </div>
   );
