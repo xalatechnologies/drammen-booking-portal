@@ -1,9 +1,9 @@
 
-
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { QueryClient } from '@/contexts/QueryClient';
 import { LanguageProvider } from '@/contexts/LanguageContext';
+import { LocalizationProvider } from '@/contexts/LocalizationContext';
 import { CartProvider } from '@/contexts/CartContext';
 import { BookingStateProvider } from '@/contexts/BookingStateContext';
 import Index from '@/pages/Index';
@@ -20,23 +20,25 @@ function App() {
     <Router>
       <QueryClient>
         <LanguageProvider>
-          <AuthProvider>
-            <CartProvider>
-              <BookingStateProvider>
-                <div className="App">
-                  <Routes>
-                    <Route path="/" element={<Index />} />
-                    <Route path="/facility/:id" element={<FacilityDetailsPage />} />
-                    <Route path="/booking/:facilityId/confirm" element={<BookingConfirmationPage />} />
-                    <Route path="/checkout" element={<CheckoutPage />} />
-                    <Route path="/login" element={<LoginPage />} />
-                    <Route path="/login-selection" element={<LoginSelectionPage />} />
-                  </Routes>
-                  <Toaster />
-                </div>
-              </BookingStateProvider>
-            </CartProvider>
-          </AuthProvider>
+          <LocalizationProvider>
+            <AuthProvider>
+              <CartProvider>
+                <BookingStateProvider>
+                  <div className="App">
+                    <Routes>
+                      <Route path="/" element={<Index />} />
+                      <Route path="/facility/:id" element={<FacilityDetailsPage />} />
+                      <Route path="/booking/:facilityId/confirm" element={<BookingConfirmationPage />} />
+                      <Route path="/checkout" element={<CheckoutPage />} />
+                      <Route path="/login" element={<LoginPage />} />
+                      <Route path="/login-selection" element={<LoginSelectionPage />} />
+                    </Routes>
+                    <Toaster />
+                  </div>
+                </BookingStateProvider>
+              </CartProvider>
+            </AuthProvider>
+          </LocalizationProvider>
         </LanguageProvider>
       </QueryClient>
     </Router>
@@ -44,4 +46,3 @@ function App() {
 }
 
 export default App;
-
