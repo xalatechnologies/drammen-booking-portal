@@ -58,7 +58,12 @@ export const bookingTranslations = {
       contactPhone: "Telefon",
       expectedAttendees: "Forventet deltakere",
       totalPrice: "Totalpris"
-    }
+    },
+    approval: {
+      required: "Krever godkjenning",
+      description: "Denne bookingen krever godkjenning fra kommunen på grunn av aktørtype eller spesielle betingelser. Du vil motta en bekreftelse når bookingen er behandlet."
+    },
+    estimateNotice: "Prisberegning basert på estimert 2-timers booking. Velg tidsperiode for nøyaktig pris."
   },
   EN: {
     status: {
@@ -118,6 +123,11 @@ export const bookingTranslations = {
       contactPhone: "Phone",
       expectedAttendees: "Expected attendees",
       totalPrice: "Total price"
-    }
+    },
+    approval: {
+      required: "Requires approval",
+      description: "This booking requires approval from the municipality due to actor type or special conditions. You will receive a confirmation when the booking has been processed."
+    },
+    estimateNotice: "Price calculation based on estimated 2-hour booking. Select time period for exact price."
   }
 };

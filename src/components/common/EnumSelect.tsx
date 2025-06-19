@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label';
 import { useEnum } from '@/hooks/useEnum';
 import { EnumType } from '@/types/enum';
 import { Loader2 } from 'lucide-react';
+import { useTranslation } from '@/i18n/hooks/useTranslation';
 
 interface EnumSelectProps {
   enumType: EnumType;
@@ -32,11 +33,12 @@ export function EnumSelect({
   showDescription = true
 }: EnumSelectProps) {
   const { options, isLoading, error } = useEnum(enumType);
+  const { t } = useTranslation();
 
   if (error) {
     return (
       <div className="text-red-500 text-sm">
-        Error loading options: {error}
+        {t('common.errors.loadingOptions', {}, 'Error loading options')}: {error}
       </div>
     );
   }
@@ -60,7 +62,7 @@ export function EnumSelect({
         disabled={disabled || isLoading}
       >
         <SelectTrigger className="h-12 border-gray-300 focus:border-slate-700">
-          <SelectValue placeholder={isLoading ? "Loading..." : placeholder}>
+          <SelectValue placeholder={isLoading ? t('common.messages.loading', {}, 'Loading...') : placeholder}>
             {isLoading && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
           </SelectValue>
         </SelectTrigger>

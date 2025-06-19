@@ -13,7 +13,9 @@ export const commonTranslations = {
       submit: "Send inn",
       back: "Tilbake",
       next: "Neste",
-      continue: "Fortsett"
+      continue: "Fortsett",
+      login: "Logg inn",
+      logout: "Logg ut"
     },
     labels: {
       name: "Navn",
@@ -33,6 +35,9 @@ export const commonTranslations = {
       error: "Feil",
       noResults: "Ingen resultater",
       confirmation: "Bekreftelse"
+    },
+    errors: {
+      loadingOptions: "Feil ved lasting av valg"
     },
     navigation: {
       home: "Hjem",
@@ -56,7 +61,9 @@ export const commonTranslations = {
       submit: "Submit",
       back: "Back",
       next: "Next",
-      continue: "Continue"
+      continue: "Continue",
+      login: "Login",
+      logout: "Logout"
     },
     labels: {
       name: "Name",
@@ -76,6 +83,9 @@ export const commonTranslations = {
       error: "Error",
       noResults: "No results",
       confirmation: "Confirmation"
+    },
+    errors: {
+      loadingOptions: "Error loading options"
     },
     navigation: {
       home: "Home",

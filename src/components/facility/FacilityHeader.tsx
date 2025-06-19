@@ -2,7 +2,7 @@
 import React from "react";
 import { MapPin } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { useTranslation } from "@/i18n";
+import { useTranslation } from "@/i18n/hooks/useTranslation";
 
 interface FacilityHeaderProps {
   name: string;
