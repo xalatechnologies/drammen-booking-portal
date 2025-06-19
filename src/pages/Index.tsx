@@ -10,10 +10,8 @@ import MapView from "@/components/MapView";
 import CalendarView from "@/components/CalendarView";
 import { useFacilitiesPagination } from "@/hooks/useFacilities";
 import { FacilityFilters } from "@/types/facility";
-import { useTranslation } from "@/i18n/hooks/useTranslation";
 
 const Index = () => {
-  const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const [date, setDate] = useState<Date>();
   const [facilityType, setFacilityType] = useState<string>("all");
@@ -134,21 +132,6 @@ const Index = () => {
       <main id="main-content" className="flex-1 w-full">
         {/* Bento Grid Hero Banner - Full Width */}
         <BentoHeroBanner />
-        
-        {/* Professional Title Section */}
-        <div className="w-full bg-white border-b border-gray-100">
-          <div className="content-center py-8">
-            <div className="text-center">
-              <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-                {t('search.labels.searchFacilities')}
-              </h2>
-              <p className="text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
-                Utforsk vårt omfattende utvalg av kommunale lokaler og fasiliteter. 
-                Bruk filtrene nedenfor for å finne det perfekte stedet for ditt arrangement eller aktivitet.
-              </p>
-            </div>
-          </div>
-        </div>
         
         {/* Content Area - Centered */}
         <div className="content-center py-6">
