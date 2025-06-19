@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Facility } from '@/types/facility';
@@ -37,6 +36,8 @@ export function LocalizationProvider({ children }: LocalizationProviderProps) {
       name: facility.name?.[language] || facility.name?.NO || '',
       description: facility.description?.[language] || facility.description?.NO || '',
       suitableFor: facility.suitableFor?.[language] || facility.suitableFor?.NO || [],
+      equipment: facility.equipment?.[language] || facility.equipment?.NO || facility.equipment || [],
+      amenities: facility.amenities?.[language] || facility.amenities?.NO || facility.amenities || [],
       // Keep other properties as they are
     };
   };

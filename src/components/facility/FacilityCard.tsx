@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { MapPin, Users, Heart, Share2, Projector, Volume2, FileText, ChefHat, Car, Wifi, Snowflake, Accessibility } from "lucide-react";
@@ -77,7 +76,10 @@ export function FacilityCard({ facility, onAddressClick }: FacilityCardProps) {
       'wheelchair accessible': Accessibility,
     };
     
-    return facility.equipment.slice(0, 4).map((item, index) => {
+    // Safety check: ensure equipment exists and is an array
+    const equipmentArray = Array.isArray(facility.equipment) ? facility.equipment : [];
+    
+    return equipmentArray.slice(0, 4).map((item, index) => {
       const IconComponent = amenityMap[item.toLowerCase()] || FileText;
       return (
         <IconComponent 
@@ -193,7 +195,7 @@ export function FacilityCard({ facility, onAddressClick }: FacilityCardProps) {
         {/* Suitable For Tags */}
         <div className="mb-6">
           <div className="flex flex-wrap gap-2">
-            {facility.suitableFor.slice(0, 2).map((activity, index) => (
+            {Array.isArray(facility.suitableFor) && facility.suitableFor.slice(0, 2).map((activity, index) => (
               <Badge
                 key={index}
                 className="bg-blue-50 text-blue-700 border-blue-200 font-medium px-4 py-2 text-base hover:bg-blue-100 transition-colors"
@@ -201,7 +203,7 @@ export function FacilityCard({ facility, onAddressClick }: FacilityCardProps) {
                 {activity}
               </Badge>
             ))}
-            {facility.suitableFor.length > 2 && (
+            {Array.isArray(facility.suitableFor) && facility.suitableFor.length > 2 && (
               <Badge 
                 variant="outline" 
                 className="bg-gray-50 text-gray-600 border-gray-300 font-medium px-4 py-2 text-base"
