@@ -120,22 +120,22 @@ export function AvailabilityTabContent({
 
       {/* Strøtimer Accordion - Only show if there are strøtimer */}
       {hasStrøtimer && (
-        <Accordion type="single" collapsible className="w-full">
-          <AccordionItem value="strotimer">
-            <AccordionTrigger className="hover:no-underline">
+        <Accordion type="single" collapsible className="w-full bg-slate-100 rounded-lg">
+          <AccordionItem value="strotimer" className="border-slate-200">
+            <AccordionTrigger className="hover:no-underline px-6 py-4 bg-slate-800 text-white rounded-t-lg">
               <div className="flex items-center gap-3">
-                <Zap className="h-6 w-6 text-orange-600" />
+                <Zap className="h-6 w-6 text-orange-400" />
                 <div className="text-left">
-                  <h3 className="text-lg font-semibold text-gray-900">
+                  <h3 className="text-lg font-semibold text-white">
                     Strøtimer - Ledige tider
                   </h3>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-slate-300">
                     {strøtimer.length} ledige tider tilgjengelig for drop-in booking
                   </p>
                 </div>
               </div>
             </AccordionTrigger>
-            <AccordionContent className="space-y-4 pt-4">
+            <AccordionContent className="space-y-4 pt-4 px-6 pb-6 bg-slate-800 rounded-b-lg">
               {weekDays.map(day => (
                 <StrotimeDisplay
                   key={day.toISOString()}
