@@ -16,8 +16,8 @@ function App() {
     <CartProvider>
       <QueryClient>
         <Router>
-          <LocalizationProvider>
-            <LanguageProvider>
+          <LanguageProvider>
+            <LocalizationProvider>
               <div className="flex flex-col min-h-screen w-full">
                 <Routes>
                   <Route path="/" element={<Index />} />
@@ -27,8 +27,8 @@ function App() {
                   <Route path="/confirmation" element={<ConfirmationPage />} />
                 </Routes>
               </div>
-            </LanguageProvider>
-          </LocalizationProvider>
+            </LocalizationProvider>
+          </LanguageProvider>
         </Router>
       </QueryClient>
     </CartProvider>
