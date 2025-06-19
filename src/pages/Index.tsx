@@ -129,39 +129,41 @@ const Index = () => {
       <GlobalHeader />
 
       <main id="main-content" className="flex-1">
-        <div className="container mx-auto px-4 py-6">
-          <HeroBanner />
-          
-          <SearchFilter
-            date={date}
-            setDate={setDate}
-            facilityType={facilityType}
-            setFacilityType={setFacilityType}
-            location={location}
-            setLocation={setLocation}
-            viewMode={viewMode}
-            setViewMode={setViewMode}
-            accessibility={accessibility}
-            setAccessibility={setAccessibility}
-            capacity={capacity}
-            setCapacity={setCapacity}
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
-            priceRange={priceRange}
-            setPriceRange={setPriceRange}
-            availableNow={availableNow}
-            setAvailableNow={setAvailableNow}
-            hasEquipment={hasEquipment}
-            setHasEquipment={setHasEquipment}
-            hasParking={hasParking}
-            setHasParking={setHasParking}
-            hasWifi={hasWifi}
-            setHasWifi={setHasWifi}
-            allowsPhotography={allowsPhotography}
-            setAllowsPhotography={setAllowsPhotography}
-          />
+        <div className="w-full px-4 py-6">
+          <div className="max-w-7xl mx-auto">
+            <HeroBanner />
+            
+            <SearchFilter
+              date={date}
+              setDate={setDate}
+              facilityType={facilityType}
+              setFacilityType={setFacilityType}
+              location={location}
+              setLocation={setLocation}
+              viewMode={viewMode}
+              setViewMode={setViewMode}
+              accessibility={accessibility}
+              setAccessibility={setAccessibility}
+              capacity={capacity}
+              setCapacity={setCapacity}
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
+              priceRange={priceRange}
+              setPriceRange={setPriceRange}
+              availableNow={availableNow}
+              setAvailableNow={setAvailableNow}
+              hasEquipment={hasEquipment}
+              setHasEquipment={setHasEquipment}
+              hasParking={hasParking}
+              setHasParking={setHasParking}
+              hasWifi={hasWifi}
+              setHasWifi={setHasWifi}
+              allowsPhotography={allowsPhotography}
+              setAllowsPhotography={setAllowsPhotography}
+            />
 
-          {renderContent()}
+            {renderContent()}
+          </div>
         </div>
       </main>
 
