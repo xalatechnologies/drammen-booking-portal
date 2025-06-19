@@ -34,34 +34,27 @@ export function FacilityListItemMap({ address, facilityName }: FacilityListItemM
       attributionControl: false
     });
 
-    // Add custom marker with better styling
+    // Create custom colored marker element to match other maps
     const markerElement = document.createElement('div');
-    markerElement.className = 'custom-marker';
+    markerElement.className = 'facility-marker';
     markerElement.style.cssText = `
-      width: 32px;
-      height: 32px;
-      background: linear-gradient(135deg, #3B82F6, #1D4ED8);
-      border: 3px solid white;
+      width: 30px;
+      height: 30px;
+      background-color: #ef4444;
+      border: 2px solid white;
       border-radius: 50%;
-      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
       display: flex;
       align-items: center;
       justify-content: center;
-      position: relative;
     `;
-
-    // Add pulse animation
-    const pulseElement = document.createElement('div');
-    pulseElement.className = 'map-pulse';
-    pulseElement.style.cssText = `
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      background: rgba(59, 130, 246, 0.3);
-      animation: map-pulse 2s infinite;
-    `;
-    markerElement.appendChild(pulseElement);
+    
+    // Add icon to marker
+    const icon = document.createElement('div');
+    icon.innerHTML = '📍';
+    icon.style.fontSize = '12px';
+    markerElement.appendChild(icon);
 
     new mapboxgl.Marker(markerElement)
       .setLngLat(coordinates)
@@ -86,42 +79,22 @@ export function FacilityListItemMap({ address, facilityName }: FacilityListItemM
   }, [address, facilityName]);
 
   return (
-    <>
-      <style>
-        {`
-          @keyframes map-pulse {
-            0% {
-              transform: scale(1);
-              opacity: 0.7;
-            }
-            50% {
-              transform: scale(1.3);
-              opacity: 0.3;
-            }
-            100% {
-              transform: scale(1.6);
-              opacity: 0;
-            }
-          }
-        `}
-      </style>
-      <div className="h-full w-full">
-        <div className="w-full h-full bg-gray-100 shadow-md hover:shadow-xl transition-all duration-300 group-hover:border-blue-300 relative">
-          <div ref={mapContainer} className="w-full h-full" />
-          
-          {/* Overlay gradient for better text readability */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-          
-          {/* Location label */}
-          <div className="absolute bottom-2 left-2 right-2">
-            <div className="bg-white/95 backdrop-blur-sm rounded-lg px-3 py-1 shadow-sm opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
-              <p className="text-xs font-semibold text-gray-800 truncate">
-                📍 {facilityName}
-              </p>
-            </div>
+    <div className="h-full w-full">
+      <div className="w-full h-full bg-gray-100 shadow-md hover:shadow-xl transition-all duration-300 group-hover:border-blue-300 relative">
+        <div ref={mapContainer} className="w-full h-full" />
+        
+        {/* Overlay gradient for better text readability */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        
+        {/* Location label */}
+        <div className="absolute bottom-2 left-2 right-2">
+          <div className="bg-white/95 backdrop-blur-sm rounded-lg px-3 py-1 shadow-sm opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
+            <p className="text-xs font-semibold text-gray-800 truncate">
+              📍 {facilityName}
+            </p>
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }

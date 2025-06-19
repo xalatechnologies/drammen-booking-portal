@@ -98,26 +98,28 @@ export function FacilityListItemContent({
 
       {/* Bottom section with Suitable For and Action Buttons */}
       <div className="flex items-center justify-between">
-        {/* Suitable For */}
-        <div className="flex flex-wrap gap-2 flex-1">
-          {facility.suitableFor.slice(0, 4).map((activity, index) => (
-            <Badge 
-              key={index} 
-              className="bg-blue-50 text-blue-700 border-blue-200 font-medium px-3 py-1.5 text-sm hover:bg-blue-100 transition-colors flex items-center gap-1.5"
-            >
-              {getSuitableForIcon(activity)}
-              {activity}
-            </Badge>
-          ))}
-          {facility.suitableFor.length > 4 && (
-            <Badge variant="outline" className="bg-gray-50 text-gray-600 border-gray-300 font-medium px-3 py-1.5 text-sm">
-              +{facility.suitableFor.length - 4}
-            </Badge>
-          )}
+        {/* Suitable For - Limited to one line */}
+        <div className="flex flex-wrap gap-2 flex-1 overflow-hidden">
+          <div className="flex gap-2 items-center min-w-0">
+            {facility.suitableFor.slice(0, 3).map((activity, index) => (
+              <Badge 
+                key={index} 
+                className="bg-blue-50 text-blue-700 border-blue-200 font-medium px-3 py-1.5 text-sm hover:bg-blue-100 transition-colors flex items-center gap-1.5 whitespace-nowrap"
+              >
+                {getSuitableForIcon(activity)}
+                {activity}
+              </Badge>
+            ))}
+            {facility.suitableFor.length > 3 && (
+              <Badge variant="outline" className="bg-gray-50 text-gray-600 border-gray-300 font-medium px-3 py-1.5 text-sm whitespace-nowrap">
+                +{facility.suitableFor.length - 3}
+              </Badge>
+            )}
+          </div>
         </div>
 
         {/* Action Buttons - aligned to the right */}
-        <div className="flex gap-2 ml-4 opacity-0 group-hover:opacity-100 transition-all duration-300">
+        <div className="flex gap-2 ml-4 opacity-0 group-hover:opacity-100 transition-all duration-300 flex-shrink-0">
           <Button 
             variant="ghost" 
             size="sm" 
