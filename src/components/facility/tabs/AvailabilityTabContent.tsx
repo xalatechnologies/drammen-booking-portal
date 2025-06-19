@@ -74,6 +74,22 @@ export function AvailabilityTabContent({
     }
   };
 
+  const getAvailabilityStatus = (zoneId: string, date: Date, timeSlot: string) => {
+    const conflict = conflictManager.checkTimeSlotConflict(zoneId, date, timeSlot);
+    return {
+      status: conflict ? 'busy' : 'available',
+      conflict: conflict
+    };
+  };
+
+  const isSlotSelectedUtil = (zoneId: string, date: Date, timeSlot: string) => {
+    return selectedSlots.some(slot => 
+      slot.zoneId === zoneId && 
+      format(slot.date, 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd') && 
+      slot.timeSlot === timeSlot
+    );
+  };
+
   return (
     <div className="space-y-6">
       {/* Zone Info Header */}
@@ -118,11 +134,12 @@ export function AvailabilityTabContent({
 
       {/* Calendar Grid */}
       <ResponsiveCalendarGrid
-        weekDates={weekDates}
+        zone={zone}
+        currentWeekStart={currentWeekStart}
         timeSlots={timeSlots}
         selectedSlots={selectedSlots}
-        zone={zone}
-        conflictManager={conflictManager}
+        getAvailabilityStatus={getAvailabilityStatus}
+        isSlotSelected={isSlotSelectedUtil}
         onSlotClick={handleSlotClick}
       />
 

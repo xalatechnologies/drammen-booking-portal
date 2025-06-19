@@ -78,7 +78,7 @@ export function AvailabilityTab({
   });
 
   const handlePatternApplyWrapper = () => {
-    handlePatternApply();
+    handlePatternApply(currentPattern);
     setShowPatternBuilder(false);
   };
 

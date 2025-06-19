@@ -89,7 +89,6 @@ export function FacilityInfoTabs({
           amenities={amenities}
           address={address}
           area={area}
-          suitableFor={suitableFor}
         />
       </TabsContent>
       
