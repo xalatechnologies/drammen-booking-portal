@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Facility } from '@/types/facility';
@@ -7,10 +8,10 @@ interface LocalizationContextType {
   language: 'NO' | 'EN';
 }
 
-const LocalizationContext = createContext<LocalizationContextType | undefined>(undefined);
+const LocalizationContextInstance = createContext<LocalizationContextType | undefined>(undefined);
 
 export const useLocalization = () => {
-  const context = useContext(LocalizationContext);
+  const context = useContext(LocalizationContextInstance);
   if (!context) {
     throw new Error('useLocalization must be used within a LocalizationProvider');
   }
@@ -46,9 +47,9 @@ export function LocalizationProvider({ children }: LocalizationProviderProps) {
   };
 
   return (
-    <LocalizationContext.Provider value={value}>
+    <LocalizationContextInstance.Provider value={value}>
       {children}
-    </LocalizationContext.Provider>
+    </LocalizationContextInstance.Provider>
   );
 }
 
