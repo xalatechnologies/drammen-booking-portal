@@ -63,15 +63,15 @@ export function FacilityInfoTabs({
 
   return (
     <Tabs defaultValue="availability" className="w-full">
-      <TabsList className="grid w-full grid-cols-5 mb-8">
-        <TabsTrigger value="availability">{t.availability}</TabsTrigger>
-        <TabsTrigger value="about">{t.about}</TabsTrigger>
-        <TabsTrigger value="zones">{t.zones}</TabsTrigger>
-        <TabsTrigger value="rules">{t.rules}</TabsTrigger>
-        <TabsTrigger value="faq">{t.faq}</TabsTrigger>
+      <TabsList className="grid w-full grid-cols-5 mb-6 h-12 text-base">
+        <TabsTrigger value="availability" className="text-base font-medium">{t.availability}</TabsTrigger>
+        <TabsTrigger value="about" className="text-base font-medium">{t.about}</TabsTrigger>
+        <TabsTrigger value="zones" className="text-base font-medium">{t.zones}</TabsTrigger>
+        <TabsTrigger value="rules" className="text-base font-medium">{t.rules}</TabsTrigger>
+        <TabsTrigger value="faq" className="text-base font-medium">{t.faq}</TabsTrigger>
       </TabsList>
       
-      <TabsContent value="availability" className="space-y-6">
+      <TabsContent value="availability" className="space-y-6 text-base">
         <AvailabilityTab 
           zones={zones} 
           startDate={new Date()}
@@ -82,7 +82,7 @@ export function FacilityInfoTabs({
         />
       </TabsContent>
       
-      <TabsContent value="about" className="space-y-6">
+      <TabsContent value="about" className="space-y-6 text-base">
         <EnhancedAboutTab 
           description={description}
           capacity={capacity}
@@ -95,15 +95,15 @@ export function FacilityInfoTabs({
         />
       </TabsContent>
       
-      <TabsContent value="zones" className="space-y-6">
+      <TabsContent value="zones" className="space-y-6 text-base">
         <ZonesTab zones={zones} />
       </TabsContent>
       
-      <TabsContent value="rules" className="space-y-6">
+      <TabsContent value="rules" className="space-y-6 text-base">
         <RulesTab />
       </TabsContent>
       
-      <TabsContent value="faq" className="space-y-6">
+      <TabsContent value="faq" className="space-y-6 text-base">
         <FaqTab />
       </TabsContent>
     </Tabs>
