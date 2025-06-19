@@ -88,7 +88,10 @@ export function FacilityInfoTabs({
           capacity={capacity}
           amenities={amenities}
           address={address}
+          openingHours="08:00-22:00"
           area={area}
+          zones={zones}
+          hasAutoApproval={true}
         />
       </TabsContent>
       

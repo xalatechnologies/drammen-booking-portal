@@ -75,7 +75,8 @@ export function AvailabilityTabContent({
   };
 
   const getAvailabilityStatus = (zoneId: string, date: Date, timeSlot: string) => {
-    const conflict = conflictManager.checkTimeSlotConflict(zoneId, date, timeSlot);
+    // Use the inherited method from the base class
+    const conflict = conflictManager.hasConflict(zoneId, date, timeSlot);
     return {
       status: conflict ? 'busy' : 'available',
       conflict: conflict
