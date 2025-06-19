@@ -1,7 +1,7 @@
 
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { CheckCircle2, MapPin, Users, Map, Share2, Heart, Clock, CheckCircle, XCircle, Tag } from "lucide-react";
+import { CheckCircle2, MapPin, Users, Map, Clock, CheckCircle, XCircle, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -28,10 +28,7 @@ export function EnhancedFacilitySidebar({
   openingHours,
   capacity,
   area,
-  zoneCount,
-  onShare,
-  onToggleFavorite,
-  isFavorited = false
+  zoneCount
 }: EnhancedFacilitySidebarProps) {
   const navigate = useNavigate();
   const { language } = useLanguage();
@@ -76,29 +73,13 @@ export function EnhancedFacilitySidebar({
 
   return (
     <div className="space-y-4">
-      {/* Action Buttons - Match tab button height and font size */}
-      <div className="flex gap-2">
-        <Button 
-          onClick={handleBookingClick}
-          className="flex-1 bg-[#1e3a8a] hover:bg-[#1e40af] text-white font-medium text-base h-auto p-3"
-        >
-          {t.reserveNow}
-        </Button>
-        <Button
-          variant="outline"
-          onClick={onToggleFavorite}
-          className="px-3 h-auto p-3"
-        >
-          <Heart className={`h-5 w-5 ${isFavorited ? 'fill-red-500 text-red-500' : ''}`} />
-        </Button>
-        <Button
-          variant="outline"
-          onClick={onShare}
-          className="px-3 h-auto p-3"
-        >
-          <Share2 className="h-5 w-5" />
-        </Button>
-      </div>
+      {/* Main Booking Button - Full width and prominent */}
+      <Button 
+        onClick={handleBookingClick}
+        className="w-full bg-[#1e3a8a] hover:bg-[#1e40af] text-white font-medium text-base h-12 shadow-lg hover:shadow-xl transition-all duration-200"
+      >
+        {t.reserveNow}
+      </Button>
 
       {/* Enhanced Quick Facts */}
       <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">
