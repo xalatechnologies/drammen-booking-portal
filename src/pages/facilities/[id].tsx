@@ -7,10 +7,11 @@ import GlobalFooter from "@/components/GlobalFooter";
 import { AirBnbStyleGallery } from "@/components/facility/AirBnbStyleGallery";
 import { FacilityHeader } from "@/components/facility/FacilityHeader";
 import { FacilityInfoTabs } from "@/components/facility/FacilityInfoTabs";
-import { PersistentBookingSidebar } from "@/components/facility/PersistentBookingSidebar";
+import { EnhancedBookingSidebar } from "@/components/facility/EnhancedBookingSidebar";
 import { SimilarFacilitiesSlider } from "@/components/facility/SimilarFacilitiesSlider";
 import { AvailabilityTab } from "@/components/facility/tabs/AvailabilityTab";
 import { Zone } from "@/components/booking/types";
+import { SelectedTimeSlot } from "@/utils/recurrenceEngine";
 import { useOptimizedFacility } from "@/hooks/useOptimizedFacility";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useTranslation } from "@/i18n";
@@ -21,6 +22,7 @@ const FacilityDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [isFavorited, setIsFavorited] = useState(false);
+  const [selectedSlots, setSelectedSlots] = useState<SelectedTimeSlot[]>([]);
   const { t } = useTranslation();
 
   const { facility, isLoading, error, notFound } = useOptimizedFacility(Number(id));
@@ -201,15 +203,20 @@ const FacilityDetail = () => {
                   suitableFor={facility.suitableFor || []}
                   facilityId={id}
                   facilityName={facility.name}
+                  selectedSlots={selectedSlots}
+                  onSlotsChange={setSelectedSlots}
                 />
               </div>
 
-              {/* Right Column - Simplified Cart Sidebar (30%) */}
+              {/* Right Column - Enhanced Booking Sidebar (30%) */}
               <div className="lg:col-span-3 hidden lg:block">
                 <div className="sticky top-6">
-                  <PersistentBookingSidebar
+                  <EnhancedBookingSidebar
                     facilityName={facility.name}
                     facilityId={id || ""}
+                    selectedSlots={selectedSlots}
+                    zones={zones}
+                    onSlotsChange={setSelectedSlots}
                   />
                 </div>
               </div>
