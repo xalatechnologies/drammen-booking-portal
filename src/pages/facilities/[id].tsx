@@ -1,4 +1,5 @@
 
+
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -146,7 +147,7 @@ const FacilityDetail = () => {
 
       {/* Breadcrumb Navigation */}
       <div className="bg-gray-50 border-b border-gray-200">
-        <div className="container mx-auto px-4 py-3">
+        <div className="container mx-auto px-4 py-4 max-w-7xl">
           <nav className="flex items-center space-x-2 text-sm">
             <Button variant="ghost" size="sm" className="text-gray-600 hover:text-gray-900 p-0 h-auto font-normal" onClick={() => navigate("/")}>
               <Home className="h-4 w-4 mr-1" />
@@ -237,3 +238,4 @@ const FacilityDetail = () => {
 };
 
 export default FacilityDetail;
+
