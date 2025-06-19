@@ -1,9 +1,8 @@
 
 import React, { useState } from "react";
 import { DateRange } from "react-day-picker";
-import { X, Filter, Search, MapPin, Calendar, Users, Settings } from "lucide-react";
+import { X, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import SearchInput from "@/components/search/SearchInput";
 import DateRangePicker from "@/components/search/DateRangePicker";
 import FilterSelects from "@/components/search/FilterSelects";
@@ -90,36 +89,23 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
   };
 
   const hasActiveFilters = date || dateRange || (facilityType && facilityType !== "all") || (location && location !== "all") || (accessibility && accessibility !== "all") || capacity[0] > 0 || capacity[1] < 200 || searchTerm || priceRange[0] > 0 || priceRange[1] < 5000 || availableNow || hasEquipment || hasParking || hasWifi || allowsPhotography;
-  const hasAdvancedFilters = dateRange || (accessibility && accessibility !== "all") || capacity[0] > 0 || capacity[1] < 200 || priceRange[0] > 0 || priceRange[1] < 5000 || availableNow || hasEquipment || hasParking || hasWifi || allowsPhotography;
 
   return (
     <div className="mb-8">
-      {/* Main Search Section */}
-      <div className="bg-gradient-to-br from-slate-600 via-slate-700 to-slate-800 rounded-2xl p-8 shadow-2xl">
-        <div className="flex flex-col lg:flex-row gap-6 items-stretch">
-          {/* Search Input */}
-          <div className="lg:flex-1">
-            <SearchInput 
-              searchTerm={searchTerm}
-              setSearchTerm={setSearchTerm}
-            />
-          </div>
-
-          {/* Date Range Picker */}
-          <div className="lg:w-72">
-            <DateRangePicker 
-              dateRange={dateRange}
-              setDateRange={setDateRange}
-            />
-          </div>
+      {/* Main Search and Filters */}
+      <div className="bg-white rounded-lg p-6 shadow-md border">
+        {/* Search Input */}
+        <div className="mb-6">
+          <SearchInput 
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+          />
         </div>
-      </div>
 
-      {/* Filters Section */}
-      <div className="mt-6 bg-white/95 backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg p-6">
-        {/* Quick Filters Row */}
-        <div className="flex flex-col lg:flex-row gap-6 items-stretch mb-6">
-          <div className="lg:flex-1">
+        {/* Filter Row */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-end">
+          {/* Filters */}
+          <div className="lg:col-span-2">
             <FilterSelects 
               facilityType={facilityType}
               setFacilityType={setFacilityType}
@@ -129,30 +115,20 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
               setAccessibility={setAccessibility}
               capacity={capacity}
               setCapacity={setCapacity}
-              showOnlyMain={true}
             />
           </div>
 
           {/* Action Buttons */}
-          <div className="flex gap-4">
-            {/* Advanced Filters Button */}
+          <div className="flex gap-2">
             <Button
               variant="outline"
               onClick={() => setShowAdvanced(!showAdvanced)}
-              className={`h-14 px-6 border-2 text-base font-semibold transition-all duration-300 rounded-xl ${
-                showAdvanced || hasAdvancedFilters
-                  ? 'border-slate-500 bg-slate-50 text-slate-700 hover:bg-slate-100 shadow-md' 
-                  : 'border-slate-300 hover:border-slate-500 hover:bg-slate-50/50'
-              }`}
+              className="flex items-center gap-2"
             >
-              <Settings className="h-5 w-5 mr-2" />
+              <Filter className="h-4 w-4" />
               {t('search.actions.moreFilters')}
-              {hasAdvancedFilters && (
-                <div className="ml-2 h-2 w-2 bg-slate-500 rounded-full"></div>
-              )}
             </Button>
-
-            {/* View Mode Toggle */}
+            
             <ViewModeToggle 
               viewMode={viewMode}
               setViewMode={setViewMode}
@@ -160,13 +136,9 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
           </div>
         </div>
 
-        {/* Advanced Filters - Expandable */}
+        {/* Advanced Filters */}
         {showAdvanced && (
-          <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm animate-fade-in">
-            <div className="flex items-center mb-6">
-              <Settings className="h-5 w-5 text-slate-600 mr-3" />
-              <h3 className="font-bold text-slate-900 text-lg">{t('search.labels.advancedFilters')}</h3>
-            </div>
+          <div className="mt-6 pt-6 border-t">
             <AdvancedFilters 
               accessibility={accessibility}
               setAccessibility={setAccessibility}
@@ -225,7 +197,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
               variant="ghost" 
               size="sm" 
               onClick={clearFilters} 
-              className="text-slate-500 hover:text-red-600 hover:bg-red-50 font-medium transition-colors duration-200"
+              className="text-gray-500 hover:text-red-600"
             >
               <X className="h-4 w-4 mr-2" />
               {t('search.actions.clearFilters')}
