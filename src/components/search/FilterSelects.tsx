@@ -77,7 +77,7 @@ const FilterSelects: React.FC<FilterSelectsProps> = ({
             <SelectTrigger className="w-full h-14 pl-12 border-2 border-gray-200 hover:border-blue-400 focus:border-blue-500 text-lg font-medium rounded-lg bg-white shadow-sm hover:shadow-md transition-all duration-200">
               <SelectValue placeholder={t('search.labels.facilityType')} />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="z-[9999] bg-white border border-gray-200 shadow-lg">
               {facilityTypeOptions.map((option) => (
                 <SelectItem key={option.value} value={option.value} className="text-lg">
                   {option.label}
@@ -94,7 +94,7 @@ const FilterSelects: React.FC<FilterSelectsProps> = ({
             <SelectTrigger className="w-full h-14 pl-12 border-2 border-gray-200 hover:border-blue-400 focus:border-blue-500 text-lg font-medium rounded-lg bg-white shadow-sm hover:shadow-md transition-all duration-200">
               <SelectValue placeholder={t('search.labels.location')} />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="z-[9999] bg-white border border-gray-200 shadow-lg">
               {locationOptions.map((option) => (
                 <SelectItem key={option.value} value={option.value} className="text-lg">
                   {option.label}
@@ -114,7 +114,7 @@ const FilterSelects: React.FC<FilterSelectsProps> = ({
         <SelectTrigger className="w-full h-14 border-2 border-gray-300 focus:border-gray-900 text-lg font-medium">
           <SelectValue placeholder={t('search.labels.facilityType')} />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="z-[9999] bg-white border border-gray-200 shadow-lg">
           {facilityTypeOptions.map((option) => (
             <SelectItem key={option.value} value={option.value} className="text-lg">
               {option.label}
@@ -128,7 +128,7 @@ const FilterSelects: React.FC<FilterSelectsProps> = ({
         <SelectTrigger className="w-full h-14 border-2 border-gray-300 focus:border-gray-900 text-lg font-medium">
           <SelectValue placeholder={t('search.labels.location')} />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="z-[9999] bg-white border border-gray-200 shadow-lg">
           {locationOptions.map((option) => (
             <SelectItem key={option.value} value={option.value} className="text-lg">
               {option.label}
@@ -142,7 +142,7 @@ const FilterSelects: React.FC<FilterSelectsProps> = ({
         <SelectTrigger className="w-full h-14 border-2 border-gray-300 focus:border-gray-900 text-lg font-medium">
           <SelectValue placeholder={t('search.labels.accessibility')} />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="z-[9999] bg-white border border-gray-200 shadow-lg">
           {accessibilityOptions.map((option) => (
             <SelectItem key={option.value} value={option.value} className="text-lg">
               {option.label}
@@ -159,7 +159,7 @@ const FilterSelects: React.FC<FilterSelectsProps> = ({
         <SelectTrigger className="w-full h-14 border-2 border-gray-300 focus:border-gray-900 text-lg font-medium">
           <SelectValue placeholder={t('search.labels.capacity')} />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="z-[9999] bg-white border border-gray-200 shadow-lg">
           {capacityOptions.map((option) => (
             <SelectItem key={option.value} value={option.value} className="text-lg">
               {option.label}
