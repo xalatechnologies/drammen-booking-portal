@@ -25,12 +25,15 @@ export function MobileGallery({
   onDotClick 
 }: MobileGalleryProps) {
   return (
-    <div className="md:hidden h-64 relative cursor-pointer w-full" onClick={onImageClick}>
+    <div className="md:hidden h-64 relative cursor-pointer w-full rounded-xl overflow-hidden shadow-lg" onClick={onImageClick}>
       <img 
         src={images[activeImageIndex]} 
         alt={`${facilityName} - Image ${activeImageIndex + 1}`}
-        className="w-full h-full object-cover"
+        className="w-full h-full object-cover transition-transform duration-500"
       />
+      
+      {/* Gradient overlay for better contrast */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-black/10" />
       
       {/* Mobile navigation */}
       {images.length > 1 && (
@@ -40,20 +43,20 @@ export function MobileGallery({
               e.stopPropagation();
               onPrevImage();
             }}
-            className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-gray-900 p-2 rounded-full shadow-lg"
+            className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-gray-900 p-3 rounded-full shadow-xl backdrop-blur-sm border border-white/20 transition-all duration-300 hover:scale-110"
             aria-label="Previous image"
           >
-            <ChevronLeft className="h-4 w-4" />
+            <ChevronLeft className="h-5 w-5" />
           </button>
           <button 
             onClick={(e) => {
               e.stopPropagation();
               onNextImage();
             }}
-            className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-gray-900 p-2 rounded-full shadow-lg"
+            className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-gray-900 p-3 rounded-full shadow-xl backdrop-blur-sm border border-white/20 transition-all duration-300 hover:scale-110"
             aria-label="Next image"
           >
-            <ChevronRight className="h-4 w-4" />
+            <ChevronRight className="h-5 w-5" />
           </button>
         </>
       )}
@@ -63,7 +66,7 @@ export function MobileGallery({
         <Button
           variant="secondary"
           size="sm"
-          className="bg-white/95 hover:bg-white text-gray-900 shadow-lg"
+          className="bg-white/95 hover:bg-white text-gray-900 shadow-xl backdrop-blur-sm border border-white/20 rounded-lg transition-all duration-300 hover:scale-105"
           onClick={(e) => {
             e.stopPropagation();
             onShowAllClick();
@@ -84,10 +87,10 @@ export function MobileGallery({
                 e.stopPropagation();
                 onDotClick(index);
               }}
-              className={`w-2 h-2 rounded-full transition-all duration-300 ${
+              className={`w-2.5 h-2.5 rounded-full transition-all duration-300 backdrop-blur-sm ${
                 index === activeImageIndex 
-                  ? 'bg-white scale-125' 
-                  : 'bg-white/50 hover:bg-white/75'
+                  ? 'bg-white scale-125 shadow-lg' 
+                  : 'bg-white/60 hover:bg-white/80 hover:scale-110'
               }`}
               aria-label={`View image ${index + 1}`}
             />
