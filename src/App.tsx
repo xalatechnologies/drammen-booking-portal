@@ -26,18 +26,20 @@ const App = () => (
         <LocalizationProvider>
           <TooltipProvider>
             <Toaster />
-            <Router>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/facilities/:id" element={<FacilityDetail />} />
-                <Route path="/booking/:facilityId" element={<BookingPage />} />
-                <Route path="/booking/success/:bookingReference" element={<BookingSuccessPage bookingReference="" facilityId="" />} />
-                <Route path="/bookings" element={<BookingsPage />} />
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/profile" element={<ProfilePage />} />
-                <Route path="/settings" element={<SettingsPage />} />
-              </Routes>
-            </Router>
+            <div className="w-full min-h-screen">
+              <Router>
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/facilities/:id" element={<FacilityDetail />} />
+                  <Route path="/booking/:facilityId" element={<BookingPage />} />
+                  <Route path="/booking/success/:bookingReference" element={<BookingSuccessPage bookingReference="" facilityId="" />} />
+                  <Route path="/bookings" element={<BookingsPage />} />
+                  <Route path="/login" element={<LoginPage />} />
+                  <Route path="/profile" element={<ProfilePage />} />
+                  <Route path="/settings" element={<SettingsPage />} />
+                </Routes>
+              </Router>
+            </div>
           </TooltipProvider>
         </LocalizationProvider>
       </LanguageProvider>
