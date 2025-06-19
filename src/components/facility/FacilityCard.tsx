@@ -66,7 +66,7 @@ export function FacilityCard({ facility, onAddressClick }: FacilityCardProps) {
       onMouseLeave={() => setIsHovered(false)}
       role="button"
       tabIndex={0}
-      aria-label={`Se detaljer for ${facility.name} på ${facility.address}`}
+      aria-label={t('facility.actions.viewDetails', { name: facility.name, address: facility.address })}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();

@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -28,11 +27,11 @@ const FacilityDetail = () => {
   // Enhanced zones with full zone management capabilities
   const zones: Zone[] = [{
     id: "whole-facility",
-    name: "Hele lokalet",
+    name: t('facility.booking.wholeVenue'),
     capacity: facility?.capacity || 30,
     equipment: facility?.equipment || ["Projektor", "Lydanlegg", "Whiteboard"],
     pricePerHour: facility?.pricePerHour || 450,
-    description: "Komplett lokale med full tilgang til alt utstyr og alle soner",
+    description: t('facility.booking.wholeVenueDescription'),
     area: facility?.area || "120 m²",
     isMainZone: true,
     subZones: ["zone-1", "zone-2"],
@@ -47,7 +46,7 @@ const FacilityDetail = () => {
     adminInfo: {
       contactPersonName: "Lars Hansen",
       contactPersonEmail: "lars.hansen@drammen.kommune.no",
-      specialInstructions: "Hele lokalet inkluderer begge soner og all tilgjengelig utstyr",
+      specialInstructions: t('facility.booking.mainZoneInstructions'),
       maintenanceSchedule: [{
         day: "Mandag",
         startTime: "06:00",

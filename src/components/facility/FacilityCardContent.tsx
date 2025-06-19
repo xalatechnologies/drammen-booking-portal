@@ -45,7 +45,7 @@ export function FacilityCardContent({ facility, onAddressClick }: FacilityCardCo
       <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-3 text-gray-600">
           <Users className="h-5 w-5" />
-          <span className="text-base font-medium">Kapasitet: {facility.capacity}</span>
+          <span className="text-base font-medium">{t('facility.details.capacity')}: {facility.capacity}</span>
         </div>
         
         <FacilityCardAmenities equipment={facility.equipment} />
