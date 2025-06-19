@@ -1,10 +1,10 @@
+
 import React, { useEffect, useState } from 'react';
 import { format, addDays } from 'date-fns';
 import { Zone } from '@/components/booking/types';
 import { SelectedTimeSlot, RecurrencePattern, recurrenceEngine } from '@/utils/recurrenceEngine';
 import { EnhancedZoneConflictManager } from '@/utils/enhancedZoneConflictManager';
 import { isDateUnavailable } from '@/utils/holidaysAndAvailability';
-import { useCart } from '@/contexts/CartContext';
 import { useTranslation } from '@/i18n';
 import { WeekNavigation } from './WeekNavigation';
 import { ZoneInfoHeader } from './ZoneInfoHeader';
@@ -80,7 +80,6 @@ export function AvailabilityTabContent({
   };
 
   const timeSlots = parseOpeningHours(openingHours);
-  const { addToCart } = useCart();
   const { t } = useTranslation();
 
   // Add state for strøtimer
@@ -137,20 +136,8 @@ export function AvailabilityTabContent({
     if (isSelected) {
       setSelectedSlots(prev => removeSlotFromSelection(prev, zoneId, date, timeSlot));
     } else {
-      // Add to both local selection and global cart
-      const newSlot = { zoneId, date, timeSlot };
+      // Only add to local selection, not to cart yet
       setSelectedSlots(prev => addSlotToSelection(prev, zoneId, date, timeSlot));
-      
-      // Add to global cart with required duration property
-      addToCart({
-        facilityId,
-        facilityName,
-        zoneId,
-        date,
-        timeSlot,
-        duration: 1, // 1-hour duration for hourly slots
-        pricePerHour: zone.pricePerHour
-      });
     }
   };
 

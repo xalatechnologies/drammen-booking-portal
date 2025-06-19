@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { SelectedTimeSlot } from '@/utils/recurrenceEngine';
 import { ActorType, BookingType } from '@/types/pricing';
 import { Zone } from '@/components/booking/types';
+import { useCart } from '@/contexts/CartContext';
 import { BookingSummaryStep } from './BookingSummaryStep';
 import { BookingDetailsStep } from './BookingDetailsStep';
 
@@ -30,6 +31,7 @@ export function BookingDrawerContent({
   zones = []
 }: BookingDrawerContentProps) {
   const navigate = useNavigate();
+  const { addToCart } = useCart();
   const [step, setStep] = useState<'summary' | 'details'>('summary');
   const [actorType, setActorType] = useState<ActorType>('private-person');
   const [purpose, setPurpose] = useState('');
@@ -55,6 +57,20 @@ export function BookingDrawerContent({
   }, [selectedSlots]);
 
   const handleSubmit = () => {
+    // Add selected slots to cart when booking is completed
+    selectedSlots.forEach(slot => {
+      const zone = zones.find(z => z.id === slot.zoneId);
+      addToCart({
+        facilityId,
+        facilityName,
+        zoneId: slot.zoneId,
+        date: slot.date,
+        timeSlot: slot.timeSlot,
+        duration: slot.duration || 1, // Default to 1 hour if not specified
+        pricePerHour: zone?.pricePerHour || 450 // Use zone price or default
+      });
+    });
+
     // Navigate to booking confirmation
     navigate(`/booking/${facilityId}/confirm`, {
       state: {
