@@ -53,7 +53,7 @@ export function ResponsiveCalendarGrid({
     
     const button = (
       <button
-        className={`w-full h-7 md:h-8 rounded border transition-all duration-200 font-inter text-xs ${statusColor} ${
+        className={`w-full h-6 md:h-6 rounded border transition-all duration-200 font-inter text-xs ${statusColor} ${
           status === 'available' 
             ? 'cursor-pointer shadow-sm hover:shadow-md transform active:scale-95 md:hover:scale-105' 
             : 'cursor-not-allowed opacity-75'
@@ -83,16 +83,16 @@ export function ResponsiveCalendarGrid({
 
   return (
     <Card>
-      <CardContent className="p-2 md:p-3">
+      <CardContent className="p-2 md:p-2">
         {/* Desktop Grid Layout */}
         <div className="hidden md:block">
-          <div className="grid grid-cols-8 gap-1 mb-3">
-            <div className="p-1.5 text-sm font-medium text-gray-500 font-inter">Tid</div>
+          <div className="grid grid-cols-8 gap-0.5 mb-2">
+            <div className="p-1 text-sm font-medium text-gray-500 font-inter">Tid</div>
             {weekDays.map((day, i) => {
               const holidayCheck = isNorwegianHoliday(day);
               const isToday = format(day, 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd');
               return (
-                <div key={i} className={`p-1.5 text-center rounded font-inter ${isToday ? 'bg-blue-100 border border-blue-300' : 'bg-gray-50'}`}>
+                <div key={i} className={`p-1 text-center rounded font-inter ${isToday ? 'bg-blue-100 border border-blue-300' : 'bg-gray-50'}`}>
                   <div className={`text-sm font-medium ${isToday ? 'text-blue-800' : 'text-gray-700'}`}>
                     {format(day, "EEE", { locale: nb })}
                   </div>
@@ -109,11 +109,11 @@ export function ResponsiveCalendarGrid({
             })}
           </div>
 
-          <div className="space-y-1">
+          <div className="space-y-0.5">
             {timeSlots.map((timeSlot) => (
-              <div key={timeSlot} className="grid grid-cols-8 gap-1">
-                <div className="p-1.5 text-sm font-medium text-gray-700 flex items-center bg-gray-50 rounded font-inter truncate">
-                  {timeSlot}
+              <div key={timeSlot} className="grid grid-cols-8 gap-0.5">
+                <div className="p-1 text-sm font-medium text-gray-700 flex items-center bg-gray-50 rounded font-inter">
+                  <span className="truncate">{timeSlot}</span>
                 </div>
                 {weekDays.map((day, dayIndex) => (
                   <div key={dayIndex} className="relative">
@@ -127,12 +127,12 @@ export function ResponsiveCalendarGrid({
 
         {/* Mobile Scrollable Layout */}
         <div className="md:hidden">
-          <div className="flex gap-1 overflow-x-auto pb-3 mb-3">
+          <div className="flex gap-0.5 overflow-x-auto pb-2 mb-2">
             {weekDays.map((day, i) => {
               const holidayCheck = isNorwegianHoliday(day);
               const isToday = format(day, 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd');
               return (
-                <div key={i} className={`flex-shrink-0 w-16 p-1.5 text-center rounded font-inter ${isToday ? 'bg-blue-100 border border-blue-300' : 'bg-gray-50'}`}>
+                <div key={i} className={`flex-shrink-0 w-14 p-1 text-center rounded font-inter ${isToday ? 'bg-blue-100 border border-blue-300' : 'bg-gray-50'}`}>
                   <div className={`text-xs font-medium ${isToday ? 'text-blue-800' : 'text-gray-700'}`}>
                     {format(day, "EEE", { locale: nb })}
                   </div>
@@ -149,13 +149,13 @@ export function ResponsiveCalendarGrid({
             })}
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-1">
             {timeSlots.map((timeSlot) => (
-              <div key={timeSlot} className="space-y-1">
-                <div className="text-xs font-medium text-gray-700 bg-gray-50 p-1.5 rounded truncate">
-                  {timeSlot}
+              <div key={timeSlot} className="space-y-0.5">
+                <div className="text-sm font-medium text-gray-700 bg-gray-50 p-1 rounded">
+                  <span className="truncate">{timeSlot}</span>
                 </div>
-                <div className="grid grid-cols-7 gap-1">
+                <div className="grid grid-cols-7 gap-0.5">
                   {weekDays.map((day, dayIndex) => (
                     <div key={dayIndex} className="relative">
                       {renderSlotButton(day, timeSlot, dayIndex)}
