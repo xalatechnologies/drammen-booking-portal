@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from "react";
 import { Search, MapPin, Building, Clock, Users } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -165,7 +164,7 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ onResultClick }) => {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           onFocus={() => setIsOpen(true)}
-          className="pl-12 pr-4 h-12 bg-gray-50 border-gray-200 focus:bg-white focus:border-gray-400 text-base font-medium placeholder:text-gray-500"
+          className="pl-12 pr-4 h-12 bg-gray-50 border-gray-200 focus:bg-white focus:border-gray-400 text-base font-medium placeholder:text-base placeholder:font-medium"
           autoComplete="off"
         />
       </div>
@@ -184,7 +183,7 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ onResultClick }) => {
                     <CommandGroup 
                       key={type} 
                       heading={t[type as keyof typeof t] || type}
-                      className="[&_[cmdk-group-heading]]:text-sm [&_[cmdk-group-heading]]:font-semibold [&_[cmdk-group-heading]]:text-gray-700 [&_[cmdk-group-heading]]:px-4 [&_[cmdk-group-heading]]:py-2"
+                      className="[&_[cmdk-group-heading]]:text-base [&_[cmdk-group-heading]]:font-semibold [&_[cmdk-group-heading]]:text-gray-700 [&_[cmdk-group-heading]]:px-4 [&_[cmdk-group-heading]]:py-3"
                     >
                       {typeResults.map((result) => (
                         <CommandItem
@@ -194,7 +193,7 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ onResultClick }) => {
                           className="flex items-center gap-4 px-4 py-4 cursor-pointer hover:bg-gray-50"
                         >
                           {result.image ? (
-                            <div className="w-12 h-12 bg-gray-100 overflow-hidden flex-shrink-0">
+                            <div className="w-12 h-12 bg-gray-100 overflow-hidden flex-shrink-0 rounded">
                               <img 
                                 src={result.image} 
                                 alt={result.title}
@@ -202,7 +201,7 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ onResultClick }) => {
                               />
                             </div>
                           ) : (
-                            <div className="w-12 h-12 bg-gray-100 flex items-center justify-center flex-shrink-0">
+                            <div className="w-12 h-12 bg-gray-100 flex items-center justify-center flex-shrink-0 rounded">
                               {result.icon}
                             </div>
                           )}
@@ -211,7 +210,7 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ onResultClick }) => {
                               {result.title}
                             </div>
                             {result.subtitle && (
-                              <div className="text-sm text-gray-500 truncate mt-1">
+                              <div className="text-base text-gray-500 truncate mt-1">
                                 {result.subtitle}
                               </div>
                             )}

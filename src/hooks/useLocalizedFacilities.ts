@@ -4,6 +4,7 @@ import { LocalizedFacilityService } from "@/services/LocalizedFacilityService";
 import { FacilityFilters, FacilitySortOptions } from "@/types/facility";
 import { PaginationParams } from "@/types/api";
 import { useLocalizedServices } from "./useLocalizedServices";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface UseFacilitiesParams {
   pagination: PaginationParams;
@@ -18,6 +19,9 @@ export function useLocalizedFacilities({
 }: UseFacilitiesParams) {
   // Ensure services are language-aware
   useLocalizedServices();
+  
+  // Get current language to include in query key
+  const { language } = useLanguage();
 
   const {
     data: response,
@@ -25,7 +29,7 @@ export function useLocalizedFacilities({
     error,
     refetch
   } = useQuery({
-    queryKey: ['localizedFacilities', pagination, filters, sort],
+    queryKey: ['localizedFacilities', language, pagination, filters, sort],
     queryFn: () => LocalizedFacilityService.getFacilities(pagination, filters, sort),
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
