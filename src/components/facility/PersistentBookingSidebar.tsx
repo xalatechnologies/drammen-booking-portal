@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { ShoppingCart, X, CreditCard, Plus, Minus } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -10,55 +9,38 @@ import { useCart } from "@/contexts/CartContext";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "@/i18n/hooks/useTranslation";
 import { format } from "date-fns";
-
 interface PersistentBookingSidebarProps {
   facilityName: string;
   facilityId: string;
 }
-
 export function PersistentBookingSidebar({
   facilityName,
   facilityId
 }: PersistentBookingSidebarProps) {
-  const { cartItems, removeFromCart, getTotalPrice, getItemCount } = useCart();
+  const {
+    cartItems,
+    removeFromCart,
+    getTotalPrice,
+    getItemCount
+  } = useCart();
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const {
+    t
+  } = useTranslation();
   const [customerType, setCustomerType] = useState<string>('private');
-
   const facilityCartItems = cartItems.filter(item => item.facilityId === facilityId);
-
   const handleProceedToCheckout = () => {
     navigate('/checkout');
   };
-
   const addTimeSlot = (item: any) => {
     console.log('Add time slot for:', item);
   };
-
   const removeTimeSlot = (item: any) => {
     console.log('Remove time slot for:', item);
   };
-
-  return (
-    <div className="space-y-6">
+  return <div className="space-y-6">
       {/* Customer Type Selection */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg">{t('booking.customerType')}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Select value={customerType} onValueChange={setCustomerType}>
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="private">{t('booking.customerTypes.private')}</SelectItem>
-              <SelectItem value="business">{t('booking.customerTypes.business')}</SelectItem>
-              <SelectItem value="organization">{t('booking.customerTypes.organization')}</SelectItem>
-            </SelectContent>
-          </Select>
-        </CardContent>
-      </Card>
+      
 
       {/* Booking Cart */}
       <Card>
@@ -69,16 +51,12 @@ export function PersistentBookingSidebar({
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {facilityCartItems.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
+          {facilityCartItems.length === 0 ? <div className="text-center py-8 text-gray-500">
               <ShoppingCart className="h-12 w-12 mx-auto mb-4 text-gray-300" />
               <p className="text-sm font-medium">{t('booking.cart.empty')}</p>
               <p className="text-xs mt-1 text-gray-400">{t('booking.cart.selectSlots')}</p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {facilityCartItems.map((item, index) => (
-                <div key={item.id} className="border rounded-lg p-4 bg-gray-50 hover:bg-gray-100 transition-colors">
+            </div> : <div className="space-y-4">
+              {facilityCartItems.map((item, index) => <div key={item.id} className="border rounded-lg p-4 bg-gray-50 hover:bg-gray-100 transition-colors">
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
@@ -91,12 +69,7 @@ export function PersistentBookingSidebar({
                       </p>
                       <p className="text-sm text-gray-600">{item.timeSlot}</p>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => removeFromCart(item.id)}
-                      className="p-1 h-auto text-gray-400 hover:text-red-500"
-                    >
+                    <Button variant="ghost" size="sm" onClick={() => removeFromCart(item.id)} className="p-1 h-auto text-gray-400 hover:text-red-500">
                       <X className="h-4 w-4" />
                     </Button>
                   </div>
@@ -117,8 +90,7 @@ export function PersistentBookingSidebar({
                   </div>
                   
                   {index < facilityCartItems.length - 1 && <Separator className="mt-4" />}
-                </div>
-              ))}
+                </div>)}
               
               <Separator className="my-4" />
               
@@ -138,18 +110,12 @@ export function PersistentBookingSidebar({
                 </div>
               </div>
               
-              <Button
-                onClick={handleProceedToCheckout}
-                className="w-full bg-[#1e3a8a] hover:bg-[#1e40af] font-medium text-base h-12 mt-4"
-                disabled={getItemCount() === 0}
-              >
+              <Button onClick={handleProceedToCheckout} className="w-full bg-[#1e3a8a] hover:bg-[#1e40af] font-medium text-base h-12 mt-4" disabled={getItemCount() === 0}>
                 <CreditCard className="h-5 w-5 mr-2" />
                 {t('booking.cart.proceedToCheckout')}
               </Button>
-            </div>
-          )}
+            </div>}
         </CardContent>
       </Card>
-    </div>
-  );
+    </div>;
 }
