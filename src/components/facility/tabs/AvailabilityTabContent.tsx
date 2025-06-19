@@ -1,21 +1,19 @@
 
-import React from 'react';
-import { addDays } from 'date-fns';
-import { Zone } from '@/components/booking/types';
-import { SelectedTimeSlot, RecurrencePattern } from '@/utils/recurrenceEngine';
-import { EnhancedZoneConflictManager } from '@/utils/enhancedZoneConflictManager';
-import { useTranslation } from '@/i18n';
-import { WeekNavigation } from './WeekNavigation';
-import { ZoneInfoHeader } from './ZoneInfoHeader';
-import { ResponsiveCalendarGrid } from './ResponsiveCalendarGrid';
-import { SelectedSlotsDisplay } from './SelectedSlotsDisplay';
-import { LegendDisplay } from './LegendDisplay';
-import { StrotimeDisplay } from './StrotimeDisplay';
-import { AvailabilityStatusManager } from './AvailabilityStatusManager';
-import { useStrotimer } from '@/hooks/useStrotimer';
-import { useSlotSelection } from '@/hooks/useSlotSelection';
-import { parseOpeningHours } from '@/utils/openingHoursParser';
-import { isSlotSelected } from './AvailabilityTabUtils';
+import React from "react";
+import { startOfWeek, addDays, format, isSameDay } from "date-fns";
+import { nb } from "date-fns/locale";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Calendar, Clock, Plus, Repeat, ShoppingCart } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Zone } from "@/components/booking/types";
+import { EnhancedZoneConflictManager } from "@/utils/enhancedZoneConflictManager";
+import { RecurrencePattern, SelectedTimeSlot } from "@/utils/recurrenceEngine";
+import { WeekNavigation } from "./WeekNavigation";
+import { ResponsiveCalendarGrid } from "./ResponsiveCalendarGrid";
+import { LegendDisplay } from "./LegendDisplay";
+import { SelectedSlotsDisplay } from "./SelectedSlotsDisplay";
+import { isSlotSelected } from "./AvailabilityTabUtils";
 
 interface AvailabilityTabContentProps {
   zone: Zone;
@@ -33,9 +31,10 @@ interface AvailabilityTabContentProps {
   setConflictResolutionData: (data: any) => void;
   currentPattern: RecurrencePattern;
   setCurrentPattern: (pattern: RecurrencePattern) => void;
-  facilityId?: string;
-  facilityName?: string;
-  openingHours?: string;
+  facilityId: string;
+  facilityName: string;
+  openingHours: string;
+  onSlotClick?: (zoneId: string, date: Date, timeSlot: string, availability: string) => void;
 }
 
 export function AvailabilityTabContent({
@@ -54,92 +53,105 @@ export function AvailabilityTabContent({
   setConflictResolutionData,
   currentPattern,
   setCurrentPattern,
-  facilityId = "",
-  facilityName = "",
-  openingHours = "08:00-22:00"
+  facilityId,
+  facilityName,
+  openingHours,
+  onSlotClick
 }: AvailabilityTabContentProps) {
-  const timeSlots = parseOpeningHours(openingHours);
-  const { t } = useTranslation();
 
-  // Use custom hooks for separated concerns
-  const { strøtimer, handleStrøtimeBookingComplete } = useStrotimer({
-    facilityId,
-    currentWeekStart
-  });
+  // Generate week dates
+  const weekDates = Array.from({ length: 7 }, (_, i) => addDays(currentWeekStart, i));
 
-  const { handleSlotClick: internalHandleSlotClick, clearSelection } = useSlotSelection();
+  // Generate time slots based on opening hours
+  const timeSlots = [
+    "08:00-10:00", "10:00-12:00", "12:00-14:00", 
+    "14:00-16:00", "16:00-18:00", "18:00-20:00", "20:00-22:00"
+  ];
 
-  // Create availability status manager
-  const availabilityStatusManager = new AvailabilityStatusManager(conflictManager);
-
-  const weekDays = Array(7).fill(0).map((_, i) => addDays(currentWeekStart, i));
-
-  const handleSlotClick = (zoneId: string, date: Date, timeSlot: string, availability: string) => {
-    if (availability !== 'available') return;
-
-    const isSelected = isSlotSelected(selectedSlots, zoneId, date, timeSlot);
-
-    if (isSelected) {
-      setSelectedSlots(prev => prev.filter(slot => 
-        !(slot.zoneId === zoneId && 
-          slot.date.toDateString() === date.toDateString() && 
-          slot.timeSlot === timeSlot)
-      ));
-    } else {
-      setSelectedSlots(prev => [...prev, {
-        zoneId,
-        date: new Date(date),
-        timeSlot,
-        duration: 2 // Default 2 hours
-      }]);
+  const handleSlotClick = (date: Date, timeSlot: string) => {
+    if (onSlotClick) {
+      const availability = Math.random() > 0.3 ? 'available' : 'booked'; // Mock availability
+      onSlotClick(zone.id, date, timeSlot, availability);
     }
   };
 
-  const clearSelectionHandler = () => {
-    setSelectedSlots([]);
-  };
-
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
+      {/* Zone Info Header */}
+      <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+        <CardHeader className="pb-4">
+          <CardTitle className="flex items-center gap-3 text-xl">
+            <div className="p-2 bg-blue-100 rounded-lg">
+              <Calendar className="h-5 w-5 text-blue-600" />
+            </div>
+            <div>
+              <h3 className="text-xl font-bold text-gray-900">{zone.name}</h3>
+              <p className="text-sm text-gray-600 font-normal">{zone.description}</p>
+            </div>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-wrap items-center gap-4 text-sm">
+            <div className="flex items-center gap-2">
+              <Badge variant="outline" className="bg-white">
+                {zone.capacity} plasser
+              </Badge>
+            </div>
+            <div className="flex items-center gap-2">
+              <Badge variant="outline" className="bg-white">
+                {zone.area}
+              </Badge>
+            </div>
+            <div className="flex items-center gap-2">
+              <Clock className="h-4 w-4 text-gray-500" />
+              <span className="text-gray-600">{openingHours}</span>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Week Navigation */}
       <WeekNavigation
         currentWeekStart={currentWeekStart}
-        onWeekChange={setCurrentWeekStart}
+        setCurrentWeekStart={setCurrentWeekStart}
         canGoPrevious={canGoPrevious}
       />
 
-      {/* Show strøtimer for each day of the week */}
-      {weekDays.map(day => (
-        <StrotimeDisplay
-          key={day.toISOString()}
-          strøtimer={strøtimer}
-          date={day}
-          onBookingComplete={handleStrøtimeBookingComplete}
-        />
-      ))}
-
+      {/* Calendar Grid */}
       <ResponsiveCalendarGrid
-        zone={zone}
-        currentWeekStart={currentWeekStart}
+        weekDates={weekDates}
         timeSlots={timeSlots}
         selectedSlots={selectedSlots}
-        getAvailabilityStatus={(zoneId, date, timeSlot) => 
-          availabilityStatusManager.getAvailabilityStatus(zoneId, date, timeSlot)
-        }
-        isSlotSelected={(zoneId, date, timeSlot) => isSlotSelected(selectedSlots, zoneId, date, timeSlot)}
+        zone={zone}
+        conflictManager={conflictManager}
         onSlotClick={handleSlotClick}
       />
 
-      <LegendDisplay showLegend={showLegend} />
+      {/* Action Buttons */}
+      <div className="flex flex-wrap gap-3 pt-4">
+        <Button
+          onClick={onPatternBuilderOpen}
+          variant="outline"
+          className="flex items-center gap-2 hover:bg-blue-50 hover:border-blue-300"
+        >
+          <Repeat className="h-4 w-4" />
+          Opprett gjentakende mønster
+        </Button>
+        
+        <Button
+          onClick={() => {}}
+          variant="outline" 
+          className="flex items-center gap-2 hover:bg-green-50 hover:border-green-300"
+        >
+          <Plus className="h-4 w-4" />
+          Legg til flere tidspunkt
+        </Button>
+      </div>
 
-      <ZoneInfoHeader
-        zone={zone}
-        selectedSlots={selectedSlots}
-        onPatternBuilderOpen={onPatternBuilderOpen}
-        onClearSelection={clearSelectionHandler}
-        onBookingDrawerOpen={onBookingDrawerOpen}
-        zones={zones}
-      />
+      {/* Legend */}
+      {showLegend && <LegendDisplay />}
 
+      {/* Selected Slots Display - Only show if there are selections */}
       <SelectedSlotsDisplay selectedSlots={selectedSlots} />
     </div>
   );

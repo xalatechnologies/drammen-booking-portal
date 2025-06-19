@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -7,7 +8,7 @@ import GlobalFooter from "@/components/GlobalFooter";
 import { AirBnbStyleGallery } from "@/components/facility/AirBnbStyleGallery";
 import { FacilityHeader } from "@/components/facility/FacilityHeader";
 import { FacilityInfoTabs } from "@/components/facility/FacilityInfoTabs";
-import { PersistentBookingSidebar } from "@/components/facility/PersistentBookingSidebar";
+import { EnhancedBookingSidebar } from "@/components/facility/EnhancedBookingSidebar";
 import { SimilarFacilitiesSlider } from "@/components/facility/SimilarFacilitiesSlider";
 import { AvailabilityTab } from "@/components/facility/tabs/AvailabilityTab";
 import { Zone } from "@/components/booking/types";
@@ -16,12 +17,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useTranslation } from "@/i18n";
 import { CartProvider } from "@/contexts/CartContext";
 import { MobileBookingPanel } from "@/components/facility/MobileBookingPanel";
+import { useSlotSelection } from "@/hooks/useSlotSelection";
 
 const FacilityDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [isFavorited, setIsFavorited] = useState(false);
   const { t } = useTranslation();
+  const { selectedSlots, setSelectedSlots, handleSlotClick, clearSelection } = useSlotSelection();
 
   const { facility, isLoading, error, notFound } = useOptimizedFacility(Number(id));
 
@@ -201,15 +204,19 @@ const FacilityDetail = () => {
                   suitableFor={facility.suitableFor || []}
                   facilityId={id}
                   facilityName={facility.name}
+                  selectedSlots={selectedSlots}
+                  onSlotClick={handleSlotClick}
                 />
               </div>
 
-              {/* Right Column - Simplified Cart Sidebar (30%) */}
+              {/* Right Column - Enhanced Booking Sidebar (30%) */}
               <div className="lg:col-span-3 hidden lg:block">
                 <div className="sticky top-6">
-                  <PersistentBookingSidebar
+                  <EnhancedBookingSidebar
                     facilityName={facility.name}
                     facilityId={id || ""}
+                    selectedSlots={selectedSlots}
+                    onClearSlots={clearSelection}
                   />
                 </div>
               </div>
