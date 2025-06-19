@@ -19,22 +19,29 @@ export function ReviewStep({
   onRemoveReservation, 
   onContinue 
 }: ReviewStepProps) {
+  const totalSlots = items.reduce((total, item) => total + (item.timeSlots?.length || 1), 0);
+
   return (
     <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <ShoppingCart className="h-5 w-5" />
-          Dine reservasjoner ({items.length})
+      <CardHeader className="pb-4">
+        <CardTitle className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <ShoppingCart className="h-5 w-5" />
+            Dine reservasjoner
+          </div>
+          <div className="text-sm font-normal text-gray-600">
+            {items.length} reservasjon{items.length !== 1 ? 'er' : ''} • {totalSlots} tidspunkt
+          </div>
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-6">
         <ReservationAccordion 
           reservations={items}
           onEditReservation={onEditReservation}
           onRemoveReservation={onRemoveReservation}
         />
         
-        <Button onClick={onContinue} className="w-full h-12 text-lg mt-6">
+        <Button onClick={onContinue} className="w-full h-12 text-lg">
           Fortsett til kontaktopplysninger
         </Button>
       </CardContent>
