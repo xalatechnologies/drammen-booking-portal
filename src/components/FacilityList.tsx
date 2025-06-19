@@ -56,10 +56,12 @@ const FacilityList: React.FC<FacilityListProps> = ({
       )}
 
       {paginationInfo && (
-        <PaginationControls 
-          pagination={paginationInfo}
-          onPageChange={goToPage}
-        />
+        <div className="flex justify-center">
+          <PaginationControls 
+            pagination={paginationInfo}
+            onPageChange={goToPage}
+          />
+        </div>
       )}
     </div>
   );

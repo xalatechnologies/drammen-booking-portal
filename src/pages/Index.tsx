@@ -129,10 +129,14 @@ const Index = () => {
       <GlobalHeader />
 
       <main id="main-content" className="flex-1">
-        <div className="w-full px-4 py-6">
-          <div className="max-w-7xl mx-auto">
+        <div className="w-full py-6">
+          {/* Hero Banner - Centered */}
+          <div className="max-w-7xl mx-auto px-4">
             <HeroBanner />
-            
+          </div>
+          
+          {/* Search Filter - Centered */}
+          <div className="max-w-7xl mx-auto px-4">
             <SearchFilter
               date={date}
               setDate={setDate}
@@ -161,9 +165,18 @@ const Index = () => {
               allowsPhotography={allowsPhotography}
               setAllowsPhotography={setAllowsPhotography}
             />
-
-            {renderContent()}
           </div>
+
+          {/* Content - Conditional container based on view mode */}
+          {(viewMode === "list") ? (
+            <div className="w-full px-6">
+              {renderContent()}
+            </div>
+          ) : (
+            <div className="max-w-7xl mx-auto px-4">
+              {renderContent()}
+            </div>
+          )}
         </div>
       </main>
 
