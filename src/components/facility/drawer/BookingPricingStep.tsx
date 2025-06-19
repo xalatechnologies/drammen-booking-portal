@@ -3,8 +3,8 @@ import React from 'react';
 import { ArrowLeft, User, LogIn } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { SelectedTimeSlot } from '@/utils/recurrenceEngine';
-import { ActorType } from '@/types/cart';
-import { BookingType } from '@/types/pricing';
+import { ActorType as PricingActorType, BookingType } from '@/types/pricing';
+import { ActorType as CartActorType } from '@/types/cart';
 import { Zone } from '@/components/booking/types';
 import { BookingOverviewCard } from './BookingOverviewCard';
 import { CustomerTypeSection } from './CustomerTypeSection';
@@ -20,13 +20,25 @@ interface BookingPricingStepProps {
   facilityId: string;
   facilityName: string;
   zones: Zone[];
-  actorType: ActorType;
-  onActorTypeChange: (type: ActorType) => void;
+  actorType: PricingActorType;
+  onActorTypeChange: (type: PricingActorType) => void;
   bookingType: BookingType;
   onBack: () => void;
   onComplete: () => void;
   onAddToCart: () => void;
 }
+
+// Helper function to convert between ActorType formats
+const convertActorType = (pricingType: PricingActorType): CartActorType => {
+  switch (pricingType) {
+    case 'private-person': return 'private';
+    case 'lag-foreninger': return 'organization';
+    case 'paraply': return 'organization';
+    case 'private-firma': return 'business';
+    case 'kommunale-enheter': return 'organization';
+    default: return 'private';
+  }
+};
 
 export function BookingPricingStep({
   selectedSlots,
@@ -51,6 +63,9 @@ export function BookingPricingStep({
 
   const handleAddToCart = () => {
     try {
+      // Convert actor type for cart
+      const cartActorType = convertActorType(actorType);
+
       // Add selected slots to cart with complete cart item structure
       selectedSlots.forEach(slot => {
         const zone = zones.find(z => z.id === slot.zoneId);
@@ -68,9 +83,14 @@ export function BookingPricingStep({
           // Required new fields with defaults
           purpose: 'Generell booking',
           expectedAttendees: 1,
-          organizationType: actorType,
+          organizationType: cartActorType,
           additionalServices: [],
           timeSlots: [slot],
+          customerInfo: {
+            name: '',
+            email: '',
+            phone: ''
+          },
           pricing: {
             baseFacilityPrice: pricePerHour * duration,
             servicesPrice: 0,
@@ -104,7 +124,7 @@ export function BookingPricingStep({
         selectedSlots,
         facilityId,
         facilityName,
-        actorType,
+        actorType: convertActorType(actorType),
         bookingType
       }));
       

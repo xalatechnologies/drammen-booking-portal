@@ -2,7 +2,8 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SelectedTimeSlot } from '@/utils/recurrenceEngine';
-import { ActorType, BookingType } from '@/types/pricing';
+import { ActorType as PricingActorType, BookingType } from '@/types/pricing';
+import { ActorType as CartActorType } from '@/types/cart';
 import { Zone } from '@/components/booking/types';
 import { BookingActivityStep } from './BookingActivityStep';
 import { BookingPricingStep } from './BookingPricingStep';
@@ -25,6 +26,27 @@ interface BookingDrawerContentProps {
   onSlotsCleared?: () => void;
 }
 
+// Helper function to convert between ActorType formats
+const convertActorType = (pricingType: PricingActorType): CartActorType => {
+  switch (pricingType) {
+    case 'private-person': return 'private';
+    case 'lag-foreninger': return 'organization';
+    case 'paraply': return 'organization';
+    case 'private-firma': return 'business';
+    case 'kommunale-enheter': return 'organization';
+    default: return 'private';
+  }
+};
+
+const convertToDialerFormat = (cartType: CartActorType): PricingActorType => {
+  switch (cartType) {
+    case 'private': return 'private-person';
+    case 'business': return 'private-firma';
+    case 'organization': return 'lag-foreninger';
+    default: return 'private-person';
+  }
+};
+
 export function BookingDrawerContent({
   selectedSlots,
   facilityId,
@@ -34,7 +56,7 @@ export function BookingDrawerContent({
 }: BookingDrawerContentProps) {
   const navigate = useNavigate();
   const [step, setStep] = useState<'activity' | 'pricing' | 'details'>('activity');
-  const [actorType, setActorType] = useState<ActorType>('private-person');
+  const [pricingActorType, setPricingActorType] = useState<PricingActorType>('private-person');
   const [activityType, setActivityType] = useState<string>('');
   const [attendees, setAttendees] = useState<number>(1);
   const [purpose, setPurpose] = useState('');
@@ -65,7 +87,7 @@ export function BookingDrawerContent({
   // Reset form state to initial values
   const resetFormState = () => {
     setStep('activity');
-    setActorType('private-person');
+    setPricingActorType('private-person');
     setActivityType('');
     setAttendees(1);
     setPurpose('');
@@ -86,6 +108,9 @@ export function BookingDrawerContent({
       return;
     }
 
+    // Convert actor type for navigation state
+    const cartActorType = convertActorType(pricingActorType);
+
     // Navigate to booking confirmation
     navigate(`/booking/${facilityId}/confirm`, {
       state: {
@@ -94,9 +119,9 @@ export function BookingDrawerContent({
           ...formData,
           purpose
         },
-        actorType,
+        actorType: cartActorType,
         bookingType,
-        requiresApproval: ['lag-foreninger', 'paraply'].includes(actorType)
+        requiresApproval: ['lag-foreninger', 'paraply'].includes(pricingActorType)
       }
     });
   };
@@ -148,8 +173,8 @@ export function BookingDrawerContent({
           facilityId={facilityId}
           facilityName={facilityName}
           zones={zones}
-          actorType={actorType}
-          onActorTypeChange={setActorType}
+          actorType={pricingActorType}
+          onActorTypeChange={setPricingActorType}
           bookingType={bookingType}
           onBack={() => setStep('activity')}
           onComplete={handleSubmit}
