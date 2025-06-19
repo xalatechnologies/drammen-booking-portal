@@ -1,10 +1,11 @@
+
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Home, AlertCircle } from "lucide-react";
 import GlobalHeader from "@/components/GlobalHeader";
 import GlobalFooter from "@/components/GlobalFooter";
-import { EnhancedImageGallery } from "@/components/facility/EnhancedImageGallery";
+import { AirBnbStyleGallery } from "@/components/facility/AirBnbStyleGallery";
 import { FacilityHeader } from "@/components/facility/FacilityHeader";
 import { FacilityInfoTabs } from "@/components/facility/FacilityInfoTabs";
 import { PersistentBookingSidebar } from "@/components/facility/PersistentBookingSidebar";
@@ -13,7 +14,7 @@ import { AvailabilityTab } from "@/components/facility/tabs/AvailabilityTab";
 import { Zone } from "@/components/booking/types";
 import { useOptimizedFacility } from "@/hooks/useOptimizedFacility";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useTranslation } from "@/i18n/hooks/useTranslation";
+import { useTranslation } from "@/i18n";
 import { CartProvider } from "@/contexts/CartContext";
 
 const FacilityDetail = () => {
@@ -164,9 +165,14 @@ const FacilityDetail = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* Left Column - Main Content (2/3 width) */}
               <div className="lg:col-span-2 space-y-6">
-                {/* Enhanced Image Gallery */}
-                <EnhancedImageGallery 
-                  images={[facility.image]} 
+                {/* AirBnB-Style Image Gallery */}
+                <AirBnbStyleGallery 
+                  images={[
+                    facility.image,
+                    "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&auto=format&fit=crop",
+                    "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=800&auto=format&fit=crop",
+                    "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&auto=format&fit=crop"
+                  ]} 
                   facilityName={facility.name}
                 />
 
@@ -179,10 +185,15 @@ const FacilityDetail = () => {
                   onToggleFavorite={() => setIsFavorited(!isFavorited)} 
                 />
 
-                {/* Main Calendar - Moved from tabs to main content */}
+                {/* Main Calendar - Primary Feature */}
                 <div className="bg-white rounded-lg shadow-sm border">
                   <div className="p-6">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-6">Tilgjengelighet</h2>
+                    <div className="flex items-center justify-between mb-6">
+                      <h2 className="text-2xl font-bold text-gray-900">Tilgjengelighet og booking</h2>
+                      <div className="text-sm text-gray-500">
+                        Velg tidspunkt for å booke
+                      </div>
+                    </div>
                     <AvailabilityTab 
                       zones={zones} 
                       startDate={new Date()} 
@@ -208,7 +219,7 @@ const FacilityDetail = () => {
                 />
               </div>
 
-              {/* Right Column - Persistent Booking Sidebar (1/3 width) */}
+              {/* Right Column - Persistent Booking Panel (1/3 width) */}
               <div className="lg:col-span-1">
                 <div className="sticky top-6">
                   <PersistentBookingSidebar
