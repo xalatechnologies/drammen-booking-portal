@@ -1,8 +1,8 @@
 
 import React from "react";
-import { MapPin, Users, Trophy, Target, Zap, Heart, Share2 } from "lucide-react";
+import { MapPin, Users, Trophy, Target, Zap } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { FacilityListItemHeader } from "./FacilityListItemHeader";
 
 interface Facility {
   id: number;
@@ -71,71 +71,56 @@ export function FacilityListItemContent({
   };
 
   return (
-    <div className="flex-1 p-6 flex flex-col h-full">
-      {/* Title */}
-      <h3 className="text-2xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors line-clamp-1">
-        {facility.name}
-      </h3>
+    <div className="flex-1 p-8 flex flex-col">
+      {/* Header Section */}
+      <FacilityListItemHeader
+        facilityName={facility.name}
+        isFavorited={isFavorited}
+        onFavorite={onFavorite}
+        onShare={onShare}
+      />
       
-      {/* Address - directly under title */}
-      <div className="flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors cursor-pointer mb-4" onClick={onAddressClick}>
+      {/* Address */}
+      <div className="flex items-center gap-3 text-gray-600 hover:text-blue-600 transition-colors cursor-pointer flex-1 mb-4" onClick={onAddressClick}>
         <MapPin className="h-5 w-5" />
         <span className="text-base font-medium line-clamp-1">{facility.address}</span>
       </div>
 
       {/* Description */}
-      <div className="mb-4 flex-grow">
-        <p className="text-gray-700 leading-relaxed text-base line-clamp-2">
+      <div className="mb-6 flex-grow">
+        <p className="text-gray-700 leading-relaxed text-base line-clamp-3">
           {facility.description}
         </p>
       </div>
 
       {/* Capacity */}
-      <div className="flex items-center gap-2 text-gray-600 mb-4">
-        <Users className="h-5 w-5" />
-        <span className="font-medium text-base">{facility.capacity} personer</span>
+      <div className="flex items-center gap-3 text-gray-600 mb-6">
+        <Users className="h-6 w-6" />
+        <span className="font-medium text-lg">{facility.capacity} personer</span>
       </div>
 
-      {/* Bottom section with Suitable For and Action Buttons */}
-      <div className="flex items-center justify-between">
-        {/* Suitable For */}
-        <div className="flex flex-wrap gap-2 flex-1">
-          {facility.suitableFor.slice(0, 4).map((activity, index) => (
-            <Badge 
-              key={index} 
-              className="bg-blue-50 text-blue-700 border-blue-200 font-medium px-3 py-1.5 text-sm hover:bg-blue-100 transition-colors flex items-center gap-1.5"
-            >
-              {getSuitableForIcon(activity)}
-              {activity}
-            </Badge>
-          ))}
-          {facility.suitableFor.length > 4 && (
-            <Badge variant="outline" className="bg-gray-50 text-gray-600 border-gray-300 font-medium px-3 py-1.5 text-sm">
-              +{facility.suitableFor.length - 4}
-            </Badge>
-          )}
-        </div>
-
-        {/* Action Buttons - aligned to the right */}
-        <div className="flex gap-2 ml-4 opacity-0 group-hover:opacity-100 transition-all duration-300">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            className="h-9 w-9 p-0 hover:bg-gray-100 rounded-full focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" 
-            onClick={onFavorite} 
-            aria-label={isFavorited ? "Fjern fra favoritter" : "Legg til favoritter"}
-          >
-            <Heart className={`h-4 w-4 ${isFavorited ? 'fill-red-500 text-red-500' : 'text-gray-400'}`} />
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            className="h-9 w-9 p-0 hover:bg-gray-100 rounded-full focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" 
-            onClick={onShare} 
-            aria-label="Del lokale"
-          >
-            <Share2 className="h-4 w-4 text-gray-400" />
-          </Button>
+      {/* Suitable For */}
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <div className="flex items-center text-slate-700">
+            <span className="font-semibold text-base">Egnet for</span>
+          </div>
+          <div className="flex flex-wrap gap-2 ml-0">
+            {facility.suitableFor.slice(0, 3).map((activity, index) => (
+              <Badge 
+                key={index} 
+                className="bg-blue-50 text-blue-700 border-blue-200 font-medium px-4 py-2 text-base hover:bg-blue-100 transition-colors flex items-center gap-2"
+              >
+                {getSuitableForIcon(activity)}
+                {activity}
+              </Badge>
+            ))}
+            {facility.suitableFor.length > 3 && (
+              <Badge variant="outline" className="bg-gray-50 text-gray-600 border-gray-300 font-medium px-4 py-2 text-base">
+                +{facility.suitableFor.length - 3} flere
+              </Badge>
+            )}
+          </div>
         </div>
       </div>
     </div>
