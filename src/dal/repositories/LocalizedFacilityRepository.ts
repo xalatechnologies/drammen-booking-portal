@@ -288,7 +288,7 @@ export class LocalizedFacilityRepository extends BaseRepository<Facility> {
     }
   }
 
-  // New raw methods for optimized architecture
+  // Raw methods for optimized architecture
   async findAllRaw(
     pagination: { page: number; limit: number },
     filters?: FacilityFilters,
@@ -343,7 +343,7 @@ export class LocalizedFacilityRepository extends BaseRepository<Facility> {
 
         if (filters.accessibility) {
           facilities = facilities.filter(facility =>
-            facility.accessibility.includes(filters.accessibility!)
+            Array.isArray(facility.accessibility) && facility.accessibility.includes(filters.accessibility!)
           );
         }
       }
@@ -482,3 +482,4 @@ export class LocalizedFacilityRepository extends BaseRepository<Facility> {
       };
     }
   }
+}
