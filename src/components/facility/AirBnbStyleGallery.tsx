@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-import { ArrowLeft, ArrowRight, X, Grid3x3, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, X, Grid3x3, ChevronLeft, ChevronRight, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface AirBnbStyleGalleryProps {
@@ -20,25 +20,134 @@ export function AirBnbStyleGallery({ images, facilityName }: AirBnbStyleGalleryP
     setActiveImageIndex((prev) => (prev - 1 + images.length) % images.length);
   };
 
-  const openModal = () => setShowModal(true);
+  const openModal = (index?: number) => {
+    if (typeof index === 'number') {
+      setActiveImageIndex(index);
+    }
+    setShowModal(true);
+  };
+
   const closeModal = () => setShowModal(false);
+
+  // Handle keyboard navigation
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!showModal) return;
+      if (e.key === 'Escape') closeModal();
+      if (e.key === 'ArrowLeft') prevImage();
+      if (e.key === 'ArrowRight') nextImage();
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [showModal]);
+
+  const handleShare = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (navigator.share) {
+      navigator.share({
+        title: facilityName,
+        url: window.location.href
+      });
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+    }
+  };
 
   return (
     <>
-      {/* Main Image Display - AirBnB Style */}
-      <div className="relative rounded-xl overflow-hidden group cursor-pointer" onClick={openModal}>
-        <div className="h-96 relative">
+      {/* Airbnb-Style Grid Layout */}
+      <div className="relative rounded-xl overflow-hidden group">
+        {/* Desktop Grid Layout */}
+        <div className="hidden md:grid md:grid-cols-4 gap-2 h-96">
+          {/* Main Image - Takes up 2 columns */}
+          <div 
+            className="col-span-2 relative cursor-pointer overflow-hidden group/main"
+            onClick={() => openModal(0)}
+          >
+            <img 
+              src={images[0]} 
+              alt={`${facilityName} - Main view`}
+              className="w-full h-full object-cover transition-transform duration-300 group-hover/main:scale-105"
+            />
+            <div className="absolute inset-0 bg-black/0 group-hover/main:bg-black/10 transition-colors duration-300" />
+          </div>
+          
+          {/* Grid of 4 smaller images */}
+          <div className="col-span-2 grid grid-cols-2 gap-2">
+            {images.slice(1, 5).map((image, index) => (
+              <div 
+                key={index + 1}
+                className="relative cursor-pointer overflow-hidden group/grid"
+                onClick={() => openModal(index + 1)}
+              >
+                <img 
+                  src={image} 
+                  alt={`${facilityName} - View ${index + 2}`}
+                  className="w-full h-full object-cover transition-transform duration-300 group-hover/grid:scale-105"
+                />
+                <div className="absolute inset-0 bg-black/0 group-hover/grid:bg-black/10 transition-colors duration-300" />
+                
+                {/* Show all photos button on last image */}
+                {index === 3 && images.length > 5 && (
+                  <div className="absolute inset-0 bg-black/40 group-hover/grid:bg-black/50 transition-colors duration-300">
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        className="bg-white hover:bg-gray-100 text-gray-900 shadow-lg font-medium"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openModal();
+                        }}
+                      >
+                        <Grid3x3 className="h-4 w-4 mr-2" />
+                        Show all {images.length} photos
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Mobile Layout - Single main image */}
+        <div className="md:hidden h-64 relative cursor-pointer" onClick={() => openModal(0)}>
           <img 
             src={images[activeImageIndex]} 
             alt={`${facilityName} - Image ${activeImageIndex + 1}`}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            className="w-full h-full object-cover"
           />
           
-          {/* Overlay gradient */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          {/* Mobile navigation */}
+          {images.length > 1 && (
+            <>
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  prevImage();
+                }}
+                className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-gray-900 p-2 rounded-full shadow-lg"
+                aria-label="Previous image"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  nextImage();
+                }}
+                className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-gray-900 p-2 rounded-full shadow-lg"
+                aria-label="Next image"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </button>
+            </>
+          )}
           
-          {/* View all photos button */}
-          <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          {/* Mobile show all button */}
+          <div className="absolute bottom-4 right-4">
             <Button
               variant="secondary"
               size="sm"
@@ -49,37 +158,11 @@ export function AirBnbStyleGallery({ images, facilityName }: AirBnbStyleGalleryP
               }}
             >
               <Grid3x3 className="h-4 w-4 mr-2" />
-              View all {images.length} photos
+              {images.length} photos
             </Button>
           </div>
           
-          {/* Navigation arrows - only show if multiple images */}
-          {images.length > 1 && (
-            <>
-              <button 
-                onClick={(e) => {
-                  e.stopPropagation();
-                  prevImage();
-                }}
-                className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-gray-900 p-3 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110"
-                aria-label="Previous image"
-              >
-                <ChevronLeft className="h-5 w-5" />
-              </button>
-              <button 
-                onClick={(e) => {
-                  e.stopPropagation();
-                  nextImage();
-                }}
-                className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-gray-900 p-3 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110"
-                aria-label="Next image"
-              >
-                <ChevronRight className="h-5 w-5" />
-              </button>
-            </>
-          )}
-          
-          {/* Dots indicator - AirBnB style */}
+          {/* Mobile dots indicator */}
           {images.length > 1 && (
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
               {images.map((_, index) => (
@@ -100,27 +183,52 @@ export function AirBnbStyleGallery({ images, facilityName }: AirBnbStyleGalleryP
             </div>
           )}
         </div>
+
+        {/* Floating Action Buttons */}
+        <div className="absolute top-6 right-6 flex gap-2">
+          <Button
+            variant="secondary"
+            size="sm"
+            className="bg-white/95 hover:bg-white text-gray-900 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+            onClick={handleShare}
+          >
+            <Share2 className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
 
-      {/* Full-screen Modal */}
+      {/* Enhanced Full-screen Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/95 z-50 flex items-center justify-center">
-          <div className="relative w-full h-full flex items-center justify-center p-4">
-            {/* Close button */}
+        <div className="fixed inset-0 bg-black/95 z-50 flex flex-col">
+          {/* Modal Header */}
+          <div className="flex items-center justify-between p-6 text-white">
             <button
               onClick={closeModal}
-              className="absolute top-6 right-6 text-white hover:text-gray-300 z-10 p-2 rounded-full bg-black/20 hover:bg-black/40 transition-colors"
+              className="p-2 rounded-full hover:bg-white/10 transition-colors"
               aria-label="Close gallery"
             >
               <X className="h-6 w-6" />
             </button>
             
-            {/* Image counter */}
-            <div className="absolute top-6 left-6 text-white bg-black/20 px-4 py-2 rounded-full text-sm font-medium z-10">
-              {activeImageIndex + 1} / {images.length}
+            <div className="text-center">
+              <span className="text-sm font-medium">
+                {activeImageIndex + 1} / {images.length}
+              </span>
             </div>
             
-            {/* Image */}
+            <Button
+              variant="secondary"
+              size="sm"
+              className="bg-white/10 hover:bg-white/20 text-white border-white/20"
+              onClick={handleShare}
+            >
+              <Share2 className="h-4 w-4 mr-2" />
+              Share
+            </Button>
+          </div>
+          
+          {/* Main Image Area */}
+          <div className="flex-1 flex items-center justify-center relative px-6 pb-6">
             <img
               src={images[activeImageIndex]}
               alt={`${facilityName} - Image ${activeImageIndex + 1}`}
@@ -146,25 +254,32 @@ export function AirBnbStyleGallery({ images, facilityName }: AirBnbStyleGalleryP
                 </button>
               </>
             )}
-            
-            {/* Dots in modal */}
-            {images.length > 1 && (
-              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-3">
-                {images.map((_, index) => (
+          </div>
+          
+          {/* Thumbnail Strip */}
+          {images.length > 1 && (
+            <div className="px-6 pb-6">
+              <div className="flex gap-3 justify-center overflow-x-auto pb-2">
+                {images.map((image, index) => (
                   <button
                     key={index}
                     onClick={() => setActiveImageIndex(index)}
-                    className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                    className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all duration-300 ${
                       index === activeImageIndex 
-                        ? 'bg-white' 
-                        : 'bg-white/50 hover:bg-white/75'
+                        ? 'border-white' 
+                        : 'border-transparent hover:border-white/50'
                     }`}
-                    aria-label={`View image ${index + 1}`}
-                  />
+                  >
+                    <img
+                      src={image}
+                      alt={`Thumbnail ${index + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </button>
                 ))}
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       )}
     </>
