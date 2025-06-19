@@ -14,6 +14,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { ShoppingCart, ArrowLeft, User, Mail, Phone, Building, Calendar, Clock, MapPin, Edit3, Trash2, Info } from 'lucide-react';
 import { format } from 'date-fns';
 import { nb } from 'date-fns/locale';
+import { CheckoutBreadcrumb } from '@/components/checkout/CheckoutBreadcrumb';
+import { ReservationAccordion } from '@/components/checkout/ReservationAccordion';
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
@@ -29,24 +31,19 @@ const CheckoutPage = () => {
     customerType: 'private' as 'private' | 'business' | 'organization'
   });
 
-  // Group cart items by facility for better display
-  const groupedReservations = items.reduce((acc, item) => {
-    const key = `${item.facilityId}`;
-    if (!acc[key]) {
-      acc[key] = {
-        facilityId: item.facilityId,
-        facilityName: item.facilityName,
-        customerType: 'private',
-        items: [],
-        totalPrice: 0
-      };
+  const handleEditReservation = (reservationId: string) => {
+    // Find the reservation and navigate back to booking with pre-filled data
+    const reservation = items.find(item => item.id === reservationId);
+    if (reservation) {
+      // Store current cart state and navigate to facility booking
+      sessionStorage.setItem('editing_reservation', JSON.stringify(reservation));
+      navigate(`/facility/${reservation.facilityId}`);
     }
-    acc[key].items.push(item);
-    acc[key].totalPrice += item.pricePerHour * (item.duration || 2);
-    return acc;
-  }, {} as Record<string, any>);
+  };
 
-  const reservations = Object.values(groupedReservations);
+  const handleRemoveReservation = (reservationId: string) => {
+    removeFromCart(reservationId);
+  };
 
   const handleSubmit = async () => {
     await new Promise(resolve => setTimeout(resolve, 1000));
@@ -65,8 +62,8 @@ const CheckoutPage = () => {
 
   const getCustomerTypeDiscount = () => {
     switch (formData.customerType) {
-      case 'business': return 0.1; // 10% discount
-      case 'organization': return 0.2; // 20% discount
+      case 'business': return 0.1;
+      case 'organization': return 0.2;
       default: return 0;
     }
   };
@@ -103,6 +100,8 @@ const CheckoutPage = () => {
       <GlobalHeader />
       <div className="flex-grow py-8">
         <div className="container mx-auto px-4 max-w-6xl">
+          <CheckoutBreadcrumb />
+
           {/* Header */}
           <div className="flex items-center gap-4 mb-8">
             <Button variant="ghost" onClick={() => navigate(-1)}>
@@ -140,62 +139,17 @@ const CheckoutPage = () => {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <ShoppingCart className="h-5 w-5" />
-                      Dine reservasjoner ({reservations.length})
+                      Dine reservasjoner ({items.length})
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-6">
-                    {reservations.map((reservation, index) => (
-                      <div key={index} className="border rounded-lg p-6 bg-white">
-                        <div className="flex justify-between items-start mb-4">
-                          <div>
-                            <h3 className="text-lg font-semibold flex items-center gap-2">
-                              <MapPin className="h-5 w-5 text-blue-600" />
-                              {reservation.facilityName}
-                            </h3>
-                            <Badge variant="outline" className="mt-2">
-                              {reservation.items.length} tidspunkt
-                            </Badge>
-                          </div>
-                          <div className="text-right">
-                            <p className="text-2xl font-bold text-green-600">{reservation.totalPrice} kr</p>
-                            <p className="text-sm text-gray-500">Totalt for denne reservasjonen</p>
-                          </div>
-                        </div>
-                        
-                        <Separator className="my-4" />
-                        
-                        <div className="space-y-3">
-                          <h4 className="font-medium text-gray-900">Valgte tidspunkt:</h4>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            {reservation.items.map((item: any, itemIndex: number) => (
-                              <div key={itemIndex} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                                <div className="flex items-center gap-3">
-                                  <Calendar className="h-4 w-4 text-gray-500" />
-                                  <div>
-                                    <p className="font-medium">{format(new Date(item.date), 'EEEE d. MMMM', { locale: nb })}</p>
-                                    <p className="text-sm text-gray-600">{item.timeSlot}</p>
-                                    <p className="text-xs text-gray-500">{item.zoneId === 'whole-facility' ? 'Hele lokalet' : item.zoneId}</p>
-                                  </div>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                  <span className="text-sm font-medium">{item.pricePerHour * (item.duration || 2)} kr</span>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => removeFromCart(item.id)}
-                                    className="text-red-500 hover:text-red-700"
-                                  >
-                                    <Trash2 className="h-4 w-4" />
-                                  </Button>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
+                  <CardContent>
+                    <ReservationAccordion 
+                      reservations={items}
+                      onEditReservation={handleEditReservation}
+                      onRemoveReservation={handleRemoveReservation}
+                    />
                     
-                    <Button onClick={() => setStep('details')} className="w-full h-12 text-lg">
+                    <Button onClick={() => setStep('details')} className="w-full h-12 text-lg mt-6">
                       Fortsett til kontaktopplysninger
                     </Button>
                   </CardContent>
@@ -398,7 +352,7 @@ const CheckoutPage = () => {
                 <CardContent className="space-y-4">
                   <div className="space-y-3">
                     <div className="flex justify-between text-sm">
-                      <span>Subtotal ({items.length} tidspunkt)</span>
+                      <span>Subtotal ({items.length} reservasjon{items.length !== 1 ? 'er' : ''})</span>
                       <span>{subtotal} kr</span>
                     </div>
                     

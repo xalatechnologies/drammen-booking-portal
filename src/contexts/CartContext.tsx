@@ -6,6 +6,7 @@ import { CartSessionService } from '@/services/CartSessionService';
 interface CartContextType extends CartState {
   addToCart: (item: Omit<CartItem, 'id'>) => void;
   removeFromCart: (itemId: string) => void;
+  updateReservation: (itemId: string, updates: Partial<CartItem>) => void;
   clearCart: () => void;
   getTotalPrice: () => number;
   getItemCount: () => number;
@@ -18,15 +19,30 @@ function cartReducer(state: CartState, action: CartAction): CartState {
   switch (action.type) {
     case 'ADD_TO_CART': {
       const item = action.payload;
-      const itemId = `${item.facilityId}-${item.zoneId}-${item.date.toISOString()}-${item.timeSlot}`;
+      const itemId = `${item.facilityId}-${item.purpose}-${Date.now()}`;
       
-      // Check if item already exists
-      const existingItem = state.items.find(cartItem => cartItem.id === itemId);
-      if (existingItem) {
-        return state; // Don't add duplicates
-      }
-
-      const newItem: CartItem = { ...item, id: itemId };
+      // Initialize default values for new cart structure
+      const newItem: CartItem = { 
+        ...item, 
+        id: itemId,
+        expectedAttendees: item.expectedAttendees || 1,
+        organizationType: item.organizationType || 'private',
+        additionalServices: item.additionalServices || [],
+        timeSlots: item.timeSlots || [{
+          date: item.date,
+          timeSlot: item.timeSlot,
+          zoneId: item.zoneId,
+          duration: item.duration
+        }],
+        pricing: item.pricing || {
+          baseFacilityPrice: item.pricePerHour * (item.duration || 2),
+          servicesPrice: 0,
+          discounts: 0,
+          vatAmount: 0,
+          totalPrice: item.pricePerHour * (item.duration || 2)
+        }
+      };
+      
       const newItems = [...state.items, newItem];
       const newState = {
         items: newItems,
@@ -34,7 +50,6 @@ function cartReducer(state: CartState, action: CartAction): CartState {
         itemCount: newItems.length
       };
       
-      // Save to session
       CartSessionService.saveCartToSession(newItems);
       return newState;
     }
@@ -47,7 +62,22 @@ function cartReducer(state: CartState, action: CartAction): CartState {
         itemCount: newItems.length
       };
       
-      // Save to session
+      CartSessionService.saveCartToSession(newItems);
+      return newState;
+    }
+
+    case 'UPDATE_RESERVATION': {
+      const newItems = state.items.map(item => 
+        item.id === action.payload.itemId 
+          ? { ...item, ...action.payload.updates }
+          : item
+      );
+      const newState = {
+        items: newItems,
+        totalPrice: calculateTotalPrice(newItems),
+        itemCount: newItems.length
+      };
+      
       CartSessionService.saveCartToSession(newItems);
       return newState;
     }
@@ -78,7 +108,12 @@ function cartReducer(state: CartState, action: CartAction): CartState {
 // Helper function to calculate total price
 function calculateTotalPrice(items: CartItem[]): number {
   return items.reduce((total, item) => {
-    const duration = item.duration || 2; // Default to 2 hours if not specified
+    // Use pricing object if available, otherwise calculate from legacy fields
+    if (item.pricing) {
+      return total + item.pricing.totalPrice;
+    }
+    
+    const duration = item.duration || 2;
     return total + (item.pricePerHour * duration);
   }, 0);
 }
@@ -114,6 +149,10 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     dispatch({ type: 'REMOVE_FROM_CART', payload: itemId });
   };
 
+  const updateReservation = (itemId: string, updates: Partial<CartItem>) => {
+    dispatch({ type: 'UPDATE_RESERVATION', payload: { itemId, updates } });
+  };
+
   const clearCart = () => {
     dispatch({ type: 'CLEAR_CART' });
   };
@@ -127,6 +166,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       ...state,
       addToCart,
       removeFromCart,
+      updateReservation,
       clearCart,
       getTotalPrice,
       getItemCount,
