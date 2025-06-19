@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -38,7 +39,7 @@ export function AvailabilityTab({
     type: 'weekly',
     weekdays: [],
     timeSlots: ['08:00'],
-    duration: 2,
+    interval: 1,
     endDate: new Date(),
   });
 
