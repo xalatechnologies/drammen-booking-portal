@@ -35,7 +35,7 @@ export function MobileGallery({
       {/* Gradient overlay for better contrast */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-black/10" />
       
-      {/* Mobile navigation */}
+      {/* Mobile navigation - only show if more than 1 image */}
       {images.length > 1 && (
         <>
           <button 
@@ -61,23 +61,25 @@ export function MobileGallery({
         </>
       )}
       
-      {/* Mobile show all button */}
-      <div className="absolute bottom-4 right-4">
-        <Button
-          variant="secondary"
-          size="sm"
-          className="bg-white/95 hover:bg-white text-gray-900 shadow-xl backdrop-blur-sm border border-white/20 rounded-lg transition-all duration-300 hover:scale-105"
-          onClick={(e) => {
-            e.stopPropagation();
-            onShowAllClick();
-          }}
-        >
-          <Grid3x3 className="h-4 w-4 mr-2" />
-          {images.length} photos
-        </Button>
-      </div>
+      {/* Mobile show all button - only show if more than 1 image */}
+      {images.length > 1 && (
+        <div className="absolute bottom-4 right-4">
+          <Button
+            variant="secondary"
+            size="sm"
+            className="bg-white/95 hover:bg-white text-gray-900 shadow-xl backdrop-blur-sm border border-white/20 rounded-lg transition-all duration-300 hover:scale-105"
+            onClick={(e) => {
+              e.stopPropagation();
+              onShowAllClick();
+            }}
+          >
+            <Grid3x3 className="h-4 w-4 mr-2" />
+            {images.length} photos
+          </Button>
+        </div>
+      )}
       
-      {/* Mobile dots indicator */}
+      {/* Mobile dots indicator - only show if more than 1 image */}
       {images.length > 1 && (
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
           {images.map((_, index) => (

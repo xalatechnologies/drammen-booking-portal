@@ -61,7 +61,7 @@ export function GalleryModal({
           className="max-w-full max-h-full object-contain rounded-2xl shadow-2xl transition-all duration-500"
         />
         
-        {/* Navigation in modal */}
+        {/* Navigation in modal - only show if more than 1 image */}
         {images.length > 1 && (
           <>
             <button
@@ -82,26 +82,21 @@ export function GalleryModal({
         )}
       </div>
       
-      {/* Thumbnail Strip */}
+      {/* Dots Navigation - only show if more than 1 image */}
       {images.length > 1 && (
         <div className="px-6 pb-6">
-          <div className="flex gap-4 justify-center overflow-x-auto pb-2">
-            {images.map((image, index) => (
+          <div className="flex gap-3 justify-center overflow-x-auto pb-2">
+            {images.map((_, index) => (
               <button
                 key={index}
                 onClick={() => onImageSelect(index)}
-                className={`flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden border-2 transition-all duration-300 hover:scale-110 ${
+                className={`flex-shrink-0 w-3 h-3 rounded-full border-2 transition-all duration-300 hover:scale-125 ${
                   index === activeImageIndex 
-                    ? 'border-white shadow-lg scale-110' 
-                    : 'border-transparent hover:border-white/50'
+                    ? 'bg-white border-white scale-125' 
+                    : 'bg-transparent border-white/50 hover:border-white/80'
                 }`}
-              >
-                <img
-                  src={image}
-                  alt={`Thumbnail ${index + 1}`}
-                  className="w-full h-full object-cover"
-                />
-              </button>
+                aria-label={`View image ${index + 1}`}
+              />
             ))}
           </div>
         </div>
