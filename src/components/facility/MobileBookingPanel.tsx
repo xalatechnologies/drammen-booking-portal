@@ -49,9 +49,6 @@ export function MobileBookingPanel({
             <PersistentBookingSidebar
               facilityName={facilityName}
               facilityId={facilityId}
-              capacity={capacity}
-              area={area}
-              openingHours={openingHours}
             />
           </div>
         </div>
