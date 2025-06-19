@@ -3,7 +3,7 @@ import React from "react";
 import { MapPin, Users } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useTranslation } from "@/i18n";
-import { FacilityCardAmenities } from "./FacilityCardAmenities";
+import { FlatAmenitiesGrid } from "./FlatAmenitiesGrid";
 
 interface Facility {
   id: number;
@@ -41,18 +41,28 @@ export function FacilityCardContent({ facility, onAddressClick }: FacilityCardCo
         {facility.description}
       </p>
 
-      {/* Capacity and Amenities Row */}
-      <div className="flex items-center justify-between mb-5">
-        <div className="flex items-center gap-3 text-gray-600">
-          <Users className="h-5 w-5" />
-          <span className="text-base font-medium">{t('facility.details.capacity')}: {facility.capacity}</span>
-        </div>
-        
-        <FacilityCardAmenities equipment={facility.equipment} />
+      {/* Capacity */}
+      <div className="flex items-center gap-3 text-gray-600 mb-5">
+        <Users className="h-5 w-5" />
+        <span className="text-base font-medium">{t('facility.details.capacity')}: {facility.capacity}</span>
       </div>
+
+      {/* Flat Equipment Grid */}
+      {facility.equipment && facility.equipment.length > 0 && (
+        <div className="mb-6">
+          <FlatAmenitiesGrid 
+            amenities={facility.equipment} 
+            title={t('facility.amenities.equipment', {}, 'Equipment')}
+            maxItems={4}
+          />
+        </div>
+      )}
 
       {/* Suitable For Tags */}
       <div className="mb-6">
+        <h4 className="text-base font-semibold text-gray-900 mb-3">
+          {t('facility.details.suitableFor', {}, 'Suitable for')}
+        </h4>
         <div className="flex flex-wrap gap-2">
           {Array.isArray(facility.suitableFor) && facility.suitableFor.slice(0, 2).map((activity, index) => (
             <Badge
