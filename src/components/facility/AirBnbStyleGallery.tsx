@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { ArrowLeft, ArrowRight, X, Grid3x3, ChevronLeft, ChevronRight, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -56,10 +55,10 @@ export function AirBnbStyleGallery({ images, facilityName }: AirBnbStyleGalleryP
 
   return (
     <>
-      {/* Airbnb-Style Grid Layout */}
-      <div className="relative rounded-xl overflow-hidden group">
+      {/* Airbnb-Style Grid Layout - Full Width */}
+      <div className="relative overflow-hidden group w-full">
         {/* Desktop Grid Layout */}
-        <div className="hidden md:grid md:grid-cols-4 gap-2 h-96">
+        <div className="hidden md:grid md:grid-cols-4 gap-2 h-96 w-full">
           {/* Main Image - Takes up 2 columns */}
           <div 
             className="col-span-2 relative cursor-pointer overflow-hidden group/main"
@@ -113,7 +112,7 @@ export function AirBnbStyleGallery({ images, facilityName }: AirBnbStyleGalleryP
         </div>
 
         {/* Mobile Layout - Single main image */}
-        <div className="md:hidden h-64 relative cursor-pointer" onClick={() => openModal(0)}>
+        <div className="md:hidden h-64 relative cursor-pointer w-full" onClick={() => openModal(0)}>
           <img 
             src={images[activeImageIndex]} 
             alt={`${facilityName} - Image ${activeImageIndex + 1}`}
