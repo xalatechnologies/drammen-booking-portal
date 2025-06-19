@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { useTranslation } from "@/i18n/hooks/useTranslation";
 
 interface PaymentFormProps {
   amount: number;
@@ -22,6 +23,7 @@ export function PaymentForm({
   onPaymentComplete, 
   onCancel 
 }: PaymentFormProps) {
+  const { t } = useTranslation();
   const [isProcessing, setIsProcessing] = useState(false);
   const [cardNumber, setCardNumber] = useState("");
   const [expiryDate, setExpiryDate] = useState("");
@@ -83,10 +85,10 @@ export function PaymentForm({
             </div>
             <div>
               <CardTitle id="payment-heading" className="text-xl font-bold text-gray-900">
-                Betaling påkrevd
+                {t('payment.titles.paymentRequired')}
               </CardTitle>
               <p className="text-sm text-gray-600 mt-1">
-                Reservasjon godkjent - fullfør betaling for å sikre bookingen
+                {t('payment.descriptions.approvedReservation')}
               </p>
             </div>
           </div>
@@ -95,16 +97,16 @@ export function PaymentForm({
         <CardContent className="p-6">
           <div className="space-y-4">
             <div className="flex justify-between items-center">
-              <span className="text-base font-medium text-gray-700">Lokale:</span>
+              <span className="text-base font-medium text-gray-700">{t('payment.labels.facility')}:</span>
               <span className="text-base font-semibold text-gray-900">{facilityName}</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-base font-medium text-gray-700">Referanse:</span>
+              <span className="text-base font-medium text-gray-700">{t('payment.labels.reference')}:</span>
               <span className="text-base font-mono text-gray-900">{bookingReference}</span>
             </div>
             <Separator />
             <div className="flex justify-between items-center">
-              <span className="text-lg font-semibold text-gray-900">Totalt å betale:</span>
+              <span className="text-lg font-semibold text-gray-900">{t('payment.labels.totalToPay')}:</span>
               <span className="text-2xl font-bold text-blue-600">{amount.toFixed(2)} kr</span>
             </div>
           </div>
@@ -116,10 +118,10 @@ export function PaymentForm({
         <CardHeader>
           <CardTitle className="text-lg font-semibold flex items-center gap-2">
             <Lock className="h-5 w-5 text-green-600" aria-hidden="true" />
-            Sikker betaling
+            {t('payment.titles.securePayment')}
           </CardTitle>
           <p className="text-sm text-gray-600">
-            Din betaling behandles sikkert og kryptert
+            {t('payment.descriptions.secureProcessing')}
           </p>
         </CardHeader>
         
@@ -128,41 +130,41 @@ export function PaymentForm({
             {/* Card Name */}
             <div className="space-y-2">
               <Label htmlFor="card-name" className="text-sm font-semibold text-gray-700">
-                Navn på kort *
+                {t('payment.labels.nameOnCard')} *
               </Label>
               <Input
                 id="card-name"
                 type="text"
                 value={cardName}
                 onChange={(e) => setCardName(e.target.value)}
-                placeholder="Som det står på kortet"
+                placeholder={t('forms.placeholders.asOnCard')}
                 required
                 className="h-12 text-base border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                 aria-describedby="card-name-description"
               />
               <p id="card-name-description" className="text-xs text-gray-500">
-                Skriv inn navnet akkurat som det står på kortet ditt
+                {t('forms.descriptions.cardNameHelp')}
               </p>
             </div>
 
             {/* Card Number */}
             <div className="space-y-2">
               <Label htmlFor="card-number" className="text-sm font-semibold text-gray-700">
-                Kortnummer *
+                {t('payment.labels.cardNumber')} *
               </Label>
               <Input
                 id="card-number"
                 type="text"
                 value={cardNumber}
                 onChange={handleCardNumberChange}
-                placeholder="1234 5678 9012 3456"
+                placeholder={t('forms.placeholders.cardNumberExample')}
                 maxLength={19}
                 required
                 className="h-12 text-base font-mono border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                 aria-describedby="card-number-description"
               />
               <p id="card-number-description" className="text-xs text-gray-500">
-                16-sifret nummer på forsiden av kortet
+                {t('forms.descriptions.cardNumberHelp')}
               </p>
             </div>
 
@@ -170,41 +172,41 @@ export function PaymentForm({
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="expiry-date" className="text-sm font-semibold text-gray-700">
-                  Utløpsdato *
+                  {t('payment.labels.expiryDate')} *
                 </Label>
                 <Input
                   id="expiry-date"
                   type="text"
                   value={expiryDate}
                   onChange={handleExpiryChange}
-                  placeholder="MM/ÅÅ"
+                  placeholder={t('forms.placeholders.expiryExample')}
                   maxLength={5}
                   required
                   className="h-12 text-base font-mono border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                   aria-describedby="expiry-description"
                 />
                 <p id="expiry-description" className="text-xs text-gray-500">
-                  Måned/År
+                  {t('forms.labels.monthYear')}
                 </p>
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="cvv" className="text-sm font-semibold text-gray-700">
-                  CVV *
+                  {t('payment.labels.cvv')} *
                 </Label>
                 <Input
                   id="cvv"
                   type="text"
                   value={cvv}
                   onChange={(e) => setCvv(e.target.value.replace(/\D/g, ""))}
-                  placeholder="123"
+                  placeholder={t('forms.placeholders.cvvExample')}
                   maxLength={4}
                   required
                   className="h-12 text-base font-mono border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                   aria-describedby="cvv-description"
                 />
                 <p id="cvv-description" className="text-xs text-gray-500">
-                  3-4 siffer på baksiden
+                  {t('forms.descriptions.cvvHelp')}
                 </p>
               </div>
             </div>
@@ -215,11 +217,10 @@ export function PaymentForm({
                 <CheckCircle className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" aria-hidden="true" />
                 <div className="space-y-1">
                   <p className="text-sm font-semibold text-green-800">
-                    Sikker betaling garantert
+                    {t('payment.descriptions.secureGuarantee')}
                   </p>
                   <p className="text-sm text-green-700">
-                    Vi bruker 256-bit SSL-kryptering og oppbevarer aldri kortopplysningene dine.
-                    Betaling behandles av Stripe, en av verdens mest pålitelige betalingstjenester.
+                    {t('payment.descriptions.sslEncryption')}
                   </p>
                 </div>
               </div>
@@ -235,12 +236,12 @@ export function PaymentForm({
                 {isProcessing ? (
                   <>
                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" aria-hidden="true" />
-                    Behandler betaling...
+                    {t('payment.buttons.processing')}
                   </>
                 ) : (
                   <>
                     <Lock className="h-4 w-4 mr-2" aria-hidden="true" />
-                    Betal {amount.toFixed(2)} kr
+                    {t('payment.buttons.pay', { amount: amount.toFixed(2) })}
                   </>
                 )}
               </Button>
@@ -252,7 +253,7 @@ export function PaymentForm({
                 disabled={isProcessing}
                 className="h-12 text-base font-medium border-gray-300 hover:bg-gray-50"
               >
-                Avbryt
+                {t('payment.buttons.cancel')}
               </Button>
             </div>
           </form>
@@ -263,7 +264,7 @@ export function PaymentForm({
       <Card>
         <CardContent className="p-4">
           <p className="text-center text-sm text-gray-600 mb-3 font-medium">
-            Aksepterte betalingsmåter
+            {t('payment.descriptions.acceptedMethods')}
           </p>
           <div className="flex justify-center items-center gap-4">
             <div className="px-3 py-2 bg-blue-600 text-white text-xs font-bold rounded">VISA</div>

@@ -8,6 +8,10 @@ import { adminTranslations } from '../translations/admin';
 import { enumTranslations } from '../translations/enums';
 import { modelTranslations } from '../translations/models';
 import { serviceTranslations } from '../translations/services';
+import { formsTranslations } from '../translations/forms';
+import { validationTranslations } from '../translations/validation';
+import { accessibilityTranslations } from '../translations/accessibility';
+import { paymentTranslations } from '../translations/payment';
 import { TranslationParams, TranslationFunction } from '../types';
 
 type TranslationPath = string;
@@ -24,7 +28,11 @@ export function useTranslation() {
     admin: adminTranslations[language],
     enum: enumTranslations[language],
     models: modelTranslations[language],
-    services: serviceTranslations[language]
+    services: serviceTranslations[language],
+    forms: formsTranslations[language],
+    validation: validationTranslations[language],
+    accessibility: accessibilityTranslations[language],
+    payment: paymentTranslations[language]
   };
 
   const t: TranslationFunction = (path: TranslationPath, params?: TranslationParams, defaultValue?: string): string => {
