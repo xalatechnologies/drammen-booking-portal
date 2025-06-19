@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { MapPin, Users, Heart, Share2, Projector, Volume2, FileText, ChefHat, Car, Wifi, Snowflake, Accessibility } from "lucide-react";
@@ -118,7 +119,7 @@ const FacilityListItem: React.FC<FacilityListItemProps> = ({
       }}
     >
       <CardContent className="p-0">
-        <div className="flex h-96">
+        <div className="flex" style={{ height: '350px' }}>
           {/* Enhanced Image Section */}
           <div className="w-80 flex-shrink-0 relative overflow-hidden">
             <img 
