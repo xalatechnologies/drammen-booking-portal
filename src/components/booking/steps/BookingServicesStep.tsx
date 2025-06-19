@@ -2,17 +2,16 @@
 import React, { useState, useEffect } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { BookingFormValues } from '@/components/booking/formSchema';
-import { ServiceCategoryGrid } from '../services/ServiceCategoryGrid';
-import { ServiceSelectionCard } from '../services/ServiceSelectionCard';
-import { ServiceSummary } from '../services/ServiceSummary';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { ServiceCategory, AdditionalService } from '@/types/additionalServices';
 import { useAdditionalServices, useServicePricing } from '@/hooks/useAdditionalServices';
-import { useTranslation } from '@/i18n';
+import { useTranslation } from '@/i18n/hooks/useTranslation';
+import { useModelTranslation } from '@/hooks/useModelTranslation';
 import { AlertTriangle } from 'lucide-react';
+import { ServiceCategorySection } from './sections/ServiceCategorySection';
+import { ServiceSelectionGridSection } from './sections/ServiceSelectionGridSection';
+import { ServiceSummarySection } from './sections/ServiceSummarySection';
 
 interface BookingServicesStepProps {
   form: UseFormReturn<BookingFormValues>;
@@ -34,6 +33,7 @@ export function BookingServicesStep({
   attendees
 }: BookingServicesStepProps) {
   const { t } = useTranslation();
+  const { getSectionTitle } = useModelTranslation();
   const [selectedCategory, setSelectedCategory] = useState<ServiceCategory | undefined>();
   const [selectedServices, setSelectedServices] = useState<Record<string, number>>({});
   const [calculatedServices, setCalculatedServices] = useState<SelectedService[]>([]);
@@ -71,7 +71,7 @@ export function BookingServicesStep({
                 newCalculatedServices.push(serviceData);
                 total += result.data.totalPrice;
               } else {
-                setCalculationError(`Kunne ikke beregne pris for ${service.name}`);
+                setCalculationError(t('services.errors.calculationFailed', { serviceName: service.name }, `Kunne ikke beregne pris for ${service.name}`));
               }
             }
           }
@@ -81,12 +81,12 @@ export function BookingServicesStep({
         setTotalServicesCost(total);
       } catch (error) {
         console.error('Error calculating service prices:', error);
-        setCalculationError('En feil oppstod ved beregning av priser');
+        setCalculationError(t('services.errors.calculationError', {}, 'En feil oppstod ved beregning av priser'));
       }
     };
 
     updateCalculatedServices();
-  }, [selectedServices, services, actorType, attendees, calculateServicePrice]);
+  }, [selectedServices, services, actorType, attendees, calculateServicePrice, t]);
 
   // Update form with selected services
   useEffect(() => {
@@ -121,7 +121,7 @@ export function BookingServicesStep({
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold text-gray-900 mb-2">
-          {t('booking.steps.services', {}, 'Ekstra tjenester')}
+          {getSectionTitle('booking', 'services')}
         </h2>
         <p className="text-gray-600">
           {t('booking.steps.servicesDescription', {}, 'Velg tilleggstjenester for ditt arrangement')}
@@ -133,7 +133,7 @@ export function BookingServicesStep({
         <Alert variant="destructive">
           <AlertTriangle className="h-4 w-4" />
           <AlertDescription>
-            {calculationError || (error as any)?.message || 'En feil oppstod'}
+            {calculationError || (error as any)?.message || t('common.messages.error', {}, 'En feil oppstod')}
           </AlertDescription>
         </Alert>
       )}
@@ -160,45 +160,22 @@ export function BookingServicesStep({
             </TabsList>
 
             <TabsContent value="categories" className="space-y-4">
-              <ServiceCategoryGrid
-                onCategorySelect={setSelectedCategory}
+              <ServiceCategorySection
                 selectedCategory={selectedCategory}
-                showPopularOnly={true}
+                onCategorySelect={setSelectedCategory}
               />
             </TabsContent>
 
             {(['cleaning', 'equipment', 'catering', 'personnel', 'parking'] as ServiceCategory[]).map(category => (
               <TabsContent key={category} value={category} className="space-y-4">
-                {isLoading ? (
-                  <div className="text-center py-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-                    <p className="mt-2 text-gray-500">
-                      {t('common.loading', {}, 'Laster...')}
-                    </p>
-                  </div>
-                ) : services.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {services.map(service => (
-                      <ServiceSelectionCard
-                        key={service.id}
-                        service={service}
-                        actorType={actorType as any}
-                        attendees={attendees}
-                        selectedQuantity={selectedServices[service.id] || 0}
-                        onQuantityChange={handleQuantityChange}
-                        isSelected={(selectedServices[service.id] || 0) > 0}
-                      />
-                    ))}
-                  </div>
-                ) : (
-                  <Card>
-                    <CardContent className="text-center py-8">
-                      <p className="text-gray-500">
-                        {t('services.noServicesAvailable', {}, 'Ingen tjenester tilgjengelig i denne kategorien')}
-                      </p>
-                    </CardContent>
-                  </Card>
-                )}
+                <ServiceSelectionGridSection
+                  services={services}
+                  isLoading={isLoading}
+                  actorType={actorType}
+                  attendees={attendees}
+                  selectedServices={selectedServices}
+                  onQuantityChange={handleQuantityChange}
+                />
               </TabsContent>
             ))}
           </Tabs>
@@ -206,21 +183,12 @@ export function BookingServicesStep({
 
         {/* Service Summary Sidebar */}
         <div className="space-y-4">
-          <ServiceSummary
-            selectedServices={calculatedServices}
-            onRemoveService={handleRemoveService}
+          <ServiceSummarySection
+            calculatedServices={calculatedServices}
             totalServicesCost={totalServicesCost}
+            onRemoveService={handleRemoveService}
+            onClearAll={clearAllServices}
           />
-
-          {calculatedServices.length > 0 && (
-            <Button
-              variant="outline"
-              onClick={clearAllServices}
-              className="w-full"
-            >
-              {t('services.clearAll', {}, 'Fjern alle tjenester')}
-            </Button>
-          )}
         </div>
       </div>
     </div>
