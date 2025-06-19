@@ -9,6 +9,9 @@ import { BookingOverviewCard } from './BookingOverviewCard';
 import { CustomerTypeSection } from './CustomerTypeSection';
 import { IntegratedPriceCalculation } from '@/components/booking/IntegratedPriceCalculation';
 import { useTranslation } from '@/i18n/hooks/useTranslation';
+import { useCart } from '@/contexts/CartContext';
+import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 
 interface BookingPricingStepProps {
   selectedSlots: SelectedTimeSlot[];
@@ -36,9 +39,71 @@ export function BookingPricingStep({
   onAddToCart
 }: BookingPricingStepProps) {
   const { t } = useTranslation();
+  const { addToCart } = useCart();
+  const { toast } = useToast();
+  const navigate = useNavigate();
 
   // Check if booking requires approval
   const requiresApproval = ['lag-foreninger', 'paraply'].includes(actorType);
+
+  // Check authentication status from localStorage (simple implementation)
+  const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+
+  const handleAddToCart = () => {
+    try {
+      // Add selected slots to cart
+      selectedSlots.forEach(slot => {
+        const zone = zones.find(z => z.id === slot.zoneId);
+        addToCart({
+          facilityId,
+          facilityName,
+          zoneId: slot.zoneId,
+          date: slot.date,
+          timeSlot: slot.timeSlot,
+          duration: slot.duration || 2,
+          pricePerHour: zone?.pricePerHour || 450
+        });
+      });
+
+      toast({
+        title: "Lagt til i handlekurv",
+        description: `${selectedSlots.length} tidspunkt er lagt til i handlekurven`,
+      });
+
+      // Call the parent's onAddToCart to reset state
+      onAddToCart();
+    } catch (error) {
+      toast({
+        title: "Feil",
+        description: "Kunne ikke legge til i handlekurv. Prøv igjen.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleComplete = () => {
+    if (!isLoggedIn) {
+      // Store current booking state for post-login redirect
+      sessionStorage.setItem('pending_booking', JSON.stringify({
+        selectedSlots,
+        facilityId,
+        facilityName,
+        actorType,
+        bookingType
+      }));
+      
+      toast({
+        title: "Logg inn påkrevd",
+        description: "Du må logge inn for å fullføre reservasjonen",
+      });
+      
+      navigate('/login');
+      return;
+    }
+
+    // User is logged in, proceed with booking completion
+    onComplete();
+  };
 
   return (
     <>
@@ -53,7 +118,6 @@ export function BookingPricingStep({
 
       <CustomerTypeSection value={actorType} onChange={onActorTypeChange} />
 
-      {/* Integrated Price Calculation - positioned prominently after actor type */}
       <IntegratedPriceCalculation 
         selectedSlots={selectedSlots} 
         facilityId={facilityId}
@@ -63,7 +127,7 @@ export function BookingPricingStep({
 
       <div className="flex gap-3">
         <Button 
-          onClick={onAddToCart} 
+          onClick={handleAddToCart} 
           variant="outline"
           className="flex-1 text-lg py-6" 
           size="lg"
@@ -72,7 +136,7 @@ export function BookingPricingStep({
         </Button>
         
         <Button 
-          onClick={onComplete} 
+          onClick={handleComplete} 
           className="flex-1 text-lg py-6" 
           size="lg"
         >

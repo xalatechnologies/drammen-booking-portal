@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { SelectedTimeSlot } from '@/utils/recurrenceEngine';
 import { ActorType, BookingType } from '@/types/pricing';
 import { Zone } from '@/components/booking/types';
-import { useCart } from '@/contexts/CartContext';
 import { BookingActivityStep } from './BookingActivityStep';
 import { BookingPricingStep } from './BookingPricingStep';
 import { BookingDetailsStep } from './BookingDetailsStep';
@@ -23,16 +22,17 @@ interface BookingDrawerContentProps {
   facilityId: string;
   facilityName: string;
   zones?: Zone[];
+  onSlotsCleared?: () => void; // Callback to clear slots in parent
 }
 
 export function BookingDrawerContent({
   selectedSlots,
   facilityId,
   facilityName,
-  zones = []
+  zones = [],
+  onSlotsCleared
 }: BookingDrawerContentProps) {
   const navigate = useNavigate();
-  const { addToCart } = useCart();
   const [step, setStep] = useState<'activity' | 'pricing' | 'details'>('activity');
   const [actorType, setActorType] = useState<ActorType>('private-person');
   const [activityType, setActivityType] = useState<string>('');
@@ -64,28 +64,29 @@ export function BookingDrawerContent({
     return selectedSlots.length > 3 ? 'fastlan' : 'engangs';
   }, [selectedSlots]);
 
+  // Reset form state to initial values
+  const resetFormState = () => {
+    setStep('activity');
+    setActorType('private-person');
+    setActivityType('');
+    setAttendees(1);
+    setPurpose('');
+    setFormData({
+      name: '',
+      email: '',
+      phone: '',
+      organization: '',
+      purpose: '',
+      notes: ''
+    });
+  };
+
   const handleSubmit = () => {
     // Validate that we have selected slots
     if (selectedSlots.length === 0) {
       console.error('No slots selected for booking');
       return;
     }
-
-    // Add selected slots to cart when booking is completed
-    selectedSlots.forEach(slot => {
-      const zone = zones.find(z => z.id === slot.zoneId);
-      addToCart({
-        facilityId,
-        facilityName,
-        zoneId: slot.zoneId,
-        date: slot.date,
-        timeSlot: slot.timeSlot,
-        duration: slot.duration || 2, // Default to 2 hours if not specified
-        pricePerHour: zone?.pricePerHour || 450 // Use zone price or default
-      });
-    });
-
-    console.log('Added slots to cart:', selectedSlots);
 
     // Navigate to booking confirmation
     navigate(`/booking/${facilityId}/confirm`, {
@@ -103,24 +104,15 @@ export function BookingDrawerContent({
   };
 
   const handleAddToCart = () => {
-    // Add selected slots to cart
-    selectedSlots.forEach(slot => {
-      const zone = zones.find(z => z.id === slot.zoneId);
-      addToCart({
-        facilityId,
-        facilityName,
-        zoneId: slot.zoneId,
-        date: slot.date,
-        timeSlot: slot.timeSlot,
-        duration: slot.duration || 2,
-        pricePerHour: zone?.pricePerHour || 450
-      });
-    });
-
-    console.log('Added slots to cart:', selectedSlots);
+    // Reset form state after adding to cart
+    resetFormState();
     
-    // Navigate to cart or show success message
-    navigate('/checkout');
+    // Clear selected slots in parent component if callback provided
+    if (onSlotsCleared) {
+      onSlotsCleared();
+    }
+
+    console.log('Added slots to cart and reset state');
   };
 
   // Show message if no slots are selected
