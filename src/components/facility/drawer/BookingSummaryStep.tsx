@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -10,6 +11,8 @@ import { CustomerTypeSection } from './CustomerTypeSection';
 import { ActivityDetailsForm } from './ActivityDetailsForm';
 import { PurposeForm } from './PurposeForm';
 import { IntegratedPriceCalculation } from '@/components/booking/IntegratedPriceCalculation';
+import { useTranslation } from '@/i18n/hooks/useTranslation';
+
 interface BookingSummaryStepProps {
   selectedSlots: SelectedTimeSlot[];
   facilityName: string;
@@ -24,6 +27,7 @@ interface BookingSummaryStepProps {
   totalPrice: number;
   onContinue: () => void;
 }
+
 export function BookingSummaryStep({
   selectedSlots,
   facilityName,
@@ -35,6 +39,7 @@ export function BookingSummaryStep({
   onPurposeChange,
   onContinue
 }: BookingSummaryStepProps) {
+  const { t } = useTranslation();
   const [activityType, setActivityType] = React.useState<string>('');
   const [attendees, setAttendees] = React.useState<number>(1);
 
@@ -43,24 +48,38 @@ export function BookingSummaryStep({
 
   // Validation
   const isValid = purpose.trim().length > 0 && activityType.length > 0 && attendees > 0;
-  return <>
+  
+  return (
+    <>
       <BookingOverviewCard selectedSlots={selectedSlots} facilityName={facilityName} zones={zones} />
 
       <CustomerTypeSection value={actorType} onChange={onActorTypeChange} />
 
       {/* Integrated Price Calculation - positioned prominently after actor type */}
-      <IntegratedPriceCalculation selectedSlots={selectedSlots} facilityId="1" // TODO: Get from props or context
-    actorType={actorType} bookingType={bookingType} />
+      <IntegratedPriceCalculation 
+        selectedSlots={selectedSlots} 
+        facilityId="1" // TODO: Get from props or context
+        actorType={actorType} 
+        bookingType={bookingType} 
+      />
 
-      {/* Approval Notice */}
-      {requiresApproval}
-
-      <ActivityDetailsForm activityType={activityType} onActivityTypeChange={setActivityType} attendees={attendees} onAttendeesChange={setAttendees} />
+      <ActivityDetailsForm 
+        activityType={activityType} 
+        onActivityTypeChange={setActivityType} 
+        attendees={attendees} 
+        onAttendeesChange={setAttendees} 
+      />
 
       <PurposeForm purpose={purpose} onPurposeChange={onPurposeChange} />
 
-      <Button onClick={onContinue} className="w-full text-lg py-6" size="lg" disabled={!isValid}>
-        {requiresApproval ? 'Send inn til godkjenning' : 'Fortsett til kontaktdetaljer'}
+      <Button 
+        onClick={onContinue} 
+        className="w-full text-lg py-6" 
+        size="lg" 
+        disabled={!isValid}
+      >
+        {requiresApproval ? t('forms.buttons.submitForApproval') : t('forms.buttons.continueToContact')}
       </Button>
-    </>;
+    </>
+  );
 }

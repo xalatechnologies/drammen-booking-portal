@@ -1,6 +1,22 @@
-
 export const facilityTranslations = {
   NO: {
+    labels: {
+      name: "Navn",
+      description: "Beskrivelse",
+      capacity: "Kapasitet",
+      pricePerHour: "Pris per time",
+      location: "Lokasjon",
+      address: "Adresse",
+      openingHours: "Åpningstider",
+      equipment: "Utstyr",
+      amenities: "Fasiliteter",
+      accessibility: "Tilgjengelighet",
+      suitableFor: "Egnet for",
+      area: "Areal",
+      zones: "Soner",
+      availability: "Tilgjengelighet",
+      bookingRules: "Booking regler"
+    },
     types: {
       "Gymsal": "Gymsal",
       "Idrettshall": "Idrettshall",
@@ -57,6 +73,23 @@ export const facilityTranslations = {
     }
   },
   EN: {
+    labels: {
+      name: "Name",
+      description: "Description",
+      capacity: "Capacity",
+      pricePerHour: "Price per hour",
+      location: "Location",
+      address: "Address",
+      openingHours: "Opening hours",
+      equipment: "Equipment",
+      amenities: "Amenities",
+      accessibility: "Accessibility",
+      suitableFor: "Suitable for",
+      area: "Area",
+      zones: "Zones",
+      availability: "Availability",
+      bookingRules: "Booking rules"
+    },
     types: {
       "Gymsal": "Gymnasium",
       "Idrettshall": "Sports Hall",

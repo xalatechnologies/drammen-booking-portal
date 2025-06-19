@@ -2,82 +2,108 @@
 export const formsTranslations = {
   NO: {
     labels: {
-      fullName: "Fullt navn",
-      email: "E-postadresse",
-      phone: "Telefonnummer",
-      organization: "Organisasjon/Firma",
-      purpose: "Formål med booking",
-      notes: "Tilleggsinformasjon",
-      contactDetails: "Kontaktdetaljer",
-      bookingDetails: "Bookingdetaljer",
-      cardName: "Navn på kort",
-      cardNumber: "Kortnummer",
-      expiryDate: "Utløpsdato",
-      cvv: "CVV",
-      monthYear: "Måned/År"
-    },
-    placeholders: {
-      enterFullName: "Skriv inn ditt fulle navn",
-      emailExample: "din.epost@eksempel.no",
-      phoneExample: "99 99 99 99",
-      organizationOptional: "Organisasjonsnavn (valgfritt)",
-      purposeExample: "F.eks. fotballtrening, arrangement",
-      additionalInfo: "Eventuelle spesielle behov eller kommentarer",
-      asOnCard: "Som det står på kortet",
-      cardNumberExample: "1234 5678 9012 3456",
-      expiryExample: "MM/ÅÅ",
-      cvvExample: "123"
+      name: "Navn",
+      email: "E-post",
+      phone: "Telefon",
+      organization: "Organisasjon",
+      purpose: "Formål med bookingen",
+      notes: "Merknader",
+      activityType: "Type aktivitet",
+      attendees: "Antall personer",
+      actorType: "Aktørtype",
+      contactPerson: "Kontaktperson",
+      additionalInfo: "Tilleggsinformasjon"
     },
     descriptions: {
-      emailConfirmation: "Vi sender bekreftelse og viktige oppdateringer til denne adressen",
-      phoneNotifications: "Brukes for viktige varsler om din reservasjon",
-      organizationOptional: "Legg til hvis du representerer en organisasjon eller firma",
-      cardNameHelp: "Skriv inn navnet akkurat som det står på kortet ditt",
-      cardNumberHelp: "16-sifret nummer på forsiden av kortet",
-      expiryHelp: "Måned/År",
-      cvvHelp: "3-4 siffer på baksiden"
+      contactInfo: "Denne informasjonen brukes for bekreftelser og viktige oppdateringer om din reservasjon. Alle felt merket med stjerne (*) er obligatoriske og må fylles ut.",
+      activityType: "Velg hvilken type aktivitet som skal gjennomføres",
+      actorType: "Velg hvilken type aktør du representerer. Dette påvirker pris og godkjenningsprosess.",
+      approvalProcess: "Denne bookingen krever godkjenning fra kommunen på grunn av aktørtype eller spesielle betingelser. Du vil motta en bekreftelse når bookingen er behandlet."
     },
-    required: "påkrevd",
-    optional: "valgfritt"
+    placeholders: {
+      name: "Skriv inn ditt fulle navn",
+      email: "din@epost.no",
+      phone: "Telefonnummer",
+      organization: "Organisasjonsnavn (valgfritt)",
+      purpose: "Beskriv kort hva lokalet skal brukes til...",
+      notes: "Eventuelle spesielle ønsker eller merknader...",
+      selectActivityType: "Velg aktivitetstype",
+      attendees: "Antall deltakere",
+      selectActorType: "Velg aktørtype"
+    },
+    buttons: {
+      submit: "Send inn",
+      cancel: "Avbryt",
+      back: "Tilbake",
+      continue: "Fortsett",
+      save: "Lagre",
+      submitForApproval: "Send inn til godkjenning",
+      continueToContact: "Fortsett til kontaktdetaljer"
+    },
+    messages: {
+      required: "Dette feltet er påkrevd",
+      requiresApproval: "Krever godkjenning",
+      success: "Skjema sendt inn",
+      error: "Noe gikk galt"
+    },
+    headings: {
+      contactInformation: "Kontaktinformasjon",
+      bookingDetails: "Booking detaljer",
+      activityDetails: "Aktivitetsdetaljer",
+      additionalServices: "Tilleggstjenester"
+    }
   },
   EN: {
     labels: {
-      fullName: "Full name",
-      email: "Email address",
-      phone: "Phone number",
-      organization: "Organization/Company",
-      purpose: "Booking purpose",
-      notes: "Additional information",
-      contactDetails: "Contact details",
-      bookingDetails: "Booking details",
-      cardName: "Name on card",
-      cardNumber: "Card number",
-      expiryDate: "Expiry date",
-      cvv: "CVV",
-      monthYear: "Month/Year"
-    },
-    placeholders: {
-      enterFullName: "Enter your full name",
-      emailExample: "your.email@example.com",
-      phoneExample: "99 99 99 99",
-      organizationOptional: "Organization name (optional)",
-      purposeExample: "E.g. football training, event",
-      additionalInfo: "Any special needs or comments",
-      asOnCard: "As it appears on card",
-      cardNumberExample: "1234 5678 9012 3456",
-      expiryExample: "MM/YY",
-      cvvExample: "123"
+      name: "Name",
+      email: "Email",
+      phone: "Phone",
+      organization: "Organization",
+      purpose: "Purpose of booking",
+      notes: "Notes",
+      activityType: "Activity type",
+      attendees: "Number of people",
+      actorType: "Actor type",
+      contactPerson: "Contact person",
+      additionalInfo: "Additional information"
     },
     descriptions: {
-      emailConfirmation: "We send confirmations and important updates to this address",
-      phoneNotifications: "Used for important alerts about your reservation",
-      organizationOptional: "Add if you represent an organization or company",
-      cardNameHelp: "Enter the name exactly as it appears on your card",
-      cardNumberHelp: "16-digit number on the front of your card",
-      expiryHelp: "Month/Year",
-      cvvHelp: "3-4 digits on the back"
+      contactInfo: "This information is used for confirmations and important updates about your reservation. All fields marked with an asterisk (*) are required and must be filled out.",
+      activityType: "Select what type of activity will be conducted",
+      actorType: "Select which type of actor you represent. This affects pricing and approval process.",
+      approvalProcess: "This booking requires approval from the municipality due to actor type or special conditions. You will receive a confirmation when the booking has been processed."
     },
-    required: "required",
-    optional: "optional"
+    placeholders: {
+      name: "Enter your full name",
+      email: "your@email.com",
+      phone: "Phone number",
+      organization: "Organization name (optional)",
+      purpose: "Briefly describe what the facility will be used for...",
+      notes: "Any special requests or notes...",
+      selectActivityType: "Select activity type",
+      attendees: "Number of participants",
+      selectActorType: "Select actor type"
+    },
+    buttons: {
+      submit: "Submit",
+      cancel: "Cancel",
+      back: "Back",
+      continue: "Continue",
+      save: "Save",
+      submitForApproval: "Submit for approval",
+      continueToContact: "Continue to contact details"
+    },
+    messages: {
+      required: "This field is required",
+      requiresApproval: "Requires approval",
+      success: "Form submitted",
+      error: "Something went wrong"
+    },
+    headings: {
+      contactInformation: "Contact information",
+      bookingDetails: "Booking details",
+      activityDetails: "Activity details",
+      additionalServices: "Additional services"
+    }
   }
 };

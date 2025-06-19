@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { ActorType } from '@/types/pricing';
 import { EnumSelect } from '@/components/common/EnumSelect';
+import { useTranslation } from '@/i18n/hooks/useTranslation';
 
 interface CustomerTypeSectionProps {
   value: ActorType;
@@ -12,6 +13,8 @@ interface CustomerTypeSectionProps {
 }
 
 export function CustomerTypeSection({ value, onChange }: CustomerTypeSectionProps) {
+  const { t } = useTranslation();
+  
   // Check if booking requires approval
   const requiresApproval = ['lag-foreninger', 'paraply'].includes(value);
 
@@ -21,9 +24,9 @@ export function CustomerTypeSection({ value, onChange }: CustomerTypeSectionProp
         enumType="ActorType"
         value={value}
         onValueChange={(newValue) => onChange(newValue as ActorType)}
-        label="Aktørtype"
-        description="Velg hvilken type aktør du representerer. Dette påvirker pris og godkjenningsprosess."
-        placeholder="Velg aktørtype"
+        label={t('forms.labels.actorType')}
+        description={t('forms.descriptions.actorType')}
+        placeholder={t('forms.placeholders.selectActorType')}
         required
         showDescription={true}
       />
@@ -32,10 +35,9 @@ export function CustomerTypeSection({ value, onChange }: CustomerTypeSectionProp
         <Alert className="border-amber-200 bg-amber-50">
           <AlertTriangle className="h-4 w-4 text-amber-600" />
           <AlertDescription className="text-amber-800">
-            <div className="font-medium mb-1">Krever godkjenning</div>
+            <div className="font-medium mb-1">{t('forms.messages.requiresApproval')}</div>
             <div className="text-sm">
-              Denne bookingen krever godkjenning fra kommunen på grunn av aktørtype eller spesielle betingelser. 
-              Du vil motta en bekreftelse når bookingen er behandlet.
+              {t('forms.descriptions.approvalProcess')}
             </div>
           </AlertDescription>
         </Alert>
