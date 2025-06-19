@@ -15,6 +15,23 @@ export class LocalizedFacilityRepository extends BaseRepository<Facility> {
     this.currentLanguage = language;
   }
 
+  // Implement required abstract methods
+  protected getId(item: Facility): string {
+    return item.id.toString();
+  }
+
+  protected applyFilters(items: Facility[], filters: any): Facility[] {
+    return items; // Filtering is handled in findAll method
+  }
+
+  protected createEntity(data: Partial<Facility>): Facility {
+    throw new Error("Create operation not implemented for mock data");
+  }
+
+  protected updateEntity(existing: Facility, updates: Partial<Facility>): Facility {
+    return { ...existing, ...updates };
+  }
+
   async findAll(
     pagination: { page: number; limit: number },
     filters?: FacilityFilters,
@@ -29,8 +46,8 @@ export class LocalizedFacilityRepository extends BaseRepository<Facility> {
 
       // Apply filters
       if (filters) {
-        if (filters.search) {
-          const searchLower = filters.search.toLowerCase();
+        if (filters.searchTerm) {
+          const searchLower = filters.searchTerm.toLowerCase();
           facilities = facilities.filter(facility =>
             facility.name.toLowerCase().includes(searchLower) ||
             facility.address.toLowerCase().includes(searchLower) ||
@@ -38,57 +55,37 @@ export class LocalizedFacilityRepository extends BaseRepository<Facility> {
           );
         }
 
-        if (filters.type && filters.type.length > 0) {
+        if (filters.facilityType) {
           facilities = facilities.filter(facility =>
-            filters.type!.includes(facility.type)
+            facility.type === filters.facilityType
           );
         }
 
-        if (filters.area && filters.area.length > 0) {
+        if (filters.location) {
           facilities = facilities.filter(facility =>
-            filters.area!.includes(facility.area)
+            facility.area === filters.location
           );
         }
 
-        if (filters.capacity) {
-          if (filters.capacity.min !== undefined) {
-            facilities = facilities.filter(facility => facility.capacity >= filters.capacity!.min!);
-          }
-          if (filters.capacity.max !== undefined) {
-            facilities = facilities.filter(facility => facility.capacity <= filters.capacity!.max!);
-          }
-        }
-
-        if (filters.equipment && filters.equipment.length > 0) {
-          facilities = facilities.filter(facility =>
-            filters.equipment!.some(eq => facility.equipment.includes(eq))
+        if (filters.capacity && Array.isArray(filters.capacity) && filters.capacity.length === 2) {
+          const [min, max] = filters.capacity;
+          facilities = facilities.filter(facility => 
+            facility.capacity >= min && facility.capacity <= max
           );
         }
 
-        if (filters.accessibility && filters.accessibility.length > 0) {
+        if (filters.amenities && filters.amenities.length > 0) {
           facilities = facilities.filter(facility =>
-            filters.accessibility!.every(acc => facility.accessibility.includes(acc))
+            filters.amenities!.some(amenity => 
+              facility.equipment?.includes(amenity) || facility.amenities?.includes(amenity)
+            )
           );
         }
 
-        if (filters.suitableFor && filters.suitableFor.length > 0) {
+        if (filters.accessibility) {
           facilities = facilities.filter(facility =>
-            filters.suitableFor!.some(sf => facility.suitableFor.includes(sf))
+            facility.accessibility.includes(filters.accessibility!)
           );
-        }
-
-        if (filters.availability) {
-          const { date, startTime, endTime } = filters.availability;
-          if (date && startTime && endTime) {
-            facilities = facilities.filter(facility => {
-              const availableTimes = facility.availableTimes?.find(at => 
-                at.date.toDateString() === date.toDateString()
-              );
-              return availableTimes?.slots.some(slot => 
-                slot.available && slot.start >= startTime && slot.end <= endTime
-              );
-            });
-          }
         }
       }
 
@@ -289,7 +286,7 @@ export class LocalizedFacilityRepository extends BaseRepository<Facility> {
     throw new Error("Update operation not implemented for mock data");
   }
 
-  async delete(id: string): Promise<ApiResponse<void>> {
+  async delete(id: string): Promise<ApiResponse<boolean>> {
     throw new Error("Delete operation not implemented for mock data");
   }
 }
