@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -7,9 +8,9 @@ import GlobalFooter from "@/components/GlobalFooter";
 import { AirBnbStyleGallery } from "@/components/facility/AirBnbStyleGallery";
 import { FacilityHeader } from "@/components/facility/FacilityHeader";
 import { FacilityInfoTabs } from "@/components/facility/FacilityInfoTabs";
-import { PersistentBookingSidebar } from "@/components/facility/PersistentBookingSidebar";
-import { SimilarFacilitiesSlider } from "@/components/facility/SimilarFacilitiesSlider";
+import { FacilityContactInfo } from "@/components/facility/FacilityContactInfo";
 import { AvailabilityTab } from "@/components/facility/tabs/AvailabilityTab";
+import { SimilarFacilitiesSlider } from "@/components/facility/SimilarFacilitiesSlider";
 import { Zone } from "@/components/booking/types";
 import { useOptimizedFacility } from "@/hooks/useOptimizedFacility";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -187,7 +188,7 @@ const FacilityDetail = () => {
             </div>
 
             {/* Main Content Layout - 70% / 30% */}
-            <div className="grid grid-cols-1 lg:grid-cols-10 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-10 gap-8 mb-12">
               {/* Left Column - Tabs Content (70%) */}
               <div className="lg:col-span-7 space-y-6">
                 <FacilityInfoTabs 
@@ -204,14 +205,34 @@ const FacilityDetail = () => {
                 />
               </div>
 
-              {/* Right Column - Simplified Cart Sidebar (30%) */}
+              {/* Right Column - Contact Info Sidebar (30%) */}
               <div className="lg:col-span-3 hidden lg:block">
                 <div className="sticky top-6">
-                  <PersistentBookingSidebar
+                  <FacilityContactInfo
                     facilityName={facility.name}
-                    facilityId={id || ""}
+                    address={facility.address}
+                    openingHours={facility.openingHours}
+                    capacity={facility.capacity}
+                    area={facility.area}
                   />
                 </div>
+              </div>
+            </div>
+
+            {/* Full Width Calendar Section */}
+            <div className="w-full mb-12">
+              <div className="bg-white rounded-lg shadow-sm border p-6">
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">
+                  Tilgjengelighet og booking
+                </h2>
+                <AvailabilityTab 
+                  zones={zones} 
+                  startDate={new Date()} 
+                  showLegend={true}
+                  facilityId={id}
+                  facilityName={facility.name}
+                  openingHours={facility.openingHours}
+                />
               </div>
             </div>
 
