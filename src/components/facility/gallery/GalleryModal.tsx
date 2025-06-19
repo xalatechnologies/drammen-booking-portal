@@ -58,7 +58,7 @@ export function GalleryModal({
         <img
           src={images[activeImageIndex]}
           alt={`${facilityName} - Image ${activeImageIndex + 1}`}
-          className="max-w-full max-h-full object-contain rounded-2xl shadow-2xl transition-all duration-500"
+          className="max-w-full max-h-full object-contain object-center rounded-2xl shadow-2xl transition-all duration-500"
         />
         
         {/* Navigation in modal - only show if more than 1 image */}

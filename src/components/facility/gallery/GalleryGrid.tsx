@@ -16,7 +16,7 @@ export function GalleryGrid({ images, facilityName, onImageClick, onShowAllClick
       <img 
         src={images[0]} 
         alt={`${facilityName} - Main view`}
-        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+        className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
       />
       
       {/* Gradient overlay for better contrast */}
