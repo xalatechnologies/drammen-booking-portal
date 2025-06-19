@@ -6,7 +6,6 @@ import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/comp
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { BookingFormValues, Zone } from "../types";
 import { EnhancedZoneSelector } from "../EnhancedZoneSelector";
@@ -16,6 +15,7 @@ import { PriceBreakdown } from "../PriceBreakdown";
 import { usePriceCalculation } from "@/hooks/usePriceCalculation";
 import { ActorType } from "@/types/pricing";
 import { CustomerTypeSection } from "./CustomerTypeSection";
+import { EnumSelect } from "@/components/common/EnumSelect";
 
 export interface BookingDetailsStepProps {
   form: UseFormReturn<BookingFormValues>;
@@ -76,18 +76,13 @@ export function BookingDetailsStep({ form, facility }: BookingDetailsStepProps) 
                 Type arrangement
               </FormLabel>
               <FormControl>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <SelectTrigger className="h-11 border-gray-300 focus:border-slate-700">
-                    <SelectValue placeholder="Velg type arrangement" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="training">Trening/Øvelse</SelectItem>
-                    <SelectItem value="competition">Konkurranse/Turnering</SelectItem>
-                    <SelectItem value="meeting">Møte/Kurs</SelectItem>
-                    <SelectItem value="celebration">Fest/Feiring</SelectItem>
-                    <SelectItem value="other">Annet</SelectItem>
-                  </SelectContent>
-                </Select>
+                <EnumSelect
+                  enumType="EventType"
+                  value={field.value}
+                  onValueChange={field.onChange}
+                  placeholder="Velg type arrangement"
+                  showDescription={false}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -104,18 +99,13 @@ export function BookingDetailsStep({ form, facility }: BookingDetailsStepProps) 
                 Aldersgruppe
               </FormLabel>
               <FormControl>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <SelectTrigger className="h-11 border-gray-300 focus:border-slate-700">
-                    <SelectValue placeholder="Velg aldersgruppe" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="mixed">Blandet alder</SelectItem>
-                    <SelectItem value="children">Barn (under 12 år)</SelectItem>
-                    <SelectItem value="under-20">Ungdom (under 20 år)</SelectItem>
-                    <SelectItem value="over-20">Voksne (over 20 år)</SelectItem>
-                    <SelectItem value="adults">Voksne (over 67 år)</SelectItem>
-                  </SelectContent>
-                </Select>
+                <EnumSelect
+                  enumType="AgeGroup"
+                  value={field.value}
+                  onValueChange={field.onChange}
+                  placeholder="Velg aldersgruppe"
+                  showDescription={false}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
