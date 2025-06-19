@@ -22,6 +22,14 @@ export function IntegratedPriceCalculation({
   // Calculate pricing for the first slot as a representative sample
   const firstSlot = selectedSlots[0];
   
+  console.log('IntegratedPriceCalculation - Input:', {
+    selectedSlotsCount: selectedSlots.length,
+    facilityId,
+    actorType,
+    bookingType,
+    firstSlot
+  });
+
   const { calculation, isLoading } = usePriceCalculation({
     facilityId,
     zoneId: firstSlot?.zoneId,
@@ -31,11 +39,21 @@ export function IntegratedPriceCalculation({
     bookingMode: bookingType === 'fastlan' ? 'recurring' : 'one-time'
   });
 
+  console.log('IntegratedPriceCalculation - Calculation result:', calculation);
+
   // Calculate total price for all slots
   const totalPrice = calculation ? calculation.finalPrice * selectedSlots.length : 0;
 
   if (!firstSlot) {
-    return null;
+    return (
+      <div className="border-2 border-gray-200 bg-gray-50 rounded-xl p-4">
+        <div className="flex items-center gap-2 text-gray-600 mb-2">
+          <Calculator className="h-5 w-5" />
+          <h3 className="text-lg font-semibold">Prisberegning</h3>
+        </div>
+        <p className="text-sm text-gray-600">Velg tidspunkt for å se pris</p>
+      </div>
+    );
   }
 
   return (
@@ -45,7 +63,7 @@ export function IntegratedPriceCalculation({
         <h3 className="text-lg font-semibold">Prisberegning</h3>
       </div>
       
-      {calculation && (
+      {calculation ? (
         <>
           <PriceBreakdown 
             calculation={calculation}
@@ -66,6 +84,11 @@ export function IntegratedPriceCalculation({
             </div>
           )}
         </>
+      ) : (
+        <div className="flex items-center gap-2 text-blue-600">
+          <Calculator className="h-5 w-5 animate-spin" />
+          <span>Beregner pris...</span>
+        </div>
       )}
     </div>
   );
