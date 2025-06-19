@@ -9,7 +9,10 @@ import {
   Building,
   ClipboardList,
   Languages,
-  ChevronRight
+  ChevronRight,
+  Calendar,
+  MessageSquare,
+  Shield
 } from "lucide-react";
 import {
   Sidebar,
@@ -23,6 +26,9 @@ import {
   SidebarFooter,
 } from "@/components/ui/sidebar";
 
+// Mock for innlogget bruker
+const currentUser = { name: "Admin Bruker", role: "systemadmin" }; // Bytt til 'systemadmin' eller 'superadmin' for full tilgang
+
 const AdminSidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -31,7 +37,6 @@ const AdminSidebar = () => {
   const overviewItems = [
     {
       title: "Dashboard",
-      icon: LayoutDashboard,
       path: "/admin",
     },
   ];
@@ -39,17 +44,22 @@ const AdminSidebar = () => {
   const bookingItems = [
     {
       title: "Lokaler",
-      icon: Building,
       path: "/admin/facilities",
     },
     {
+      title: "Bookingoversikt",
+      path: "/admin/bookings-overview",
+    },
+    {
+      title: "Eksterne kalendere",
+      path: "/admin/external-calendars",
+    },
+    {
       title: "Godkjenningsprosesser",
-      icon: Activity,
       path: "/admin/approvals",
     },
     {
       title: "Forespørsler",
-      icon: ClipboardList,
       path: "/admin/requests",
     },
   ];
@@ -57,37 +67,79 @@ const AdminSidebar = () => {
   const managementItems = [
     {
       title: "Brukere & Roller",
-      icon: Users,
       path: "/admin/users",
     },
     {
       title: "Rapporter & Analytikk",
-      icon: BarChart3,
       path: "/admin/reports",
     },
     {
+      title: "Support",
+      path: "/admin/support-tickets",
+    },
+    {
+      title: "SLA Konfigurasjon",
+      path: "/admin/sla-config",
+    },
+    {
       title: "Varsler",
-      icon: Bell,
       path: "/admin/notifications",
     },
     {
-      title: "Roller",
-      icon: Users,
-      path: "/admin/roles",
+      title: "Meldingsmaler",
+      path: "/admin/message-templates",
     },
     {
-      title: "Tildel roller",
-      icon: Users,
-      path: "/admin/role-assignments",
+      title: "Systemkonfigurasjon",
+      path: "/admin/system-config",
     },
+    ...( ["systemadmin", "superadmin"].includes(currentUser.role) ? [
+      {
+        title: "Roller",
+        path: "/admin/roles",
+      },
+      {
+        title: "Tildel roller",
+        path: "/admin/role-assignments",
+      },
+    ] : [] ),
   ];
 
   const systemItems = [
     {
-      title: "Oversettelser",
-      icon: Languages,
-      path: "/admin/translations",
+      title: "Autentisering",
+      path: "/admin/auth-providers",
     },
+    {
+      title: "Exchange-integrasjon",
+      path: "/admin/exchange-integration",
+    },
+    {
+      title: "Integrasjoner",
+      path: "/admin/integrations",
+    },
+    {
+      title: "Låssystemer",
+      path: "/admin/lock-config",
+    },
+    ...( ["systemadmin", "superadmin"].includes(currentUser.role) ? [
+      {
+        title: "Revisjonslogger",
+        path: "/admin/audit-logs",
+      },
+      {
+        title: "Datalagring & anonymisering",
+        path: "/admin/data-retention",
+      },
+      {
+        title: "Azure & Deploy",
+        path: "/admin/azure-deploy",
+      },
+      {
+        title: "Overvåkning",
+        path: "/admin/monitoring",
+      },
+    ] : [] ),
   ];
 
   const isActive = (path: string) => {
@@ -120,18 +172,7 @@ const AdminSidebar = () => {
                   group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-2
                 `}
               >
-                <div className="flex items-center gap-4 group-data-[collapsible=icon]:gap-0">
-                  <div className={`
-                    relative p-2.5 rounded-xl transition-all duration-300 transform
-                    ${isActive(item.path) 
-                      ? 'bg-blue-200/60 text-blue-700 shadow-inner' 
-                      : 'bg-slate-100 text-slate-600 group-hover:bg-slate-200 group-hover:scale-105'
-                    }
-                  `}>
-                    <item.icon className="h-[18px] w-[18px]" strokeWidth={2.2} />
-                  </div>
-                  <span className="truncate font-medium leading-5 group-data-[collapsible=icon]:hidden">{item.title}</span>
-                </div>
+                <span className="truncate font-medium leading-5 group-data-[collapsible=icon]:hidden">{item.title}</span>
                 <ChevronRight className={`
                   h-4 w-4 transition-all duration-300 transform group-data-[collapsible=icon]:hidden
                   ${isActive(item.path) 
@@ -159,23 +200,6 @@ const AdminSidebar = () => {
         {renderMenuGroup(managementItems, "ADMINISTRASJON")}
         {renderMenuGroup(systemItems, "SYSTEM")}
       </SidebarContent>
-
-      <SidebarFooter className="p-10 border-t border-slate-100 bg-gradient-to-t from-slate-50/50 to-white group-data-[collapsible=icon]:p-2">
-        <div className="flex items-center gap-5 p-6 rounded-2xl bg-white border border-slate-200/60 shadow-lg shadow-slate-200/20 hover:shadow-xl hover:shadow-slate-200/30 transition-all duration-300 group-data-[collapsible=icon]:p-2 group-data-[collapsible=icon]:justify-center">
-          <div className="flex items-center gap-4 group-data-[collapsible=icon]:gap-0">
-            <div className="relative">
-              <div className="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse"></div>
-              <div className="absolute inset-0 w-2.5 h-2.5 bg-emerald-400 rounded-full animate-ping opacity-30"></div>
-            </div>
-            <span className="text-[16px] font-semibold text-slate-800 leading-5 group-data-[collapsible=icon]:hidden">System Status</span>
-          </div>
-          <div className="ml-auto group-data-[collapsible=icon]:hidden">
-            <span className="text-[14px] text-emerald-700 font-bold bg-emerald-50 px-4 py-2 rounded-full border border-emerald-200/50 shadow-sm">
-              Operative
-            </span>
-          </div>
-        </div>
-      </SidebarFooter>
     </Sidebar>
   );
 };

@@ -33,8 +33,14 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Filter, Plus, Search, MoreHorizontal, MapPin, Clock } from "lucide-react";
+import { Filter, Plus, Search, MoreHorizontal, MapPin, Clock, Wrench, CalendarX, Users } from "lucide-react";
 import {
   Pagination,
   PaginationContent,
@@ -43,6 +49,8 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import ZoneManagement from "@/components/admin/ZoneManagement";
+import { Zone, ConflictRule } from "@/types/facility";
 
 // Define facility type
 interface OpeningHours {
@@ -65,6 +73,7 @@ interface Facility {
   openingHours: OpeningHours[];
   bookingInterval: string; // '15', '30', 'daily'
   season: { from: string; to: string };
+  zones?: Zone[];
 }
 
 const WEEKDAYS = [
@@ -194,6 +203,47 @@ const FacilityManagementPage = () => {
   const [editSeason, setEditSeason] = useState<{ from: string; to: string }>({ from: "", to: "" });
   const [modalOpen, setModalOpen] = useState(false);
   const [rulesModalOpen, setRulesModalOpen] = useState(false);
+  const [editingZonesFacility, setEditingZonesFacility] = useState<Facility | null>(null);
+  const [zoneModalOpen, setZoneModalOpen] = useState(false);
+  const [blockModalOpen, setBlockModalOpen] = useState(false);
+  const [blockFacility, setBlockFacility] = useState<Facility | null>(null);
+  const [blockType, setBlockType] = useState("maintenance");
+  const [blockFrom, setBlockFrom] = useState("");
+  const [blockTo, setBlockTo] = useState("");
+  const [blockReason, setBlockReason] = useState("");
+  const [blockNotify, setBlockNotify] = useState(true);
+  const [blockOverride, setBlockOverride] = useState(false);
+  const [blockedPeriods, setBlockedPeriods] = useState<{facilityId: number, type: string, from: string, to: string, reason: string}[]>([
+    { facilityId: 1, type: "maintenance", from: "2025-07-01T08:00", to: "2025-07-01T16:00", reason: "Årlig vedlikehold" },
+    { facilityId: 2, type: "internal", from: "2025-07-03T10:00", to: "2025-07-03T12:00", reason: "Kommunalt arrangement" },
+  ]);
+  const [rammetidModalOpen, setRammetidModalOpen] = useState(false);
+  const [rammetidFacility, setRammetidFacility] = useState<Facility | null>(null);
+  const [rammetidOrg, setRammetidOrg] = useState("");
+  const [rammetidWeekday, setRammetidWeekday] = useState("Mandag");
+  const [rammetidFrom, setRammetidFrom] = useState("");
+  const [rammetidTo, setRammetidTo] = useState("");
+  const [rammetidPeriodFrom, setRammetidPeriodFrom] = useState("");
+  const [rammetidPeriodTo, setRammetidPeriodTo] = useState("");
+  const [rammetidDelegation, setRammetidDelegation] = useState(false);
+  const [rammetidAllocations, setRammetidAllocations] = useState<{
+    facilityId: number,
+    org: string,
+    weekday: string,
+    from: string,
+    to: string,
+    periodFrom: string,
+    periodTo: string,
+    delegation?: boolean
+  }[]>([
+    { facilityId: 1, org: "Drammen IF", weekday: "Mandag", from: "16:00", to: "18:00", periodFrom: "2025-08-01", periodTo: "2025-12-31", delegation: true },
+    { facilityId: 1, org: "Åssiden FK", weekday: "Mandag", from: "17:00", to: "19:00", periodFrom: "2025-08-01", periodTo: "2025-12-31", delegation: false },
+  ]);
+  
+  // Mock paraplyorganisasjoner
+  const umbrellaOrgs = [
+    "Drammen IF", "Åssiden FK", "Fjell IL", "Strømsgodset IF"
+  ];
   
   // Filter facilities based on search query and active filter
   const filteredFacilities = facilities.filter((facility) => {
@@ -216,6 +266,181 @@ const FacilityManagementPage = () => {
     maintenance: facilities.filter(f => f.status === "maintenance").length,
     inactive: facilities.filter(f => f.status === "inactive").length,
   };
+
+  // Zone management handlers
+  const handleZoneCreate = (facilityId: string, zone: Omit<Zone, 'id'>) => {
+    // In a real app, this would make an API call
+    const newZone = {
+      ...zone,
+      id: Math.random().toString(36).substr(2, 9), // Temporary ID generation
+    };
+    
+    setFacilities(facilities.map(f => {
+      if (f.id === parseInt(facilityId)) {
+        return {
+          ...f,
+          zones: [...(f.zones || []), newZone],
+        };
+      }
+      return f;
+    }));
+  };
+
+  const handleZoneUpdate = (facilityId: string, zone: Zone) => {
+    setFacilities(facilities.map(f => {
+      if (f.id === parseInt(facilityId)) {
+        return {
+          ...f,
+          zones: (f.zones || []).map(z => z.id === zone.id ? zone : z),
+        };
+      }
+      return f;
+    }));
+  };
+
+  const handleZoneDelete = (facilityId: string, zoneId: string) => {
+    setFacilities(facilities.map(f => {
+      if (f.id === parseInt(facilityId)) {
+        return {
+          ...f,
+          zones: (f.zones || []).filter(z => z.id !== zoneId),
+        };
+      }
+      return f;
+    }));
+  };
+
+  const handleConflictRuleCreate = (facilityId: string, rule: Omit<ConflictRule, 'id'>) => {
+    const newRule = {
+      ...rule,
+      id: Math.random().toString(36).substr(2, 9), // Temporary ID generation
+    };
+
+    setFacilities(facilities.map(f => {
+      if (f.id === parseInt(facilityId)) {
+        return {
+          ...f,
+          zones: (f.zones || []).map(z => {
+            if (z.id === rule.zoneId) {
+              return {
+                ...z,
+                conflictRules: [...z.conflictRules, newRule],
+              };
+            }
+            return z;
+          }),
+        };
+      }
+      return f;
+    }));
+  };
+
+  const handleConflictRuleDelete = (facilityId: string, ruleId: string) => {
+    setFacilities(facilities.map(f => {
+      if (f.id === parseInt(facilityId)) {
+        return {
+          ...f,
+          zones: (f.zones || []).map(z => ({
+            ...z,
+            conflictRules: z.conflictRules.filter(r => r.id !== ruleId),
+          })),
+        };
+      }
+      return f;
+    }));
+  };
+
+  // Update the dropdown menu items to include zone management
+  const dropdownMenuItems = (facility: Facility) => (
+    <DropdownMenuContent 
+      align="end" 
+      className="w-52 shadow-lg border-gray-300"
+      role="menu"
+      aria-label="Handlingsmeny"
+    >
+      <DropdownMenuItem 
+        className="py-3 text-base cursor-pointer focus:bg-gray-100"
+        role="menuitem"
+      >
+        Se detaljer
+      </DropdownMenuItem>
+      <DropdownMenuItem 
+        className="py-3 text-base cursor-pointer focus:bg-gray-100"
+        role="menuitem"
+        onClick={() => {
+          setEditFacility(facility);
+          setEditBookingTypes(facility.allowedBookingTypes);
+          setModalOpen(true);
+        }}
+      >
+        Rediger bookingtyper
+      </DropdownMenuItem>
+      <DropdownMenuItem 
+        className="py-3 text-base cursor-pointer focus:bg-gray-100"
+        role="menuitem"
+      >
+        Endre status
+      </DropdownMenuItem>
+      <DropdownMenuItem 
+        className="py-3 text-base cursor-pointer focus:bg-gray-100"
+        role="menuitem"
+        onClick={() => {
+          setEditRulesFacility(facility);
+          setEditOpeningHours(facility.openingHours);
+          setEditBookingInterval(facility.bookingInterval);
+          setEditSeason(facility.season);
+          setRulesModalOpen(true);
+        }}
+      >
+        Rediger åpningstider/bookingregler
+      </DropdownMenuItem>
+      <DropdownMenuItem 
+        className="py-3 text-base cursor-pointer focus:bg-gray-100"
+        role="menuitem"
+        onClick={() => {
+          setEditingZonesFacility(facility);
+          setZoneModalOpen(true);
+        }}
+      >
+        Administrer soner
+      </DropdownMenuItem>
+      <DropdownMenuItem 
+        className="py-3 text-base cursor-pointer focus:bg-gray-100 flex items-center gap-2"
+        role="menuitem"
+        onClick={() => {
+          setBlockFacility(facility);
+          setBlockType("maintenance");
+          setBlockFrom("");
+          setBlockTo("");
+          setBlockReason("");
+          setBlockNotify(true);
+          setBlockOverride(false);
+          setBlockModalOpen(true);
+        }}
+      >
+        <CalendarX className="h-5 w-5 text-amber-600" />
+        Blokker tid for vedlikehold/internt
+      </DropdownMenuItem>
+      <DropdownMenuItem 
+        className="py-3 text-base cursor-pointer focus:bg-gray-100 flex items-center gap-2"
+        role="menuitem"
+        onClick={() => {
+          setRammetidFacility(facility);
+          setRammetidOrg("");
+          setRammetidWeekday("Mandag");
+          setRammetidFrom("");
+          setRammetidTo("");
+          setRammetidPeriodFrom("");
+          setRammetidPeriodTo("");
+          setRammetidDelegation(false);
+          setRammetidModalOpen(true);
+        }}
+      >
+        <Users className="h-5 w-5 text-blue-600" />
+        Tildel rammetid (paraply)
+      </DropdownMenuItem>
+    </DropdownMenuContent>
+  );
 
   return (
     <div className="space-y-8 max-w-full" role="main" aria-labelledby="page-title">
@@ -560,55 +785,7 @@ const FacilityManagementPage = () => {
                                   <MoreHorizontal className="h-5 w-5" aria-hidden="true" />
                                 </Button>
                               </DropdownMenuTrigger>
-                              <DropdownMenuContent 
-                                align="end" 
-                                className="w-52 shadow-lg border-gray-300"
-                                role="menu"
-                                aria-label="Handlingsmeny"
-                              >
-                                <DropdownMenuItem 
-                                  className="py-3 text-base cursor-pointer focus:bg-gray-100"
-                                  role="menuitem"
-                                >
-                                  Se detaljer
-                                </DropdownMenuItem>
-                                <DropdownMenuItem 
-                                  className="py-3 text-base cursor-pointer focus:bg-gray-100"
-                                  role="menuitem"
-                                  onClick={() => {
-                                    setEditFacility(facility);
-                                    setEditBookingTypes(facility.allowedBookingTypes);
-                                    setModalOpen(true);
-                                  }}
-                                >
-                                  Rediger bookingtyper
-                                </DropdownMenuItem>
-                                <DropdownMenuItem 
-                                  className="py-3 text-base cursor-pointer focus:bg-gray-100"
-                                  role="menuitem"
-                                >
-                                  Endre status
-                                </DropdownMenuItem>
-                                <DropdownMenuItem 
-                                  className="py-3 text-base cursor-pointer focus:bg-gray-100"
-                                  role="menuitem"
-                                  onClick={() => {
-                                    setEditRulesFacility(facility);
-                                    setEditOpeningHours(facility.openingHours);
-                                    setEditBookingInterval(facility.bookingInterval);
-                                    setEditSeason(facility.season);
-                                    setRulesModalOpen(true);
-                                  }}
-                                >
-                                  Rediger åpningstider/bookingregler
-                                </DropdownMenuItem>
-                                <DropdownMenuItem 
-                                  className="text-red-700 py-3 text-base cursor-pointer focus:bg-red-50"
-                                  role="menuitem"
-                                >
-                                  Slett
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
+                              {dropdownMenuItems(facility)}
                             </DropdownMenu>
                           </TableCell>
                         </TableRow>
@@ -840,6 +1017,307 @@ const FacilityManagementPage = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Zone Management Modal */}
+      <Dialog open={zoneModalOpen} onOpenChange={setZoneModalOpen}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle>
+              Administrer soner for {editingZonesFacility?.name}
+            </DialogTitle>
+          </DialogHeader>
+          {editingZonesFacility && (
+            <ZoneManagement
+              facilityId={editingZonesFacility.id.toString()}
+              zones={editingZonesFacility.zones || []}
+              onZoneCreate={(zone) => handleZoneCreate(editingZonesFacility.id.toString(), zone)}
+              onZoneUpdate={(zone) => handleZoneUpdate(editingZonesFacility.id.toString(), zone)}
+              onZoneDelete={(zoneId) => handleZoneDelete(editingZonesFacility.id.toString(), zoneId)}
+              onConflictRuleCreate={(rule) => handleConflictRuleCreate(editingZonesFacility.id.toString(), rule)}
+              onConflictRuleDelete={(ruleId) => handleConflictRuleDelete(editingZonesFacility.id.toString(), ruleId)}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal for blokkering av tid */}
+      {blockFacility && (
+        <Dialog open={blockModalOpen} onOpenChange={setBlockModalOpen}>
+          <DialogContent className="max-w-lg">
+            <DialogHeader>
+              <DialogTitle>Blokker tid for {blockFacility.name}</DialogTitle>
+            </DialogHeader>
+            <form
+              onSubmit={e => {
+                e.preventDefault();
+                setBlockedPeriods([
+                  ...blockedPeriods,
+                  {
+                    facilityId: blockFacility.id,
+                    type: blockType,
+                    from: blockFrom,
+                    to: blockTo,
+                    reason: blockReason,
+                  },
+                ]);
+                setBlockModalOpen(false);
+              }}
+              className="space-y-4"
+            >
+              <div>
+                <label className="block font-medium mb-1">Type blokkering</label>
+                <select
+                  className="w-full border rounded px-3 py-2"
+                  value={blockType}
+                  onChange={e => setBlockType(e.target.value)}
+                  required
+                >
+                  <option value="maintenance">Vedlikehold</option>
+                  <option value="internal">Internt arrangement</option>
+                  <option value="other">Annet</option>
+                </select>
+              </div>
+              <div className="flex gap-4">
+                <div className="flex-1">
+                  <label className="block font-medium mb-1">Fra</label>
+                  <input
+                    type="datetime-local"
+                    className="w-full border rounded px-3 py-2"
+                    value={blockFrom}
+                    onChange={e => setBlockFrom(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="flex-1">
+                  <label className="block font-medium mb-1">Til</label>
+                  <input
+                    type="datetime-local"
+                    className="w-full border rounded px-3 py-2"
+                    value={blockTo}
+                    onChange={e => setBlockTo(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block font-medium mb-1">Årsak/merknad</label>
+                <input
+                  type="text"
+                  className="w-full border rounded px-3 py-2"
+                  value={blockReason}
+                  onChange={e => setBlockReason(e.target.value)}
+                  placeholder="F.eks. årlig service, intern samling..."
+                  required
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={blockNotify}
+                  onChange={e => setBlockNotify(e.target.checked)}
+                  id="block-notify"
+                />
+                <label htmlFor="block-notify">Varsle berørte brukere</label>
+              </div>
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={blockOverride}
+                  onChange={e => setBlockOverride(e.target.checked)}
+                  id="block-override"
+                />
+                <label htmlFor="block-override">Tillat booking likevel (override)</label>
+              </div>
+              <div>
+                <label className="block font-medium mb-1">Eksisterende blokkerte perioder</label>
+                <ul className="bg-gray-50 border rounded p-2 max-h-32 overflow-y-auto text-sm">
+                  {blockedPeriods.filter(b => b.facilityId === blockFacility.id).length === 0 ? (
+                    <li className="text-gray-400">Ingen blokkerte perioder</li>
+                  ) : (
+                    blockedPeriods.filter(b => b.facilityId === blockFacility.id).map((b, i) => (
+                      <li key={i} className="mb-1">
+                        <span className="font-semibold">{b.type === "maintenance" ? "Vedlikehold" : b.type === "internal" ? "Internt" : "Annet"}</span>: {b.from.replace("T", " ")} - {b.to.replace("T", " ")} ({b.reason})
+                      </li>
+                    ))
+                  )}
+                </ul>
+              </div>
+              <div className="flex justify-end gap-2 mt-4">
+                <button
+                  type="button"
+                  className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 text-gray-800"
+                  onClick={() => setBlockModalOpen(false)}
+                >
+                  Avbryt
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white font-semibold"
+                >
+                  Blokker tid
+                </button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* Modal for tildeling av rammetid */}
+      {rammetidFacility && (
+        <Dialog open={rammetidModalOpen} onOpenChange={setRammetidModalOpen}>
+          <DialogContent className="max-w-lg">
+            <DialogHeader>
+              <DialogTitle>Tildel rammetid for {rammetidFacility.name}</DialogTitle>
+            </DialogHeader>
+            <form
+              onSubmit={e => {
+                e.preventDefault();
+                setRammetidAllocations([
+                  ...rammetidAllocations,
+                  {
+                    facilityId: rammetidFacility.id,
+                    org: rammetidOrg,
+                    weekday: rammetidWeekday,
+                    from: rammetidFrom,
+                    to: rammetidTo,
+                    periodFrom: rammetidPeriodFrom,
+                    periodTo: rammetidPeriodTo,
+                    delegation: rammetidDelegation,
+                  },
+                ]);
+                setRammetidModalOpen(false);
+              }}
+              className="space-y-4"
+            >
+              <div>
+                <label className="block font-medium mb-1">Paraplyorganisasjon</label>
+                <select
+                  className="w-full border rounded px-3 py-2"
+                  value={rammetidOrg}
+                  onChange={e => setRammetidOrg(e.target.value)}
+                  required
+                >
+                  <option value="">Velg organisasjon</option>
+                  {umbrellaOrgs.map(org => (
+                    <option key={org} value={org}>{org}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex gap-4">
+                <div className="flex-1">
+                  <label className="block font-medium mb-1">Ukedag</label>
+                  <select
+                    className="w-full border rounded px-3 py-2"
+                    value={rammetidWeekday}
+                    onChange={e => setRammetidWeekday(e.target.value)}
+                    required
+                  >
+                    {WEEKDAYS.map(day => (
+                      <option key={day} value={day}>{day}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex-1">
+                  <label className="block font-medium mb-1">Fra</label>
+                  <input
+                    type="time"
+                    className="w-full border rounded px-3 py-2"
+                    value={rammetidFrom}
+                    onChange={e => setRammetidFrom(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="flex-1">
+                  <label className="block font-medium mb-1">Til</label>
+                  <input
+                    type="time"
+                    className="w-full border rounded px-3 py-2"
+                    value={rammetidTo}
+                    onChange={e => setRammetidTo(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+              <div className="flex gap-4">
+                <div className="flex-1">
+                  <label className="block font-medium mb-1">Periode fra</label>
+                  <input
+                    type="date"
+                    className="w-full border rounded px-3 py-2"
+                    value={rammetidPeriodFrom}
+                    onChange={e => setRammetidPeriodFrom(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="flex-1">
+                  <label className="block font-medium mb-1">Periode til</label>
+                  <input
+                    type="date"
+                    className="w-full border rounded px-3 py-2"
+                    value={rammetidPeriodTo}
+                    onChange={e => setRammetidPeriodTo(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={rammetidDelegation}
+                  onChange={e => setRammetidDelegation(e.target.checked)}
+                  id="rammetid-delegation"
+                />
+                <label htmlFor="rammetid-delegation">Tillat delegasjon (paraply kan fordele/gi slipp på rammetid)</label>
+              </div>
+              <div>
+                <label className="block font-medium mb-1">Eksisterende tildelinger (overlapper vises i rødt)</label>
+                <ul className="bg-gray-50 border rounded p-2 max-h-32 overflow-y-auto text-sm">
+                  {rammetidAllocations.filter(a => a.facilityId === rammetidFacility.id).length === 0 ? (
+                    <li className="text-gray-400">Ingen tildelinger</li>
+                  ) : (
+                    rammetidAllocations.filter(a => a.facilityId === rammetidFacility.id).map((a, i) => {
+                      // Sjekk overlapper (mock, kun ukedag og tid)
+                      const overlap =
+                        a.weekday === rammetidWeekday &&
+                        ((rammetidFrom && rammetidTo && a.from < rammetidTo && rammetidFrom < a.to) || false);
+                      return (
+                        <li key={i} className={overlap ? "text-red-600 font-semibold" : ""}>
+                          {a.org}: {a.weekday} {a.from}-{a.to} ({a.periodFrom} til {a.periodTo})
+                          {a.delegation && (
+                            <span className="ml-2 text-blue-600">[Delegasjon]</span>
+                          )}
+                          {overlap && " (overlapp!)"}
+                        </li>
+                      );
+                    })
+                  )}
+                </ul>
+              </div>
+              {rammetidDelegation && (
+                <div className="bg-blue-50 border border-blue-200 rounded p-3 mt-2 text-sm">
+                  <b>Delegasjon aktivert:</b> Paraplyrepresentant kan fordele eller gi slipp på rammetid. <br />
+                  <span className="text-blue-700">Mock: Disse tidene vil kunne bli synlige som drop-in for undergrupper.</span>
+                </div>
+              )}
+              <div className="flex justify-end gap-2 mt-4">
+                <button
+                  type="button"
+                  className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 text-gray-800"
+                  onClick={() => setRammetidModalOpen(false)}
+                >
+                  Avbryt
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white font-semibold"
+                >
+                  Tildel rammetid
+                </button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
       )}
     </div>
   );

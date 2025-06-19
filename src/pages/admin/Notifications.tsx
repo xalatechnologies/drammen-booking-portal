@@ -1,11 +1,10 @@
-
 import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Bell, Mail, MessageSquare, Info, CheckCircle, AlertTriangle } from "lucide-react";
+import { Bell, Mail, MessageSquare, Info, CheckCircle, AlertTriangle, Trash2, Plus } from "lucide-react";
 
 type NotificationType = "email" | "sms" | "app";
 type NotificationCategory = "bookings" | "approvals" | "system" | "users";
@@ -76,11 +75,41 @@ const mockNotifications: Notification[] = [
   }
 ];
 
+const mockFacilities = [
+  "Brandengen Skole - Gymsal",
+  "Fjell Skole - Aktivitetshall",
+  "Åssiden Fotballhall",
+  "Drammen Bibliotek - Møterom"
+];
+const mockBookingTypes = [
+  { value: "dropin", label: "Drop-in" },
+  { value: "engangslan", label: "Engangslån" },
+  { value: "fastlan", label: "Fastlån" },
+];
+
 const NotificationsPage = () => {
   const [notifications, setNotifications] = useState<Notification[]>(mockNotifications);
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [smsNotifications, setSmsNotifications] = useState(true);
   const [appNotifications, setAppNotifications] = useState(true);
+
+  // Abonnement på drop-in-varsler
+  const [subscriptions, setSubscriptions] = useState<{
+    id: string,
+    facility: string,
+    type: NotificationType,
+    weekday: string,
+    time: string,
+    bookingType: string
+  }[]>([
+    { id: "1", facility: "Brandengen Skole - Gymsal", type: "email", weekday: "Mandag", time: "16:00", bookingType: "dropin" },
+    { id: "2", facility: "Åssiden Fotballhall", type: "app", weekday: "Torsdag", time: "18:00", bookingType: "dropin" },
+  ]);
+  const [subFacility, setSubFacility] = useState("");
+  const [subType, setSubType] = useState<NotificationType>("email");
+  const [subWeekday, setSubWeekday] = useState("Mandag");
+  const [subTime, setSubTime] = useState("");
+  const [subBookingType, setSubBookingType] = useState("dropin");
 
   const getNotificationIcon = (category: NotificationCategory) => {
     switch (category) {
@@ -287,6 +316,143 @@ const NotificationsPage = () => {
           </Card>
         </div>
       </div>
+
+      {/* Abonnement på drop-in-varsler */}
+      <Card className="mt-10">
+        <CardHeader>
+          <CardTitle>Abonnement på drop-in-varsler</CardTitle>
+          <CardDescription>
+            Administrer hvilke brukere som får varsler om ledige drop-in-timer basert på lokasjon og kriterier.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="mb-6">
+            <form
+              className="flex flex-wrap gap-4 items-end"
+              onSubmit={e => {
+                e.preventDefault();
+                setSubscriptions([
+                  ...subscriptions,
+                  {
+                    id: Math.random().toString(36).substr(2, 9),
+                    facility: subFacility,
+                    type: subType,
+                    weekday: subWeekday,
+                    time: subTime,
+                    bookingType: subBookingType,
+                  },
+                ]);
+                setSubFacility("");
+                setSubType("email");
+                setSubWeekday("Mandag");
+                setSubTime("");
+                setSubBookingType("dropin");
+              }}
+            >
+              <div>
+                <label className="block font-medium mb-1">Lokale</label>
+                <select
+                  className="border rounded px-3 py-2 min-w-[180px]"
+                  value={subFacility}
+                  onChange={e => setSubFacility(e.target.value)}
+                  required
+                >
+                  <option value="">Velg lokale</option>
+                  {mockFacilities.map(f => (
+                    <option key={f} value={f}>{f}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block font-medium mb-1">Type varsel</label>
+                <select
+                  className="border rounded px-3 py-2 min-w-[120px]"
+                  value={subType}
+                  onChange={e => setSubType(e.target.value as NotificationType)}
+                  required
+                >
+                  <option value="email">E-post</option>
+                  <option value="sms">SMS</option>
+                  <option value="app">App</option>
+                </select>
+              </div>
+              <div>
+                <label className="block font-medium mb-1">Ukedag</label>
+                <select
+                  className="border rounded px-3 py-2 min-w-[120px]"
+                  value={subWeekday}
+                  onChange={e => setSubWeekday(e.target.value)}
+                  required
+                >
+                  {[
+                    "Mandag", "Tirsdag", "Onsdag", "Torsdag", "Fredag", "Lørdag", "Søndag"
+                  ].map(day => (
+                    <option key={day} value={day}>{day}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block font-medium mb-1">Tidspunkt</label>
+                <input
+                  type="time"
+                  className="border rounded px-3 py-2 min-w-[120px]"
+                  value={subTime}
+                  onChange={e => setSubTime(e.target.value)}
+                  required
+                />
+              </div>
+              <div>
+                <label className="block font-medium mb-1">Bookingtype</label>
+                <select
+                  className="border rounded px-3 py-2 min-w-[120px]"
+                  value={subBookingType}
+                  onChange={e => setSubBookingType(e.target.value)}
+                  required
+                >
+                  {mockBookingTypes.map(bt => (
+                    <option key={bt.value} value={bt.value}>{bt.label}</option>
+                  ))}
+                </select>
+              </div>
+              <Button type="submit" className="gap-2"><Plus className="h-4 w-4" /> Legg til abonnement</Button>
+            </form>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-sm border rounded">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-4 py-2 text-left">Lokale</th>
+                  <th className="px-4 py-2 text-left">Type varsel</th>
+                  <th className="px-4 py-2 text-left">Ukedag</th>
+                  <th className="px-4 py-2 text-left">Tidspunkt</th>
+                  <th className="px-4 py-2 text-left">Bookingtype</th>
+                  <th className="px-4 py-2 text-left">Handling</th>
+                </tr>
+              </thead>
+              <tbody>
+                {subscriptions.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="text-center text-gray-500 py-8">Ingen abonnementer funnet.</td>
+                  </tr>
+                ) : (
+                  subscriptions.map(sub => (
+                    <tr key={sub.id}>
+                      <td className="px-4 py-2">{sub.facility}</td>
+                      <td className="px-4 py-2 capitalize">{sub.type}</td>
+                      <td className="px-4 py-2">{sub.weekday}</td>
+                      <td className="px-4 py-2">{sub.time}</td>
+                      <td className="px-4 py-2">{mockBookingTypes.find(bt => bt.value === sub.bookingType)?.label}</td>
+                      <td className="px-4 py-2">
+                        <Button size="icon" variant="ghost" onClick={() => setSubscriptions(subscriptions.filter(s => s.id !== sub.id))} aria-label="Slett"><Trash2 className="h-4 w-4 text-red-600" /></Button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

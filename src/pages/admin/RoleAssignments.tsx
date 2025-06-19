@@ -25,6 +25,8 @@ const mockGroups = [
   { id: 3, name: "Skole-Admins" },
 ];
 
+const currentUser = { name: "Admin Bruker", role: "systemadmin" };
+
 const RoleAssignmentsPage = () => {
   const [tab, setTab] = useState("users");
   const [userAssignments, setUserAssignments] = useState({
@@ -43,7 +45,7 @@ const RoleAssignmentsPage = () => {
   const [selectedRoles, setSelectedRoles] = useState([]);
   const [assignType, setAssignType] = useState("user");
 
-  if (!mockUser.isSuperadmin) {
+  if (!["systemadmin", "superadmin"].includes(currentUser.role)) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Card className="max-w-md w-full">
@@ -51,7 +53,7 @@ const RoleAssignmentsPage = () => {
             <CardTitle>Ingen tilgang</CardTitle>
           </CardHeader>
           <CardContent>
-            <p>Du må være superadmin for å tildele roller.</p>
+            <p>Du må være systemadministrator for å tildele roller.</p>
           </CardContent>
         </Card>
       </div>

@@ -20,7 +20,7 @@ const permissionLevels = [
   { value: "full admin", label: "Full admin" },
 ];
 
-const mockUser = { name: "Superadmin Bruker", isSuperadmin: true };
+const currentUser = { name: "Admin Bruker", role: "systemadmin" };
 
 const RolesPage = () => {
   const [roles, setRoles] = useState(initialRoles);
@@ -30,7 +30,7 @@ const RolesPage = () => {
   const [roleName, setRoleName] = useState("");
   const [rolePermission, setRolePermission] = useState(permissionLevels[0].value);
 
-  if (!mockUser.isSuperadmin) {
+  if (!["systemadmin", "superadmin"].includes(currentUser.role)) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Card className="max-w-md w-full">
@@ -38,7 +38,7 @@ const RolesPage = () => {
             <CardTitle>Ingen tilgang</CardTitle>
           </CardHeader>
           <CardContent>
-            <p>Du må være superadmin for å administrere roller.</p>
+            <p>Du må være systemadministrator for å administrere roller.</p>
           </CardContent>
         </Card>
       </div>
@@ -63,14 +63,14 @@ const RolesPage = () => {
     if (editRole) {
       setRoles(roles.map(r => r.id === editRole.id ? { ...r, name: roleName, permission: rolePermission } : r));
       setLog([
-        { who: mockUser.name, when: new Date().toLocaleString(), what: `Endret rolle: ${editRole.name} → ${roleName}, rettighet: ${rolePermission}` },
+        { who: currentUser.name, when: new Date().toLocaleString(), what: `Endret rolle: ${editRole.name} → ${roleName}, rettighet: ${rolePermission}` },
         ...log,
       ]);
     } else {
       const newRole = { id: Date.now(), name: roleName, permission: rolePermission };
       setRoles([ ...roles, newRole ]);
       setLog([
-        { who: mockUser.name, when: new Date().toLocaleString(), what: `Opprettet rolle: ${roleName}, rettighet: ${rolePermission}` },
+        { who: currentUser.name, when: new Date().toLocaleString(), what: `Opprettet rolle: ${roleName}, rettighet: ${rolePermission}` },
         ...log,
       ]);
     }
@@ -80,7 +80,7 @@ const RolesPage = () => {
   const handleDelete = (role) => {
     setRoles(roles.filter(r => r.id !== role.id));
     setLog([
-      { who: mockUser.name, when: new Date().toLocaleString(), what: `Slettet rolle: ${role.name}` },
+      { who: currentUser.name, when: new Date().toLocaleString(), what: `Slettet rolle: ${role.name}` },
       ...log,
     ]);
   };
