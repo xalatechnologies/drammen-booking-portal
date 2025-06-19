@@ -129,39 +129,54 @@ const Index = () => {
       <GlobalHeader />
 
       <main id="main-content" className="flex-1">
-        <div className="container mx-auto px-4 py-6">
-          <HeroBanner />
+        <div className="w-full py-6">
+          {/* Hero Banner - Full width */}
+          <div className="w-full px-4">
+            <HeroBanner />
+          </div>
           
-          <SearchFilter
-            date={date}
-            setDate={setDate}
-            facilityType={facilityType}
-            setFacilityType={setFacilityType}
-            location={location}
-            setLocation={setLocation}
-            viewMode={viewMode}
-            setViewMode={setViewMode}
-            accessibility={accessibility}
-            setAccessibility={setAccessibility}
-            capacity={capacity}
-            setCapacity={setCapacity}
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
-            priceRange={priceRange}
-            setPriceRange={setPriceRange}
-            availableNow={availableNow}
-            setAvailableNow={setAvailableNow}
-            hasEquipment={hasEquipment}
-            setHasEquipment={setHasEquipment}
-            hasParking={hasParking}
-            setHasParking={setHasParking}
-            hasWifi={hasWifi}
-            setHasWifi={setHasWifi}
-            allowsPhotography={allowsPhotography}
-            setAllowsPhotography={setAllowsPhotography}
-          />
+          {/* Search Filter - Full width */}
+          <div className="w-full px-4">
+            <SearchFilter
+              date={date}
+              setDate={setDate}
+              facilityType={facilityType}
+              setFacilityType={setFacilityType}
+              location={location}
+              setLocation={setLocation}
+              viewMode={viewMode}
+              setViewMode={setViewMode}
+              accessibility={accessibility}
+              setAccessibility={setAccessibility}
+              capacity={capacity}
+              setCapacity={setCapacity}
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
+              priceRange={priceRange}
+              setPriceRange={setPriceRange}
+              availableNow={availableNow}
+              setAvailableNow={setAvailableNow}
+              hasEquipment={hasEquipment}
+              setHasEquipment={setHasEquipment}
+              hasParking={hasParking}
+              setHasParking={setHasParking}
+              hasWifi={hasWifi}
+              setHasWifi={setHasWifi}
+              allowsPhotography={allowsPhotography}
+              setAllowsPhotography={setAllowsPhotography}
+            />
+          </div>
 
-          {renderContent()}
+          {/* Content - Full width for list view, contained for others */}
+          {(viewMode === "list") ? (
+            <div className="w-full px-6">
+              {renderContent()}
+            </div>
+          ) : (
+            <div className="w-full px-4">
+              {renderContent()}
+            </div>
+          )}
         </div>
       </main>
 

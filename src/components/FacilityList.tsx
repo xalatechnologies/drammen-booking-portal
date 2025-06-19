@@ -26,11 +26,11 @@ const FacilityList: React.FC<FacilityListProps> = ({
   console.log("FacilityList - facilities count:", facilities.length);
 
   return (
-    <div className="space-y-6">
+    <div className="w-full space-y-6">
       {viewMode === "grid" ? (
         <FacilityGrid pagination={pagination} filters={filters} />
       ) : (
-        <div className="space-y-4">
+        <div className="w-full space-y-4">
           {isLoading ? (
             <div>Loading...</div>
           ) : error ? (
@@ -56,10 +56,12 @@ const FacilityList: React.FC<FacilityListProps> = ({
       )}
 
       {paginationInfo && (
-        <PaginationControls 
-          pagination={paginationInfo}
-          onPageChange={goToPage}
-        />
+        <div className="flex justify-center">
+          <PaginationControls 
+            pagination={paginationInfo}
+            onPageChange={goToPage}
+          />
+        </div>
       )}
     </div>
   );
