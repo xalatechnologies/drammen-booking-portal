@@ -3,7 +3,7 @@ import { Dispatch } from 'react';
 import { BookingAction, BookingFormData } from './types';
 import { SelectedTimeSlot } from '@/utils/recurrenceEngine';
 import { validateFormData, isFormValid } from './validation';
-import { saveToStorage } from './storage';
+import { saveToStorage, loadFromStorage } from './storage';
 import { useCart } from '@/contexts/CartContext';
 
 export const createActions = (
@@ -110,6 +110,10 @@ export const createActions = (
 
   saveToStorage: () => saveToStorage(state),
   
-  loadFromStorage: (data: any) => 
-    dispatch({ type: 'LOAD_FROM_STORAGE', payload: data }),
+  loadFromStorage: () => {
+    const data = loadFromStorage();
+    if (data) {
+      dispatch({ type: 'LOAD_FROM_STORAGE', payload: data });
+    }
+  },
 });
