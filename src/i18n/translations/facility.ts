@@ -34,7 +34,9 @@ export const facilityTranslations = {
     zones: {
       wholeVenue: "Hele lokalet",
       partialBooking: "Delvis booking",
-      selectZone: "Velg sone"
+      selectZone: "Velg sone",
+      wholeVenueDescription: "Komplett lokale med full tilgang til alt utstyr og alle soner",
+      mainZoneInstructions: "Hele lokalet inkluderer alle soner og tilgjengelig utstyr. Perfekt for store arrangementer og turneringer."
     },
     actions: {
       book: "Bestill",
@@ -42,7 +44,37 @@ export const facilityTranslations = {
       edit: "Rediger",
       view: "Vis",
       share: "Del",
-      favorite: "Favoritt"
+      favorite: "Favoritt",
+      viewDetails: "Se detaljer for {name} på {address}",
+      addToFavorites: "Legg til favoritter",
+      removeFromFavorites: "Fjern fra favoritter",
+      shareFacility: "Del lokale"
+    },
+    image: {
+      alt: "Bilde av {name}"
+    },
+    types: {
+      gymsal: "Gymsal",
+      "møterom": "Møterom",
+      idrettshall: "Idrettshall",
+      auditorium: "Auditorium",
+      verksted: "Verksted",
+      aktivitetssal: "Aktivitetssal",
+      studieplass: "Studieplass",
+      "uteområde": "Uteområde"
+    },
+    errors: {
+      notFound: "Lokale ikke funnet",
+      loadError: "Noe gikk galt",
+      notFoundDescription: "Lokalet du leter etter eksisterer ikke eller har blitt fjernet.",
+      loadErrorDescription: "Kunne ikke laste inn lokalets informasjon. Prøv igjen senere."
+    },
+    availability: {
+      title: "Tilgjengelighet og booking"
+    },
+    similar: {
+      title: "Lignende lokaler",
+      viewAll: "Se alle lokaler"
     }
   },
   EN: {
@@ -79,7 +111,9 @@ export const facilityTranslations = {
     zones: {
       wholeVenue: "Whole venue",
       partialBooking: "Partial booking",
-      selectZone: "Select zone"
+      selectZone: "Select zone",
+      wholeVenueDescription: "Complete facility with full access to all equipment and zones",
+      mainZoneInstructions: "The whole facility includes all zones and available equipment. Perfect for large events and tournaments."
     },
     actions: {
       book: "Book",
@@ -87,7 +121,37 @@ export const facilityTranslations = {
       edit: "Edit",
       view: "View",
       share: "Share",
-      favorite: "Favorite"
+      favorite: "Favorite",
+      viewDetails: "View details for {name} at {address}",
+      addToFavorites: "Add to favorites",
+      removeFromFavorites: "Remove from favorites",
+      shareFacility: "Share facility"
+    },
+    image: {
+      alt: "Image of {name}"
+    },
+    types: {
+      gymsal: "Gymnasium",
+      "møterom": "Meeting room",
+      idrettshall: "Sports hall",
+      auditorium: "Auditorium",
+      verksted: "Workshop",
+      aktivitetssal: "Activity hall",
+      studieplass: "Study space",
+      "uteområde": "Outdoor area"
+    },
+    errors: {
+      notFound: "Facility not found",
+      loadError: "Something went wrong",
+      notFoundDescription: "The facility you are looking for does not exist or has been removed.",
+      loadErrorDescription: "Could not load facility information. Please try again later."
+    },
+    availability: {
+      title: "Availability and booking"
+    },
+    similar: {
+      title: "Similar facilities",
+      viewAll: "View all facilities"
     }
   }
 };

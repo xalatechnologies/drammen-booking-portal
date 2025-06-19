@@ -41,11 +41,11 @@ const FacilityDetail = () => {
   // Enhanced zones with full zone management capabilities
   const zones: Zone[] = [{
     id: "whole-facility",
-    name: "Hele lokalet",
+    name: t('facility.zones.wholeVenue'),
     capacity: facility?.capacity || 30,
-    equipment: facility?.equipment || ["Projektor", "Lydanlegg", "Whiteboard"],
+    equipment: facility?.equipment || [t('common.equipment.projector'), t('common.equipment.sound'), t('common.equipment.whiteboard')],
     pricePerHour: facility?.pricePerHour || 450,
-    description: "Komplett gymsal med full tilgang til alt utstyr og alle soner",
+    description: t('facility.zones.wholeVenueDescription'),
     area: facility?.area || "120 m²",
     isMainZone: true,
     subZones: ["zone-1", "zone-2"],
@@ -60,9 +60,9 @@ const FacilityDetail = () => {
     adminInfo: {
       contactPersonName: "Lars Hansen",
       contactPersonEmail: "lars.hansen@drammen.kommune.no",
-      specialInstructions: "Hele lokalet inkluderer begge soner og all tilgjengelig utstyr. Perfekt for store arrangementer og turneringer.",
+      specialInstructions: t('facility.zones.mainZoneInstructions'),
       maintenanceSchedule: [{
-        day: "Mandag",
+        day: t('common.weekdays.monday'),
         startTime: "06:00",
         endTime: "08:00"
       }]
@@ -74,89 +74,10 @@ const FacilityDetail = () => {
         width: 120,
         height: 80
       },
-      entryPoints: ["Hovedinngang", "Utstyrsinngaang", "Nødutgang vest"]
+      entryPoints: [t('common.entrances.main'), t('common.entrances.equipment'), t('common.entrances.emergency')]
     },
     accessibility: ["wheelchair", "hearing-loop", "visual-guidance"],
-    features: ["Klimaanlegg", "Moderne lyd", "LED-belysning", "Sikkerhetskameraer"],
-    isActive: true
-  }, {
-    id: "zone-1",
-    name: "Sone A (Nord)",
-    capacity: 15,
-    equipment: ["Lydanlegg", "Basketkurv", "Håndballmål"],
-    pricePerHour: 250,
-    description: "Nordre del av gymsalen med basketbane og håndballfelt",
-    area: "60 m²",
-    parentZoneId: "whole-facility",
-    bookingRules: {
-      minBookingDuration: 1,
-      maxBookingDuration: 6,
-      allowedTimeSlots: ["08:00-10:00", "10:00-12:00", "12:00-14:00", "14:00-16:00", "16:00-18:00", "18:00-20:00", "20:00-22:00"],
-      bookingTypes: ['one-time', 'recurring'],
-      advanceBookingDays: 60,
-      cancellationHours: 24
-    },
-    adminInfo: {
-      contactPersonName: "Maria Olsen",
-      contactPersonEmail: "maria.olsen@drammen.kommune.no",
-      specialInstructions: "Egnet for mindre ballsportaktiviteter og gruppetrening.",
-      maintenanceSchedule: [{
-        day: "Tirsdag",
-        startTime: "07:00",
-        endTime: "08:00"
-      }]
-    },
-    layout: {
-      coordinates: {
-        x: 0,
-        y: 0,
-        width: 60,
-        height: 80
-      },
-      entryPoints: ["Hovedinngang", "Nord-inngang"]
-    },
-    accessibility: ["wheelchair", "hearing-loop"],
-    features: ["Delvis klimaanlegg", "God ventilasjon"],
-    isActive: true
-  }, {
-    id: "zone-2",
-    name: "Sone B (Sør)",
-    capacity: 15,
-    equipment: ["Projektor", "Whiteboard", "Volleyballnett", "Presentasjonsutstyr"],
-    pricePerHour: 280,
-    description: "Søndre del av gymsalen med volleyballbane og presentasjoner",
-    area: "60 m²",
-    parentZoneId: "whole-facility",
-    bookingRules: {
-      minBookingDuration: 1,
-      maxBookingDuration: 6,
-      allowedTimeSlots: ["08:00-10:00", "10:00-12:00", "12:00-14:00", "14:00-16:00", "16:00-18:00", "18:00-20:00", "20:00-22:00"],
-      bookingTypes: ['one-time', 'recurring'],
-      advanceBookingDays: 60,
-      cancellationHours: 24
-    },
-    adminInfo: {
-      contactPersonName: "Erik Nordahl",
-      contactPersonEmail: "erik.nordahl@drammen.kommune.no",
-      specialInstructions: "Perfekt for volleyball, badminton og presentasjoner. Har avansert AV-utstyr.",
-      maintenanceSchedule: [{
-        day: "Onsdag",
-        startTime: "07:00",
-        endTime: "08:00"
-      }]
-    },
-    layout: {
-      coordinates: {
-        x: 60,
-        y: 0,
-        width: 60,
-        height: 80
-      },
-      entryPoints: ["Hovedinngang", "Sør-inngang"]
-    },
-    accessibility: ["wheelchair", "hearing-loop", "visual-guidance"],
-    features: ["Avansert AV-utstyr", "Fleksibel belysning", "Akustikk optimaliseret"],
-    restrictions: ["Ingen mat eller drikke", "Kun innendørssko"],
+    features: [t('common.features.airConditioning'), t('common.features.modernSound'), t('common.features.ledLighting'), t('common.features.securityCameras')],
     isActive: true
   }];
 
@@ -188,7 +109,7 @@ const FacilityDetail = () => {
               variant="outline"
               className="mb-4"
             >
-              ← Back to Facility
+              ← {t('common.actions.back')}
             </Button>
             <LocalizationTestComprehensive />
           </div>
@@ -233,17 +154,17 @@ const FacilityDetail = () => {
           <div className="text-center max-w-md mx-auto px-4">
             <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-6" />
             <h1 className="text-3xl font-bold text-gray-900 mb-4">
-              {notFound ? "Lokale ikke funnet" : "Noe gikk galt"}
+              {notFound ? t('facility.errors.notFound') : t('facility.errors.loadError')}
             </h1>
             <p className="text-gray-600 mb-8">
               {notFound 
-                ? "Lokalet du leter etter eksisterer ikke eller har blitt fjernet."
-                : "Kunne ikke laste inn lokalets informasjon. Prøv igjen senere."
+                ? t('facility.errors.notFoundDescription')
+                : t('facility.errors.loadErrorDescription')
               }
             </p>
             <Button onClick={() => navigate("/")} className="mb-4">
               <Home className="h-4 w-4 mr-2" />
-              Tilbake til forsiden
+              {t('common.navigation.backToHome')}
             </Button>
           </div>
         </div>
@@ -265,7 +186,7 @@ const FacilityDetail = () => {
           <nav className="flex items-center space-x-2 text-sm">
             <Button variant="ghost" size="sm" className="text-gray-600 hover:text-gray-900 p-0 h-auto font-normal" onClick={() => navigate("/")}>
               <Home className="h-4 w-4 mr-1" />
-              Hjem
+              {t('common.navigation.home')}
             </Button>
             <span className="text-gray-400">/</span>
             <span className="text-gray-900 font-medium">{facility.name}</span>
@@ -279,7 +200,7 @@ const FacilityDetail = () => {
                   onClick={() => setShowLocalizationTest(true)}
                   className="text-blue-600 hover:text-blue-900 p-0 h-auto font-normal"
                 >
-                  🌍 Test Localization
+                  🌍 {t('common.debug.testLocalization')}
                 </Button>
               </>
             )}
@@ -341,7 +262,7 @@ const FacilityDetail = () => {
             {/* Enhanced Availability Calendar Section */}
             <div className="bg-white rounded-lg shadow-sm border">
               <div className="p-6">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">Tilgjengelighet og booking</h2>
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">{t('facility.availability.title')}</h2>
                 <AvailabilityTab 
                   zones={zones} 
                   startDate={new Date()} 

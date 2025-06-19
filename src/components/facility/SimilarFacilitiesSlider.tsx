@@ -10,6 +10,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { FacilityCard } from "@/components/facility/FacilityCard";
+import { useTranslation } from "@/i18n/hooks/useTranslation";
 
 interface SimilarFacilitiesSliderProps {
   currentFacilityId: string;
@@ -17,6 +18,7 @@ interface SimilarFacilitiesSliderProps {
 
 export function SimilarFacilitiesSlider({ currentFacilityId }: SimilarFacilitiesSliderProps) {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   // Mock data for similar facilities - using same comprehensive data as main page
   const allFacilities = [
@@ -266,9 +268,9 @@ export function SimilarFacilitiesSlider({ currentFacilityId }: SimilarFacilities
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-900">Lignende lokaler</h2>
+        <h2 className="text-2xl font-bold text-gray-900">{t('facility.similar.title')}</h2>
         <Button variant="outline" onClick={() => navigate("/")}>
-          Se alle lokaler
+          {t('facility.similar.viewAll')}
         </Button>
       </div>
       

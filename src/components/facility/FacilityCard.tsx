@@ -62,13 +62,19 @@ export function FacilityCard({ facility, onAddressClick }: FacilityCardProps) {
   const getAmenityIcons = () => {
     const amenityMap: { [key: string]: React.ElementType } = {
       'projektor': Projector,
+      'projector': Projector,
       'lydanlegg': Volume2,
+      'sound system': Volume2,
       'whiteboard': FileText,
       'kjøkken': ChefHat,
+      'kitchen': ChefHat,
       'parkering': Car,
+      'parking': Car,
       'wifi': Wifi,
       'klimaanlegg': Snowflake,
+      'air conditioning': Snowflake,
       'rullestolvennlig': Accessibility,
+      'wheelchair accessible': Accessibility,
     };
     
     return facility.equipment.slice(0, 4).map((item, index) => {
@@ -91,7 +97,7 @@ export function FacilityCard({ facility, onAddressClick }: FacilityCardProps) {
       onMouseLeave={() => setIsHovered(false)}
       role="button"
       tabIndex={0}
-      aria-label={`Se detaljer for ${facility.name} på ${facility.address}`}
+      aria-label={t('facility.actions.viewDetails', { name: facility.name, address: facility.address })}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
@@ -103,7 +109,7 @@ export function FacilityCard({ facility, onAddressClick }: FacilityCardProps) {
       <div className="relative h-48 overflow-hidden">
         <img 
           src={facility.image} 
-          alt={`Bilde av ${facility.name}`}
+          alt={t('facility.image.alt', { name: facility.name })}
           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
           onError={(e) => {
             const target = e.target as HTMLImageElement;
@@ -122,7 +128,7 @@ export function FacilityCard({ facility, onAddressClick }: FacilityCardProps) {
             size="sm"
             className="bg-white/20 backdrop-blur-md hover:bg-white/30 text-white border-0 h-12 w-12 p-0 rounded-full focus:ring-2 focus:ring-white focus:ring-offset-2"
             onClick={handleFavorite}
-            aria-label={isFavorited ? "Fjern fra favoritter" : "Legg til favoritter"}
+            aria-label={isFavorited ? t('facility.actions.removeFromFavorites') : t('facility.actions.addToFavorites')}
           >
             <Heart className={`h-5 w-5 ${isFavorited ? 'fill-red-500 text-red-500' : ''}`} />
           </Button>
@@ -131,7 +137,7 @@ export function FacilityCard({ facility, onAddressClick }: FacilityCardProps) {
             size="sm"
             className="bg-white/20 backdrop-blur-md hover:bg-white/30 text-white border-0 h-12 w-12 p-0 rounded-full focus:ring-2 focus:ring-white focus:ring-offset-2"
             onClick={handleShare}
-            aria-label="Del lokale"
+            aria-label={t('facility.actions.shareFacility')}
           >
             <Share2 className="h-5 w-5" />
           </Button>
@@ -176,10 +182,10 @@ export function FacilityCard({ facility, onAddressClick }: FacilityCardProps) {
         <div className="flex items-center justify-between mb-5">
           <div className="flex items-center gap-3 text-gray-600">
             <Users className="h-5 w-5" />
-            <span className="text-base font-medium">{facility.capacity} personer</span>
+            <span className="text-base font-medium">{t('facility.details.capacity')}: {facility.capacity}</span>
           </div>
           
-          <div className="flex gap-3" aria-label="Tilgjengelig utstyr">
+          <div className="flex gap-3" aria-label={t('facility.details.equipment')}>
             {getAmenityIcons()}
           </div>
         </div>
