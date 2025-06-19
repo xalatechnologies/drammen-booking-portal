@@ -1,13 +1,13 @@
 
 import React from 'react';
 import { CreditCard } from 'lucide-react';
-import { CustomerType } from '@/types/pricing';
+import { ActorType } from '@/types/pricing';
 import { EnumSelect } from '@/components/common/EnumSelect';
 import { useTranslation } from '@/i18n/hooks/useTranslation';
 
 interface CustomerTypeSelectorProps {
-  value: CustomerType;
-  onChange: (value: CustomerType) => void;
+  value: ActorType;
+  onChange: (value: ActorType) => void;
 }
 
 export function CustomerTypeSelector({ value, onChange }: CustomerTypeSelectorProps) {
@@ -17,7 +17,7 @@ export function CustomerTypeSelector({ value, onChange }: CustomerTypeSelectorPr
     <EnumSelect
       enumType="ActorType"
       value={value}
-      onValueChange={(newValue) => onChange(newValue as CustomerType)}
+      onValueChange={(newValue) => onChange(newValue as ActorType)}
       label={t('forms.labels.actorType')}
       description={t('forms.descriptions.actorType')}
       placeholder={t('forms.placeholders.selectActorType')}

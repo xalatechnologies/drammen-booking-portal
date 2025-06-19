@@ -1,3 +1,4 @@
+
 import { ActorType, BookingType, PriceCalculation, PriceBreakdownItem } from '@/types/pricing';
 
 interface ZonePricing {
@@ -38,8 +39,9 @@ const actorTypeMultipliers: Record<ActorType, number> = {
 
 // Booking type multipliers
 const bookingTypeMultipliers: Record<BookingType, number> = {
-  'fastlan': 0.9,  // 10% discount for recurring bookings
-  'engangs': 1.0   // Standard price for one-time bookings
+  'fastlan': 0.9,   // 10% discount for recurring bookings
+  'engangs': 1.0,   // Standard price for one-time bookings
+  'strotimer': 1.0  // Standard price for drop-in bookings
 };
 
 // Time-based multipliers
@@ -138,7 +140,11 @@ export const pricingEngine = {
         subtotal: 0,
         finalPrice: 0,
         requiresApproval: false,
-        breakdown: []
+        breakdown: [],
+        discounts: [],
+        surcharges: [],
+        totalPrice: 0,
+        currency: 'NOK'
       };
     }
 
@@ -156,7 +162,11 @@ export const pricingEngine = {
         subtotal: 0,
         finalPrice: 0,
         requiresApproval: false,
-        breakdown: []
+        breakdown: [],
+        discounts: [],
+        surcharges: [],
+        totalPrice: 0,
+        currency: 'NOK'
       };
     }
 
@@ -186,12 +196,21 @@ export const pricingEngine = {
       }
     ];
 
+    const discounts = [];
+    const surcharges = [];
+
     if (actorMultiplier !== 1.0) {
       const discount = subtotal - afterActorType;
       breakdown.push({
         description: `${actorType} rabatt`,
         amount: -discount,
         type: 'discount'
+      });
+      discounts.push({
+        type: 'discount' as const,
+        name: `${actorType} rabatt`,
+        amount: discount,
+        reason: 'Actor type discount'
       });
     }
 
@@ -202,6 +221,12 @@ export const pricingEngine = {
         amount: -discount,
         type: 'discount'
       });
+      discounts.push({
+        type: 'discount' as const,
+        name: `${bookingType} rabatt`,
+        amount: discount,
+        reason: 'Booking type discount'
+      });
     }
 
     if (timeMultiplier !== 1.0) {
@@ -211,6 +236,12 @@ export const pricingEngine = {
         amount: surcharge,
         type: 'surcharge'
       });
+      surcharges.push({
+        type: 'surcharge' as const,
+        name: 'Kveldstillegg',
+        amount: surcharge,
+        reason: 'Evening time surcharge'
+      });
     }
 
     if (weekendMulti !== 1.0) {
@@ -219,6 +250,12 @@ export const pricingEngine = {
         description: 'Helgetillegg',
         amount: surcharge,
         type: 'surcharge'
+      });
+      surcharges.push({
+        type: 'surcharge' as const,
+        name: 'Helgetillegg',
+        amount: surcharge,
+        reason: 'Weekend surcharge'
       });
     }
 
@@ -233,7 +270,11 @@ export const pricingEngine = {
       subtotal,
       finalPrice,
       requiresApproval: requiresApproval(actorType, eventType),
-      breakdown
+      breakdown,
+      discounts,
+      surcharges,
+      totalPrice: finalPrice,
+      currency: 'NOK'
     };
   },
 
@@ -247,6 +288,9 @@ export const pricingEngine = {
     return {
       ...calculation,
       finalPrice: amount,
+      totalPrice: amount,
+      overrideAmount: amount,
+      overrideReason: reason,
       breakdown: [...calculation.breakdown, override]
     };
   }
