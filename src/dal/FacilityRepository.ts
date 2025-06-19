@@ -1,8 +1,8 @@
-
 import { BaseRepository } from './BaseRepository';
 import { Facility, FacilityFilters } from '@/types/facility';
 import { Zone } from '@/types/zone';
-import { mockFacilities } from '@/data/mockFacilities';
+import { localizedMockFacilities } from '@/data/localizedMockFacilities';
+import { getLocalizedFacility } from '@/utils/localizationHelper';
 import { mockZones, getZonesByFacilityId } from '@/data/mockZones';
 
 interface FacilityCreateRequest {
@@ -28,34 +28,17 @@ interface FacilityUpdateRequest extends Partial<FacilityCreateRequest> {
   hasAutoApproval?: boolean;
 }
 
-// Convert mock facility to proper Facility type
-const convertMockFacility = (mockFacility: any): Facility => ({
-  id: mockFacility.id,
-  name: mockFacility.name,
-  address: mockFacility.address,
-  type: mockFacility.type,
-  image: mockFacility.image,
-  nextAvailable: mockFacility.nextAvailable,
-  capacity: mockFacility.capacity,
-  accessibility: mockFacility.accessibility,
-  area: mockFacility.area,
-  suitableFor: mockFacility.suitableFor,
-  equipment: mockFacility.equipment,
-  openingHours: mockFacility.openingHours,
-  description: mockFacility.description,
-  rating: 4.2,
-  reviewCount: 15,
-  pricePerHour: 500,
-  amenities: mockFacility.equipment,
-  hasAutoApproval: false,
-  availableTimes: mockFacility.availableTimes
-});
+// Convert localized facility to proper Facility type
+const convertLocalizedFacility = (localizedFacility: any): Facility => {
+  // Use Norwegian as default for the regular facility repository
+  return getLocalizedFacility(localizedFacility, 'NO');
+};
 
 export class FacilityRepository extends BaseRepository<Facility, FacilityFilters, FacilityCreateRequest, FacilityUpdateRequest> {
   private zones: Zone[] = [];
 
   constructor() {
-    const convertedFacilities = mockFacilities.map(convertMockFacility);
+    const convertedFacilities = localizedMockFacilities.map(convertLocalizedFacility);
     super(convertedFacilities);
     this.zones = [...mockZones];
   }

@@ -1,15 +1,24 @@
-
 import { BaseRepository } from "@/dal/BaseRepository";
 import { Facility, FacilityFilters } from "@/types/facility";
 import { Zone } from "@/types/zone";
 import { PaginatedResponse, ApiResponse } from "@/types/api";
 import { Language } from "@/i18n/types";
-import { localizedMockFacilities } from "@/data/localizedMockFacilities";
+import { LocalizedFacility } from "@/types/localization";
 import { mockZones } from "@/data/mockZones";
 import { getLocalizedFacility } from "@/utils/localizationHelper";
 
 export class LocalizedFacilityRepository extends BaseRepository<Facility> {
   private currentLanguage: Language = 'NO';
+  private localizedFacilities: LocalizedFacility[];
+
+  constructor(initialData: LocalizedFacility[]) {
+    // Convert initial localized data to regular facilities for the base repository
+    const convertedFacilities = initialData.map(facility => 
+      getLocalizedFacility(facility, 'NO')
+    );
+    super(convertedFacilities);
+    this.localizedFacilities = initialData;
+  }
 
   setLanguage(language: Language) {
     this.currentLanguage = language;
@@ -40,7 +49,7 @@ export class LocalizedFacilityRepository extends BaseRepository<Facility> {
   ): Promise<ApiResponse<PaginatedResponse<Facility>>> {
     try {
       // Convert localized facilities to current language
-      let facilities = localizedMockFacilities.map(facility => 
+      let facilities = this.localizedFacilities.map(facility => 
         getLocalizedFacility(facility, this.currentLanguage)
       );
 
@@ -160,7 +169,7 @@ export class LocalizedFacilityRepository extends BaseRepository<Facility> {
   async findById(id: string): Promise<ApiResponse<Facility>> {
     try {
       const facilityId = parseInt(id, 10);
-      const localizedFacility = localizedMockFacilities.find(f => f.id === facilityId);
+      const localizedFacility = this.localizedFacilities.find(f => f.id === facilityId);
       
       if (!localizedFacility) {
         return {
@@ -238,7 +247,7 @@ export class LocalizedFacilityRepository extends BaseRepository<Facility> {
 
   async getFacilitiesByType(type: string): Promise<ApiResponse<Facility[]>> {
     try {
-      const facilities = localizedMockFacilities
+      const facilities = this.localizedFacilities
         .filter(f => f.type === type)
         .map(facility => getLocalizedFacility(facility, this.currentLanguage));
 
@@ -259,7 +268,7 @@ export class LocalizedFacilityRepository extends BaseRepository<Facility> {
 
   async getFacilitiesByArea(area: string): Promise<ApiResponse<Facility[]>> {
     try {
-      const facilities = localizedMockFacilities
+      const facilities = this.localizedFacilities
         .filter(f => f.area === area)
         .map(facility => getLocalizedFacility(facility, this.currentLanguage));
 

@@ -1,12 +1,12 @@
-
 import { Facility, FacilityFilters, FacilitySortOptions } from "@/types/facility";
 import { Zone } from "@/types/zone";
 import { PaginatedResponse, PaginationParams, ApiResponse } from "@/types/api";
 import { LocalizedFacilityRepository } from "@/dal/repositories/LocalizedFacilityRepository";
 import { Language } from "@/i18n/types";
+import { localizedMockFacilities } from "@/data/localizedMockFacilities";
 
-// Create singleton instance
-const localizedFacilityRepository = new LocalizedFacilityRepository();
+// Create singleton instance with initial data
+const localizedFacilityRepository = new LocalizedFacilityRepository(localizedMockFacilities);
 
 // Simulate API delay
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
