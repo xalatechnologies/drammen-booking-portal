@@ -34,7 +34,15 @@ export function useOptimizedFacilities({
   // Transform the data based on current language (memoized)
   const facilities = useMemo(() => {
     if (!response?.success || !response.data.data) return [];
-    return response.data.data.map(facility => getLocalizedFacility(facility));
+    const transformed = response.data.data.map(facility => getLocalizedFacility(facility));
+    
+    // Debug logging to see actual facility types and areas
+    console.log("useOptimizedFacilities - Sample facility types:", 
+      transformed.slice(0, 3).map(f => ({ id: f.id, type: f.type, area: f.area }))
+    );
+    console.log("useOptimizedFacilities - Applied filters:", filters);
+    
+    return transformed;
   }, [response, getLocalizedFacility]);
 
   const paginationInfo = response?.success ? {

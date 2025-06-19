@@ -29,17 +29,17 @@ const FilterSelects: React.FC<FilterSelectsProps> = ({
 }) => {
   const { t } = useTranslation();
 
-  // Define facility type mappings - these values should match what's in your database
+  // Use the actual facility type values from the data
   const facilityTypeOptions = [
     { value: "all", label: t('forms.facilityTypes.all') },
-    { value: "sports-hall", label: t('forms.facilityTypes.sportsHall') },
-    { value: "meeting-room", label: t('forms.facilityTypes.meetingRoom') },
-    { value: "conference-room", label: t('forms.facilityTypes.conferenceRoom') },
-    { value: "auditorium", label: t('forms.facilityTypes.auditorium') },
-    { value: "gym", label: t('forms.facilityTypes.gym') }
+    { value: "sports-center", label: t('forms.facilityTypes.sportsHall') },
+    { value: "community-center", label: t('forms.facilityTypes.meetingRoom') },
+    { value: "conference-center", label: t('forms.facilityTypes.conferenceRoom') },
+    { value: "cultural-center", label: t('forms.facilityTypes.auditorium') },
+    { value: "school", label: t('forms.facilityTypes.gym') }
   ];
 
-  // Define location mappings - these values should match what's in your database
+  // Use the actual location values from the data
   const locationOptions = [
     { value: "all", label: t('forms.locations.all') },
     { value: "drammen-sentrum", label: t('forms.locations.drammenSentrum') },
