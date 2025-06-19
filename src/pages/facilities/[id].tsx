@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -16,6 +15,7 @@ import { useOptimizedFacility } from "@/hooks/useOptimizedFacility";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useTranslation } from "@/i18n";
 import { CartProvider } from "@/contexts/CartContext";
+import { MobileBookingPanel } from "@/components/facility/MobileBookingPanel";
 
 const FacilityDetail = () => {
   const { id } = useParams();
@@ -160,7 +160,7 @@ const FacilityDetail = () => {
         </div>
 
         {/* Main Content */}
-        <div className="flex-grow">
+        <div className="flex-grow pb-20 lg:pb-0">
           <div className="container mx-auto px-4 py-6 max-w-7xl">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* Left Column - Main Content (2/3 width) */}
@@ -187,9 +187,9 @@ const FacilityDetail = () => {
 
                 {/* Main Calendar - Primary Feature */}
                 <div className="bg-white rounded-lg shadow-sm border">
-                  <div className="p-6">
+                  <div className="p-4 md:p-6">
                     <div className="flex items-center justify-between mb-6">
-                      <h2 className="text-2xl font-bold text-gray-900">Tilgjengelighet og booking</h2>
+                      <h2 className="text-xl md:text-2xl font-bold text-gray-900">Tilgjengelighet og booking</h2>
                       <div className="text-sm text-gray-500">
                         Velg tidspunkt for å booke
                       </div>
@@ -219,8 +219,8 @@ const FacilityDetail = () => {
                 />
               </div>
 
-              {/* Right Column - Persistent Booking Panel (1/3 width) */}
-              <div className="lg:col-span-1">
+              {/* Right Column - Desktop Persistent Booking Panel (1/3 width) */}
+              <div className="lg:col-span-1 hidden lg:block">
                 <div className="sticky top-6">
                   <PersistentBookingSidebar
                     facilityName={facility.name}
@@ -239,6 +239,15 @@ const FacilityDetail = () => {
             </div>
           </div>
         </div>
+
+        {/* Mobile Booking Panel */}
+        <MobileBookingPanel
+          facilityName={facility.name}
+          facilityId={id || ""}
+          capacity={facility.capacity}
+          area={facility.area}
+          openingHours={facility.openingHours}
+        />
 
         <GlobalFooter />
       </div>

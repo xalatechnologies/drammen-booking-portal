@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { format, addDays } from 'date-fns';
 import { Zone } from '@/components/booking/types';
@@ -9,7 +8,7 @@ import { useCart } from '@/contexts/CartContext';
 import { useTranslation } from '@/i18n';
 import { WeekNavigation } from './WeekNavigation';
 import { ZoneInfoHeader } from './ZoneInfoHeader';
-import { CalendarGrid } from './CalendarGrid';
+import { ResponsiveCalendarGrid } from './ResponsiveCalendarGrid';
 import { SelectedSlotsDisplay } from './SelectedSlotsDisplay';
 import { LegendDisplay } from './LegendDisplay';
 import { isSlotSelected, addSlotToSelection, removeSlotFromSelection } from './AvailabilityTabUtils';
@@ -108,7 +107,7 @@ export function AvailabilityTabContent({
         canGoPrevious={canGoPrevious}
       />
 
-      <CalendarGrid
+      <ResponsiveCalendarGrid
         zone={zone}
         currentWeekStart={currentWeekStart}
         timeSlots={timeSlots}
