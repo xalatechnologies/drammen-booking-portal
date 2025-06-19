@@ -11,7 +11,5 @@ export function SelectedSlotsDisplay({
   selectedSlots
 }: SelectedSlotsDisplayProps) {
   if (selectedSlots.length === 0) return null;
-  return <Card className="bg-blue-50 border-blue-200">
-      
-    </Card>;
+  return;
 }
