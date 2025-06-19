@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { format, addDays } from 'date-fns';
 import { Zone } from '@/components/booking/types';
 import { SelectedTimeSlot, RecurrencePattern, recurrenceEngine } from '@/utils/recurrenceEngine';
@@ -11,7 +11,10 @@ import { ZoneInfoHeader } from './ZoneInfoHeader';
 import { ResponsiveCalendarGrid } from './ResponsiveCalendarGrid';
 import { SelectedSlotsDisplay } from './SelectedSlotsDisplay';
 import { LegendDisplay } from './LegendDisplay';
+import { StrotimeDisplay } from './StrotimeDisplay';
 import { isSlotSelected, addSlotToSelection, removeSlotFromSelection } from './AvailabilityTabUtils';
+import { StrotimeService } from '@/services/StrotimeService';
+import { StrøtimeSlot } from '@/types/booking/strøtimer';
 
 interface AvailabilityTabContentProps {
   zone: Zone;
@@ -80,6 +83,38 @@ export function AvailabilityTabContent({
   const { addToCart } = useCart();
   const { t } = useTranslation();
 
+  // Add state for strøtimer
+  const [strøtimer, setStrøtimer] = useState<StrøtimeSlot[]>([]);
+  const [loadingStrøtimer, setLoadingStrøtimer] = useState(false);
+
+  // Fetch strøtimer for the current week
+  useEffect(() => {
+    const fetchStrøtimer = async () => {
+      if (!facilityId) return;
+      
+      setLoadingStrøtimer(true);
+      try {
+        const response = await StrotimeService.getAvailableStrøtimer({
+          facilityId,
+          startDate: currentWeekStart,
+          endDate: addDays(currentWeekStart, 6)
+        });
+        
+        if (response.success) {
+          setStrøtimer(response.data || []);
+        }
+      } catch (error) {
+        console.error('Failed to fetch strøtimer:', error);
+      } finally {
+        setLoadingStrøtimer(false);
+      }
+    };
+
+    fetchStrøtimer();
+  }, [facilityId, currentWeekStart]);
+
+  const weekDays = Array(7).fill(0).map((_, i) => addDays(currentWeekStart, i));
+
   const getAvailabilityStatus = (zoneId: string, date: Date, timeSlot: string) => {
     const unavailableCheck = isDateUnavailable(date);
     if (unavailableCheck.isUnavailable) {
@@ -123,6 +158,29 @@ export function AvailabilityTabContent({
     setSelectedSlots([]);
   };
 
+  const handleStrøtimeBookingComplete = (booking: any) => {
+    // Refresh strøtimer after booking
+    const fetchStrøtimer = async () => {
+      if (!facilityId) return;
+      
+      try {
+        const response = await StrotimeService.getAvailableStrøtimer({
+          facilityId,
+          startDate: currentWeekStart,
+          endDate: addDays(currentWeekStart, 6)
+        });
+        
+        if (response.success) {
+          setStrøtimer(response.data || []);
+        }
+      } catch (error) {
+        console.error('Failed to refresh strøtimer:', error);
+      }
+    };
+
+    fetchStrøtimer();
+  };
+
   return (
     <div className="space-y-4">
       <WeekNavigation
@@ -130,6 +188,16 @@ export function AvailabilityTabContent({
         onWeekChange={setCurrentWeekStart}
         canGoPrevious={canGoPrevious}
       />
+
+      {/* Show strøtimer for each day of the week */}
+      {weekDays.map(day => (
+        <StrotimeDisplay
+          key={day.toISOString()}
+          strøtimer={strøtimer}
+          date={day}
+          onBookingComplete={handleStrøtimeBookingComplete}
+        />
+      ))}
 
       <ResponsiveCalendarGrid
         zone={zone}

@@ -1,70 +1,48 @@
 
+export type BookingType = 'engangs' | 'fastlan' | 'strotimer';
+
+export type ActorType = 
+  | 'private-person'
+  | 'lag-foreninger' 
+  | 'paraply'
+  | 'private-firma'
+  | 'kommunale-enheter';
+
 export interface PriceRule {
   id: string;
-  facilityId: string;
-  zoneId?: string;
+  name: string;
+  description: string;
   actorType: ActorType;
-  timeSlot: TimeSlotCategory;
   bookingType: BookingType;
-  dayType: 'weekday' | 'weekend';
-  priceType: 'hourly' | 'daily' | 'flat';
-  basePrice: number;
+  baseRate: number;
+  discountPercentage?: number;
+  minimumDuration?: number;
+  maximumDuration?: number;
+  validDays?: string[];
+  validTimeSlots?: string[];
+  seasonalMultiplier?: number;
   isActive: boolean;
-  validFrom?: Date;
-  validTo?: Date;
-  requiresApproval?: boolean;
-  actorStatus?: ActorStatus;
 }
 
 export interface PriceCalculation {
   basePrice: number;
-  totalHours: number;
-  totalDays: number;
-  actorTypeDiscount: number;
-  timeSlotMultiplier: number;
-  bookingTypeDiscount: number;
-  weekendSurcharge: number;
-  subtotal: number;
-  overrideAmount?: number;
-  overrideReason?: string;
-  finalPrice: number;
-  requiresApproval: boolean;
+  discounts: PriceAdjustment[];
+  surcharges: PriceAdjustment[];
+  totalPrice: number;
+  currency: string;
   breakdown: PriceBreakdownItem[];
+}
+
+export interface PriceAdjustment {
+  type: 'discount' | 'surcharge';
+  name: string;
+  amount: number;
+  percentage?: number;
+  reason: string;
 }
 
 export interface PriceBreakdownItem {
   description: string;
   amount: number;
-  type: 'base' | 'discount' | 'surcharge' | 'override';
+  type: 'base' | 'discount' | 'surcharge' | 'tax';
 }
-
-export interface PriceOverride {
-  amount: number;
-  reason: string;
-  appliedBy: string;
-  timestamp: Date;
-}
-
-export type ActorType = 
-  | 'lag-foreninger'      // Lag og foreninger (frivillige)
-  | 'paraply'             // Paraplyorganisasjoner
-  | 'private-firma'       // Private firmaer
-  | 'kommunale-enheter'   // Kommunale enheter
-  | 'private-person';     // Private personer
-
-export type ActorStatus = 
-  | 'verified'            // Verifisert i aktørregisteret
-  | 'pending'             // Venter på verifisering
-  | 'unverified';         // Ikke verifisert
-
-export type TimeSlotCategory = 
-  | 'morning'             // Morgen (06:00-12:00)
-  | 'day'                 // Dag (12:00-17:00)
-  | 'evening'             // Kveld (17:00-23:00)
-  | 'night';              // Natt (23:00-06:00)
-
-export type BookingType = 
-  | 'engangs'             // Engangslån
-  | 'fastlan';            // Fastlån/gjentakende
-
-export type CustomerType = ActorType; // For backwards compatibility

@@ -34,6 +34,7 @@ export type EventType =
   | 'conference'
   | 'performance'
   | 'exhibition'
+  | 'drop-in'
   | 'other';
 
 export type AgeGroup = 
