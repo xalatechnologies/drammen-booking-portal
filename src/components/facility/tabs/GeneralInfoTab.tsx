@@ -1,4 +1,5 @@
 
+
 import React from "react";
 import { MapPin, Clock, Square, Users } from "lucide-react";
 import { Zone } from "@/components/booking/types";
@@ -16,6 +17,7 @@ interface GeneralInfoTabProps {
   zones: Zone[];
   facilityId?: string;
   facilityName?: string;
+  openingHours?: string;
 }
 
 export function GeneralInfoTab({
@@ -26,7 +28,8 @@ export function GeneralInfoTab({
   suitableFor,
   zones,
   facilityId = "",
-  facilityName = ""
+  facilityName = "",
+  openingHours = "08:00-22:00"
 }: GeneralInfoTabProps) {
   const { t } = useTranslation();
 
@@ -68,7 +71,11 @@ export function GeneralInfoTab({
             <Square className="h-6 w-6 text-gray-700" />
             <span className="text-gray-700 text-base">{area}</span>
           </div>
-          <div className="flex items-center gap-3 md:col-span-2">
+          <div className="flex items-center gap-3">
+            <Clock className="h-6 w-6 text-gray-700" />
+            <span className="text-gray-700 text-base">{openingHours}</span>
+          </div>
+          <div className="flex items-center gap-3 md:col-span-1">
             <MapPin className="h-6 w-6 text-gray-700" />
             <span className="text-gray-700 text-base">{address}</span>
           </div>
@@ -97,6 +104,7 @@ export function GeneralInfoTab({
             showLegend={true}
             facilityId={facilityId}
             facilityName={facilityName}
+            openingHours={openingHours}
           />
         </div>
       </div>
