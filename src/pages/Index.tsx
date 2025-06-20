@@ -126,11 +126,15 @@ const Index = () => {
         Hopp til hovedinnhold
       </a>
 
-      <GlobalHeader />
+      {/* Fixed Global Header */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-white shadow-md">
+        <GlobalHeader />
+      </div>
 
-      <main id="main-content" className="flex-1 w-full">
-        {/* Sticky Search Filter */}
-        <div className="sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-sm">
+      {/* Main content with top padding to account for fixed header */}
+      <main id="main-content" className="flex-1 w-full pt-20">
+        {/* Fixed Search Filter */}
+        <div className="fixed top-20 left-0 right-0 z-40 bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-sm">
           <div className="content-center py-6">
             <SearchFilter
               date={date}
@@ -163,8 +167,8 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Content Area */}
-        <div className="content-center py-6">
+        {/* Scrollable Content Area with top padding for fixed filter */}
+        <div className="pt-32 content-center py-6">
           {renderContent()}
         </div>
       </main>

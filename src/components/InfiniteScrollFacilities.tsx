@@ -1,5 +1,6 @@
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
+import InfiniteScroll from 'react-infinite-scroll-component';
 import { Loader2, ArrowUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -23,7 +24,6 @@ export function InfiniteScrollFacilities({
   const [allFacilities, setAllFacilities] = useState<any[]>([]);
   const [hasMore, setHasMore] = useState(true);
   const [showScrollTop, setShowScrollTop] = useState(false);
-  const observerRef = useRef<HTMLDivElement>(null);
 
   const { facilities, pagination, isLoading, error } = useOptimizedFacilities({
     pagination: { page, limit: 6 },
@@ -57,35 +57,7 @@ export function InfiniteScrollFacilities({
     }
   }, [facilities, page, pagination]);
 
-  // Intersection Observer for infinite scroll
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const entry = entries[0];
-        if (entry.isIntersecting && hasMore && !isLoading) {
-          console.log('Loading next page:', page + 1);
-          setPage(prev => prev + 1);
-        }
-      },
-      { 
-        threshold: 0.1,
-        rootMargin: '50px'
-      }
-    );
-
-    if (observerRef.current) {
-      observer.observe(observerRef.current);
-    }
-
-    return () => {
-      if (observerRef.current) {
-        observer.unobserve(observerRef.current);
-      }
-      observer.disconnect();
-    };
-  }, [hasMore, isLoading, page]);
-
-  // Scroll position tracking
+  // Scroll position tracking for scroll-to-top button
   useEffect(() => {
     const handleScroll = () => {
       const scrollTop = window.scrollY;
@@ -95,6 +67,13 @@ export function InfiniteScrollFacilities({
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const fetchMoreData = useCallback(() => {
+    if (!isLoading && hasMore) {
+      console.log('Loading next page:', page + 1);
+      setPage(prev => prev + 1);
+    }
+  }, [isLoading, hasMore, page]);
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -146,6 +125,25 @@ export function InfiniteScrollFacilities({
     );
   }
 
+  const LoadingSpinner = () => (
+    <div className="flex items-center justify-center py-8">
+      <div className="flex items-center gap-3 bg-white rounded-full px-6 py-3 shadow-lg border">
+        <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
+        <span className="text-gray-700 font-medium">Laster flere lokaler...</span>
+      </div>
+    </div>
+  );
+
+  const EndMessage = () => (
+    <div className="text-center py-8">
+      <div className="inline-flex items-center gap-2 bg-gray-100 rounded-full px-6 py-3">
+        <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+        <span className="text-gray-600 font-medium">Du har sett alle tilgjengelige lokaler</span>
+        <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="relative">
       {/* Results summary */}
@@ -167,75 +165,52 @@ export function InfiniteScrollFacilities({
         </div>
       </div>
 
-      {/* Facilities content */}
-      {viewMode === "grid" ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 animate-fade-in">
-          {allFacilities.map((facility, index) => (
-            <div 
-              key={`${facility.id}-${index}`}
-              className="animate-scale-in"
-              style={{ animationDelay: `${(index % 6) * 50}ms` }}
-            >
-              <FacilityCard 
-                facility={facility} 
-                onAddressClick={handleAddressClick}
-              />
-            </div>
-          ))}
-        </div>
-      ) : (
-        <div className="space-y-4">
-          {allFacilities.map((facility, index) => (
-            <div 
-              key={`${facility.id}-${index}`}
-              className="animate-fade-in"
-              style={{ animationDelay: `${(index % 6) * 50}ms` }}
-            >
-              <FacilityListItem 
-                facility={facility}
-                facilityType={filters.facilityType}
-                location={filters.location}
-                accessibility={filters.accessibility}
-                capacity={filters.capacity}
-              />
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Loading indicator */}
-      {isLoading && page > 1 && (
-        <div className="flex items-center justify-center py-8">
-          <div className="flex items-center gap-3 bg-white rounded-full px-6 py-3 shadow-lg border">
-            <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
-            <span className="text-gray-700 font-medium">Laster flere lokaler...</span>
+      {/* Infinite Scroll Container */}
+      <InfiniteScroll
+        dataLength={allFacilities.length}
+        next={fetchMoreData}
+        hasMore={hasMore}
+        loader={<LoadingSpinner />}
+        endMessage={<EndMessage />}
+        scrollThreshold={0.9}
+        style={{ overflow: 'visible' }}
+      >
+        {/* Facilities content */}
+        {viewMode === "grid" ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            {allFacilities.map((facility, index) => (
+              <div 
+                key={`${facility.id}-${index}`}
+                className="animate-scale-in"
+                style={{ animationDelay: `${(index % 6) * 50}ms` }}
+              >
+                <FacilityCard 
+                  facility={facility} 
+                  onAddressClick={handleAddressClick}
+                />
+              </div>
+            ))}
           </div>
-        </div>
-      )}
-
-      {/* End of results indicator */}
-      {!hasMore && allFacilities.length > 0 && (
-        <div className="text-center py-8">
-          <div className="inline-flex items-center gap-2 bg-gray-100 rounded-full px-6 py-3">
-            <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
-            <span className="text-gray-600 font-medium">Du har sett alle tilgjengelige lokaler</span>
-            <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+        ) : (
+          <div className="space-y-4">
+            {allFacilities.map((facility, index) => (
+              <div 
+                key={`${facility.id}-${index}`}
+                className="animate-fade-in"
+                style={{ animationDelay: `${(index % 6) * 50}ms` }}
+              >
+                <FacilityListItem 
+                  facility={facility}
+                  facilityType={filters.facilityType}
+                  location={filters.location}
+                  accessibility={filters.accessibility}
+                  capacity={filters.capacity}
+                />
+              </div>
+            ))}
           </div>
-        </div>
-      )}
-
-      {/* Infinite scroll trigger - This is the key element for intersection observer */}
-      {hasMore && (
-        <div 
-          ref={observerRef} 
-          className="h-10 flex items-center justify-center"
-        >
-          {/* Visual indicator when near end */}
-          {!isLoading && (
-            <div className="text-gray-400 text-sm">Laster flere...</div>
-          )}
-        </div>
-      )}
+        )}
+      </InfiniteScroll>
 
       {/* Scroll to top button */}
       {showScrollTop && (
