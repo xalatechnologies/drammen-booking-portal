@@ -13,7 +13,7 @@ import { SimplifiedBookingForm } from '@/components/booking/SimplifiedBookingFor
 import { Zone } from '@/components/booking/types';
 import { SelectedTimeSlot, RecurrencePattern, recurrenceEngine } from '@/utils/recurrenceEngine';
 import { useAvailabilityStatus } from './useAvailabilityStatus';
-import { AvailabilityModals } from './AvailabilityModals';
+import { SimpleRecurrenceDrawer } from '../recurrence/SimpleRecurrenceDrawer';
 
 interface AvailabilityTabProps {
   zones: Zone[];
@@ -48,7 +48,7 @@ export function AvailabilityTab({
     startOfWeek(new Date(), { weekStartsOn: 1 })
   );
   const [selectedZoneId, setSelectedZoneId] = useState(zones[0]?.id || '');
-  const [showPatternBuilder, setShowPatternBuilder] = useState(false);
+  const [showRecurrenceDrawer, setShowRecurrenceDrawer] = useState(false);
   const [showConflictWizard, setShowConflictWizard] = useState(false);
   const [showBookingDrawer, setShowBookingDrawer] = useState(false);
   const [conflictResolutionData, setConflictResolutionData] = useState<any>(null);
@@ -94,11 +94,11 @@ export function AvailabilityTab({
   };
 
   const handleRecurringBooking = () => {
-    setShowPatternBuilder(true);
+    setShowRecurrenceDrawer(true);
   };
 
-  const handlePatternBuilderClose = () => {
-    setShowPatternBuilder(false);
+  const handleRecurrenceDrawerClose = () => {
+    setShowRecurrenceDrawer(false);
   };
 
   const handleConflictWizardClose = () => {
@@ -138,7 +138,7 @@ export function AvailabilityTab({
     if (onPatternApply) {
       onPatternApply(pattern);
     }
-    setShowPatternBuilder(false);
+    setShowRecurrenceDrawer(false);
   };
 
   return (
@@ -264,21 +264,13 @@ export function AvailabilityTab({
         </div>
       </div>
 
-      {/* Modals */}
-      <AvailabilityModals
-        showPatternBuilder={showPatternBuilder}
-        showConflictWizard={showConflictWizard}
-        showBookingDrawer={showBookingDrawer}
-        currentPattern={recurrencePattern}
-        conflictResolutionData={conflictResolutionData}
-        selectedSlots={selectedSlots}
-        facilityId={facilityId}
-        facilityName={facilityName}
-        onPatternBuilderClose={handlePatternBuilderClose}
-        onConflictWizardClose={handleConflictWizardClose}
-        onBookingDrawerClose={handleBookingDrawerClose}
+      {/* Recurrence Drawer */}
+      <SimpleRecurrenceDrawer
+        isOpen={showRecurrenceDrawer}
+        onClose={handleRecurrenceDrawerClose}
+        pattern={recurrencePattern}
         onPatternChange={handlePatternChange}
-        onPatternApply={handlePatternApply}
+        onApplyPattern={handlePatternApply}
       />
     </div>
   );
