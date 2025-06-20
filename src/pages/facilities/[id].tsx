@@ -12,6 +12,7 @@ import { AvailabilityTab } from "@/components/facility/tabs/AvailabilityTab";
 import { SimilarFacilitiesSlider } from "@/components/facility/SimilarFacilitiesSlider";
 import { Zone } from "@/components/booking/types";
 import { useOptimizedFacility } from "@/hooks/useOptimizedFacility";
+import { useZones } from "@/hooks/useZones";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useTranslation } from "@/i18n";
 import { CartProvider } from "@/contexts/CartContext";
@@ -23,13 +24,14 @@ const FacilityDetail = () => {
   const [isFavorited, setIsFavorited] = useState(false);
   const { t } = useTranslation();
   const { facility, isLoading, error, notFound } = useOptimizedFacility(Number(id));
+  const { data: zones = [], isLoading: zonesLoading } = useZones(id);
 
   // State for availability tab
   const [selectedSlots, setSelectedSlots] = useState<any[]>([]);
   const [currentPattern, setCurrentPattern] = useState<any>({});
 
-  // Enhanced zones with full zone management capabilities
-  const zones: Zone[] = [{
+  // Default zone if no zones are returned from the API
+  const defaultZone: Zone = {
     id: "whole-facility",
     name: t('facility.booking.wholeVenue'),
     capacity: facility?.capacity || 30,
@@ -69,7 +71,10 @@ const FacilityDetail = () => {
     accessibility: ["wheelchair", "hearing-loop", "visual-guidance"],
     features: ["Klimaanlegg", "Moderne lyd", "LED-belysning", "Sikkerhetskameraer"],
     isActive: true
-  }];
+  };
+
+  // Use real zones if available, otherwise fall back to default
+  const displayZones = zones.length > 0 ? zones : [defaultZone];
 
   const handleSlotClick = (zoneId: string, date: Date, timeSlot: string, availability: string) => {
     if (availability !== 'available') return;
@@ -128,7 +133,7 @@ const FacilityDetail = () => {
   };
 
   // Loading state
-  if (isLoading) {
+  if (isLoading || zonesLoading) {
     return <CartProvider>
         <div className="min-h-screen bg-white flex flex-col">
           <GlobalHeader />
@@ -215,7 +220,7 @@ const FacilityDetail = () => {
             <div className="grid grid-cols-1 lg:grid-cols-10 gap-8 mb-12">
               {/* Left Column - Tabs Content (70%) */}
               <div className="lg:col-span-7 space-y-6">
-                <FacilityInfoTabs description={facility.description} capacity={facility.capacity} equipment={facility.equipment || []} zones={zones} amenities={facility.amenities || []} address={facility.address} area={facility.area} suitableFor={facility.suitableFor || []} facilityId={id} facilityName={facility.name} />
+                <FacilityInfoTabs description={facility.description} capacity={facility.capacity} equipment={facility.equipment || []} zones={displayZones} amenities={facility.amenities || []} address={facility.address} area={facility.area} suitableFor={facility.suitableFor || []} facilityId={id} facilityName={facility.name} />
               </div>
 
               {/* Right Column - Contact Info Sidebar (30%) */}
@@ -231,7 +236,7 @@ const FacilityDetail = () => {
               <div className="bg-white border border-gray-200 rounded-lg p-6">
                 <h2 className="text-2xl font-bold mb-6">Tilgjengelighet og booking</h2>
                 <AvailabilityTab 
-                  zones={zones} 
+                  zones={displayZones} 
                   selectedSlots={selectedSlots}
                   onSlotClick={handleSlotClick}
                   onBulkSlotSelection={handleBulkSlotSelection}

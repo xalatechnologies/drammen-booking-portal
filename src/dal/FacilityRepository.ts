@@ -1,3 +1,4 @@
+
 import { BaseRepository } from './BaseRepository';
 import { Facility, FacilityFilters } from '@/types/facility';
 import { Zone } from '@/types/zone';
@@ -39,6 +40,7 @@ export class FacilityRepository extends BaseRepository<Facility, FacilityFilters
 
   constructor() {
     const convertedFacilities = localizedMockFacilities.map(convertLocalizedFacility);
+    
     // Add timeSlotDuration to some facilities for testing
     convertedFacilities.forEach((facility, index) => {
       // Set some facilities to use 2-hour slots for variety
@@ -48,6 +50,54 @@ export class FacilityRepository extends BaseRepository<Facility, FacilityFilters
         facility.timeSlotDuration = 1;
       }
     });
+
+    // Add two new mock facilities with multiple zones
+    const multiZoneFacility1: Facility = {
+      id: 999,
+      name: "Storsal Kulturhus - Multisone",
+      address: "Storgata 15, Drammen",
+      type: "Kulturlokale",
+      image: "/lovable-uploads/13aee1f6-e9d9-474b-9ed7-c656d703d19b.png",
+      nextAvailable: "I dag, 16:00",
+      capacity: 200,
+      accessibility: ["Rullestoltilgjengelig", "Hørselssløyfe"],
+      area: "Drammen sentrum",
+      suitableFor: ["Teater", "Konsert", "Konferanse", "Workshop"],
+      equipment: ["Scene", "Lydanlegg", "Lysrigger", "Projektor"],
+      openingHours: "Man-Fre: 08:00-22:00, Lør-Søn: 10:00-20:00",
+      description: "Storsal med flere avdelinger som kan brukes separat eller sammen",
+      rating: 4.8,
+      reviewCount: 45,
+      pricePerHour: 800,
+      amenities: ["Scene", "Profesjonelt lydanlegg", "Garderober"],
+      hasAutoApproval: false,
+      timeSlotDuration: 1
+    };
+
+    const multiZoneFacility2: Facility = {
+      id: 998,
+      name: "Idrettshall Mjøndalen - Fleksibel",
+      address: "Idrettsveien 22, Mjøndalen",
+      type: "Idrettshall",
+      image: "/lovable-uploads/13aee1f6-e9d9-474b-9ed7-c656d703d19b.png",
+      nextAvailable: "I morgen, 09:00",
+      capacity: 150,
+      accessibility: ["Rullestoltilgjengelig"],
+      area: "Mjøndalen",
+      suitableFor: ["Håndball", "Basketball", "Volleyball", "Badminton"],
+      equipment: ["Basketkurver", "Håndballmål", "Nettstolper", "Tribuner"],
+      openingHours: "Man-Fre: 07:00-23:00, Lør-Søn: 09:00-21:00",
+      description: "Moderne idrettshall med tre separate soner som kan kombineres",
+      rating: 4.6,
+      reviewCount: 32,
+      pricePerHour: 600,
+      amenities: ["Moderne utstyr", "God ventilasjon", "Garderober"],
+      hasAutoApproval: true,
+      timeSlotDuration: 2
+    };
+
+    convertedFacilities.push(multiZoneFacility1, multiZoneFacility2);
+    
     super(convertedFacilities);
     this.zones = [...mockZones];
   }

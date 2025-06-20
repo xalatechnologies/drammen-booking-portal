@@ -8,6 +8,7 @@ import { ResponsiveCalendarGrid } from './ResponsiveCalendarGrid';
 import { CalendarSidebar } from '../CalendarSidebar';
 import { WeekNavigation } from './WeekNavigation';
 import { useAvailabilityStatus } from './useAvailabilityStatus';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface AvailabilityTabProps {
   zones: Zone[];
@@ -96,51 +97,45 @@ export function AvailabilityTab({
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const calendarComponent = isMobile ? (
-    <ResponsiveCalendarGrid
-      zone={selectedZone}
-      currentWeekStart={currentWeekStart}
-      timeSlots={timeSlots}
-      selectedSlots={selectedSlots}
-      getAvailabilityStatus={getAvailabilityStatus}
-      isSlotSelected={isSlotSelected}
-      onSlotClick={onSlotClick}
-      onBulkSlotSelection={onBulkSlotSelection}
-    />
-  ) : (
-    <CalendarGrid
-      zone={selectedZone}
-      currentWeekStart={currentWeekStart}
-      timeSlots={timeSlots}
-      selectedSlots={selectedSlots}
-      getAvailabilityStatus={getAvailabilityStatus}
-      isSlotSelected={isSlotSelected}
-      onSlotClick={onSlotClick}
-      onBulkSlotSelection={onBulkSlotSelection}
-    />
-  );
+  const renderCalendarForZone = (zone: Zone) => {
+    const calendarComponent = isMobile ? (
+      <ResponsiveCalendarGrid
+        zone={zone}
+        currentWeekStart={currentWeekStart}
+        timeSlots={timeSlots}
+        selectedSlots={selectedSlots}
+        getAvailabilityStatus={getAvailabilityStatus}
+        isSlotSelected={isSlotSelected}
+        onSlotClick={onSlotClick}
+        onBulkSlotSelection={onBulkSlotSelection}
+      />
+    ) : (
+      <CalendarGrid
+        zone={zone}
+        currentWeekStart={currentWeekStart}
+        timeSlots={timeSlots}
+        selectedSlots={selectedSlots}
+        getAvailabilityStatus={getAvailabilityStatus}
+        isSlotSelected={isSlotSelected}
+        onSlotClick={onSlotClick}
+        onBulkSlotSelection={onBulkSlotSelection}
+      />
+    );
+
+    return (
+      <div className="space-y-4">
+        <WeekNavigation
+          currentWeekStart={currentWeekStart}
+          onWeekChange={setCurrentWeekStart}
+          canGoPrevious={true}
+        />
+        {calendarComponent}
+      </div>
+    );
+  };
 
   return (
     <div className="space-y-4">
-      {/* Zone Selection */}
-      <div className="flex items-center gap-4 mb-4">
-        <label className="text-sm font-medium">Velg sone:</label>
-        <select 
-          value={selectedZone.id} 
-          onChange={(e) => {
-            const zone = zones.find(z => z.id === e.target.value);
-            if (zone) setSelectedZone(zone);
-          }}
-          className="px-3 py-2 border rounded-md"
-        >
-          {zones.map(zone => (
-            <option key={zone.id} value={zone.id}>
-              {zone.name}
-            </option>
-          ))}
-        </select>
-      </div>
-
       {/* Helper Message */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
         <p className="text-sm text-blue-800">
@@ -152,14 +147,27 @@ export function AvailabilityTab({
       <div className="grid grid-cols-1 lg:grid-cols-10 gap-6">
         {/* Calendar Column - 70% */}
         <div className="lg:col-span-7">
-          <div className="space-y-4">
-            <WeekNavigation
-              currentWeekStart={currentWeekStart}
-              onWeekChange={setCurrentWeekStart}
-              canGoPrevious={true}
-            />
-            {calendarComponent}
-          </div>
+          {zones.length > 1 ? (
+            <Tabs value={selectedZone.id} onValueChange={(value) => {
+              const zone = zones.find(z => z.id === value);
+              if (zone) setSelectedZone(zone);
+            }}>
+              <TabsList className="grid w-full grid-cols-2 lg:grid-cols-3">
+                {zones.map(zone => (
+                  <TabsTrigger key={zone.id} value={zone.id} className="text-sm">
+                    {zone.name}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+              {zones.map(zone => (
+                <TabsContent key={zone.id} value={zone.id} className="mt-6">
+                  {renderCalendarForZone(zone)}
+                </TabsContent>
+              ))}
+            </Tabs>
+          ) : (
+            renderCalendarForZone(zones[0])
+          )}
         </div>
 
         {/* Sidebar Column - 30% */}

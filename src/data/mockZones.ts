@@ -1,4 +1,3 @@
-
 import { Zone } from '@/types/zone';
 
 export const mockZones: Zone[] = [
@@ -229,26 +228,26 @@ export const mockZones: Zone[] = [
     createdAt: new Date(2025, 0, 1),
     updatedAt: new Date(2025, 5, 1)
   },
-  // Add more zones for other facilities...
+  // Multi-zone facility 1 (ID: 999) - Storsal Kulturhus zones
   {
-    id: "zone-3-main",
-    facilityId: "3",
-    name: "Auditorium",
-    description: "Professional auditorium with stage lighting",
+    id: "zone-999-main",
+    facilityId: "999",
+    name: "Hovedsalen",
+    description: "Hovedscene med full kapasitet",
     isMainZone: true,
-    capacity: 150,
-    area: 300,
+    capacity: 200,
+    area: 400,
     floor: "1",
-    coordinates: { x: 0, y: 0, width: 25, height: 12 },
-    equipment: ["Projektor", "Lydsystem", "Mikrofoner", "Scene", "Lysrigger"],
-    features: ["Profesjonelt", "Scenebelysning", "Høykvalitets lyd"],
-    accessibility: ["wheelchair", "hearing-loop", "sign-language"],
+    coordinates: { x: 0, y: 0, width: 40, height: 20 },
+    equipment: ["Scene", "Profesjonelt lydanlegg", "Lysrigger", "Projektor", "Garderober"],
+    features: ["Høy standard", "Profesjonell scene", "God akustikk"],
+    accessibility: ["wheelchair", "hearing-loop"],
     pricing: {
-      basePrice: 1500,
+      basePrice: 800,
       currency: "NOK",
       priceRules: [
         {
-          id: "rule-5",
+          id: "rule-999-1",
           actorType: "lag-foreninger",
           timeSlot: "evening",
           dayType: "weekday",
@@ -256,13 +255,13 @@ export const mockZones: Zone[] = [
           isActive: true
         }
       ],
-      minimumBookingDuration: 180,
+      minimumBookingDuration: 120,
       maximumBookingDuration: 480,
       cancellationPolicy: {
-        freeUntilHours: 72,
-        partialRefundUntilHours: 48,
-        partialRefundPercentage: 70,
-        noRefundAfterHours: 6
+        freeUntilHours: 48,
+        partialRefundUntilHours: 24,
+        partialRefundPercentage: 60,
+        noRefundAfterHours: 4
       }
     },
     availability: {
@@ -272,8 +271,8 @@ export const mockZones: Zone[] = [
         { dayOfWeek: 3, openTime: "08:00", closeTime: "22:00", isOpen: true },
         { dayOfWeek: 4, openTime: "08:00", closeTime: "22:00", isOpen: true },
         { dayOfWeek: 5, openTime: "08:00", closeTime: "22:00", isOpen: true },
-        { dayOfWeek: 6, openTime: "10:00", closeTime: "18:00", isOpen: true },
-        { dayOfWeek: 0, openTime: "00:00", closeTime: "00:00", isOpen: false }
+        { dayOfWeek: 6, openTime: "10:00", closeTime: "20:00", isOpen: true },
+        { dayOfWeek: 0, openTime: "10:00", closeTime: "20:00", isOpen: true }
       ],
       blackoutPeriods: [],
       maintenanceSchedule: [],
@@ -281,14 +280,349 @@ export const mockZones: Zone[] = [
     },
     restrictions: {
       requiresSupervision: true,
-      allowedActivities: ["Presentasjoner", "Teater", "Konferanser", "Filmvisning"],
-      prohibitedActivities: ["Smoking", "Food consumption in auditorium"],
-      requiresTraining: true,
+      allowedActivities: ["Teater", "Konsert", "Konferanse", "Workshop"],
+      prohibitedActivities: ["Smoking"],
+      requiresTraining: false,
+      alcoholPermitted: true,
+      smokingPermitted: false,
+      petsAllowed: false,
+      cateringAllowed: true,
+      decorationsAllowed: true,
+      amplifiedSoundAllowed: true,
+      commercialUseAllowed: true
+    },
+    isActive: true,
+    createdAt: new Date(2025, 0, 1),
+    updatedAt: new Date(2025, 5, 1)
+  },
+  {
+    id: "zone-999-side-a",
+    facilityId: "999",
+    name: "Sidesal A",
+    description: "Mindre sal for workshops og møter",
+    isMainZone: false,
+    parentZoneId: "zone-999-main",
+    capacity: 50,
+    area: 100,
+    floor: "1",
+    coordinates: { x: 0, y: 20, width: 20, height: 10 },
+    equipment: ["Projektor", "Whiteboard", "Lydanlegg"],
+    features: ["Intim setting", "God for workshops"],
+    accessibility: ["wheelchair"],
+    pricing: {
+      basePrice: 300,
+      currency: "NOK",
+      priceRules: [
+        {
+          id: "rule-999-2",
+          actorType: "lag-foreninger",
+          timeSlot: "day",
+          dayType: "weekday",
+          multiplier: 0.5,
+          isActive: true
+        }
+      ],
+      minimumBookingDuration: 60,
+      maximumBookingDuration: 480,
+      cancellationPolicy: {
+        freeUntilHours: 24,
+        partialRefundUntilHours: 12,
+        partialRefundPercentage: 50,
+        noRefundAfterHours: 2
+      }
+    },
+    availability: {
+      openingHours: [
+        { dayOfWeek: 1, openTime: "08:00", closeTime: "22:00", isOpen: true },
+        { dayOfWeek: 2, openTime: "08:00", closeTime: "22:00", isOpen: true },
+        { dayOfWeek: 3, openTime: "08:00", closeTime: "22:00", isOpen: true },
+        { dayOfWeek: 4, openTime: "08:00", closeTime: "22:00", isOpen: true },
+        { dayOfWeek: 5, openTime: "08:00", closeTime: "22:00", isOpen: true },
+        { dayOfWeek: 6, openTime: "10:00", closeTime: "20:00", isOpen: true },
+        { dayOfWeek: 0, openTime: "10:00", closeTime: "20:00", isOpen: true }
+      ],
+      blackoutPeriods: [],
+      maintenanceSchedule: [],
+      recurringUnavailability: []
+    },
+    restrictions: {
+      requiresSupervision: false,
+      allowedActivities: ["Workshop", "Møter", "Undervisning"],
+      prohibitedActivities: ["Smoking", "Loud music"],
+      requiresTraining: false,
+      alcoholPermitted: false,
+      smokingPermitted: false,
+      petsAllowed: false,
+      cateringAllowed: true,
+      decorationsAllowed: true,
+      amplifiedSoundAllowed: false,
+      commercialUseAllowed: true
+    },
+    isActive: true,
+    createdAt: new Date(2025, 0, 1),
+    updatedAt: new Date(2025, 5, 1)
+  },
+  {
+    id: "zone-999-side-b",
+    facilityId: "999",
+    name: "Sidesal B",
+    description: "Fleksibel sal for ulike arrangementer",
+    isMainZone: false,
+    parentZoneId: "zone-999-main",
+    capacity: 75,
+    area: 150,
+    floor: "1",
+    coordinates: { x: 20, y: 20, width: 20, height: 15 },
+    equipment: ["Projector", "Sound system", "Movable seating"],
+    features: ["Fleksibel", "Moderne utstyr"],
+    accessibility: ["wheelchair", "hearing-loop"],
+    pricing: {
+      basePrice: 450,
+      currency: "NOK",
+      priceRules: [
+        {
+          id: "rule-999-3",
+          actorType: "paraply",
+          timeSlot: "evening",
+          dayType: "weekday",
+          multiplier: 0.4,
+          isActive: true
+        }
+      ],
+      minimumBookingDuration: 60,
+      maximumBookingDuration: 480,
+      cancellationPolicy: {
+        freeUntilHours: 24,
+        partialRefundUntilHours: 12,
+        partialRefundPercentage: 50,
+        noRefundAfterHours: 2
+      }
+    },
+    availability: {
+      openingHours: [
+        { dayOfWeek: 1, openTime: "08:00", closeTime: "22:00", isOpen: true },
+        { dayOfWeek: 2, openTime: "08:00", closeTime: "22:00", isOpen: true },
+        { dayOfWeek: 3, openTime: "08:00", closeTime: "22:00", isOpen: true },
+        { dayOfWeek: 4, openTime: "08:00", closeTime: "22:00", isOpen: true },
+        { dayOfWeek: 5, openTime: "08:00", closeTime: "22:00", isOpen: true },
+        { dayOfWeek: 6, openTime: "10:00", closeTime: "20:00", isOpen: true },
+        { dayOfWeek: 0, openTime: "10:00", closeTime: "20:00", isOpen: true }
+      ],
+      blackoutPeriods: [],
+      maintenanceSchedule: [],
+      recurringUnavailability: []
+    },
+    restrictions: {
+      requiresSupervision: false,
+      allowedActivities: ["Konferanse", "Workshop", "Småarrangementer"],
+      prohibitedActivities: ["Smoking"],
+      requiresTraining: false,
+      alcoholPermitted: true,
+      smokingPermitted: false,
+      petsAllowed: false,
+      cateringAllowed: true,
+      decorationsAllowed: true,
+      amplifiedSoundAllowed: true,
+      commercialUseAllowed: true
+    },
+    isActive: true,
+    createdAt: new Date(2025, 0, 1),
+    updatedAt: new Date(2025, 5, 1)
+  },
+  // Multi-zone facility 2 (ID: 998) - Idrettshall Mjøndalen zones
+  {
+    id: "zone-998-main",
+    facilityId: "998",
+    name: "Hele hallen",
+    description: "Full idrettshall med alle soner",
+    isMainZone: true,
+    capacity: 150,
+    area: 800,
+    floor: "1",
+    coordinates: { x: 0, y: 0, width: 40, height: 20 },
+    equipment: ["Basketkurver", "Håndballmål", "Nettstolper", "Tribuner", "Scoreboard"],
+    features: ["Full hall", "Profesjonelt utstyr", "Tribuner"],
+    accessibility: ["wheelchair"],
+    pricing: {
+      basePrice: 600,
+      currency: "NOK",
+      priceRules: [
+        {
+          id: "rule-998-1",
+          actorType: "lag-foreninger",
+          timeSlot: "evening",
+          dayType: "weekday",
+          multiplier: 0.3,
+          isActive: true
+        }
+      ],
+      minimumBookingDuration: 120,
+      maximumBookingDuration: 480,
+      cancellationPolicy: {
+        freeUntilHours: 24,
+        partialRefundUntilHours: 12,
+        partialRefundPercentage: 50,
+        noRefundAfterHours: 2
+      }
+    },
+    availability: {
+      openingHours: [
+        { dayOfWeek: 1, openTime: "07:00", closeTime: "23:00", isOpen: true },
+        { dayOfWeek: 2, openTime: "07:00", closeTime: "23:00", isOpen: true },
+        { dayOfWeek: 3, openTime: "07:00", closeTime: "23:00", isOpen: true },
+        { dayOfWeek: 4, openTime: "07:00", closeTime: "23:00", isOpen: true },
+        { dayOfWequeek: 5, openTime: "07:00", closeTime: "23:00", isOpen: true },
+        { dayOfWeek: 6, openTime: "09:00", closeTime: "21:00", isOpen: true },
+        { dayOfWeek: 0, openTime: "09:00", closeTime: "21:00", isOpen: true }
+      ],
+      blackoutPeriods: [],
+      maintenanceSchedule: [],
+      recurringUnavailability: []
+    },
+    restrictions: {
+      requiresSupervision: false,
+      allowedActivities: ["Håndball", "Basketball", "Volleyball", "Badminton", "Innebandy"],
+      prohibitedActivities: ["Smoking", "Street shoes"],
+      requiresTraining: false,
       alcoholPermitted: false,
       smokingPermitted: false,
       petsAllowed: false,
       cateringAllowed: false,
-      decorationsAllowed: true,
+      decorationsAllowed: false,
+      amplifiedSoundAllowed: true,
+      commercialUseAllowed: true
+    },
+    isActive: true,
+    createdAt: new Date(2025, 0, 1),
+    updatedAt: new Date(2025, 5, 1)
+  },
+  {
+    id: "zone-998-court-1",
+    facilityId: "998",
+    name: "Bane 1 (Håndball)",
+    description: "Håndballbane med mål",
+    isMainZone: false,
+    parentZoneId: "zone-998-main",
+    capacity: 50,
+    area: 250,
+    floor: "1",
+    coordinates: { x: 0, y: 0, width: 20, height: 20 },
+    equipment: ["Håndballmål", "Scoreboard"],
+    features: ["Standard håndballbane", "Offisiell størrelse"],
+    accessibility: ["wheelchair"],
+    pricing: {
+      basePrice: 250,
+      currency: "NOK",
+      priceRules: [
+        {
+          id: "rule-998-2",
+          actorType: "lag-foreninger",
+          timeSlot: "evening",
+          dayType: "weekday",
+          multiplier: 0.4,
+          isActive: true
+        }
+      ],
+      minimumBookingDuration: 60,
+      maximumBookingDuration: 480,
+      cancellationPolicy: {
+        freeUntilHours: 24,
+        partialRefundUntilHours: 12,
+        partialRefundPercentage: 50,
+        noRefundAfterHours: 2
+      }
+    },
+    availability: {
+      openingHours: [
+        { dayOfWeek: 1, openTime: "07:00", closeTime: "23:00", isOpen: true },
+        { dayOfWeek: 2, openTime: "07:00", closeTime: "23:00", isOpen: true },
+        { dayOfWeek: 3, openTime: "07:00", closeTime: "23:00", isOpen: true },
+        { dayOfWeek: 4, openTime: "07:00", closeTime: "23:00", isOpen: true },
+        { dayOfWeek: 5, openTime: "07:00", closeTime: "23:00", isOpen: true },
+        { dayOfWeek: 6, openTime: "09:00", closeTime: "21:00", isOpen: true },
+        { dayOfWeek: 0, openTime: "09:00", closeTime: "21:00", isOpen: true }
+      ],
+      blackoutPeriods: [],
+      maintenanceSchedule: [],
+      recurringUnavailability: []
+    },
+    restrictions: {
+      requiresSupervision: false,
+      allowedActivities: ["Håndball", "Badminton", "Futsal"],
+      prohibitedActivities: ["Smoking", "Street shoes"],
+      requiresTraining: false,
+      alcoholPermitted: false,
+      smokingPermitted: false,
+      petsAllowed: false,
+      cateringAllowed: false,
+      decorationsAllowed: false,
+      amplifiedSoundAllowed: true,
+      commercialUseAllowed: true
+    },
+    isActive: true,
+    createdAt: new Date(2025, 0, 1),
+    updatedAt: new Date(2025, 5, 1)
+  },
+  {
+    id: "zone-998-court-2",
+    facilityId: "998",
+    name: "Bane 2 (Basketball)",
+    description: "Basketballbane med kurver",
+    isMainZone: false,
+    parentZoneId: "zone-998-main",
+    capacity: 50,
+    area: 250,
+    floor: "1",
+    coordinates: { x: 20, y: 0, width: 20, height: 20 },
+    equipment: ["Basketkurver", "Scoreboard"],
+    features: ["Standard basketballbane", "Profesjonelle kurver"],
+    accessibility: ["wheelchair"],
+    pricing: {
+      basePrice: 250,
+      currency: "NOK",
+      priceRules: [
+        {
+          id: "rule-998-3",
+          actorType: "lag-foreninger",
+          timeSlot: "evening",
+          dayType: "weekday",
+          multiplier: 0.4,
+          isActive: true
+        }
+      ],
+      minimumBookingDuration: 60,
+      maximumBookingDuration: 480,
+      cancellationPolicy: {
+        freeUntilHours: 24,
+        partialRefundUntilHours: 12,
+        partialRefundPercentage: 50,
+        noRefundAfterHours: 2
+      }
+    },
+    availability: {
+      openingHours: [
+        { dayOfWeek: 1, openTime: "07:00", closeTime: "23:00", isOpen: true },
+        { dayOfWeek: 2, openTime: "07:00", closeTime: "23:00", isOpen: true },
+        { dayOfWeek: 3, openTime: "07:00", closeTime: "23:00", isOpen: true },
+        { dayOfWeek: 4, openTime: "07:00", closeTime: "23:00", isOpen: true },
+        { dayOfWeek: 5, openTime: "07:00", closeTime: "23:00", isOpen: true },
+        { dayOfWeek: 6, openTime: "09:00", closeTime: "21:00", isOpen: true },
+        { dayOfWeek: 0, openTime: "09:00", closeTime: "21:00", isOpen: true }
+      ],
+      blackoutPeriods: [],
+      maintenanceSchedule: [],
+      recurringUnavailability: []
+    },
+    restrictions: {
+      requiresSupervision: false,
+      allowedActivities: ["Basketball", "Badminton", "Volleyball"],
+      prohibitedActivities: ["Smoking", "Street shoes"],
+      requiresTraining: false,
+      alcoholPermitted: false,
+      smokingPermitted: false,
+      petsAllowed: false,
+      cateringAllowed: false,
+      decorationsAllowed: false,
       amplifiedSoundAllowed: true,
       commercialUseAllowed: true
     },
