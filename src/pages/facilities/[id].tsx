@@ -9,7 +9,6 @@ import { FacilityHeader } from "@/components/facility/FacilityHeader";
 import { FacilityInfoTabs } from "@/components/facility/FacilityInfoTabs";
 import { FacilityContactInfo } from "@/components/facility/FacilityContactInfo";
 import { AvailabilityTab } from "@/components/facility/tabs/AvailabilityTab";
-import { SimilarFacilitiesSlider } from "@/components/facility/SimilarFacilitiesSlider";
 import { Zone } from "@/components/booking/types";
 import { useOptimizedFacility } from "@/hooks/useOptimizedFacility";
 import { useZones } from "@/hooks/useZones";
@@ -230,11 +229,6 @@ const FacilityDetail = () => {
                   timeSlotDuration={facility.timeSlotDuration || 1}
                 />
               </div>
-            </div>
-
-            {/* Similar Facilities Section */}
-            <div className="mt-12">
-              <SimilarFacilitiesSlider currentFacilityId={id || ""} />
             </div>
           </div>
         </div>
