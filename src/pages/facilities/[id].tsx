@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import GlobalHeader from "@/components/GlobalHeader";
 import { Zone } from "@/components/booking/types";
-import { useOptimizedFacility } from "@/hooks/useOptimizedFacility";
+import { useFacility } from "@/hooks/useFacility";
 import { useZones } from "@/hooks/useZones";
 import { useSlotSelection } from "@/hooks/useSlotSelection";
 import { CartProvider } from "@/contexts/CartContext";
@@ -19,7 +19,7 @@ const FacilityDetail = () => {
   const { id } = useParams();
   const [isFavorited, setIsFavorited] = useState(false);
   const { t } = useTranslation();
-  const { facility, isLoading, error, notFound } = useOptimizedFacility(Number(id));
+  const { facility, isLoading, error, notFound } = useFacility(Number(id));
   const { data: zones = [], isLoading: zonesLoading } = useZones(id);
 
   // Use the centralized slot selection hook
