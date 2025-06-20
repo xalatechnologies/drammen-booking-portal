@@ -1,4 +1,4 @@
-import { LocalizedFacility } from '@/types/localizedFacility';
+import { LocalizedFacility } from '@/types/localization';
 
 export const localizedMockFacilities: LocalizedFacility[] = [
   {
