@@ -8,127 +8,58 @@ const BentoHeroBanner = () => {
   const { t } = useTranslation();
 
   return (
-    <div className="w-full mb-8 overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-blue-900 border-b border-slate-600/50">
-      <div className="content-center py-12 px-4">
-        {/* Hero Text Section */}
-        <div className="text-center mb-8 animate-fade-in">
-          <h1 className="text-4xl lg:text-5xl xl:text-6xl font-bold text-white leading-tight tracking-tight mb-6">
+    <div className="w-full mb-6 overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-blue-900 border-b border-slate-600/50">
+      <div className="content-center py-6 px-4">
+        {/* Hero Text Section - Compact */}
+        <div className="text-center mb-6 animate-fade-in">
+          <h1 className="text-2xl lg:text-3xl xl:text-4xl font-bold text-white leading-tight tracking-tight mb-3">
             {t('hero.title')}
           </h1>
-          <p className="text-xl lg:text-2xl xl:text-3xl text-slate-200 leading-relaxed max-w-5xl mx-auto font-light">
+          <p className="text-base lg:text-lg xl:text-xl text-slate-200 leading-relaxed max-w-4xl mx-auto font-light">
             {t('hero.subtitle')}
           </p>
         </div>
 
-        {/* 3 Step Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+        {/* 3 Step Cards - Compact inline design */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
           {/* Step 1: Search Card */}
-          <Card className="bg-gradient-to-br from-emerald-50 via-emerald-100 to-teal-100 border-emerald-200 shadow-lg hover:shadow-xl transition-all duration-500 hover:scale-105 hover:-translate-y-2 group animate-fade-in cursor-pointer transform hover:rotate-1" style={{ animationDelay: '0.2s' }}>
-            <CardContent className="p-6 h-full flex flex-col justify-center text-center relative overflow-hidden min-h-[200px]">
-              {/* Floating particles background */}
-              <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-emerald-300 rounded-full opacity-60 animate-bounce" style={{ animationDelay: '0s', animationDuration: '3s' }}></div>
-                <div className="absolute top-3/4 right-1/4 w-1 h-1 bg-teal-400 rounded-full opacity-40 animate-bounce" style={{ animationDelay: '1s', animationDuration: '4s' }}></div>
-                <div className="absolute top-1/2 right-1/3 w-1.5 h-1.5 bg-emerald-400 rounded-full opacity-50 animate-bounce" style={{ animationDelay: '2s', animationDuration: '5s' }}></div>
+          <Card className="bg-gradient-to-br from-emerald-50 to-emerald-100 border-emerald-200 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 group animate-fade-in" style={{ animationDelay: '0.2s' }}>
+            <CardContent className="p-4 flex items-center gap-3 min-h-[80px]">
+              <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center group-hover:rotate-6 transition-transform duration-300 shadow-md flex-shrink-0">
+                <Search className="h-5 w-5 text-white" />
               </div>
-              
-              {/* Background pattern */}
-              <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-from)_0%,_transparent_50%)] group-hover:opacity-20 transition-opacity duration-500"></div>
-              
-              {/* Step number */}
-              <div className="absolute top-3 left-3 w-8 h-8 bg-emerald-600 text-white rounded-full flex items-center justify-center text-base font-bold shadow-lg group-hover:scale-110 transition-transform duration-300">
-                1
-              </div>
-              
-              <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:rotate-12 group-hover:scale-110 transition-all duration-500 shadow-lg relative z-10">
-                <Search className="h-8 w-8 text-white group-hover:scale-110 transition-transform duration-300" />
-                {/* Icon glow effect */}
-                <div className="absolute inset-0 bg-emerald-400 rounded-2xl opacity-0 group-hover:opacity-40 group-hover:scale-125 transition-all duration-500 blur-lg"></div>
-              </div>
-              <div className="space-y-3 relative z-10">
-                <div className="text-base font-bold text-emerald-600 uppercase tracking-wider group-hover:text-emerald-700 transition-colors duration-300">
+              <div className="flex-1">
+                <span className="text-lg font-bold text-emerald-900 group-hover:scale-105 transition-transform duration-300">
                   {t('hero.steps.search.title')}
-                </div>
-                <h3 className="text-xl font-bold text-emerald-900 group-hover:scale-105 transition-transform duration-300">
-                  {t('hero.steps.search.subtitle')}
-                </h3>
-                <p className="text-base text-emerald-700 leading-relaxed group-hover:text-emerald-800 transition-colors duration-300">
-                  {t('hero.steps.search.description')}
-                </p>
+                </span>
               </div>
             </CardContent>
           </Card>
 
           {/* Step 2: Select Card */}
-          <Card className="bg-gradient-to-br from-blue-50 via-blue-100 to-indigo-100 border-blue-200 shadow-lg hover:shadow-xl transition-all duration-500 hover:scale-105 hover:-translate-y-2 group animate-fade-in cursor-pointer transform hover:-rotate-1" style={{ animationDelay: '0.4s' }}>
-            <CardContent className="p-6 h-full flex flex-col justify-center text-center relative overflow-hidden min-h-[200px]">
-              {/* Floating particles background */}
-              <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute top-1/3 right-1/4 w-2 h-2 bg-blue-300 rounded-full opacity-60 animate-bounce" style={{ animationDelay: '0.5s', animationDuration: '3.5s' }}></div>
-                <div className="absolute bottom-1/4 left-1/4 w-1 h-1 bg-indigo-400 rounded-full opacity-40 animate-bounce" style={{ animationDelay: '1.5s', animationDuration: '4.5s' }}></div>
-                <div className="absolute top-1/4 left-1/3 w-1.5 h-1.5 bg-blue-400 rounded-full opacity-50 animate-bounce" style={{ animationDelay: '2.5s', animationDuration: '5.5s' }}></div>
+          <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 group animate-fade-in" style={{ animationDelay: '0.4s' }}>
+            <CardContent className="p-4 flex items-center gap-3 min-h-[80px]">
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-xl flex items-center justify-center group-hover:rotate-6 transition-transform duration-300 shadow-md flex-shrink-0">
+                <Calendar className="h-5 w-5 text-white" />
               </div>
-              
-              {/* Background pattern */}
-              <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-from)_0%,_transparent_50%)] group-hover:opacity-20 transition-opacity duration-500"></div>
-              
-              {/* Step number */}
-              <div className="absolute top-3 left-3 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-base font-bold shadow-lg group-hover:scale-110 transition-transform duration-300">
-                2
-              </div>
-              
-              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:rotate-12 group-hover:scale-110 transition-all duration-500 shadow-lg relative z-10">
-                <Calendar className="h-8 w-8 text-white group-hover:scale-110 transition-transform duration-300" />
-                {/* Icon glow effect */}
-                <div className="absolute inset-0 bg-blue-400 rounded-2xl opacity-0 group-hover:opacity-40 group-hover:scale-125 transition-all duration-500 blur-lg"></div>
-              </div>
-              <div className="space-y-3 relative z-10">
-                <div className="text-base font-bold text-blue-600 uppercase tracking-wider group-hover:text-blue-700 transition-colors duration-300">
+              <div className="flex-1">
+                <span className="text-lg font-bold text-blue-900 group-hover:scale-105 transition-transform duration-300">
                   {t('hero.steps.select.title')}
-                </div>
-                <h3 className="text-xl font-bold text-blue-900 group-hover:scale-105 transition-transform duration-300">
-                  {t('hero.steps.select.subtitle')}
-                </h3>
-                <p className="text-base text-blue-700 leading-relaxed group-hover:text-blue-800 transition-colors duration-300">
-                  {t('hero.steps.select.description')}
-                </p>
+                </span>
               </div>
             </CardContent>
           </Card>
 
           {/* Step 3: Reserve Card */}
-          <Card className="bg-gradient-to-br from-purple-50 via-purple-100 to-pink-100 border-purple-200 shadow-lg hover:shadow-xl transition-all duration-500 hover:scale-105 hover:-translate-y-2 group animate-fade-in cursor-pointer transform hover:rotate-1" style={{ animationDelay: '0.6s' }}>
-            <CardContent className="p-6 h-full flex flex-col justify-center text-center relative overflow-hidden min-h-[200px]">
-              {/* Floating particles background */}
-              <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute top-1/4 right-1/3 w-2 h-2 bg-purple-300 rounded-full opacity-60 animate-bounce" style={{ animationDelay: '1s', animationDuration: '3.2s' }}></div>
-                <div className="absolute bottom-1/3 right-1/4 w-1 h-1 bg-pink-400 rounded-full opacity-40 animate-bounce" style={{ animationDelay: '2s', animationDuration: '4.2s' }}></div>
-                <div className="absolute top-2/3 left-1/4 w-1.5 h-1.5 bg-purple-400 rounded-full opacity-50 animate-bounce" style={{ animationDelay: '3s', animationDuration: '5.2s' }}></div>
+          <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 group animate-fade-in" style={{ animationDelay: '0.6s' }}>
+            <CardContent className="p-4 flex items-center gap-3 min-h-[80px]">
+              <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center group-hover:rotate-6 transition-transform duration-300 shadow-md flex-shrink-0">
+                <Check className="h-5 w-5 text-white" />
               </div>
-              
-              {/* Background pattern */}
-              <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-from)_0%,_transparent_50%)] group-hover:opacity-20 transition-opacity duration-500"></div>
-              
-              {/* Step number */}
-              <div className="absolute top-3 left-3 w-8 h-8 bg-purple-600 text-white rounded-full flex items-center justify-center text-base font-bold shadow-lg group-hover:scale-110 transition-transform duration-300">
-                3
-              </div>
-              
-              <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:rotate-12 group-hover:scale-110 transition-all duration-500 shadow-lg relative z-10">
-                <Check className="h-8 w-8 text-white group-hover:scale-110 transition-transform duration-300" />
-                {/* Icon glow effect */}
-                <div className="absolute inset-0 bg-purple-400 rounded-2xl opacity-0 group-hover:opacity-40 group-hover:scale-125 transition-all duration-500 blur-lg"></div>
-              </div>
-              <div className="space-y-3 relative z-10">
-                <div className="text-base font-bold text-purple-600 uppercase tracking-wider group-hover:text-purple-700 transition-colors duration-300">
+              <div className="flex-1">
+                <span className="text-lg font-bold text-purple-900 group-hover:scale-105 transition-transform duration-300">
                   {t('hero.steps.reserve.title')}
-                </div>
-                <h3 className="text-xl font-bold text-purple-900 group-hover:scale-105 transition-transform duration-300">
-                  {t('hero.steps.reserve.subtitle')}
-                </h3>
-                <p className="text-base text-purple-700 leading-relaxed group-hover:text-purple-800 transition-colors duration-300">
-                  {t('hero.steps.reserve.description')}
-                </p>
+                </span>
               </div>
             </CardContent>
           </Card>
