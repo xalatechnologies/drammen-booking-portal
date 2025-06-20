@@ -8,6 +8,7 @@ import MapView from "@/components/MapView";
 import CalendarView from "@/components/CalendarView";
 import { useFacilitiesPagination } from "@/hooks/useFacilities";
 import { FacilityFilters } from "@/types/facility";
+
 const Index = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [date, setDate] = useState<Date>();
@@ -102,7 +103,9 @@ const Index = () => {
         return <FacilityList filters={filters} viewMode="grid" setViewMode={setViewMode} />;
     }
   };
-  return <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex flex-col w-full">
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex flex-col w-full">
       {/* Skip to main content link for screen readers */}
       <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-0 focus:left-0 bg-blue-600 text-white p-2 z-50 rounded-br-md focus:outline-none focus:ring-2 focus:ring-blue-500" tabIndex={0}>
         Hopp til hovedinnhold
@@ -115,18 +118,45 @@ const Index = () => {
 
       {/* Main content with top padding to account for fixed header */}
       <main id="main-content" className="flex-1 w-full pt-20">
-        {/* Fixed Search Filter with more top spacing */}
-        <div className="fixed top-28 left-0 right-0 z-40 bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-sm">
-          <div className="content-center py-0">
-            <SearchFilter date={date} setDate={setDate} facilityType={facilityType} setFacilityType={setFacilityType} location={location} setLocation={setLocation} viewMode={viewMode} setViewMode={setViewMode} accessibility={accessibility} setAccessibility={setAccessibility} capacity={capacity} setCapacity={setCapacity} searchTerm={searchTerm} setSearchTerm={setSearchTerm} priceRange={priceRange} setPriceRange={setPriceRange} availableNow={availableNow} setAvailableNow={setAvailableNow} hasEquipment={hasEquipment} setHasEquipment={setHasEquipment} hasParking={hasParking} setHasParking={setHasParking} hasWifi={hasWifi} setHasWifi={setHasWifi} allowsPhotography={allowsPhotography} setAllowsPhotography={setAllowsPhotography} />
-          </div>
+        {/* Fixed Search Filter attached to header */}
+        <div className="fixed top-20 left-0 right-0 z-40 w-full">
+          <SearchFilter 
+            date={date} 
+            setDate={setDate} 
+            facilityType={facilityType} 
+            setFacilityType={setFacilityType} 
+            location={location} 
+            setLocation={setLocation} 
+            viewMode={viewMode} 
+            setViewMode={setViewMode} 
+            accessibility={accessibility} 
+            setAccessibility={setAccessibility} 
+            capacity={capacity} 
+            setCapacity={setCapacity} 
+            searchTerm={searchTerm} 
+            setSearchTerm={setSearchTerm} 
+            priceRange={priceRange} 
+            setPriceRange={setPriceRange} 
+            availableNow={availableNow} 
+            setAvailableNow={setAvailableNow} 
+            hasEquipment={hasEquipment} 
+            setHasEquipment={setHasEquipment} 
+            hasParking={hasParking} 
+            setHasParking={setHasParking} 
+            hasWifi={hasWifi} 
+            setHasWifi={setHasWifi} 
+            allowsPhotography={allowsPhotography} 
+            setAllowsPhotography={setAllowsPhotography} 
+          />
         </div>
 
-        {/* Scrollable Content Area with much more top padding for fixed filter */}
-        <div className="pt-64 content-center py-12 px-4">
+        {/* Scrollable Content Area with reduced top padding */}
+        <div className="pt-40 px-4 py-6">
           {renderContent()}
         </div>
       </main>
-    </div>;
+    </div>
+  );
 };
+
 export default Index;
