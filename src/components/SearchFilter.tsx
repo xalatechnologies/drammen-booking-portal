@@ -1,22 +1,9 @@
-import React, { useState } from "react";
-import { CalendarDays, Filter, Search, MapPin, Building, Users, DollarSign } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import React from "react";
+import { MapPin, Users, Building } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
-import { format } from "date-fns";
-import { Slider } from "@/components/ui/slider";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
-import { ViewModeToggle } from "@/components/search/ViewModeToggle";
-import { useFacilityTypes, useLocations } from "@/hooks/useFilterOptions";
-import { useTranslation } from "@/i18n";
-
 interface SearchFilterProps {
   date?: Date;
-  setDate: (date: Date | undefined) => void;
+  setDate: (date?: Date) => void;
   facilityType: string;
   setFacilityType: (type: string) => void;
   location: string;
@@ -42,229 +29,123 @@ interface SearchFilterProps {
   allowsPhotography: boolean;
   setAllowsPhotography: (allowsPhotography: boolean) => void;
 }
-
-const SearchFilter = ({
-  date,
-  setDate,
+const SearchFilter: React.FC<SearchFilterProps> = ({
   facilityType,
   setFacilityType,
   location,
   setLocation,
-  viewMode,
-  setViewMode,
   accessibility,
   setAccessibility,
   capacity,
-  setCapacity,
-  searchTerm,
-  setSearchTerm,
-  priceRange,
-  setPriceRange,
-  availableNow,
-  setAvailableNow,
-  hasEquipment,
-  setHasEquipment,
-  hasParking,
-  setHasParking,
-  hasWifi,
-  setHasWifi,
-  allowsPhotography,
-  setAllowsPhotography,
-}: SearchFilterProps) => {
-  const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
-  const { t } = useTranslation();
-  
-  const { data: facilityTypes = [], isLoading: loadingTypes } = useFacilityTypes();
-  const { data: locations = [], isLoading: loadingLocations } = useLocations();
-
-  const accessibilityOptions = [
-    { value: "wheelchair", label: t('search.filters.accessibility.wheelchair') },
-    { value: "hearing-loop", label: t('search.filters.accessibility.hearingLoop') },
-    { value: "visual-guidance", label: t('search.filters.accessibility.visualGuidance') },
-    { value: "braille", label: t('search.filters.accessibility.braille') }
-  ];
-
-  return (
-    <div className="bg-white border-b border-gray-200 shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 py-4">
-        {/* Main search bar */}
-        <div className="flex flex-col lg:flex-row gap-4 items-center">
-          {/* Search input */}
-          <div className="relative flex-1 min-w-[300px]">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <Input
-              placeholder={t('search.placeholder')}
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 h-12 border-gray-300 focus:border-slate-700"
-            />
+  setCapacity
+}) => {
+  const handleCapacityChange = (value: string) => {
+    switch (value) {
+      case "small":
+        setCapacity([0, 20]);
+        break;
+      case "medium":
+        setCapacity([21, 50]);
+        break;
+      case "large":
+        setCapacity([51, 100]);
+        break;
+      case "extra-large":
+        setCapacity([101, 200]);
+        break;
+      default:
+        setCapacity([0, 200]);
+    }
+  };
+  const getCapacityValue = () => {
+    const [min, max] = capacity;
+    if (min === 0 && max === 20) return "small";
+    if (min === 21 && max === 50) return "medium";
+    if (min === 51 && max === 100) return "large";
+    if (min === 101 && max === 200) return "extra-large";
+    return "all";
+  };
+  return <div className="bg-gradient-to-r from-slate-600/90 to-slate-700/90 backdrop-blur-sm w-full shadow-lg border-b border-slate-500/30 my-[22px] py-[8px]">
+      <div className="max-w-7xl mx-auto px-4 py-3">
+        {/* Single filter row - equally distributed */}
+        <div className="flex flex-col lg:flex-row gap-3 items-stretch w-full">
+          {/* Facility type */}
+          <div className="flex-1">
+            <Select value={facilityType} onValueChange={setFacilityType}>
+              <SelectTrigger className="h-14 w-full border-gray-300 hover:border-blue-500 text-base rounded-lg bg-white/95 backdrop-blur-sm shadow-sm">
+                <div className="flex items-center text-left">
+                  <Building className="mr-2 h-4 w-4" />
+                  <SelectValue placeholder="Velg type" />
+                </div>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all" className="text-base">Alle typer</SelectItem>
+                <SelectItem value="gymnasium" className="text-base">Gymnasium</SelectItem>
+                <SelectItem value="meeting-room" className="text-base">Møterom</SelectItem>
+                <SelectItem value="auditorium" className="text-base">Auditorium</SelectItem>
+                <SelectItem value="sports-field" className="text-base">Sportsbane</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
-          {/* Date picker */}
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline" className="h-12 px-4 border-gray-300 hover:border-slate-700 min-w-[200px] justify-start">
-                <CalendarDays className="mr-2 h-4 w-4" />
-                {date ? format(date, "dd.MM.yyyy") : t('search.filters.selectDate')}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <Calendar
-                mode="single"
-                selected={date}
-                onSelect={setDate}
-                initialFocus
-              />
-            </PopoverContent>
-          </Popover>
-
-          {/* Facility type selector */}
-          <Select value={facilityType} onValueChange={setFacilityType}>
-            <SelectTrigger className="h-12 min-w-[180px] border-gray-300 focus:border-slate-700">
-              <Building className="mr-2 h-4 w-4" />
-              <SelectValue placeholder={loadingTypes ? t('common.loading') : t('search.filters.facilityType')} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">{t('search.filters.allTypes')}</SelectItem>
-              {facilityTypes.map((type) => (
-                <SelectItem key={type.value} value={type.value}>
-                  {type.label} {type.count && `(${type.count})`}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          {/* Location selector */}
-          <Select value={location} onValueChange={setLocation}>
-            <SelectTrigger className="h-12 min-w-[150px] border-gray-300 focus:border-slate-700">
-              <MapPin className="mr-2 h-4 w-4" />
-              <SelectValue placeholder={loadingLocations ? t('common.loading') : t('search.filters.location')} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">{t('search.filters.allLocations')}</SelectItem>
-              {locations.map((loc) => (
-                <SelectItem key={loc.value} value={loc.value}>
-                  {loc.label} {loc.count && `(${loc.count})`}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          {/* Advanced filters toggle */}
-          <Popover open={isAdvancedOpen} onOpenChange={setIsAdvancedOpen}>
-            <PopoverTrigger asChild>
-              <Button variant="outline" className="h-12 px-4 border-gray-300 hover:border-slate-700">
-                <Filter className="mr-2 h-4 w-4" />
-                {t('search.filters.advanced')}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-80 p-4" align="end">
-              <div className="space-y-4">
-                <h3 className="font-semibold text-lg">{t('search.filters.advanced')}</h3>
-                
-                {/* Accessibility */}
-                <div>
-                  <Label className="text-sm font-medium">{t('search.filters.accessibility.title')}</Label>
-                  <Select value={accessibility} onValueChange={setAccessibility}>
-                    <SelectTrigger className="mt-1">
-                      <SelectValue placeholder={t('search.filters.accessibility.all')} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">{t('search.filters.accessibility.all')}</SelectItem>
-                      {accessibilityOptions.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+          {/* Location */}
+          <div className="flex-1">
+            <Select value={location} onValueChange={setLocation}>
+              <SelectTrigger className="h-14 w-full border-gray-300 hover:border-blue-500 text-base rounded-lg bg-white/95 backdrop-blur-sm shadow-sm">
+                <div className="flex items-center text-left">
+                  <MapPin className="mr-2 h-4 w-4" />
+                  <SelectValue placeholder="Velg område" />
                 </div>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all" className="text-base">Alle områder</SelectItem>
+                <SelectItem value="halleren" className="text-base">Halleren</SelectItem>
+                <SelectItem value="city" className="text-base">Sentrum</SelectItem>
+                <SelectItem value="plant" className="text-base">Planten</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
-                {/* Capacity range */}
-                <div>
-                  <Label className="text-sm font-medium">{t('search.filters.capacity')}: {capacity[0]} - {capacity[1]} {t('search.filters.people')}</Label>
-                  <Slider
-                    value={capacity}
-                    onValueChange={setCapacity}
-                    min={0}
-                    max={200}
-                    step={10}
-                    className="mt-2"
-                  />
+          {/* Capacity */}
+          <div className="flex-1">
+            <Select value={getCapacityValue()} onValueChange={handleCapacityChange}>
+              <SelectTrigger className="h-14 w-full border-gray-300 hover:border-blue-500 text-base rounded-lg bg-white/95 backdrop-blur-sm shadow-sm">
+                <div className="flex items-center text-left">
+                  <Users className="mr-2 h-4 w-4" />
+                  <SelectValue placeholder="Velg kapasitet" />
                 </div>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all" className="text-base">Alle størrelser</SelectItem>
+                <SelectItem value="small" className="text-base">Liten (1-20 personer)</SelectItem>
+                <SelectItem value="medium" className="text-base">Middels (21-50 personer)</SelectItem>
+                <SelectItem value="large" className="text-base">Stor (51-100 personer)</SelectItem>
+                <SelectItem value="extra-large" className="text-base">Ekstra stor (100+ personer)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
-                {/* Price range */}
-                <div>
-                  <Label className="text-sm font-medium">{t('search.filters.priceRange')}: {priceRange[0]} - {priceRange[1]} NOK</Label>
-                  <Slider
-                    value={priceRange}
-                    onValueChange={setPriceRange}
-                    min={0}
-                    max={5000}
-                    step={50}
-                    className="mt-2"
-                  />
+          {/* Accessibility */}
+          <div className="flex-1">
+            <Select value={accessibility} onValueChange={setAccessibility}>
+              <SelectTrigger className="h-14 w-full border-gray-300 hover:border-blue-500 text-base rounded-lg bg-white/95 backdrop-blur-sm shadow-sm">
+                <div className="flex items-center text-left">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="mr-2 h-4 w-4">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+                  </svg>
+                  <SelectValue placeholder="Velg tilgjengelighet" />
                 </div>
-
-                <Separator />
-
-                {/* Amenities toggles */}
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="available-now" className="text-sm">{t('search.filters.availableNow')}</Label>
-                    <Switch
-                      id="available-now"
-                      checked={availableNow}
-                      onCheckedChange={setAvailableNow}
-                    />
-                  </div>
-                  
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="has-equipment" className="text-sm">{t('search.filters.amenities.equipment')}</Label>
-                    <Switch
-                      id="has-equipment"
-                      checked={hasEquipment}
-                      onCheckedChange={setHasEquipment}
-                    />
-                  </div>
-                  
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="has-parking" className="text-sm">{t('search.filters.amenities.parking')}</Label>
-                    <Switch
-                      id="has-parking"
-                      checked={hasParking}
-                      onCheckedChange={setHasParking}
-                    />
-                  </div>
-                  
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="has-wifi" className="text-sm">{t('search.filters.amenities.wifi')}</Label>
-                    <Switch
-                      id="has-wifi"
-                      checked={hasWifi}
-                      onCheckedChange={setHasWifi}
-                    />
-                  </div>
-                  
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="allows-photography" className="text-sm">{t('search.filters.amenities.photography')}</Label>
-                    <Switch
-                      id="allows-photography"
-                      checked={allowsPhotography}
-                      onCheckedChange={setAllowsPhotography}
-                    />
-                  </div>
-                </div>
-              </div>
-            </PopoverContent>
-          </Popover>
-
-          {/* View mode toggle */}
-          <ViewModeToggle viewMode={viewMode} setViewMode={setViewMode} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all" className="text-base">Alle</SelectItem>
+                <SelectItem value="wheelchair" className="text-base">Rullestoltilpasset</SelectItem>
+                <SelectItem value="hearing-loop" className="text-base">Teleslynge</SelectItem>
+                <SelectItem value="visual-aids" className="text-base">Synshjelpemidler</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default SearchFilter;

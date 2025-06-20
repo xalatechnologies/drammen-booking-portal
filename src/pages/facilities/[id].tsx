@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import GlobalHeader from "@/components/GlobalHeader";
@@ -32,45 +33,56 @@ const FacilityDetail = () => {
   // State for availability tab patterns
   const [currentPattern, setCurrentPattern] = useState<any>({});
 
-  // Convert zones from database or use facility as single zone
-  const convertedZones = zones.length > 0 
-    ? zones.map(convertZoneToBookingZone)
-    : facility ? [{
-        id: "whole-facility",
-        name: t('facility.booking.wholeVenue'),
-        capacity: facility.capacity || 30,
-        equipment: facility.equipment || [],
-        pricePerHour: facility.pricePerHour || 450,
-        description: t('facility.booking.wholeVenueDescription'),
-        area: facility.area || "120 m²",
-        isMainZone: true,
-        subZones: [],
-        bookingRules: {
-          minBookingDuration: 2,
-          maxBookingDuration: 8,
-          allowedTimeSlots: ["08:00-10:00", "10:00-12:00", "12:00-14:00", "14:00-16:00", "16:00-18:00", "18:00-20:00", "20:00-22:00"],
-          bookingTypes: ['one-time', 'recurring', 'fixed-lease'],
-          advanceBookingDays: 90,
-          cancellationHours: 48
-        },
-        adminInfo: {
-          contactPersonName: facility.contact_name || "Lars Hansen",
-          contactPersonEmail: facility.contact_email || "lars.hansen@drammen.kommune.no",
-          specialInstructions: t('facility.booking.mainZoneInstructions'),
-          maintenanceSchedule: []
-        },
-        layout: {
-          coordinates: { x: 0, y: 0, width: 120, height: 80 },
-          entryPoints: ["Hovedinngang"]
-        },
-        accessibility: facility.accessibility || [],
-        features: facility.amenities || [],
-        isActive: true
-      } as Zone] 
-    : [];
+  // Default zone if no zones are returned from the API
+  const defaultZone: Zone = {
+    id: "whole-facility",
+    name: t('facility.booking.wholeVenue'),
+    capacity: facility?.capacity || 30,
+    equipment: facility?.equipment || ["Projektor", "Lydanlegg", "Whiteboard"],
+    pricePerHour: facility?.pricePerHour || 450,
+    description: t('facility.booking.wholeVenueDescription'),
+    area: facility?.area || "120 m²",
+    isMainZone: true,
+    subZones: ["zone-1", "zone-2"],
+    bookingRules: {
+      minBookingDuration: 2,
+      maxBookingDuration: 8,
+      allowedTimeSlots: ["08:00-10:00", "10:00-12:00", "12:00-14:00", "14:00-16:00", "16:00-18:00", "18:00-20:00", "20:00-22:00"],
+      bookingTypes: ['one-time', 'recurring', 'fixed-lease'],
+      advanceBookingDays: 90,
+      cancellationHours: 48
+    },
+    adminInfo: {
+      contactPersonName: "Lars Hansen",
+      contactPersonEmail: "lars.hansen@drammen.kommune.no",
+      specialInstructions: t('facility.booking.mainZoneInstructions'),
+      maintenanceSchedule: [{
+        day: "Mandag",
+        startTime: "06:00",
+        endTime: "08:00"
+      }]
+    },
+    layout: {
+      coordinates: {
+        x: 0,
+        y: 0,
+        width: 120,
+        height: 80
+      },
+      entryPoints: ["Hovedinngang", "Utstyrsinngaang", "Nødutgang vest"]
+    },
+    accessibility: ["wheelchair", "hearing-loop", "visual-guidance"],
+    features: ["Klimaanlegg", "Moderne lyd", "LED-belysning", "Sikkerhetskameraer"],
+    isActive: true
+  };
+
+  // Use real zones if available, otherwise fall back to default
+  const convertedZones = zones.length > 0 ? zones.map(convertZoneToBookingZone) : [defaultZone];
+  const displayZones = convertedZones;
 
   const handleRemoveSlot = (zoneId: string, date: Date, timeSlot: string) => {
     console.log('FacilityDetail: handleRemoveSlot called:', { zoneId, date, timeSlot });
+    // This will be handled by the individual slot click since we're removing
     handleSlotClick(zoneId, date, timeSlot, 'available');
   };
 
@@ -98,6 +110,7 @@ const FacilityDetail = () => {
   const formatOpeningHours = (openingHours: any) => {
     if (typeof openingHours === 'string') return openingHours;
     if (Array.isArray(openingHours)) {
+      // Convert to a simple string representation
       const weekdays = openingHours.filter(h => h.dayOfWeek >= 1 && h.dayOfWeek <= 5);
       const weekends = openingHours.filter(h => h.dayOfWeek === 0 || h.dayOfWeek === 6);
       
@@ -135,7 +148,7 @@ const FacilityDetail = () => {
         <div className="flex-grow pb-20 lg:pb-0">
           <FacilityDetailLayout 
             facility={facility}
-            zones={convertedZones}
+            zones={displayZones}
             onShare={handleShare}
             isFavorited={isFavorited}
             onToggleFavorite={() => setIsFavorited(!isFavorited)}
@@ -143,7 +156,7 @@ const FacilityDetail = () => {
 
           {/* Full Width Calendar Section - Updated with Unified Booking Form */}
           <FacilityDetailCalendar 
-            zones={convertedZones}
+            zones={displayZones}
             selectedSlots={selectedSlots}
             onSlotClick={handleSlotClick}
             onBulkSlotSelection={handleBulkSlotSelection}
