@@ -27,11 +27,11 @@ export function SelectedSlotsAccordion({
   const totalHours = selectedSlots.length;
 
   return (
-    <div className="bg-blue-50/50 rounded-lg border border-blue-200/60 overflow-hidden">
+    <div className="bg-navy-50/50 rounded-lg border border-navy-200/60 overflow-hidden">
       <Accordion type="single" collapsible>
         <AccordionItem value="selected-times" className="border-none">
-          <AccordionTrigger className="px-4 py-3 hover:no-underline bg-blue-100/30 hover:bg-blue-100/50 transition-colors">
-            <div className="flex items-center gap-3 text-blue-900">
+          <AccordionTrigger className="px-4 py-3 hover:no-underline bg-navy-100/30 hover:bg-navy-100/50 transition-colors">
+            <div className="flex items-center gap-3 text-navy-900">
               <Clock className="h-5 w-5" />
               <span className="font-medium">
                 {selectedSlots.length === 0 
@@ -39,7 +39,7 @@ export function SelectedSlotsAccordion({
                   : `${totalHours} ${totalHours === 1 ? 'time' : 'timer'} valgt`}
               </span>
               {selectedSlots.length > 0 && (
-                <span className="text-sm text-blue-600 ml-2">
+                <span className="text-sm text-navy-600 ml-2">
                   Klikk for detaljer
                 </span>
               )}
@@ -49,13 +49,13 @@ export function SelectedSlotsAccordion({
             <div className="space-y-2 max-h-48 overflow-y-auto">
               {selectedSlots.map((slot, index) => (
                 <div key={`${slot.zoneId}-${slot.date.toISOString()}-${slot.timeSlot}`} 
-                     className="flex items-center justify-between p-3 bg-white rounded border border-blue-200/60 shadow-sm">
+                     className="flex items-center justify-between p-3 bg-white rounded border border-navy-200/60 shadow-sm">
                   <div className="flex-1">
-                    <div className="flex items-center gap-2 text-blue-900 font-medium text-sm">
+                    <div className="flex items-center gap-2 text-navy-900 font-medium text-sm">
                       <Calendar className="h-4 w-4" />
                       {format(slot.date, 'EEE d. MMM', { locale: nb })}
                     </div>
-                    <div className="flex items-center gap-4 text-blue-700 text-sm mt-1">
+                    <div className="flex items-center gap-4 text-navy-700 text-sm mt-1">
                       <div className="flex items-center gap-1">
                         <Clock className="h-3 w-3" />
                         {slot.timeSlot}
