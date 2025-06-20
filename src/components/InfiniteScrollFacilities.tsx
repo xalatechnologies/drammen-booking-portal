@@ -39,8 +39,8 @@ export const InfiniteScrollFacilities: React.FC<InfiniteScrollFacilitiesProps> =
     goToPage(1);
   }, [filterString, goToPage]);
 
-  // Handle facility data updates using direct state management
-  useMemo(() => {
+  // Handle facility data updates - Fixed to use useEffect instead of useMemo
+  useEffect(() => {
     if (!isLoading && facilities && Array.isArray(facilities)) {
       console.log('InfiniteScrollFacilities - Processing facilities data', {
         page: pagination.page,
