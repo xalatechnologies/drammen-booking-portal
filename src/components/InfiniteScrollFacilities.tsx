@@ -22,6 +22,8 @@ export const InfiniteScrollFacilities: React.FC<InfiniteScrollFacilitiesProps> =
   const [hasMore, setHasMore] = useState(true);
 
   console.log('InfiniteScrollFacilities - Rendering with filters:', filters);
+  console.log('InfiniteScrollFacilities - Current viewMode:', viewMode);
+  console.log('InfiniteScrollFacilities - allFacilities count:', allFacilities.length);
 
   const { facilities, isLoading, pagination: paginationInfo } = useFacilities({
     pagination,
@@ -40,7 +42,7 @@ export const InfiniteScrollFacilities: React.FC<InfiniteScrollFacilitiesProps> =
     goToPage(1);
   }, [filterString, goToPage]);
 
-  // Handle facility data updates - SIMPLIFIED LOGIC
+  // Handle facility data updates
   useEffect(() => {
     console.log('InfiniteScrollFacilities - Processing facilities data', {
       page: currentPage,
@@ -52,13 +54,13 @@ export const InfiniteScrollFacilities: React.FC<InfiniteScrollFacilitiesProps> =
     });
 
     // Only process when we have facilities data and not loading
-    if (!isLoading && facilities) {
+    if (!isLoading && facilities && Array.isArray(facilities)) {
       console.log('InfiniteScrollFacilities - Setting facilities data');
       
       if (currentPage === 1) {
         // For page 1, replace all facilities
+        console.log('InfiniteScrollFacilities - Setting facilities for page 1:', facilities.length);
         setAllFacilities([...facilities]);
-        console.log('InfiniteScrollFacilities - Set facilities for page 1:', facilities.length);
       } else {
         // For subsequent pages, append new facilities
         setAllFacilities(prev => {
@@ -105,13 +107,14 @@ export const InfiniteScrollFacilities: React.FC<InfiniteScrollFacilitiesProps> =
     console.log('Address clicked for facility:', facility.name);
   };
 
-  console.log('InfiniteScrollFacilities - Current state:', {
+  console.log('InfiniteScrollFacilities - Render state:', {
     allFacilitiesCount: allFacilities.length,
     isLoading,
     hasMore,
     currentPage,
     facilitiesFromAPI: facilities?.length || 0,
-    paginationTotal: paginationInfo?.total
+    paginationTotal: paginationInfo?.total,
+    viewMode
   });
 
   // Get total count from pagination info or fall back to current facilities count
@@ -127,18 +130,21 @@ export const InfiniteScrollFacilities: React.FC<InfiniteScrollFacilitiesProps> =
         setViewMode={setViewMode || (() => {})}
       />
 
+      {/* Loading state for first load */}
       {isLoading && allFacilities.length === 0 && (
         <div className="flex justify-center items-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
         </div>
       )}
 
+      {/* No results state */}
       {!isLoading && allFacilities.length === 0 && (
         <div className="text-center py-8 text-gray-500">
           No facilities found matching your criteria
         </div>
       )}
 
+      {/* Facilities list */}
       {allFacilities.length > 0 && (
         <>
           {viewMode === "grid" ? (
@@ -161,12 +167,14 @@ export const InfiniteScrollFacilities: React.FC<InfiniteScrollFacilitiesProps> =
         </>
       )}
       
+      {/* Loading indicator for pagination */}
       {isLoading && allFacilities.length > 0 && (
         <div className="flex justify-center items-center h-16 mt-4">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
         </div>
       )}
       
+      {/* End of list indicator */}
       {!hasMore && allFacilities.length > 0 && (
         <div className="text-center py-4 text-gray-500">
           No more facilities to load
