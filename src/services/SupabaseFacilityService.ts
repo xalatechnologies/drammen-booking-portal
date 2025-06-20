@@ -2,7 +2,16 @@ import { supabase } from '@/integrations/supabase/client';
 import { ApiResponse, PaginatedResponse, PaginationParams } from '@/types/api';
 import { Facility, FacilityFilters, FacilitySortOptions } from '@/types/facility';
 import { Zone } from '@/types/zone';
-import { PaginationParams, ServiceResponse, PaginatedResponse } from '@/types/api';
+
+// Define ServiceResponse type locally since it's not in api.ts
+interface ServiceResponse<T> {
+  success: boolean;
+  data?: T;
+  error?: {
+    message: string;
+    code?: string;
+  };
+}
 
 export class SupabaseFacilityService {
   private static readonly EDGE_FUNCTION_URL = 'https://szpdoihoxzlivothoyva.supabase.co/functions/v1/facilities';
@@ -215,7 +224,6 @@ export class SupabaseFacilityService {
           description,
           bookable_independently,
           equipment,
-          dimensions,
           status,
           is_main_zone,
           area_sqm,
@@ -227,7 +235,7 @@ export class SupabaseFacilityService {
           features,
           is_active
         `)
-        .eq('facility_id', facilityId)
+        .eq('facility_id', parseInt(facilityId))
         .eq('is_active', true);
 
       if (error) {
@@ -243,31 +251,56 @@ export class SupabaseFacilityService {
 
       const zones: Zone[] = (data || []).map(zone => ({
         id: zone.id,
+        facilityId: zone.facility_id.toString(),
         name: zone.name,
-        facilityId: zone.facility_id,
-        type: zone.type as 'court' | 'room' | 'area' | 'section',
-        capacity: zone.capacity || 30,
         description: zone.description,
-        bookableIndependently: zone.bookable_independently,
-        conflictRules: [],
-        equipment: zone.equipment || [],
-        dimensions: zone.dimensions ? {
-          width: zone.dimensions.width,
-          length: zone.dimensions.length,
-          height: zone.dimensions.height
-        } : undefined,
-        status: zone.status as 'active' | 'maintenance' | 'inactive',
-        isMainZone: zone.is_main_zone,
-        area: zone.area_sqm,
+        isMainZone: zone.is_main_zone || false,
+        capacity: zone.capacity || 30,
+        area: zone.area_sqm || 0,
         coordinates: zone.coordinates_x && zone.coordinates_y ? {
           x: zone.coordinates_x,
           y: zone.coordinates_y,
           width: zone.coordinates_width || 100,
           height: zone.coordinates_height || 80
         } : undefined,
-        accessibility: zone.accessibility_features || [],
+        equipment: zone.equipment || [],
         features: zone.features || [],
-        isActive: zone.is_active
+        accessibility: zone.accessibility_features || [],
+        pricing: {
+          basePrice: 450,
+          currency: 'NOK',
+          priceRules: [],
+          minimumBookingDuration: 60,
+          maximumBookingDuration: 480,
+          cancellationPolicy: {
+            freeUntilHours: 48,
+            partialRefundUntilHours: 24,
+            partialRefundPercentage: 50,
+            noRefundAfterHours: 2
+          }
+        },
+        availability: {
+          openingHours: [],
+          blackoutPeriods: [],
+          maintenanceSchedule: [],
+          recurringUnavailability: []
+        },
+        restrictions: {
+          requiresSupervision: false,
+          allowedActivities: [],
+          prohibitedActivities: [],
+          requiresTraining: false,
+          alcoholPermitted: false,
+          smokingPermitted: false,
+          petsAllowed: false,
+          cateringAllowed: true,
+          decorationsAllowed: true,
+          amplifiedSoundAllowed: true,
+          commercialUseAllowed: true
+        },
+        isActive: zone.is_active,
+        createdAt: new Date(),
+        updatedAt: new Date()
       }));
 
       return { success: true, data: zones };
@@ -296,7 +329,6 @@ export class SupabaseFacilityService {
           description,
           bookable_independently,
           equipment,
-          dimensions,
           status,
           is_main_zone,
           area_sqm,
@@ -328,31 +360,56 @@ export class SupabaseFacilityService {
 
       const zone: Zone = {
         id: data.id,
+        facilityId: data.facility_id.toString(),
         name: data.name,
-        facilityId: data.facility_id,
-        type: data.type as 'court' | 'room' | 'area' | 'section',
-        capacity: data.capacity || 30,
         description: data.description,
-        bookableIndependently: data.bookable_independently,
-        conflictRules: [],
-        equipment: data.equipment || [],
-        dimensions: data.dimensions ? {
-          width: data.dimensions.width,
-          length: data.dimensions.length,
-          height: data.dimensions.height
-        } : undefined,
-        status: data.status as 'active' | 'maintenance' | 'inactive',
-        isMainZone: data.is_main_zone,
-        area: data.area_sqm,
+        isMainZone: data.is_main_zone || false,
+        capacity: data.capacity || 30,
+        area: data.area_sqm || 0,
         coordinates: data.coordinates_x && data.coordinates_y ? {
           x: data.coordinates_x,
           y: data.coordinates_y,
           width: data.coordinates_width || 100,
           height: data.coordinates_height || 80
         } : undefined,
-        accessibility: data.accessibility_features || [],
+        equipment: data.equipment || [],
         features: data.features || [],
-        isActive: data.is_active
+        accessibility: data.accessibility_features || [],
+        pricing: {
+          basePrice: 450,
+          currency: 'NOK',
+          priceRules: [],
+          minimumBookingDuration: 60,
+          maximumBookingDuration: 480,
+          cancellationPolicy: {
+            freeUntilHours: 48,
+            partialRefundUntilHours: 24,
+            partialRefundPercentage: 50,
+            noRefundAfterHours: 2
+          }
+        },
+        availability: {
+          openingHours: [],
+          blackoutPeriods: [],
+          maintenanceSchedule: [],
+          recurringUnavailability: []
+        },
+        restrictions: {
+          requiresSupervision: false,
+          allowedActivities: [],
+          prohibitedActivities: [],
+          requiresTraining: false,
+          alcoholPermitted: false,
+          smokingPermitted: false,
+          petsAllowed: false,
+          cateringAllowed: true,
+          decorationsAllowed: true,
+          amplifiedSoundAllowed: true,
+          commercialUseAllowed: true
+        },
+        isActive: data.is_active,
+        createdAt: new Date(),
+        updatedAt: new Date()
       };
 
       return { success: true, data: zone };
