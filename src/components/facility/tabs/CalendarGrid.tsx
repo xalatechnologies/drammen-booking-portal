@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { format, addDays } from 'date-fns';
 import { nb } from 'date-fns/locale';
@@ -7,6 +6,7 @@ import { Zone } from '@/components/booking/types';
 import { SelectedTimeSlot } from '@/utils/recurrenceEngine';
 import { isNorwegianHoliday } from '@/utils/holidaysAndAvailability';
 import { ConflictTooltip } from '@/components/facility/ConflictTooltip';
+import { useDragSelection } from '@/hooks/useDragSelection';
 
 interface CalendarGridProps {
   zone: Zone;
@@ -28,10 +28,15 @@ export function CalendarGrid({
   onSlotClick 
 }: CalendarGridProps) {
   const weekDays = Array(7).fill(0).map((_, i) => addDays(currentWeekStart, i));
+  const { dragState, startDrag, updateDrag, endDrag, cancelDrag, isSlotInPreview } = useDragSelection();
 
-  const getStatusStyle = (status: string, isSelected: boolean) => {
+  const getStatusStyle = (status: string, isSelected: boolean, isInPreview: boolean) => {
     if (isSelected) {
       return 'bg-blue-500 hover:bg-blue-600 text-white font-semibold border border-blue-600';
+    }
+    
+    if (isInPreview) {
+      return 'bg-blue-200 hover:bg-blue-300 border border-blue-400 text-blue-800 font-medium cursor-pointer';
     }
     
     switch (status) {
@@ -45,30 +50,70 @@ export function CalendarGrid({
     }
   };
 
+  const handleMouseDown = (day: Date, timeSlot: string, event: React.MouseEvent) => {
+    const { status } = getAvailabilityStatus(zone.id, day, timeSlot);
+    if (status === 'available') {
+      startDrag(zone.id, day, timeSlot, event);
+    }
+  };
+
+  const handleMouseEnter = (day: Date, timeSlot: string) => {
+    if (dragState.isDragging) {
+      updateDrag(zone.id, day, timeSlot, timeSlots, weekDays, getAvailabilityStatus);
+    }
+  };
+
+  const handleMouseUp = () => {
+    if (dragState.isDragging) {
+      const previewSlots = endDrag();
+      // Apply all preview slots as selected
+      previewSlots.forEach(slot => {
+        if (!isSlotSelected(slot.zoneId, slot.date, slot.timeSlot)) {
+          onSlotClick(slot.zoneId, slot.date, slot.timeSlot, 'available');
+        }
+      });
+    }
+  };
+
+  const handleClick = (day: Date, timeSlot: string, status: string, event: React.MouseEvent) => {
+    // Only handle click if we're not in the middle of a drag operation
+    if (!dragState.isDragging) {
+      onSlotClick(zone.id, day, timeSlot, status);
+    }
+  };
+
   const renderTimeSlotCell = (day: Date, timeSlot: string, dayIndex: number) => {
     const { status, conflict } = getAvailabilityStatus(zone.id, day, timeSlot);
     const isSelected = isSlotSelected(zone.id, day, timeSlot);
-    const statusStyle = getStatusStyle(status, isSelected);
+    const isInPreview = isSlotInPreview(zone.id, day, timeSlot);
+    const statusStyle = getStatusStyle(status, isSelected, isInPreview);
     
     // Extract just the start time from timeSlot (e.g., "08:00" from "08:00-09:00")
     const startTime = timeSlot.split('-')[0];
     
     const cell = (
       <button
-        className={`w-full h-8 rounded border transition-all duration-200 text-base ${statusStyle} ${
+        className={`w-full h-8 rounded border transition-all duration-200 text-base select-none ${statusStyle} ${
           status === 'available' ? 'transform hover:scale-105' : ''
         }`}
         disabled={status !== 'available'}
-        onClick={() => status === 'available' && onSlotClick(zone.id, day, timeSlot, status)}
+        onMouseDown={(e) => handleMouseDown(day, timeSlot, e)}
+        onMouseEnter={() => handleMouseEnter(day, timeSlot)}
+        onMouseUp={handleMouseUp}
+        onClick={(e) => handleClick(day, timeSlot, status, e)}
         title={status === 'available' ? `Book ${timeSlot}` : 
                status === 'busy' ? 'Opptatt' : 'Ikke tilgjengelig'}
+        style={{ userSelect: 'none' }}
       >
         <div className="flex items-center justify-center h-full">
-          <span className={`text-base ${isSelected ? 'text-white' : 'text-gray-700'}`}>
+          <span className={`text-base ${isSelected ? 'text-white' : isInPreview ? 'text-blue-800' : 'text-gray-700'}`}>
             {startTime}
           </span>
           {isSelected && (
             <span className="text-base text-white ml-1">✓</span>
+          )}
+          {isInPreview && !isSelected && (
+            <span className="text-base text-blue-800 ml-1">◯</span>
           )}
         </div>
       </button>
@@ -86,54 +131,60 @@ export function CalendarGrid({
   };
 
   return (
-    <Card>
-      <CardContent className="p-3">
-        {/* Week Header */}
-        <div className="mb-4 text-center">
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">
-            {format(currentWeekStart, 'dd. MMMM', { locale: nb })} - {format(addDays(currentWeekStart, 6), 'dd. MMMM yyyy', { locale: nb })}
-          </h3>
-        </div>
+    <div 
+      onMouseLeave={cancelDrag}
+      onMouseUp={handleMouseUp}
+      style={{ userSelect: 'none' }}
+    >
+      <Card>
+        <CardContent className="p-3">
+          {/* Week Header */}
+          <div className="mb-4 text-center">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              {format(currentWeekStart, 'dd. MMMM', { locale: nb })} - {format(addDays(currentWeekStart, 6), 'dd. MMMM yyyy', { locale: nb })}
+            </h3>
+          </div>
 
-        {/* Day Headers */}
-        <div className="grid grid-cols-7 gap-1 mb-3">
-          {weekDays.map((day, i) => {
-            const holidayCheck = isNorwegianHoliday(day);
-            const isToday = format(day, 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd');
-            
-            return (
-              <div key={i} className={`p-2 text-center rounded text-xs font-inter ${
-                isToday ? 'bg-blue-100 border border-blue-300' : 'bg-gray-50 border border-gray-200'
-              }`}>
-                <div className={`text-xs font-medium ${isToday ? 'text-blue-800' : 'text-gray-700'}`}>
-                  {format(day, "EEE", { locale: nb })}
-                </div>
-                <div className={`text-sm font-bold ${isToday ? 'text-blue-900' : 'text-gray-900'}`}>
-                  {format(day, "dd.MM", { locale: nb })}
-                </div>
-                {holidayCheck.isHoliday && (
-                  <div className="text-xs text-red-600 truncate font-inter mt-1" title={holidayCheck.name}>
-                    {holidayCheck.name?.substring(0, 6)}
+          {/* Day Headers */}
+          <div className="grid grid-cols-7 gap-2 mb-3">
+            {weekDays.map((day, i) => {
+              const holidayCheck = isNorwegianHoliday(day);
+              const isToday = format(day, 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd');
+              
+              return (
+                <div key={i} className={`p-2 text-center rounded text-xs font-inter ${
+                  isToday ? 'bg-blue-100 border border-blue-300' : 'bg-gray-50 border border-gray-200'
+                }`}>
+                  <div className={`text-xs font-medium ${isToday ? 'text-blue-800' : 'text-gray-700'}`}>
+                    {format(day, "EEE", { locale: nb })}
                   </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Time Slots Grid - More spaced Excel-like layout */}
-        <div className="space-y-1">
-          {timeSlots.map((timeSlot) => (
-            <div key={timeSlot} className="grid grid-cols-7 gap-1">
-              {weekDays.map((day, dayIndex) => (
-                <div key={dayIndex} className="relative">
-                  {renderTimeSlotCell(day, timeSlot, dayIndex)}
+                  <div className={`text-sm font-bold ${isToday ? 'text-blue-900' : 'text-gray-900'}`}>
+                    {format(day, "dd.MM", { locale: nb })}
+                  </div>
+                  {holidayCheck.isHoliday && (
+                    <div className="text-xs text-red-600 truncate font-inter mt-1" title={holidayCheck.name}>
+                      {holidayCheck.name?.substring(0, 6)}
+                    </div>
+                  )}
                 </div>
-              ))}
-            </div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+              );
+            })}
+          </div>
+
+          {/* Time Slots Grid - Enhanced with drag selection */}
+          <div className="space-y-2">
+            {timeSlots.map((timeSlot) => (
+              <div key={timeSlot} className="grid grid-cols-7 gap-2">
+                {weekDays.map((day, dayIndex) => (
+                  <div key={dayIndex} className="relative">
+                    {renderTimeSlotCell(day, timeSlot, dayIndex)}
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 }
