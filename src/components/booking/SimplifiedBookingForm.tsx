@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { SelectedTimeSlot } from '@/utils/recurrenceEngine';
@@ -6,7 +5,7 @@ import { Zone } from './types';
 import { ActorType } from '@/types/pricing';
 import { SelectedSlotsAccordion } from './SelectedSlotsAccordion';
 import { BookingFormFields } from './BookingFormFields';
-import { PriceCalculationCard } from './PriceCalculationCard';
+import { EnhancedPriceCalculationCard } from './EnhancedPriceCalculationCard';
 import { BookingActionButtons } from './BookingActionButtons';
 import { useCartStore } from '@/stores/useCartStore';
 import { useToast } from '@/hooks/use-toast';
@@ -252,8 +251,8 @@ export function SimplifiedBookingForm({
           onUpdateFormData={updateFormData}
         />
 
-        {/* Price Calculation */}
-        <PriceCalculationCard
+        {/* Enhanced Price Calculation */}
+        <EnhancedPriceCalculationCard
           selectedSlots={selectedSlots}
           facilityId={facilityId}
           actorType={formData.actorType}
