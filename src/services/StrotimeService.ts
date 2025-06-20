@@ -1,266 +1,307 @@
-import { StrøtimeSlot, StrøtimeBooking, StrøtimeFilters } from '@/types/booking/strøtimer';
-import { ApiResponse } from '@/types/api';
-import { addDays, isSameDay } from 'date-fns';
 
-// Mock data for demo - expanded to cover multiple weeks and facility ID "1"
-const mockStrøtimeSlots: StrøtimeSlot[] = [
-  // Facility ID "1" slots (Current week - June 19, 2025)
-  {
-    id: 'stro-1-1',
-    facilityId: '1',
-    facilityName: 'Drammen kulturhus - Storstudio',
-    zoneId: 'whole-facility',
-    zoneName: 'Hele lokalet',
-    date: new Date(2025, 5, 19),
-    startTime: '14:00',
-    endTime: '15:00',
-    duration: 60,
-    isAvailable: true,
-    publishedAt: new Date(),
-    publishedBy: 'admin',
-    pricePerSlot: 200
-  },
-  {
-    id: 'stro-1-2',
-    facilityId: '1',
-    facilityName: 'Drammen kulturhus - Storstudio',
-    zoneId: 'whole-facility',
-    zoneName: 'Hele lokalet',
-    date: new Date(2025, 5, 19),
-    startTime: '17:30',
-    endTime: '18:00',
-    duration: 30,
-    isAvailable: true,
-    publishedAt: new Date(),
-    publishedBy: 'admin',
-    pricePerSlot: 100
-  },
-  {
-    id: 'stro-1-3',
-    facilityId: '1',
-    facilityName: 'Drammen kulturhus - Storstudio',
-    zoneId: 'whole-facility',
-    zoneName: 'Hele lokalet',
-    date: new Date(2025, 5, 20),
-    startTime: '13:00',
-    endTime: '14:00',
-    duration: 60,
-    isAvailable: true,
-    publishedAt: new Date(),
-    publishedBy: 'admin',
-    pricePerSlot: 200
-  },
-  // Facility ID "2" slots (existing data)
-  {
-    id: 'stro-2',
-    facilityId: '2',
-    facilityName: 'Gymsal 2 - Brandengen skole',
-    zoneId: 'zone-1',
-    zoneName: 'Sone A (Nord)',
-    date: new Date(2025, 5, 19),
-    startTime: '15:00',
-    endTime: '16:00',
-    duration: 60,
-    isAvailable: true,
-    publishedAt: new Date(),
-    publishedBy: 'admin',
-    pricePerSlot: 150
-  },
-  {
-    id: 'stro-3',
-    facilityId: '2',
-    facilityName: 'Gymsal 2 - Brandengen skole',
-    zoneId: 'zone-1',
-    zoneName: 'Sone A (Nord)',
-    date: new Date(2025, 5, 19),
-    startTime: '16:30',
-    endTime: '17:00',
-    duration: 30,
-    isAvailable: true,
-    publishedAt: new Date(),
-    publishedBy: 'admin',
-    pricePerSlot: 80
-  },
-  {
-    id: 'stro-4',
-    facilityId: '2',
-    facilityName: 'Gymsal 2 - Brandengen skole',
-    zoneId: 'zone-2',
-    zoneName: 'Sone B (Sør)',
-    date: new Date(2025, 5, 20),
-    startTime: '12:00',
-    endTime: '12:30',
-    duration: 30,
-    isAvailable: false,
-    publishedAt: new Date(),
-    publishedBy: 'admin',
-    bookedBy: 'john.doe@example.com',
-    bookedAt: new Date(),
-    pricePerSlot: 80
-  },
-  // Next week (June 26, 2025)
-  {
-    id: 'stro-5',
-    facilityId: '2',
-    facilityName: 'Gymsal 2 - Brandengen skole',
-    zoneId: 'zone-1',
-    zoneName: 'Sone A (Nord)',
-    date: new Date(2025, 5, 26),
-    startTime: '14:00',
-    endTime: '15:00',
-    duration: 60,
-    isAvailable: true,
-    publishedAt: new Date(),
-    publishedBy: 'admin',
-    pricePerSlot: 150
-  },
-  {
-    id: 'stro-6',
-    facilityId: '2',
-    facilityName: 'Gymsal 2 - Brandengen skole',
-    zoneId: 'zone-2',
-    zoneName: 'Sone B (Sør)',
-    date: new Date(2025, 5, 27),
-    startTime: '10:00',
-    endTime: '11:00',
-    duration: 60,
-    isAvailable: true,
-    publishedAt: new Date(),
-    publishedBy: 'admin',
-    pricePerSlot: 150
-  }
-];
+import { supabase } from '@/integrations/supabase/client';
+import { ApiResponse, PaginatedResponse, PaginationParams } from '@/types/api';
 
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+export interface StrotimeSlot {
+  id: string;
+  facility_id: number;
+  zone_id: string;
+  slot_date: string;
+  start_time: string;
+  end_time: string;
+  duration_minutes: 30 | 60;
+  price_per_slot: number;
+  max_participants: number;
+  current_participants: number;
+  is_available: boolean;
+  published_at: string;
+  published_by: string;
+  released_from_rammetid: boolean;
+  original_booking_id?: string;
+  created_at: string;
+}
+
+export interface StrotimeBooking {
+  id: string;
+  strotime_slot_id: string;
+  user_id?: string;
+  contact_name: string;
+  contact_email: string;
+  contact_phone: string;
+  participants: number;
+  special_requirements?: string;
+  status: 'confirmed' | 'cancelled' | 'no-show';
+  booked_at: string;
+  cancelled_at?: string;
+  cancellation_reason?: string;
+  payment_status: string;
+  total_price: number;
+}
+
+export interface StrotimeFilters {
+  facility_id?: number;
+  zone_id?: string;
+  date?: string;
+  start_date?: string;
+  end_date?: string;
+  is_available?: boolean;
+}
 
 export class StrotimeService {
-  static async getAvailableStrøtimer(filters?: StrøtimeFilters): Promise<ApiResponse<StrøtimeSlot[]>> {
+  static async getAvailableSlots(
+    pagination?: PaginationParams,
+    filters?: StrotimeFilters
+  ): Promise<ApiResponse<PaginatedResponse<StrotimeSlot>>> {
     try {
-      await delay(200);
-      
-      console.log('StrotimeService - Getting strøtimer with filters:', filters);
-      
-      let filteredSlots = mockStrøtimeSlots.filter(slot => slot.isAvailable);
-      
-      if (filters) {
-        if (filters.facilityId) {
-          console.log(`StrotimeService - Filtering by facilityId: ${filters.facilityId}`);
-          filteredSlots = filteredSlots.filter(slot => slot.facilityId === filters.facilityId);
-        }
-        if (filters.zoneId) {
-          filteredSlots = filteredSlots.filter(slot => slot.zoneId === filters.zoneId);
-        }
-        if (filters.date) {
-          filteredSlots = filteredSlots.filter(slot => 
-            isSameDay(slot.date, filters.date!)
-          );
-        }
-        if (filters.startDate && filters.endDate) {
-          filteredSlots = filteredSlots.filter(slot => 
-            slot.date >= filters.startDate! && slot.date <= filters.endDate!
-          );
-        }
-        if (filters.duration) {
-          filteredSlots = filteredSlots.filter(slot => slot.duration === filters.duration);
-        }
+      let query = supabase
+        .from('strotime_slots')
+        .select('*', { count: 'exact' })
+        .eq('is_available', true)
+        .gte('slot_date', new Date().toISOString().split('T')[0]); // Only future slots
+
+      // Apply filters
+      if (filters?.facility_id) {
+        query = query.eq('facility_id', filters.facility_id);
       }
       
-      console.log('StrotimeService - Returning slots:', filteredSlots);
+      if (filters?.zone_id) {
+        query = query.eq('zone_id', filters.zone_id);
+      }
       
+      if (filters?.date) {
+        query = query.eq('slot_date', filters.date);
+      }
+      
+      if (filters?.start_date) {
+        query = query.gte('slot_date', filters.start_date);
+      }
+      
+      if (filters?.end_date) {
+        query = query.lte('slot_date', filters.end_date);
+      }
+
+      // Apply pagination
+      if (pagination) {
+        const from = (pagination.page - 1) * pagination.limit;
+        const to = from + pagination.limit - 1;
+        query = query.range(from, to);
+      }
+
+      // Order by date and time
+      query = query.order('slot_date', { ascending: true })
+                   .order('start_time', { ascending: true });
+
+      const { data, error, count } = await query;
+
+      if (error) {
+        return {
+          success: false,
+          error: {
+            message: 'Failed to fetch strotime slots',
+            details: error
+          }
+        };
+      }
+
+      const totalPages = pagination ? Math.ceil((count || 0) / pagination.limit) : 1;
+
       return {
         success: true,
-        data: filteredSlots
+        data: {
+          data: data || [],
+          pagination: {
+            page: pagination?.page || 1,
+            limit: pagination?.limit || data?.length || 0,
+            total: count || 0,
+            totalPages,
+            hasNext: pagination ? pagination.page < totalPages : false,
+            hasPrev: pagination ? pagination.page > 1 : false
+          }
+        }
       };
     } catch (error) {
-      console.error('StrotimeService - Error:', error);
       return {
         success: false,
-        error: { message: 'Failed to fetch strøtimer', details: error }
+        error: {
+          message: 'Failed to fetch strotime slots',
+          details: error
+        }
       };
     }
   }
 
-  static async bookStrøtime(
+  static async bookStrotimeSlot(
     slotId: string,
-    contactInfo: { name: string; email: string; phone: string }
-  ): Promise<ApiResponse<StrøtimeBooking>> {
+    bookingData: Omit<StrotimeBooking, 'id' | 'strotime_slot_id' | 'booked_at' | 'status'>
+  ): Promise<ApiResponse<StrotimeBooking>> {
     try {
-      await delay(300);
-      
-      const slot = mockStrøtimeSlots.find(s => s.id === slotId);
-      if (!slot) {
+      // First check if slot is still available
+      const { data: slot, error: slotError } = await supabase
+        .from('strotime_slots')
+        .select('*')
+        .eq('id', slotId)
+        .eq('is_available', true)
+        .single();
+
+      if (slotError || !slot) {
         return {
           success: false,
-          error: { message: 'Strøtime slot not found' }
+          error: {
+            message: 'Slot not available',
+            code: 'SLOT_UNAVAILABLE'
+          }
         };
       }
-      
-      if (!slot.isAvailable) {
+
+      // Check capacity
+      if (slot.current_participants + bookingData.participants > slot.max_participants) {
         return {
           success: false,
-          error: { message: 'Strøtime slot is no longer available' }
+          error: {
+            message: 'Not enough capacity',
+            code: 'INSUFFICIENT_CAPACITY'
+          }
         };
       }
-      
-      // Mark slot as booked
-      slot.isAvailable = false;
-      slot.bookedBy = contactInfo.email;
-      slot.bookedAt = new Date();
-      
-      const booking: StrøtimeBooking = {
-        id: `stro-booking-${Date.now()}`,
-        strøtimeSlotId: slotId,
-        contactName: contactInfo.name,
-        contactEmail: contactInfo.email,
-        contactPhone: contactInfo.phone,
-        bookedAt: new Date(),
-        status: 'confirmed'
-      };
-      
+
+      // Start transaction
+      const { data, error } = await supabase.rpc('book_strotime_slot', {
+        p_slot_id: slotId,
+        p_booking_data: {
+          ...bookingData,
+          strotime_slot_id: slotId,
+          status: 'confirmed',
+          total_price: slot.price_per_slot * bookingData.participants
+        }
+      });
+
+      if (error) {
+        return {
+          success: false,
+          error: {
+            message: 'Failed to book strotime slot',
+            details: error
+          }
+        };
+      }
+
       return {
         success: true,
-        data: booking
+        data
       };
     } catch (error) {
       return {
         success: false,
-        error: { message: 'Failed to book strøtime', details: error }
+        error: {
+          message: 'Failed to book strotime slot',
+          details: error
+        }
       };
     }
   }
 
-  static async cancelStrøtime(bookingId: string, reason?: string): Promise<ApiResponse<StrøtimeBooking>> {
+  static async getUserStrotimeBookings(
+    userId?: string,
+    pagination?: PaginationParams
+  ): Promise<ApiResponse<PaginatedResponse<StrotimeBooking>>> {
     try {
-      await delay(200);
-      
-      // Find the booking and mark the slot as available again
-      const slot = mockStrøtimeSlots.find(s => s.bookedBy);
-      if (slot) {
-        slot.isAvailable = true;
-        slot.bookedBy = undefined;
-        slot.bookedAt = undefined;
+      const { data: { user } } = await supabase.auth.getUser();
+      const targetUserId = userId || user?.id;
+
+      let query = supabase
+        .from('strotime_bookings')
+        .select('*', { count: 'exact' });
+
+      if (targetUserId) {
+        query = query.eq('user_id', targetUserId);
       }
-      
-      const cancelledBooking: StrøtimeBooking = {
-        id: bookingId,
-        strøtimeSlotId: slot?.id || '',
-        contactName: 'User',
-        contactEmail: 'user@example.com',
-        contactPhone: '12345678',
-        bookedAt: new Date(),
-        status: 'cancelled',
-        cancelledAt: new Date(),
-        cancellationReason: reason
-      };
-      
+
+      // Apply pagination
+      if (pagination) {
+        const from = (pagination.page - 1) * pagination.limit;
+        const to = from + pagination.limit - 1;
+        query = query.range(from, to);
+      }
+
+      // Order by booking date (newest first)
+      query = query.order('booked_at', { ascending: false });
+
+      const { data, error, count } = await query;
+
+      if (error) {
+        return {
+          success: false,
+          error: {
+            message: 'Failed to fetch strotime bookings',
+            details: error
+          }
+        };
+      }
+
+      const totalPages = pagination ? Math.ceil((count || 0) / pagination.limit) : 1;
+
       return {
         success: true,
-        data: cancelledBooking
+        data: {
+          data: data || [],
+          pagination: {
+            page: pagination?.page || 1,
+            limit: pagination?.limit || data?.length || 0,
+            total: count || 0,
+            totalPages,
+            hasNext: pagination ? pagination.page < totalPages : false,
+            hasPrev: pagination ? pagination.page > 1 : false
+          }
+        }
       };
     } catch (error) {
       return {
         success: false,
-        error: { message: 'Failed to cancel strøtime', details: error }
+        error: {
+          message: 'Failed to fetch strotime bookings',
+          details: error
+        }
+      };
+    }
+  }
+
+  static async cancelStrotimeBooking(
+    bookingId: string,
+    reason?: string
+  ): Promise<ApiResponse<StrotimeBooking>> {
+    try {
+      const { data, error } = await supabase
+        .from('strotime_bookings')
+        .update({
+          status: 'cancelled',
+          cancelled_at: new Date().toISOString(),
+          cancellation_reason: reason
+        })
+        .eq('id', bookingId)
+        .select()
+        .single();
+
+      if (error) {
+        return {
+          success: false,
+          error: {
+            message: 'Failed to cancel strotime booking',
+            details: error
+          }
+        };
+      }
+
+      return {
+        success: true,
+        data
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: {
+          message: 'Failed to cancel strotime booking',
+          details: error
+        }
       };
     }
   }
