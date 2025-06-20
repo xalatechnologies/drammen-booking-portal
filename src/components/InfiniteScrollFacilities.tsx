@@ -98,7 +98,7 @@ export function InfiniteScrollFacilities({
 
   if (error) {
     return (
-      <div className="text-center py-10 bg-red-50 rounded-lg border border-red-200">
+      <div className="text-center py-10 bg-red-50 rounded-lg border border-red-200 mx-4">
         <h3 className="text-xl font-medium text-red-800 mb-2">Feil ved lasting</h3>
         <p className="text-red-600">Kunne ikke laste lokaler. Prøv igjen senere.</p>
       </div>
@@ -118,7 +118,7 @@ export function InfiniteScrollFacilities({
 
   if (allFacilities.length === 0 && !isLoading) {
     return (
-      <div className="text-center py-10 bg-gray-50 rounded-lg">
+      <div className="text-center py-10 bg-gray-50 rounded-lg mx-4">
         <h3 className="text-xl font-medium mb-2">Ingen lokaler funnet</h3>
         <p className="text-gray-500">Prøv å endre søkekriteriene dine</p>
       </div>
@@ -145,9 +145,9 @@ export function InfiniteScrollFacilities({
   );
 
   return (
-    <div className="relative">
+    <div className="relative max-w-7xl mx-auto px-4">
       {/* Results summary */}
-      <div className="mb-8 flex items-center justify-between">
+      <div className="mb-10 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
             {pagination?.total || allFacilities.length} lokaler
@@ -178,7 +178,7 @@ export function InfiniteScrollFacilities({
       >
         {/* Facilities content */}
         {viewMode === "grid" ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 w-full">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-10 w-full mb-8">
             {allFacilities.map((facility, index) => (
               <div 
                 key={`${facility.id}-${index}`}
@@ -192,7 +192,7 @@ export function InfiniteScrollFacilities({
             ))}
           </div>
         ) : (
-          <div className="space-y-6 w-full">
+          <div className="space-y-8 w-full mb-8">
             {allFacilities.map((facility, index) => (
               <div 
                 key={`${facility.id}-${index}`}

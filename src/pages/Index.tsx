@@ -167,8 +167,8 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Scrollable Content Area with top padding for fixed filter */}
-        <div className="pt-32 content-center py-6">
+        {/* Scrollable Content Area with increased top padding for fixed filter */}
+        <div className="pt-48 content-center py-8 px-4">
           {renderContent()}
         </div>
       </main>
