@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from "react";
 import { Search, MapPin, Building, Clock, Users } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -80,7 +79,7 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ onResultClick }) => {
           const errorMsg = result.error?.message || "Failed to load facilities";
           console.error("GlobalSearch - Failed to load facilities:", errorMsg);
           setError(errorMsg);
-          setFacilities([]); // Set empty array on error
+          setFacilities([]);
         }
       } catch (error) {
         const errorMsg = error instanceof Error ? error.message : "Failed to load facilities";
@@ -142,7 +141,7 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ onResultClick }) => {
         subtitle: `${facility.area} - Kapasitet: ${facility.capacity}`,
         icon: <Building className="h-5 w-5" />,
         url: `/facilities/${facility.id}`,
-        image: facility.image_url
+        image: facility.image
       }));
 
     // Add location results (unique areas from facilities)
