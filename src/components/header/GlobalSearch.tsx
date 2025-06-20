@@ -4,6 +4,7 @@ import { Search, MapPin, Building, Clock, Users } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useNavigate } from "react-router-dom";
 import { facilityRepository } from "@/dal/repositories";
 import { Facility } from "@/types/facility";
 
@@ -15,6 +16,7 @@ interface SearchResult {
   icon: React.ReactNode;
   url: string;
   image?: string;
+  searchParams?: Record<string, string>;
 }
 
 interface GlobalSearchProps {
@@ -26,7 +28,9 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ onResultClick }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [results, setResults] = useState<SearchResult[]>([]);
   const [facilities, setFacilities] = useState<Facility[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
   const { language } = useLanguage();
 
   const translations = {
@@ -36,7 +40,8 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ onResultClick }) => {
       facilities: "Lokaler",
       locations: "Områder",
       categories: "Kategorier",
-      recent: "Nylig søkt"
+      recent: "Nylig søkt",
+      searching: "Søker..."
     },
     EN: {
       placeholder: "Search facilities, areas, activities...",
@@ -44,7 +49,8 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ onResultClick }) => {
       facilities: "Facilities",
       locations: "Locations", 
       categories: "Categories",
-      recent: "Recent searches"
+      recent: "Recent searches",
+      searching: "Searching..."
     }
   };
 
@@ -53,11 +59,20 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ onResultClick }) => {
   // Load facilities on component mount
   useEffect(() => {
     const loadFacilities = async () => {
-      console.log("GlobalSearch - Loading facilities...");
-      const result = await facilityRepository.findAll({ page: 1, limit: 100 });
-      if (result.success && result.data?.data) {
-        console.log("GlobalSearch - Loaded facilities:", result.data.data.length);
-        setFacilities(result.data.data);
+      try {
+        setIsLoading(true);
+        console.log("GlobalSearch - Loading facilities...");
+        const result = await facilityRepository.findAll({ page: 1, limit: 100 });
+        if (result.success && result.data?.data) {
+          console.log("GlobalSearch - Loaded facilities:", result.data.data.length);
+          setFacilities(result.data.data);
+        } else {
+          console.error("GlobalSearch - Failed to load facilities:", result.error);
+        }
+      } catch (error) {
+        console.error("GlobalSearch - Error loading facilities:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
     loadFacilities();
@@ -65,26 +80,22 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ onResultClick }) => {
 
   // Create search results from facilities and other data
   const createSearchResults = (searchTerm: string): SearchResult[] => {
+    if (!searchTerm.trim() || facilities.length === 0) return [];
+    
     const searchLower = searchTerm.toLowerCase();
     console.log("GlobalSearch - Searching for:", searchLower);
     
     const facilityResults: SearchResult[] = facilities
       .filter(facility => {
         const matchesName = facility.name.toLowerCase().includes(searchLower);
-        const matchesDescription = facility.description.toLowerCase().includes(searchLower);
+        const matchesDescription = facility.description?.toLowerCase().includes(searchLower);
         const matchesType = facility.type.toLowerCase().includes(searchLower);
         const matchesArea = facility.area.toLowerCase().includes(searchLower);
-        const matchesActivity = facility.suitableFor.some(activity => 
+        const matchesActivity = facility.suitableFor?.some(activity => 
           activity.toLowerCase().includes(searchLower)
         );
         
-        const matches = matchesName || matchesDescription || matchesType || matchesArea || matchesActivity;
-        
-        if (matches) {
-          console.log(`GlobalSearch - Found match: ${facility.name}`);
-        }
-        
-        return matches;
+        return matchesName || matchesDescription || matchesType || matchesArea || matchesActivity;
       })
       .slice(0, 6) // Limit facility results
       .map(facility => ({
@@ -107,7 +118,8 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ onResultClick }) => {
         title: area,
         subtitle: `${facilities.filter(f => f.area === area).length} lokaler tilgjengelig`,
         icon: <MapPin className="h-5 w-5" />,
-        url: `/?location=${encodeURIComponent(area.toLowerCase().replace(' ', '-'))}`,
+        url: '/',
+        searchParams: { location: area.toLowerCase().replace(' ', '-') }
       }));
 
     // Add category results (unique types from facilities)
@@ -120,7 +132,8 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ onResultClick }) => {
         title: type,
         subtitle: `${facilities.filter(f => f.type === type).length} lokaler tilgjengelig`,
         icon: <Users className="h-5 w-5" />,
-        url: `/?facilityType=${encodeURIComponent(type.toLowerCase().replace(' ', '-'))}`,
+        url: '/',
+        searchParams: { facilityType: type.toLowerCase().replace(' ', '-') }
       }));
 
     console.log("GlobalSearch - Total results:", facilityResults.length + uniqueAreas.length + uniqueTypes.length);
@@ -150,9 +163,8 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ onResultClick }) => {
       setResults(sorted.slice(0, 8)); // Limit to 8 results
       setIsOpen(true);
     } else {
-      // Show empty results when no search term
       setResults([]);
-      setIsOpen(searchTerm.length === 0 && document.activeElement === searchRef.current?.querySelector('input'));
+      setIsOpen(false);
     }
   }, [searchTerm, facilities]);
 
@@ -173,8 +185,15 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ onResultClick }) => {
     setIsOpen(false);
     onResultClick?.(result);
     
-    // Navigate to result
-    window.location.href = result.url;
+    // Navigate using React Router
+    if (result.searchParams) {
+      // For search results with parameters, navigate to home page with search params
+      const searchParams = new URLSearchParams(result.searchParams);
+      navigate(`${result.url}?${searchParams.toString()}`);
+    } else {
+      // For direct navigation (facilities)
+      navigate(result.url);
+    }
   };
 
   const groupedResults = results.reduce((acc, result) => {
@@ -192,7 +211,7 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ onResultClick }) => {
           placeholder={t.placeholder}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          onFocus={() => setIsOpen(true)}
+          onFocus={() => setIsOpen(searchTerm.length > 0)}
           className="pl-12 pr-4 h-12 bg-gray-50 border-gray-200 focus:bg-white focus:border-gray-400 text-base font-medium placeholder:text-base placeholder:font-medium"
           autoComplete="off"
         />
@@ -202,7 +221,11 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ onResultClick }) => {
         <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 shadow-xl z-50 max-h-[500px] overflow-hidden">
           <Command>
             <CommandList>
-              {results.length === 0 ? (
+              {isLoading ? (
+                <CommandEmpty className="py-8 text-center text-base text-gray-500">
+                  {t.searching}
+                </CommandEmpty>
+              ) : results.length === 0 ? (
                 <CommandEmpty className="py-8 text-center text-base text-gray-500">
                   {searchTerm.length > 0 ? t.noResults : "Skriv for å søke..."}
                 </CommandEmpty>
