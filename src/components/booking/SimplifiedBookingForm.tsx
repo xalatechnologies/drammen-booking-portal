@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { SelectedTimeSlot } from '@/utils/recurrenceEngine';
@@ -58,6 +57,12 @@ export function SimplifiedBookingForm({
     }
   };
 
+  const handleClearAll = () => {
+    if (onSlotsCleared) {
+      onSlotsCleared();
+    }
+  };
+
   const isFormValid = () => {
     return formData.purpose.trim() && 
            formData.attendees > 0 && 
@@ -112,6 +117,7 @@ export function SimplifiedBookingForm({
           selectedSlots={selectedSlots}
           zones={zones}
           onRemoveSlot={handleRemoveSlot}
+          onClearAll={handleClearAll}
         />
 
         {/* Basic Information */}
