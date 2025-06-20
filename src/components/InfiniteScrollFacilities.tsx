@@ -40,23 +40,24 @@ export const InfiniteScrollFacilities: React.FC<InfiniteScrollFacilitiesProps> =
     goToPage(1);
   }, [filterString, goToPage]);
 
-  // Handle facility data updates - FIXED: Better logic for setting facilities
+  // Handle facility data updates - FIXED: Simplified logic
   useEffect(() => {
-    console.log('InfiniteScrollFacilities - useEffect triggered', {
+    console.log('InfiniteScrollFacilities - Processing facilities data', {
       page: currentPage,
       facilitiesLength: facilities.length,
       isLoading,
-      hasMore: paginationInfo?.hasNext,
-      allFacilitiesLength: allFacilities.length
+      allFacilitiesLength: allFacilities.length,
+      paginationHasNext: paginationInfo?.hasNext
     });
 
-    if (!isLoading) {
+    // Only process when not loading and we have facilities data (including empty arrays)
+    if (!isLoading && facilities !== undefined) {
       if (currentPage === 1) {
-        // For first page, replace all facilities (this handles both fresh loads and filter changes)
+        // For page 1, replace all facilities (handles both initial load and filter changes)
         console.log('InfiniteScrollFacilities - Setting facilities for page 1:', facilities.length);
-        setAllFacilities(facilities || []);
-      } else if (facilities && facilities.length > 0) {
-        // For subsequent pages, append new facilities (avoid duplicates)
+        setAllFacilities(facilities);
+      } else if (facilities.length > 0) {
+        // For subsequent pages, append only new facilities
         console.log('InfiniteScrollFacilities - Appending facilities for page', currentPage);
         setAllFacilities(prev => {
           const newFacilities = facilities.filter(facility => 
@@ -72,7 +73,7 @@ export const InfiniteScrollFacilities: React.FC<InfiniteScrollFacilitiesProps> =
         console.log('InfiniteScrollFacilities - Updated hasMore:', paginationInfo.hasNext);
       }
     }
-  }, [facilities, currentPage, isLoading, paginationInfo?.hasNext, paginationInfo?.total]);
+  }, [facilities, isLoading, currentPage, paginationInfo]);
 
   const loadMore = useCallback(() => {
     if (!isLoading && hasMore) {
