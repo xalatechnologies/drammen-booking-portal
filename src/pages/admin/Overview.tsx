@@ -85,6 +85,13 @@ const mockUpcomingMaintenance = [
   },
 ];
 
+const mockNotifications = [
+  { id: "1", title: "Ny forespørsel om lokale", description: "Brandengen Skole ba om godkjenning", timestamp: "2 minutter siden", read: false },
+  { id: "2", title: "Brukerrolle oppdatert", description: "Thomas Hansen er nå administrator", timestamp: "1 time siden", read: false },
+  { id: "3", title: "Systemvarsel", description: "Planlagt vedlikehold i kveld kl. 23:00.", timestamp: "4 timer siden", read: true },
+  { id: "4", title: "Ny melding mottatt", description: "Du har en ny melding fra Per Olsen.", timestamp: "1 dag siden", read: false },
+];
+
 const Overview: React.FC = () => {
   const navigate = useNavigate();
   const { currentRole } = useAdminRole();
