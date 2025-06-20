@@ -33,6 +33,7 @@ interface FacilityAccordionItemProps {
   getAvailabilityStatus: (zoneId: string, date: Date, timeSlot: string) => { status: string; conflict: any };
   isSlotSelected: (zoneId: string, date: Date, timeSlot: string) => boolean;
   handleSlotClick: (zoneId: string, date: Date, timeSlot: string, availability: string) => void;
+  onFacilitySelect?: (facilityId: string) => void;
 }
 
 export const FacilityAccordionItem: React.FC<FacilityAccordionItemProps> = ({
@@ -42,16 +43,23 @@ export const FacilityAccordionItem: React.FC<FacilityAccordionItemProps> = ({
   getAvailabilityStatus,
   isSlotSelected,
   handleSlotClick,
+  onFacilitySelect,
 }) => {
+  const handleFacilityClick = () => {
+    if (onFacilitySelect) {
+      onFacilitySelect(facility.id.toString());
+    }
+  };
+
   const renderZoneContent = (zone: CalendarZone) => (
     <div>
-      <div className="mb-4 p-4 bg-gray-50 rounded-lg">
-        <h4 className="font-medium text-gray-900 mb-2">{zone.name}</h4>
-        <div className="flex items-center gap-4 text-sm text-gray-600">
-          <span>{zone.capacity} personer</span>
-          <span>{zone.pricePerHour} kr/time</span>
+      <div className="mb-6 p-6 bg-gray-50 rounded-lg border">
+        <h4 className="font-semibold text-lg text-gray-900 mb-3">{zone.name}</h4>
+        <div className="flex items-center gap-6 text-base text-gray-600">
+          <span className="font-medium">{zone.capacity} personer</span>
+          <span className="font-medium">{zone.pricePerHour} kr/time</span>
         </div>
-        <p className="text-sm text-gray-600 mt-1">{zone.description}</p>
+        <p className="text-base text-gray-600 mt-2">{zone.description}</p>
       </div>
       <CalendarGrid
         zone={convertCalendarZoneToBookingZone(zone, facility.id)}
@@ -66,30 +74,48 @@ export const FacilityAccordionItem: React.FC<FacilityAccordionItemProps> = ({
   );
 
   return (
-    <AccordionItem value={`facility-${facility.id}`}>
-      <AccordionTrigger className="hover:no-underline">
+    <AccordionItem value={`facility-${facility.id}`} className="border-b border-gray-200">
+      <AccordionTrigger 
+        className="hover:no-underline py-6 px-6"
+        onClick={handleFacilityClick}
+      >
         <div className="flex items-center justify-between w-full pr-4">
           <FacilityHeader facility={facility} />
-          <Button
-            variant="outline"
-            size="sm"
-            className="shrink-0"
-            onClick={(e) => {
-              e.stopPropagation();
-              window.location.href = `/facilities/${facility.id}`;
-            }}
-          >
-            Se detaljer
-          </Button>
+          <div className="flex gap-3">
+            <Button
+              variant="outline"
+              size="default"
+              className="shrink-0 text-base px-4 py-2"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (onFacilitySelect) {
+                  onFacilitySelect(facility.id.toString());
+                }
+              }}
+            >
+              Reserver nå
+            </Button>
+            <Button
+              variant="ghost"
+              size="default"
+              className="shrink-0 text-base px-4 py-2"
+              onClick={(e) => {
+                e.stopPropagation();
+                window.location.href = `/facilities/${facility.id}`;
+              }}
+            >
+              Se detaljer
+            </Button>
+          </div>
         </div>
       </AccordionTrigger>
       
-      <AccordionContent className="pt-4">
+      <AccordionContent className="pt-4 px-6 pb-6">
         {facility.zones.length > 1 ? (
           <Tabs defaultValue={facility.zones[0].id}>
-            <TabsList className="grid w-full grid-cols-2 mb-6">
+            <TabsList className="grid w-full grid-cols-2 mb-8 h-12">
               {facility.zones.map(zone => (
-                <TabsTrigger key={zone.id} value={zone.id} className="text-sm">
+                <TabsTrigger key={zone.id} value={zone.id} className="text-base py-3">
                   {zone.name}
                 </TabsTrigger>
               ))}

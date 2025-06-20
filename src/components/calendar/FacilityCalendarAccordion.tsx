@@ -26,11 +26,13 @@ interface FacilityWithZones {
 interface FacilityCalendarAccordionProps {
   facilities: FacilityWithZones[];
   currentWeekStart: Date;
+  onFacilitySelect?: (facilityId: string) => void;
 }
 
 export const FacilityCalendarAccordion: React.FC<FacilityCalendarAccordionProps> = ({
   facilities,
   currentWeekStart,
+  onFacilitySelect,
 }) => {
   // Generate hourly time slots from 08:00 to 22:00
   const timeSlots = Array.from({ length: 14 }, (_, i) => {
@@ -62,8 +64,13 @@ export const FacilityCalendarAccordion: React.FC<FacilityCalendarAccordionProps>
 
   const handleSlotClick = (zoneId: string, date: Date, timeSlot: string, availability: string) => {
     if (availability === 'available') {
-      // Navigate to facility booking page with pre-selected time
+      // Extract facility ID and select it for the sidebar
       const facilityId = zoneId.split('-')[1];
+      if (onFacilitySelect) {
+        onFacilitySelect(facilityId);
+      }
+      
+      // Navigate to facility booking page with pre-selected time
       window.location.href = `/facilities/${facilityId}?date=${date.toISOString().split('T')[0]}&time=${timeSlot}`;
     }
   };
@@ -79,6 +86,7 @@ export const FacilityCalendarAccordion: React.FC<FacilityCalendarAccordionProps>
           getAvailabilityStatus={getAvailabilityStatus}
           isSlotSelected={isSlotSelected}
           handleSlotClick={handleSlotClick}
+          onFacilitySelect={onFacilitySelect}
         />
       ))}
     </Accordion>

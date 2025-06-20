@@ -10,6 +10,7 @@ import { CalendarViewProps } from "./types";
 import { useFacilities } from "@/hooks/useFacilities";
 import { FacilityFilters } from "@/types/facility";
 import ViewHeader from "../search/ViewHeader";
+import { PersistentBookingSidebar } from "../facility/PersistentBookingSidebar";
 
 interface CalendarViewWithToggleProps extends CalendarViewProps {
   viewMode: "grid" | "map" | "calendar" | "list";
@@ -26,6 +27,7 @@ const CalendarView: React.FC<CalendarViewWithToggleProps> = ({
   setViewMode,
 }) => {
   const [currentWeekStart, setCurrentWeekStart] = useState(startOfWeek(date || new Date(), { weekStartsOn: 1 }));
+  const [selectedFacilityId, setSelectedFacilityId] = useState<string | null>(null);
   
   // Check if we can go to previous week (prevent going to past dates)
   const today = startOfDay(new Date());
@@ -76,6 +78,11 @@ const CalendarView: React.FC<CalendarViewWithToggleProps> = ({
     ]
   }));
 
+  // Get selected facility details
+  const selectedFacility = selectedFacilityId 
+    ? facilitiesWithZones.find(f => f.id.toString() === selectedFacilityId)
+    : null;
+
   if (isLoading) {
     return (
       <div className="max-w-7xl mx-auto px-4 my-[12px]">
@@ -118,30 +125,46 @@ const CalendarView: React.FC<CalendarViewWithToggleProps> = ({
         setViewMode={setViewMode}
       />
 
-      <div className="space-y-6">
-        <WeekNavigation
-          currentWeekStart={currentWeekStart}
-          setCurrentWeekStart={setCurrentWeekStart}
-          canGoPrevious={canGoPrevious}
-        />
+      <div className="flex gap-6">
+        {/* Main Calendar Content */}
+        <div className="flex-1 space-y-6">
+          <WeekNavigation
+            currentWeekStart={currentWeekStart}
+            setCurrentWeekStart={setCurrentWeekStart}
+            canGoPrevious={canGoPrevious}
+          />
 
-        <Card className="shadow-lg border-0">
-          <CalendarHeader />
-          <CardContent className="p-0">
-            {facilitiesWithZones.length === 0 ? (
-              <div className="p-8 text-center text-gray-500">
-                <Calendar className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                <p className="text-lg font-medium">Ingen lokaler funnet</p>
-                <p className="text-sm">Prøv å justere filtrene dine</p>
-              </div>
-            ) : (
-              <FacilityCalendarAccordion
-                facilities={facilitiesWithZones}
-                currentWeekStart={currentWeekStart}
+          <Card className="shadow-lg border-0">
+            <CalendarHeader />
+            <CardContent className="p-0">
+              {facilitiesWithZones.length === 0 ? (
+                <div className="p-8 text-center text-gray-500">
+                  <Calendar className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                  <p className="text-lg font-medium">Ingen lokaler funnet</p>
+                  <p className="text-sm">Prøv å justere filtrene dine</p>
+                </div>
+              ) : (
+                <FacilityCalendarAccordion
+                  facilities={facilitiesWithZones}
+                  currentWeekStart={currentWeekStart}
+                  onFacilitySelect={setSelectedFacilityId}
+                />
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Reservation Sidebar */}
+        {selectedFacility && (
+          <div className="w-80 flex-shrink-0">
+            <div className="sticky top-4">
+              <PersistentBookingSidebar
+                facilityName={selectedFacility.name}
+                facilityId={selectedFacility.id.toString()}
               />
-            )}
-          </CardContent>
-        </Card>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
