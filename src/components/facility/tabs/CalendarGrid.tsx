@@ -108,7 +108,7 @@ export function CalendarGrid({
     
     const cell = (
       <button
-        className={`w-full h-8 rounded border transition-all duration-200 text-base select-none ${statusStyle} ${
+        className={`w-full h-8 rounded border transition-all duration-200 text-sm select-none ${statusStyle} ${
           status === 'available' ? 'transform hover:scale-105' : ''
         }`}
         disabled={status !== 'available'}
@@ -121,14 +121,14 @@ export function CalendarGrid({
         style={{ userSelect: 'none' }}
       >
         <div className="flex items-center justify-center h-full">
-          <span className={`text-base ${isSelected ? 'text-white' : isInPreview ? 'text-blue-800' : 'text-gray-700'}`}>
+          <span className={`text-sm font-medium ${isSelected ? 'text-white' : isInPreview ? 'text-blue-800' : 'text-gray-700'}`}>
             {startTime}
           </span>
           {isSelected && (
-            <span className="text-base text-white ml-1">✓</span>
+            <span className="text-sm text-white ml-1">✓</span>
           )}
           {isInPreview && !isSelected && (
-            <span className="text-base text-blue-800 ml-1">◯</span>
+            <span className="text-sm text-blue-800 ml-1">◯</span>
           )}
         </div>
       </button>
@@ -152,33 +152,28 @@ export function CalendarGrid({
       style={{ userSelect: 'none' }}
     >
       <Card>
-        <CardContent className="p-3">
-          {/* Week Header */}
-          <div className="mb-4 text-center">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              {format(currentWeekStart, 'dd. MMMM', { locale: nb })} - {format(addDays(currentWeekStart, 6), 'dd. MMMM yyyy', { locale: nb })}
-            </h3>
-          </div>
-
-          {/* Day Headers */}
-          <div className="grid grid-cols-7 gap-2 mb-3">
+        <CardContent className="p-4">
+          {/* Compact Day Headers */}
+          <div className="grid grid-cols-7 gap-2 mb-4">
             {weekDays.map((day, i) => {
               const holidayCheck = isNorwegianHoliday(day);
               const isToday = format(day, 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd');
               
               return (
-                <div key={i} className={`p-2 text-center rounded text-xs font-inter ${
-                  isToday ? 'bg-blue-100 border border-blue-300' : 'bg-gray-50 border border-gray-200'
+                <div key={i} className={`p-2 text-center rounded-lg border ${
+                  isToday 
+                    ? 'bg-blue-500 border-blue-600 text-white' 
+                    : 'bg-gray-50 border-gray-200 text-gray-700'
                 }`}>
-                  <div className={`text-xs font-medium ${isToday ? 'text-blue-800' : 'text-gray-700'}`}>
+                  <div className="text-xs font-medium uppercase tracking-wide">
                     {format(day, "EEE", { locale: nb })}
                   </div>
-                  <div className={`text-sm font-bold ${isToday ? 'text-blue-900' : 'text-gray-900'}`}>
-                    {format(day, "dd.MM", { locale: nb })}
+                  <div className="text-lg font-bold mt-1">
+                    {format(day, "dd", { locale: nb })}
                   </div>
                   {holidayCheck.isHoliday && (
-                    <div className="text-xs text-red-600 truncate font-inter mt-1" title={holidayCheck.name}>
-                      {holidayCheck.name?.substring(0, 6)}
+                    <div className="text-xs text-red-600 truncate mt-1" title={holidayCheck.name}>
+                      {holidayCheck.name?.substring(0, 4)}
                     </div>
                   )}
                 </div>
@@ -186,8 +181,8 @@ export function CalendarGrid({
             })}
           </div>
 
-          {/* Time Slots Grid - Enhanced with drag selection */}
-          <div className="space-y-2">
+          {/* Time Slots Grid */}
+          <div className="space-y-1">
             {timeSlots.map((timeSlot) => (
               <div key={timeSlot} className="grid grid-cols-7 gap-2">
                 {weekDays.map((day, dayIndex) => (

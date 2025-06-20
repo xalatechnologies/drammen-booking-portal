@@ -1,11 +1,10 @@
 
 import React from 'react';
-import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Minus } from 'lucide-react';
+import { Plus, Minus, Users } from 'lucide-react';
 import { ActorType } from '@/types/pricing';
 
 interface BookingFormData {
@@ -50,114 +49,91 @@ export function BookingFormFields({
   };
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-4">
       {/* Purpose */}
-      <div className="space-y-2">
-        <Label htmlFor="purpose" className="text-lg font-medium">
-          Formål <span className="text-red-500">*</span>
-        </Label>
-        <Textarea
-          id="purpose"
-          placeholder="Beskriv formålet med reservasjonen..."
-          value={formData.purpose}
-          onChange={(e) => onUpdateFormData({ purpose: e.target.value })}
-          className="min-h-[80px] text-lg"
-          required
-        />
-      </div>
+      <Textarea
+        placeholder="Beskriv formålet med reservasjonen... *"
+        value={formData.purpose}
+        onChange={(e) => onUpdateFormData({ purpose: e.target.value })}
+        className="min-h-[80px] resize-none"
+        required
+      />
 
-      {/* Number of Attendees */}
-      <div className="space-y-2">
-        <Label className="text-lg font-medium">
-          Antall deltakere <span className="text-red-500">*</span>
-        </Label>
-        <div className="flex items-center gap-3">
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => handleAttendeesChange(-1)}
-            disabled={formData.attendees <= 1}
-            className="h-10 w-10 p-0"
-          >
-            <Minus className="h-4 w-4" />
-          </Button>
-          <Input
-            type="number"
-            value={formData.attendees}
-            onChange={(e) => onUpdateFormData({ attendees: parseInt(e.target.value) || 1 })}
-            className="w-20 text-center text-lg"
-            min="1"
-          />
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => handleAttendeesChange(1)}
-            className="h-10 w-10 p-0"
-          >
-            <Plus className="h-4 w-4" />
-          </Button>
+      {/* Number of Attendees - Special Design */}
+      <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Users className="h-5 w-5 text-gray-600" />
+            <span className="font-medium text-gray-700">Antall deltakere</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => handleAttendeesChange(-1)}
+              disabled={formData.attendees <= 1}
+              className="h-8 w-8 p-0 rounded-full"
+            >
+              <Minus className="h-4 w-4" />
+            </Button>
+            <div className="bg-white border border-gray-300 rounded-lg px-4 py-2 min-w-[60px] text-center font-semibold text-lg">
+              {formData.attendees}
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => handleAttendeesChange(1)}
+              className="h-8 w-8 p-0 rounded-full"
+            >
+              <Plus className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </div>
 
       {/* Activity Type */}
-      <div className="space-y-2">
-        <Label className="text-lg font-medium">
-          Type aktivitet <span className="text-red-500">*</span>
-        </Label>
-        <Select
-          value={formData.activityType}
-          onValueChange={(value) => onUpdateFormData({ activityType: value })}
-        >
-          <SelectTrigger className="text-lg">
-            <SelectValue placeholder="Velg type aktivitet" />
-          </SelectTrigger>
-          <SelectContent>
-            {activityTypes.map((type) => (
-              <SelectItem key={type} value={type} className="text-lg">
-                {type}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+      <Select
+        value={formData.activityType}
+        onValueChange={(value) => onUpdateFormData({ activityType: value })}
+      >
+        <SelectTrigger>
+          <SelectValue placeholder="Velg type aktivitet *" />
+        </SelectTrigger>
+        <SelectContent>
+          {activityTypes.map((type) => (
+            <SelectItem key={type} value={type}>
+              {type}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
 
       {/* Additional Information */}
-      <div className="space-y-2">
-        <Label htmlFor="additionalInfo" className="text-lg font-medium">
-          Tilleggsopplysninger
-        </Label>
-        <Textarea
-          id="additionalInfo"
-          placeholder="Tilleggsinformasjon om reservasjonen (valgfritt)..."
-          value={formData.additionalInfo}
-          onChange={(e) => onUpdateFormData({ additionalInfo: e.target.value })}
-          className="min-h-[80px] text-lg"
-        />
-      </div>
+      <Textarea
+        placeholder="Tilleggsinformasjon om reservasjonen (valgfritt)..."
+        value={formData.additionalInfo}
+        onChange={(e) => onUpdateFormData({ additionalInfo: e.target.value })}
+        className="min-h-[60px] resize-none"
+      />
 
       {/* Actor Type */}
-      <div className="space-y-2">
-        <Label className="text-lg font-medium">
-          Aktør type <span className="text-red-500">*</span>
-        </Label>
-        <Select
-          value={formData.actorType}
-          onValueChange={(value: ActorType) => onUpdateFormData({ actorType: value })}
-        >
-          <SelectTrigger className="text-lg">
-            <SelectValue placeholder="Velg aktør type" />
-          </SelectTrigger>
-          <SelectContent>
-            {actorTypes.map((type) => (
-              <SelectItem key={type.value} value={type.value} className="text-lg">
-                {type.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+      <Select
+        value={formData.actorType}
+        onValueChange={(value: ActorType) => onUpdateFormData({ actorType: value })}
+      >
+        <SelectTrigger>
+          <SelectValue placeholder="Velg aktør type *" />
+        </SelectTrigger>
+        <SelectContent>
+          {actorTypes.map((type) => (
+            <SelectItem key={type.value} value={type.value}>
+              {type.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     </div>
   );
 }

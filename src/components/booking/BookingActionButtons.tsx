@@ -22,20 +22,20 @@ export function BookingActionButtons({
   return (
     <>
       {/* Terms and Conditions */}
-      <div className="flex items-start space-x-3">
+      <div className="flex items-start space-x-3 pt-2">
         <Checkbox
           id="terms"
           checked={termsAccepted}
           onCheckedChange={(checked) => onTermsAcceptedChange(!!checked)}
           className="mt-1"
         />
-        <div className="text-lg">
+        <div className="text-sm leading-relaxed">
           <label htmlFor="terms" className="cursor-pointer">
             Jeg aksepterer{' '}
             <a 
               href="/vilkar" 
               target="_blank" 
-              className="text-blue-600 hover:text-blue-800 underline"
+              className="text-blue-600 hover:text-blue-800 underline font-medium"
             >
               vilkår og betingelser
             </a>
@@ -46,12 +46,12 @@ export function BookingActionButtons({
       </div>
 
       {/* Action Buttons */}
-      <div className="space-y-3 pt-4">
+      <div className="space-y-3 pt-3">
         <Button
           onClick={onAddToCart}
           disabled={!isFormValid}
           variant="outline"
-          className="w-full border-blue-600 text-blue-600 hover:bg-blue-50 text-lg py-3"
+          className="w-full border-blue-600 text-blue-600 hover:bg-blue-50 py-3"
           size="lg"
         >
           <ShoppingCart className="h-5 w-5 mr-2" />
@@ -61,7 +61,7 @@ export function BookingActionButtons({
         <Button
           onClick={onCompleteBooking}
           disabled={!isFormValid}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-lg py-3"
+          className="w-full bg-blue-600 hover:bg-blue-700 py-3"
           size="lg"
         >
           <CreditCard className="h-5 w-5 mr-2" />

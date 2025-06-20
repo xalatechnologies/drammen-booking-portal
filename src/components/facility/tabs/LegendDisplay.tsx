@@ -1,29 +1,30 @@
 
 import React from 'react';
+import { Card, CardContent } from '@/components/ui/card';
 
-export function LegendDisplay({ showLegend = true }: { showLegend?: boolean } = {}) {
-  if (!showLegend) return null;
-
+export function LegendDisplay() {
   return (
-    <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 text-sm font-inter">
-        <div className="flex items-center gap-2">
-          <div className="w-4 h-4 rounded bg-green-100 border-2 border-green-400"></div>
-          <span>Ledig</span>
+    <Card className="bg-gray-50">
+      <CardContent className="p-3">
+        <div className="flex items-center justify-between text-sm">
+          <div className="flex items-center gap-1">
+            <div className="w-4 h-4 bg-green-100 border border-green-300 rounded"></div>
+            <span className="text-gray-600">Ledig</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="w-4 h-4 bg-blue-500 border border-blue-600 rounded"></div>
+            <span className="text-gray-600">Valgt</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="w-4 h-4 bg-red-50 border border-red-200 rounded"></div>
+            <span className="text-gray-600">Opptatt</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="w-4 h-4 bg-gray-100 border border-gray-200 rounded"></div>
+            <span className="text-gray-600">Utilgjengelig</span>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="w-4 h-4 rounded bg-red-100 border-2 border-red-400"></div>
-          <span>Opptatt</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-4 h-4 rounded bg-blue-500 border-2 border-blue-600"></div>
-          <span>Valgt</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-4 h-4 rounded bg-gray-100 border-2 border-gray-400"></div>
-          <span>Ikke tilgjengelig</span>
-        </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }

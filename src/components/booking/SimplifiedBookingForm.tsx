@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { SelectedTimeSlot } from '@/utils/recurrenceEngine';
 import { Zone } from './types';
 import { ActorType } from '@/types/pricing';
@@ -96,7 +96,7 @@ export function SimplifiedBookingForm({
           <h3 className="text-xl font-semibold text-gray-900 mb-3">
             Ingen tidspunkt valgt
           </h3>
-          <p className="text-gray-600 text-lg">
+          <p className="text-gray-600">
             Velg tidspunkt i kalenderen først for å starte booking prosessen.
           </p>
         </CardContent>
@@ -106,10 +106,7 @@ export function SimplifiedBookingForm({
 
   return (
     <Card className="w-full">
-      <CardHeader>
-        <CardTitle className="text-xl">Booking informasjon</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-5 p-5">
         {/* Selected Times Overview Accordion */}
         <SelectedSlotsAccordion
           selectedSlots={selectedSlots}
