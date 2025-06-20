@@ -471,7 +471,7 @@ export const mockZones: Zone[] = [
         { dayOfWeek: 2, openTime: "07:00", closeTime: "23:00", isOpen: true },
         { dayOfWeek: 3, openTime: "07:00", closeTime: "23:00", isOpen: true },
         { dayOfWeek: 4, openTime: "07:00", closeTime: "23:00", isOpen: true },
-        { dayOfWequeek: 5, openTime: "07:00", closeTime: "23:00", isOpen: true },
+        { dayOfWeek: 5, openTime: "07:00", closeTime: "23:00", isOpen: true },
         { dayOfWeek: 6, openTime: "09:00", closeTime: "21:00", isOpen: true },
         { dayOfWeek: 0, openTime: "09:00", closeTime: "21:00", isOpen: true }
       ],

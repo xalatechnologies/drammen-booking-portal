@@ -17,6 +17,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useTranslation } from "@/i18n";
 import { CartProvider } from "@/contexts/CartContext";
 import { MobileBookingPanel } from "@/components/facility/MobileBookingPanel";
+import { convertZoneToBookingZone } from "@/utils/zoneConverter";
 
 const FacilityDetail = () => {
   const { id } = useParams();
@@ -74,7 +75,8 @@ const FacilityDetail = () => {
   };
 
   // Use real zones if available, otherwise fall back to default
-  const displayZones = zones.length > 0 ? zones : [defaultZone];
+  const convertedZones = zones.length > 0 ? zones.map(convertZoneToBookingZone) : [defaultZone];
+  const displayZones = convertedZones;
 
   const handleSlotClick = (zoneId: string, date: Date, timeSlot: string, availability: string) => {
     if (availability !== 'available') return;
