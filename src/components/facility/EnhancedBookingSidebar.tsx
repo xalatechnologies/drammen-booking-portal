@@ -36,15 +36,39 @@ export function EnhancedBookingSidebar({
   const [isBookingDetailsOpen, setIsBookingDetailsOpen] = useState(false);
   const [actorType, setActorType] = useState<ActorType>('private-person');
   
-  // Group slots by date for better organization
-  const slotsByDate = selectedSlots.reduce((acc, slot) => {
+  // Transform selectedSlots to match SelectedSlotsSection expected format
+  const transformedSlotsByDate = selectedSlots.reduce((acc, slot) => {
     const dateKey = format(slot.date, 'yyyy-MM-dd');
     if (!acc[dateKey]) {
       acc[dateKey] = [];
     }
-    acc[dateKey].push(slot);
+    
+    // Create a unique ID for the slot
+    const slotId = `${slot.zoneId}-${dateKey}-${slot.timeSlot}`;
+    
+    // Parse timeSlot to get start and end times
+    const [startTime, endTime] = slot.timeSlot.includes('-') 
+      ? slot.timeSlot.split('-').map(t => t.trim())
+      : [slot.timeSlot, slot.timeSlot];
+    
+    acc[dateKey].push({
+      id: slotId,
+      date: format(slot.date, 'yyyy-MM-dd'),
+      startTime,
+      endTime,
+      zone: slot.zoneId,
+      price: undefined // Price will be calculated separately
+    });
+    
     return acc;
-  }, {} as Record<string, typeof selectedSlots>);
+  }, {} as Record<string, Array<{
+    id: string;
+    date: string;
+    startTime: string;
+    endTime: string;
+    zone?: string;
+    price?: number;
+  }>>);
 
   const totalDuration = selectedSlots.length; // Assuming each slot is 1 hour
 
@@ -88,7 +112,7 @@ export function EnhancedBookingSidebar({
           <div className="flex items-center gap-4 text-sm text-gray-600">
             <div className="flex items-center gap-1">
               <CalendarDays className="h-4 w-4" />
-              <span>{Object.keys(slotsByDate).length} dag(er)</span>
+              <span>{Object.keys(transformedSlotsByDate).length} dag(er)</span>
             </div>
             <div className="flex items-center gap-1">
               <Clock className="h-4 w-4" />
@@ -101,7 +125,7 @@ export function EnhancedBookingSidebar({
       {/* Selected Time Slots */}
       {selectedSlots.length > 0 && (
         <SelectedSlotsSection 
-          slotsByDate={slotsByDate}
+          slotsByDate={transformedSlotsByDate}
           onSlotRemove={handleSlotRemove}
         />
       )}
