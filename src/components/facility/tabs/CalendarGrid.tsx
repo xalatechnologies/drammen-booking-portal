@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { format, addDays } from 'date-fns';
 import { nb } from 'date-fns/locale';
@@ -68,20 +69,18 @@ export function CalendarGrid({
   const handleMouseUp = () => {
     if (dragState.isDragging) {
       const previewSlots = endDrag();
+      console.log('CalendarGrid: drag ended, preview slots:', previewSlots);
       
       if (onBulkSlotSelection && previewSlots.length > 0) {
+        // Filter out already selected slots to prevent duplicates
         const newSlots = previewSlots.filter(slot => 
           !isSlotSelected(slot.zoneId, slot.date, slot.timeSlot)
         );
+        console.log('CalendarGrid: filtered new slots (not already selected):', newSlots);
+        
         if (newSlots.length > 0) {
           onBulkSlotSelection(newSlots);
         }
-      } else {
-        previewSlots.forEach(slot => {
-          if (!isSlotSelected(slot.zoneId, slot.date, slot.timeSlot)) {
-            onSlotClick(slot.zoneId, slot.date, slot.timeSlot, 'available');
-          }
-        });
       }
     }
   };

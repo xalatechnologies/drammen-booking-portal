@@ -26,6 +26,32 @@ export function useSlotSelection() {
     }
   };
 
+  const handleBulkSlotSelection = (newSlots: SelectedTimeSlot[]) => {
+    console.log('useSlotSelection: handleBulkSlotSelection called with:', newSlots);
+    console.log('useSlotSelection: current selectedSlots before bulk add:', selectedSlots);
+    
+    setSelectedSlots(prev => {
+      // Create a new array to avoid mutations
+      const updatedSlots = [...prev];
+      
+      // Only add slots that aren't already in the selection
+      newSlots.forEach(newSlot => {
+        const alreadyExists = updatedSlots.some(existingSlot =>
+          existingSlot.zoneId === newSlot.zoneId &&
+          existingSlot.date.toISOString() === newSlot.date.toISOString() &&
+          existingSlot.timeSlot === newSlot.timeSlot
+        );
+        
+        if (!alreadyExists) {
+          updatedSlots.push(newSlot);
+        }
+      });
+      
+      console.log('useSlotSelection: bulk selection result:', updatedSlots);
+      return updatedSlots;
+    });
+  };
+
   const clearSelection = () => {
     console.log('useSlotSelection: clearing all selections');
     setSelectedSlots([]);
@@ -35,6 +61,7 @@ export function useSlotSelection() {
     selectedSlots,
     setSelectedSlots,
     handleSlotClick,
+    handleBulkSlotSelection,
     clearSelection
   };
 }
