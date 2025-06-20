@@ -106,8 +106,8 @@ export function AvailabilityTab({
 
   const timeSlots = generateTimeSlots();
 
-  // Use the first zone or create a default one
-  const primaryZone = zones[0] || {
+  // Use the first zone or create a default one with all required properties
+  const primaryZone: Zone = zones[0] || {
     id: 'whole-facility',
     name: 'Hele lokalet',
     capacity: 30,
@@ -115,7 +115,28 @@ export function AvailabilityTab({
     pricePerHour: 450,
     description: '',
     area: '120 m²',
-    isMainZone: true
+    isMainZone: true,
+    bookingRules: {
+      minBookingDuration: 60,
+      maxBookingDuration: 480,
+      allowedTimeSlots: ['08:00-22:00'],
+      bookingTypes: ['engangs', 'fast', 'arrangement'],
+      advanceBookingDays: 365,
+      cancellationHours: 24
+    },
+    adminInfo: {
+      contactPersonName: 'Facility Admin',
+      contactPersonEmail: 'admin@facility.no',
+      specialInstructions: '',
+      maintenanceSchedule: []
+    },
+    layout: {
+      coordinates: { x: 0, y: 0, width: 100, height: 100 },
+      entryPoints: ['main']
+    },
+    accessibility: [],
+    features: [],
+    isActive: true
   };
 
   const getAvailabilityStatus = (zoneId: string, date: Date, timeSlot: string) => {
