@@ -2,11 +2,11 @@
 import React from 'react';
 import { Calendar, CalendarDays } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { format } from 'date-fns';
 import { nb } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
+import { DayPicker } from 'react-day-picker';
 
 interface DateRangeStepProps {
   startDate?: Date;
@@ -57,13 +57,13 @@ export function DateRangeStep({
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
-              <CalendarComponent
+              <DayPicker
                 mode="single"
                 selected={startDate}
                 onSelect={onStartDateChange}
-                initialFocus
                 disabled={(date) => date < new Date()}
-                className={cn("p-3 pointer-events-auto")}
+                className="p-3 pointer-events-auto"
+                locale={nb}
               />
             </PopoverContent>
           </Popover>
@@ -92,18 +92,18 @@ export function DateRangeStep({
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
-              <CalendarComponent
+              <DayPicker
                 mode="single"
                 selected={endDate}
                 onSelect={onEndDateChange}
-                initialFocus
                 disabled={(date) => {
                   if (startDate) {
                     return date < startDate;
                   }
                   return date < new Date();
                 }}
-                className={cn("p-3 pointer-events-auto")}
+                className="p-3 pointer-events-auto"
+                locale={nb}
               />
             </PopoverContent>
           </Popover>
