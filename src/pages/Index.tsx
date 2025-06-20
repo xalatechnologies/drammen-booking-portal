@@ -133,9 +133,9 @@ const Index = () => {
 
       {/* Main content with top padding to account for fixed header */}
       <main id="main-content" className="flex-1 w-full pt-20">
-        {/* Fixed Search Filter */}
-        <div className="fixed top-20 left-0 right-0 z-40 bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-sm">
-          <div className="content-center py-6">
+        {/* Fixed Search Filter with more top spacing */}
+        <div className="fixed top-28 left-0 right-0 z-40 bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-sm">
+          <div className="content-center py-8">
             <SearchFilter
               date={date}
               setDate={setDate}
@@ -167,8 +167,8 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Scrollable Content Area with increased top padding for fixed filter */}
-        <div className="pt-48 content-center py-8 px-4">
+        {/* Scrollable Content Area with much more top padding for fixed filter */}
+        <div className="pt-64 content-center py-12 px-4">
           {renderContent()}
         </div>
       </main>
