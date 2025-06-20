@@ -27,12 +27,3 @@ export interface ApiResponse<T> {
   data?: T;
   error?: ApiError;
 }
-
-export interface ServiceResponse<T> {
-  success: boolean;
-  data?: T;
-  error?: {
-    message: string;
-    code?: string;
-  };
-}

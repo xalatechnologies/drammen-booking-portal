@@ -1,3 +1,4 @@
+
 export interface Facility {
   id: number;
   name: string;
@@ -33,9 +34,6 @@ export interface Facility {
   };
   allowedBookingTypes: ('engangslån' | 'fastlån' | 'rammetid' | 'strøtimer')[];
   zones: Zone[];
-  contact_name?: string;
-  contact_email?: string;
-  contact_phone?: string;
 }
 
 export interface FacilityFilters {
@@ -84,4 +82,4 @@ export interface OpeningHours {
   dayOfWeek: 0 | 1 | 2 | 3 | 4 | 5 | 6; // 0 = Sunday, 1 = Monday, etc.
   opens: string; // HH:mm format
   closes: string; // HH:mm format
-}
+} 
