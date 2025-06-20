@@ -1,4 +1,3 @@
-
 import React from "react";
 import { MapPin, Users, Building } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -66,14 +65,14 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
     if (min === 101 && max === 200) return "extra-large";
     return "all";
   };
-  return <div className="bg-slate-700 w-full">
+  return <div className="bg-gradient-to-r from-slate-600/90 to-slate-700/90 backdrop-blur-sm w-full shadow-lg border-b border-slate-500/30">
       <div className="max-w-7xl mx-auto px-4 py-4">
         {/* Single filter row - equally distributed */}
         <div className="flex flex-col lg:flex-row gap-3 items-stretch w-full">
           {/* Facility type */}
           <div className="flex-1">
             <Select value={facilityType} onValueChange={setFacilityType}>
-              <SelectTrigger className="h-11 w-full border-gray-300 hover:border-blue-500 text-base rounded-lg">
+              <SelectTrigger className="h-11 w-full border-gray-300 hover:border-blue-500 text-base rounded-lg bg-white/95 backdrop-blur-sm shadow-sm">
                 <div className="flex items-center text-left">
                   <Building className="mr-2 h-4 w-4" />
                   <SelectValue placeholder="Velg type" />
@@ -92,7 +91,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
           {/* Location */}
           <div className="flex-1">
             <Select value={location} onValueChange={setLocation}>
-              <SelectTrigger className="h-11 w-full border-gray-300 hover:border-blue-500 text-base rounded-lg">
+              <SelectTrigger className="h-11 w-full border-gray-300 hover:border-blue-500 text-base rounded-lg bg-white/95 backdrop-blur-sm shadow-sm">
                 <div className="flex items-center text-left">
                   <MapPin className="mr-2 h-4 w-4" />
                   <SelectValue placeholder="Velg område" />
@@ -110,7 +109,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
           {/* Capacity */}
           <div className="flex-1">
             <Select value={getCapacityValue()} onValueChange={handleCapacityChange}>
-              <SelectTrigger className="h-11 w-full border-gray-300 hover:border-blue-500 text-base rounded-lg">
+              <SelectTrigger className="h-11 w-full border-gray-300 hover:border-blue-500 text-base rounded-lg bg-white/95 backdrop-blur-sm shadow-sm">
                 <div className="flex items-center text-left">
                   <Users className="mr-2 h-4 w-4" />
                   <SelectValue placeholder="Velg kapasitet" />
@@ -129,7 +128,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
           {/* Accessibility */}
           <div className="flex-1">
             <Select value={accessibility} onValueChange={setAccessibility}>
-              <SelectTrigger className="h-11 w-full border-gray-300 hover:border-blue-500 text-base rounded-lg">
+              <SelectTrigger className="h-11 w-full border-gray-300 hover:border-blue-500 text-base rounded-lg bg-white/95 backdrop-blur-sm shadow-sm">
                 <div className="flex items-center text-left">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="mr-2 h-4 w-4">
                     <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
