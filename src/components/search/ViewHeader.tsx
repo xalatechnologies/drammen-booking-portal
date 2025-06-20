@@ -19,7 +19,7 @@ const ViewHeader: React.FC<ViewHeaderProps> = ({
   const getViewLabel = () => {
     switch (viewMode) {
       case "grid":
-        return "Rutenett";
+        return "Rutenett visning";
       case "list":
         return "Liste visning";
       case "map":
@@ -27,24 +27,30 @@ const ViewHeader: React.FC<ViewHeaderProps> = ({
       case "calendar":
         return "Kalender";
       default:
-        return "Rutenett";
+        return "Rutenett visning";
     }
   };
 
   return (
-    <div className="flex items-center justify-between mb-6">
-      {/* Left side: Facility count and view type - matching list/grid view style */}
-      <div className="flex items-center gap-2">
-        <span className="text-4xl font-bold text-gray-900">
-          {isLoading ? "..." : facilityCount}
-        </span>
-        <span className="text-lg font-medium text-gray-600">
-          {isLoading ? "Laster lokaler..." : `lokaler ${getViewLabel()}`}
-        </span>
+    <div className="mb-8 flex flex-col md:flex-row gap-6 md:gap-0 items-start md:items-end justify-between">
+      <div className="flex items-center gap-6">
+        <div className="flex items-center gap-3">
+          <span className="text-4xl font-bold text-gray-900">
+            {isLoading ? "..." : facilityCount}
+          </span>
+          <span className="text-xl font-semibold text-gray-700">lokaler</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="text-lg px-6 py-3 font-medium text-gray-600 bg-gray-100 rounded-full">
+            {isLoading ? "Laster..." : getViewLabel()}
+          </div>
+        </div>
       </div>
-
-      {/* Right side: View mode toggle */}
-      <ViewModeToggle viewMode={viewMode} setViewMode={setViewMode} />
+      
+      {/* View mode toggle aligned with the results label */}
+      <div className="flex-shrink-0">
+        <ViewModeToggle viewMode={viewMode} setViewMode={setViewMode} />
+      </div>
     </div>
   );
 };
