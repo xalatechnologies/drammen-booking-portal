@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -83,15 +82,15 @@ export function BookingStepsAccordion({
       const zone = zones.find(z => z.id === slot.zoneId);
       const basePrice = zone?.pricePerHour || 225;
       const duration = slot.duration || 2;
-      let price = basePrice * duration;
+      let finalPrice = basePrice * duration;
       
       // Apply discounts
       switch (formData.customerType) {
         case 'organization':
-          price *= 0.8;
+          finalPrice *= 0.8;
           break;
         case 'business':
-          price *= 0.9;
+          finalPrice *= 0.9;
           break;
       }
 
@@ -103,7 +102,6 @@ export function BookingStepsAccordion({
         zoneId: slot.zoneId,
         pricePerHour: basePrice,
         duration: duration,
-        price,
         customerType: formData.customerType,
         contactDetails: {
           name: formData.contactName,
@@ -133,7 +131,7 @@ export function BookingStepsAccordion({
           servicesPrice: 0,
           discounts: 0,
           vatAmount: 0,
-          totalPrice: price
+          totalPrice: finalPrice
         }
       });
     });

@@ -47,7 +47,7 @@ export function TwoColumnAvailabilityLayout({
 
   const getAvailabilityStatus = (zoneId: string, date: Date, timeSlot: string) => {
     const conflict = conflictManager.checkZoneConflict(zoneId, date, timeSlot);
-    if (conflict && conflict.hasConflict) {
+    if (conflict) {
       return { status: 'busy', conflict: conflict };
     }
     return { status: 'available', conflict: null };
