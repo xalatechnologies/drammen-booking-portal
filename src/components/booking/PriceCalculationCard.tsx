@@ -27,6 +27,10 @@ export function PriceCalculationCard({
   activityType
 }: PriceCalculationCardProps) {
   const firstSlot = selectedSlots[0];
+  
+  // Calculate total hours from all slots
+  const totalHours = selectedSlots.length;
+  
   const { calculation, isLoading } = usePriceCalculation({
     facilityId,
     zoneId: firstSlot?.zoneId,
@@ -35,6 +39,8 @@ export function PriceCalculationCard({
     timeSlot: firstSlot?.timeSlot,
     eventType: activityType,
   });
+
+  console.log('PriceCalculationCard - calculation:', calculation, 'selectedSlots:', selectedSlots.length, 'actorType:', actorType);
 
   return (
     <Card className="bg-blue-50 border-blue-200">
@@ -54,27 +60,31 @@ export function PriceCalculationCard({
         ) : calculation ? (
           <div className="space-y-2 text-blue-800">
             <div className="flex justify-between text-lg">
-              <span>Antall tidspunkt:</span>
-              <span>{selectedSlots.length}</span>
+              <span>Grunnpris per time:</span>
+              <span>{Math.round(calculation.basePrice / (calculation.totalHours || 1))} kr</span>
             </div>
             <div className="flex justify-between text-lg">
-              <span>Grunnpris:</span>
-              <span>{calculation.basePrice} kr</span>
+              <span>Antall timer:</span>
+              <span>{totalHours}</span>
+            </div>
+            <div className="flex justify-between text-lg">
+              <span>Totalt før rabatt:</span>
+              <span>{Math.round(calculation.basePrice * totalHours / (calculation.totalHours || 1))} kr</span>
             </div>
             {calculation.discounts.length > 0 && (
               <div className="flex justify-between text-lg text-green-700">
                 <span>Rabatt ({actorTypes.find(a => a.value === actorType)?.label}):</span>
-                <span>-{calculation.discounts.reduce((sum, d) => sum + d.amount, 0)} kr</span>
+                <span>-{Math.round(calculation.discounts.reduce((sum, d) => sum + d.amount, 0) * totalHours / (calculation.totalHours || 1))} kr</span>
               </div>
             )}
             <div className="flex justify-between text-lg">
               <span>MVA (25%):</span>
-              <span>{Math.round(calculation.totalPrice * 0.25)} kr</span>
+              <span>{Math.round((calculation.totalPrice * totalHours / (calculation.totalHours || 1)) * 0.25)} kr</span>
             </div>
             <hr className="border-blue-300" />
             <div className="flex justify-between font-bold text-xl">
-              <span>Total:</span>
-              <span>{calculation.totalPrice + Math.round(calculation.totalPrice * 0.25)} kr</span>
+              <span>Total inkl. MVA:</span>
+              <span>{Math.round((calculation.totalPrice * totalHours / (calculation.totalHours || 1)) * 1.25)} kr</span>
             </div>
           </div>
         ) : (

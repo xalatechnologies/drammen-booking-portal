@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -20,6 +19,19 @@ interface BookingFormFieldsProps {
   onUpdateFormData: (updates: Partial<BookingFormData>) => void;
 }
 
+const purposeOptions = [
+  'Møte',
+  'Konferanse',
+  'Workshop',
+  'Trening',
+  'Sosial aktivitet',
+  'Kurs',
+  'Presentasjon',
+  'Idrett og fysisk aktivitet',
+  'Kulturarrangement',
+  'Annet'
+];
+
 const activityTypes = [
   'Møte',
   'Konferanse', 
@@ -28,6 +40,8 @@ const activityTypes = [
   'Sosial aktivitet',
   'Kurs',
   'Presentasjon',
+  'Idrettsaktivitet',
+  'Kulturaktivitet',
   'Annet'
 ];
 
@@ -50,14 +64,39 @@ export function BookingFormFields({
 
   return (
     <div className="space-y-4">
-      {/* Purpose */}
-      <Textarea
-        placeholder="Beskriv formålet med reservasjonen... *"
+      {/* Purpose Dropdown */}
+      <Select
         value={formData.purpose}
-        onChange={(e) => onUpdateFormData({ purpose: e.target.value })}
-        className="min-h-[80px] resize-none"
-        required
-      />
+        onValueChange={(value) => onUpdateFormData({ purpose: value })}
+      >
+        <SelectTrigger>
+          <SelectValue placeholder="Velg formål med reservasjonen *" />
+        </SelectTrigger>
+        <SelectContent>
+          {purposeOptions.map((purpose) => (
+            <SelectItem key={purpose} value={purpose}>
+              {purpose}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
+      {/* Activity Type */}
+      <Select
+        value={formData.activityType}
+        onValueChange={(value) => onUpdateFormData({ activityType: value })}
+      >
+        <SelectTrigger>
+          <SelectValue placeholder="Velg type aktivitet *" />
+        </SelectTrigger>
+        <SelectContent>
+          {activityTypes.map((type) => (
+            <SelectItem key={type} value={type}>
+              {type}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
 
       {/* Number of Attendees - Special Design */}
       <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
@@ -93,29 +132,12 @@ export function BookingFormFields({
         </div>
       </div>
 
-      {/* Activity Type */}
-      <Select
-        value={formData.activityType}
-        onValueChange={(value) => onUpdateFormData({ activityType: value })}
-      >
-        <SelectTrigger>
-          <SelectValue placeholder="Velg type aktivitet *" />
-        </SelectTrigger>
-        <SelectContent>
-          {activityTypes.map((type) => (
-            <SelectItem key={type} value={type}>
-              {type}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-
-      {/* Additional Information */}
+      {/* Description - Combined field */}
       <Textarea
-        placeholder="Tilleggsinformasjon om reservasjonen (valgfritt)..."
+        placeholder="Beskrivelse av formål og tilleggsopplysninger..."
         value={formData.additionalInfo}
         onChange={(e) => onUpdateFormData({ additionalInfo: e.target.value })}
-        className="min-h-[60px] resize-none"
+        className="min-h-[80px] resize-none"
       />
 
       {/* Actor Type */}
