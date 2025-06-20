@@ -3,7 +3,7 @@ import React from 'react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { AlertTriangle, User, Clock } from 'lucide-react';
 import { BookingConflict } from '@/components/booking/types';
-import { format } from 'date-fns';
+import { format, isValid } from 'date-fns';
 import { nb } from 'date-fns/locale';
 
 interface ConflictTooltipProps {
@@ -34,6 +34,20 @@ export function ConflictTooltip({ conflict, children }: ConflictTooltipProps) {
     }
   };
 
+  // Safely format the date with validation
+  const formatSafeDate = (date: Date) => {
+    if (!date || !isValid(date)) {
+      console.warn('Invalid date passed to ConflictTooltip:', date);
+      return 'Ugyldig dato';
+    }
+    try {
+      return format(date, 'EEEE dd.MM.yyyy', { locale: nb });
+    } catch (error) {
+      console.error('Error formatting date in ConflictTooltip:', error, date);
+      return 'Ugyldig dato';
+    }
+  };
+
   return (
     <TooltipProvider>
       <Tooltip>
@@ -49,7 +63,7 @@ export function ConflictTooltip({ conflict, children }: ConflictTooltipProps) {
             <div className="text-sm text-gray-600">
               <div className="flex items-center gap-1 mb-1">
                 <Clock className="h-3 w-3" />
-                <span>{format(conflict.date, 'EEEE dd.MM.yyyy', { locale: nb })} kl. {conflict.timeSlot}</span>
+                <span>{formatSafeDate(conflict.date)} kl. {conflict.timeSlot}</span>
               </div>
               <div>{getConflictMessage()}</div>
             </div>
