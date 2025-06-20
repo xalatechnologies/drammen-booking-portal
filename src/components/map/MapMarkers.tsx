@@ -132,7 +132,7 @@ export const MapMarkers: React.FC<MapMarkersProps> = ({ map, facilities }) => {
       `;
 
       const popup = new mapboxgl.Popup({ 
-        offset: [0, -15], // Position popup above marker
+        offset: [0, -50], // Position popup further above marker
         closeButton: true,
         closeOnClick: false,
         anchor: 'bottom' // Anchor popup to bottom so it appears above marker
