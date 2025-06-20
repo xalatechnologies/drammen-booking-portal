@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { format, addDays } from 'date-fns';
 import { nb } from 'date-fns/locale';
@@ -35,11 +34,11 @@ export function CalendarGrid({
 
   const getStatusStyle = (status: string, isSelected: boolean, isInPreview: boolean) => {
     if (isSelected) {
-      return 'bg-blue-500 hover:bg-blue-600 text-white font-semibold border border-blue-600';
+      return 'bg-navy-600 hover:bg-navy-700 text-white font-semibold border border-navy-700';
     }
     
     if (isInPreview) {
-      return 'bg-blue-200 hover:bg-blue-300 border border-blue-400 text-blue-800 font-medium cursor-pointer';
+      return 'bg-navy-200 hover:bg-navy-300 border border-navy-400 text-navy-800 font-medium cursor-pointer';
     }
     
     switch (status) {
@@ -70,9 +69,7 @@ export function CalendarGrid({
     if (dragState.isDragging) {
       const previewSlots = endDrag();
       
-      // Use bulk selection if available, otherwise fall back to individual selection
       if (onBulkSlotSelection && previewSlots.length > 0) {
-        // Filter out already selected slots
         const newSlots = previewSlots.filter(slot => 
           !isSlotSelected(slot.zoneId, slot.date, slot.timeSlot)
         );
@@ -80,7 +77,6 @@ export function CalendarGrid({
           onBulkSlotSelection(newSlots);
         }
       } else {
-        // Fallback to individual selection
         previewSlots.forEach(slot => {
           if (!isSlotSelected(slot.zoneId, slot.date, slot.timeSlot)) {
             onSlotClick(slot.zoneId, slot.date, slot.timeSlot, 'available');
@@ -91,7 +87,6 @@ export function CalendarGrid({
   };
 
   const handleClick = (day: Date, timeSlot: string, status: string, event: React.MouseEvent) => {
-    // Only handle click if we're not in the middle of a drag operation
     if (!dragState.isDragging) {
       onSlotClick(zone.id, day, timeSlot, status);
     }
@@ -103,7 +98,6 @@ export function CalendarGrid({
     const isInPreview = isSlotInPreview(zone.id, day, timeSlot);
     const statusStyle = getStatusStyle(status, isSelected, isInPreview);
     
-    // Extract just the start time from timeSlot (e.g., "08:00" from "08:00-09:00")
     const startTime = timeSlot.split('-')[0];
     
     const cell = (
@@ -121,14 +115,14 @@ export function CalendarGrid({
         style={{ userSelect: 'none' }}
       >
         <div className="flex items-center justify-center h-full">
-          <span className={`text-sm font-medium ${isSelected ? 'text-white' : isInPreview ? 'text-blue-800' : 'text-gray-700'}`}>
+          <span className={`text-sm font-medium ${isSelected ? 'text-white' : isInPreview ? 'text-navy-800' : 'text-gray-700'}`}>
             {startTime}
           </span>
           {isSelected && (
             <span className="text-sm text-white ml-1">✓</span>
           )}
           {isInPreview && !isSelected && (
-            <span className="text-sm text-blue-800 ml-1">◯</span>
+            <span className="text-sm text-navy-800 ml-1">◯</span>
           )}
         </div>
       </button>
@@ -162,7 +156,7 @@ export function CalendarGrid({
               return (
                 <div key={i} className={`p-2 text-center rounded-lg border ${
                   isToday 
-                    ? 'bg-blue-500 border-blue-600 text-white' 
+                    ? 'bg-navy-600 border-navy-700 text-white' 
                     : 'bg-gray-50 border-gray-200 text-gray-700'
                 }`}>
                   <div className="text-xs font-medium uppercase tracking-wide">

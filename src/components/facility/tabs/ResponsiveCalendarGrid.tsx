@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { format, addDays } from 'date-fns';
 import { nb } from 'date-fns/locale';
@@ -35,11 +34,11 @@ export function ResponsiveCalendarGrid({
 
   const getStatusStyle = (status: string, isSelected: boolean, isInPreview: boolean) => {
     if (isSelected) {
-      return 'bg-blue-500 hover:bg-blue-600 text-white font-semibold border-2 border-blue-600';
+      return 'bg-navy-600 hover:bg-navy-700 text-white font-semibold border-2 border-navy-700';
     }
     
     if (isInPreview) {
-      return 'bg-blue-200 hover:bg-blue-300 border border-blue-400 text-blue-800 font-medium cursor-pointer';
+      return 'bg-navy-200 hover:bg-navy-300 border border-navy-400 text-navy-800 font-medium cursor-pointer';
     }
     
     switch (status) {
@@ -70,9 +69,7 @@ export function ResponsiveCalendarGrid({
     if (dragState.isDragging) {
       const previewSlots = endDrag();
       
-      // Use bulk selection if available, otherwise fall back to individual selection
       if (onBulkSlotSelection && previewSlots.length > 0) {
-        // Filter out already selected slots
         const newSlots = previewSlots.filter(slot => 
           !isSlotSelected(slot.zoneId, slot.date, slot.timeSlot)
         );
@@ -80,7 +77,6 @@ export function ResponsiveCalendarGrid({
           onBulkSlotSelection(newSlots);
         }
       } else {
-        // Fallback to individual selection
         previewSlots.forEach(slot => {
           if (!isSlotSelected(slot.zoneId, slot.date, slot.timeSlot)) {
             onSlotClick(slot.zoneId, slot.date, slot.timeSlot, 'available');
@@ -91,7 +87,6 @@ export function ResponsiveCalendarGrid({
   };
 
   const handleClick = (day: Date, timeSlot: string, status: string, event: React.MouseEvent) => {
-    // Only handle click if we're not in the middle of a drag operation
     if (!dragState.isDragging) {
       onSlotClick(zone.id, day, timeSlot, status);
     }
@@ -103,7 +98,6 @@ export function ResponsiveCalendarGrid({
     const isInPreview = isSlotInPreview(zone.id, day, timeSlot);
     const statusStyle = getStatusStyle(status, isSelected, isInPreview);
     
-    // Extract just the start time from timeSlot
     const startTime = timeSlot.split('-')[0];
     
     const cell = (
@@ -121,14 +115,14 @@ export function ResponsiveCalendarGrid({
         style={{ userSelect: 'none' }}
       >
         <div className="flex flex-col items-center justify-center h-full">
-          <span className={`text-sm font-medium ${isSelected ? 'text-white' : isInPreview ? 'text-blue-800' : 'text-gray-700'}`}>
+          <span className={`text-sm font-medium ${isSelected ? 'text-white' : isInPreview ? 'text-navy-800' : 'text-gray-700'}`}>
             {startTime}
           </span>
           {isSelected && (
             <span className="text-sm text-white mt-0.5">✓</span>
           )}
           {isInPreview && !isSelected && (
-            <span className="text-sm text-blue-800 mt-0.5">◯</span>
+            <span className="text-sm text-navy-800 mt-0.5">◯</span>
           )}
         </div>
       </button>
@@ -170,12 +164,12 @@ export function ResponsiveCalendarGrid({
                 
                 return (
                   <div key={i} className={`p-4 text-center rounded-lg font-inter ${
-                    isToday ? 'bg-blue-100 border-2 border-blue-300' : 'bg-gray-50 border border-gray-200'
+                    isToday ? 'bg-navy-100 border-2 border-navy-300' : 'bg-gray-50 border border-gray-200'
                   }`}>
-                    <div className={`text-base font-medium ${isToday ? 'text-blue-800' : 'text-gray-700'}`}>
+                    <div className={`text-base font-medium ${isToday ? 'text-navy-800' : 'text-gray-700'}`}>
                       {format(day, "EEE", { locale: nb })}
                     </div>
-                    <div className={`text-xl font-bold ${isToday ? 'text-blue-900' : 'text-gray-900'}`}>
+                    <div className={`text-xl font-bold ${isToday ? 'text-navy-900' : 'text-gray-900'}`}>
                       {format(day, "dd.MM", { locale: nb })}
                     </div>
                     {holidayCheck.isHoliday && (
@@ -212,12 +206,12 @@ export function ResponsiveCalendarGrid({
                 
                 return (
                   <div key={i} className={`flex-shrink-0 w-16 p-2 text-center rounded-lg font-inter ${
-                    isToday ? 'bg-blue-100 border border-blue-300' : 'bg-gray-50 border border-gray-200'
+                    isToday ? 'bg-navy-100 border border-navy-300' : 'bg-gray-50 border border-gray-200'
                   }`}>
-                    <div className={`text-xs font-medium ${isToday ? 'text-blue-800' : 'text-gray-700'}`}>
+                    <div className={`text-xs font-medium ${isToday ? 'text-navy-800' : 'text-gray-700'}`}>
                       {format(day, "EEE", { locale: nb })}
                     </div>
-                    <div className={`text-sm font-bold ${isToday ? 'text-blue-900' : 'text-gray-900'}`}>
+                    <div className={`text-sm font-bold ${isToday ? 'text-navy-900' : 'text-gray-900'}`}>
                       {format(day, "dd.MM", { locale: nb })}
                     </div>
                     {holidayCheck.isHoliday && (

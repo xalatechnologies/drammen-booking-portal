@@ -35,7 +35,7 @@ export function BookingActionButtons({
             <a 
               href="/vilkar" 
               target="_blank" 
-              className="text-navy-600 hover:text-navy-800 underline font-medium"
+              className="text-blue-600 hover:text-blue-800 underline font-medium"
             >
               vilkår og betingelser
             </a>
@@ -51,7 +51,7 @@ export function BookingActionButtons({
           onClick={onAddToCart}
           disabled={!isFormValid}
           variant="outline"
-          className="w-full border-navy-600 text-navy-600 hover:bg-navy-50 py-3"
+          className="w-full border-blue-600 text-blue-600 hover:bg-blue-50 py-3"
           size="lg"
         >
           <ShoppingCart className="h-5 w-5 mr-2" />
@@ -61,7 +61,7 @@ export function BookingActionButtons({
         <Button
           onClick={onCompleteBooking}
           disabled={!isFormValid}
-          className="w-full bg-navy-600 hover:bg-navy-700 py-3"
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3"
           size="lg"
         >
           <CreditCard className="h-5 w-5 mr-2" />
