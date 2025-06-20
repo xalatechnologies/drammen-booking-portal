@@ -63,7 +63,7 @@ export function DateRangeStep({
                 onSelect={onStartDateChange}
                 initialFocus
                 disabled={(date) => date < new Date()}
-                className={cn("p-3 pointer-events-auto")}
+                className="p-3 pointer-events-auto"
               />
             </PopoverContent>
           </Popover>
@@ -103,7 +103,7 @@ export function DateRangeStep({
                   }
                   return date < new Date();
                 }}
-                className={cn("p-3 pointer-events-auto")}
+                className="p-3 pointer-events-auto"
               />
             </PopoverContent>
           </Popover>
