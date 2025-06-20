@@ -22,7 +22,15 @@ export const localizedMockFacilities: LocalizedFacility[] = [
       NO: ["Basketkurver", "Volleyballnett", "Lydsystem", "Projektor"],
       EN: ["Basketball hoops", "Volleyball net", "Sound system", "Projector"]
     },
-    openingHours: "Man-Fre: 08:00-22:00, Lør-Søn: 10:00-20:00",
+    openingHours: [
+      { dayOfWeek: 1, opens: "08:00", closes: "22:00" },
+      { dayOfWeek: 2, opens: "08:00", closes: "22:00" },
+      { dayOfWeek: 3, opens: "08:00", closes: "22:00" },
+      { dayOfWeek: 4, opens: "08:00", closes: "22:00" },
+      { dayOfWeek: 5, opens: "08:00", closes: "22:00" },
+      { dayOfWeek: 6, opens: "10:00", closes: "20:00" },
+      { dayOfWeek: 0, opens: "10:00", closes: "20:00" }
+    ],
     description: {
       NO: "En moderne gymsal med høy standard og god ventilasjon. Ideell for ballsport og større arrangementer.",
       EN: "A modern gymnasium with high standards and good ventilation. Ideal for ball sports and larger events."
@@ -69,7 +77,15 @@ export const localizedMockFacilities: LocalizedFacility[] = [
       NO: ["Fotballmål", "Lydanlegg", "Scene", "Garderober"],
       EN: ["Football goals", "Sound system", "Stage", "Changing rooms"]
     },
-    openingHours: "Man-Tor: 07:00-23:00, Fre: 07:00-24:00, Lør-Søn: 09:00-22:00",
+    openingHours: [
+      { dayOfWeek: 1, opens: "07:00", closes: "23:00" },
+      { dayOfWeek: 2, opens: "07:00", closes: "23:00" },
+      { dayOfWeek: 3, opens: "07:00", closes: "23:00" },
+      { dayOfWeek: 4, opens: "07:00", closes: "23:00" },
+      { dayOfWeek: 5, opens: "07:00", closes: "24:00" },
+      { dayOfWeek: 6, opens: "09:00", closes: "22:00" },
+      { dayOfWeek: 0, opens: "09:00", closes: "22:00" }
+    ],
     description: {
       NO: "Stor aktivitetshall med mulighet for både sport og kulturarrangementer. God akustikk og moderne fasiliteter.",
       EN: "Large activity hall suitable for both sports and cultural events. Good acoustics and modern facilities."
@@ -115,7 +131,14 @@ export const localizedMockFacilities: LocalizedFacility[] = [
       NO: ["Projektor", "Lydsystem", "Mikrofoner", "Scene", "Lysrigger"],
       EN: ["Projector", "Sound system", "Microphones", "Stage", "Lighting rig"]
     },
-    openingHours: "Man-Fre: 08:00-22:00, Lør: 10:00-18:00, Søn: Stengt",
+    openingHours: [
+      { dayOfWeek: 1, opens: "08:00", closes: "22:00" },
+      { dayOfWeek: 2, opens: "08:00", closes: "22:00" },
+      { dayOfWeek: 3, opens: "08:00", closes: "22:00" },
+      { dayOfWeek: 4, opens: "08:00", closes: "22:00" },
+      { dayOfWeek: 5, opens: "08:00", closes: "22:00" },
+      { dayOfWeek: 6, opens: "10:00", closes: "18:00" }
+    ],
     description: {
       NO: "Profesjonelt auditorium med scenebelysning og høykvalitets lyd- og bildeutstyr. Perfekt for større arrangementer.",
       EN: "Professional auditorium with stage lighting and high-quality audio-visual equipment. Perfect for larger events."
@@ -160,7 +183,14 @@ export const localizedMockFacilities: LocalizedFacility[] = [
       NO: ["Whiteboard", "Projektor", "WiFi", "Kaffe/te", "Flipchart"],
       EN: ["Whiteboard", "Projector", "WiFi", "Coffee/tea", "Flipchart"]
     },
-    openingHours: "Man-Fre: 07:00-20:00, Lør: 09:00-16:00, Søn: Stengt",
+    openingHours: [
+      { dayOfWeek: 1, opens: "07:00", closes: "20:00" },
+      { dayOfWeek: 2, opens: "07:00", closes: "20:00" },
+      { dayOfWeek: 3, opens: "07:00", closes: "20:00" },
+      { dayOfWeek: 4, opens: "07:00", closes: "20:00" },
+      { dayOfWeek: 5, opens: "07:00", closes: "20:00" },
+      { dayOfWeek: 6, opens: "09:00", closes: "16:00" }
+    ],
     description: {
       NO: "Romslig møtesal med naturlig lys og moderne konferanseutstyr. Ideell for bedriftsmøter og kursvirksomhet.",
       EN: "Spacious meeting room with natural light and modern conference equipment. Ideal for business meetings and training activities."
@@ -206,7 +236,14 @@ export const localizedMockFacilities: LocalizedFacility[] = [
       NO: ["25m basseng", "Barnebassseng", "Garderober", "Dusjer", "Livredningsutstyr"],
       EN: ["25m pool", "Children's pool", "Changing rooms", "Showers", "Safety equipment"]
     },
-    openingHours: "Man-Fre: 06:00-22:00, Lør-Søn: 08:00-20:00",
+    openingHours: [
+      { dayOfWeek: 1, opens: "06:00", closes: "22:00" },
+      { dayOfWeek: 2, opens: "06:00", closes: "22:00" },
+      { dayOfWeek: 3, opens: "06:00", closes: "22:00" },
+      { dayOfWeek: 4, opens: "06:00", closes: "22:00" },
+      { dayOfWeek: 5, opens: "06:00", closes: "22:00" },
+      { dayOfWeek: 6, opens: "08:00", closes: "20:00" }
+    ],
     description: {
       NO: "Moderne svømmeanlegg med både konkurransebasseng og barneområde. Høy standard på fasiliteter og sikkerhet.",
       EN: "Modern swimming facility with both competition pool and children's area. High standard facilities and safety measures."
@@ -252,7 +289,14 @@ export const localizedMockFacilities: LocalizedFacility[] = [
       NO: ["Kunstgress", "Fotballmål", "Tilskuerplasser", "Garderober", "Kafeteria"],
       EN: ["Artificial turf", "Football goals", "Spectator seats", "Changing rooms", "Cafeteria"]
     },
-    openingHours: "Man-Søn: 07:00-23:00",
+    openingHours: [
+      { dayOfWeek: 1, opens: "07:00", closes: "23:00" },
+      { dayOfWeek: 2, opens: "07:00", closes: "23:00" },
+      { dayOfWeek: 3, opens: "07:00", closes: "23:00" },
+      { dayOfWeek: 4, opens: "07:00", closes: "23:00" },
+      { dayOfWeek: 5, opens: "07:00", closes: "23:00" },
+      { dayOfWeek: 6, opens: "07:00", closes: "23:00" }
+    ],
     description: {
       NO: "Stor fotballhall med kunstgress av høy kvalitet. Egnet for både trening, kamper og turneringer.",
       EN: "Large football hall with high-quality artificial turf. Suitable for training, matches and tournaments."
@@ -297,7 +341,14 @@ export const localizedMockFacilities: LocalizedFacility[] = [
       NO: ["Whiteboard", "Projektor", "WiFi", "Bøker", "Stilleområde"],
       EN: ["Whiteboard", "Projector", "WiFi", "Books", "Quiet area"]
     },
-    openingHours: "Man-Fre: 09:00-20:00, Lør: 10:00-16:00, Søn: 12:00-17:00",
+    openingHours: [
+      { dayOfWeek: 1, opens: "09:00", closes: "20:00" },
+      { dayOfWeek: 2, opens: "09:00", closes: "20:00" },
+      { dayOfWeek: 3, opens: "09:00", closes: "20:00" },
+      { dayOfWeek: 4, opens: "09:00", closes: "20:00" },
+      { dayOfWeek: 5, opens: "09:00", closes: "20:00" },
+      { dayOfWeek: 6, opens: "10:00", closes: "16:00" }
+    ],
     description: {
       NO: "Rolig møterom i biblioteket med tilgang til forskningsressurser og stille arbeidsmiljø.",
       EN: "Quiet meeting room in the library with access to research resources and peaceful working environment."
@@ -345,7 +396,14 @@ export const localizedMockFacilities: LocalizedFacility[] = [
       NO: ["Scene", "Lydanlegg", "Dansegulv", "Kjøkken", "Bar"],
       EN: ["Stage", "Sound system", "Dance floor", "Kitchen", "Bar"]
     },
-    openingHours: "Man-Søn: 10:00-24:00",
+    openingHours: [
+      { dayOfWeek: 1, opens: "10:00", closes: "24:00" },
+      { dayOfWeek: 2, opens: "10:00", closes: "24:00" },
+      { dayOfWeek: 3, opens: "10:00", closes: "24:00" },
+      { dayOfWeek: 4, opens: "10:00", closes: "24:00" },
+      { dayOfWeek: 5, opens: "10:00", closes: "24:00" },
+      { dayOfWeek: 6, opens: "10:00", closes: "24:00" }
+    ],
     description: {
       NO: "Tradisjonell festsal med historisk charme. Perfekt for store feiringer og kulturelle arrangementer.",
       EN: "Traditional banquet hall with historic charm. Perfect for large celebrations and cultural events."
@@ -390,7 +448,14 @@ export const localizedMockFacilities: LocalizedFacility[] = [
       NO: ["Speil", "Lydanlegg", "Piano", "Yogamatter", "Belysning"],
       EN: ["Mirrors", "Sound system", "Piano", "Yoga mats", "Lighting"]
     },
-    openingHours: "Man-Fre: 09:00-22:00, Lør: 10:00-20:00, Søn: 12:00-18:00",
+    openingHours: [
+      { dayOfWeek: 1, opens: "09:00", closes: "22:00" },
+      { dayOfWeek: 2, opens: "09:00", closes: "22:00" },
+      { dayOfWeek: 3, opens: "09:00", closes: "22:00" },
+      { dayOfWeek: 4, opens: "09:00", closes: "22:00" },
+      { dayOfWeek: 5, opens: "09:00", closes: "22:00" },
+      { dayOfWeek: 6, opens: "10:00", closes: "20:00" }
+    ],
     description: {
       NO: "Fleksibelt studio med høy standard. Perfekt for kreative aktiviteter og treningsgrupper.",
       EN: "Flexible studio with high standards. Perfect for creative activities and exercise groups."
@@ -436,7 +501,14 @@ export const localizedMockFacilities: LocalizedFacility[] = [
       NO: ["Tavle", "Projektor", "WiFi", "Stoler", "Bord"],
       EN: ["Blackboard", "Projector", "WiFi", "Chairs", "Tables"]
     },
-    openingHours: "Man-Fre: 16:00-21:00, Lør: 10:00-16:00, Søn: Stengt",
+    openingHours: [
+      { dayOfWeek: 1, opens: "16:00", closes: "21:00" },
+      { dayOfWeek: 2, opens: "16:00", closes: "21:00" },
+      { dayOfWeek: 3, opens: "16:00", closes: "21:00" },
+      { dayOfWeek: 4, opens: "16:00", closes: "21:00" },
+      { dayOfWeek: 5, opens: "16:00", closes: "21:00" },
+      { dayOfWeek: 6, opens: "10:00", closes: "16:00" }
+    ],
     description: {
       NO: "Praktisk klasserom med god belysning og moderne undervisningsutstyr.",
       EN: "Practical classroom with good lighting and modern teaching equipment."
@@ -482,7 +554,14 @@ export const localizedMockFacilities: LocalizedFacility[] = [
       NO: ["Kunstgress", "Tribuner", "Lydanlegg", "Garderober", "Kantine"],
       EN: ["Artificial turf", "Stands", "Sound system", "Changing rooms", "Canteen"]
     },
-    openingHours: "Man-Søn: 06:00-23:30",
+    openingHours: [
+      { dayOfWeek: 1, opens: "06:00", closes: "23:30" },
+      { dayOfWeek: 2, opens: "06:00", closes: "23:30" },
+      { dayOfWeek: 3, opens: "06:00", closes: "23:30" },
+      { dayOfWeek: 4, opens: "06:00", closes: "23:30" },
+      { dayOfWeek: 5, opens: "06:00", closes: "23:30" },
+      { dayOfWeek: 6, opens: "06:00", closes: "23:30" }
+    ],
     description: {
       NO: "Stor idrettshall med tribuner og moderne fasiliteter. Ideell for store idrettsarrangementer.",
       EN: "Large sports hall with stands and modern facilities. Ideal for major sports events."
@@ -528,7 +607,14 @@ export const localizedMockFacilities: LocalizedFacility[] = [
       NO: ["Mikrofoner", "Projektor", "Lyd-/videoutstyr", "Wifi", "Tolketjenester"],
       EN: ["Microphones", "Projector", "Audio/video equipment", "WiFi", "Interpretation services"]
     },
-    openingHours: "Man-Fre: 08:00-16:00, Lør-Søn: Kun ved avtale",
+    openingHours: [
+      { dayOfWeek: 1, opens: "08:00", closes: "16:00" },
+      { dayOfWeek: 2, opens: "08:00", closes: "16:00" },
+      { dayOfWeek: 3, opens: "08:00", closes: "16:00" },
+      { dayOfWeek: 4, opens: "08:00", closes: "16:00" },
+      { dayOfWeek: 5, opens: "08:00", closes: "16:00" },
+      { dayOfWeek: 6, opens: "08:00", closes: "16:00" }
+    ],
     description: {
       NO: "Representativ forsamlingssal i rådhuset med full teknisk utrustning for offentlige arrangementer.",
       EN: "Representative assembly hall in the city hall with full technical equipment for public events."
@@ -573,7 +659,14 @@ export const localizedMockFacilities: LocalizedFacility[] = [
       NO: ["Scene", "Lysrigg", "Lydanlegg", "Kostymeavdeling", "Billettluke"],
       EN: ["Stage", "Lighting rig", "Sound system", "Costume department", "Box office"]
     },
-    openingHours: "Man-Søn: 18:00-23:00, eller ved arrangement",
+    openingHours: [
+      { dayOfWeek: 1, opens: "18:00", closes: "23:00" },
+      { dayOfWeek: 2, opens: "18:00", closes: "23:00" },
+      { dayOfWeek: 3, opens: "18:00", closes: "23:00" },
+      { dayOfWeek: 4, opens: "18:00", closes: "23:00" },
+      { dayOfWeek: 5, opens: "18:00", closes: "23:00" },
+      { dayOfWeek: 6, opens: "18:00", closes: "23:00" }
+    ],
     description: {
       NO: "Profesjonell teatersal med fullt utstyrt scene og god akustikk for kulturelle opplevelser.",
       EN: "Professional theatre hall with fully equipped stage and excellent acoustics for cultural experiences."
@@ -618,7 +711,14 @@ export const localizedMockFacilities: LocalizedFacility[] = [
       NO: ["Gaming-setup", "Lydanlegg", "Instrumenter", "Spillkonsoll", "WiFi"],
       EN: ["Gaming setup", "Sound system", "Instruments", "Game consoles", "WiFi"]
     },
-    openingHours: "Man-Fre: 15:00-22:00, Lør: 12:00-20:00, Søn: Stengt",
+    openingHours: [
+      { dayOfWeek: 1, opens: "15:00", closes: "22:00" },
+      { dayOfWeek: 2, opens: "15:00", closes: "22:00" },
+      { dayOfWeek: 3, opens: "15:00", closes: "22:00" },
+      { dayOfWeek: 4, opens: "15:00", closes: "22:00" },
+      { dayOfWeek: 5, opens: "15:00", closes: "22:00" },
+      { dayOfWeek: 6, opens: "12:00", closes: "20:00" }
+    ],
     description: {
       NO: "Moderne ungdomslokale med gaming og musikk-utstyr. Perfekt for ungdomsgrupper og sosiale aktiviteter.",
       EN: "Modern youth facility with gaming and music equipment. Perfect for youth groups and social activities."
@@ -664,7 +764,14 @@ export const localizedMockFacilities: LocalizedFacility[] = [
       NO: ["Orgel", "Lydanlegg", "Lysanlegg", "Kjøkken", "Servering"],
       EN: ["Organ", "Sound system", "Lighting", "Kitchen", "Catering"]
     },
-    openingHours: "Man-Fre: 10:00-16:00, Søn: 08:00-15:00, Lør: Kun ved avtale",
+    openingHours: [
+      { dayOfWeek: 1, opens: "10:00", closes: "16:00" },
+      { dayOfWeek: 2, opens: "10:00", closes: "16:00" },
+      { dayOfWeek: 3, opens: "10:00", closes: "16:00" },
+      { dayOfWeek: 4, opens: "10:00", closes: "16:00" },
+      { dayOfWeek: 5, opens: "10:00", closes: "16:00" },
+      { dayOfWeek: 6, opens: "08:00", closes: "15:00" }
+    ],
     description: {
       NO: "Vakker menighetsal med historisk atmosfære og flott akustikk for konserter og seremonier.",
       EN: "Beautiful parish hall with historic atmosphere and excellent acoustics for concerts and ceremonies."
@@ -709,7 +816,14 @@ export const localizedMockFacilities: LocalizedFacility[] = [
       NO: ["25m basseng", "Varmbasseng", "Badstue", "Garderober", "Kafeteria"],
       EN: ["25m pool", "Warm pool", "Sauna", "Changing rooms", "Cafeteria"]
     },
-    openingHours: "Man-Fre: 06:00-21:00, Lør-Søn: 09:00-18:00",
+    openingHours: [
+      { dayOfWeek: 1, opens: "06:00", closes: "21:00" },
+      { dayOfWeek: 2, opens: "06:00", closes: "21:00" },
+      { dayOfWeek: 3, opens: "06:00", closes: "21:00" },
+      { dayOfWeek: 4, opens: "06:00", closes: "21:00" },
+      { dayOfWeek: 5, opens: "06:00", closes: "21:00" },
+      { dayOfWeek: 6, opens: "09:00", closes: "18:00" }
+    ],
     description: {
       NO: "Moderne svømmeanlegg med varmebasseng og badstue. Familievennlig med gode fasiliteter.",
       EN: "Modern swimming facility with warm pool and sauna. Family-friendly with excellent facilities."
@@ -755,7 +869,15 @@ export const localizedMockFacilities: LocalizedFacility[] = [
       NO: ["Scene", "Lydanlegg", "Lysrigger", "Projektor"],
       EN: ["Stage", "Sound System", "Light Rig", "Projector"]
     },
-    openingHours: "Man-Fre: 08:00-22:00, Lør-Søn: 10:00-20:00",
+    openingHours: [
+      { dayOfWeek: 1, opens: "08:00", closes: "22:00" },
+      { dayOfWeek: 2, opens: "08:00", closes: "22:00" },
+      { dayOfWeek: 3, opens: "08:00", closes: "22:00" },
+      { dayOfWeek: 4, opens: "08:00", closes: "22:00" },
+      { dayOfWeek: 5, opens: "08:00", closes: "22:00" },
+      { dayOfWeek: 6, opens: "10:00", closes: "20:00" },
+      { dayOfWeek: 0, opens: "10:00", closes: "20:00" }
+    ],
     description: {
       NO: "Storsal med flere avdelinger som kan brukes separat eller sammen. Perfekt for teater, konserter, konferanser og workshops med fleksible romløsninger.",
       EN: "Grand hall with multiple sections that can be used separately or together. Perfect for theater, concerts, conferences and workshops with flexible room solutions."
@@ -793,7 +915,15 @@ export const localizedMockFacilities: LocalizedFacility[] = [
       NO: ["Basketkurver", "Håndballmål", "Nettstolper", "Tribuner"],
       EN: ["Basketball Hoops", "Handball Goals", "Net Posts", "Stands"]
     },
-    openingHours: "Man-Fre: 07:00-23:00, Lør-Søn: 09:00-21:00",
+    openingHours: [
+      { dayOfWeek: 1, opens: "07:00", closes: "23:00" },
+      { dayOfWeek: 2, opens: "07:00", closes: "23:00" },
+      { dayOfWeek: 3, opens: "07:00", closes: "23:00" },
+      { dayOfWeek: 4, opens: "07:00", closes: "23:00" },
+      { dayOfWeek: 5, opens: "07:00", closes: "23:00" },
+      { dayOfWeek: 6, opens: "09:00", closes: "21:00" },
+      { dayOfWeek: 0, opens: "09:00", closes: "21:00" }
+    ],
     description: {
       NO: "Moderne idrettshall med tre separate soner som kan kombineres. Ideell for håndball, basketball, volleyball og badminton med mulighet for samtidig bruk av flere områder.",
       EN: "Modern sports hall with three separate zones that can be combined. Ideal for handball, basketball, volleyball and badminton with the possibility of simultaneous use of multiple areas."

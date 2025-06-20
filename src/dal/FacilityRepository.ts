@@ -1,3 +1,4 @@
+
 import { BaseRepository } from './BaseRepository';
 import { Facility, FacilityFilters } from '@/types/facility';
 import { Zone } from '@/types/zone';
@@ -15,7 +16,7 @@ interface FacilityCreateRequest {
   accessibility: string[];
   suitableFor: string[];
   equipment: string[];
-  openingHours: string;
+  openingHours: { dayOfWeek: number; opens: string; closes: string; }[];
   image: string;
 }
 
@@ -230,7 +231,13 @@ export class FacilityRepository extends BaseRepository<Facility, FacilityFilters
       pricePerHour: 500,
       amenities: request.equipment,
       hasAutoApproval: false,
-      timeSlotDuration: 1
+      timeSlotDuration: 1,
+      season: {
+        from: "2024-01-01",
+        to: "2024-12-31"
+      },
+      allowedBookingTypes: ['engangslån', 'fastlån', 'rammetid', 'strøtimer'],
+      zones: []
     };
   }
 

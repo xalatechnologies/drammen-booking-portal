@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { useTranslation } from "@/i18n";
 import { FacilityCardImage } from "./FacilityCardImage";
 import { FacilityCardContent } from "./FacilityCardContent";
+import { OpeningHours } from "@/types/facility";
 
 interface Facility {
   id: number;
@@ -18,7 +19,7 @@ interface Facility {
   area: string;
   suitableFor: string[];
   equipment: string[];
-  openingHours: string;
+  openingHours: OpeningHours[];
   description: string;
   availableTimes?: {
     date: Date;
