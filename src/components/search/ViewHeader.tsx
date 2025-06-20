@@ -21,7 +21,7 @@ const ViewHeader: React.FC<ViewHeaderProps> = ({
       case "grid":
         return "Rutenett";
       case "list":
-        return "Liste";
+        return "Liste visning";
       case "map":
         return "Kart";
       case "calendar":
@@ -31,38 +31,16 @@ const ViewHeader: React.FC<ViewHeaderProps> = ({
     }
   };
 
-  const getViewIcon = () => {
-    switch (viewMode) {
-      case "grid":
-        return Grid3X3;
-      case "list":
-        return List;
-      case "map":
-        return Map;
-      case "calendar":
-        return Calendar;
-      default:
-        return Grid3X3;
-    }
-  };
-
-  const Icon = getViewIcon();
-
   return (
     <div className="flex items-center justify-between mb-6">
-      {/* Left side: Facility count and view type */}
-      <div className="flex items-center gap-4">
-        <div className="flex items-center gap-2">
-          <Icon className="h-5 w-5 text-blue-600" />
-          <span className="text-lg font-medium text-gray-900">{getViewLabel()}</span>
-        </div>
-        <div className="text-sm text-gray-600">
-          {isLoading ? (
-            <span>Laster lokaler...</span>
-          ) : (
-            <span>{facilityCount} {facilityCount === 1 ? 'lokale' : 'lokaler'} funnet</span>
-          )}
-        </div>
+      {/* Left side: Facility count and view type - matching list/grid view style */}
+      <div className="flex items-center gap-2">
+        <span className="text-4xl font-bold text-gray-900">
+          {isLoading ? "..." : facilityCount}
+        </span>
+        <span className="text-lg font-medium text-gray-600">
+          {isLoading ? "Laster lokaler..." : `lokaler ${getViewLabel()}`}
+        </span>
       </div>
 
       {/* Right side: View mode toggle */}
