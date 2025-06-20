@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,7 @@ import { SimilarFacilitiesSlider } from "@/components/facility/SimilarFacilities
 import { Zone } from "@/components/booking/types";
 import { useOptimizedFacility } from "@/hooks/useOptimizedFacility";
 import { useZones } from "@/hooks/useZones";
+import { useSlotSelection } from "@/hooks/useSlotSelection";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useTranslation } from "@/i18n";
 import { CartProvider } from "@/contexts/CartContext";
@@ -27,8 +29,15 @@ const FacilityDetail = () => {
   const { facility, isLoading, error, notFound } = useOptimizedFacility(Number(id));
   const { data: zones = [], isLoading: zonesLoading } = useZones(id);
 
-  // State for availability tab
-  const [selectedSlots, setSelectedSlots] = useState<any[]>([]);
+  // Use the centralized slot selection hook
+  const {
+    selectedSlots,
+    handleSlotClick,
+    handleBulkSlotSelection,
+    clearSelection
+  } = useSlotSelection();
+
+  // State for availability tab patterns
   const [currentPattern, setCurrentPattern] = useState<any>({});
 
   // Default zone if no zones are returned from the API
@@ -130,15 +139,14 @@ const FacilityDetail = () => {
   };
 
   const handleRemoveSlot = (zoneId: string, date: Date, timeSlot: string) => {
-    setSelectedSlots(selectedSlots.filter(slot => 
-      !(slot.zoneId === zoneId &&
-        slot.date.toDateString() === date.toDateString() &&
-        slot.timeSlot === timeSlot)
-    ));
+    console.log('FacilityDetail: handleRemoveSlot called:', { zoneId, date, timeSlot });
+    // This will be handled by the individual slot click since we're removing
+    handleSlotClick(zoneId, date, timeSlot, 'available');
   };
 
   const handleClearSlots = () => {
-    setSelectedSlots([]);
+    console.log('FacilityDetail: handleClearSlots called');
+    clearSelection();
   };
 
   const handlePatternApply = (pattern: any) => {
