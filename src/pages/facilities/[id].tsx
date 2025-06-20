@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -16,8 +17,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useTranslation } from "@/i18n";
 import { CartProvider } from "@/contexts/CartContext";
 import { MobileBookingPanel } from "@/components/facility/MobileBookingPanel";
-
-export default FacilityDetail;
 
 const FacilityDetail = () => {
   const { id } = useParams();
@@ -262,3 +261,5 @@ const FacilityDetail = () => {
       </div>
     </CartProvider>;
 };
+
+export default FacilityDetail;
