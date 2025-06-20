@@ -33,6 +33,9 @@ export function FacilityDetailCalendar({
   onPatternApply,
   timeSlotDuration
 }: FacilityDetailCalendarProps) {
+  console.log('FacilityDetailCalendar: Rendering with selectedSlots:', selectedSlots);
+  console.log('FacilityDetailCalendar: facilityId:', facilityId, 'facilityName:', facilityName);
+
   return (
     <div className="container mx-auto px-4 max-w-7xl">
       <div className="w-full mb-12">

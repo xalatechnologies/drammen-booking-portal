@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { SelectedTimeSlot } from '@/utils/recurrenceEngine';
@@ -7,6 +8,9 @@ import { SelectedSlotsAccordion } from './SelectedSlotsAccordion';
 import { BookingFormFields } from './BookingFormFields';
 import { PriceCalculationCard } from './PriceCalculationCard';
 import { BookingActionButtons } from './BookingActionButtons';
+import { useCartStore } from '@/stores/useCartStore';
+import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 
 interface SimplifiedBookingFormProps {
   selectedSlots: SelectedTimeSlot[];
@@ -38,6 +42,13 @@ export function SimplifiedBookingForm({
   onSlotsCleared,
   onRemoveSlot
 }: SimplifiedBookingFormProps) {
+  console.log('SimplifiedBookingForm: Rendering with selectedSlots:', selectedSlots);
+  console.log('SimplifiedBookingForm: facilityId:', facilityId, 'facilityName:', facilityName);
+  
+  const { addToCart } = useCartStore();
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState<BookingFormData>({
     purpose: '',
     attendees: 1,
@@ -52,39 +63,148 @@ export function SimplifiedBookingForm({
   };
 
   const handleRemoveSlot = (slot: SelectedTimeSlot) => {
+    console.log('SimplifiedBookingForm: handleRemoveSlot called:', slot);
     if (onRemoveSlot) {
       onRemoveSlot(slot.zoneId, slot.date, slot.timeSlot);
     }
   };
 
   const handleClearAll = () => {
+    console.log('SimplifiedBookingForm: handleClearAll called');
     if (onSlotsCleared) {
       onSlotsCleared();
     }
   };
 
   const isFormValid = () => {
-    return formData.purpose.trim() && 
+    const valid = formData.purpose.trim() && 
            formData.attendees > 0 && 
            formData.activityType && 
            formData.actorType &&
            formData.termsAccepted &&
            selectedSlots.length > 0;
+    
+    console.log('SimplifiedBookingForm: Form validation:', {
+      purpose: !!formData.purpose.trim(),
+      attendees: formData.attendees > 0,
+      activityType: !!formData.activityType,
+      actorType: !!formData.actorType,
+      termsAccepted: formData.termsAccepted,
+      hasSlots: selectedSlots.length > 0,
+      overall: valid
+    });
+    
+    return valid;
   };
 
   const handleAddToCart = () => {
-    if (onAddToCart && isFormValid()) {
-      onAddToCart({
-        selectedSlots,
-        facilityId,
-        facilityName,
-        formData
+    console.log('SimplifiedBookingForm: handleAddToCart called');
+    console.log('SimplifiedBookingForm: Form valid:', isFormValid());
+    console.log('SimplifiedBookingForm: Form data:', formData);
+    console.log('SimplifiedBookingForm: Selected slots:', selectedSlots);
+
+    if (!isFormValid()) {
+      toast({
+        title: "Manglende informasjon",
+        description: "Vennligst fyll ut alle påkrevde felt og aksepter vilkårene",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      // Add each selected slot as a separate cart item
+      selectedSlots.forEach(slot => {
+        const zone = zones.find(z => z.id === slot.zoneId);
+        const pricePerHour = zone?.pricePerHour || 450;
+        const duration = slot.duration || 2;
+
+        console.log('SimplifiedBookingForm: Adding slot to cart:', {
+          slot,
+          zone: zone?.name,
+          pricePerHour,
+          duration
+        });
+
+        addToCart({
+          facilityId,
+          facilityName,
+          zoneId: slot.zoneId,
+          date: slot.date,
+          timeSlot: slot.timeSlot,
+          duration,
+          pricePerHour,
+          purpose: formData.purpose,
+          expectedAttendees: formData.attendees,
+          organizationType: formData.actorType === 'private-person' ? 'private' : 
+                          formData.actorType === 'lag-foreninger' ? 'organization' : 'business',
+          additionalServices: [],
+          timeSlots: [slot],
+          customerInfo: {
+            name: '',
+            email: '',
+            phone: ''
+          },
+          pricing: {
+            baseFacilityPrice: pricePerHour * duration,
+            servicesPrice: 0,
+            discounts: 0,
+            vatAmount: 0,
+            totalPrice: pricePerHour * duration
+          }
+        });
+      });
+
+      toast({
+        title: "Lagt til i handlekurv",
+        description: `${selectedSlots.length} tidspunkt er lagt til i handlekurven`,
+      });
+
+      // Clear slots after successful addition
+      if (onSlotsCleared) {
+        onSlotsCleared();
+      }
+
+      // Call parent callback if provided
+      if (onAddToCart) {
+        onAddToCart({
+          selectedSlots,
+          facilityId,
+          facilityName,
+          formData
+        });
+      }
+    } catch (error) {
+      console.error('SimplifiedBookingForm: Error adding to cart:', error);
+      toast({
+        title: "Feil",
+        description: "Kunne ikke legge til i handlekurv. Prøv igjen.",
+        variant: "destructive",
       });
     }
   };
 
   const handleCompleteBooking = () => {
-    if (onCompleteBooking && isFormValid()) {
+    console.log('SimplifiedBookingForm: handleCompleteBooking called');
+    console.log('SimplifiedBookingForm: Form valid:', isFormValid());
+
+    if (!isFormValid()) {
+      toast({
+        title: "Manglende informasjon",
+        description: "Vennligst fyll ut alle påkrevde felt og aksepter vilkårene",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // For now, add to cart and navigate to checkout
+    handleAddToCart();
+    
+    setTimeout(() => {
+      navigate('/checkout');
+    }, 1000);
+
+    if (onCompleteBooking) {
       onCompleteBooking({
         selectedSlots,
         facilityId,

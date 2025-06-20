@@ -19,6 +19,11 @@ export function BookingActionButtons({
   onCompleteBooking,
   isFormValid
 }: BookingActionButtonsProps) {
+  console.log('BookingActionButtons: Rendering with props:', {
+    termsAccepted,
+    isFormValid
+  });
+
   return (
     <>
       {/* Terms and Conditions */}
@@ -26,7 +31,10 @@ export function BookingActionButtons({
         <Checkbox
           id="terms"
           checked={termsAccepted}
-          onCheckedChange={(checked) => onTermsAcceptedChange(!!checked)}
+          onCheckedChange={(checked) => {
+            console.log('BookingActionButtons: Terms checkbox changed:', checked);
+            onTermsAcceptedChange(!!checked);
+          }}
           className="mt-1"
         />
         <div className="text-sm leading-relaxed">
@@ -48,7 +56,10 @@ export function BookingActionButtons({
       {/* Action Buttons */}
       <div className="space-y-3 pt-3">
         <Button
-          onClick={onAddToCart}
+          onClick={() => {
+            console.log('BookingActionButtons: Add to cart button clicked');
+            onAddToCart();
+          }}
           disabled={!isFormValid}
           variant="outline"
           className="w-full border-blue-600 text-blue-600 hover:bg-blue-50 py-3"
@@ -59,7 +70,10 @@ export function BookingActionButtons({
         </Button>
         
         <Button
-          onClick={onCompleteBooking}
+          onClick={() => {
+            console.log('BookingActionButtons: Complete booking button clicked');
+            onCompleteBooking();
+          }}
           disabled={!isFormValid}
           className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3"
           size="lg"
