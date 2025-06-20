@@ -43,6 +43,14 @@ export function EnumSelect({
     );
   }
 
+  // Default placeholder based on enum type
+  const getDefaultPlaceholder = () => {
+    if (enumType === 'ActorType') {
+      return 'Velg aktør';
+    }
+    return placeholder || t('common.messages.selectOption', {}, 'Velg alternativ');
+  };
+
   return (
     <div className={`space-y-2 ${className}`}>
       {label && (
@@ -62,7 +70,7 @@ export function EnumSelect({
         disabled={disabled || isLoading}
       >
         <SelectTrigger className="h-12 border-gray-300 focus:border-slate-700">
-          <SelectValue placeholder={isLoading ? t('common.messages.loading', {}, 'Loading...') : placeholder}>
+          <SelectValue placeholder={isLoading ? t('common.messages.loading', {}, 'Loading...') : getDefaultPlaceholder()}>
             {isLoading && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
           </SelectValue>
         </SelectTrigger>
