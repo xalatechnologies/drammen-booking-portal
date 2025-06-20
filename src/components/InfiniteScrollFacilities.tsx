@@ -1,0 +1,218 @@
+
+import React, { useEffect, useRef, useState } from "react";
+import { Loader2, ArrowUp } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import FacilityGrid from "./FacilityGrid";
+import FacilityListItem from "./facility/FacilityListItem";
+import { useOptimizedFacilities } from "@/hooks/useOptimizedFacilities";
+import { FacilityFilters } from "@/types/facility";
+
+interface InfiniteScrollFacilitiesProps {
+  filters: FacilityFilters;
+  viewMode: "grid" | "list";
+}
+
+export function InfiniteScrollFacilities({
+  filters,
+  viewMode
+}: InfiniteScrollFacilitiesProps) {
+  const [page, setPage] = useState(1);
+  const [allFacilities, setAllFacilities] = useState<any[]>([]);
+  const [hasMore, setHasMore] = useState(true);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  const observerRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const { facilities, pagination, isLoading, error } = useOptimizedFacilities({
+    pagination: { page, limit: 6 },
+    filters
+  });
+
+  // Reset when filters change
+  useEffect(() => {
+    setPage(1);
+    setAllFacilities([]);
+    setHasMore(true);
+  }, [JSON.stringify(filters)]);
+
+  // Add new facilities to the list
+  useEffect(() => {
+    if (facilities.length > 0) {
+      if (page === 1) {
+        setAllFacilities(facilities);
+      } else {
+        setAllFacilities(prev => [...prev, ...facilities]);
+      }
+      
+      if (pagination) {
+        setHasMore(pagination.hasNext);
+      }
+    }
+  }, [facilities, page, pagination]);
+
+  // Intersection Observer for infinite scroll
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !isLoading) {
+          setPage(prev => prev + 1);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (observerRef.current) {
+      observer.observe(observerRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [hasMore, isLoading]);
+
+  // Scroll position tracking
+  useEffect(() => {
+    const handleScroll = () => {
+      if (containerRef.current) {
+        const scrollTop = containerRef.current.scrollTop || window.scrollY;
+        setShowScrollTop(scrollTop > 400);
+      }
+    };
+
+    const scrollContainer = containerRef.current || window;
+    scrollContainer.addEventListener('scroll', handleScroll);
+    return () => scrollContainer.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    if (containerRef.current) {
+      containerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  if (error) {
+    return (
+      <div className="text-center py-10 bg-red-50 rounded-lg border border-red-200">
+        <h3 className="text-xl font-medium text-red-800 mb-2">Feil ved lasting</h3>
+        <p className="text-red-600">Kunne ikke laste lokaler. Prøv igjen senere.</p>
+      </div>
+    );
+  }
+
+  if (page === 1 && isLoading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="text-center space-y-4">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto text-blue-600" />
+          <p className="text-gray-600 font-medium">Laster lokaler...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (allFacilities.length === 0 && !isLoading) {
+    return (
+      <div className="text-center py-10 bg-gray-50 rounded-lg">
+        <h3 className="text-xl font-medium mb-2">Ingen lokaler funnet</h3>
+        <p className="text-gray-500">Prøv å endre søkekriteriene dine</p>
+      </div>
+    );
+  }
+
+  return (
+    <div ref={containerRef} className="relative">
+      {/* Results summary */}
+      <div className="mb-6 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+            {pagination?.total || allFacilities.length} lokaler
+          </Badge>
+          {viewMode === "grid" && (
+            <Badge variant="secondary" className="text-gray-600">
+              Rutenett visning
+            </Badge>
+          )}
+          {viewMode === "list" && (
+            <Badge variant="secondary" className="text-gray-600">
+              Liste visning
+            </Badge>
+          )}
+        </div>
+      </div>
+
+      {/* Facilities content */}
+      <div className={`space-y-6 ${viewMode === "list" ? "space-y-4" : ""}`}>
+        {viewMode === "grid" ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {allFacilities.map((facility, index) => (
+              <div 
+                key={`${facility.id}-${index}`}
+                className="animate-fade-in"
+                style={{ animationDelay: `${(index % 6) * 100}ms` }}
+              >
+                <FacilityGrid 
+                  pagination={{ page: 1, limit: 1 }} 
+                  filters={{ ...filters, facilityIds: [facility.id] }}
+                />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {allFacilities.map((facility, index) => (
+              <div 
+                key={`${facility.id}-${index}`}
+                className="animate-fade-in"
+                style={{ animationDelay: `${(index % 6) * 50}ms` }}
+              >
+                <FacilityListItem 
+                  facility={facility}
+                  facilityType={filters.facilityType}
+                  location={filters.location}
+                  accessibility={filters.accessibility}
+                  capacity={filters.capacity}
+                />
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Loading indicator */}
+      {isLoading && page > 1 && (
+        <div className="flex items-center justify-center py-8">
+          <div className="flex items-center gap-3 bg-white rounded-full px-6 py-3 shadow-lg border">
+            <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
+            <span className="text-gray-700 font-medium">Laster flere lokaler...</span>
+          </div>
+        </div>
+      )}
+
+      {/* End of results indicator */}
+      {!hasMore && allFacilities.length > 0 && (
+        <div className="text-center py-8">
+          <div className="inline-flex items-center gap-2 bg-gray-100 rounded-full px-6 py-3">
+            <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+            <span className="text-gray-600 font-medium">Du har sett alle tilgjengelige lokaler</span>
+            <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+          </div>
+        </div>
+      )}
+
+      {/* Infinite scroll trigger */}
+      <div ref={observerRef} className="h-4" />
+
+      {/* Scroll to top button */}
+      {showScrollTop && (
+        <Button
+          onClick={scrollToTop}
+          size="lg"
+          className="fixed bottom-6 right-6 rounded-full w-14 h-14 shadow-lg hover:shadow-xl transition-all duration-300 bg-blue-600 hover:bg-blue-700 z-50"
+        >
+          <ArrowUp className="h-6 w-6" />
+        </Button>
+      )}
+    </div>
+  );
+}
