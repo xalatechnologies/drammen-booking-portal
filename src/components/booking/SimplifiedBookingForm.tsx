@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { ShoppingCart, CreditCard, Plus, Minus, RotateCcw } from 'lucide-react';
+import { ShoppingCart, CreditCard, Plus, Minus } from 'lucide-react';
 import { SelectedTimeSlot } from '@/utils/recurrenceEngine';
 import { Zone } from './types';
 import { ActorType } from '@/types/pricing';
@@ -20,7 +20,6 @@ interface SimplifiedBookingFormProps {
   zones?: Zone[];
   onAddToCart?: (bookingData: any) => void;
   onCompleteBooking?: (bookingData: any) => void;
-  onRecurringBooking?: () => void;
   onSlotsCleared?: () => void;
 }
 
@@ -29,7 +28,7 @@ interface BookingFormData {
   attendees: number;
   activityType: string;
   additionalInfo: string;
-  actorType: ActorType;
+  actorType: ActorType | '';
   termsAccepted: boolean;
 }
 
@@ -59,7 +58,6 @@ export function SimplifiedBookingForm({
   zones = [],
   onAddToCart,
   onCompleteBooking,
-  onRecurringBooking,
   onSlotsCleared
 }: SimplifiedBookingFormProps) {
   const [formData, setFormData] = useState<BookingFormData>({
@@ -67,7 +65,7 @@ export function SimplifiedBookingForm({
     attendees: 1,
     activityType: '',
     additionalInfo: '',
-    actorType: 'private-person',
+    actorType: '',
     termsAccepted: false
   });
 
@@ -76,7 +74,7 @@ export function SimplifiedBookingForm({
     facilityId,
     zoneId: firstSlot?.zoneId,
     startDate: firstSlot?.date,
-    customerType: formData.actorType,
+    customerType: formData.actorType as ActorType,
     timeSlot: firstSlot?.timeSlot,
     eventType: formData.activityType,
   });
@@ -125,10 +123,10 @@ export function SimplifiedBookingForm({
     return (
       <Card className="w-full">
         <CardContent className="p-6 text-center">
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+          <h3 className="text-xl font-semibold text-gray-900 mb-3">
             Ingen tidspunkt valgt
           </h3>
-          <p className="text-gray-600">
+          <p className="text-gray-600 text-base">
             Velg tidspunkt i kalenderen først for å starte booking prosessen.
           </p>
         </CardContent>
@@ -139,14 +137,14 @@ export function SimplifiedBookingForm({
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle>Booking informasjon</CardTitle>
+        <CardTitle className="text-xl">Booking informasjon</CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Basic Information */}
-        <div className="space-y-4">
+        <div className="space-y-5">
           {/* Purpose */}
           <div className="space-y-2">
-            <Label htmlFor="purpose" className="text-sm font-medium">
+            <Label htmlFor="purpose" className="text-base font-medium">
               Formål <span className="text-red-500">*</span>
             </Label>
             <Textarea
@@ -154,14 +152,14 @@ export function SimplifiedBookingForm({
               placeholder="Beskriv formålet med reservasjonen..."
               value={formData.purpose}
               onChange={(e) => updateFormData({ purpose: e.target.value })}
-              className="min-h-[60px]"
+              className="min-h-[80px] text-base"
               required
             />
           </div>
 
           {/* Number of Attendees */}
           <div className="space-y-2">
-            <Label className="text-sm font-medium">
+            <Label className="text-base font-medium">
               Antall deltakere <span className="text-red-500">*</span>
             </Label>
             <div className="flex items-center gap-3">
@@ -171,7 +169,7 @@ export function SimplifiedBookingForm({
                 size="sm"
                 onClick={() => handleAttendeesChange(-1)}
                 disabled={formData.attendees <= 1}
-                className="h-8 w-8 p-0"
+                className="h-10 w-10 p-0"
               >
                 <Minus className="h-4 w-4" />
               </Button>
@@ -179,7 +177,7 @@ export function SimplifiedBookingForm({
                 type="number"
                 value={formData.attendees}
                 onChange={(e) => updateFormData({ attendees: parseInt(e.target.value) || 1 })}
-                className="w-16 text-center"
+                className="w-20 text-center text-base"
                 min="1"
               />
               <Button
@@ -187,7 +185,7 @@ export function SimplifiedBookingForm({
                 variant="outline"
                 size="sm"
                 onClick={() => handleAttendeesChange(1)}
-                className="h-8 w-8 p-0"
+                className="h-10 w-10 p-0"
               >
                 <Plus className="h-4 w-4" />
               </Button>
@@ -196,42 +194,20 @@ export function SimplifiedBookingForm({
 
           {/* Activity Type */}
           <div className="space-y-2">
-            <Label className="text-sm font-medium">
+            <Label className="text-base font-medium">
               Type aktivitet <span className="text-red-500">*</span>
             </Label>
             <Select
               value={formData.activityType}
               onValueChange={(value) => updateFormData({ activityType: value })}
             >
-              <SelectTrigger>
+              <SelectTrigger className="text-base">
                 <SelectValue placeholder="Velg type aktivitet" />
               </SelectTrigger>
               <SelectContent>
                 {activityTypes.map((type) => (
-                  <SelectItem key={type} value={type}>
+                  <SelectItem key={type} value={type} className="text-base">
                     {type}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Actor Type */}
-          <div className="space-y-2">
-            <Label className="text-sm font-medium">
-              Aktør type <span className="text-red-500">*</span>
-            </Label>
-            <Select
-              value={formData.actorType}
-              onValueChange={(value: ActorType) => updateFormData({ actorType: value })}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Velg aktør type" />
-              </SelectTrigger>
-              <SelectContent>
-                {actorTypes.map((type) => (
-                  <SelectItem key={type.value} value={type.value}>
-                    {type.label}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -240,7 +216,7 @@ export function SimplifiedBookingForm({
 
           {/* Additional Information */}
           <div className="space-y-2">
-            <Label htmlFor="additionalInfo" className="text-sm font-medium">
+            <Label htmlFor="additionalInfo" className="text-base font-medium">
               Tilleggsopplysninger
             </Label>
             <Textarea
@@ -248,48 +224,76 @@ export function SimplifiedBookingForm({
               placeholder="Tilleggsinformasjon om reservasjonen (valgfritt)..."
               value={formData.additionalInfo}
               onChange={(e) => updateFormData({ additionalInfo: e.target.value })}
-              className="min-h-[60px]"
+              className="min-h-[80px] text-base"
             />
+          </div>
+
+          {/* Actor Type - Moved after Additional Information */}
+          <div className="space-y-2">
+            <Label className="text-base font-medium">
+              Aktør type <span className="text-red-500">*</span>
+            </Label>
+            <Select
+              value={formData.actorType}
+              onValueChange={(value: ActorType) => updateFormData({ actorType: value })}
+            >
+              <SelectTrigger className="text-base">
+                <SelectValue placeholder="Velg aktør type" />
+              </SelectTrigger>
+              <SelectContent>
+                {actorTypes.map((type) => (
+                  <SelectItem key={type.value} value={type.value} className="text-base">
+                    {type.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
-        {/* Price Calculation */}
+        {/* Price Calculation - Conditional */}
         <Card className="bg-blue-50 border-blue-200">
           <CardContent className="p-4">
-            <h4 className="font-semibold text-blue-900 mb-3">
+            <h4 className="font-semibold text-blue-900 mb-3 text-lg">
               Prisberegning
             </h4>
             
-            {isLoading ? (
-              <div className="text-blue-700">Beregner pris...</div>
+            {!formData.actorType ? (
+              <div className="text-blue-700 text-base">
+                Velg aktør type for å beregne pris
+              </div>
+            ) : isLoading ? (
+              <div className="text-blue-700 text-base">
+                Beregner pris...
+              </div>
             ) : calculation ? (
               <div className="space-y-2 text-blue-800">
-                <div className="flex justify-between text-sm">
+                <div className="flex justify-between text-base">
                   <span>Antall tidspunkt:</span>
                   <span>{selectedSlots.length}</span>
                 </div>
-                <div className="flex justify-between text-sm">
+                <div className="flex justify-between text-base">
                   <span>Grunnpris:</span>
                   <span>{calculation.basePrice} kr</span>
                 </div>
                 {calculation.discounts.length > 0 && (
-                  <div className="flex justify-between text-sm text-green-700">
-                    <span>Rabatt ({formData.actorType}):</span>
+                  <div className="flex justify-between text-base text-green-700">
+                    <span>Rabatt ({actorTypes.find(a => a.value === formData.actorType)?.label}):</span>
                     <span>-{calculation.discounts.reduce((sum, d) => sum + d.amount, 0)} kr</span>
                   </div>
                 )}
-                <div className="flex justify-between text-sm">
+                <div className="flex justify-between text-base">
                   <span>MVA (25%):</span>
                   <span>{Math.round(calculation.totalPrice * 0.25)} kr</span>
                 </div>
                 <hr className="border-blue-300" />
-                <div className="flex justify-between font-bold">
+                <div className="flex justify-between font-bold text-lg">
                   <span>Total:</span>
                   <span>{calculation.totalPrice + Math.round(calculation.totalPrice * 0.25)} kr</span>
                 </div>
               </div>
             ) : (
-              <div className="text-blue-700">Ingen prisberegning tilgjengelig</div>
+              <div className="text-blue-700 text-base">Ingen prisberegning tilgjengelig</div>
             )}
           </CardContent>
         </Card>
@@ -302,9 +306,17 @@ export function SimplifiedBookingForm({
             onCheckedChange={(checked) => updateFormData({ termsAccepted: !!checked })}
             className="mt-1"
           />
-          <div className="text-sm">
+          <div className="text-base">
             <label htmlFor="terms" className="cursor-pointer">
-              Jeg aksepterer vilkår og betingelser for bruk av lokalene{' '}
+              Jeg aksepterer{' '}
+              <a 
+                href="/vilkar" 
+                target="_blank" 
+                className="text-blue-600 hover:text-blue-800 underline"
+              >
+                vilkår og betingelser
+              </a>
+              {' '}for bruk av lokalene{' '}
               <span className="text-red-500">*</span>
             </label>
           </div>
@@ -313,30 +325,23 @@ export function SimplifiedBookingForm({
         {/* Action Buttons */}
         <div className="space-y-3 pt-4">
           <Button
-            onClick={onRecurringBooking}
-            variant="outline"
-            className="w-full border-purple-600 text-purple-600 hover:bg-purple-50"
-          >
-            <RotateCcw className="h-4 w-4 mr-2" />
-            Gjentakende booking
-          </Button>
-          
-          <Button
             onClick={handleAddToCart}
             disabled={!isFormValid()}
             variant="outline"
-            className="w-full border-blue-600 text-blue-600 hover:bg-blue-50"
+            className="w-full border-blue-600 text-blue-600 hover:bg-blue-50 text-base py-3"
+            size="lg"
           >
-            <ShoppingCart className="h-4 w-4 mr-2" />
+            <ShoppingCart className="h-5 w-5 mr-2" />
             Legg i handlekurv
           </Button>
           
           <Button
             onClick={handleCompleteBooking}
             disabled={!isFormValid()}
-            className="w-full bg-blue-600 hover:bg-blue-700"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-base py-3"
+            size="lg"
           >
-            <CreditCard className="h-4 w-4 mr-2" />
+            <CreditCard className="h-5 w-5 mr-2" />
             Fullfør booking
           </Button>
         </div>
