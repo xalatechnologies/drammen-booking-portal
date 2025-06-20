@@ -46,7 +46,7 @@ export function TwoColumnAvailabilityLayout({
   const timeSlots = ["08:00-10:00", "10:00-12:00", "12:00-14:00", "14:00-16:00", "16:00-18:00", "18:00-20:00", "20:00-22:00"];
 
   const getAvailabilityStatus = (zoneId: string, date: Date, timeSlot: string) => {
-    const conflict = conflictManager.checkConflict(zoneId, date, timeSlot);
+    const conflict = conflictManager.checkZoneConflict(zoneId, date, timeSlot);
     if (conflict.hasConflict) {
       return { status: 'busy', conflict: conflict.conflictDetails };
     }
@@ -72,7 +72,12 @@ export function TwoColumnAvailabilityLayout({
           slot.timeSlot === timeSlot)
       ));
     } else {
-      setSelectedSlots([...selectedSlots, { zoneId, date, timeSlot }]);
+      setSelectedSlots([...selectedSlots, { 
+        zoneId, 
+        date, 
+        timeSlot,
+        duration: 2 // Default 2-hour duration
+      }]);
     }
   };
 
@@ -93,9 +98,11 @@ export function TwoColumnAvailabilityLayout({
       {/* Zone Info Header */}
       <ZoneInfoHeader 
         zone={zone} 
-        selectedCount={selectedSlots.length}
+        selectedSlots={selectedSlots}
+        onPatternBuilderOpen={() => {}}
         onClearSelection={handleClearSlots}
-        hasSelection={selectedSlots.length > 0}
+        onBookingDrawerOpen={() => {}}
+        zones={zones}
       />
 
       {/* Week Navigation */}

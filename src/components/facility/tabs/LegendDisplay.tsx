@@ -1,11 +1,7 @@
 
 import React from 'react';
 
-interface LegendDisplayProps {
-  showLegend: boolean;
-}
-
-export function LegendDisplay({ showLegend }: LegendDisplayProps) {
+export function LegendDisplay({ showLegend = true }: { showLegend?: boolean } = {}) {
   if (!showLegend) return null;
 
   return (

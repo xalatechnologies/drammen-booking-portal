@@ -51,7 +51,7 @@ export function BookingStepsAccordion({
     return selectedSlots.reduce((total, slot) => {
       const zone = zones.find(z => z.id === slot.zoneId);
       const basePrice = zone?.pricePerHour || 225;
-      const duration = 2; // Assuming 2-hour slots
+      const duration = slot.duration || 2; // Use slot duration or default to 2
       let price = basePrice * duration;
       
       // Apply customer type discounts
@@ -82,7 +82,8 @@ export function BookingStepsAccordion({
     selectedSlots.forEach(slot => {
       const zone = zones.find(z => z.id === slot.zoneId);
       const basePrice = zone?.pricePerHour || 225;
-      let price = basePrice * 2; // 2-hour duration
+      const duration = slot.duration || 2;
+      let price = basePrice * duration;
       
       // Apply discounts
       switch (formData.customerType) {
@@ -95,7 +96,6 @@ export function BookingStepsAccordion({
       }
 
       addToCart({
-        id: `${facilityId}-${slot.zoneId}-${format(slot.date, 'yyyy-MM-dd')}-${slot.timeSlot}`,
         facilityId,
         facilityName,
         zoneName: getZoneName(slot.zoneId),
@@ -292,7 +292,7 @@ export function BookingStepsAccordion({
                         </div>
                         <div className="text-right">
                           <div className="font-medium">
-                            {Math.round((zones.find(z => z.id === slot.zoneId)?.pricePerHour || 225) * 2 * 
+                            {Math.round((zones.find(z => z.id === slot.zoneId)?.pricePerHour || 225) * (slot.duration || 2) * 
                               (formData.customerType === 'organization' ? 0.8 : 
                                formData.customerType === 'business' ? 0.9 : 1))} kr
                           </div>
