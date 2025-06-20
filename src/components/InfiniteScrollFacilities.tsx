@@ -32,7 +32,6 @@ export const InfiniteScrollFacilities: React.FC<InfiniteScrollFacilitiesProps> =
 
   // Memoize the filter string to detect changes
   const filterString = JSON.stringify(filters);
-  const currentPage = pagination.page;
 
   // Reset when filters change
   useEffect(() => {
@@ -42,10 +41,10 @@ export const InfiniteScrollFacilities: React.FC<InfiniteScrollFacilitiesProps> =
     goToPage(1);
   }, [filterString, goToPage]);
 
-  // Handle facility data updates
+  // Handle facility data updates - Fixed dependency array
   useEffect(() => {
     console.log('InfiniteScrollFacilities - Processing facilities data', {
-      page: currentPage,
+      page: pagination.page,
       facilitiesLength: facilities?.length || 0,
       isLoading,
       allFacilitiesLength: allFacilities.length,
@@ -57,7 +56,7 @@ export const InfiniteScrollFacilities: React.FC<InfiniteScrollFacilitiesProps> =
     if (!isLoading && facilities && Array.isArray(facilities)) {
       console.log('InfiniteScrollFacilities - Setting facilities data');
       
-      if (currentPage === 1) {
+      if (pagination.page === 1) {
         // For page 1, replace all facilities
         console.log('InfiniteScrollFacilities - Setting facilities for page 1:', facilities.length);
         setAllFacilities([...facilities]);
@@ -68,7 +67,7 @@ export const InfiniteScrollFacilities: React.FC<InfiniteScrollFacilitiesProps> =
             !prev.some(existing => existing.id === facility.id)
           );
           const updated = [...prev, ...newFacilities];
-          console.log('InfiniteScrollFacilities - Appended facilities for page', currentPage, ':', newFacilities.length);
+          console.log('InfiniteScrollFacilities - Appended facilities for page', pagination.page, ':', newFacilities.length);
           return updated;
         });
       }
@@ -79,14 +78,14 @@ export const InfiniteScrollFacilities: React.FC<InfiniteScrollFacilitiesProps> =
         console.log('InfiniteScrollFacilities - Updated hasMore:', paginationInfo.hasNext);
       }
     }
-  }, [facilities, isLoading, currentPage, paginationInfo]);
+  }, [facilities, isLoading, pagination.page, paginationInfo]); // Fixed dependencies
 
   const loadMore = useCallback(() => {
     if (!isLoading && hasMore) {
-      console.log('InfiniteScrollFacilities - Loading more, current page:', currentPage);
+      console.log('InfiniteScrollFacilities - Loading more, current page:', pagination.page);
       nextPage();
     }
-  }, [isLoading, hasMore, currentPage, nextPage]);
+  }, [isLoading, hasMore, pagination.page, nextPage]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -111,7 +110,7 @@ export const InfiniteScrollFacilities: React.FC<InfiniteScrollFacilitiesProps> =
     allFacilitiesCount: allFacilities.length,
     isLoading,
     hasMore,
-    currentPage,
+    currentPage: pagination.page,
     facilitiesFromAPI: facilities?.length || 0,
     paginationTotal: paginationInfo?.total,
     viewMode
