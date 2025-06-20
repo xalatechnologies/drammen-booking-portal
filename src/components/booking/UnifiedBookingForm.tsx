@@ -49,9 +49,9 @@ export function UnifiedBookingForm({
   });
 
   const steps = [
-    { title: 'Grunnleggende informasjon', component: BookingStepBasicInfo },
-    { title: 'Detaljer og prising', component: BookingStepPricingDetails },
-    { title: 'Vilkår og handlinger', component: BookingStepTermsActions }
+    { title: 'Grunnleggende informasjon', component: 'basic' },
+    { title: 'Detaljer og prising', component: 'pricing' },
+    { title: 'Vilkår og handlinger', component: 'terms' }
   ];
 
   const updateFormData = (updates: Partial<BookingFormData>) => {
@@ -108,7 +108,37 @@ export function UnifiedBookingForm({
     }
   };
 
-  const CurrentStepComponent = steps[currentStep].component;
+  const renderCurrentStep = () => {
+    const baseProps = {
+      formData,
+      updateFormData
+    };
+
+    switch (currentStep) {
+      case 0:
+        return <BookingStepBasicInfo {...baseProps} />;
+      case 1:
+        return (
+          <BookingStepPricingDetails
+            {...baseProps}
+            selectedSlots={selectedSlots}
+            facilityId={facilityId}
+            facilityName={facilityName}
+            zones={zones}
+          />
+        );
+      case 2:
+        return (
+          <BookingStepTermsActions
+            {...baseProps}
+            onAddToCart={handleAddToCart}
+            onCompleteBooking={handleCompleteBooking}
+          />
+        );
+      default:
+        return null;
+    }
+  };
 
   if (selectedSlots.length === 0) {
     return (
@@ -158,16 +188,7 @@ export function UnifiedBookingForm({
 
         {/* Step Content */}
         <div className="min-h-[300px]">
-          <CurrentStepComponent
-            formData={formData}
-            updateFormData={updateFormData}
-            selectedSlots={selectedSlots}
-            facilityId={facilityId}
-            facilityName={facilityName}
-            zones={zones}
-            onAddToCart={handleAddToCart}
-            onCompleteBooking={handleCompleteBooking}
-          />
+          {renderCurrentStep()}
         </div>
 
         {/* Navigation */}

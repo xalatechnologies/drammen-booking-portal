@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Accordion } from "@/components/ui/accordion";
 import { FacilityAccordionItem } from "./FacilityAccordionItem";
@@ -69,11 +70,12 @@ export const FacilityCalendarAccordion: React.FC<FacilityCalendarAccordionProps>
       // Extract facility ID from zone ID
       const facilityId = zoneId.split('-')[1];
       
-      // Create a selected slot
+      // Create a selected slot with duration
       const newSlot: SelectedTimeSlot = {
         zoneId,
         date,
-        timeSlot
+        timeSlot,
+        duration: 2 // Default 2 hours duration
       };
       
       // For now, just pass single slot - in future this could handle multiple selections
