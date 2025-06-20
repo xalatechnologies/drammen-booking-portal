@@ -11,6 +11,8 @@ import Index from '@/pages/Index';
 import FacilityDetailsPage from '@/pages/facilities/[id]';
 import BookingConfirmationPage from '@/pages/BookingConfirmationPage';
 import CheckoutPage from '@/pages/checkout';
+import BookingsPage from '@/pages/bookings/index';
+import ProfilePage from '@/pages/profile/index';
 import LoginPage from '@/pages/LoginPage';
 import LoginSelectionPage from '@/pages/LoginSelection';
 import { Toaster } from "@/components/ui/toaster"
@@ -33,6 +35,8 @@ function App() {
                         <Route path="/facilities/:id" element={<FacilityDetailsPage />} />
                         <Route path="/booking/:facilityId/confirm" element={<BookingConfirmationPage />} />
                         <Route path="/checkout" element={<CheckoutPage />} />
+                        <Route path="/bookings" element={<BookingsPage />} />
+                        <Route path="/profile" element={<ProfilePage />} />
                         <Route path="/login" element={<LoginPage />} />
                         <Route path="/login-selection" element={<LoginSelectionPage />} />
                       </Routes>

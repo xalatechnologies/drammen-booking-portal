@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import GlobalHeader from '@/components/GlobalHeader';
@@ -44,15 +43,8 @@ const CheckoutPage = () => {
     await new Promise(resolve => setTimeout(resolve, 1000));
     
     clearCart();
-    navigate('/booking/confirmation', {
-      state: {
-        bookingReference: `BK-${Date.now().toString(36).toUpperCase()}`,
-        selectedSlots: items,
-        formData: formData,
-        totalPrice: items.reduce((total, item) => total + item.pricing.totalPrice, 0),
-        requiresApproval: formData.customerType === 'organization'
-      }
-    });
+    // Navigate to bookings page instead of confirmation page
+    navigate('/bookings');
   };
 
   const updateFormData = (data: Partial<typeof formData>) => {
