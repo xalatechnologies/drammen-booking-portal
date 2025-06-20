@@ -1,7 +1,8 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { LogIn } from "lucide-react";
+import { LogIn, Shield, Cookie, Info } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { useTranslation } from "@/i18n/hooks/useTranslation";
 
 interface MobileMenuProps {
@@ -22,8 +23,14 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
   closeMobileMenu,
 }) => {
   const { t, language } = useTranslation();
+  const navigate = useNavigate();
 
   if (!isOpen) return null;
+
+  const handleNavigation = (path: string) => {
+    navigate(path);
+    closeMobileMenu();
+  };
 
   return (
     <div className="fixed inset-0 z-50 bg-white lg:hidden pt-16 px-4">
@@ -56,6 +63,37 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
         )}
         
         <div className="border-t my-2"></div>
+        
+        {/* Privacy Menu Items */}
+        <Button 
+          variant="ghost" 
+          className="w-full justify-start text-lg font-medium py-3"
+          onClick={() => handleNavigation('/personvern')}
+        >
+          <Shield className="mr-2 h-5 w-5" />
+          Personvern
+        </Button>
+        
+        <Button 
+          variant="ghost" 
+          className="w-full justify-start text-lg font-medium py-3"
+          onClick={() => handleNavigation('/cookies')}
+        >
+          <Cookie className="mr-2 h-5 w-5" />
+          Cookies
+        </Button>
+        
+        <Button 
+          variant="ghost" 
+          className="w-full justify-start text-lg font-medium py-3"
+          onClick={() => handleNavigation('/tilgjengelighet')}
+        >
+          <Info className="mr-2 h-5 w-5" />
+          Tilgjengelighet
+        </Button>
+        
+        <div className="border-t my-2"></div>
+        
         {/* Language toggle for mobile */}
         <div className="flex justify-around mt-4">
           <Button 

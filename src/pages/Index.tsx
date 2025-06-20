@@ -1,12 +1,13 @@
+
 import React, { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { DateRange } from "react-day-picker";
 import GlobalHeader from "@/components/GlobalHeader";
-import GlobalFooter from "@/components/GlobalFooter";
 import SearchFilter from "@/components/SearchFilter";
 import FacilityList from "@/components/FacilityList";
 import MapView from "@/components/MapView";
 import CalendarView from "@/components/CalendarView";
+import GdprPopup from "@/components/GdprPopup";
 import { useFacilitiesPagination } from "@/hooks/useFacilities";
 import { FacilityFilters } from "@/types/facility";
 
@@ -164,7 +165,7 @@ const Index = () => {
         </div>
       </main>
 
-      <GlobalFooter />
+      <GdprPopup />
     </div>
   );
 };

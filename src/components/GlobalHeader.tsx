@@ -2,9 +2,15 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, ShoppingCart } from "lucide-react";
+import { Menu, ShoppingCart, Shield } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import Logo from "@/components/header/Logo";
 import LanguageToggle from "@/components/header/LanguageToggle";
 import ProfileMenu from "@/components/header/ProfileMenu";
@@ -19,6 +25,7 @@ const GlobalHeader = () => {
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
+  const [privacyOpen, setPrivacyOpen] = useState(false);
   const { language, toggleLanguage } = useLanguage();
   const { getItemCount } = useCart();
   const { isAuthenticated, logout } = useAuth();
@@ -57,8 +64,28 @@ const GlobalHeader = () => {
           <Menu className="h-6 w-6" />
         </Button>
 
-        {/* Right side: Cart, Language toggle & Login/Profile */}
+        {/* Right side: Privacy, Cart, Language toggle & Login/Profile */}
         <div className="hidden md:flex items-center space-x-2 flex-shrink-0">
+          {/* Privacy/GDPR Menu */}
+          <DropdownMenu open={privacyOpen} onOpenChange={setPrivacyOpen}>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="p-2 hover:bg-gray-100">
+                <Shield className="h-6 w-6" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem onClick={() => navigate('/personvern')}>
+                Personvern
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate('/cookies')}>
+                Cookies
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate('/tilgjengelighet')}>
+                Tilgjengelighet
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
           {/* Cart Icon with Dropdown */}
           <Popover open={cartOpen} onOpenChange={setCartOpen}>
             <PopoverTrigger asChild>
