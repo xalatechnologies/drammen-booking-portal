@@ -5,7 +5,8 @@ import { Calendar, Repeat, ShoppingCart } from 'lucide-react';
 import { SelectedTimeSlot, RecurrencePattern } from '@/utils/recurrenceEngine';
 import { Zone } from '@/components/booking/types';
 import { SimplifiedBookingForm } from '@/components/booking/SimplifiedBookingForm';
-import { CalendarWeekView } from '@/components/booking/CalendarWeekView';
+import { CalendarGrid } from './CalendarGrid';
+import { WeekNavigation } from './WeekNavigation';
 import { AvailabilityModals } from './AvailabilityModals';
 import { usePatternHandler } from './PatternHandler';
 import { EnhancedZoneConflictManager } from '@/utils/enhancedZoneConflictManager';
@@ -124,13 +125,18 @@ export function AvailabilityTab({
               <h3 className="text-lg font-semibold">Velg tidspunkt</h3>
             </div>
             
-            <CalendarWeekView
+            <WeekNavigation
+              currentWeekStart={currentWeekStart}
+              onWeekChange={setCurrentWeekStart}
+              canGoPrevious={true}
+            />
+            
+            <CalendarGrid
               zones={zones}
               selectedSlots={selectedSlots}
               onSlotClick={onSlotClick}
               timeSlotDuration={timeSlotDuration}
               currentWeekStart={currentWeekStart}
-              onWeekChange={setCurrentWeekStart}
             />
           </div>
         </div>
