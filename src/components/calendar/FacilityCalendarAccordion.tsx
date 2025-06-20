@@ -86,6 +86,25 @@ export const FacilityCalendarAccordion: React.FC<FacilityCalendarAccordionProps>
       equipment: [],
       features: [],
       accessibility: [],
+      pricePerHour: calendarZone.pricePerHour,
+      bookingRules: {
+        minBookingDuration: 1,
+        maxBookingDuration: 8,
+        allowedTimeSlots: timeSlots,
+        bookingTypes: ['one-time', 'recurring', 'fixed-lease'],
+        advanceBookingDays: 90,
+        cancellationHours: 24
+      },
+      adminInfo: {
+        contactPersonName: "Facility Manager",
+        contactPersonEmail: "manager@drammen.kommune.no",
+        specialInstructions: calendarZone.description,
+        maintenanceSchedule: []
+      },
+      layout: {
+        coordinates: { x: 0, y: 0, width: 100, height: 100 },
+        entryPoints: ["Hovedinngang"]
+      },
       pricing: {
         basePrice: calendarZone.pricePerHour,
         currency: 'NOK',
