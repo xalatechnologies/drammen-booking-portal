@@ -10,6 +10,7 @@ export const localizedMockFacilities: LocalizedFacility[] = [
     address: "Iver Holters gate 48, 3041 Drammen",
     type: "Gymsal",
     area: "Bragernes",
+    status: 'active',
     image: "/lovable-uploads/13aee1f6-e9d9-474b-9ed7-c656d703d19b.png",
     nextAvailable: "I dag, 18:00",
     capacity: 120,
@@ -45,6 +46,12 @@ export const localizedMockFacilities: LocalizedFacility[] = [
     hasAutoApproval: false,
     lat: 59.7464,
     lng: 10.2045,
+    season: {
+      from: "2024-01-01",
+      to: "2024-12-31"
+    },
+    allowedBookingTypes: ['engangslån', 'fastlån', 'rammetid', 'strøtimer'],
+    zones: [],
     availableTimes: [
       {
         date: new Date(2025, 4, 25),
@@ -65,6 +72,7 @@ export const localizedMockFacilities: LocalizedFacility[] = [
     address: "Lauritz Hervigs vei 20, 3035 Drammen",
     type: "Aktivitetshall",
     area: "Konnerud",
+    status: 'active',
     image: "/lovable-uploads/b12bcda3-d611-4e9e-bbcc-d53d2db38af9.png",
     nextAvailable: "Fredag, 17:00",
     capacity: 200,
@@ -100,6 +108,12 @@ export const localizedMockFacilities: LocalizedFacility[] = [
     hasAutoApproval: false,
     lat: 59.7298,
     lng: 10.1845,
+    season: {
+      from: "2024-01-01",
+      to: "2024-12-31"
+    },
+    allowedBookingTypes: ['engangslån', 'fastlån', 'rammetid', 'strøtimer'],
+    zones: [],
     availableTimes: [
       {
         date: new Date(2025, 4, 28),
@@ -119,6 +133,7 @@ export const localizedMockFacilities: LocalizedFacility[] = [
     address: "Vintergata 8, 3048 Drammen",
     type: "Auditorium",
     area: "Gulskogen",
+    status: 'active',
     image: "/lovable-uploads/b692664c-737a-4a20-8673-25a401789f82.png",
     nextAvailable: "Torsdag, 19:00",
     capacity: 150,
@@ -153,6 +168,12 @@ export const localizedMockFacilities: LocalizedFacility[] = [
     hasAutoApproval: false,
     lat: 59.7512,
     lng: 10.1689,
+    season: {
+      from: "2024-01-01",
+      to: "2024-12-31"
+    },
+    allowedBookingTypes: ['engangslån', 'fastlån', 'rammetid', 'strøtimer'],
+    zones: [],
     availableTimes: [
       {
         date: new Date(2025, 4, 27),
@@ -205,6 +226,12 @@ export const localizedMockFacilities: LocalizedFacility[] = [
     hasAutoApproval: true,
     lat: 59.7389,
     lng: 10.2167,
+    season: {
+      from: "2024-01-01",
+      to: "2024-12-31"
+    },
+    allowedBookingTypes: ['engangslån', 'fastlån', 'rammetid', 'strøtimer'],
+    zones: [],
     availableTimes: [
       {
         date: new Date(2025, 4, 30),
@@ -258,6 +285,12 @@ export const localizedMockFacilities: LocalizedFacility[] = [
     hasAutoApproval: false,
     lat: 59.7545,
     lng: 10.1798,
+    season: {
+      from: "2024-01-01",
+      to: "2024-12-31"
+    },
+    allowedBookingTypes: ['engangslån', 'fastlån', 'rammetid', 'strøtimer'],
+    zones: [],
     availableTimes: [
       {
         date: new Date(2025, 5, 1),
@@ -311,6 +344,12 @@ export const localizedMockFacilities: LocalizedFacility[] = [
     hasAutoApproval: true,
     lat: 59.7634,
     lng: 10.1456,
+    season: {
+      from: "2024-01-01",
+      to: "2024-12-31"
+    },
+    allowedBookingTypes: ['engangslån', 'fastlån', 'rammetid', 'strøtimer'],
+    zones: [],
     availableTimes: [
       {
         date: new Date(2025, 4, 30),
@@ -363,6 +402,12 @@ export const localizedMockFacilities: LocalizedFacility[] = [
     hasAutoApproval: true,
     lat: 59.7423,
     lng: 10.2056,
+    season: {
+      from: "2024-01-01",
+      to: "2024-12-31"
+    },
+    allowedBookingTypes: ['engangslån', 'fastlån', 'rammetid', 'strøtimer'],
+    zones: [],
     availableTimes: [
       {
         date: new Date(2025, 5, 2),
@@ -418,6 +463,12 @@ export const localizedMockFacilities: LocalizedFacility[] = [
     hasAutoApproval: false,
     lat: 59.7401,
     lng: 10.2134,
+    season: {
+      from: "2024-01-01",
+      to: "2024-12-31"
+    },
+    allowedBookingTypes: ['engangslån', 'fastlån', 'rammetid', 'strøtimer'],
+    zones: [],
     availableTimes: [
       {
         date: new Date(2025, 4, 28),
@@ -470,6 +521,12 @@ export const localizedMockFacilities: LocalizedFacility[] = [
     hasAutoApproval: true,
     lat: 59.7356,
     lng: 10.1923,
+    season: {
+      from: "2024-01-01",
+      to: "2024-12-31"
+    },
+    allowedBookingTypes: ['engangslån', 'fastlån', 'rammetid', 'strøtimer'],
+    zones: [],
     availableTimes: [
       {
         date: new Date(2025, 5, 3),
@@ -523,6 +580,12 @@ export const localizedMockFacilities: LocalizedFacility[] = [
     hasAutoApproval: true,
     lat: 59.7512,
     lng: 10.2234,
+    season: {
+      from: "2024-01-01",
+      to: "2024-12-31"
+    },
+    allowedBookingTypes: ['engangslån', 'fastlån', 'rammetid', 'strøtimer'],
+    zones: [],
     availableTimes: [
       {
         date: new Date(2025, 5, 4),
@@ -576,6 +639,12 @@ export const localizedMockFacilities: LocalizedFacility[] = [
     hasAutoApproval: false,
     lat: 59.7234,
     lng: 10.1678,
+    season: {
+      from: "2024-01-01",
+      to: "2024-12-31"
+    },
+    allowedBookingTypes: ['engangslån', 'fastlån', 'rammetid', 'strøtimer'],
+    zones: [],
     availableTimes: [
       {
         date: new Date(2025, 5, 5),
@@ -629,6 +698,12 @@ export const localizedMockFacilities: LocalizedFacility[] = [
     hasAutoApproval: false,
     lat: 59.7445,
     lng: 10.2089,
+    season: {
+      from: "2024-01-01",
+      to: "2024-12-31"
+    },
+    allowedBookingTypes: ['engangslån', 'fastlån', 'rammetid', 'strøtimer'],
+    zones: [],
     availableTimes: [
       {
         date: new Date(2025, 5, 6),
@@ -681,6 +756,12 @@ export const localizedMockFacilities: LocalizedFacility[] = [
     hasAutoApproval: false,
     lat: 59.6123,
     lng: 10.4056,
+    season: {
+      from: "2024-01-01",
+      to: "2024-12-31"
+    },
+    allowedBookingTypes: ['engangslån', 'fastlån', 'rammetid', 'strøtimer'],
+    zones: [],
     availableTimes: [
       {
         date: new Date(2025, 5, 7),
@@ -733,6 +814,12 @@ export const localizedMockFacilities: LocalizedFacility[] = [
     hasAutoApproval: true,
     lat: 59.7398,
     lng: 10.2178,
+    season: {
+      from: "2024-01-01",
+      to: "2024-12-31"
+    },
+    allowedBookingTypes: ['engangslån', 'fastlån', 'rammetid', 'strøtimer'],
+    zones: [],
     availableTimes: [
       {
         date: new Date(2025, 5, 8),
@@ -786,6 +873,12 @@ export const localizedMockFacilities: LocalizedFacility[] = [
     hasAutoApproval: false,
     lat: 59.7434,
     lng: 10.2067,
+    season: {
+      from: "2024-01-01",
+      to: "2024-12-31"
+    },
+    allowedBookingTypes: ['engangslån', 'fastlån', 'rammetid', 'strøtimer'],
+    zones: [],
     availableTimes: [
       {
         date: new Date(2025, 5, 9),
@@ -838,6 +931,12 @@ export const localizedMockFacilities: LocalizedFacility[] = [
     hasAutoApproval: true,
     lat: 59.4894,
     lng: 10.3123,
+    season: {
+      from: "2024-01-01",
+      to: "2024-12-31"
+    },
+    allowedBookingTypes: ['engangslån', 'fastlån', 'rammetid', 'strøtimer'],
+    zones: [],
     availableTimes: [
       {
         date: new Date(2025, 5, 10),

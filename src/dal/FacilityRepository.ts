@@ -1,4 +1,3 @@
-
 import { BaseRepository } from './BaseRepository';
 import { Facility, FacilityFilters } from '@/types/facility';
 import { Zone } from '@/types/zone';
@@ -212,11 +211,19 @@ export class FacilityRepository extends BaseRepository<Facility, FacilityFilters
     const now = this.getCurrentTimestamp();
     const newId = parseInt(this.generateId());
     
+    // Properly cast dayOfWeek values to the required union type
+    const openingHours = request.openingHours.map(hour => ({
+      dayOfWeek: hour.dayOfWeek as 0 | 1 | 2 | 3 | 4 | 5 | 6,
+      opens: hour.opens,
+      closes: hour.closes
+    }));
+    
     return {
       id: newId,
       name: request.name,
       address: request.address,
       type: request.type,
+      status: 'active' as const,
       image: "/lovable-uploads/13aee1f6-e9d9-474b-9ed7-c656d703d19b.png",
       nextAvailable: "I dag, 18:00",
       capacity: request.capacity,
@@ -224,7 +231,7 @@ export class FacilityRepository extends BaseRepository<Facility, FacilityFilters
       area: request.area,
       suitableFor: request.suitableFor,
       equipment: request.equipment,
-      openingHours: request.openingHours,
+      openingHours: openingHours,
       description: request.description,
       rating: 4.0,
       reviewCount: 0,
@@ -242,10 +249,21 @@ export class FacilityRepository extends BaseRepository<Facility, FacilityFilters
   }
 
   protected updateEntity(existing: Facility, request: FacilityUpdateRequest): Facility {
-    return {
+    const updatedFacility = {
       ...existing,
       ...request
     };
+
+    // If openingHours is being updated, properly cast dayOfWeek values
+    if (request.openingHours) {
+      updatedFacility.openingHours = request.openingHours.map(hour => ({
+        dayOfWeek: hour.dayOfWeek as 0 | 1 | 2 | 3 | 4 | 5 | 6,
+        opens: hour.opens,
+        closes: hour.closes
+      }));
+    }
+
+    return updatedFacility;
   }
 
   // Zone-specific methods
