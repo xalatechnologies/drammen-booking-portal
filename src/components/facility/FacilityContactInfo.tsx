@@ -8,7 +8,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 interface FacilityContactInfoProps {
   facilityName: string;
   address: string;
-  openingHours: string;
+  openingHours: string | any[];
   capacity: number;
   area: string;
 }
@@ -51,6 +51,27 @@ export function FacilityContactInfo({
 
   const t = translations[language];
 
+  // Format opening hours for display
+  const formatOpeningHours = (hours: string | any[]) => {
+    if (typeof hours === 'string') {
+      return hours;
+    }
+    
+    if (Array.isArray(hours)) {
+      // Convert array of opening hours objects to string format
+      const weekdays = hours.filter(h => h.dayOfWeek >= 1 && h.dayOfWeek <= 5);
+      const weekends = hours.filter(h => h.dayOfWeek === 0 || h.dayOfWeek === 6);
+      
+      if (weekdays.length > 0 && weekends.length > 0) {
+        return `Man-Fre: ${weekdays[0].opens}-${weekdays[0].closes}, Lør-Søn: ${weekends[0].opens}-${weekends[0].closes}`;
+      } else if (weekdays.length > 0) {
+        return `Man-Fre: ${weekdays[0].opens}-${weekdays[0].closes}`;
+      }
+    }
+    
+    return "06:00-23:00"; // Fallback
+  };
+
   return (
     <div className="space-y-4">
       {/* Contact Information */}
@@ -85,7 +106,7 @@ export function FacilityContactInfo({
               <Clock className="h-5 w-5 text-gray-600" />
               <span className="text-base font-medium text-gray-700">{t.openingHours}</span>
             </div>
-            <p className="text-base text-gray-900">{openingHours}</p>
+            <p className="text-base text-gray-900">{formatOpeningHours(openingHours)}</p>
           </div>
 
           <Separator />
