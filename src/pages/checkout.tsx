@@ -4,10 +4,12 @@ import { useNavigate } from 'react-router-dom';
 import GlobalHeader from '@/components/GlobalHeader';
 import GlobalFooter from '@/components/GlobalFooter';
 import { useCart } from '@/contexts/CartContext';
+import { useAuthStore } from '@/stores/useAuthStore';
 import { CheckoutHeader } from '@/components/checkout/CheckoutHeader';
 import { ProgressIndicator } from '@/components/checkout/ProgressIndicator';
 import { EmptyCart } from '@/components/checkout/EmptyCart';
 import { ReviewStep } from '@/components/checkout/ReviewStep';
+import { LoginStep } from '@/components/checkout/LoginStep';
 import { ContactDetailsStep } from '@/components/checkout/ContactDetailsStep';
 import { ConfirmationStep } from '@/components/checkout/ConfirmationStep';
 import { OrderSummary } from '@/components/checkout/OrderSummary';
@@ -15,7 +17,8 @@ import { OrderSummary } from '@/components/checkout/OrderSummary';
 const CheckoutPage = () => {
   const navigate = useNavigate();
   const { items, removeFromCart, clearCart } = useCart();
-  const [step, setStep] = useState<'review' | 'details' | 'confirm'>('review');
+  const { isAuthenticated } = useAuthStore();
+  const [step, setStep] = useState<'review' | 'login' | 'details' | 'confirm'>('review');
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -57,6 +60,19 @@ const CheckoutPage = () => {
     setFormData(prev => ({ ...prev, ...data }));
   };
 
+  const handleContinueFromReview = () => {
+    // Skip login step if user is already authenticated
+    if (isAuthenticated) {
+      setStep('details');
+    } else {
+      setStep('login');
+    }
+  };
+
+  const handleContinueFromLogin = () => {
+    setStep('details');
+  };
+
   if (items.length === 0) {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -84,7 +100,14 @@ const CheckoutPage = () => {
                   items={items}
                   onEditReservation={handleEditReservation}
                   onRemoveReservation={handleRemoveReservation}
-                  onContinue={() => setStep('details')}
+                  onContinue={handleContinueFromReview}
+                />
+              )}
+
+              {step === 'login' && (
+                <LoginStep
+                  onBack={() => setStep('review')}
+                  onContinue={handleContinueFromLogin}
                 />
               )}
 
@@ -92,7 +115,7 @@ const CheckoutPage = () => {
                 <ContactDetailsStep
                   formData={formData}
                   onFormDataChange={updateFormData}
-                  onBack={() => setStep('review')}
+                  onBack={() => isAuthenticated ? setStep('review') : setStep('login')}
                   onContinue={() => setStep('confirm')}
                 />
               )}

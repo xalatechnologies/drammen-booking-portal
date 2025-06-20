@@ -2,11 +2,11 @@
 import React from 'react';
 
 interface ProgressIndicatorProps {
-  currentStep: 'review' | 'details' | 'confirm';
+  currentStep: 'review' | 'login' | 'details' | 'confirm';
 }
 
 export function ProgressIndicator({ currentStep }: ProgressIndicatorProps) {
-  const steps = ['review', 'details', 'confirm'];
+  const steps = ['review', 'login', 'details', 'confirm'];
   
   return (
     <div className="flex items-center justify-center mb-8">
@@ -19,7 +19,7 @@ export function ProgressIndicator({ currentStep }: ProgressIndicatorProps) {
             }`}>
               {index + 1}
             </div>
-            {index < 2 && <div className="w-12 h-px bg-gray-300 mx-2" />}
+            {index < 3 && <div className="w-12 h-px bg-gray-300 mx-2" />}
           </div>
         ))}
       </div>
