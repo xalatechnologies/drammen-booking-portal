@@ -7,7 +7,6 @@ import { Zone } from '@/components/booking/types';
 import { SelectedTimeSlot } from '@/utils/recurrenceEngine';
 import { isNorwegianHoliday } from '@/utils/holidaysAndAvailability';
 import { ConflictTooltip } from '@/components/facility/ConflictTooltip';
-import { AlertTriangle } from 'lucide-react';
 
 interface ResponsiveCalendarGridProps {
   zone: Zone;
@@ -30,77 +29,92 @@ export function ResponsiveCalendarGrid({
 }: ResponsiveCalendarGridProps) {
   const weekDays = Array(7).fill(0).map((_, i) => addDays(currentWeekStart, i));
 
-  const getStatusColor = (status: string, isSelected: boolean) => {
+  const getStatusStyle = (status: string, isSelected: boolean) => {
     if (isSelected) {
-      return 'bg-blue-500 hover:bg-blue-600 border-blue-600 ring-2 ring-blue-300 text-white';
+      return 'bg-blue-500 hover:bg-blue-600 text-white font-semibold border-2 border-blue-600';
     }
     
     switch (status) {
       case 'available':
-        return 'bg-green-100 hover:bg-green-200 border-green-400 hover:border-green-500';
+        return 'bg-green-100 hover:bg-green-200 border border-green-300 text-gray-800 hover:shadow-md cursor-pointer';
       case 'busy':
-        return 'bg-red-100 border-red-400 cursor-not-allowed';
+        return 'bg-red-50 border border-red-200 text-gray-500 line-through cursor-not-allowed';
       case 'unavailable':
       default:
-        return 'bg-gray-100 border-gray-400 cursor-not-allowed';
+        return 'bg-gray-100 border border-gray-200 text-gray-400 line-through cursor-not-allowed';
     }
   };
 
-  const renderSlotButton = (day: Date, timeSlot: string, dayIndex: number) => {
+  const renderTimeSlotCell = (day: Date, timeSlot: string, dayIndex: number) => {
     const { status, conflict } = getAvailabilityStatus(zone.id, day, timeSlot);
     const isSelected = isSlotSelected(zone.id, day, timeSlot);
-    const statusColor = getStatusColor(status, isSelected);
+    const statusStyle = getStatusStyle(status, isSelected);
     
-    const button = (
+    // Extract just the start time from timeSlot
+    const startTime = timeSlot.split('-')[0];
+    
+    const cell = (
       <button
-        className={`w-full h-9 md:h-10 rounded border transition-all duration-200 font-inter text-sm ${statusColor} ${
-          status === 'available' 
-            ? 'cursor-pointer shadow-sm hover:shadow-md transform active:scale-95 md:hover:scale-105' 
-            : 'cursor-not-allowed opacity-75'
+        className={`w-full h-10 md:h-12 rounded-lg transition-all duration-200 text-sm font-medium ${statusStyle} ${
+          status === 'available' ? 'transform active:scale-95 md:hover:scale-105' : ''
         }`}
         disabled={status !== 'available'}
-        onClick={() => onSlotClick(zone.id, day, timeSlot, status)}
+        onClick={() => status === 'available' && onSlotClick(zone.id, day, timeSlot, status)}
+        title={status === 'available' ? `Book ${timeSlot}` : 
+               status === 'busy' ? 'Opptatt' : 'Ikke tilgjengelig'}
       >
-        {isSelected && (
-          <div className="text-sm font-medium">✓</div>
-        )}
-        {status === 'busy' && (
-          <AlertTriangle className="h-3 w-3 mx-auto text-red-500" />
-        )}
+        <div className="flex flex-col items-center justify-center h-full">
+          <span className={`text-xs ${isSelected ? 'text-white' : 'text-gray-600'}`}>
+            {startTime}
+          </span>
+          {isSelected && (
+            <span className="text-xs text-white mt-0.5">✓</span>
+          )}
+        </div>
       </button>
     );
 
     if (conflict) {
       return (
         <ConflictTooltip key={dayIndex} conflict={conflict}>
-          {button}
+          {cell}
         </ConflictTooltip>
       );
     }
 
-    return button;
+    return cell;
   };
 
   return (
     <Card>
-      <CardContent className="p-2 md:p-4">
-        {/* Desktop Grid Layout */}
+      <CardContent className="p-3 md:p-4">
+        {/* Week Header */}
+        <div className="mb-4 text-center">
+          <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-2">
+            {format(currentWeekStart, 'dd. MMM', { locale: nb })} - {format(addDays(currentWeekStart, 6), 'dd. MMM yyyy', { locale: nb })}
+          </h3>
+        </div>
+
+        {/* Desktop Layout */}
         <div className="hidden md:block">
-          <div className="grid grid-cols-8 gap-2 mb-4">
-            <div className="p-2 text-base font-medium text-gray-500 font-inter text-center">Tid</div>
+          {/* Day Headers */}
+          <div className="grid grid-cols-7 gap-2 mb-4">
             {weekDays.map((day, i) => {
               const holidayCheck = isNorwegianHoliday(day);
               const isToday = format(day, 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd');
+              
               return (
-                <div key={i} className={`p-2 text-center rounded font-inter ${isToday ? 'bg-blue-100 border border-blue-300' : 'bg-gray-50'}`}>
-                  <div className={`text-base font-medium ${isToday ? 'text-blue-800' : 'text-gray-700'}`}>
+                <div key={i} className={`p-3 text-center rounded-lg font-inter ${
+                  isToday ? 'bg-blue-100 border-2 border-blue-300' : 'bg-gray-50 border border-gray-200'
+                }`}>
+                  <div className={`text-sm font-medium ${isToday ? 'text-blue-800' : 'text-gray-700'}`}>
                     {format(day, "EEE", { locale: nb })}
                   </div>
-                  <div className={`text-base font-bold ${isToday ? 'text-blue-900' : 'text-gray-900'}`}>
+                  <div className={`text-lg font-bold ${isToday ? 'text-blue-900' : 'text-gray-900'}`}>
                     {format(day, "dd.MM", { locale: nb })}
                   </div>
                   {holidayCheck.isHoliday && (
-                    <div className="text-sm text-red-600 truncate font-inter" title={holidayCheck.name}>
+                    <div className="text-xs text-red-600 truncate font-inter mt-1" title={holidayCheck.name}>
                       {holidayCheck.name?.substring(0, 8)}
                     </div>
                   )}
@@ -109,15 +123,13 @@ export function ResponsiveCalendarGrid({
             })}
           </div>
 
+          {/* Time Slots Grid */}
           <div className="space-y-2">
             {timeSlots.map((timeSlot) => (
-              <div key={timeSlot} className="grid grid-cols-8 gap-2">
-                <div className="p-2 text-base font-medium text-gray-700 flex items-center justify-center bg-gray-50 rounded font-inter">
-                  {timeSlot}
-                </div>
+              <div key={timeSlot} className="grid grid-cols-7 gap-2">
                 {weekDays.map((day, dayIndex) => (
                   <div key={dayIndex} className="relative">
-                    {renderSlotButton(day, timeSlot, dayIndex)}
+                    {renderTimeSlotCell(day, timeSlot, dayIndex)}
                   </div>
                 ))}
               </div>
@@ -125,15 +137,19 @@ export function ResponsiveCalendarGrid({
           </div>
         </div>
 
-        {/* Mobile Scrollable Layout */}
+        {/* Mobile Layout */}
         <div className="md:hidden">
+          {/* Horizontal scrollable day headers */}
           <div className="flex gap-2 overflow-x-auto pb-4 mb-4">
             {weekDays.map((day, i) => {
               const holidayCheck = isNorwegianHoliday(day);
               const isToday = format(day, 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd');
+              
               return (
-                <div key={i} className={`flex-shrink-0 w-20 p-2 text-center rounded font-inter ${isToday ? 'bg-blue-100 border border-blue-300' : 'bg-gray-50'}`}>
-                  <div className={`text-sm font-medium ${isToday ? 'text-blue-800' : 'text-gray-700'}`}>
+                <div key={i} className={`flex-shrink-0 w-16 p-2 text-center rounded-lg font-inter ${
+                  isToday ? 'bg-blue-100 border border-blue-300' : 'bg-gray-50 border border-gray-200'
+                }`}>
+                  <div className={`text-xs font-medium ${isToday ? 'text-blue-800' : 'text-gray-700'}`}>
                     {format(day, "EEE", { locale: nb })}
                   </div>
                   <div className={`text-sm font-bold ${isToday ? 'text-blue-900' : 'text-gray-900'}`}>
@@ -141,7 +157,7 @@ export function ResponsiveCalendarGrid({
                   </div>
                   {holidayCheck.isHoliday && (
                     <div className="text-xs text-red-600 truncate font-inter" title={holidayCheck.name}>
-                      {holidayCheck.name?.substring(0, 6)}
+                      {holidayCheck.name?.substring(0, 4)}
                     </div>
                   )}
                 </div>
@@ -149,21 +165,40 @@ export function ResponsiveCalendarGrid({
             })}
           </div>
 
+          {/* Time slots in rows */}
           <div className="space-y-3">
             {timeSlots.map((timeSlot) => (
               <div key={timeSlot} className="space-y-2">
                 <div className="text-sm font-medium text-gray-700 bg-gray-50 p-2 rounded text-center">
                   {timeSlot}
                 </div>
-                <div className="grid grid-cols-7 gap-2">
+                <div className="grid grid-cols-7 gap-1">
                   {weekDays.map((day, dayIndex) => (
                     <div key={dayIndex} className="relative">
-                      {renderSlotButton(day, timeSlot, dayIndex)}
+                      {renderTimeSlotCell(day, timeSlot, dayIndex)}
                     </div>
                   ))}
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+
+        {/* Legend */}
+        <div className="mt-6 flex flex-wrap gap-3 text-xs text-gray-600 justify-center">
+          <div className="flex items-center gap-1">
+            <div className="w-3 h-3 bg-green-100 border border-green-300 rounded"></div>
+            <span>Ledig</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="w-3 h-3 bg-blue-500 rounded"></div>
+            <span>Valgt</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="w-3 h-3 bg-red-50 border border-red-200 rounded relative">
+              <div className="absolute inset-0 border-t border-gray-400 transform rotate-12"></div>
+            </div>
+            <span>Opptatt</span>
           </div>
         </div>
       </CardContent>

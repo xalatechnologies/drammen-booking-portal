@@ -1,7 +1,6 @@
 
 import React from "react";
 import { format, addDays } from "date-fns";
-import { Clock } from "lucide-react";
 import { nb } from "date-fns/locale";
 import { isDateUnavailable, isNorwegianHoliday } from "@/utils/holidaysAndAvailability";
 import { Facility } from "./types";
@@ -23,32 +22,31 @@ export const CalendarTimeGrid: React.FC<CalendarTimeGridProps> = ({
     <div className="overflow-x-auto">
       <div className="min-w-[800px]">
         {/* Day Headers */}
-        <div className="grid grid-cols-8 border-b bg-white">
-          <div className="p-3 border-r border-white bg-gray-50 flex items-center">
-            <Clock className="h-4 w-4 mr-2 text-gray-500" />
-            <span className="font-medium text-gray-700">Tid</span>
+        <div className="grid grid-cols-8 mb-4">
+          <div className="p-3 bg-gray-50 flex items-center justify-center rounded-l-lg">
+            <span className="font-medium text-gray-700">Tidspunkter</span>
           </div>
           {days.map((day, i) => {
             const unavailableCheck = isDateUnavailable(day);
             const holidayCheck = isNorwegianHoliday(day);
             const isToday = format(day, 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd');
             
-            let headerClass = "p-3 border-r border-white text-center ";
+            let headerClass = "p-3 text-center rounded-lg ";
             if (isToday) {
-              headerClass += "bg-blue-100 border-l-4 border-l-blue-500";
+              headerClass += "bg-blue-100 border-2 border-blue-300";
             } else if (unavailableCheck.isUnavailable) {
               switch (unavailableCheck.reason) {
                 case 'weekend':
-                  headerClass += "bg-amber-50";
+                  headerClass += "bg-amber-50 border border-amber-200";
                   break;
                 case 'holiday':
-                  headerClass += "bg-red-50";
+                  headerClass += "bg-red-50 border border-red-200";
                   break;
                 default:
-                  headerClass += "bg-gray-50";
+                  headerClass += "bg-gray-50 border border-gray-200";
               }
             } else {
-              headerClass += "bg-green-50";
+              headerClass += "bg-green-50 border border-green-200";
             }
             
             return (
@@ -70,53 +68,76 @@ export const CalendarTimeGrid: React.FC<CalendarTimeGridProps> = ({
         </div>
 
         {/* Time Slot Rows */}
-        {timeSlots.map((timeSlot, timeIndex) => (
-          <div key={timeSlot} className="grid grid-cols-8 border-b border-white hover:bg-gray-50/50">
-            <div className="p-3 border-r border-white bg-gray-50 font-medium text-gray-700 flex items-center">
-              {timeSlot}
-            </div>
-            {days.map((day, dayIndex) => {
-              const unavailableCheck = isDateUnavailable(new Date(day));
-              const isBooked = isTimeSlotBooked(facility.id, new Date(day), parseInt(timeSlot.split(':')[0]));
-              
-              let cellClass = "p-3 border-r border-2 border-white text-center relative h-12 ";
-              let clickHandler = null;
+        <div className="space-y-2">
+          {timeSlots.map((timeSlot, timeIndex) => (
+            <div key={timeSlot} className="grid grid-cols-8 gap-2">
+              <div className="p-3 bg-gray-50 font-medium text-gray-700 flex items-center justify-center rounded-lg">
+                {timeSlot}
+              </div>
+              {days.map((day, dayIndex) => {
+                const unavailableCheck = isDateUnavailable(new Date(day));
+                const isBooked = isTimeSlotBooked(facility.id, new Date(day), parseInt(timeSlot.split(':')[0]));
+                
+                let cellClass = "p-3 text-center relative h-12 rounded-lg transition-all duration-200 ";
+                let clickHandler = null;
+                let cellContent = timeSlot.split('-')[0]; // Show start time
 
-              if (unavailableCheck.isUnavailable) {
-                switch (unavailableCheck.reason) {
-                  case 'past':
-                    cellClass += "bg-gray-200";
-                    break;
-                  case 'weekend':
-                    cellClass += "bg-amber-100";
-                    break;
-                  case 'holiday':
-                    cellClass += "bg-red-200";
-                    break;
-                  default:
-                    cellClass += "bg-gray-100";
+                if (unavailableCheck.isUnavailable) {
+                  switch (unavailableCheck.reason) {
+                    case 'past':
+                      cellClass += "bg-gray-200 text-gray-400 line-through cursor-not-allowed";
+                      break;
+                    case 'weekend':
+                      cellClass += "bg-amber-100 text-amber-800 border border-amber-300";
+                      break;
+                    case 'holiday':
+                      cellClass += "bg-red-200 text-red-800 line-through cursor-not-allowed";
+                      break;
+                    default:
+                      cellClass += "bg-gray-100 text-gray-400 line-through cursor-not-allowed";
+                  }
+                } else if (isBooked) {
+                  cellClass += "bg-red-100 border border-red-300 text-red-700 line-through cursor-not-allowed";
+                } else {
+                  cellClass += "bg-green-100 hover:bg-green-200 border border-green-300 text-gray-800 cursor-pointer shadow-sm hover:shadow-md transform hover:scale-105";
+                  clickHandler = () => window.location.href = `/facilities/${facility.id}?date=${format(day, 'yyyy-MM-dd')}&time=${timeSlot}`;
                 }
-              } else if (isBooked) {
-                cellClass += "bg-red-300";
-              } else {
-                cellClass += "bg-green-200 hover:bg-green-300 cursor-pointer transition-colors";
-                clickHandler = () => window.location.href = `/facilities/${facility.id}?date=${format(day, 'yyyy-MM-dd')}&time=${timeSlot}`;
-              }
-              
-              return (
-                <div 
-                  key={dayIndex} 
-                  className={cellClass}
-                  onClick={clickHandler}
-                  title={unavailableCheck.isUnavailable ? unavailableCheck.details : 
-                         isBooked ? 'Opptatt' : 'Ledig - klikk for å booke'}
-                >
-                  {/* Empty cell - only color coding */}
-                </div>
-              );
-            })}
+                
+                return (
+                  <div 
+                    key={dayIndex} 
+                    className={cellClass}
+                    onClick={clickHandler}
+                    title={unavailableCheck.isUnavailable ? unavailableCheck.details : 
+                           isBooked ? 'Opptatt' : 'Ledig - klikk for å booke'}
+                  >
+                    <div className="flex items-center justify-center h-full">
+                      <span className="text-sm font-medium">{cellContent}</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ))}
+        </div>
+
+        {/* Legend */}
+        <div className="mt-6 flex flex-wrap gap-4 text-xs text-gray-600 justify-center">
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 bg-green-100 border border-green-300 rounded"></div>
+            <span>Ledig</span>
           </div>
-        ))}
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 bg-red-100 border border-red-300 rounded relative">
+              <div className="absolute inset-0 border-t border-gray-400 transform rotate-12"></div>
+            </div>
+            <span>Opptatt</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 bg-amber-100 border border-amber-300 rounded"></div>
+            <span>Helg</span>
+          </div>
+        </div>
       </div>
     </div>
   );

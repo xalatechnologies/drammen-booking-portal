@@ -7,7 +7,6 @@ import { Zone } from '@/components/booking/types';
 import { SelectedTimeSlot } from '@/utils/recurrenceEngine';
 import { isNorwegianHoliday } from '@/utils/holidaysAndAvailability';
 import { ConflictTooltip } from '@/components/facility/ConflictTooltip';
-import { AlertTriangle } from 'lucide-react';
 
 interface CalendarGridProps {
   zone: Zone;
@@ -30,76 +29,91 @@ export function CalendarGrid({
 }: CalendarGridProps) {
   const weekDays = Array(7).fill(0).map((_, i) => addDays(currentWeekStart, i));
 
-  const getStatusColor = (status: string, isSelected: boolean) => {
+  const getStatusStyle = (status: string, isSelected: boolean) => {
     if (isSelected) {
-      return 'bg-blue-500 hover:bg-blue-600 border-blue-600 ring-2 ring-blue-300 text-white';
+      return 'bg-blue-500 hover:bg-blue-600 text-white font-semibold border-2 border-blue-600';
     }
     
     switch (status) {
       case 'available':
-        return 'bg-green-100 hover:bg-green-200 border-green-400 hover:border-green-500';
+        return 'bg-green-100 hover:bg-green-200 border border-green-300 text-gray-800 hover:shadow-md cursor-pointer';
       case 'busy':
-        return 'bg-red-100 border-red-400 cursor-not-allowed';
+        return 'bg-red-50 border border-red-200 text-gray-500 line-through cursor-not-allowed';
       case 'unavailable':
       default:
-        return 'bg-gray-100 border-gray-400 cursor-not-allowed';
+        return 'bg-gray-100 border border-gray-200 text-gray-400 line-through cursor-not-allowed';
     }
   };
 
-  const renderSlotButton = (day: Date, timeSlot: string, dayIndex: number) => {
+  const renderTimeSlotCell = (day: Date, timeSlot: string, dayIndex: number) => {
     const { status, conflict } = getAvailabilityStatus(zone.id, day, timeSlot);
     const isSelected = isSlotSelected(zone.id, day, timeSlot);
-    const statusColor = getStatusColor(status, isSelected);
+    const statusStyle = getStatusStyle(status, isSelected);
     
-    const button = (
+    // Extract just the start time from timeSlot (e.g., "08:00" from "08:00-10:00")
+    const startTime = timeSlot.split('-')[0];
+    
+    const cell = (
       <button
-        className={`w-full h-8 rounded border transition-all duration-200 font-inter text-xs ${statusColor} ${
-          status === 'available' 
-            ? 'cursor-pointer shadow-sm hover:shadow-md transform hover:scale-105' 
-            : 'cursor-not-allowed opacity-75'
+        className={`w-full h-12 rounded-lg transition-all duration-200 text-sm font-medium ${statusStyle} ${
+          status === 'available' ? 'transform hover:scale-105' : ''
         }`}
         disabled={status !== 'available'}
-        onClick={() => onSlotClick(zone.id, day, timeSlot, status)}
+        onClick={() => status === 'available' && onSlotClick(zone.id, day, timeSlot, status)}
+        title={status === 'available' ? `Book ${timeSlot}` : 
+               status === 'busy' ? 'Opptatt' : 'Ikke tilgjengelig'}
       >
-        {isSelected && (
-          <div className="text-xs font-medium">✓</div>
-        )}
-        {status === 'busy' && (
-          <AlertTriangle className="h-2.5 w-2.5 mx-auto text-red-500" />
-        )}
+        <div className="flex flex-col items-center justify-center h-full">
+          <span className={`text-xs ${isSelected ? 'text-white' : 'text-gray-600'}`}>
+            {startTime}
+          </span>
+          {isSelected && (
+            <span className="text-xs text-white mt-0.5">✓</span>
+          )}
+        </div>
       </button>
     );
 
     if (conflict) {
       return (
         <ConflictTooltip key={dayIndex} conflict={conflict}>
-          {button}
+          {cell}
         </ConflictTooltip>
       );
     }
 
-    return button;
+    return cell;
   };
 
   return (
     <Card>
-      <CardContent className="p-3">
-        <div className="grid grid-cols-8 gap-1 mb-3">
-          <div className="p-1.5 text-sm font-medium text-gray-500 font-inter">Tid</div>
+      <CardContent className="p-4">
+        {/* Week Header */}
+        <div className="mb-6 text-center">
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            {format(currentWeekStart, 'dd. MMMM', { locale: nb })} - {format(addDays(currentWeekStart, 6), 'dd. MMMM yyyy', { locale: nb })}
+          </h3>
+        </div>
+
+        {/* Day Headers */}
+        <div className="grid grid-cols-7 gap-2 mb-4">
           {weekDays.map((day, i) => {
             const holidayCheck = isNorwegianHoliday(day);
             const isToday = format(day, 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd');
+            
             return (
-              <div key={i} className={`p-1.5 text-center rounded font-inter ${isToday ? 'bg-blue-100 border border-blue-300' : 'bg-gray-50'}`}>
+              <div key={i} className={`p-3 text-center rounded-lg font-inter ${
+                isToday ? 'bg-blue-100 border-2 border-blue-300' : 'bg-gray-50 border border-gray-200'
+              }`}>
                 <div className={`text-sm font-medium ${isToday ? 'text-blue-800' : 'text-gray-700'}`}>
                   {format(day, "EEE", { locale: nb })}
                 </div>
-                <div className={`text-sm font-bold ${isToday ? 'text-blue-900' : 'text-gray-900'}`}>
+                <div className={`text-lg font-bold ${isToday ? 'text-blue-900' : 'text-gray-900'}`}>
                   {format(day, "dd.MM", { locale: nb })}
                 </div>
                 {holidayCheck.isHoliday && (
-                  <div className="text-xs text-red-600 truncate font-inter" title={holidayCheck.name}>
-                    {holidayCheck.name?.substring(0, 6)}
+                  <div className="text-xs text-red-600 truncate font-inter mt-1" title={holidayCheck.name}>
+                    {holidayCheck.name?.substring(0, 8)}
                   </div>
                 )}
               </div>
@@ -108,22 +122,34 @@ export function CalendarGrid({
         </div>
 
         {/* Time Slots Grid */}
-        <div className="space-y-1">
+        <div className="space-y-2">
           {timeSlots.map((timeSlot) => (
-            <div key={timeSlot} className="grid grid-cols-8 gap-1">
-              <div className="p-1.5 text-sm font-medium text-gray-700 flex items-center bg-gray-50 rounded font-inter truncate">
-                {timeSlot}
-              </div>
-              {weekDays.map((day, dayIndex) => {
-                const button = renderSlotButton(day, timeSlot, dayIndex);
-                return (
-                  <div key={dayIndex} className="relative">
-                    {button}
-                  </div>
-                );
-              })}
+            <div key={timeSlot} className="grid grid-cols-7 gap-2">
+              {weekDays.map((day, dayIndex) => (
+                <div key={dayIndex} className="relative">
+                  {renderTimeSlotCell(day, timeSlot, dayIndex)}
+                </div>
+              ))}
             </div>
           ))}
+        </div>
+
+        {/* Legend */}
+        <div className="mt-6 flex flex-wrap gap-4 text-xs text-gray-600 justify-center">
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 bg-green-100 border border-green-300 rounded"></div>
+            <span>Ledig</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 bg-blue-500 rounded"></div>
+            <span>Valgt</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 bg-red-50 border border-red-200 rounded relative">
+              <div className="absolute inset-0 border-t border-gray-400 transform rotate-12"></div>
+            </div>
+            <span>Opptatt</span>
+          </div>
         </div>
       </CardContent>
     </Card>
