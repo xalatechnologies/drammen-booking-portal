@@ -159,18 +159,22 @@ export function AvailabilityTab({
           </div>
 
           {/* Calendar Grid */}
-          <Card>
-            <CardContent className="p-0">
-              <CalendarGrid
-                weekDays={weekDays}
-                timeSlots={timeSlots}
-                selectedZoneId={selectedZoneId}
-                getAvailabilityStatus={getAvailabilityStatus}
-                isSlotSelected={isSlotSelected}
-                onSlotClick={handleSlotClick}
-              />
-            </CardContent>
-          </Card>
+          {selectedZone && (
+            <Card>
+              <CardContent className="p-0">
+                <CalendarGrid
+                  zone={selectedZone}
+                  currentWeekStart={currentWeekStart}
+                  timeSlots={timeSlots}
+                  selectedSlots={selectedSlots}
+                  getAvailabilityStatus={getAvailabilityStatus}
+                  isSlotSelected={isSlotSelected}
+                  onSlotClick={handleSlotClick}
+                  onBulkSlotSelection={onBulkSlotSelection}
+                />
+              </CardContent>
+            </Card>
+          )}
 
           {/* Legend */}
           <LegendDisplay />
