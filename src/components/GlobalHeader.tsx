@@ -44,85 +44,87 @@ const GlobalHeader = () => {
 
   return (
     <header className="bg-white dark:bg-gray-900 py-3 shadow-md sticky top-0 z-10 border-b border-gray-200 dark:border-gray-700 w-full">
-      <div className="flex justify-between items-center gap-4">
-        {/* Logo (left) */}
-        <div className="flex items-center flex-shrink-0">
-          <Logo />
+      <div className="container mx-auto px-4 max-w-7xl">
+        <div className="flex justify-between items-center gap-4">
+          {/* Logo (left) */}
+          <div className="flex items-center flex-shrink-0">
+            <Logo />
+          </div>
+
+          {/* Global Search (center) - Hidden on mobile */}
+          <div className="hidden md:flex flex-1 justify-center max-w-lg">
+            <GlobalSearch />
+          </div>
+
+          {/* Mobile Menu Button */}
+          <Button 
+            variant="ghost" 
+            className="md:hidden p-2" 
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          >
+            <Menu className="h-6 w-6" />
+          </Button>
+
+          {/* Right side: Privacy, Cart, Language toggle & Login/Profile */}
+          <div className="hidden md:flex items-center space-x-2 flex-shrink-0">
+            {/* Privacy/GDPR Menu */}
+            <DropdownMenu open={privacyOpen} onOpenChange={setPrivacyOpen}>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="hover:bg-gray-100">
+                  <Shield className="h-6 w-6" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem onClick={() => navigate('/personvern')}>
+                  Personvern
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/cookies')}>
+                  Cookies
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/tilgjengelighet')}>
+                  Tilgjengelighet
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* Selected Times Icon with Dropdown */}
+            <Popover open={cartOpen} onOpenChange={setCartOpen}>
+              <PopoverTrigger asChild>
+                <Button variant="ghost" className="relative hover:bg-gray-100">
+                  <Clock className="h-6 w-6" />
+                  {itemCount > 0 && (
+                    <Badge 
+                      className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center text-xs bg-red-500 text-white rounded-full animate-pulse"
+                    >
+                      {itemCount > 99 ? '99+' : itemCount}
+                    </Badge>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-96 p-0" align="end">
+                <CartDropdown onClose={() => setCartOpen(false)} />
+              </PopoverContent>
+            </Popover>
+            
+            {/* Language toggle */}
+            <LanguageToggle 
+              language={language} 
+              toggleLanguage={toggleLanguage} 
+            />
+            
+            {/* Profile menu (login button or dropdown) */}
+            <ProfileMenu 
+              isLoggedIn={isAuthenticated} 
+              handleLogin={handleLogin} 
+              handleLogout={handleLogout}
+            />
+          </div>
         </div>
 
-        {/* Global Search (center) - Hidden on mobile */}
-        <div className="hidden md:flex flex-1 justify-center max-w-lg">
+        {/* Mobile Search Bar - Shown only on mobile */}
+        <div className="md:hidden mt-3">
           <GlobalSearch />
         </div>
-
-        {/* Mobile Menu Button */}
-        <Button 
-          variant="ghost" 
-          className="md:hidden p-2" 
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-        >
-          <Menu className="h-6 w-6" />
-        </Button>
-
-        {/* Right side: Privacy, Cart, Language toggle & Login/Profile */}
-        <div className="hidden md:flex items-center space-x-2 flex-shrink-0">
-          {/* Privacy/GDPR Menu */}
-          <DropdownMenu open={privacyOpen} onOpenChange={setPrivacyOpen}>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="hover:bg-gray-100">
-                <Shield className="h-6 w-6" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuItem onClick={() => navigate('/personvern')}>
-                Personvern
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate('/cookies')}>
-                Cookies
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate('/tilgjengelighet')}>
-                Tilgjengelighet
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          {/* Selected Times Icon with Dropdown */}
-          <Popover open={cartOpen} onOpenChange={setCartOpen}>
-            <PopoverTrigger asChild>
-              <Button variant="ghost" className="relative hover:bg-gray-100">
-                <Clock className="h-6 w-6" />
-                {itemCount > 0 && (
-                  <Badge 
-                    className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center text-xs bg-red-500 text-white rounded-full animate-pulse"
-                  >
-                    {itemCount > 99 ? '99+' : itemCount}
-                  </Badge>
-                )}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-96 p-0" align="end">
-              <CartDropdown onClose={() => setCartOpen(false)} />
-            </PopoverContent>
-          </Popover>
-          
-          {/* Language toggle */}
-          <LanguageToggle 
-            language={language} 
-            toggleLanguage={toggleLanguage} 
-          />
-          
-          {/* Profile menu (login button or dropdown) */}
-          <ProfileMenu 
-            isLoggedIn={isAuthenticated} 
-            handleLogin={handleLogin} 
-            handleLogout={handleLogout}
-          />
-        </div>
-      </div>
-
-      {/* Mobile Search Bar - Shown only on mobile */}
-      <div className="md:hidden mt-3 px-6">
-        <GlobalSearch />
       </div>
 
       {/* Mobile Menu */}
