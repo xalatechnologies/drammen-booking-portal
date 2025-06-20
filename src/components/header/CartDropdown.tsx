@@ -32,8 +32,8 @@ export function CartDropdown({ onClose }: CartDropdownProps) {
     return (
       <div className="p-6 text-center">
         <ShoppingCart className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-        <p className="text-sm font-medium text-gray-500 mb-2">{t('booking.cart.empty')}</p>
-        <p className="text-xs text-gray-400">{t('booking.cart.selectTimeSlots')}</p>
+        <p className="text-base font-medium text-gray-500 mb-2">{t('booking.cart.empty')}</p>
+        <p className="text-sm text-gray-400">{t('booking.cart.selectTimeSlots')}</p>
       </div>
     );
   }
@@ -43,12 +43,12 @@ export function CartDropdown({ onClose }: CartDropdownProps) {
       {/* Header */}
       <div className="p-4 border-b bg-gray-50">
         <div className="flex items-center justify-between">
-          <h3 className="font-semibold text-lg">{t('booking.cart.title')} ({getItemCount()})</h3>
+          <h3 className="font-semibold text-xl">{t('booking.cart.title')} ({getItemCount()})</h3>
           <Button 
             variant="ghost" 
             size="sm" 
             onClick={handleClearCart}
-            className="text-red-500 hover:text-red-700"
+            className="text-red-500 hover:text-red-700 text-base"
           >
             <Trash2 className="h-4 w-4 mr-1" />
             {t('booking.cart.clear')}
@@ -62,10 +62,10 @@ export function CartDropdown({ onClose }: CartDropdownProps) {
           <div key={item.id} className="border rounded-lg p-3 bg-gray-50 hover:bg-gray-100 transition-colors">
             <div className="flex items-start justify-between mb-2">
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate">
+                <p className="text-base font-medium text-gray-900 truncate">
                   {item.facilityName}
                 </p>
-                <p className="text-xs text-gray-600 truncate mt-1">
+                <p className="text-sm text-gray-600 truncate mt-1">
                   {item.purpose}
                 </p>
               </div>
@@ -82,28 +82,28 @@ export function CartDropdown({ onClose }: CartDropdownProps) {
             {/* Time slots summary */}
             <div className="space-y-1 mb-2">
               {item.timeSlots && item.timeSlots.length > 1 ? (
-                <div className="flex items-center gap-2 text-xs text-gray-600">
-                  <Calendar className="h-3 w-3" />
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <Calendar className="h-4 w-4" />
                   <span>{item.timeSlots.length} tidspunkt</span>
-                  <Clock className="h-3 w-3 ml-2" />
+                  <Clock className="h-4 w-4 ml-2" />
                   <span>{item.duration || (item.timeSlots.length * 2)}t total</span>
                 </div>
               ) : (
-                <div className="flex items-center gap-2 text-xs text-gray-600">
-                  <Calendar className="h-3 w-3" />
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <Calendar className="h-4 w-4" />
                   <span>{format(new Date(item.date), 'dd.MM.yyyy')}</span>
-                  <Clock className="h-3 w-3 ml-2" />
+                  <Clock className="h-4 w-4 ml-2" />
                   <span>{item.timeSlot}</span>
                 </div>
               )}
             </div>
             
             <div className="flex items-center justify-between">
-              <Badge variant="outline" className="text-xs">
+              <Badge variant="outline" className="text-sm">
                 {item.organizationType === 'private' ? 'Privat' : 
                  item.organizationType === 'organization' ? 'Organisasjon' : 'Bedrift'}
               </Badge>
-              <Badge className="bg-green-100 text-green-800 text-xs">
+              <Badge className="bg-green-100 text-green-800 text-sm font-semibold">
                 {item.pricing?.totalPrice || (item.pricePerHour * (item.duration || 2))} kr
               </Badge>
             </div>
@@ -114,16 +114,16 @@ export function CartDropdown({ onClose }: CartDropdownProps) {
       {/* Footer with Total and Checkout Button */}
       <div className="p-4 border-t bg-gray-50 space-y-3">
         <div className="space-y-2">
-          <div className="flex justify-between items-center text-sm">
+          <div className="flex justify-between items-center text-base">
             <span className="text-gray-600">{t('booking.pricing.subtotal')}</span>
             <span className="font-medium">{getTotalPrice()} kr</span>
           </div>
-          <div className="flex justify-between items-center text-sm">
+          <div className="flex justify-between items-center text-base">
             <span className="text-gray-600">{t('booking.pricing.vat')}</span>
             <span className="font-medium">{Math.round(getTotalPrice() * 0.25)} kr</span>
           </div>
           <Separator />
-          <div className="flex justify-between items-center text-base font-bold">
+          <div className="flex justify-between items-center text-lg font-bold">
             <span>{t('booking.pricing.total')}</span>
             <span>{getTotalPrice() + Math.round(getTotalPrice() * 0.25)} kr</span>
           </div>
@@ -131,7 +131,7 @@ export function CartDropdown({ onClose }: CartDropdownProps) {
         
         <Button 
           onClick={handleProceedToCheckout} 
-          className="w-full bg-[#1e3a8a] hover:bg-[#1e40af] font-medium"
+          className="w-full bg-[#1e3a8a] hover:bg-[#1e40af] font-medium text-base"
           disabled={getItemCount() === 0}
         >
           <CreditCard className="h-4 w-4 mr-2" />
