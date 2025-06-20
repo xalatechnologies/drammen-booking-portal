@@ -48,11 +48,7 @@ export function AvailabilityTab({
   );
   const [selectedZoneId, setSelectedZoneId] = useState(zones[0]?.id || '');
 
-  const { getAvailabilityStatus, isSlotSelected } = useAvailabilityStatus({
-    selectedSlots,
-    facilityId,
-    zoneId: selectedZoneId
-  });
+  const { getAvailabilityStatus, isSlotSelected } = useAvailabilityStatus(selectedSlots);
 
   // Generate time slots from 08:00 to 22:00
   const timeSlots = useMemo(() => 
@@ -79,9 +75,8 @@ export function AvailabilityTab({
     setCurrentWeekStart(prev => addDays(prev, 7));
   };
 
-  const handleSlotClick = (date: Date, timeSlot: string) => {
-    const availability = getAvailabilityStatus(selectedZoneId, date, timeSlot);
-    onSlotClick(selectedZoneId, date, timeSlot, availability.status);
+  const handleSlotClick = (zoneId: string, date: Date, timeSlot: string, availability: string) => {
+    onSlotClick(zoneId, date, timeSlot, availability);
   };
 
   const handleAddToCart = (bookingData: any) => {
