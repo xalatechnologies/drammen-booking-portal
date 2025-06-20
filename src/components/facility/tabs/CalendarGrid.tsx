@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { format, addDays } from 'date-fns';
 import { nb } from 'date-fns/locale';
@@ -16,6 +17,7 @@ interface CalendarGridProps {
   getAvailabilityStatus: (zoneId: string, date: Date, timeSlot: string) => { status: string; conflict: any };
   isSlotSelected: (zoneId: string, date: Date, timeSlot: string) => boolean;
   onSlotClick: (zoneId: string, date: Date, timeSlot: string, availability: string) => void;
+  onBulkSlotSelection?: (slots: SelectedTimeSlot[]) => void;
 }
 
 export function CalendarGrid({ 
@@ -25,7 +27,8 @@ export function CalendarGrid({
   selectedSlots, 
   getAvailabilityStatus, 
   isSlotSelected, 
-  onSlotClick 
+  onSlotClick,
+  onBulkSlotSelection 
 }: CalendarGridProps) {
   const weekDays = Array(7).fill(0).map((_, i) => addDays(currentWeekStart, i));
   const { dragState, startDrag, updateDrag, endDrag, cancelDrag, isSlotInPreview } = useDragSelection();
@@ -66,12 +69,24 @@ export function CalendarGrid({
   const handleMouseUp = () => {
     if (dragState.isDragging) {
       const previewSlots = endDrag();
-      // Apply all preview slots as selected
-      previewSlots.forEach(slot => {
-        if (!isSlotSelected(slot.zoneId, slot.date, slot.timeSlot)) {
-          onSlotClick(slot.zoneId, slot.date, slot.timeSlot, 'available');
+      
+      // Use bulk selection if available, otherwise fall back to individual selection
+      if (onBulkSlotSelection && previewSlots.length > 0) {
+        // Filter out already selected slots
+        const newSlots = previewSlots.filter(slot => 
+          !isSlotSelected(slot.zoneId, slot.date, slot.timeSlot)
+        );
+        if (newSlots.length > 0) {
+          onBulkSlotSelection(newSlots);
         }
-      });
+      } else {
+        // Fallback to individual selection
+        previewSlots.forEach(slot => {
+          if (!isSlotSelected(slot.zoneId, slot.date, slot.timeSlot)) {
+            onSlotClick(slot.zoneId, slot.date, slot.timeSlot, 'available');
+          }
+        });
+      }
     }
   };
 
