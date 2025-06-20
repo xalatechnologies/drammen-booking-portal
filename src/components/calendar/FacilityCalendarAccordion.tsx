@@ -1,12 +1,7 @@
 
 import React from "react";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MapPin, Users } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { CalendarGrid } from "../facility/tabs/CalendarGrid";
-import { addDays } from "date-fns";
+import { Accordion } from "@/components/ui/accordion";
+import { FacilityAccordionItem } from "./FacilityAccordionItem";
 
 // Simplified Zone interface for calendar view
 interface CalendarZone {
@@ -73,197 +68,18 @@ export const FacilityCalendarAccordion: React.FC<FacilityCalendarAccordionProps>
     }
   };
 
-  // Convert CalendarZone to the Zone type expected by CalendarGrid
-  const convertToZone = (calendarZone: CalendarZone, facilityId: number) => {
-    return {
-      id: calendarZone.id,
-      facilityId: facilityId.toString(),
-      name: calendarZone.name,
-      description: calendarZone.description,
-      isMainZone: true,
-      capacity: calendarZone.capacity,
-      area: 100, // Keep as number
-      equipment: [],
-      features: [],
-      accessibility: [],
-      pricePerHour: calendarZone.pricePerHour,
-      bookingRules: {
-        minBookingDuration: 1,
-        maxBookingDuration: 8,
-        allowedTimeSlots: timeSlots,
-        bookingTypes: ['one-time', 'recurring', 'fixed-lease'],
-        advanceBookingDays: 90,
-        cancellationHours: 24
-      },
-      adminInfo: {
-        contactPersonName: "Facility Manager",
-        contactPersonEmail: "manager@drammen.kommune.no",
-        specialInstructions: calendarZone.description,
-        maintenanceSchedule: []
-      },
-      layout: {
-        coordinates: { x: 0, y: 0, width: 100, height: 100 },
-        entryPoints: ["Hovedinngang"]
-      },
-      pricing: {
-        basePrice: calendarZone.pricePerHour,
-        currency: 'NOK',
-        priceRules: [],
-        minimumBookingDuration: 60,
-        maximumBookingDuration: 480,
-        cancellationPolicy: {
-          freeUntilHours: 24,
-          partialRefundUntilHours: 12,
-          partialRefundPercentage: 50,
-          noRefundAfterHours: 0
-        }
-      },
-      availability: {
-        openingHours: [],
-        blackoutPeriods: [],
-        maintenanceSchedule: [],
-        recurringUnavailability: []
-      },
-      restrictions: {
-        requiresSupervision: false,
-        allowedActivities: [],
-        prohibitedActivities: [],
-        requiresTraining: false,
-        alcoholPermitted: false,
-        smokingPermitted: false,
-        petsAllowed: false,
-        cateringAllowed: true,
-        decorationsAllowed: true,
-        amplifiedSoundAllowed: true,
-        commercialUseAllowed: true
-      },
-      isActive: true,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
-  };
-
   return (
     <Accordion type="multiple" className="w-full">
-      {facilities.map((facility, index) => (
-        <AccordionItem key={facility.id} value={`facility-${facility.id}`}>
-          <AccordionTrigger className="hover:no-underline">
-            <div className="flex items-center justify-between w-full pr-4">
-              <div className="flex items-start gap-4 text-left">
-                {/* Facility Image */}
-                <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
-                  <img 
-                    src={facility.image || 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&auto=format&fit=crop'} 
-                    alt={facility.name}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.src = "https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&auto=format&fit=crop";
-                      target.onerror = null;
-                    }}
-                  />
-                </div>
-                
-                {/* Facility Info */}
-                <div className="flex-1">
-                  <h3 className="font-bold text-lg text-gray-900 mb-1">{facility.name}</h3>
-                  <div className="flex items-center gap-4 text-sm text-gray-600 mb-2">
-                    <div className="flex items-center gap-1">
-                      <MapPin className="h-4 w-4" />
-                      <span>{facility.address}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Users className="h-4 w-4" />
-                      <span>{facility.capacity} personer</span>
-                    </div>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {facility.suitableFor.slice(0, 3).map((activity, i) => (
-                      <Badge
-                        key={i}
-                        className="bg-blue-100 text-blue-800 border-blue-200 text-xs"
-                      >
-                        {activity}
-                      </Badge>
-                    ))}
-                    {facility.accessibility.includes("wheelchair") && (
-                      <Badge className="bg-green-100 text-green-800 border-green-200 text-xs">
-                        Rullestol
-                      </Badge>
-                    )}
-                  </div>
-                </div>
-              </div>
-              
-              <Button
-                variant="outline"
-                size="sm"
-                className="shrink-0"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  window.location.href = `/facilities/${facility.id}`;
-                }}
-              >
-                Se detaljer
-              </Button>
-            </div>
-          </AccordionTrigger>
-          
-          <AccordionContent className="pt-4">
-            {facility.zones.length > 1 ? (
-              <Tabs defaultValue={facility.zones[0].id}>
-                <TabsList className="grid w-full grid-cols-2 mb-6">
-                  {facility.zones.map(zone => (
-                    <TabsTrigger key={zone.id} value={zone.id} className="text-sm">
-                      {zone.name}
-                    </TabsTrigger>
-                  ))}
-                </TabsList>
-                {facility.zones.map(zone => (
-                  <TabsContent key={zone.id} value={zone.id}>
-                    <div className="mb-4 p-4 bg-gray-50 rounded-lg">
-                      <h4 className="font-medium text-gray-900 mb-2">{zone.name}</h4>
-                      <div className="flex items-center gap-4 text-sm text-gray-600">
-                        <span>{zone.capacity} personer</span>
-                        <span>{zone.pricePerHour} kr/time</span>
-                      </div>
-                      <p className="text-sm text-gray-600 mt-1">{zone.description}</p>
-                    </div>
-                    <CalendarGrid
-                      zone={convertToZone(zone, facility.id)}
-                      currentWeekStart={currentWeekStart}
-                      timeSlots={timeSlots}
-                      selectedSlots={[]}
-                      getAvailabilityStatus={getAvailabilityStatus}
-                      isSlotSelected={isSlotSelected}
-                      onSlotClick={handleSlotClick}
-                    />
-                  </TabsContent>
-                ))}
-              </Tabs>
-            ) : (
-              <div>
-                <div className="mb-4 p-4 bg-gray-50 rounded-lg">
-                  <h4 className="font-medium text-gray-900 mb-2">{facility.zones[0].name}</h4>
-                  <div className="flex items-center gap-4 text-sm text-gray-600">
-                    <span>{facility.zones[0].capacity} personer</span>
-                    <span>{facility.zones[0].pricePerHour} kr/time</span>
-                  </div>
-                  <p className="text-sm text-gray-600 mt-1">{facility.zones[0].description}</p>
-                </div>
-                <CalendarGrid
-                  zone={convertToZone(facility.zones[0], facility.id)}
-                  currentWeekStart={currentWeekStart}
-                  timeSlots={timeSlots}
-                  selectedSlots={[]}
-                  getAvailabilityStatus={getAvailabilityStatus}
-                  isSlotSelected={isSlotSelected}
-                  onSlotClick={handleSlotClick}
-                />
-              </div>
-            )}
-          </AccordionContent>
-        </AccordionItem>
+      {facilities.map((facility) => (
+        <FacilityAccordionItem
+          key={facility.id}
+          facility={facility}
+          currentWeekStart={currentWeekStart}
+          timeSlots={timeSlots}
+          getAvailabilityStatus={getAvailabilityStatus}
+          isSlotSelected={isSlotSelected}
+          handleSlotClick={handleSlotClick}
+        />
       ))}
     </Accordion>
   );
