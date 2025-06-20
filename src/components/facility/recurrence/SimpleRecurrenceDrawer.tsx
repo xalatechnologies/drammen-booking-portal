@@ -26,13 +26,13 @@ const timeSlots = [
 ];
 
 const weekdays = [
-  { id: 'monday', label: 'Mandag' },
-  { id: 'tuesday', label: 'Tirsdag' },
-  { id: 'wednesday', label: 'Onsdag' },
-  { id: 'thursday', label: 'Torsdag' },
-  { id: 'friday', label: 'Fredag' },
-  { id: 'saturday', label: 'Lørdag' },
-  { id: 'sunday', label: 'Søndag' }
+  { id: 1, label: 'Mandag' },
+  { id: 2, label: 'Tirsdag' },
+  { id: 3, label: 'Onsdag' },
+  { id: 4, label: 'Torsdag' },
+  { id: 5, label: 'Fredag' },
+  { id: 6, label: 'Lørdag' },
+  { id: 0, label: 'Søndag' }
 ];
 
 export function SimpleRecurrenceDrawer({
@@ -47,7 +47,7 @@ export function SimpleRecurrenceDrawer({
       ? pattern.type 
       : 'weekly'
   );
-  const [selectedWeekdays, setSelectedWeekdays] = useState<string[]>(pattern.weekdays || []);
+  const [selectedWeekdays, setSelectedWeekdays] = useState<number[]>(pattern.weekdays || []);
   const [selectedTimeSlots, setSelectedTimeSlots] = useState<string[]>(pattern.timeSlots || []);
   const [startDate, setStartDate] = useState<string>(
     pattern.startDate ? format(pattern.startDate, 'yyyy-MM-dd') : ''
@@ -56,10 +56,10 @@ export function SimpleRecurrenceDrawer({
     pattern.endDate ? format(pattern.endDate, 'yyyy-MM-dd') : ''
   );
 
-  const handleWeekdayToggle = (weekday: string) => {
-    const newWeekdays = selectedWeekdays.includes(weekday)
-      ? selectedWeekdays.filter(d => d !== weekday)
-      : [...selectedWeekdays, weekday];
+  const handleWeekdayToggle = (weekdayId: number) => {
+    const newWeekdays = selectedWeekdays.includes(weekdayId)
+      ? selectedWeekdays.filter(d => d !== weekdayId)
+      : [...selectedWeekdays, weekdayId];
     setSelectedWeekdays(newWeekdays);
   };
 
@@ -76,7 +76,8 @@ export function SimpleRecurrenceDrawer({
       weekdays: selectedWeekdays,
       timeSlots: selectedTimeSlots,
       startDate: startDate ? new Date(startDate) : undefined,
-      endDate: endDate ? new Date(endDate) : undefined
+      endDate: endDate ? new Date(endDate) : undefined,
+      interval: 1
     };
 
     onPatternChange(newPattern);
@@ -176,11 +177,11 @@ export function SimpleRecurrenceDrawer({
                     {weekdays.map((day) => (
                       <div key={day.id} className="flex items-center space-x-2">
                         <Checkbox
-                          id={day.id}
+                          id={`day-${day.id}`}
                           checked={selectedWeekdays.includes(day.id)}
                           onCheckedChange={() => handleWeekdayToggle(day.id)}
                         />
-                        <Label htmlFor={day.id} className="text-sm">
+                        <Label htmlFor={`day-${day.id}`} className="text-sm">
                           {day.label}
                         </Label>
                       </div>
@@ -223,7 +224,7 @@ export function SimpleRecurrenceDrawer({
                 <h4 className="font-medium text-blue-900 mb-2">Sammendrag</h4>
                 <p className="text-blue-800 text-sm">
                   {frequency === 'weekly' ? 'Hver uke' : frequency === 'biweekly' ? 'Annenhver uke' : 'Månedlig'} på{' '}
-                  {selectedWeekdays.map(day => weekdays.find(wd => wd.id === day)?.label).join(', ')}{' '}
+                  {selectedWeekdays.map(dayId => weekdays.find(wd => wd.id === dayId)?.label).join(', ')}{' '}
                   kl. {selectedTimeSlots.join(', ')}
                 </p>
                 <p className="text-blue-700 text-sm mt-1">
