@@ -2,7 +2,7 @@
 import { Facility, FacilityFilters, FacilitySortOptions } from "@/types/facility";
 import { Zone } from "@/types/zone";
 import { PaginatedResponse, PaginationParams, ApiResponse } from "@/types/api";
-import { facilityRepository } from "@/dal/FacilityRepository";
+import { facilityRepository, zoneRepository } from "@/dal/repositories";
 
 // Simulate API delay
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -16,7 +16,6 @@ export class FacilityService {
     try {
       await delay(300); // Simulate network delay
 
-      // Use repository for filtering and pagination
       const result = await facilityRepository.findAll(
         pagination,
         filters,
@@ -57,7 +56,7 @@ export class FacilityService {
     try {
       await delay(150);
 
-      const result = await facilityRepository.getZonesByFacilityId(facilityId);
+      const result = await zoneRepository.getZonesByFacilityId(facilityId);
       return result;
     } catch (error) {
       return {
@@ -74,7 +73,7 @@ export class FacilityService {
     try {
       await delay(150);
 
-      const result = await facilityRepository.getZoneById(zoneId);
+      const result = await zoneRepository.getZoneById(zoneId);
       return result;
     } catch (error) {
       return {
