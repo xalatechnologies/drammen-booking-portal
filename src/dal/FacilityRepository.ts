@@ -41,12 +41,9 @@ export class FacilityRepository extends BaseRepository<Facility, FacilityFilters
     const convertedFacilities = localizedMockFacilities.map(convertLocalizedFacility);
     // Add timeSlotDuration to some facilities for testing
     convertedFacilities.forEach((facility, index) => {
-      // Set some facilities to use 2-hour slots for variety
-      if (index % 3 === 0) {
-        facility.timeSlotDuration = 2;
-      } else {
-        facility.timeSlotDuration = 1;
-      }
+      // Set different facilities to use different slot durations for variety
+      const durations = [1, 2, 3, 4];
+      facility.timeSlotDuration = durations[index % durations.length];
     });
     super(convertedFacilities);
     this.zones = [...mockZones];
