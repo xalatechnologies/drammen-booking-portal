@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -128,7 +127,7 @@ export function RecurrenceWizard({ pattern, onPatternChange, onClose, onApplyPat
   };
 
   return (
-    <Card className="w-full max-w-3xl mx-auto bg-white border border-gray-200 shadow-lg">
+    <Card className="w-full max-w-5xl mx-auto bg-white border border-gray-200 shadow-lg">
       <CardHeader className="bg-gray-50 border-b border-gray-200">
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-3 text-lg font-semibold text-gray-900">
@@ -169,7 +168,7 @@ export function RecurrenceWizard({ pattern, onPatternChange, onClose, onApplyPat
         </div>
       </CardHeader>
       
-      <CardContent className="p-8 min-h-[400px]">
+      <CardContent className="p-8 min-h-[500px]">
         {renderStep()}
       </CardContent>
 
