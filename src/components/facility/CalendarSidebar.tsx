@@ -55,52 +55,24 @@ export function CalendarSidebar({
     <div className="space-y-4 h-full">
       <Card className="sticky top-4">
         <CardContent className="p-4">
+          {/* Simple Recurrence Button */}
+          <div className="mb-4">
+            <Button
+              onClick={() => setShowRecurrenceWizard(true)}
+              className="w-full bg-white hover:bg-gray-50 text-gray-700 border border-gray-300"
+              variant="outline"
+            >
+              <Repeat className="h-4 w-4 mr-2" />
+              Opprett gjentakende reservasjon
+            </Button>
+          </div>
+
           <Accordion 
             type="multiple" 
             value={openAccordion} 
             onValueChange={setOpenAccordion}
             className="space-y-2"
           >
-            {/* Recurrence Section */}
-            <AccordionItem value="recurrence" className="border rounded-lg">
-              <AccordionTrigger className="px-4 py-3 hover:no-underline">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-blue-100 rounded-lg">
-                    <Repeat className="h-4 w-4 text-blue-600" />
-                  </div>
-                  <div className="text-left">
-                    <div className="font-semibold">Gjentagende reservasjon</div>
-                    <div className="text-sm text-gray-600">Opprett gjentakende booking</div>
-                  </div>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent className="px-4 pb-4">
-                <div className="space-y-3">
-                  <Button
-                    onClick={() => setShowRecurrenceWizard(true)}
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-                  >
-                    <Repeat className="h-4 w-4 mr-2" />
-                    Opprett gjentakende reservasjon
-                  </Button>
-                  
-                  {(currentPattern.weekdays?.length > 0 || currentPattern.timeSlots?.length > 0) && (
-                    <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
-                      <div className="text-sm font-medium text-blue-800 mb-2">Aktivt mønster:</div>
-                      <div className="space-y-1 text-xs text-blue-700">
-                        {currentPattern.weekdays?.length > 0 && (
-                          <div>Dager: {currentPattern.weekdays.length} valgt</div>
-                        )}
-                        {currentPattern.timeSlots?.length > 0 && (
-                          <div>Tider: {currentPattern.timeSlots.length} valgt</div>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-
             {/* Selected Slots Section */}
             <AccordionItem value="selected-slots" className="border rounded-lg">
               <AccordionTrigger className="px-4 py-3 hover:no-underline">

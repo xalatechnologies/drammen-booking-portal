@@ -8,6 +8,7 @@ import { CalendarSidebar } from '../CalendarSidebar';
 import { WeekNavigation } from './WeekNavigation';
 import { ZoneInfoHeader } from './ZoneInfoHeader';
 import { ResponsiveCalendarGrid } from './ResponsiveCalendarGrid';
+import { LegendDisplay } from './LegendDisplay';
 
 interface TwoColumnAvailabilityLayoutProps {
   zone: Zone;
@@ -43,9 +44,24 @@ export function TwoColumnAvailabilityLayout({
   onPatternApply
 }: TwoColumnAvailabilityLayoutProps) {
   
-  const timeSlots = ["08:00-10:00", "10:00-12:00", "12:00-14:00", "14:00-16:00", "16:00-18:00", "18:00-20:00", "20:00-22:00"];
+  // Generate hourly time slots from 08:00 to 22:00
+  const timeSlots = Array.from({ length: 14 }, (_, i) => {
+    const hour = 8 + i;
+    const nextHour = hour + 1;
+    return `${hour.toString().padStart(2, '0')}:00-${nextHour.toString().padStart(2, '0')}:00`;
+  });
 
   const getAvailabilityStatus = (zoneId: string, date: Date, timeSlot: string) => {
+    // Check if the time slot is in the past
+    const now = new Date();
+    const timeHour = parseInt(timeSlot.split(':')[0]);
+    const slotDateTime = new Date(date);
+    slotDateTime.setHours(timeHour, 0, 0, 0);
+    
+    if (slotDateTime < now) {
+      return { status: 'unavailable', conflict: null };
+    }
+
     const conflict = conflictManager.checkZoneConflict(zoneId, date, timeSlot);
     if (conflict) {
       return { status: 'busy', conflict: conflict };
@@ -76,7 +92,7 @@ export function TwoColumnAvailabilityLayout({
         zoneId, 
         date, 
         timeSlot,
-        duration: 2 // Default 2-hour duration
+        duration: 1 // Changed to 1 hour duration for hourly slots
       }]);
     }
   };
@@ -94,7 +110,7 @@ export function TwoColumnAvailabilityLayout({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Zone Info Header */}
       <ZoneInfoHeader 
         zone={zone} 
@@ -105,17 +121,19 @@ export function TwoColumnAvailabilityLayout({
         zones={zones}
       />
 
-      {/* Week Navigation */}
-      <WeekNavigation 
-        currentWeekStart={currentWeekStart}
-        onWeekChange={setCurrentWeekStart}
-        canGoPrevious={canGoPrevious}
-      />
-
       {/* Two Column Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-10 gap-6">
         {/* Calendar Column - 70% */}
         <div className="lg:col-span-7">
+          {/* Week Navigation - positioned on the left side */}
+          <div className="mb-4">
+            <WeekNavigation 
+              currentWeekStart={currentWeekStart}
+              onWeekChange={setCurrentWeekStart}
+              canGoPrevious={canGoPrevious}
+            />
+          </div>
+
           {/* Desktop Calendar */}
           <div className="hidden lg:block">
             <CalendarGrid
@@ -140,6 +158,11 @@ export function TwoColumnAvailabilityLayout({
               isSlotSelected={isSlotSelected}
               onSlotClick={handleSlotClick}
             />
+          </div>
+
+          {/* Legend positioned under calendar with same width */}
+          <div className="mt-4">
+            <LegendDisplay />
           </div>
         </div>
 

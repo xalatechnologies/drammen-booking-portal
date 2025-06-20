@@ -3,7 +3,6 @@ import { Zone } from "@/components/booking/types";
 import { SelectedTimeSlot, RecurrencePattern } from "@/utils/recurrenceEngine";
 import { EnhancedZoneConflictManager } from "@/utils/enhancedZoneConflictManager";
 import { TwoColumnAvailabilityLayout } from "./TwoColumnAvailabilityLayout";
-import { LegendDisplay } from "./LegendDisplay";
 import { BookingDrawer } from "../BookingDrawer";
 
 interface AvailabilityTabContentProps {
@@ -55,10 +54,7 @@ export function AvailabilityTabContent({
 
   return (
     <div className="space-y-6">
-      {/* Legend */}
-      {showLegend && <LegendDisplay />}
-
-      {/* Two Column Layout */}
+      {/* Two Column Layout - Legend is now included within the layout */}
       <TwoColumnAvailabilityLayout
         zone={zone}
         zones={zones}
