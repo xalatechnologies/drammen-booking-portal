@@ -48,43 +48,31 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
   const [availableAccessibility, setAvailableAccessibility] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Fetch all available filter options based on current selections
+  // Fetch ALL available filter options (without applying current filters)
   const fetchFilterOptions = async () => {
     try {
       setLoading(true);
-      console.log('SearchFilter - Fetching filter options with current filters:', { facilityType, location, accessibility });
+      console.log('SearchFilter - Fetching ALL available filter options');
 
-      let query = supabase
+      // Get ALL facilities to extract complete option lists
+      const { data, error } = await supabase
         .from('facilities')
         .select('type, area, accessibility_features')
         .eq('status', 'active');
-
-      // Apply current filters to narrow down options
-      if (facilityType && facilityType !== 'all') {
-        query = query.eq('type', facilityType);
-      }
-      if (location && location !== 'all') {
-        query = query.eq('area', location);
-      }
-      if (accessibility && accessibility !== 'all') {
-        query = query.contains('accessibility_features', [accessibility]);
-      }
-
-      const { data, error } = await query;
       
       if (error) {
         console.error('SearchFilter - Error fetching filter options:', error);
         return;
       }
 
-      // Extract unique values for each filter
+      // Extract unique values for each filter from ALL facilities
       const types = [...new Set(data?.map(f => f.type).filter(Boolean) || [])];
       const areas = [...new Set(data?.map(f => f.area).filter(Boolean) || [])];
       const accessibilityFeatures = [...new Set(
         data?.flatMap(f => f.accessibility_features || []).filter(Boolean) || []
       )];
 
-      console.log('SearchFilter - Available options:', { types, areas, accessibilityFeatures });
+      console.log('SearchFilter - ALL available options:', { types, areas, accessibilityFeatures });
 
       setAvailableTypes(types);
       setAvailableAreas(areas);
@@ -96,10 +84,10 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
     }
   };
 
-  // Fetch options on mount and when filters change
+  // Fetch options only once on mount
   useEffect(() => {
     fetchFilterOptions();
-  }, [facilityType, location, accessibility]);
+  }, []); // Removed dependencies to avoid re-fetching when filters change
 
   const handleCapacityChange = (value: string) => {
     console.log('SearchFilter - Capacity filter changed to:', value);
