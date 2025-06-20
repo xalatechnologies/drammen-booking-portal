@@ -1,27 +1,23 @@
+
 import React, { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Home, AlertCircle } from "lucide-react";
+import { useParams } from "react-router-dom";
 import GlobalHeader from "@/components/GlobalHeader";
 import GlobalFooter from "@/components/GlobalFooter";
-import { AirBnbStyleGallery } from "@/components/facility/AirBnbStyleGallery";
-import { FacilityHeader } from "@/components/facility/FacilityHeader";
-import { FacilityInfoTabs } from "@/components/facility/FacilityInfoTabs";
-import { FacilityContactInfo } from "@/components/facility/FacilityContactInfo";
-import { AvailabilityTab } from "@/components/facility/tabs/AvailabilityTab";
 import { Zone } from "@/components/booking/types";
 import { useOptimizedFacility } from "@/hooks/useOptimizedFacility";
 import { useZones } from "@/hooks/useZones";
 import { useSlotSelection } from "@/hooks/useSlotSelection";
-import { Skeleton } from "@/components/ui/skeleton";
-import { useTranslation } from "@/i18n";
 import { CartProvider } from "@/contexts/CartContext";
 import { MobileBookingPanel } from "@/components/facility/MobileBookingPanel";
 import { convertZoneToBookingZone } from "@/utils/zoneConverter";
+import { FacilityDetailBreadcrumb } from "@/components/facility/detail/FacilityDetailBreadcrumb";
+import { FacilityDetailLayout } from "@/components/facility/detail/FacilityDetailLayout";
+import { FacilityDetailCalendar } from "@/components/facility/detail/FacilityDetailCalendar";
+import { LoadingState, ErrorState } from "@/components/facility/detail/FacilityDetailStates";
+import { useTranslation } from "@/i18n";
 
 const FacilityDetail = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
   const [isFavorited, setIsFavorited] = useState(false);
   const { t } = useTranslation();
   const { facility, isLoading, error, notFound } = useOptimizedFacility(Number(id));
@@ -113,132 +109,65 @@ const FacilityDetail = () => {
 
   // Loading state
   if (isLoading || zonesLoading) {
-    return <CartProvider>
-        <div className="min-h-screen bg-white flex flex-col">
-          <GlobalHeader />
-          <div className="flex-grow">
-            <div className="container mx-auto px-4 py-6 max-w-7xl">
-              <div className="space-y-6">
-                <Skeleton className="h-96 w-full rounded-lg" />
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                  <div className="lg:col-span-2 space-y-6">
-                    <Skeleton className="h-64 w-full rounded-lg" />
-                    <Skeleton className="h-96 w-full rounded-lg" />
-                  </div>
-                  <div className="lg:col-span-1">
-                    <Skeleton className="h-80 w-full rounded-lg" />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <GlobalFooter />
-        </div>
-      </CartProvider>;
+    return <LoadingState />;
   }
 
   // Error state
   if (error || notFound) {
-    return <CartProvider>
-        <div className="min-h-screen bg-white flex flex-col">
-          <GlobalHeader />
-          <div className="flex-grow flex items-center justify-center">
-            <div className="text-center max-w-md mx-auto px-4">
-              <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-6" />
-              <h1 className="text-3xl font-bold text-gray-900 mb-4">
-                {notFound ? "Lokale ikke funnet" : "Feil ved lasting"}
-              </h1>
-              <p className="text-gray-600 mb-8">
-                {notFound ? "Det forespurte lokalet kunne ikke finnes." : "Det oppstod en feil ved lasting av lokalet."}
-              </p>
-              <Button onClick={() => navigate("/")} className="mb-4">
-                <Home className="h-4 w-4 mr-2" />
-                Tilbake til forsiden
-              </Button>
-            </div>
-          </div>
-          <GlobalFooter />
-        </div>
-      </CartProvider>;
+    return <ErrorState error={error} notFound={notFound} />;
   }
 
   // Success state with facility data
   if (!facility) return null;
-  return <CartProvider>
+
+  return (
+    <CartProvider>
       <div className="min-h-screen bg-white flex flex-col">
         <GlobalHeader />
 
         {/* Breadcrumb Navigation */}
-        <div className="bg-gray-50 border-b border-gray-200">
-          <div className="container mx-auto px-4 py-4 max-w-7xl">
-            <nav className="flex items-center space-x-2 text-sm">
-              <Button variant="ghost" size="sm" className="text-gray-600 hover:text-gray-900 p-0 h-auto font-normal" onClick={() => navigate("/")}>
-                <Home className="h-4 w-4 mr-1" />
-                Hjem
-              </Button>
-              <span className="text-gray-400">/</span>
-              <span className="text-gray-900 font-medium">{facility.name}</span>
-            </nav>
-          </div>
-        </div>
+        <FacilityDetailBreadcrumb facilityName={facility.name} />
 
         {/* Main Content */}
         <div className="flex-grow pb-20 lg:pb-0">
-          <div className="container mx-auto px-4 py-6 max-w-7xl">
-            {/* Full Width Gallery Section */}
-            <div className="w-full mb-8">
-              <AirBnbStyleGallery images={[facility.image, "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&auto=format&fit=crop", "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=800&auto=format&fit=crop", "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&auto=format&fit=crop"]} facilityName={facility.name} />
-            </div>
+          <FacilityDetailLayout 
+            facility={facility}
+            zones={displayZones}
+            onShare={handleShare}
+            isFavorited={isFavorited}
+            onToggleFavorite={() => setIsFavorited(!isFavorited)}
+          />
 
-            {/* Facility Header - Title, Tags, Address */}
-            <div className="mb-8">
-              <FacilityHeader name={facility.name} address={facility.address} onShare={handleShare} isFavorited={isFavorited} onToggleFavorite={() => setIsFavorited(!isFavorited)} />
-            </div>
-
-            {/* Main Content Layout - 70% / 30% */}
-            <div className="grid grid-cols-1 lg:grid-cols-10 gap-8 mb-12">
-              {/* Left Column - Tabs Content (70%) */}
-              <div className="lg:col-span-7 space-y-6">
-                <FacilityInfoTabs description={facility.description} capacity={facility.capacity} equipment={facility.equipment || []} zones={displayZones} amenities={facility.amenities || []} address={facility.address} area={facility.area} suitableFor={facility.suitableFor || []} facilityId={id} facilityName={facility.name} />
-              </div>
-
-              {/* Right Column - Contact Info Sidebar (30%) */}
-              <div className="lg:col-span-3 hidden lg:block">
-                <div className="sticky top-6">
-                  <FacilityContactInfo facilityName={facility.name} address={facility.address} openingHours={facility.openingHours} capacity={facility.capacity} area={facility.area} />
-                </div>
-              </div>
-            </div>
-
-            {/* Full Width Calendar Section - Updated with Unified Booking Form */}
-            <div className="w-full mb-12">
-              <div className="bg-white border border-gray-200 rounded-lg p-6">
-                <h2 className="text-2xl font-bold mb-6">Tilgjengelighet og booking</h2>
-                <AvailabilityTab 
-                  zones={displayZones} 
-                  selectedSlots={selectedSlots}
-                  onSlotClick={handleSlotClick}
-                  onBulkSlotSelection={handleBulkSlotSelection}
-                  onClearSlots={handleClearSlots}
-                  onRemoveSlot={handleRemoveSlot}
-                  facilityId={id || ""} 
-                  facilityName={facility.name}
-                  currentPattern={currentPattern}
-                  onPatternChange={setCurrentPattern}
-                  onPatternApply={handlePatternApply}
-                  timeSlotDuration={facility.timeSlotDuration || 1}
-                />
-              </div>
-            </div>
-          </div>
+          {/* Full Width Calendar Section - Updated with Unified Booking Form */}
+          <FacilityDetailCalendar 
+            zones={displayZones}
+            selectedSlots={selectedSlots}
+            onSlotClick={handleSlotClick}
+            onBulkSlotSelection={handleBulkSlotSelection}
+            onClearSlots={handleClearSlots}
+            onRemoveSlot={handleRemoveSlot}
+            facilityId={id || ""}
+            facilityName={facility.name}
+            currentPattern={currentPattern}
+            onPatternChange={setCurrentPattern}
+            onPatternApply={handlePatternApply}
+            timeSlotDuration={facility.timeSlotDuration || 1}
+          />
         </div>
 
         {/* Mobile Booking Panel */}
-        <MobileBookingPanel facilityName={facility.name} facilityId={id || ""} capacity={facility.capacity} area={facility.area} openingHours={facility.openingHours} />
+        <MobileBookingPanel 
+          facilityName={facility.name} 
+          facilityId={id || ""} 
+          capacity={facility.capacity} 
+          area={facility.area} 
+          openingHours={facility.openingHours} 
+        />
 
         <GlobalFooter />
       </div>
-    </CartProvider>;
+    </CartProvider>
+  );
 };
 
 export default FacilityDetail;
