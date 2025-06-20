@@ -3,11 +3,8 @@ import { useMemo, useCallback } from 'react';
 import { format } from 'date-fns';
 
 interface AvailabilityStatus {
-  status: 'available' | 'busy' | 'unavailable';
-  conflict?: {
-    type: string;
-    details: string;
-  } | null;
+  status: string;
+  conflict?: any;
 }
 
 interface AvailabilityCacheEntry {
