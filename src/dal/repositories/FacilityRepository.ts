@@ -1,10 +1,8 @@
 
 import { BaseRepository } from '../BaseRepository';
 import { Facility, FacilityFilters, OpeningHours } from '@/types/facility';
-import { localizedMockFacilities } from '@/data/localizedMockFacilities';
-import { getLocalizedFacility } from '@/utils/localizationHelper';
-import { FacilityFilterService } from './services/FacilityFilterService';
-import { FacilityConverterService } from './services/FacilityConverterService';
+import { supabaseFacilityRepository } from './SupabaseFacilityRepository';
+import { PaginationParams, ApiResponse, PaginatedResponse } from '@/types/api';
 
 interface FacilityCreateRequest {
   name: string;
@@ -31,31 +29,8 @@ interface FacilityUpdateRequest extends Partial<FacilityCreateRequest> {
 
 export class FacilityRepository extends BaseRepository<Facility, FacilityFilters, FacilityCreateRequest, FacilityUpdateRequest> {
   constructor() {
-    const convertedFacilities = localizedMockFacilities.map(FacilityConverterService.convertLocalizedFacility);
-    
-    // Add timeSlotDuration to some facilities for testing
-    convertedFacilities.forEach((facility, index) => {
-      // Set some facilities to use 2-hour slots for variety
-      if (index % 3 === 0) {
-        facility.timeSlotDuration = 2;
-      } else {
-        facility.timeSlotDuration = 1;
-      }
-    });
-
-    console.log("FacilityRepository - Total facilities loaded:", convertedFacilities.length);
-    console.log("FacilityRepository - Sample facility data for search debugging:", 
-      convertedFacilities.slice(0, 3).map(f => ({ 
-        id: f.id, 
-        name: f.name, 
-        type: f.type, 
-        area: f.area, 
-        description: f.description.substring(0, 50) + "...",
-        suitableFor: f.suitableFor
-      }))
-    );
-    
-    super(convertedFacilities);
+    super([]); // No mock data needed anymore
+    console.log("FacilityRepository - Now using Supabase backend");
   }
 
   protected getId(facility: Facility): string {
@@ -63,34 +38,57 @@ export class FacilityRepository extends BaseRepository<Facility, FacilityFilters
   }
 
   protected applyFilters(facilities: Facility[], filters: FacilityFilters): Facility[] {
-    return FacilityFilterService.applyFilters(facilities, filters);
+    // Delegate to Supabase repository
+    return facilities;
   }
 
   protected createEntity(request: FacilityCreateRequest): Facility {
-    return FacilityConverterService.createFacilityFromRequest(request, this.generateId());
+    throw new Error('Use createAsync instead - now handled by Supabase');
   }
 
   protected updateEntity(existing: Facility, request: FacilityUpdateRequest): Facility {
-    return FacilityConverterService.updateFacilityFromRequest(existing, request);
+    throw new Error('Use updateAsync instead - now handled by Supabase');
   }
 
-  // Enhanced facility methods
+  // Override all methods to use Supabase backend
+  async getAll(pagination?: PaginationParams, filters?: FacilityFilters): Promise<ApiResponse<PaginatedResponse<Facility>>> {
+    console.log("FacilityRepository.getAll - Using Supabase backend", { pagination, filters });
+    return supabaseFacilityRepository.getAll(pagination, filters);
+  }
+
+  async getById(id: string): Promise<ApiResponse<Facility>> {
+    console.log("FacilityRepository.getById - Using Supabase backend", { id });
+    return supabaseFacilityRepository.getById(id);
+  }
+
+  async createAsync(facilityData: Partial<Facility>): Promise<ApiResponse<Facility>> {
+    console.log("FacilityRepository.createAsync - Using Supabase backend", { facilityData });
+    return supabaseFacilityRepository.createAsync(facilityData);
+  }
+
+  async updateAsync(id: string, facilityData: Partial<Facility>): Promise<ApiResponse<Facility>> {
+    console.log("FacilityRepository.updateAsync - Using Supabase backend", { id, facilityData });
+    return supabaseFacilityRepository.updateAsync(id, facilityData);
+  }
+
+  async deleteAsync(id: string): Promise<ApiResponse<Facility>> {
+    console.log("FacilityRepository.deleteAsync - Using Supabase backend", { id });
+    return supabaseFacilityRepository.deleteAsync(id);
+  }
+
   async getFacilitiesByType(type: string) {
-    try {
-      const facilities = this.data.filter(f => f.type.toLowerCase().includes(type.toLowerCase()));
-      return { success: true, data: facilities };
-    } catch (error) {
-      return { success: false, error: { message: 'Failed to fetch facilities by type', details: error } };
-    }
+    console.log("FacilityRepository.getFacilitiesByType - Using Supabase backend", { type });
+    return supabaseFacilityRepository.getFacilitiesByType(type);
   }
 
   async getFacilitiesByArea(area: string) {
-    try {
-      const facilities = this.data.filter(f => f.area.toLowerCase().includes(area.toLowerCase()));
-      return { success: true, data: facilities };
-    } catch (error) {
-      return { success: false, error: { message: 'Failed to fetch facilities by area', details: error } };
-    }
+    console.log("FacilityRepository.getFacilitiesByArea - Using Supabase backend", { area });
+    return supabaseFacilityRepository.getFacilitiesByArea(area);
+  }
+
+  async getFacilityZones(id: string) {
+    console.log("FacilityRepository.getFacilityZones - Using Supabase backend", { id });
+    return supabaseFacilityRepository.getFacilityZones(id);
   }
 }
 
