@@ -1,8 +1,10 @@
+
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import { LocalizationProvider } from "@/contexts/LocalizationContext";
 import { SearchProvider } from "@/contexts/SearchContext";
 import Index from "./pages/Index";
 import FacilityPage from "./pages/facilities/[id]";
@@ -40,50 +42,52 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <LanguageProvider>
-      <SearchProvider>
-        <TooltipProvider>
-          <Toaster />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/facility/:id" element={<FacilityDetailsPage />} />
-              <Route path="/facilities/:id" element={<FacilityDetailsPage />} />
-              <Route path="/booking/:facilityId/confirm" element={<BookingConfirmationPage />} />
-              <Route path="/checkout" element={<CheckoutPage />} />
-              <Route path="/bookings" element={<BookingsPage />} />
-              <Route path="/profile" element={<ProfilePage />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/login-selection" element={<LoginSelectionPage />} />
-              
-              <Route path="/facilities/:facilityId" element={<FacilityPage />} />
-              <Route path="/facilities/:facilityId/book" element={<BookingPage />} />
-              <Route path="/booking/success/:bookingReference" element={<BookingSuccessPage bookingReference="" facilityId="" />} />
-              <Route path="/bookings" element={<BookingsPage />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/profile" element={<ProfilePage />} />
-              <Route path="/settings" element={<SettingsPage />} />
-              <Route path="/admin/*" element={<AdminDashboard />} />
-              <Route path="/minside/paraply" element={<UmbrellaLayout />}>
-                <Route index element={<UmbrellaOverview />} />
-                <Route path="rammetid" element={<AllocatedTime />} />
-                <Route path="fordeling" element={<Distribution />} />
-                <Route path="brukere" element={<Users />} />
-                <Route path="logg" element={<HistoryLogPage />} />
-                <Route path="meldinger" element={<MessagesPage />} />
-                <Route path="frigjor-tid" element={<ReleaseTimePage />} />
-              </Route>
-              <Route path="/minside/bruker" element={<UserLayout />}>
-                <Route index element={<UserOverviewPage />} />
-                <Route path="bookinger" element={<UserBookingsPage />} />
-                <Route path="soknad" element={<NewApplicationPage />} />
-                <Route path="hjelp" element={<HelpPage />} />
-                <Route path="profil" element={<UserProfilePage />} />
-                <Route path="fakturaer" element={<InvoicesPage />} />
-              </Route>
-            </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
-      </SearchProvider>
+      <LocalizationProvider>
+        <SearchProvider>
+          <TooltipProvider>
+            <Toaster />
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/facility/:id" element={<FacilityDetailsPage />} />
+                <Route path="/facilities/:id" element={<FacilityDetailsPage />} />
+                <Route path="/booking/:facilityId/confirm" element={<BookingConfirmationPage />} />
+                <Route path="/checkout" element={<CheckoutPage />} />
+                <Route path="/bookings" element={<BookingsPage />} />
+                <Route path="/profile" element={<ProfilePage />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/login-selection" element={<LoginSelectionPage />} />
+                
+                <Route path="/facilities/:facilityId" element={<FacilityPage />} />
+                <Route path="/facilities/:facilityId/book" element={<BookingPage />} />
+                <Route path="/booking/success/:bookingReference" element={<BookingSuccessPage bookingReference="" facilityId="" />} />
+                <Route path="/bookings" element={<BookingsPage />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/profile" element={<ProfilePage />} />
+                <Route path="/settings" element={<SettingsPage />} />
+                <Route path="/admin/*" element={<AdminDashboard />} />
+                <Route path="/minside/paraply" element={<UmbrellaLayout />}>
+                  <Route index element={<UmbrellaOverview />} />
+                  <Route path="rammetid" element={<AllocatedTime />} />
+                  <Route path="fordeling" element={<Distribution />} />
+                  <Route path="brukere" element={<Users />} />
+                  <Route path="logg" element={<HistoryLogPage />} />
+                  <Route path="meldinger" element={<MessagesPage />} />
+                  <Route path="frigjor-tid" element={<ReleaseTimePage />} />
+                </Route>
+                <Route path="/minside/bruker" element={<UserLayout />}>
+                  <Route index element={<UserOverviewPage />} />
+                  <Route path="bookinger" element={<UserBookingsPage />} />
+                  <Route path="soknad" element={<NewApplicationPage />} />
+                  <Route path="hjelp" element={<HelpPage />} />
+                  <Route path="profil" element={<UserProfilePage />} />
+                  <Route path="fakturaer" element={<InvoicesPage />} />
+                </Route>
+              </Routes>
+            </BrowserRouter>
+          </TooltipProvider>
+        </SearchProvider>
+      </LocalizationProvider>
     </LanguageProvider>
   </QueryClientProvider>
 );
