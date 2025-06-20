@@ -25,7 +25,7 @@ export const MapInfoOverlay: React.FC<MapInfoOverlayProps> = ({ facilities }) =>
           </CardTitle>
         </CardHeader>
         <CardContent className="pt-0">
-          <div className="space-y-3 max-h-80 overflow-y-auto">
+          <div className="space-y-3 max-h-[720px] overflow-y-auto">
             {facilities.map((facility, index) => (
               <div 
                 key={facility.id}

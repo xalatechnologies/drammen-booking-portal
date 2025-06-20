@@ -101,5 +101,5 @@ export const MapContainer: React.FC<MapContainerProps> = ({
     };
   }, []);
 
-  return <div ref={mapContainer} className="h-[800px] w-full" />;
+  return <div ref={mapContainer} className="h-[900px] w-full" />;
 };
