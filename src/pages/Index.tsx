@@ -93,9 +93,9 @@ const Index = () => {
   const renderContent = () => {
     switch (viewMode) {
       case "map":
-        return <MapView facilityType={facilityType} location={location} />;
+        return <MapView facilityType={facilityType} location={location} viewMode={viewMode} setViewMode={setViewMode} />;
       case "calendar":
-        return <CalendarView date={date} facilityType={facilityType} location={location} accessibility={accessibility} capacity={capacity} />;
+        return <CalendarView date={date} facilityType={facilityType} location={location} accessibility={accessibility} capacity={capacity} viewMode={viewMode} setViewMode={setViewMode} />;
       case "list":
       case "grid":
         return <FacilityList filters={filters} viewMode={viewMode} setViewMode={setViewMode} />;

@@ -9,13 +9,21 @@ import { FacilityCalendarCard } from "./FacilityCalendarCard";
 import { CalendarViewProps } from "./types";
 import { useFacilities } from "@/hooks/useFacilities";
 import { FacilityFilters } from "@/types/facility";
+import ViewHeader from "../search/ViewHeader";
 
-const CalendarView: React.FC<CalendarViewProps> = ({
+interface CalendarViewWithToggleProps extends CalendarViewProps {
+  viewMode: "grid" | "map" | "calendar" | "list";
+  setViewMode: (mode: "grid" | "map" | "calendar" | "list") => void;
+}
+
+const CalendarView: React.FC<CalendarViewWithToggleProps> = ({
   date,
   facilityType,
   location,
   accessibility,
   capacity,
+  viewMode,
+  setViewMode,
 }) => {
   const [currentWeekStart, setCurrentWeekStart] = useState(startOfWeek(date || new Date(), { weekStartsOn: 1 }));
   
@@ -97,6 +105,12 @@ const CalendarView: React.FC<CalendarViewProps> = ({
   if (isLoading) {
     return (
       <div className="max-w-7xl mx-auto px-4">
+        <ViewHeader 
+          facilityCount={0}
+          isLoading={true}
+          viewMode={viewMode}
+          setViewMode={setViewMode}
+        />
         <div className="flex justify-center items-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
         </div>
@@ -107,6 +121,12 @@ const CalendarView: React.FC<CalendarViewProps> = ({
   if (error) {
     return (
       <div className="max-w-7xl mx-auto px-4">
+        <ViewHeader 
+          facilityCount={0}
+          isLoading={false}
+          viewMode={viewMode}
+          setViewMode={setViewMode}
+        />
         <div className="text-center py-10 bg-red-50 rounded-lg border border-red-200">
           <h3 className="text-xl font-medium mb-2 text-red-800">Kunne ikke laste kalenderen</h3>
           <p className="text-red-600">Prøv igjen senere.</p>
@@ -117,6 +137,14 @@ const CalendarView: React.FC<CalendarViewProps> = ({
   
   return (
     <div className="max-w-7xl mx-auto px-4">
+      {/* Reusable Header */}
+      <ViewHeader 
+        facilityCount={facilitiesWithBookings.length}
+        isLoading={isLoading}
+        viewMode={viewMode}
+        setViewMode={setViewMode}
+      />
+
       <div className="space-y-6">
         {/* Enhanced Week Navigation */}
         <WeekNavigation

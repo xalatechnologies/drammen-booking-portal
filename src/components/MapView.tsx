@@ -8,6 +8,7 @@ import { MapLoadingState } from './map/MapLoadingState';
 import { MapErrorState } from './map/MapErrorState';
 import { useFacilities } from '@/hooks/useFacilities';
 import { FacilityFilters } from '@/types/facility';
+import ViewHeader from './search/ViewHeader';
 import mapboxgl from 'mapbox-gl';
 
 // Default token provided by user
@@ -16,9 +17,11 @@ const DEFAULT_MAPBOX_TOKEN = 'pk.eyJ1IjoieGFsYXRlY2hub2xvZ2llc2FzIiwiYSI6ImNtYmh
 interface MapViewProps {
   facilityType: string;
   location: string;
+  viewMode: "grid" | "map" | "calendar" | "list";
+  setViewMode: (mode: "grid" | "map" | "calendar" | "list") => void;
 }
 
-const MapView: React.FC<MapViewProps> = ({ facilityType, location }) => {
+const MapView: React.FC<MapViewProps> = ({ facilityType, location, viewMode, setViewMode }) => {
   const [map, setMap] = useState<mapboxgl.Map | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
@@ -63,6 +66,14 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location }) => {
 
   return (
     <div className="max-w-7xl mx-auto px-4">
+      {/* Reusable Header */}
+      <ViewHeader 
+        facilityCount={facilities.length}
+        isLoading={facilitiesLoading}
+        viewMode={viewMode}
+        setViewMode={setViewMode}
+      />
+
       {/* Map Content */}
       <Card className="min-h-[600px] relative overflow-hidden">
         <MapLoadingState isLoading={isLoading || facilitiesLoading} />
