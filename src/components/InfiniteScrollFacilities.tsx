@@ -153,7 +153,7 @@ export function InfiniteScrollFacilities({
               >
                 <FacilityGrid 
                   pagination={{ page: 1, limit: 1 }} 
-                  filters={{ ...filters, facilityIds: [facility.id] }}
+                  filters={{ ...filters, searchTerm: facility.name }}
                 />
               </div>
             ))}

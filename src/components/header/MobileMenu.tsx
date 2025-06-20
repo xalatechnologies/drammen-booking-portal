@@ -1,9 +1,10 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { LogIn, Shield, Cookie, Info } from "lucide-react";
+import { LogIn, Shield, Cookie, Info, Settings } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "@/i18n/hooks/useTranslation";
+import { useGdpr } from "@/contexts/GdprContext";
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -24,11 +25,17 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
 }) => {
   const { t, language } = useTranslation();
   const navigate = useNavigate();
+  const { showPreferences } = useGdpr();
 
   if (!isOpen) return null;
 
   const handleNavigation = (path: string) => {
     navigate(path);
+    closeMobileMenu();
+  };
+
+  const handleGdprPreferences = () => {
+    showPreferences();
     closeMobileMenu();
   };
 
@@ -72,6 +79,15 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
         >
           <Shield className="mr-2 h-5 w-5" />
           Personvern
+        </Button>
+        
+        <Button 
+          variant="ghost" 
+          className="w-full justify-start text-lg font-medium py-3"
+          onClick={handleGdprPreferences}
+        >
+          <Settings className="mr-2 h-5 w-5" />
+          Cookie-innstillinger
         </Button>
         
         <Button 

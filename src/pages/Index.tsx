@@ -8,6 +8,7 @@ import FacilityList from "@/components/FacilityList";
 import MapView from "@/components/MapView";
 import CalendarView from "@/components/CalendarView";
 import GdprPopup from "@/components/GdprPopup";
+import { GdprProvider } from "@/contexts/GdprContext";
 import { useFacilitiesPagination } from "@/hooks/useFacilities";
 import { FacilityFilters } from "@/types/facility";
 
@@ -117,56 +118,58 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex flex-col w-full">
-      {/* Skip to main content link for screen readers */}
-      <a 
-        href="#main-content" 
-        className="sr-only focus:not-sr-only focus:absolute focus:top-0 focus:left-0 bg-blue-600 text-white p-2 z-50 rounded-br-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
-        tabIndex={0}
-      >
-        Hopp til hovedinnhold
-      </a>
+    <GdprProvider>
+      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex flex-col w-full">
+        {/* Skip to main content link for screen readers */}
+        <a 
+          href="#main-content" 
+          className="sr-only focus:not-sr-only focus:absolute focus:top-0 focus:left-0 bg-blue-600 text-white p-2 z-50 rounded-br-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
+          tabIndex={0}
+        >
+          Hopp til hovedinnhold
+        </a>
 
-      <GlobalHeader />
+        <GlobalHeader />
 
-      <main id="main-content" className="flex-1 w-full">
-        {/* Content Area - Centered */}
-        <div className="content-center py-6">
-          <SearchFilter
-            date={date}
-            setDate={setDate}
-            facilityType={facilityType}
-            setFacilityType={setFacilityType}
-            location={location}
-            setLocation={setLocation}
-            viewMode={viewMode}
-            setViewMode={setViewMode}
-            accessibility={accessibility}
-            setAccessibility={setAccessibility}
-            capacity={capacity}
-            setCapacity={setCapacity}
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
-            priceRange={priceRange}
-            setPriceRange={setPriceRange}
-            availableNow={availableNow}
-            setAvailableNow={setAvailableNow}
-            hasEquipment={hasEquipment}
-            setHasEquipment={setHasEquipment}
-            hasParking={hasParking}
-            setHasParking={setHasParking}
-            hasWifi={hasWifi}
-            setHasWifi={setHasWifi}
-            allowsPhotography={allowsPhotography}
-            setAllowsPhotography={setAllowsPhotography}
-          />
+        <main id="main-content" className="flex-1 w-full">
+          {/* Content Area - Centered */}
+          <div className="content-center py-6">
+            <SearchFilter
+              date={date}
+              setDate={setDate}
+              facilityType={facilityType}
+              setFacilityType={setFacilityType}
+              location={location}
+              setLocation={setLocation}
+              viewMode={viewMode}
+              setViewMode={setViewMode}
+              accessibility={accessibility}
+              setAccessibility={setAccessibility}
+              capacity={capacity}
+              setCapacity={setCapacity}
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
+              priceRange={priceRange}
+              setPriceRange={setPriceRange}
+              availableNow={availableNow}
+              setAvailableNow={setAvailableNow}
+              hasEquipment={hasEquipment}
+              setHasEquipment={setHasEquipment}
+              hasParking={hasParking}
+              setHasParking={setHasParking}
+              hasWifi={hasWifi}
+              setHasWifi={setHasWifi}
+              allowsPhotography={allowsPhotography}
+              setAllowsPhotography={setAllowsPhotography}
+            />
 
-          {renderContent()}
-        </div>
-      </main>
+            {renderContent()}
+          </div>
+        </main>
 
-      <GdprPopup />
-    </div>
+        <GdprPopup />
+      </div>
+    </GdprProvider>
   );
 };
 
