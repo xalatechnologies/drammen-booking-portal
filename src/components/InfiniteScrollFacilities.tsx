@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useFacilities, useFacilitiesPagination } from '@/hooks/useFacilities';
 import { FacilityCard } from './facility/FacilityCard';
-import { FacilityListItem } from './facility/FacilityListItem';
+import FacilityListItem from './facility/FacilityListItem';
 import { FacilityFilters } from '@/types/facility';
 
 interface InfiniteScrollFacilitiesProps {
@@ -83,6 +83,12 @@ export const InfiniteScrollFacilities: React.FC<InfiniteScrollFacilitiesProps> =
     return () => window.removeEventListener('scroll', handleScroll);
   }, [loadMore]);
 
+  const handleAddressClick = (e: React.MouseEvent, facility: any) => {
+    e.stopPropagation();
+    // Handle address click logic here
+    console.log('Address clicked for facility:', facility.name);
+  };
+
   console.log('InfiniteScrollFacilities - Current state:', {
     allFacilitiesCount: allFacilities.length,
     isLoading,
@@ -103,7 +109,11 @@ export const InfiniteScrollFacilities: React.FC<InfiniteScrollFacilitiesProps> =
       {viewMode === "grid" ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {allFacilities.map((facility) => (
-            <FacilityCard key={facility.id} facility={facility} />
+            <FacilityCard 
+              key={facility.id} 
+              facility={facility} 
+              onAddressClick={handleAddressClick}
+            />
           ))}
         </div>
       ) : (

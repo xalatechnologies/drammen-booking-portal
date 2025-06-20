@@ -1,5 +1,6 @@
+
 // Re-export from the main service to maintain compatibility
-export { facilityRepository as FacilityService } from '@/dal/repositories/FacilityRepository';
+export { facilityRepository } from '@/dal/repositories/FacilityRepository';
 
 // Also export individual methods for convenience
 import { facilityRepository } from '@/dal/repositories/FacilityRepository';

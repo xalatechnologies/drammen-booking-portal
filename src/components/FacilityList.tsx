@@ -18,7 +18,6 @@ const FacilityList: React.FC<FacilityListProps> = ({
     <InfiniteScrollFacilities 
       filters={filters} 
       viewMode={viewMode}
-      setViewMode={setViewMode}
     />
   );
 };
