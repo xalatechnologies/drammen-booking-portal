@@ -7,6 +7,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { format } from 'date-fns';
 import { nb } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
+import { DateRange } from 'react-day-picker';
 
 interface DateRangeStepProps {
   startDate?: Date;
@@ -21,6 +22,17 @@ export function DateRangeStep({
   onStartDateChange,
   onEndDateChange
 }: DateRangeStepProps) {
+  const [dateRange, setDateRange] = React.useState<DateRange | undefined>({
+    from: startDate,
+    to: endDate,
+  });
+
+  const handleDateRangeSelect = (range: DateRange | undefined) => {
+    setDateRange(range);
+    onStartDateChange(range?.from);
+    onEndDateChange(range?.to);
+  };
+
   return (
     <div className="space-y-6">
       <div className="text-center">
@@ -33,91 +45,64 @@ export function DateRangeStep({
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Start Date */}
-        <div className="space-y-2">
-          <label className="block text-sm font-medium text-gray-700">
-            Startdato
-          </label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className={cn(
-                  "w-full justify-start text-left font-normal",
-                  !startDate && "text-muted-foreground"
-                )}
-              >
-                <CalendarDays className="mr-2 h-4 w-4" />
-                {startDate ? (
-                  format(startDate, 'dd.MM.yyyy', { locale: nb })
+      <div className="space-y-4">
+        <label className="block text-sm font-medium text-gray-700">
+          Velg tidsperiode
+        </label>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              className={cn(
+                "w-full justify-start text-left font-normal h-auto py-3",
+                !dateRange?.from && "text-muted-foreground"
+              )}
+            >
+              <CalendarDays className="mr-2 h-4 w-4" />
+              <div className="flex flex-col items-start">
+                {dateRange?.from ? (
+                  <>
+                    <span className="text-sm font-medium">
+                      {format(dateRange.from, 'dd.MM.yyyy', { locale: nb })}
+                      {dateRange.to && (
+                        <> - {format(dateRange.to, 'dd.MM.yyyy', { locale: nb })}</>
+                      )}
+                    </span>
+                    <span className="text-xs text-gray-500">
+                      {dateRange.to ? 'Periode valgt' : 'Velg sluttdato'}
+                    </span>
+                  </>
                 ) : (
-                  <span>Velg startdato</span>
+                  <span>Velg startdato og sluttdato</span>
                 )}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <CalendarComponent
-                mode="single"
-                selected={startDate}
-                onSelect={onStartDateChange}
-                initialFocus
-                disabled={(date) => date < new Date()}
-                className={cn("p-3 pointer-events-auto")}
-              />
-            </PopoverContent>
-          </Popover>
-        </div>
-
-        {/* End Date */}
-        <div className="space-y-2">
-          <label className="block text-sm font-medium text-gray-700">
-            Sluttdato
-          </label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className={cn(
-                  "w-full justify-start text-left font-normal",
-                  !endDate && "text-muted-foreground"
-                )}
-              >
-                <CalendarDays className="mr-2 h-4 w-4" />
-                {endDate ? (
-                  format(endDate, 'dd.MM.yyyy', { locale: nb })
-                ) : (
-                  <span>Velg sluttdato</span>
-                )}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <CalendarComponent
-                mode="single"
-                selected={endDate}
-                onSelect={onEndDateChange}
-                initialFocus
-                disabled={(date) => {
-                  if (startDate) {
-                    return date < startDate;
-                  }
-                  return date < new Date();
-                }}
-                className={cn("p-3 pointer-events-auto")}
-              />
-            </PopoverContent>
-          </Popover>
-        </div>
+              </div>
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <CalendarComponent
+              mode="range"
+              selected={dateRange}
+              onSelect={handleDateRangeSelect}
+              numberOfMonths={2}
+              initialFocus
+              disabled={(date) => date < new Date()}
+              className="p-3"
+            />
+          </PopoverContent>
+        </Popover>
       </div>
 
-      {startDate && endDate && (
+      {dateRange?.from && dateRange?.to && (
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
           <div className="flex items-center gap-2 text-blue-800">
             <CalendarDays className="h-4 w-4" />
             <span className="font-medium">Valgt periode:</span>
           </div>
           <p className="text-blue-700 mt-1">
-            Fra {format(startDate, 'dd.MM.yyyy', { locale: nb })} til {format(endDate, 'dd.MM.yyyy', { locale: nb })}
+            Fra {format(dateRange.from, 'dd.MM.yyyy', { locale: nb })} til {format(dateRange.to, 'dd.MM.yyyy', { locale: nb })}
+          </p>
+          <p className="text-blue-600 text-sm mt-1">
+            {Math.ceil((dateRange.to.getTime() - dateRange.from.getTime()) / (1000 * 60 * 60 * 24))} dager
           </p>
         </div>
       )}
