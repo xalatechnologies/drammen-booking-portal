@@ -123,8 +123,6 @@ export function UnifiedBookingForm({
             {...baseProps}
             selectedSlots={selectedSlots}
             facilityId={facilityId}
-            facilityName={facilityName}
-            zones={zones}
           />
         );
       case 2:
