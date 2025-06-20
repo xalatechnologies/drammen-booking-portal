@@ -3,10 +3,11 @@ import React, { useEffect, useRef, useState } from "react";
 import { Loader2, ArrowUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import FacilityGrid from "./FacilityGrid";
+import { FacilityCard } from "./facility/FacilityCard";
 import FacilityListItem from "./facility/FacilityListItem";
 import { useOptimizedFacilities } from "@/hooks/useOptimizedFacilities";
 import { FacilityFilters } from "@/types/facility";
+import { useNavigate } from "react-router-dom";
 
 interface InfiniteScrollFacilitiesProps {
   filters: FacilityFilters;
@@ -17,6 +18,7 @@ export function InfiniteScrollFacilities({
   filters,
   viewMode
 }: InfiniteScrollFacilitiesProps) {
+  const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const [allFacilities, setAllFacilities] = useState<any[]>([]);
   const [hasMore, setHasMore] = useState(true);
@@ -91,6 +93,23 @@ export function InfiniteScrollFacilities({
     }
   };
 
+  // Function to handle address click - navigate to map view with filters
+  const handleAddressClick = (e: React.MouseEvent, facility: any) => {
+    e.stopPropagation();
+    const searchParams = new URLSearchParams();
+    if (filters.facilityType) searchParams.set('facilityType', filters.facilityType);
+    if (filters.location) searchParams.set('location', filters.location);
+    if (filters.accessibility) searchParams.set('accessibility', filters.accessibility);
+    if (filters.capacity && Array.isArray(filters.capacity)) {
+      searchParams.set('capacity', filters.capacity.join(','));
+    }
+    if (filters.searchTerm) searchParams.set('searchTerm', filters.searchTerm);
+    searchParams.set('viewMode', 'map');
+    searchParams.set('focusFacility', facility.id.toString());
+    
+    navigate(`/?${searchParams.toString()}`);
+  };
+
   if (error) {
     return (
       <div className="text-center py-10 bg-red-50 rounded-lg border border-red-200">
@@ -142,42 +161,40 @@ export function InfiniteScrollFacilities({
       </div>
 
       {/* Facilities content */}
-      <div className={`space-y-6 ${viewMode === "list" ? "space-y-4" : ""}`}>
-        {viewMode === "grid" ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {allFacilities.map((facility, index) => (
-              <div 
-                key={`${facility.id}-${index}`}
-                className="animate-fade-in"
-                style={{ animationDelay: `${(index % 6) * 100}ms` }}
-              >
-                <FacilityGrid 
-                  pagination={{ page: 1, limit: 1 }} 
-                  filters={{ ...filters, searchTerm: facility.name }}
-                />
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {allFacilities.map((facility, index) => (
-              <div 
-                key={`${facility.id}-${index}`}
-                className="animate-fade-in"
-                style={{ animationDelay: `${(index % 6) * 50}ms` }}
-              >
-                <FacilityListItem 
-                  facility={facility}
-                  facilityType={filters.facilityType}
-                  location={filters.location}
-                  accessibility={filters.accessibility}
-                  capacity={filters.capacity}
-                />
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+      {viewMode === "grid" ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 animate-fade-in">
+          {allFacilities.map((facility, index) => (
+            <div 
+              key={`${facility.id}-${index}`}
+              className="animate-scale-in"
+              style={{ animationDelay: `${(index % 6) * 50}ms` }}
+            >
+              <FacilityCard 
+                facility={facility} 
+                onAddressClick={handleAddressClick}
+              />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {allFacilities.map((facility, index) => (
+            <div 
+              key={`${facility.id}-${index}`}
+              className="animate-fade-in"
+              style={{ animationDelay: `${(index % 6) * 50}ms` }}
+            >
+              <FacilityListItem 
+                facility={facility}
+                facilityType={filters.facilityType}
+                location={filters.location}
+                accessibility={filters.accessibility}
+                capacity={filters.capacity}
+              />
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Loading indicator */}
       {isLoading && page > 1 && (
