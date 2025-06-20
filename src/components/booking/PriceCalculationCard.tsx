@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { ActorType } from '@/types/pricing';
@@ -29,6 +28,15 @@ const actorTypes = [{
   label: 'Kommunale enheter'
 }];
 
+// Discount percentages for each actor type
+const actorTypeDiscounts = {
+  'lag-foreninger': 50,      // 50% discount
+  'paraply': 70,             // 70% discount
+  'private-firma': -20,      // 20% surcharge (negative discount)
+  'kommunale-enheter': 30,   // 30% discount
+  'private-person': 0        // No discount
+};
+
 export function PriceCalculationCard({
   selectedSlots,
   facilityId,
@@ -40,8 +48,6 @@ export function PriceCalculationCard({
   console.log('PriceCalculationCard - facilityId:', facilityId);
 
   const firstSlot = selectedSlots[0];
-
-  // Calculate total hours from all slots (each slot is typically 1 hour)
   const totalSlots = selectedSlots.length;
 
   const {
@@ -76,6 +82,9 @@ export function PriceCalculationCard({
     }))
   } : null;
 
+  const actorTypeLabel = actorTypes.find(a => a.value === actorType)?.label || '';
+  const discountPercentage = actorType ? actorTypeDiscounts[actorType as keyof typeof actorTypeDiscounts] : 0;
+
   console.log('PriceCalculationCard - totalCalculation:', totalCalculation);
 
   return (
@@ -95,13 +104,6 @@ export function PriceCalculationCard({
           </div>
         ) : totalCalculation ? (
           <div className="space-y-2 text-navy-800">
-            {totalSlots > 1 && (
-              <div className="flex justify-between text-lg text-blue-700 mb-3">
-                <span>Antall tidspunkt:</span>
-                <span>{totalSlots} stk</span>
-              </div>
-            )}
-
             <div className="flex justify-between text-lg">
               <span>Grunnpris per time:</span>
               <span>{Math.round(calculation.basePrice / (calculation.totalHours || 1))} kr</span>
@@ -112,16 +114,26 @@ export function PriceCalculationCard({
               <span>{Math.round(totalCalculation.basePrice)} kr</span>
             </div>
 
-            {totalCalculation.discounts.length > 0 && (
-              <div className="flex justify-between text-lg text-green-700">
-                <span>Rabatt ({actorTypes.find(a => a.value === actorType)?.label}):</span>
-                <span>-{Math.round(totalCalculation.discounts.reduce((sum, d) => sum + d.amount, 0))} kr</span>
+            {/* Discount Information */}
+            {actorType && discountPercentage !== 0 && (
+              <div className={`flex justify-between text-lg ${discountPercentage > 0 ? 'text-green-700' : 'text-orange-700'}`}>
+                <span>
+                  {discountPercentage > 0 ? 'Rabatt' : 'Tillegg'} ({actorTypeLabel}):
+                  <br />
+                  <span className="text-sm">
+                    {discountPercentage > 0 ? `${discountPercentage}% rabatt` : `${Math.abs(discountPercentage)}% tillegg`}
+                  </span>
+                </span>
+                <span>
+                  {discountPercentage > 0 ? '-' : '+'}
+                  {Math.round(totalCalculation.basePrice * Math.abs(discountPercentage) / 100)} kr
+                </span>
               </div>
             )}
 
             {totalCalculation.surcharges.length > 0 && (
               <div className="flex justify-between text-lg text-orange-700">
-                <span>Tillegg:</span>
+                <span>Andre tillegg:</span>
                 <span>+{Math.round(totalCalculation.surcharges.reduce((sum, s) => sum + s.amount, 0))} kr</span>
               </div>
             )}
@@ -136,6 +148,13 @@ export function PriceCalculationCard({
               <span>Total inkl. MVA:</span>
               <span>{Math.round(totalCalculation.totalPrice * 1.25)} kr</span>
             </div>
+
+            {/* Additional info for special actor types */}
+            {(actorType === 'lag-foreninger' || actorType === 'paraply') && (
+              <div className="mt-3 p-2 bg-blue-100 rounded text-sm text-blue-800">
+                ℹ️ Booking krever godkjenning for {actorTypeLabel.toLowerCase()}
+              </div>
+            )}
           </div>
         ) : (
           <div className="text-navy-700 text-lg">Ingen prisberegning tilgjengelig</div>
