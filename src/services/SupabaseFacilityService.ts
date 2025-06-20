@@ -218,11 +218,9 @@ export class SupabaseFacilityService {
           coordinates_width,
           coordinates_height,
           accessibility_features,
-          equipment,
-          is_active
+          equipment
         `)
-        .eq('facility_id', parseInt(facilityId))
-        .eq('is_active', true);
+        .eq('facility_id', parseInt(facilityId));
 
       if (error) {
         console.error('Error fetching zones:', error);
@@ -284,7 +282,7 @@ export class SupabaseFacilityService {
           amplifiedSoundAllowed: true,
           commercialUseAllowed: true
         },
-        isActive: zone.is_active,
+        isActive: true, // Default to true since is_active column doesn't exist
         createdAt: new Date(),
         updatedAt: new Date()
       }));
@@ -319,11 +317,9 @@ export class SupabaseFacilityService {
           coordinates_width,
           coordinates_height,
           accessibility_features,
-          equipment,
-          is_active
+          equipment
         `)
         .eq('id', zoneId)
-        .eq('is_active', true)
         .single();
 
       if (error) {
@@ -389,7 +385,7 @@ export class SupabaseFacilityService {
           amplifiedSoundAllowed: true,
           commercialUseAllowed: true
         },
-        isActive: data.is_active,
+        isActive: true, // Default to true since is_active column doesn't exist
         createdAt: new Date(),
         updatedAt: new Date()
       };
