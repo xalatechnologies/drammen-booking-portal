@@ -106,8 +106,8 @@ export function AvailabilityTab({
 
   const timeSlots = generateTimeSlots();
 
-  // Use the first zone or create a default one with all required properties
-  const primaryZone: Zone = zones[0] || {
+  // Use the first zone or create a default one
+  const primaryZone = zones[0] || {
     id: 'whole-facility',
     name: 'Hele lokalet',
     capacity: 30,
