@@ -13,7 +13,8 @@ import { useTranslation } from '@/i18n/hooks/useTranslation';
 import { useCart } from '@/contexts/CartContext';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuthStore } from '@/stores/useAuthStore';
+import { useBookingStore } from '@/stores/useBookingStore';
 
 interface BookingPricingStepProps {
   selectedSlots: SelectedTimeSlot[];
@@ -56,7 +57,8 @@ export function BookingPricingStep({
   const { addToCart } = useCart();
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuthStore();
+  const { setFacilityContext } = useBookingStore();
   const [showLoginModal, setShowLoginModal] = useState(false);
 
   // Check if booking requires approval
@@ -64,6 +66,9 @@ export function BookingPricingStep({
 
   const handleAddToCart = () => {
     try {
+      // Set facility context in booking store
+      setFacilityContext(facilityId, facilityName);
+      
       // Convert actor type for cart
       const cartActorType = convertActorType(actorType);
 
@@ -81,7 +86,6 @@ export function BookingPricingStep({
           timeSlot: slot.timeSlot,
           duration,
           pricePerHour,
-          // Required new fields with defaults
           purpose: 'Generell booking',
           expectedAttendees: 1,
           organizationType: cartActorType,
