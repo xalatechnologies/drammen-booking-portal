@@ -50,12 +50,12 @@ export const InfiniteScrollFacilities: React.FC<InfiniteScrollFacilitiesProps> =
       allFacilitiesLength: allFacilities.length
     });
 
-    if (!isLoading && facilities.length >= 0) { // Changed > 0 to >= 0 to handle empty results
+    if (!isLoading) {
       if (currentPage === 1) {
         // For first page, replace all facilities (this handles both fresh loads and filter changes)
         console.log('InfiniteScrollFacilities - Setting facilities for page 1:', facilities.length);
-        setAllFacilities(facilities);
-      } else {
+        setAllFacilities(facilities || []);
+      } else if (facilities && facilities.length > 0) {
         // For subsequent pages, append new facilities (avoid duplicates)
         console.log('InfiniteScrollFacilities - Appending facilities for page', currentPage);
         setAllFacilities(prev => {

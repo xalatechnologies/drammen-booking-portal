@@ -43,60 +43,63 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
   capacity,
   setCapacity
 }) => {
-  const [facilityTypes, setFacilityTypes] = useState<string[]>([]);
-  const [areas, setAreas] = useState<string[]>([]);
+  const [availableTypes, setAvailableTypes] = useState<string[]>([]);
+  const [availableAreas, setAvailableAreas] = useState<string[]>([]);
+  const [availableAccessibility, setAvailableAccessibility] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Fetch facility types from database
-  useEffect(() => {
-    const fetchFacilityTypes = async () => {
-      try {
-        console.log('SearchFilter - Fetching facility types from database');
-        const { data, error } = await supabase
-          .from('facilities')
-          .select('type')
-          .eq('status', 'active');
-        
-        if (error) {
-          console.error('SearchFilter - Error fetching facility types:', error);
-          return;
-        }
+  // Fetch all available filter options based on current selections
+  const fetchFilterOptions = async () => {
+    try {
+      setLoading(true);
+      console.log('SearchFilter - Fetching filter options with current filters:', { facilityType, location, accessibility });
 
-        const uniqueTypes = [...new Set(data?.map(f => f.type) || [])];
-        console.log('SearchFilter - Fetched facility types:', uniqueTypes);
-        setFacilityTypes(uniqueTypes);
-      } catch (error) {
-        console.error('SearchFilter - Failed to fetch facility types:', error);
+      let query = supabase
+        .from('facilities')
+        .select('type, area, accessibility_features')
+        .eq('status', 'active');
+
+      // Apply current filters to narrow down options
+      if (facilityType && facilityType !== 'all') {
+        query = query.eq('type', facilityType);
       }
-    };
-
-    fetchFacilityTypes();
-  }, []);
-
-  // Fetch areas from database
-  useEffect(() => {
-    const fetchAreas = async () => {
-      try {
-        console.log('SearchFilter - Fetching areas from database');
-        const { data, error } = await supabase
-          .from('facilities')
-          .select('area, address_city')
-          .eq('status', 'active');
-        
-        if (error) {
-          console.error('SearchFilter - Error fetching areas:', error);
-          return;
-        }
-
-        const uniqueAreas = [...new Set(data?.map(f => f.area) || [])];
-        console.log('SearchFilter - Fetched areas:', uniqueAreas);
-        setAreas(uniqueAreas);
-      } catch (error) {
-        console.error('SearchFilter - Failed to fetch areas:', error);
+      if (location && location !== 'all') {
+        query = query.eq('area', location);
       }
-    };
+      if (accessibility && accessibility !== 'all') {
+        query = query.contains('accessibility_features', [accessibility]);
+      }
 
-    fetchAreas();
-  }, []);
+      const { data, error } = await query;
+      
+      if (error) {
+        console.error('SearchFilter - Error fetching filter options:', error);
+        return;
+      }
+
+      // Extract unique values for each filter
+      const types = [...new Set(data?.map(f => f.type).filter(Boolean) || [])];
+      const areas = [...new Set(data?.map(f => f.area).filter(Boolean) || [])];
+      const accessibilityFeatures = [...new Set(
+        data?.flatMap(f => f.accessibility_features || []).filter(Boolean) || []
+      )];
+
+      console.log('SearchFilter - Available options:', { types, areas, accessibilityFeatures });
+
+      setAvailableTypes(types);
+      setAvailableAreas(areas);
+      setAvailableAccessibility(accessibilityFeatures);
+    } catch (error) {
+      console.error('SearchFilter - Failed to fetch filter options:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch options on mount and when filters change
+  useEffect(() => {
+    fetchFilterOptions();
+  }, [facilityType, location, accessibility]);
 
   const handleCapacityChange = (value: string) => {
     console.log('SearchFilter - Capacity filter changed to:', value);
@@ -134,7 +137,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
         <div className="flex flex-col lg:flex-row gap-3 items-stretch w-full">
           {/* Facility type */}
           <div className="flex-1">
-            <Select value={facilityType} onValueChange={setFacilityType}>
+            <Select value={facilityType} onValueChange={setFacilityType} disabled={loading}>
               <SelectTrigger className="h-14 w-full border-gray-300 hover:border-blue-500 text-base rounded-lg bg-white/95 backdrop-blur-sm shadow-sm">
                 <div className="flex items-center text-left">
                   <Building className="mr-2 h-4 w-4" />
@@ -143,7 +146,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
               </SelectTrigger>
               <SelectContent className="bg-white z-50">
                 <SelectItem value="all" className="text-base">Alle typer</SelectItem>
-                {facilityTypes.map((type) => (
+                {availableTypes.map((type) => (
                   <SelectItem key={type} value={type} className="text-base">{type}</SelectItem>
                 ))}
               </SelectContent>
@@ -152,7 +155,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
 
           {/* Location */}
           <div className="flex-1">
-            <Select value={location} onValueChange={setLocation}>
+            <Select value={location} onValueChange={setLocation} disabled={loading}>
               <SelectTrigger className="h-14 w-full border-gray-300 hover:border-blue-500 text-base rounded-lg bg-white/95 backdrop-blur-sm shadow-sm">
                 <div className="flex items-center text-left">
                   <MapPin className="mr-2 h-4 w-4" />
@@ -161,7 +164,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
               </SelectTrigger>
               <SelectContent className="bg-white z-50">
                 <SelectItem value="all" className="text-base">Alle områder</SelectItem>
-                {areas.map((area) => (
+                {availableAreas.map((area) => (
                   <SelectItem key={area} value={area} className="text-base">{area}</SelectItem>
                 ))}
               </SelectContent>
@@ -189,7 +192,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
 
           {/* Accessibility */}
           <div className="flex-1">
-            <Select value={accessibility} onValueChange={setAccessibility}>
+            <Select value={accessibility} onValueChange={setAccessibility} disabled={loading}>
               <SelectTrigger className="h-14 w-full border-gray-300 hover:border-blue-500 text-base rounded-lg bg-white/95 backdrop-blur-sm shadow-sm">
                 <div className="flex items-center text-left">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="mr-2 h-4 w-4">
@@ -200,9 +203,13 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
               </SelectTrigger>
               <SelectContent className="bg-white z-50">
                 <SelectItem value="all" className="text-base">Alle</SelectItem>
-                <SelectItem value="wheelchair" className="text-base">Rullestoltilpasset</SelectItem>
-                <SelectItem value="hearing-loop" className="text-base">Teleslynge</SelectItem>
-                <SelectItem value="visual-aids" className="text-base">Synshjelpemidler</SelectItem>
+                {availableAccessibility.map((feature) => (
+                  <SelectItem key={feature} value={feature} className="text-base">
+                    {feature === 'wheelchair' ? 'Rullestoltilpasset' : 
+                     feature === 'hearing-loop' ? 'Teleslynge' : 
+                     feature === 'visual-aids' ? 'Synshjelpemidler' : feature}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
