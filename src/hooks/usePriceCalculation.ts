@@ -30,22 +30,25 @@ export function usePriceCalculation({
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    console.log('usePriceCalculation effect triggered:', {
+    console.log('usePriceCalculation effect triggered with params:', {
       facilityId,
       zoneId,
       startDate,
-      customerType,
+      endDate,
       timeSlot,
-      bookingMode
+      customerType,
+      bookingMode,
+      eventType,
+      ageGroup
     });
 
     // Check if we have the minimum required information for pricing
     if (!facilityId || !zoneId || !startDate || !customerType) {
-      console.log('Missing required parameters for price calculation:', {
-        facilityId: !!facilityId,
-        zoneId: !!zoneId,
-        startDate: !!startDate,
-        customerType: !!customerType
+      console.log('Missing required parameters for price calculation. Details:', {
+        facilityId: facilityId || 'MISSING',
+        zoneId: zoneId || 'MISSING',
+        startDate: startDate || 'MISSING',
+        customerType: customerType || 'MISSING'
       });
       setCalculation(null);
       setIsLoading(false);
@@ -58,12 +61,12 @@ export function usePriceCalculation({
       const finalEndDate = endDate || new Date(startDate.getTime() + 2 * 60 * 60 * 1000);
       
       // Use the actual timeSlot if provided, otherwise use default for estimate
-      const calculationTimeSlot = timeSlot || '09:00 - 11:00';
+      const calculationTimeSlot = timeSlot || '09:00-11:00';
       
       // Map bookingMode to BookingType
       const bookingType: BookingType = bookingMode === 'recurring' ? 'fastlan' : 'engangs';
       
-      console.log('Calculating price with:', {
+      console.log('Calling pricingEngine.calculatePrice with:', {
         facilityId,
         zoneId,
         startDate,
@@ -87,7 +90,7 @@ export function usePriceCalculation({
         ageGroup
       );
       
-      console.log('Price calculation result:', result);
+      console.log('pricingEngine.calculatePrice returned:', result);
       setCalculation(result);
     } catch (error) {
       console.error('Error calculating price:', error);
