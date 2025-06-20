@@ -141,6 +141,13 @@ export function AvailabilityTab({
         </select>
       </div>
 
+      {/* Helper Message */}
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+        <p className="text-sm text-blue-800">
+          💡 <strong>Tips:</strong> Klikk på kalenderen for å velge enkelt tidspunkt, eller dra over flere ruter for å velge flere tidspunkt samtidig.
+        </p>
+      </div>
+
       {/* Two Column Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-10 gap-6">
         {/* Calendar Column - 70% */}
