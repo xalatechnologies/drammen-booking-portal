@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -105,7 +104,29 @@ const FacilityDetail = () => {
   };
 
   const handleBulkSlotSelection = (slots: any[]) => {
-    setSelectedSlots(prev => [...prev, ...slots]);
+    console.log('FacilityDetail: handleBulkSlotSelection called with slots:', slots);
+    console.log('FacilityDetail: current selectedSlots before bulk add:', selectedSlots);
+    
+    // Filter out slots that are already selected to prevent duplicates
+    const newSlots = slots.filter(newSlot => 
+      !selectedSlots.some(existingSlot =>
+        existingSlot.zoneId === newSlot.zoneId &&
+        existingSlot.date.toDateString() === newSlot.date.toDateString() &&
+        existingSlot.timeSlot === newSlot.timeSlot
+      )
+    );
+    
+    console.log('FacilityDetail: filtered newSlots (not duplicates):', newSlots);
+    
+    if (newSlots.length > 0) {
+      setSelectedSlots(prev => {
+        const result = [...prev, ...newSlots];
+        console.log('FacilityDetail: final selectedSlots array:', result);
+        return result;
+      });
+    } else {
+      console.log('FacilityDetail: no new slots to add (all were duplicates)');
+    }
   };
 
   const handleRemoveSlot = (zoneId: string, date: Date, timeSlot: string) => {
