@@ -1,53 +1,43 @@
 
+import { Zone as DatabaseZone } from '@/types/zone';
 import { Zone as BookingZone } from '@/components/booking/types';
-import { Zone as TypesZone } from '@/types/zone';
 
-export function convertZoneToBookingZone(zone: TypesZone): BookingZone {
+export function convertZoneToBookingZone(dbZone: DatabaseZone): BookingZone {
   return {
-    id: zone.id,
-    name: zone.name,
-    capacity: zone.capacity,
-    equipment: zone.equipment,
-    pricePerHour: zone.pricing.basePrice,
-    description: zone.description || '',
-    area: `${zone.area} m²`,
-    parentZoneId: zone.parentZoneId,
-    isMainZone: zone.isMainZone,
-    subZones: [], // Could be derived from child zones if needed
+    id: dbZone.id,
+    name: dbZone.name,
+    capacity: dbZone.capacity || 30,
+    equipment: dbZone.equipment || [],
+    pricePerHour: dbZone.pricing?.basePrice || 450,
+    description: dbZone.description || '',
+    area: dbZone.area ? `${dbZone.area} m²` : "120 m²",
+    isMainZone: dbZone.isMainZone,
+    subZones: [],
     bookingRules: {
-      minBookingDuration: Math.floor(zone.pricing.minimumBookingDuration / 60), // Convert minutes to hours
-      maxBookingDuration: Math.floor(zone.pricing.maximumBookingDuration / 60), // Convert minutes to hours
-      allowedTimeSlots: generateTimeSlots(),
+      minBookingDuration: dbZone.pricing?.minimumBookingDuration ? Math.floor(dbZone.pricing.minimumBookingDuration / 60) : 2,
+      maxBookingDuration: dbZone.pricing?.maximumBookingDuration ? Math.floor(dbZone.pricing.maximumBookingDuration / 60) : 8,
+      allowedTimeSlots: ["08:00-10:00", "10:00-12:00", "12:00-14:00", "14:00-16:00", "16:00-18:00", "18:00-20:00", "20:00-22:00"],
       bookingTypes: ['one-time', 'recurring', 'fixed-lease'],
       advanceBookingDays: 90,
-      cancellationHours: zone.pricing.cancellationPolicy.freeUntilHours
+      cancellationHours: dbZone.pricing?.cancellationPolicy?.freeUntilHours || 48
     },
     adminInfo: {
-      contactPersonName: "Facility Manager",
-      contactPersonEmail: "manager@drammen.kommune.no",
-      specialInstructions: zone.description || '',
-      maintenanceSchedule: zone.availability.maintenanceSchedule.map(m => ({
-        day: new Date(m.startDate).toLocaleDateString('no-NO', { weekday: 'long' }),
-        startTime: m.startDate.toTimeString().slice(0, 5),
-        endTime: m.endDate.toTimeString().slice(0, 5)
-      }))
+      contactPersonName: "Lars Hansen",
+      contactPersonEmail: "lars.hansen@drammen.kommune.no",
+      specialInstructions: dbZone.description || '',
+      maintenanceSchedule: []
     },
-    layout: {
-      coordinates: zone.coordinates || { x: 0, y: 0, width: 100, height: 100 },
+    layout: dbZone.coordinates ? {
+      coordinates: {
+        x: dbZone.coordinates.x,
+        y: dbZone.coordinates.y,
+        width: dbZone.coordinates.width,
+        height: dbZone.coordinates.height
+      },
       entryPoints: ["Hovedinngang"]
-    },
-    accessibility: zone.accessibility,
-    features: zone.features,
-    restrictions: zone.restrictions.prohibitedActivities,
-    isActive: zone.isActive
+    } : undefined,
+    accessibility: dbZone.accessibility || [],
+    features: dbZone.features || [],
+    isActive: dbZone.isActive
   };
-}
-
-function generateTimeSlots(): string[] {
-  return [
-    "08:00-09:00", "09:00-10:00", "10:00-11:00", "11:00-12:00",
-    "12:00-13:00", "13:00-14:00", "14:00-15:00", "15:00-16:00",
-    "16:00-17:00", "17:00-18:00", "18:00-19:00", "19:00-20:00",
-    "20:00-21:00", "21:00-22:00"
-  ];
 }
