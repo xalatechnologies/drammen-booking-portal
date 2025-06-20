@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useFacilities, useFacilitiesPagination } from '@/hooks/useFacilities';
 import { FacilityCard } from './facility/FacilityCard';
 import FacilityListItem from './facility/FacilityListItem';
@@ -19,7 +19,6 @@ export const InfiniteScrollFacilities: React.FC<InfiniteScrollFacilitiesProps> =
 }) => {
   const { pagination, nextPage, goToPage } = useFacilitiesPagination(1, 6);
   const [allFacilities, setAllFacilities] = useState<any[]>([]);
-  const [hasMore, setHasMore] = useState(true);
 
   console.log('InfiniteScrollFacilities - Rendering with filters:', filters);
   console.log('InfiniteScrollFacilities - Current viewMode:', viewMode);
@@ -31,31 +30,24 @@ export const InfiniteScrollFacilities: React.FC<InfiniteScrollFacilitiesProps> =
   });
 
   // Memoize the filter string to detect changes
-  const filterString = JSON.stringify(filters);
+  const filterString = useMemo(() => JSON.stringify(filters), [filters]);
 
   // Reset when filters change
   useEffect(() => {
     console.log('InfiniteScrollFacilities - Filters changed, resetting to page 1');
     setAllFacilities([]);
-    setHasMore(true);
     goToPage(1);
   }, [filterString, goToPage]);
 
-  // Handle facility data updates - Fixed dependency array
-  useEffect(() => {
-    console.log('InfiniteScrollFacilities - Processing facilities data', {
-      page: pagination.page,
-      facilitiesLength: facilities?.length || 0,
-      isLoading,
-      allFacilitiesLength: allFacilities.length,
-      paginationHasNext: paginationInfo?.hasNext,
-      facilitiesData: facilities
-    });
-
-    // Only process when we have facilities data and not loading
+  // Handle facility data updates using direct state management
+  useMemo(() => {
     if (!isLoading && facilities && Array.isArray(facilities)) {
-      console.log('InfiniteScrollFacilities - Setting facilities data');
-      
+      console.log('InfiniteScrollFacilities - Processing facilities data', {
+        page: pagination.page,
+        facilitiesLength: facilities.length,
+        allFacilitiesLength: allFacilities.length
+      });
+
       if (pagination.page === 1) {
         // For page 1, replace all facilities
         console.log('InfiniteScrollFacilities - Setting facilities for page 1:', facilities.length);
@@ -71,14 +63,13 @@ export const InfiniteScrollFacilities: React.FC<InfiniteScrollFacilitiesProps> =
           return updated;
         });
       }
-
-      // Update hasMore based on pagination info
-      if (paginationInfo) {
-        setHasMore(paginationInfo.hasNext);
-        console.log('InfiniteScrollFacilities - Updated hasMore:', paginationInfo.hasNext);
-      }
     }
-  }, [facilities, isLoading, pagination.page, paginationInfo]); // Fixed dependencies
+  }, [facilities, isLoading, pagination.page]);
+
+  // Calculate hasMore based on pagination info
+  const hasMore = useMemo(() => {
+    return paginationInfo?.hasNext || false;
+  }, [paginationInfo]);
 
   const loadMore = useCallback(() => {
     if (!isLoading && hasMore) {
