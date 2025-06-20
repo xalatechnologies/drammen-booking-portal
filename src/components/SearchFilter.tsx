@@ -65,7 +65,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
     if (min === 101 && max === 200) return "extra-large";
     return "all";
   };
-  return <div className="bg-gradient-to-r from-slate-600/90 to-slate-700/90 backdrop-blur-sm w-full shadow-lg border-b border-slate-500/30">
+  return <div className="bg-gradient-to-r from-slate-600/90 to-slate-700/90 backdrop-blur-sm w-full shadow-lg border-b border-slate-500/30 my-[22px] py-[8px]">
       <div className="max-w-7xl mx-auto px-4 py-3">
         {/* Single filter row - equally distributed */}
         <div className="flex flex-col lg:flex-row gap-3 items-stretch w-full">
