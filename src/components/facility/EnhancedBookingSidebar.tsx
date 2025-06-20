@@ -6,23 +6,19 @@ import { Separator } from "@/components/ui/separator";
 import { SelectedSlotsSection } from "./sidebar/SelectedSlotsSection";
 import { BookingDetailsSection } from "./sidebar/BookingDetailsSection";
 import { ReservationCartSection } from "./sidebar/ReservationCartSection";
+import { BookingPriceCalculation } from "./sidebar/BookingPriceCalculation";
 import { useCart } from "@/contexts/CartContext";
 import { useNavigate } from "react-router-dom";
 import { Clock, CalendarDays, MapPin } from "lucide-react";
 import { format } from "date-fns";
 import { nb } from "date-fns/locale";
+import { ActorType } from "@/types/pricing";
+import { SelectedTimeSlot } from "@/utils/recurrenceEngine";
 
 interface EnhancedBookingSidebarProps {
-  facilityId: number;
+  facilityId: string;
   facilityName: string;
-  selectedSlots: Array<{
-    id: string;
-    date: string;
-    startTime: string;
-    endTime: string;
-    zone?: string;
-    price?: number;
-  }>;
+  selectedSlots: SelectedTimeSlot[];
   onSlotRemove: (slotId: string) => void;
   onBookingComplete?: () => void;
 }
@@ -38,22 +34,26 @@ export function EnhancedBookingSidebar({
   const navigate = useNavigate();
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isBookingDetailsOpen, setIsBookingDetailsOpen] = useState(false);
+  const [actorType, setActorType] = useState<ActorType>('private-person');
   
   // Group slots by date for better organization
   const slotsByDate = selectedSlots.reduce((acc, slot) => {
-    const date = slot.date;
-    if (!acc[date]) {
-      acc[date] = [];
+    const dateKey = format(slot.date, 'yyyy-MM-dd');
+    if (!acc[dateKey]) {
+      acc[dateKey] = [];
     }
-    acc[date].push(slot);
+    acc[dateKey].push(slot);
     return acc;
   }, {} as Record<string, typeof selectedSlots>);
 
-  const totalPrice = selectedSlots.reduce((sum, slot) => sum + (slot.price || 0), 0);
   const totalDuration = selectedSlots.length; // Assuming each slot is 1 hour
 
   const handleProceedToCheckout = () => {
     navigate('/checkout');
+  };
+
+  const handleSlotRemove = (slotId: string) => {
+    onSlotRemove(slotId);
   };
 
   if (selectedSlots.length === 0 && items.length === 0) {
@@ -95,18 +95,6 @@ export function EnhancedBookingSidebar({
               <span>{totalDuration} time(r)</span>
             </div>
           </div>
-          
-          {totalPrice > 0 && (
-            <>
-              <Separator className="my-3" />
-              <div className="flex justify-between items-center">
-                <span className="font-medium">Total pris:</span>
-                <Badge variant="secondary" className="text-lg px-3 py-1">
-                  {totalPrice.toLocaleString('nb-NO')} kr
-                </Badge>
-              </div>
-            </>
-          )}
         </CardContent>
       </Card>
 
@@ -114,7 +102,17 @@ export function EnhancedBookingSidebar({
       {selectedSlots.length > 0 && (
         <SelectedSlotsSection 
           slotsByDate={slotsByDate}
-          onSlotRemove={onSlotRemove}
+          onSlotRemove={handleSlotRemove}
+        />
+      )}
+
+      {/* Price Calculation */}
+      {selectedSlots.length > 0 && (
+        <BookingPriceCalculation
+          selectedSlots={selectedSlots}
+          facilityId={facilityId}
+          actorType={actorType}
+          onActorTypeChange={setActorType}
         />
       )}
 
