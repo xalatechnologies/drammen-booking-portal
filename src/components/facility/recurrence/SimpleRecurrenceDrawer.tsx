@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerClose } from '@/components/ui/drawer';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Calendar, Clock, Repeat, X } from 'lucide-react';
 import { format } from 'date-fns';
 import { nb } from 'date-fns/locale';
@@ -220,21 +220,19 @@ export function SimpleRecurrenceDrawer({
   const uniqueSelectedSlots = [...new Set(selectedTimeSlots)];
 
   return (
-    <Drawer open={isOpen} onOpenChange={onClose}>
-      <DrawerContent className="max-w-4xl mx-auto max-h-[90vh]">
-        <DrawerHeader className="border-b">
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader className="border-b pb-4">
           <div className="flex items-center justify-between">
-            <DrawerTitle className="flex items-center gap-2">
+            <DialogTitle className="flex items-center gap-2 text-xl">
               <Repeat className="h-5 w-5" />
               Gjentakende Reservasjon
-            </DrawerTitle>
-            <DrawerClose asChild>
-              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                <X className="h-4 w-4" />
-              </Button>
-            </DrawerClose>
+            </DialogTitle>
+            <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={onClose}>
+              <X className="h-4 w-4" />
+            </Button>
           </div>
-        </DrawerHeader>
+        </DialogHeader>
 
         <div 
           className="p-6 overflow-y-auto"
@@ -419,7 +417,7 @@ export function SimpleRecurrenceDrawer({
             Opprett Reservasjoner
           </Button>
         </div>
-      </DrawerContent>
-    </Drawer>
+      </DialogContent>
+    </Dialog>
   );
 }
