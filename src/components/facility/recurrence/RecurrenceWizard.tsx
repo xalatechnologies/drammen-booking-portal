@@ -7,6 +7,7 @@ import { RecurrencePattern } from '@/utils/recurrenceEngine';
 import { FrequencyStep } from './wizard/FrequencyStep';
 import { WeekdayStep } from './wizard/WeekdayStep';
 import { TimeSlotStep } from './wizard/TimeSlotStep';
+import { DateRangeStep } from './wizard/DateRangeStep';
 import { PreviewStep } from './wizard/PreviewStep';
 
 interface RecurrenceWizardProps {
@@ -18,7 +19,7 @@ interface RecurrenceWizardProps {
 
 type SupportedFrequency = 'weekly' | 'biweekly' | 'monthly';
 
-const STEPS = ['Frekvens', 'Dager', 'Tider', 'Bekreft'];
+const STEPS = ['Frekvens', 'Dager', 'Tider', 'Periode', 'Bekreft'];
 
 export function RecurrenceWizard({ pattern, onPatternChange, onClose, onApplyPattern }: RecurrenceWizardProps) {
   const [currentStep, setCurrentStep] = useState(0);
@@ -38,7 +39,8 @@ export function RecurrenceWizard({ pattern, onPatternChange, onClose, onApplyPat
       case 0: return true; // Frequency always has a default
       case 1: return pattern.weekdays && pattern.weekdays.length > 0;
       case 2: return pattern.timeSlots && pattern.timeSlots.length > 0;
-      case 3: return true;
+      case 3: return pattern.startDate && pattern.endDate; // Date range required
+      case 4: return true;
       default: return false;
     }
   };
@@ -102,6 +104,15 @@ export function RecurrenceWizard({ pattern, onPatternChange, onClose, onApplyPat
           />
         );
       case 3:
+        return (
+          <DateRangeStep
+            startDate={pattern.startDate}
+            endDate={pattern.endDate}
+            onStartDateChange={(date) => updatePattern({ startDate: date })}
+            onEndDateChange={(date) => updatePattern({ endDate: date })}
+          />
+        );
+      case 4:
         return (
           <PreviewStep
             selectedFrequency={selectedFrequency}

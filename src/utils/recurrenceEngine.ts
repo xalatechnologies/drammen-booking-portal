@@ -1,4 +1,3 @@
-
 import { addDays, addWeeks, addMonths, format, startOfWeek, isSameDay, getDay } from 'date-fns';
 
 export interface RecurrencePattern {
@@ -6,7 +5,8 @@ export interface RecurrencePattern {
   weekdays: number[]; // 0 = Sunday, 1 = Monday, etc.
   timeSlots: string[];
   interval: number; // for custom patterns
-  endDate?: Date;
+  startDate?: Date; // When the recurrence should start
+  endDate?: Date; // When the recurrence should end
   monthlyPattern?: 'first' | 'second' | 'third' | 'fourth' | 'last';
   monthlyWeekday?: number;
 }
@@ -26,10 +26,13 @@ export class RecurrenceEngine {
     maxOccurrences: number = 52
   ): SelectedTimeSlot[] {
     const occurrences: SelectedTimeSlot[] = [];
-    let currentDate = startDate;
+    
+    // Use pattern's start date if available, otherwise use provided startDate
+    let currentDate = pattern.startDate || startDate;
+    const endDate = pattern.endDate;
     let count = 0;
 
-    while (count < maxOccurrences && (!pattern.endDate || currentDate <= pattern.endDate)) {
+    while (count < maxOccurrences && (!endDate || currentDate <= endDate)) {
       // Check if current date matches pattern
       if (this.dateMatchesPattern(currentDate, pattern)) {
         // Add all time slots for this date
