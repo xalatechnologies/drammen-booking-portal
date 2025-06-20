@@ -1,3 +1,4 @@
+
 import React from "react";
 import { MapPin, Users, Building } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -65,8 +66,8 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
     if (min === 101 && max === 200) return "extra-large";
     return "all";
   };
-  return <div className="bg-slate-100 w-full">
-      <div className="w-full px-4 py-[33px] my-[22px]">
+  return <div className="bg-slate-700 w-full">
+      <div className="max-w-7xl mx-auto px-4 py-4">
         {/* Single filter row - equally distributed */}
         <div className="flex flex-col lg:flex-row gap-3 items-stretch w-full">
           {/* Facility type */}
