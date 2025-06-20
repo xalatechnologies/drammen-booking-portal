@@ -69,38 +69,51 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ onResultClick }) => {
         setError(null);
         console.log("GlobalSearch - Loading facilities...");
         
-        // Use the correct method from facilityRepository
         const result = await facilityRepository.getAll({ page: 1, limit: 100 });
+        console.log("GlobalSearch - Repository result:", result);
         
         if (result.success && result.data?.data) {
           console.log("GlobalSearch - Loaded facilities:", result.data.data.length);
           setFacilities(result.data.data);
+          setError(null);
         } else {
-          console.error("GlobalSearch - Failed to load facilities:", result.error);
-          setError(result.error?.message || "Failed to load facilities");
+          const errorMsg = result.error?.message || "Failed to load facilities";
+          console.error("GlobalSearch - Failed to load facilities:", errorMsg);
+          setError(errorMsg);
+          setFacilities([]); // Set empty array on error
         }
       } catch (error) {
+        const errorMsg = error instanceof Error ? error.message : "Failed to load facilities";
         console.error("GlobalSearch - Error loading facilities:", error);
-        setError("Failed to load facilities");
+        setError(errorMsg);
+        setFacilities([]);
       } finally {
         setIsLoading(false);
       }
     };
+    
     loadFacilities();
   }, []);
 
   // Create search results from facilities and other data
   const createSearchResults = (searchTerm: string): SearchResult[] => {
+    console.log("GlobalSearch - Creating search results for:", searchTerm);
+    console.log("GlobalSearch - Available facilities:", facilities.length);
+    
     if (!searchTerm.trim()) {
       // Show recent searches when no search term
       const recentSearches = getRecentSearches();
+      console.log("GlobalSearch - Recent searches:", recentSearches.length);
       return recentSearches.map(search => ({
         ...search,
         icon: <Clock className="h-5 w-5" />
       }));
     }
     
-    if (facilities.length === 0) return [];
+    if (facilities.length === 0) {
+      console.log("GlobalSearch - No facilities available for search");
+      return [];
+    }
     
     const searchLower = searchTerm.toLowerCase();
     console.log("GlobalSearch - Searching for:", searchLower);
@@ -111,11 +124,15 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ onResultClick }) => {
         const matchesDescription = facility.description?.toLowerCase().includes(searchLower);
         const matchesType = facility.type.toLowerCase().includes(searchLower);
         const matchesArea = facility.area.toLowerCase().includes(searchLower);
-        const matchesActivity = facility.suitableFor?.some(activity => 
-          activity.toLowerCase().includes(searchLower)
+        const matchesActivity = facility.equipment?.some(eq => 
+          eq.toLowerCase().includes(searchLower)
         );
         
-        return matchesName || matchesDescription || matchesType || matchesArea || matchesActivity;
+        const matches = matchesName || matchesDescription || matchesType || matchesArea || matchesActivity;
+        if (matches) {
+          console.log("GlobalSearch - Facility match:", facility.name);
+        }
+        return matches;
       })
       .slice(0, 6) // Limit facility results
       .map(facility => ({
@@ -125,7 +142,7 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ onResultClick }) => {
         subtitle: `${facility.area} - Kapasitet: ${facility.capacity}`,
         icon: <Building className="h-5 w-5" />,
         url: `/facilities/${facility.id}`,
-        image: facility.image
+        image: facility.image_url
       }));
 
     // Add location results (unique areas from facilities)
@@ -156,9 +173,10 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ onResultClick }) => {
         searchParams: { facilityType: type.toLowerCase().replace(/\s+/g, '-') }
       }));
 
-    console.log("GlobalSearch - Total results:", facilityResults.length + uniqueAreas.length + uniqueTypes.length);
+    const totalResults = [...facilityResults, ...uniqueAreas, ...uniqueTypes];
+    console.log("GlobalSearch - Total results:", totalResults.length);
     
-    return [...facilityResults, ...uniqueAreas, ...uniqueTypes];
+    return totalResults;
   };
 
   useEffect(() => {
@@ -195,7 +213,7 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ onResultClick }) => {
   }, []);
 
   const handleResultClick = (result: SearchResult) => {
-    console.log("GlobalSearch - Result clicked:", result.title);
+    console.log("GlobalSearch - Result clicked:", result.title, result);
     setSearchTerm("");
     setIsOpen(false);
     
