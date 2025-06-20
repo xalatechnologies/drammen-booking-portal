@@ -28,6 +28,7 @@ export function DateRangeStep({
   });
 
   const handleDateRangeSelect = (range: DateRange | undefined) => {
+    console.log('Date range selected:', range);
     setDateRange(range);
     onStartDateChange(range?.from);
     onEndDateChange(range?.to);
@@ -47,7 +48,7 @@ export function DateRangeStep({
 
       <div className="space-y-4">
         <label className="block text-sm font-medium text-gray-700">
-          Velg tidsperiode
+          Velg tidsperiode (klikk og dra for å velge periode)
         </label>
         <Popover>
           <PopoverTrigger asChild>
@@ -86,7 +87,7 @@ export function DateRangeStep({
               numberOfMonths={2}
               initialFocus
               disabled={(date) => date < new Date()}
-              className="p-3"
+              className="p-3 pointer-events-auto"
             />
           </PopoverContent>
         </Popover>
@@ -102,7 +103,7 @@ export function DateRangeStep({
             Fra {format(dateRange.from, 'dd.MM.yyyy', { locale: nb })} til {format(dateRange.to, 'dd.MM.yyyy', { locale: nb })}
           </p>
           <p className="text-blue-600 text-sm mt-1">
-            {Math.ceil((dateRange.to.getTime() - dateRange.from.getTime()) / (1000 * 60 * 60 * 24))} dager
+            {Math.ceil((dateRange.to.getTime() - dateRange.from.getTime()) / (1000 * 60 * 60 * 24)) + 1} dager
           </p>
         </div>
       )}
