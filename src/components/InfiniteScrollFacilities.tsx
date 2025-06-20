@@ -32,14 +32,16 @@ export const InfiniteScrollFacilities: React.FC<InfiniteScrollFacilitiesProps> =
   // Memoize the filter string to detect changes
   const filterString = useMemo(() => JSON.stringify(filters), [filters]);
 
-  // Reset when filters change
+  // Reset when filters change - but only when we actually have a change
   useEffect(() => {
     console.log('InfiniteScrollFacilities - Filters changed, resetting to page 1');
     setAllFacilities([]);
-    goToPage(1);
-  }, [filterString, goToPage]);
+    if (pagination.page !== 1) {
+      goToPage(1);
+    }
+  }, [filterString]); // Remove goToPage from dependencies to avoid loop
 
-  // Handle facility data updates - Fixed to use useEffect instead of useMemo
+  // Handle facility data updates - separate effect without filter dependencies
   useEffect(() => {
     if (!isLoading && facilities && Array.isArray(facilities)) {
       console.log('InfiniteScrollFacilities - Processing facilities data', {
@@ -48,23 +50,23 @@ export const InfiniteScrollFacilities: React.FC<InfiniteScrollFacilitiesProps> =
         allFacilitiesLength: allFacilities.length
       });
 
-      if (pagination.page === 1) {
-        // For page 1, replace all facilities
-        console.log('InfiniteScrollFacilities - Setting facilities for page 1:', facilities.length);
-        setAllFacilities([...facilities]);
-      } else {
-        // For subsequent pages, append new facilities
-        setAllFacilities(prev => {
+      setAllFacilities(prev => {
+        if (pagination.page === 1) {
+          // For page 1, replace all facilities
+          console.log('InfiniteScrollFacilities - Setting facilities for page 1:', facilities.length);
+          return [...facilities];
+        } else {
+          // For subsequent pages, append new facilities
           const newFacilities = facilities.filter(facility => 
             !prev.some(existing => existing.id === facility.id)
           );
           const updated = [...prev, ...newFacilities];
           console.log('InfiniteScrollFacilities - Appended facilities for page', pagination.page, ':', newFacilities.length);
           return updated;
-        });
-      }
+        }
+      });
     }
-  }, [facilities, isLoading, pagination.page]);
+  }, [facilities, isLoading, pagination.page]); // Only depend on data-related values
 
   // Calculate hasMore based on pagination info
   const hasMore = useMemo(() => {
