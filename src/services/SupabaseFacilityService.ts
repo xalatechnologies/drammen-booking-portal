@@ -1,17 +1,7 @@
 import { supabase } from '@/integrations/supabase/client';
-import { ApiResponse, PaginatedResponse, PaginationParams } from '@/types/api';
-import { Facility, FacilityFilters, FacilitySortOptions } from '@/types/facility';
+import { ApiResponse, PaginatedResponse, PaginationParams, ServiceResponse } from '@/types/api';
+import { Facility, FacilityFilters } from '@/types/facility';
 import { Zone } from '@/types/zone';
-
-// Define ServiceResponse type locally since it's not in api.ts
-interface ServiceResponse<T> {
-  success: boolean;
-  data?: T;
-  error?: {
-    message: string;
-    code?: string;
-  };
-}
 
 export class SupabaseFacilityService {
   private static readonly EDGE_FUNCTION_URL = 'https://szpdoihoxzlivothoyva.supabase.co/functions/v1/facilities';
@@ -219,12 +209,8 @@ export class SupabaseFacilityService {
           id,
           name,
           facility_id,
-          type,
           capacity,
           description,
-          bookable_independently,
-          equipment,
-          status,
           is_main_zone,
           area_sqm,
           coordinates_x,
@@ -232,7 +218,7 @@ export class SupabaseFacilityService {
           coordinates_width,
           coordinates_height,
           accessibility_features,
-          features,
+          equipment,
           is_active
         `)
         .eq('facility_id', parseInt(facilityId))
@@ -264,7 +250,7 @@ export class SupabaseFacilityService {
           height: zone.coordinates_height || 80
         } : undefined,
         equipment: zone.equipment || [],
-        features: zone.features || [],
+        features: [], // Default empty array since features column doesn't exist
         accessibility: zone.accessibility_features || [],
         pricing: {
           basePrice: 450,
@@ -324,12 +310,8 @@ export class SupabaseFacilityService {
           id,
           name,
           facility_id,
-          type,
           capacity,
           description,
-          bookable_independently,
-          equipment,
-          status,
           is_main_zone,
           area_sqm,
           coordinates_x,
@@ -337,7 +319,7 @@ export class SupabaseFacilityService {
           coordinates_width,
           coordinates_height,
           accessibility_features,
-          features,
+          equipment,
           is_active
         `)
         .eq('id', zoneId)
@@ -373,7 +355,7 @@ export class SupabaseFacilityService {
           height: data.coordinates_height || 80
         } : undefined,
         equipment: data.equipment || [],
-        features: data.features || [],
+        features: [], // Default empty array since features column doesn't exist
         accessibility: data.accessibility_features || [],
         pricing: {
           basePrice: 450,
