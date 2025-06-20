@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -7,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CalendarGrid } from "../facility/tabs/CalendarGrid";
 import { addDays } from "date-fns";
+import { Zone } from "@/types/zone";
 
 // Simplified Zone interface for calendar view
 interface CalendarZone {
@@ -74,7 +74,7 @@ export const FacilityCalendarAccordion: React.FC<FacilityCalendarAccordionProps>
   };
 
   // Convert CalendarZone to the Zone type expected by CalendarGrid
-  const convertToZone = (calendarZone: CalendarZone, facilityId: number) => {
+  const convertToZone = (calendarZone: CalendarZone, facilityId: number): Zone => {
     return {
       id: calendarZone.id,
       facilityId: facilityId.toString(),
