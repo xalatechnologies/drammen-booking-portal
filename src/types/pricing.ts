@@ -1,4 +1,3 @@
-
 export type BookingType = 'engangs' | 'fastlan' | 'strotimer';
 
 export type ActorType = 
@@ -59,4 +58,5 @@ export interface PriceBreakdownItem {
   description: string;
   amount: number;
   type: 'base' | 'discount' | 'surcharge' | 'tax' | 'override';
+  details?: string;
 }

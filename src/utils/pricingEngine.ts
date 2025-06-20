@@ -191,116 +191,113 @@ export const pricingEngine = {
     const basePrice = zone.pricePerHour;
     
     console.log('📊 Calculation details:', { hours, days, basePrice });
-    
-    // Calculate multipliers
-    const actorMultiplier = actorTypeMultipliers[actorType] || 1.0;
-    const bookingMultiplier = bookingTypeMultipliers[bookingType] || 1.0;
-    const timeMultiplier = getTimeMultiplier(timeSlot);
-    const weekendMulti = isWeekend(startDate) ? weekendMultiplier : 1.0;
-    
-    console.log('🔢 Multipliers:', { actorMultiplier, bookingMultiplier, timeMultiplier, weekendMulti });
-    
-    // Calculate pricing
-    const subtotal = basePrice * hours * days;
-    const afterActorType = subtotal * actorMultiplier;
-    const afterBookingType = afterActorType * bookingMultiplier;
-    const afterTimeSlot = afterBookingType * timeMultiplier;
-    const finalPrice = Math.round(afterTimeSlot * weekendMulti);
 
-    console.log('💰 Price calculation steps:', {
-      subtotal,
-      afterActorType,
-      afterBookingType,
-      afterTimeSlot,
-      finalPrice
+    const breakdown: PriceBreakdownItem[] = [];
+    let runningTotal = basePrice * hours * days;
+
+    breakdown.push({
+      description: `Grunnpris (${zone.name})`,
+      amount: runningTotal,
+      type: 'base',
+      details: `${basePrice.toFixed(2)} kr/time x ${hours} timer x ${days} dag(er)`
     });
-
-    // Create breakdown
-    const breakdown: PriceBreakdownItem[] = [
-      {
-        description: `${zone.name} - ${hours}t x ${days} dag(er)`,
-        amount: subtotal,
-        type: 'base'
-      }
-    ];
 
     const discounts = [];
     const surcharges = [];
-
+    
+    // 1. Apply Actor Type Multiplier
+    const actorMultiplier = actorTypeMultipliers[actorType] || 1.0;
     if (actorMultiplier !== 1.0) {
-      const discount = subtotal - afterActorType;
+      const modification = runningTotal * (actorMultiplier - 1);
+      const description = actorMultiplier < 1.0 ? `Rabatt for ${actorType}` : `Pristillegg for ${actorType}`;
+      const percentage = Math.abs((actorMultiplier - 1) * 100);
+      
       breakdown.push({
-        description: `${actorType} rabatt`,
-        amount: -discount,
-        type: 'discount'
+        description: `${description} (${percentage.toFixed(0)}%)`,
+        amount: modification,
+        type: actorMultiplier < 1.0 ? 'discount' : 'surcharge'
       });
-      discounts.push({
-        type: 'discount' as const,
-        name: `${actorType} rabatt`,
-        amount: discount,
-        reason: 'Actor type discount'
-      });
+      
+      if(actorMultiplier < 1.0) {
+        discounts.push({ type: 'discount' as const, name: description, amount: -modification, reason: 'Actor type discount' });
+      } else {
+        surcharges.push({ type: 'surcharge' as const, name: description, amount: modification, reason: 'Actor type surcharge' });
+      }
+      
+      runningTotal += modification;
     }
 
+    // 2. Apply Booking Type Multiplier
+    const bookingMultiplier = bookingTypeMultipliers[bookingType] || 1.0;
     if (bookingMultiplier !== 1.0) {
-      const discount = afterActorType - afterBookingType;
+      const modification = runningTotal * (bookingMultiplier - 1);
+      const description = `Rabatt for ${bookingType}`;
+      const percentage = Math.abs((bookingMultiplier - 1) * 100);
+      
       breakdown.push({
-        description: `${bookingType} rabatt`,
-        amount: -discount,
+        description: `${description} (${percentage.toFixed(0)}%)`,
+        amount: modification,
         type: 'discount'
       });
-      discounts.push({
-        type: 'discount' as const,
-        name: `${bookingType} rabatt`,
-        amount: discount,
-        reason: 'Booking type discount'
-      });
+      
+      discounts.push({ type: 'discount' as const, name: description, amount: -modification, reason: 'Booking type discount' });
+      runningTotal += modification;
     }
 
+    // 3. Apply Time Multiplier
+    const timeMultiplier = getTimeMultiplier(timeSlot);
     if (timeMultiplier !== 1.0) {
-      const surcharge = afterTimeSlot - afterBookingType;
+      const modification = runningTotal * (timeMultiplier - 1);
+      const description = `Pristillegg for kveldstid`;
+      const percentage = Math.abs((timeMultiplier - 1) * 100);
+      
       breakdown.push({
-        description: 'Kveldstillegg',
-        amount: surcharge,
+        description: `${description} (${percentage.toFixed(0)}%)`,
+        amount: modification,
         type: 'surcharge'
       });
-      surcharges.push({
-        type: 'surcharge' as const,
-        name: 'Kveldstillegg',
-        amount: surcharge,
-        reason: 'Evening time surcharge'
-      });
+
+      surcharges.push({ type: 'surcharge' as const, name: description, amount: modification, reason: 'Time of day surcharge' });
+      runningTotal += modification;
     }
 
+    // 4. Apply Weekend Multiplier
+    const weekendMulti = isWeekend(startDate) ? weekendMultiplier : 1.0;
     if (weekendMulti !== 1.0) {
-      const surcharge = finalPrice - afterTimeSlot;
+      const modification = runningTotal * (weekendMulti - 1);
+      const description = `Pristillegg for helg`;
+      const percentage = Math.abs((weekendMulti - 1) * 100);
+      
       breakdown.push({
-        description: 'Helgetillegg',
-        amount: surcharge,
+        description: `${description} (${percentage.toFixed(0)}%)`,
+        amount: modification,
         type: 'surcharge'
       });
-      surcharges.push({
-        type: 'surcharge' as const,
-        name: 'Helgetillegg',
-        amount: surcharge,
-        reason: 'Weekend surcharge'
-      });
+      
+      surcharges.push({ type: 'surcharge' as const, name: description, amount: modification, reason: 'Weekend surcharge' });
+      runningTotal += modification;
     }
+    
+    const finalPrice = Math.round(runningTotal);
+
+    console.log('💰 Final Price:', finalPrice);
+    console.log('📝 Final Breakdown:', breakdown);
 
     return {
-      basePrice,
+      basePrice: zone.pricePerHour,
       totalHours: hours,
       totalDays: days,
-      actorTypeDiscount: actorMultiplier !== 1.0 ? (1 - actorMultiplier) * 100 : 0,
-      timeSlotMultiplier: timeMultiplier,
-      bookingTypeDiscount: bookingMultiplier !== 1.0 ? (1 - bookingMultiplier) * 100 : 0,
-      weekendSurcharge: weekendMulti !== 1.0 ? (weekendMulti - 1) * 100 : 0,
-      subtotal,
-      finalPrice,
+      subtotal: basePrice * hours * days,
+      finalPrice: finalPrice,
       requiresApproval: requiresApproval(actorType, eventType),
-      breakdown,
+      breakdown: breakdown,
       discounts,
       surcharges,
+      // Deprecated fields, kept for compatibility, can be removed later
+      actorTypeDiscount: 0, 
+      timeSlotMultiplier: 1,
+      bookingTypeDiscount: 0,
+      weekendSurcharge: 0,
       totalPrice: finalPrice,
       currency: 'NOK'
     };
