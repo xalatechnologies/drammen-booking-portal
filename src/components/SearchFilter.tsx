@@ -1,6 +1,9 @@
-import React from "react";
+
+import React, { useEffect, useState } from "react";
 import { MapPin, Users, Building } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { supabase } from "@/integrations/supabase/client";
+
 interface SearchFilterProps {
   date?: Date;
   setDate: (date?: Date) => void;
@@ -29,6 +32,7 @@ interface SearchFilterProps {
   allowsPhotography: boolean;
   setAllowsPhotography: (allowsPhotography: boolean) => void;
 }
+
 const SearchFilter: React.FC<SearchFilterProps> = ({
   facilityType,
   setFacilityType,
@@ -39,7 +43,63 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
   capacity,
   setCapacity
 }) => {
+  const [facilityTypes, setFacilityTypes] = useState<string[]>([]);
+  const [areas, setAreas] = useState<string[]>([]);
+
+  // Fetch facility types from database
+  useEffect(() => {
+    const fetchFacilityTypes = async () => {
+      try {
+        console.log('SearchFilter - Fetching facility types from database');
+        const { data, error } = await supabase
+          .from('facilities')
+          .select('type')
+          .eq('status', 'active');
+        
+        if (error) {
+          console.error('SearchFilter - Error fetching facility types:', error);
+          return;
+        }
+
+        const uniqueTypes = [...new Set(data?.map(f => f.type) || [])];
+        console.log('SearchFilter - Fetched facility types:', uniqueTypes);
+        setFacilityTypes(uniqueTypes);
+      } catch (error) {
+        console.error('SearchFilter - Failed to fetch facility types:', error);
+      }
+    };
+
+    fetchFacilityTypes();
+  }, []);
+
+  // Fetch areas from database
+  useEffect(() => {
+    const fetchAreas = async () => {
+      try {
+        console.log('SearchFilter - Fetching areas from database');
+        const { data, error } = await supabase
+          .from('facilities')
+          .select('area, address_city')
+          .eq('status', 'active');
+        
+        if (error) {
+          console.error('SearchFilter - Error fetching areas:', error);
+          return;
+        }
+
+        const uniqueAreas = [...new Set(data?.map(f => f.area) || [])];
+        console.log('SearchFilter - Fetched areas:', uniqueAreas);
+        setAreas(uniqueAreas);
+      } catch (error) {
+        console.error('SearchFilter - Failed to fetch areas:', error);
+      }
+    };
+
+    fetchAreas();
+  }, []);
+
   const handleCapacityChange = (value: string) => {
+    console.log('SearchFilter - Capacity filter changed to:', value);
     switch (value) {
       case "small":
         setCapacity([0, 20]);
@@ -57,6 +117,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
         setCapacity([0, 200]);
     }
   };
+
   const getCapacityValue = () => {
     const [min, max] = capacity;
     if (min === 0 && max === 20) return "small";
@@ -65,7 +126,9 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
     if (min === 101 && max === 200) return "extra-large";
     return "all";
   };
-  return <div className="bg-gradient-to-r from-slate-600/90 to-slate-700/90 backdrop-blur-sm w-full shadow-lg border-b border-slate-500/30 my-[22px] py-[8px]">
+
+  return (
+    <div className="bg-gradient-to-r from-slate-600/90 to-slate-700/90 backdrop-blur-sm w-full shadow-lg border-b border-slate-500/30 my-[22px] py-[8px]">
       <div className="max-w-7xl mx-auto px-4 py-3">
         {/* Single filter row - equally distributed */}
         <div className="flex flex-col lg:flex-row gap-3 items-stretch w-full">
@@ -78,12 +141,11 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
                   <SelectValue placeholder="Velg type" />
                 </div>
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white z-50">
                 <SelectItem value="all" className="text-base">Alle typer</SelectItem>
-                <SelectItem value="gymnasium" className="text-base">Gymnasium</SelectItem>
-                <SelectItem value="meeting-room" className="text-base">Møterom</SelectItem>
-                <SelectItem value="auditorium" className="text-base">Auditorium</SelectItem>
-                <SelectItem value="sports-field" className="text-base">Sportsbane</SelectItem>
+                {facilityTypes.map((type) => (
+                  <SelectItem key={type} value={type} className="text-base">{type}</SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
@@ -97,11 +159,11 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
                   <SelectValue placeholder="Velg område" />
                 </div>
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white z-50">
                 <SelectItem value="all" className="text-base">Alle områder</SelectItem>
-                <SelectItem value="halleren" className="text-base">Halleren</SelectItem>
-                <SelectItem value="city" className="text-base">Sentrum</SelectItem>
-                <SelectItem value="plant" className="text-base">Planten</SelectItem>
+                {areas.map((area) => (
+                  <SelectItem key={area} value={area} className="text-base">{area}</SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
@@ -115,7 +177,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
                   <SelectValue placeholder="Velg kapasitet" />
                 </div>
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white z-50">
                 <SelectItem value="all" className="text-base">Alle størrelser</SelectItem>
                 <SelectItem value="small" className="text-base">Liten (1-20 personer)</SelectItem>
                 <SelectItem value="medium" className="text-base">Middels (21-50 personer)</SelectItem>
@@ -136,7 +198,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
                   <SelectValue placeholder="Velg tilgjengelighet" />
                 </div>
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white z-50">
                 <SelectItem value="all" className="text-base">Alle</SelectItem>
                 <SelectItem value="wheelchair" className="text-base">Rullestoltilpasset</SelectItem>
                 <SelectItem value="hearing-loop" className="text-base">Teleslynge</SelectItem>
@@ -146,6 +208,8 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
           </div>
         </div>
       </div>
-    </div>;
+    </div>
+  );
 };
+
 export default SearchFilter;

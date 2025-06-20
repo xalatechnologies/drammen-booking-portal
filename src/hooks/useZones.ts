@@ -4,16 +4,28 @@ import { Zone } from '@/types/zone';
 import { FacilityService } from '@/services/facilityService';
 
 export const useZones = (facilityId?: string) => {
+  console.log('useZones - Fetching zones for facility ID:', facilityId);
+
   return useQuery({
     queryKey: ['zones', facilityId],
     queryFn: async () => {
-      if (!facilityId) return [];
+      if (!facilityId) {
+        console.log('useZones - No facility ID provided, returning empty array');
+        return [];
+      }
       
+      console.log('useZones - Calling FacilityService.getZonesByFacilityId with:', facilityId);
       const response = await FacilityService.getZonesByFacilityId(facilityId);
+      console.log('useZones - FacilityService response:', response);
+      
       if (!response.success) {
+        console.warn('useZones - Failed to fetch zones:', response.error);
         throw new Error(response.error?.message || 'Failed to fetch zones');
       }
-      return response.data || [];
+      
+      const zones = response.data || [];
+      console.log('useZones - Final zones data:', zones);
+      return zones;
     },
     enabled: !!facilityId,
     staleTime: 1000 * 60 * 5, // 5 minutes
@@ -21,17 +33,28 @@ export const useZones = (facilityId?: string) => {
 };
 
 export const useZone = (zoneId?: string) => {
+  console.log('useZone - Fetching zone with ID:', zoneId);
+
   return useQuery({
     queryKey: ['zone', zoneId],
     queryFn: async () => {
-      if (!zoneId) return null;
+      if (!zoneId) {
+        console.log('useZone - No zone ID provided, returning null');
+        return null;
+      }
       
+      console.log('useZone - Calling FacilityService.getZoneById with:', zoneId);
       const response = await FacilityService.getZoneById(zoneId);
+      console.log('useZone - FacilityService response:', response);
+      
       if (!response.success) {
+        console.warn('useZone - Failed to fetch zone:', response.error);
         throw new Error(response.error?.message || 'Failed to fetch zone');
       }
-      // Only access data if the response was successful
-      return response.success && 'data' in response ? response.data || null : null;
+      
+      const zone = response.success && 'data' in response ? response.data || null : null;
+      console.log('useZone - Final zone data:', zone);
+      return zone;
     },
     enabled: !!zoneId,
     staleTime: 1000 * 60 * 5, // 5 minutes

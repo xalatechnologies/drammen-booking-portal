@@ -19,8 +19,15 @@ const FacilityDetail = () => {
   const { id } = useParams();
   const [isFavorited, setIsFavorited] = useState(false);
   const { t } = useTranslation();
+
+  console.log('FacilityDetail - Rendering with facility ID:', id);
+
   const { facility, isLoading, error, notFound } = useFacility(Number(id));
   const { data: zones = [], isLoading: zonesLoading } = useZones(id);
+
+  console.log('FacilityDetail - Facility data:', facility);
+  console.log('FacilityDetail - Zones data:', zones);
+  console.log('FacilityDetail - Loading states:', { isLoading, zonesLoading });
 
   // Use the centralized slot selection hook
   const {
@@ -80,6 +87,8 @@ const FacilityDetail = () => {
   const convertedZones = zones.length > 0 ? zones.map(convertZoneToBookingZone) : [defaultZone];
   const displayZones = convertedZones;
 
+  console.log('FacilityDetail - Final display zones:', displayZones);
+
   const handleRemoveSlot = (zoneId: string, date: Date, timeSlot: string) => {
     console.log('FacilityDetail: handleRemoveSlot called:', { zoneId, date, timeSlot });
     // This will be handled by the individual slot click since we're removing
@@ -125,16 +134,23 @@ const FacilityDetail = () => {
 
   // Loading state
   if (isLoading || zonesLoading) {
+    console.log('FacilityDetail - Showing loading state');
     return <LoadingState />;
   }
 
   // Error state
   if (error || notFound) {
+    console.log('FacilityDetail - Showing error state:', { error, notFound });
     return <ErrorState error={error} notFound={notFound} />;
   }
 
   // Success state with facility data
-  if (!facility) return null;
+  if (!facility) {
+    console.log('FacilityDetail - No facility data, returning null');
+    return null;
+  }
+
+  console.log('FacilityDetail - Rendering success state with facility:', facility.name);
 
   return (
     <CartProvider>

@@ -19,6 +19,8 @@ export function useFacilities({ pagination, filters, sort }: UseFacilitiesParams
     sort
   ], [pagination, filters, sort]);
 
+  console.log('useFacilities - Query params:', { pagination, filters, sort });
+
   const {
     data: response,
     isLoading,
@@ -26,13 +28,24 @@ export function useFacilities({ pagination, filters, sort }: UseFacilitiesParams
     refetch
   } = useQuery({
     queryKey,
-    queryFn: () => FacilityService.getFacilities(pagination, filters, sort),
+    queryFn: async () => {
+      console.log('useFacilities - Calling FacilityService.getFacilities with:', { pagination, filters, sort });
+      const result = await FacilityService.getFacilities(pagination, filters, sort);
+      console.log('useFacilities - FacilityService response:', result);
+      return result;
+    },
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
+  const facilities = response?.success ? response.data?.data || [] : [];
+  const paginationInfo = response?.success ? response.data?.pagination : null;
+
+  console.log('useFacilities - Final facilities:', facilities);
+  console.log('useFacilities - Pagination info:', paginationInfo);
+
   return {
-    facilities: response?.success ? response.data?.data || [] : [],
-    pagination: response?.success ? response.data?.pagination : null,
+    facilities,
+    pagination: paginationInfo,
     isLoading,
     error: response?.success === false ? response.error : error,
     refetch,
@@ -46,10 +59,12 @@ export function useFacilitiesPagination(initialPage = 1, initialLimit = 6) {
   const pagination: PaginationParams = { page, limit };
 
   const goToPage = (newPage: number) => {
+    console.log('useFacilitiesPagination - Going to page:', newPage);
     setPage(newPage);
   };
 
   const changeLimit = (newLimit: number) => {
+    console.log('useFacilitiesPagination - Changing limit to:', newLimit);
     setLimit(newLimit);
     setPage(1); // Reset to first page when changing limit
   };

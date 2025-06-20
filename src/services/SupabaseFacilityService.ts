@@ -12,6 +12,8 @@ export class SupabaseFacilityService {
     filters?: FacilityFilters
   ): Promise<ApiResponse<PaginatedResponse<Facility>>> {
     try {
+      console.log('SupabaseFacilityService.getFacilities - Called with:', { pagination, filters });
+      
       const params = new URLSearchParams();
       
       if (pagination) {
@@ -27,6 +29,8 @@ export class SupabaseFacilityService {
         if (filters.availableNow) params.append('availableNow', 'true');
       }
 
+      console.log('SupabaseFacilityService.getFacilities - Request params:', params.toString());
+
       const { data: { session } } = await supabase.auth.getSession();
       
       const response = await fetch(`${this.EDGE_FUNCTION_URL}?${params.toString()}`, {
@@ -37,13 +41,18 @@ export class SupabaseFacilityService {
         },
       });
 
+      console.log('SupabaseFacilityService.getFacilities - HTTP response status:', response.status);
+
       if (!response.ok) {
+        console.error('SupabaseFacilityService.getFacilities - HTTP error:', response.status);
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      return await response.json();
+      const result = await response.json();
+      console.log('SupabaseFacilityService.getFacilities - Response data:', result);
+      return result;
     } catch (error) {
-      console.error('Failed to fetch facilities:', error);
+      console.error('SupabaseFacilityService.getFacilities - Failed to fetch facilities:', error);
       return {
         success: false,
         error: {
@@ -56,6 +65,8 @@ export class SupabaseFacilityService {
 
   static async getFacilityById(id: number): Promise<ApiResponse<Facility>> {
     try {
+      console.log('SupabaseFacilityService.getFacilityById - Called with ID:', id);
+      
       const { data: { session } } = await supabase.auth.getSession();
       
       const response = await fetch(`${this.EDGE_FUNCTION_URL}/${id}`, {
@@ -66,13 +77,18 @@ export class SupabaseFacilityService {
         },
       });
 
+      console.log('SupabaseFacilityService.getFacilityById - HTTP response status:', response.status);
+
       if (!response.ok) {
+        console.error('SupabaseFacilityService.getFacilityById - HTTP error:', response.status);
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      return await response.json();
+      const result = await response.json();
+      console.log('SupabaseFacilityService.getFacilityById - Response data:', result);
+      return result;
     } catch (error) {
-      console.error('Failed to fetch facility:', error);
+      console.error('SupabaseFacilityService.getFacilityById - Failed to fetch facility:', error);
       return {
         success: false,
         error: {
@@ -174,6 +190,8 @@ export class SupabaseFacilityService {
 
   static async getFacilityZones(id: number): Promise<ApiResponse<any[]>> {
     try {
+      console.log('SupabaseFacilityService.getFacilityZones - Called with facility ID:', id);
+      
       const { data: { session } } = await supabase.auth.getSession();
       
       const response = await fetch(`${this.EDGE_FUNCTION_URL}/${id}/zones`, {
@@ -184,13 +202,18 @@ export class SupabaseFacilityService {
         },
       });
 
+      console.log('SupabaseFacilityService.getFacilityZones - HTTP response status:', response.status);
+
       if (!response.ok) {
+        console.error('SupabaseFacilityService.getFacilityZones - HTTP error:', response.status);
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      return await response.json();
+      const result = await response.json();
+      console.log('SupabaseFacilityService.getFacilityZones - Response data:', result);
+      return result;
     } catch (error) {
-      console.error('Failed to fetch facility zones:', error);
+      console.error('SupabaseFacilityService.getFacilityZones - Failed to fetch facility zones:', error);
       return {
         success: false,
         error: {
