@@ -1,240 +1,130 @@
 
-import React, { useEffect, useState, useCallback } from "react";
-import InfiniteScroll from 'react-infinite-scroll-component';
-import { Loader2, ArrowUp } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { FacilityCard } from "./facility/FacilityCard";
-import FacilityListItem from "./facility/FacilityListItem";
-import { useOptimizedFacilities } from "@/hooks/useOptimizedFacilities";
-import { FacilityFilters } from "@/types/facility";
-import { useNavigate } from "react-router-dom";
-import ViewHeader from "./search/ViewHeader";
+import React, { useState, useEffect, useCallback } from 'react';
+import { useFacilities, useFacilitiesPagination } from '@/hooks/useFacilities';
+import { FacilityCard } from './facility/FacilityCard';
+import { FacilityListItem } from './facility/FacilityListItem';
+import { FacilityFilters } from '@/types/facility';
 
 interface InfiniteScrollFacilitiesProps {
   filters: FacilityFilters;
   viewMode: "grid" | "list";
-  setViewMode: (mode: "grid" | "map" | "calendar" | "list") => void;
 }
 
-export function InfiniteScrollFacilities({
+export const InfiniteScrollFacilities: React.FC<InfiniteScrollFacilitiesProps> = ({
   filters,
   viewMode,
-  setViewMode
-}: InfiniteScrollFacilitiesProps) {
-  const navigate = useNavigate();
-  const [page, setPage] = useState(1);
+}) => {
+  const { pagination, nextPage } = useFacilitiesPagination(1, 6);
   const [allFacilities, setAllFacilities] = useState<any[]>([]);
   const [hasMore, setHasMore] = useState(true);
-  const [showScrollTop, setShowScrollTop] = useState(false);
 
-  const {
-    facilities,
+  console.log('InfiniteScrollFacilities - Rendering with filters:', filters);
+
+  const { facilities, isLoading, pagination: paginationInfo } = useFacilities({
     pagination,
-    isLoading,
-    error
-  } = useOptimizedFacilities({
-    pagination: {
-      page,
-      limit: 6
-    },
-    filters
+    filters,
   });
+
+  // Memoize the effect dependencies to prevent infinite loops
+  const filterString = JSON.stringify(filters);
+  const currentPage = pagination.page;
+
+  useEffect(() => {
+    console.log('InfiniteScrollFacilities - useEffect triggered', {
+      page: currentPage,
+      facilitiesLength: facilities.length,
+      isLoading
+    });
+
+    if (currentPage === 1) {
+      // Reset on first page or filter change
+      setAllFacilities(facilities);
+    } else if (facilities.length > 0) {
+      // Append new facilities for subsequent pages
+      setAllFacilities(prev => {
+        const newFacilities = facilities.filter(facility => 
+          !prev.some(existing => existing.id === facility.id)
+        );
+        return [...prev, ...newFacilities];
+      });
+    }
+
+    // Update hasMore based on pagination info
+    if (paginationInfo) {
+      setHasMore(paginationInfo.hasNext);
+    }
+  }, [facilities, currentPage, isLoading, paginationInfo?.hasNext]);
 
   // Reset when filters change
   useEffect(() => {
-    setPage(1);
+    console.log('InfiniteScrollFacilities - Filters changed, resetting');
     setAllFacilities([]);
     setHasMore(true);
-  }, [JSON.stringify(filters)]);
+  }, [filterString]);
 
-  // Add new facilities to the list
-  useEffect(() => {
-    if (facilities.length > 0) {
-      if (page === 1) {
-        setAllFacilities(facilities);
-      } else {
-        setAllFacilities(prev => {
-          // Avoid duplicates
-          const existingIds = new Set(prev.map(f => f.id));
-          const newFacilities = facilities.filter(f => !existingIds.has(f.id));
-          return [...prev, ...newFacilities];
-        });
-      }
-      if (pagination) {
-        setHasMore(pagination.hasNext);
-      }
+  const loadMore = useCallback(() => {
+    if (!isLoading && hasMore) {
+      console.log('InfiniteScrollFacilities - Loading more, current page:', currentPage);
+      nextPage();
     }
-  }, [facilities, page, pagination]);
+  }, [isLoading, hasMore, currentPage, nextPage]);
 
-  // Scroll position tracking for scroll-to-top button
   useEffect(() => {
     const handleScroll = () => {
-      const scrollTop = window.scrollY;
-      setShowScrollTop(scrollTop > 400);
+      if (
+        window.innerHeight + document.documentElement.scrollTop
+        >= document.documentElement.offsetHeight - 1000
+      ) {
+        loadMore();
+      }
     };
+
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [loadMore]);
 
-  const fetchMoreData = useCallback(() => {
-    if (!isLoading && hasMore) {
-      console.log('Loading next page:', page + 1);
-      setPage(prev => prev + 1);
-    }
-  }, [isLoading, hasMore, page]);
+  console.log('InfiniteScrollFacilities - Current state:', {
+    allFacilitiesCount: allFacilities.length,
+    isLoading,
+    hasMore,
+    currentPage
+  });
 
-  const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
-  };
-
-  // Function to handle address click - navigate to map view with filters
-  const handleAddressClick = (e: React.MouseEvent, facility: any) => {
-    e.stopPropagation();
-    const searchParams = new URLSearchParams();
-    if (filters.facilityType) searchParams.set('facilityType', filters.facilityType);
-    if (filters.location) searchParams.set('location', filters.location);
-    if (filters.accessibility) searchParams.set('accessibility', filters.accessibility);
-    if (filters.capacity && Array.isArray(filters.capacity)) {
-      searchParams.set('capacity', filters.capacity.join(','));
-    }
-    if (filters.searchTerm) searchParams.set('searchTerm', filters.searchTerm);
-    searchParams.set('viewMode', 'map');
-    searchParams.set('focusFacility', facility.id.toString());
-    navigate(`/?${searchParams.toString()}`);
-  };
-
-  if (error) {
+  if (isLoading && allFacilities.length === 0) {
     return (
-      <div className="max-w-7xl mx-auto px-4">
-        <ViewHeader 
-          facilityCount={0}
-          isLoading={false}
-          viewMode={viewMode}
-          setViewMode={setViewMode}
-        />
-        <div className="text-center py-10 bg-red-50 rounded-lg border border-red-200">
-          <h3 className="text-xl font-medium text-red-800 mb-2">Feil ved lasting</h3>
-          <p className="text-red-600">Kunne ikke laste lokaler. Prøv igjen senere.</p>
-        </div>
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
     );
   }
-
-  if (page === 1 && isLoading) {
-    return (
-      <div className="max-w-7xl mx-auto px-4">
-        <ViewHeader 
-          facilityCount={0}
-          isLoading={true}
-          viewMode={viewMode}
-          setViewMode={setViewMode}
-        />
-        <div className="flex items-center justify-center py-20">
-          <div className="text-center space-y-4">
-            <Loader2 className="h-8 w-8 animate-spin mx-auto text-blue-600" />
-            <p className="text-gray-600 font-medium">Laster lokaler...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (allFacilities.length === 0 && !isLoading) {
-    return (
-      <div className="max-w-7xl mx-auto px-4">
-        <ViewHeader 
-          facilityCount={0}
-          isLoading={false}
-          viewMode={viewMode}
-          setViewMode={setViewMode}
-        />
-        <div className="text-center py-10 bg-gray-50 rounded-lg">
-          <h3 className="text-xl font-medium mb-2">Ingen lokaler funnet</h3>
-          <p className="text-gray-500">Prøv å endre søkekriteriene dine</p>
-        </div>
-      </div>
-    );
-  }
-
-  const LoadingSpinner = () => (
-    <div className="flex items-center justify-center py-8">
-      <div className="flex items-center gap-3 bg-white rounded-full px-6 py-3 shadow-lg border">
-        <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
-        <span className="text-gray-700 font-medium">Laster flere lokaler...</span>
-      </div>
-    </div>
-  );
-
-  const EndMessage = () => (
-    <div className="text-center py-8">
-      <div className="inline-flex items-center gap-2 bg-gray-100 rounded-full px-6 py-3">
-        <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
-        <span className="text-gray-600 font-medium">Du har sett alle tilgjengelige lokaler</span>
-        <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
-      </div>
-    </div>
-  );
 
   return (
-    <div className="relative max-w-7xl mx-auto px-4 my-[12px]">
-      {/* Reusable Header */}
-      <ViewHeader 
-        facilityCount={pagination?.total || allFacilities.length}
-        isLoading={isLoading}
-        viewMode={viewMode}
-        setViewMode={setViewMode}
-      />
-
-      {/* Infinite Scroll Container */}
-      <InfiniteScroll 
-        dataLength={allFacilities.length} 
-        next={fetchMoreData} 
-        hasMore={hasMore} 
-        loader={<LoadingSpinner />} 
-        endMessage={<EndMessage />} 
-        scrollThreshold={0.9} 
-        style={{ overflow: 'visible' }} 
-        className="w-full"
-      >
-        {/* Facilities content */}
-        {viewMode === "grid" ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 w-full mb-8">
-            {allFacilities.map((facility, index) => (
-              <div key={`${facility.id}-${index}`} className="w-full h-full">
-                <FacilityCard facility={facility} onAddressClick={handleAddressClick} />
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="space-y-6 w-full mb-8">
-            {allFacilities.map((facility, index) => (
-              <div key={`${facility.id}-${index}`} className="w-full">
-                <FacilityListItem 
-                  facility={facility} 
-                  facilityType={filters.facilityType} 
-                  location={filters.location} 
-                  accessibility={filters.accessibility} 
-                  capacity={filters.capacity} 
-                />
-              </div>
-            ))}
-          </div>
-        )}
-      </InfiniteScroll>
-
-      {/* Scroll to top button */}
-      {showScrollTop && (
-        <Button 
-          onClick={scrollToTop} 
-          size="lg" 
-          className="fixed bottom-6 right-6 rounded-full w-14 h-14 shadow-lg hover:shadow-xl transition-all duration-300 bg-blue-600 hover:bg-blue-700 z-50"
-        >
-          <ArrowUp className="h-6 w-6" />
-        </Button>
+    <div>
+      {viewMode === "grid" ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {allFacilities.map((facility) => (
+            <FacilityCard key={facility.id} facility={facility} />
+          ))}
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {allFacilities.map((facility) => (
+            <FacilityListItem key={facility.id} facility={facility} />
+          ))}
+        </div>
+      )}
+      
+      {isLoading && allFacilities.length > 0 && (
+        <div className="flex justify-center items-center h-16 mt-4">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        </div>
+      )}
+      
+      {!hasMore && allFacilities.length > 0 && (
+        <div className="text-center py-4 text-gray-500">
+          No more facilities to load
+        </div>
       )}
     </div>
   );
-}
+};

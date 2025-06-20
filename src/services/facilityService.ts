@@ -1,122 +1,21 @@
+// Re-export from the main service to maintain compatibility
+export { facilityRepository as FacilityService } from '@/dal/repositories/FacilityRepository';
 
-import { Facility, FacilityFilters, FacilitySortOptions } from "@/types/facility";
-import { Zone } from "@/types/zone";
-import { PaginatedResponse, PaginationParams, ApiResponse } from "@/types/api";
-import { facilityRepository, zoneRepository } from "@/dal/repositories";
+// Also export individual methods for convenience
+import { facilityRepository } from '@/dal/repositories/FacilityRepository';
 
-// Simulate API delay
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
-export class FacilityService {
-  static async getFacilities(
-    pagination: PaginationParams,
-    filters?: FacilityFilters,
-    sort?: FacilitySortOptions
-  ): Promise<ApiResponse<PaginatedResponse<Facility>>> {
-    try {
-      await delay(300); // Simulate network delay
-
-      const result = await facilityRepository.findAll(
-        pagination,
-        filters,
-        sort?.field,
-        sort?.direction
-      );
-
-      return result;
-    } catch (error) {
-      return {
-        success: false,
-        error: {
-          message: "Failed to fetch facilities",
-          details: error,
-        },
-      };
-    }
+export const FacilityService = {
+  getFacilities: facilityRepository.getAll.bind(facilityRepository),
+  getFacilityById: facilityRepository.getById.bind(facilityRepository),
+  createFacility: facilityRepository.createAsync.bind(facilityRepository),
+  updateFacility: facilityRepository.updateAsync.bind(facilityRepository),
+  deleteFacility: facilityRepository.deleteAsync.bind(facilityRepository),
+  getFacilitiesByType: facilityRepository.getFacilitiesByType.bind(facilityRepository),
+  getFacilitiesByArea: facilityRepository.getFacilitiesByArea.bind(facilityRepository),
+  getZonesByFacilityId: facilityRepository.getFacilityZones.bind(facilityRepository),
+  getZoneById: async (zoneId: string) => {
+    // This is a placeholder - we'll implement zone-specific queries later
+    console.log('FacilityService.getZoneById called with:', zoneId);
+    return { success: false, error: { message: 'Zone queries not yet implemented' } };
   }
-
-  static async getFacilityById(id: number): Promise<ApiResponse<Facility>> {
-    try {
-      await delay(200);
-
-      const result = await facilityRepository.findById(id.toString());
-      return result;
-    } catch (error) {
-      return {
-        success: false,
-        error: {
-          message: "Failed to fetch facility",
-          details: error,
-        },
-      };
-    }
-  }
-
-  static async getZonesByFacilityId(facilityId: string): Promise<ApiResponse<Zone[]>> {
-    try {
-      await delay(150);
-
-      const result = await zoneRepository.getZonesByFacilityId(facilityId);
-      return result;
-    } catch (error) {
-      return {
-        success: false,
-        error: {
-          message: "Failed to fetch zones",
-          details: error,
-        },
-      };
-    }
-  }
-
-  static async getZoneById(zoneId: string): Promise<ApiResponse<Zone>> {
-    try {
-      await delay(150);
-
-      const result = await zoneRepository.getZoneById(zoneId);
-      return result;
-    } catch (error) {
-      return {
-        success: false,
-        error: {
-          message: "Failed to fetch zone",
-          details: error,
-        },
-      };
-    }
-  }
-
-  static async getFacilitiesByType(type: string): Promise<ApiResponse<Facility[]>> {
-    try {
-      await delay(250);
-
-      const result = await facilityRepository.getFacilitiesByType(type);
-      return result;
-    } catch (error) {
-      return {
-        success: false,
-        error: {
-          message: "Failed to fetch facilities by type",
-          details: error,
-        },
-      };
-    }
-  }
-
-  static async getFacilitiesByArea(area: string): Promise<ApiResponse<Facility[]>> {
-    try {
-      await delay(250);
-
-      const result = await facilityRepository.getFacilitiesByArea(area);
-      return result;
-    } catch (error) {
-      return {
-        success: false,
-        error: {
-          message: "Failed to fetch facilities by area",
-          details: error,
-        },
-      };
-    }
-  }
-}
+};
