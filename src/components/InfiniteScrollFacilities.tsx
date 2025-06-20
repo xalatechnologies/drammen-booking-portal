@@ -37,25 +37,26 @@ export const InfiniteScrollFacilities: React.FC<InfiniteScrollFacilitiesProps> =
     console.log('InfiniteScrollFacilities - Filters changed, resetting to page 1');
     setAllFacilities([]);
     setHasMore(true);
-    goToPage(1); // Reset to page 1 when filters change
+    goToPage(1);
   }, [filterString, goToPage]);
 
-  // Handle facility data updates
+  // Handle facility data updates - FIXED: Better logic for setting facilities
   useEffect(() => {
     console.log('InfiniteScrollFacilities - useEffect triggered', {
       page: currentPage,
       facilitiesLength: facilities.length,
       isLoading,
-      hasMore: paginationInfo?.hasNext
+      hasMore: paginationInfo?.hasNext,
+      allFacilitiesLength: allFacilities.length
     });
 
-    if (!isLoading && facilities.length > 0) {
+    if (!isLoading && facilities.length >= 0) { // Changed > 0 to >= 0 to handle empty results
       if (currentPage === 1) {
-        // For first page, replace all facilities
+        // For first page, replace all facilities (this handles both fresh loads and filter changes)
         console.log('InfiniteScrollFacilities - Setting facilities for page 1:', facilities.length);
         setAllFacilities(facilities);
       } else {
-        // For subsequent pages, append new facilities
+        // For subsequent pages, append new facilities (avoid duplicates)
         console.log('InfiniteScrollFacilities - Appending facilities for page', currentPage);
         setAllFacilities(prev => {
           const newFacilities = facilities.filter(facility => 
@@ -64,14 +65,14 @@ export const InfiniteScrollFacilities: React.FC<InfiniteScrollFacilitiesProps> =
           return [...prev, ...newFacilities];
         });
       }
-    }
 
-    // Update hasMore based on pagination info
-    if (paginationInfo) {
-      setHasMore(paginationInfo.hasNext);
-      console.log('InfiniteScrollFacilities - Updated hasMore:', paginationInfo.hasNext);
+      // Update hasMore based on pagination info
+      if (paginationInfo) {
+        setHasMore(paginationInfo.hasNext);
+        console.log('InfiniteScrollFacilities - Updated hasMore:', paginationInfo.hasNext);
+      }
     }
-  }, [facilities, currentPage, isLoading, paginationInfo?.hasNext]);
+  }, [facilities, currentPage, isLoading, paginationInfo?.hasNext, paginationInfo?.total]);
 
   const loadMore = useCallback(() => {
     if (!isLoading && hasMore) {
@@ -104,7 +105,8 @@ export const InfiniteScrollFacilities: React.FC<InfiniteScrollFacilitiesProps> =
     isLoading,
     hasMore,
     currentPage,
-    facilitiesFromAPI: facilities.length
+    facilitiesFromAPI: facilities.length,
+    paginationTotal: paginationInfo?.total
   });
 
   // Get total count from pagination info or fall back to current facilities count
