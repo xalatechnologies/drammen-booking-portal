@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { ShoppingCart, X, CreditCard, Trash2 } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
+import { useTranslation } from "@/i18n/hooks/useTranslation";
 import { format } from "date-fns";
 
 interface CartDropdownProps {
@@ -15,6 +16,7 @@ interface CartDropdownProps {
 export function CartDropdown({ onClose }: CartDropdownProps) {
   const navigate = useNavigate();
   const { items, removeFromCart, clearCart, getTotalPrice, getItemCount } = useCart();
+  const { t } = useTranslation();
 
   const handleProceedToCheckout = () => {
     onClose();
@@ -30,8 +32,8 @@ export function CartDropdown({ onClose }: CartDropdownProps) {
     return (
       <div className="p-6 text-center">
         <ShoppingCart className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-        <p className="text-sm font-medium text-gray-500 mb-2">Din reservasjonskurv er tom</p>
-        <p className="text-xs text-gray-400">Velg tidslukene du ønsker å reservere</p>
+        <p className="text-sm font-medium text-gray-500 mb-2">{t('booking.cart.empty')}</p>
+        <p className="text-xs text-gray-400">{t('booking.cart.selectTimeSlots')}</p>
       </div>
     );
   }
@@ -41,7 +43,7 @@ export function CartDropdown({ onClose }: CartDropdownProps) {
       {/* Header */}
       <div className="p-4 border-b bg-gray-50">
         <div className="flex items-center justify-between">
-          <h3 className="font-semibold text-lg">Reservasjonskurv ({getItemCount()})</h3>
+          <h3 className="font-semibold text-lg">{t('booking.cart.title')} ({getItemCount()})</h3>
           <Button 
             variant="ghost" 
             size="sm" 
@@ -49,7 +51,7 @@ export function CartDropdown({ onClose }: CartDropdownProps) {
             className="text-red-500 hover:text-red-700"
           >
             <Trash2 className="h-4 w-4 mr-1" />
-            Tøm kurv
+            {t('booking.cart.clear')}
           </Button>
         </div>
       </div>
@@ -65,7 +67,7 @@ export function CartDropdown({ onClose }: CartDropdownProps) {
                 </p>
                 <div className="flex items-center gap-2 mt-1">
                   <Badge variant="outline" className="text-xs">
-                    {item.zoneId === 'whole-facility' ? 'Hele lokalet' : item.zoneId}
+                    {item.zoneId === 'whole-facility' ? t('booking.zones.wholeFacility') : item.zoneId}
                   </Badge>
                 </div>
               </div>
@@ -98,16 +100,16 @@ export function CartDropdown({ onClose }: CartDropdownProps) {
       <div className="p-4 border-t bg-gray-50 space-y-3">
         <div className="space-y-2">
           <div className="flex justify-between items-center text-sm">
-            <span className="text-gray-600">Subtotal</span>
+            <span className="text-gray-600">{t('booking.pricing.subtotal')}</span>
             <span className="font-medium">{getTotalPrice()} kr</span>
           </div>
           <div className="flex justify-between items-center text-sm">
-            <span className="text-gray-600">MVA (25%)</span>
+            <span className="text-gray-600">{t('booking.pricing.vat')}</span>
             <span className="font-medium">{Math.round(getTotalPrice() * 0.25)} kr</span>
           </div>
           <Separator />
           <div className="flex justify-between items-center text-base font-bold">
-            <span>Total</span>
+            <span>{t('booking.pricing.total')}</span>
             <span>{getTotalPrice() + Math.round(getTotalPrice() * 0.25)} kr</span>
           </div>
         </div>
@@ -118,7 +120,7 @@ export function CartDropdown({ onClose }: CartDropdownProps) {
           disabled={getItemCount() === 0}
         >
           <CreditCard className="h-4 w-4 mr-2" />
-          Gå til kassen
+          {t('booking.cart.proceedToCheckout')}
         </Button>
       </div>
     </div>
