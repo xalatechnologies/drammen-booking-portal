@@ -8,10 +8,12 @@ import FacilityListItem from "./facility/FacilityListItem";
 import { useOptimizedFacilities } from "@/hooks/useOptimizedFacilities";
 import { FacilityFilters } from "@/types/facility";
 import { useNavigate } from "react-router-dom";
+
 interface InfiniteScrollFacilitiesProps {
   filters: FacilityFilters;
   viewMode: "grid" | "list";
 }
+
 export function InfiniteScrollFacilities({
   filters,
   viewMode
@@ -21,6 +23,7 @@ export function InfiniteScrollFacilities({
   const [allFacilities, setAllFacilities] = useState<any[]>([]);
   const [hasMore, setHasMore] = useState(true);
   const [showScrollTop, setShowScrollTop] = useState(false);
+
   const {
     facilities,
     pagination,
@@ -131,40 +134,69 @@ export function InfiniteScrollFacilities({
       </div>
     </div>;
   return <div className="relative max-w-7xl mx-auto px-4 my-[12px]">
-      {/* Results summary */}
-      <div className="mb-10 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
-            {pagination?.total || allFacilities.length} lokaler
-          </Badge>
-          {viewMode === "grid" && <Badge variant="secondary" className="text-gray-600">
-              Rutenett visning
-            </Badge>}
-          {viewMode === "list" && <Badge variant="secondary" className="text-gray-600">
-              Liste visning
-            </Badge>}
+      {/* Enhanced Results summary */}
+      <div className="mb-12 flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
+            <span className="text-3xl font-bold text-gray-900">
+              {pagination?.total || allFacilities.length}
+            </span>
+            <span className="text-xl font-semibold text-gray-700">lokaler</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Badge variant="secondary" className="text-base px-4 py-2 font-medium text-gray-600 bg-gray-100">
+              {viewMode === "grid" ? "Rutenett visning" : "Liste visning"}
+            </Badge>
+          </div>
         </div>
       </div>
 
       {/* Infinite Scroll Container */}
-      <InfiniteScroll dataLength={allFacilities.length} next={fetchMoreData} hasMore={hasMore} loader={<LoadingSpinner />} endMessage={<EndMessage />} scrollThreshold={0.9} style={{
-      overflow: 'visible'
-    }} className="w-full">
+      <InfiniteScroll 
+        dataLength={allFacilities.length} 
+        next={fetchMoreData} 
+        hasMore={hasMore} 
+        loader={<LoadingSpinner />} 
+        endMessage={<EndMessage />} 
+        scrollThreshold={0.9} 
+        style={{ overflow: 'visible' }} 
+        className="w-full"
+      >
         {/* Facilities content */}
-        {viewMode === "grid" ? <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-10 w-full mb-8">
-            {allFacilities.map((facility, index) => <div key={`${facility.id}-${index}`} className="w-full">
+        {viewMode === "grid" ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-10 w-full mb-8">
+            {allFacilities.map((facility, index) => (
+              <div key={`${facility.id}-${index}`} className="w-full">
                 <FacilityCard facility={facility} onAddressClick={handleAddressClick} />
-              </div>)}
-          </div> : <div className="space-y-8 w-full mb-8">
-            {allFacilities.map((facility, index) => <div key={`${facility.id}-${index}`} className="w-full">
-                <FacilityListItem facility={facility} facilityType={filters.facilityType} location={filters.location} accessibility={filters.accessibility} capacity={filters.capacity} />
-              </div>)}
-          </div>}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="space-y-8 w-full mb-8">
+            {allFacilities.map((facility, index) => (
+              <div key={`${facility.id}-${index}`} className="w-full">
+                <FacilityListItem 
+                  facility={facility} 
+                  facilityType={filters.facilityType} 
+                  location={filters.location} 
+                  accessibility={filters.accessibility} 
+                  capacity={filters.capacity} 
+                />
+              </div>
+            ))}
+          </div>
+        )}
       </InfiniteScroll>
 
       {/* Scroll to top button */}
-      {showScrollTop && <Button onClick={scrollToTop} size="lg" className="fixed bottom-6 right-6 rounded-full w-14 h-14 shadow-lg hover:shadow-xl transition-all duration-300 bg-blue-600 hover:bg-blue-700 z-50">
+      {showScrollTop && (
+        <Button 
+          onClick={scrollToTop} 
+          size="lg" 
+          className="fixed bottom-6 right-6 rounded-full w-14 h-14 shadow-lg hover:shadow-xl transition-all duration-300 bg-blue-600 hover:bg-blue-700 z-50"
+        >
           <ArrowUp className="h-6 w-6" />
-        </Button>}
+        </Button>
+      )}
     </div>;
 }

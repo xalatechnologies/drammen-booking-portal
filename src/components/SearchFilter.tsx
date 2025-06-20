@@ -1,20 +1,22 @@
-
 import React, { useState } from "react";
-import { DateRange } from "react-day-picker";
-import { X, Filter, Search, MapPin, Calendar, Users, Settings } from "lucide-react";
+import { CalendarDays, MapPin, Users, Building, Search, Filter, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import SearchInput from "@/components/search/SearchInput";
-import DateRangePicker from "@/components/search/DateRangePicker";
-import FilterSelects from "@/components/search/FilterSelects";
-import ViewModeToggle from "@/components/search/ViewModeToggle";
-import ActiveFilters from "@/components/search/ActiveFilters";
-import AdvancedFilters from "@/components/search/AdvancedFilters";
-import { useTranslation } from "@/i18n/hooks/useTranslation";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
+import { Switch } from "@/components/ui/switch";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { format } from "date-fns";
+import { nb } from "date-fns/locale";
+import ViewModeToggle from "./search/ViewModeToggle";
 
 interface SearchFilterProps {
   date?: Date;
-  setDate: (date: Date | undefined) => void;
+  setDate: (date?: Date) => void;
   facilityType: string;
   setFacilityType: (type: string) => void;
   location: string;
@@ -32,13 +34,13 @@ interface SearchFilterProps {
   availableNow: boolean;
   setAvailableNow: (available: boolean) => void;
   hasEquipment: boolean;
-  setHasEquipment: (has: boolean) => void;
+  setHasEquipment: (hasEquipment: boolean) => void;
   hasParking: boolean;
-  setHasParking: (has: boolean) => void;
+  setHasParking: (hasParking: boolean) => void;
   hasWifi: boolean;
-  setHasWifi: (has: boolean) => void;
+  setHasWifi: (hasWifi: boolean) => void;
   allowsPhotography: boolean;
-  setAllowsPhotography: (allows: boolean) => void;
+  setAllowsPhotography: (allowsPhotography: boolean) => void;
 }
 
 const SearchFilter: React.FC<SearchFilterProps> = ({
@@ -67,94 +69,312 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
   hasWifi,
   setHasWifi,
   allowsPhotography,
-  setAllowsPhotography
+  setAllowsPhotography,
 }) => {
-  const {
-    t
-  } = useTranslation();
-  const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [showAdvanced, setShowAdvanced] = useState(false);
+
+  const handleCapacityChange = (value: number[]) => {
+    setCapacity(value);
+  };
+
+  const handlePriceRangeChange = (value: number[]) => {
+    setPriceRange(value);
+  };
 
   const clearFilters = () => {
     setDate(undefined);
-    setDateRange(undefined);
     setFacilityType("all");
     setLocation("all");
     setAccessibility("all");
     setCapacity([0, 200]);
-    setSearchTerm("");
     setPriceRange([0, 5000]);
     setAvailableNow(false);
     setHasEquipment(false);
     setHasParking(false);
     setHasWifi(false);
     setAllowsPhotography(false);
+    setSearchTerm("");
   };
 
-  const hasActiveFilters = date || dateRange || facilityType && facilityType !== "all" || location && location !== "all" || accessibility && accessibility !== "all" || capacity[0] > 0 || capacity[1] < 200 || searchTerm || priceRange[0] > 0 || priceRange[1] < 5000 || availableNow || hasEquipment || hasParking || hasWifi || allowsPhotography;
-  const hasAdvancedFilters = dateRange || accessibility && accessibility !== "all" || capacity[0] > 0 || capacity[1] < 200 || priceRange[0] > 0 || priceRange[1] < 5000 || availableNow || hasEquipment || hasParking || hasWifi || allowsPhotography;
+  const hasActiveFilters = (): boolean => {
+    return (
+      date !== undefined ||
+      facilityType !== "all" ||
+      location !== "all" ||
+      accessibility !== "all" ||
+      capacity[0] !== 0 ||
+      capacity[1] !== 200 ||
+      priceRange[0] !== 0 ||
+      priceRange[1] !== 5000 ||
+      availableNow ||
+      hasEquipment ||
+      hasParking ||
+      hasWifi ||
+      allowsPhotography ||
+      searchTerm !== ""
+    );
+  };
 
-  return <div className="mb-8">
-      {/* Main Filters Section - Soft Navy Blue Background */}
-      <div className="bg-slate-50 rounded-2xl p-8 shadow-lg border border-slate-200">
-        <div className="flex flex-col lg:flex-row gap-6 items-stretch">
-          {/* Main Filter Selects */}
-          <div className="lg:flex-1">
-            <FilterSelects 
-              facilityType={facilityType} 
-              setFacilityType={setFacilityType} 
-              location={location} 
-              setLocation={setLocation} 
-              accessibility={accessibility} 
-              setAccessibility={setAccessibility} 
-              capacity={capacity} 
-              setCapacity={setCapacity} 
-              showOnlyMain={true} 
-            />
+  const getActiveFiltersCount = (): number => {
+    let count = 0;
+    if (date !== undefined) count++;
+    if (facilityType !== "all") count++;
+    if (location !== "all") count++;
+    if (accessibility !== "all") count++;
+    if (capacity[0] !== 0 || capacity[1] !== 200) count++;
+    if (priceRange[0] !== 0 || priceRange[1] !== 5000) count++;
+    if (availableNow) count++;
+    if (hasEquipment) count++;
+    if (hasParking) count++;
+    if (hasWifi) count++;
+    if (allowsPhotography) count++;
+    return count;
+  };
+
+  return (
+    <div className="bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-sm">
+      <div className="max-w-7xl mx-auto px-4 py-6">
+        {/* Main search row with view toggle positioned lower */}
+        <div className="flex flex-col lg:flex-row gap-6 items-start lg:items-center justify-between">
+          {/* Search inputs section */}
+          <div className="flex flex-1 flex-col sm:flex-row gap-4 items-stretch sm:items-center">
+            {/* Search input */}
+            <div className="relative flex-1 min-w-0">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <Input
+                placeholder="Søk etter lokaler..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 h-12 text-base border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+              />
+            </div>
+
+            {/* Quick filters */}
+            <div className="flex flex-wrap gap-2">
+              {/* Date picker */}
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button 
+                    variant="outline" 
+                    className="h-12 px-4 justify-start text-left font-normal border-gray-300 hover:border-blue-500"
+                  >
+                    <CalendarDays className="mr-2 h-4 w-4" />
+                    {date ? format(date, "d. MMM", { locale: nb }) : "Velg dato"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={date}
+                    onSelect={setDate}
+                    initialFocus
+                    locale={nb}
+                  />
+                </PopoverContent>
+              </Popover>
+
+              {/* Facility type */}
+              <Select value={facilityType} onValueChange={setFacilityType}>
+                <SelectTrigger className="h-12 w-[140px] border-gray-300 hover:border-blue-500">
+                  <Building className="mr-2 h-4 w-4" />
+                  <SelectValue placeholder="Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Alle typer</SelectItem>
+                  <SelectItem value="gymnasium">Gymnasium</SelectItem>
+                  <SelectItem value="meeting-room">Møterom</SelectItem>
+                  <SelectItem value="auditorium">Auditorium</SelectItem>
+                  <SelectItem value="sports-field">Sportsbane</SelectItem>
+                </SelectContent>
+              </Select>
+
+              {/* Location */}
+              <Select value={location} onValueChange={setLocation}>
+                <SelectTrigger className="h-12 w-[120px] border-gray-300 hover:border-blue-500">
+                  <MapPin className="mr-2 h-4 w-4" />
+                  <SelectValue placeholder="Sted" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Alle steder</SelectItem>
+                  <SelectItem value="halleren">Halleren</SelectItem>
+                  <SelectItem value="city">Sentrum</SelectItem>
+                  <SelectItem value="plant">Planten</SelectItem>
+                </SelectContent>
+              </Select>
+
+              {/* Advanced filters toggle */}
+              <Button
+                variant="outline"
+                onClick={() => setShowAdvanced(!showAdvanced)}
+                className="h-12 px-4 border-gray-300 hover:border-blue-500"
+              >
+                <Filter className="mr-2 h-4 w-4" />
+                Flere filter
+                {(hasActiveFilters()) && (
+                  <Badge variant="secondary" className="ml-2 bg-blue-100 text-blue-700">
+                    {getActiveFiltersCount()}
+                  </Badge>
+                )}
+              </Button>
+            </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex gap-4">
-            {/* Advanced Filters Button */}
-            <Button variant="outline" onClick={() => setShowAdvanced(!showAdvanced)} className={`h-14 px-6 border-2 text-base font-semibold transition-all duration-300 rounded-xl ${showAdvanced || hasAdvancedFilters ? 'border-slate-500 bg-slate-50 text-slate-700 hover:bg-slate-100 shadow-md' : 'border-slate-300 hover:border-slate-500 hover:bg-slate-50/50'}`}>
-              <Settings className="h-5 w-5 mr-2" />
-              {t('search.actions.moreFilters')}
-              {hasAdvancedFilters && <div className="ml-2 h-2 w-2 bg-slate-500 rounded-full"></div>}
-            </Button>
-
-            {/* View Mode Toggle */}
+          {/* View mode toggle - positioned lower with more spacing */}
+          <div className="flex-shrink-0 mt-4 lg:mt-0">
             <ViewModeToggle viewMode={viewMode} setViewMode={setViewMode} />
           </div>
         </div>
-      </div>
 
-      {/* Advanced Filters Section - Only show when showAdvanced is true */}
-      {showAdvanced && (
-        <div className="mt-6 bg-white/95 backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg p-6">
-          {/* Advanced Filters - Expandable */}
-          <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm animate-fade-in">
-            <div className="flex items-center mb-6">
-              <Settings className="h-5 w-5 text-slate-600 mr-3" />
-              <h3 className="font-bold text-slate-900 text-lg">{t('search.labels.advancedFilters')}</h3>
+        {/* Advanced filters section */}
+        {showAdvanced && (
+          <div className="mt-6 p-6 bg-gray-50 rounded-lg border border-gray-200">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Capacity slider */}
+              <div>
+                <Label htmlFor="capacity" className="text-sm font-medium block mb-2">
+                  Kapasitet (antall personer)
+                </Label>
+                <div className="flex items-center gap-4">
+                  <Users className="h-4 w-4 text-gray-500" />
+                  <Slider
+                    id="capacity"
+                    defaultValue={capacity}
+                    max={200}
+                    step={10}
+                    onValueChange={handleCapacityChange}
+                    className="flex-1"
+                  />
+                  <span className="text-sm text-gray-700">
+                    {capacity[0]} - {capacity[1]}
+                  </span>
+                </div>
+              </div>
+
+              {/* Price range slider */}
+              <div>
+                <Label htmlFor="price" className="text-sm font-medium block mb-2">
+                  Pris per time (NOK)
+                </Label>
+                <div className="flex items-center gap-4">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    className="w-4 h-4 text-gray-500"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M12 5a2.25 2.25 0 012.25 2.25V7.5h-4.5V7.25A2.25 2.25 0 0112 5zm0 7.5a2.25 2.25 0 012.25 2.25v2.25h-4.5v-2.25A2.25 2.25 0 0112 12.5zm-2.25 5a2.25 2.25 0 012.25-2.25H15a2.25 2.25 0 012.25 2.25v2.25a2.25 2.25 0 01-2.25 2.25H9.75a2.25 2.25 0 01-2.25-2.25v-2.25z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+
+                  <Slider
+                    id="price"
+                    defaultValue={priceRange}
+                    max={5000}
+                    step={100}
+                    onValueChange={handlePriceRangeChange}
+                    className="flex-1"
+                  />
+                  <span className="text-sm text-gray-700">
+                    {priceRange[0]} - {priceRange[1]}
+                  </span>
+                </div>
+              </div>
+
+              {/* Accessibility filter */}
+              <div>
+                <Label htmlFor="accessibility" className="text-sm font-medium block mb-2">
+                  Tilgjengelighet
+                </Label>
+                <Select value={accessibility} onValueChange={setAccessibility}>
+                  <SelectTrigger className="w-full h-11 border-gray-300">
+                    <SelectValue placeholder="Velg tilgjengelighet" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Alle</SelectItem>
+                    <SelectItem value="wheelchair">Rullestoltilpasset</SelectItem>
+                    <SelectItem value="hearing-loop">Teleslynge</SelectItem>
+                    <SelectItem value="visual-aids">Synshjelpemidler</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Boolean filters */}
+              <div className="space-y-3">
+                <Label className="text-sm font-medium block mb-2">
+                  Andre fasiliteter
+                </Label>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="availableNow" className="text-sm font-medium">
+                    Tilgjengelig nå
+                  </Label>
+                  <Switch
+                    id="availableNow"
+                    checked={availableNow}
+                    onCheckedChange={setAvailableNow}
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="hasEquipment" className="text-sm font-medium">
+                    AV-utstyr
+                  </Label>
+                  <Switch
+                    id="hasEquipment"
+                    checked={hasEquipment}
+                    onCheckedChange={setHasEquipment}
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="hasParking" className="text-sm font-medium">
+                    Parkering
+                  </Label>
+                  <Switch
+                    id="hasParking"
+                    checked={hasParking}
+                    onCheckedChange={setHasParking}
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="hasWifi" className="text-sm font-medium">
+                    WiFi
+                  </Label>
+                  <Switch
+                    id="hasWifi"
+                    checked={hasWifi}
+                    onCheckedChange={setHasWifi}
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="allowsPhotography" className="text-sm font-medium">
+                    Tillater fotografering
+                  </Label>
+                  <Switch
+                    id="allowsPhotography"
+                    checked={allowsPhotography}
+                    onCheckedChange={setAllowsPhotography}
+                  />
+                </div>
+              </div>
             </div>
-            <AdvancedFilters accessibility={accessibility} setAccessibility={setAccessibility} capacity={capacity} setCapacity={setCapacity} priceRange={priceRange} setPriceRange={setPriceRange} availableNow={availableNow} setAvailableNow={setAvailableNow} hasEquipment={hasEquipment} setHasEquipment={setHasEquipment} hasParking={hasParking} setHasParking={setHasParking} hasWifi={hasWifi} setHasWifi={setHasWifi} allowsPhotography={allowsPhotography} setAllowsPhotography={setAllowsPhotography} />
-          </div>
 
-          {/* Active Filters */}
-          {hasActiveFilters && <div className="mt-4">
-              <ActiveFilters dateRange={dateRange} setDateRange={setDateRange} facilityType={facilityType} setFacilityType={setFacilityType} location={location} setLocation={setLocation} accessibility={accessibility} setAccessibility={setAccessibility} capacity={capacity} setCapacity={setCapacity} priceRange={priceRange} setPriceRange={setPriceRange} availableNow={availableNow} setAvailableNow={setAvailableNow} hasEquipment={hasEquipment} setHasEquipment={setHasEquipment} hasParking={hasParking} setHasParking={setHasParking} hasWifi={hasWifi} setHasWifi={setHasWifi} allowsPhotography={allowsPhotography} setAllowsPhotography={setAllowsPhotography} />
-            </div>}
-
-          {/* Clear Filters */}
-          {hasActiveFilters && <div className="flex justify-end mt-4">
-              <Button variant="ghost" size="sm" onClick={clearFilters} className="text-slate-500 hover:text-red-600 hover:bg-red-50 font-medium transition-colors duration-200">
-                <X className="h-4 w-4 mr-2" />
-                {t('search.actions.clearFilters')}
+            {/* Clear filters button */}
+            <div className="mt-6 flex justify-end">
+              <Button
+                variant="ghost"
+                onClick={clearFilters}
+                className="text-sm text-gray-600 hover:bg-gray-100"
+              >
+                <X className="mr-2 h-4 w-4" />
+                Fjern alle filtre
               </Button>
-            </div>}
-        </div>
-      )}
-    </div>;
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
 };
 
 export default SearchFilter;
