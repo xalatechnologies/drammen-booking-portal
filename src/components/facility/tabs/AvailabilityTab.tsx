@@ -11,8 +11,9 @@ import { CalendarGrid } from './CalendarGrid';
 import { LegendDisplay } from './LegendDisplay';
 import { SimplifiedBookingForm } from '@/components/booking/SimplifiedBookingForm';
 import { Zone } from '@/components/booking/types';
-import { SelectedTimeSlot } from '@/utils/recurrenceEngine';
+import { SelectedTimeSlot, RecurrencePattern } from '@/utils/recurrenceEngine';
 import { useAvailabilityStatus } from './useAvailabilityStatus';
+import { AvailabilityModals } from './AvailabilityModals';
 
 interface AvailabilityTabProps {
   zones: Zone[];
@@ -47,6 +48,16 @@ export function AvailabilityTab({
     startOfWeek(new Date(), { weekStartsOn: 1 })
   );
   const [selectedZoneId, setSelectedZoneId] = useState(zones[0]?.id || '');
+  const [showPatternBuilder, setShowPatternBuilder] = useState(false);
+  const [showConflictWizard, setShowConflictWizard] = useState(false);
+  const [showBookingDrawer, setShowBookingDrawer] = useState(false);
+  const [conflictResolutionData, setConflictResolutionData] = useState<any>(null);
+  const [recurrencePattern, setRecurrencePattern] = useState<RecurrencePattern>({
+    type: 'weekly',
+    weekdays: [],
+    timeSlots: [],
+    interval: 1
+  });
 
   const { getAvailabilityStatus, isSlotSelected } = useAvailabilityStatus(selectedSlots);
 
@@ -83,8 +94,35 @@ export function AvailabilityTab({
   };
 
   const handleRecurringBooking = () => {
-    console.log('Starting recurring booking process');
-    // Handle recurring booking logic
+    setShowPatternBuilder(true);
+  };
+
+  const handlePatternBuilderClose = () => {
+    setShowPatternBuilder(false);
+  };
+
+  const handleConflictWizardClose = () => {
+    setShowConflictWizard(false);
+    setConflictResolutionData(null);
+  };
+
+  const handleBookingDrawerClose = () => {
+    setShowBookingDrawer(false);
+  };
+
+  const handlePatternChange = (pattern: RecurrencePattern) => {
+    setRecurrencePattern(pattern);
+    if (onPatternChange) {
+      onPatternChange(pattern);
+    }
+  };
+
+  const handlePatternApply = (pattern: RecurrencePattern) => {
+    console.log('Applying pattern:', pattern);
+    if (onPatternApply) {
+      onPatternApply(pattern);
+    }
+    setShowPatternBuilder(false);
   };
 
   return (
@@ -121,8 +159,8 @@ export function AvailabilityTab({
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <h4 className="font-semibold text-blue-900 mb-3 text-xl">{selectedZone.name}</h4>
-                  <p className="text-blue-700 mb-4 text-base leading-relaxed">{selectedZone.description}</p>
-                  <div className="grid grid-cols-2 gap-6 text-base">
+                  <p className="text-blue-700 mb-4 text-lg leading-relaxed">{selectedZone.description}</p>
+                  <div className="grid grid-cols-2 gap-6 text-lg">
                     <div>
                       <span className="font-medium text-blue-800">Kapasitet:</span>
                       <span className="ml-2 text-blue-700">{selectedZone.capacity} personer</span>
@@ -138,7 +176,7 @@ export function AvailabilityTab({
                     onClick={handleRecurringBooking}
                     variant="outline"
                     size="lg"
-                    className="border-purple-600 text-purple-600 hover:bg-purple-50 text-base px-6 py-3"
+                    className="border-purple-600 text-purple-600 hover:bg-purple-50 text-lg px-6 py-3"
                   >
                     <RotateCcw className="h-5 w-5 mr-2" />
                     Gjentakende booking
@@ -204,10 +242,28 @@ export function AvailabilityTab({
               onAddToCart={handleAddToCart}
               onCompleteBooking={handleCompleteBooking}
               onSlotsCleared={onClearSlots}
+              onRemoveSlot={onRemoveSlot}
             />
           </div>
         </div>
       </div>
+
+      {/* Modals */}
+      <AvailabilityModals
+        showPatternBuilder={showPatternBuilder}
+        showConflictWizard={showConflictWizard}
+        showBookingDrawer={showBookingDrawer}
+        currentPattern={recurrencePattern}
+        conflictResolutionData={conflictResolutionData}
+        selectedSlots={selectedSlots}
+        facilityId={facilityId}
+        facilityName={facilityName}
+        onPatternBuilderClose={handlePatternBuilderClose}
+        onConflictWizardClose={handleConflictWizardClose}
+        onBookingDrawerClose={handleBookingDrawerClose}
+        onPatternChange={handlePatternChange}
+        onPatternApply={handlePatternApply}
+      />
     </div>
   );
 }
