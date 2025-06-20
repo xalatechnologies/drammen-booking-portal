@@ -33,7 +33,6 @@ export function TimeSlotStep({ selectedTimeSlots, onTimeSlotToggle }: TimeSlotSt
 
   const startDrag = useCallback((index: number, event: React.MouseEvent) => {
     event.preventDefault();
-    console.log('Starting drag at index:', index);
     setDragState({
       isDragging: true,
       startIndex: index,
@@ -45,15 +44,12 @@ export function TimeSlotStep({ selectedTimeSlots, onTimeSlotToggle }: TimeSlotSt
   const updateDrag = useCallback((index: number) => {
     if (!dragState.isDragging || dragState.startIndex === null) return;
 
-    console.log('Updating drag to index:', index, 'from start:', dragState.startIndex);
-
     const startIndex = dragState.startIndex;
     const endIndex = index;
     const minIndex = Math.min(startIndex, endIndex);
     const maxIndex = Math.max(startIndex, endIndex);
     
     const previewSlots = timeSlots.slice(minIndex, maxIndex + 1);
-    console.log('Preview slots:', previewSlots);
     
     setDragState(prev => ({
       ...prev,
@@ -63,14 +59,12 @@ export function TimeSlotStep({ selectedTimeSlots, onTimeSlotToggle }: TimeSlotSt
   }, [dragState.isDragging, dragState.startIndex]);
 
   const endDrag = useCallback(() => {
-    console.log('Ending drag with preview slots:', dragState.previewSlots);
-    
     if (dragState.previewSlots.length > 0) {
-      // Add all preview slots that aren't already selected
-      const newSlots = dragState.previewSlots.filter(slot => !selectedTimeSlots.includes(slot));
-      newSlots.forEach(slot => {
-        console.log('Adding slot:', slot);
-        onTimeSlotToggle(slot);
+      // Toggle all preview slots
+      dragState.previewSlots.forEach(slot => {
+        if (!selectedTimeSlots.includes(slot)) {
+          onTimeSlotToggle(slot);
+        }
       });
     }
     
@@ -83,7 +77,6 @@ export function TimeSlotStep({ selectedTimeSlots, onTimeSlotToggle }: TimeSlotSt
   }, [dragState.previewSlots, selectedTimeSlots, onTimeSlotToggle]);
 
   const cancelDrag = useCallback(() => {
-    console.log('Canceling drag');
     setDragState({
       isDragging: false,
       startIndex: null,
@@ -95,26 +88,22 @@ export function TimeSlotStep({ selectedTimeSlots, onTimeSlotToggle }: TimeSlotSt
   const handleClick = (slot: string, index: number, event: React.MouseEvent) => {
     event.preventDefault();
     if (!dragState.isDragging) {
-      console.log('Clicking slot:', slot);
       onTimeSlotToggle(slot);
     }
   };
 
   const handleMouseDown = (index: number, event: React.MouseEvent) => {
-    console.log('Mouse down on index:', index);
     startDrag(index, event);
   };
 
   const handleMouseEnter = (index: number) => {
     if (dragState.isDragging) {
-      console.log('Mouse enter on index:', index);
       updateDrag(index);
     }
   };
 
   const handleMouseUp = () => {
     if (dragState.isDragging) {
-      console.log('Mouse up - ending drag');
       endDrag();
     }
   };
@@ -135,7 +124,6 @@ export function TimeSlotStep({ selectedTimeSlots, onTimeSlotToggle }: TimeSlotSt
     return 'bg-white hover:bg-gray-50 border border-gray-300 text-gray-700 cursor-pointer';
   };
 
-  // Remove duplicates from selected time slots for display
   const uniqueSelectedSlots = [...new Set(selectedTimeSlots)];
 
   return (
@@ -160,7 +148,7 @@ export function TimeSlotStep({ selectedTimeSlots, onTimeSlotToggle }: TimeSlotSt
 
       <Card>
         <CardContent className="p-6">
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
             {timeSlots.map((slot, index) => {
               const isSelected = uniqueSelectedSlots.includes(slot);
               const isInPreview = isSlotInPreview(slot);
@@ -180,7 +168,7 @@ export function TimeSlotStep({ selectedTimeSlots, onTimeSlotToggle }: TimeSlotSt
                 >
                   <div className="flex items-center justify-center h-full">
                     <span className="text-sm font-medium">
-                      {slot.split('-')[0]}
+                      {slot}
                     </span>
                     {isSelected && (
                       <span className="text-sm ml-1">✓</span>
@@ -193,6 +181,18 @@ export function TimeSlotStep({ selectedTimeSlots, onTimeSlotToggle }: TimeSlotSt
               );
             })}
           </div>
+
+          {/* Clear all button */}
+          {uniqueSelectedSlots.length > 0 && (
+            <div className="mt-4 text-center">
+              <button
+                onClick={() => uniqueSelectedSlots.forEach(slot => onTimeSlotToggle(slot))}
+                className="text-sm text-red-600 hover:text-red-700 underline"
+              >
+                Fjern alle valgte tidspunkt
+              </button>
+            </div>
+          )}
         </CardContent>
       </Card>
 

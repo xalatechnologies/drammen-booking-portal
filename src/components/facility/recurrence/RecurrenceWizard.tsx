@@ -118,6 +118,8 @@ export function RecurrenceWizard({ pattern, onPatternChange, onClose, onApplyPat
             selectedFrequency={selectedFrequency}
             selectedWeekdays={pattern.weekdays || []}
             selectedTimeSlots={pattern.timeSlots || []}
+            startDate={pattern.startDate}
+            endDate={pattern.endDate}
           />
         );
       default:
