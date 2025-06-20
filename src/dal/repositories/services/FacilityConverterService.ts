@@ -1,6 +1,6 @@
-
 import { Facility } from '@/types/facility';
 import { getLocalizedFacility } from '@/utils/localizationHelper';
+import { OpeningHours } from '@/types/facility';
 
 interface FacilityCreateRequest {
   name: string;
@@ -12,7 +12,7 @@ interface FacilityCreateRequest {
   accessibility: string[];
   suitableFor: string[];
   equipment: string[];
-  openingHours: { dayOfWeek: number; opens: string; closes: string; }[];
+  openingHours: OpeningHours[];
   image: string;
 }
 
@@ -73,23 +73,16 @@ export class FacilityConverterService {
   }
 
   static updateFacilityFromRequest(existing: Facility, request: FacilityUpdateRequest): Facility {
-    // Create a properly typed update object
-    const updates: Partial<Facility> = { ...request };
-
-    // If openingHours is being updated, properly cast dayOfWeek values
-    if (request.openingHours) {
-      updates.openingHours = request.openingHours.map(hour => ({
-        dayOfWeek: hour.dayOfWeek as 0 | 1 | 2 | 3 | 4 | 5 | 6,
-        opens: hour.opens,
-        closes: hour.closes
-      }));
-    }
-
     // Start with the existing facility and apply updates
     const updatedFacility: Facility = {
       ...existing,
-      ...updates
+      ...request
     };
+
+    // If openingHours is being updated, ensure they're properly typed
+    if (request.openingHours) {
+      updatedFacility.openingHours = request.openingHours;
+    }
 
     return updatedFacility;
   }
