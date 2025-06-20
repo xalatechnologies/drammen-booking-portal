@@ -1,108 +1,94 @@
 
 import React from "react";
-import { Calendar, CheckCircle2, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { format } from "date-fns";
-import { SelectedTimeSlot } from "@/utils/recurrenceEngine";
+import { Separator } from "@/components/ui/separator";
+import { Clock, X, Calendar } from "lucide-react";
+import { format, parseISO } from "date-fns";
+import { nb } from "date-fns/locale";
 
 interface SelectedSlotsSectionProps {
-  selectedSlots: SelectedTimeSlot[];
-  isOpen: boolean;
-  onToggle: (open: boolean) => void;
-  onRemoveSlot: (zoneId: string, date: string, timeSlot: string) => void;
-  onBookSlots: () => void;
-  onClearSlots: () => void;
-  totalPrice: number;
-  requiresApproval: boolean;
-  canProceed: boolean;
+  slotsByDate: Record<string, Array<{
+    id: string;
+    date: string;
+    startTime: string;
+    endTime: string;
+    zone?: string;
+    price?: number;
+  }>>;
+  onSlotRemove: (slotId: string) => void;
 }
 
-export function SelectedSlotsSection({
-  selectedSlots,
-  isOpen,
-  onToggle,
-  onRemoveSlot,
-  onBookSlots,
-  onClearSlots,
-  totalPrice,
-  requiresApproval,
-  canProceed
-}: SelectedSlotsSectionProps) {
-  if (selectedSlots.length === 0) return null;
+export function SelectedSlotsSection({ slotsByDate, onSlotRemove }: SelectedSlotsSectionProps) {
+  const formatDateString = (dateStr: string) => {
+    try {
+      // Check if it's already a Date object or a valid date string
+      const date = typeof dateStr === 'string' ? parseISO(dateStr) : dateStr;
+      return format(date, 'EEEE d. MMMM', { locale: nb });
+    } catch (error) {
+      // Fallback for invalid date formats
+      return dateStr;
+    }
+  };
 
   return (
-    <Collapsible open={isOpen} onOpenChange={onToggle}>
-      <Card>
-        <CollapsibleTrigger asChild>
-          <CardHeader className="pb-3 cursor-pointer hover:bg-gray-50 transition-colors">
-            <CardTitle className="flex items-center justify-between text-lg">
-              <div className="flex items-center gap-2">
-                <Calendar className="h-5 w-5" />
-                Valgte tidspunkt ({selectedSlots.length})
-              </div>
-              <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-                Aktiv
-              </Badge>
-            </CardTitle>
-          </CardHeader>
-        </CollapsibleTrigger>
-        <CollapsibleContent>
-          <CardContent className="space-y-3">
-            {selectedSlots.map((slot, index) => (
-              <div key={index} className="p-3 bg-blue-50 rounded-lg border border-blue-200">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium text-blue-900">
-                      {format(new Date(slot.date), 'dd.MM.yyyy')}
-                    </p>
-                    <p className="text-sm text-blue-700">{slot.timeSlot}</p>
-                    <p className="text-xs text-blue-600">{slot.zoneId}</p>
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Clock className="h-5 w-5" />
+          Valgte tider
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {Object.entries(slotsByDate).map(([date, slots]) => (
+          <div key={date} className="space-y-2">
+            <div className="flex items-center gap-2">
+              <Calendar className="h-4 w-4 text-gray-500" />
+              <h4 className="font-medium text-sm capitalize">
+                {formatDateString(date)}
+              </h4>
+            </div>
+            
+            <div className="space-y-2 ml-6">
+              {slots.map((slot) => (
+                <div key={slot.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-medium text-sm">
+                        {slot.startTime} - {slot.endTime}
+                      </span>
+                      {slot.zone && (
+                        <Badge variant="outline" className="text-xs">
+                          {slot.zone}
+                        </Badge>
+                      )}
+                    </div>
+                    {slot.price && (
+                      <p className="text-xs text-gray-600">
+                        {slot.price.toLocaleString('nb-NO')} kr
+                      </p>
+                    )}
                   </div>
+                  
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => onRemoveSlot(slot.zoneId, slot.date, slot.timeSlot)}
-                    className="text-blue-600 hover:text-blue-800"
+                    onClick={() => onSlotRemove(slot.id)}
+                    className="h-8 w-8 p-0 text-gray-500 hover:text-red-500"
                   >
                     <X className="h-4 w-4" />
                   </Button>
                 </div>
-              </div>
-            ))}
-
-            <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-              <div className="flex justify-between items-center">
-                <span className="text-sm font-medium text-green-700">Estimert pris:</span>
-                <span className="font-bold text-green-800">{totalPrice} kr</span>
-              </div>
-              {requiresApproval && (
-                <p className="text-xs text-green-600 mt-1">Krever godkjenning</p>
-              )}
+              ))}
             </div>
             
-            <div className="flex gap-2 pt-2">
-              <Button
-                onClick={onBookSlots}
-                className="flex-1 bg-[#1e3a8a] hover:bg-[#1e40af] text-white"
-                disabled={!canProceed}
-              >
-                <CheckCircle2 className="h-4 w-4 mr-2" />
-                Book valgte tidspunkt
-              </Button>
-              <Button
-                variant="outline"
-                onClick={onClearSlots}
-                className="px-3"
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-          </CardContent>
-        </CollapsibleContent>
-      </Card>
-    </Collapsible>
+            {Object.keys(slotsByDate).length > 1 && (
+              <Separator className="mt-3" />
+            )}
+          </div>
+        ))}
+      </CardContent>
+    </Card>
   );
 }

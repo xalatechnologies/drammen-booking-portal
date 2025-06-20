@@ -1,138 +1,126 @@
 
-import React, { useEffect } from "react";
-import { useCart } from "@/contexts/CartContext";
-import { useBookingState } from "@/contexts/BookingStateContext";
-import { useNavigate } from "react-router-dom";
-import { useTranslation } from "@/i18n/hooks/useTranslation";
-import { SelectedTimeSlot } from "@/utils/recurrenceEngine";
+import React from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import { SelectedSlotsSection } from "./sidebar/SelectedSlotsSection";
 import { BookingDetailsSection } from "./sidebar/BookingDetailsSection";
 import { ReservationCartSection } from "./sidebar/ReservationCartSection";
+import { useCart } from "@/contexts/CartContext";
+import { Clock, CalendarDays, MapPin } from "lucide-react";
+import { format } from "date-fns";
+import { nb } from "date-fns/locale";
 
 interface EnhancedBookingSidebarProps {
+  facilityId: number;
   facilityName: string;
-  facilityId: string;
-  selectedSlots?: SelectedTimeSlot[];
-  onClearSlots?: () => void;
+  selectedSlots: Array<{
+    id: string;
+    date: string;
+    startTime: string;
+    endTime: string;
+    zone?: string;
+    price?: number;
+  }>;
+  onSlotRemove: (slotId: string) => void;
+  onBookingComplete?: () => void;
 }
 
 export function EnhancedBookingSidebar({
-  facilityName,
   facilityId,
-  selectedSlots = [],
-  onClearSlots
+  facilityName,
+  selectedSlots,
+  onSlotRemove,
+  onBookingComplete
 }: EnhancedBookingSidebarProps) {
-  const { items, removeFromCart, getTotalPrice, getItemCount } = useCart();
-  const { state, actions, businessLogic } = useBookingState();
-  const navigate = useNavigate();
-  const { t } = useTranslation();
-
-  // Sync external selectedSlots with internal state
-  useEffect(() => {
-    if (selectedSlots.length > 0) {
-      actions.setSelectedSlots(selectedSlots);
+  const { reservations } = useCart();
+  
+  // Group slots by date for better organization
+  const slotsByDate = selectedSlots.reduce((acc, slot) => {
+    const date = slot.date;
+    if (!acc[date]) {
+      acc[date] = [];
     }
-  }, [selectedSlots, actions]);
+    acc[date].push(slot);
+    return acc;
+  }, {} as Record<string, typeof selectedSlots>);
 
-  const facilityCartItems = items.filter(item => item.facilityId === facilityId);
-  const hasSelectedSlots = state.selectedSlots.length > 0;
-  const hasCartItems = facilityCartItems.length > 0;
+  const totalPrice = selectedSlots.reduce((sum, slot) => sum + (slot.price || 0), 0);
+  const totalDuration = selectedSlots.length; // Assuming each slot is 1 hour
 
-  const handleProceedToCheckout = () => {
-    navigate('/checkout');
-  };
-
-  const handleBookSlots = () => {
-    if (hasSelectedSlots) {
-      actions.setCurrentStep('booking');
-    } else {
-      actions.addBookingError('Velg minst ett tidspunkt før booking');
-    }
-  };
-
-  const handleContinueBooking = () => {
-    actions.setBookingInProgress(true);
-    
-    try {
-      const success = actions.addToCartAndContinue(facilityId, facilityName);
-      
-      if (success) {
-        if (onClearSlots) {
-          onClearSlots();
-        }
-        actions.saveToStorage();
-      }
-    } catch (error) {
-      actions.addBookingError('Feil ved opprettelse av booking');
-    } finally {
-      actions.setBookingInProgress(false);
-    }
-  };
-
-  const handleClearSlots = () => {
-    actions.clearSelectedSlots();
-    if (onClearSlots) {
-      onClearSlots();
-    }
-  };
-
-  const handleFormFieldChange = (field: string, value: string) => {
-    actions.updateFormData({ [field]: value });
-  };
-
-  const handleRemoveSelectedSlot = (zoneId: string, date: string, timeSlot: string) => {
-    actions.removeSelectedSlot(zoneId, date, timeSlot);
-  };
+  if (selectedSlots.length === 0 && reservations.length === 0) {
+    return (
+      <Card className="w-full max-w-md">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Clock className="h-5 w-5" />
+            Ingen valgte tider
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-gray-600 text-sm">
+            Velg tidspunkter i kalenderen for å starte booking-prosessen.
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
-    <div className="space-y-4">
-      {/* Auto-save indicator */}
-      {state.isDirty && (
-        <div className="text-xs text-gray-500 flex items-center gap-1 animate-fade-in">
-          <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
-          Lagrer automatisk...
-        </div>
+    <div className="space-y-6">
+      {/* Facility Info */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <MapPin className="h-5 w-5" />
+            {facilityName}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <div className="flex items-center gap-4 text-sm text-gray-600">
+            <div className="flex items-center gap-1">
+              <CalendarDays className="h-4 w-4" />
+              <span>{Object.keys(slotsByDate).length} dag(er)</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <Clock className="h-4 w-4" />
+              <span>{totalDuration} time(r)</span>
+            </div>
+          </div>
+          
+          {totalPrice > 0 && (
+            <>
+              <Separator className="my-3" />
+              <div className="flex justify-between items-center">
+                <span className="font-medium">Total pris:</span>
+                <Badge variant="secondary" className="text-lg px-3 py-1">
+                  {totalPrice.toLocaleString('nb-NO')} kr
+                </Badge>
+              </div>
+            </>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Selected Time Slots */}
+      {selectedSlots.length > 0 && (
+        <SelectedSlotsSection 
+          slotsByDate={slotsByDate}
+          onSlotRemove={onSlotRemove}
+        />
       )}
 
-      {/* Selected Time Slots Section */}
-      <SelectedSlotsSection
-        selectedSlots={state.selectedSlots}
-        isOpen={state.currentStep === 'selection'}
-        onToggle={(open) => open ? actions.setCurrentStep('selection') : null}
-        onRemoveSlot={handleRemoveSelectedSlot}
-        onBookSlots={handleBookSlots}
-        onClearSlots={handleClearSlots}
-        totalPrice={businessLogic.calculateTotalPrice()}
-        requiresApproval={businessLogic.requiresApproval()}
-        canProceed={businessLogic.canProceedToNextStep()}
-      />
+      {/* Booking Details Form */}
+      {selectedSlots.length > 0 && (
+        <BookingDetailsSection 
+          facilityId={facilityId}
+          selectedSlots={selectedSlots}
+          onBookingComplete={onBookingComplete}
+        />
+      )}
 
-      {/* Booking Details Section */}
-      <BookingDetailsSection
-        isOpen={state.currentStep === 'booking'}
-        onToggle={(open) => open ? actions.setCurrentStep('booking') : null}
-        formData={state.formData}
-        validationErrors={state.validationErrors}
-        bookingErrors={state.bookingErrors}
-        onFormFieldChange={handleFormFieldChange}
-        onContinueBooking={handleContinueBooking}
-        onResetBooking={actions.resetBookingState}
-        isBookingInProgress={state.isBookingInProgress}
-        canProceed={businessLogic.canProceedToNextStep()}
-        requiresApproval={businessLogic.requiresApproval()}
-        isFormValid={businessLogic.isFormValid()}
-      />
-
-      {/* Cart Section */}
-      <ReservationCartSection
-        isOpen={state.currentStep === 'cart'}
-        onToggle={(open) => open ? actions.setCurrentStep('cart') : null}
-        cartItems={facilityCartItems}
-        itemCount={getItemCount()}
-        totalPrice={getTotalPrice()}
-        onRemoveItem={removeFromCart}
-        onProceedToCheckout={handleProceedToCheckout}
-      />
+      {/* Reservation Cart */}
+      <ReservationCartSection />
     </div>
   );
 }
