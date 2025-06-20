@@ -93,6 +93,44 @@ export function AvailabilityTab({
     setShowBookingDrawer(false);
   };
 
+  // Generate time slots based on timeSlotDuration
+  const generateTimeSlots = () => {
+    const slots = [];
+    for (let hour = 8; hour < 22; hour += timeSlotDuration) {
+      const startTime = `${hour.toString().padStart(2, '0')}:00`;
+      const endTime = `${(hour + timeSlotDuration).toString().padStart(2, '0')}:00`;
+      slots.push(`${startTime}-${endTime}`);
+    }
+    return slots;
+  };
+
+  const timeSlots = generateTimeSlots();
+
+  // Use the first zone or create a default one
+  const primaryZone = zones[0] || {
+    id: 'whole-facility',
+    name: 'Hele lokalet',
+    capacity: 30,
+    equipment: [],
+    pricePerHour: 450,
+    description: '',
+    area: '120 m²',
+    isMainZone: true
+  };
+
+  const getAvailabilityStatus = (zoneId: string, date: Date, timeSlot: string) => {
+    // Simple availability logic - in real implementation this would check against bookings
+    return { status: 'available', conflict: null };
+  };
+
+  const isSlotSelected = (zoneId: string, date: Date, timeSlot: string) => {
+    return selectedSlots.some(slot => 
+      slot.zoneId === zoneId && 
+      slot.date.toDateString() === date.toDateString() && 
+      slot.timeSlot === timeSlot
+    );
+  };
+
   return (
     <div className="space-y-6">
       {/* Action Buttons */}
@@ -132,11 +170,14 @@ export function AvailabilityTab({
             />
             
             <CalendarGrid
-              zones={zones}
-              selectedSlots={selectedSlots}
-              onSlotClick={onSlotClick}
-              timeSlotDuration={timeSlotDuration}
+              zone={primaryZone}
               currentWeekStart={currentWeekStart}
+              timeSlots={timeSlots}
+              selectedSlots={selectedSlots}
+              getAvailabilityStatus={getAvailabilityStatus}
+              isSlotSelected={isSlotSelected}
+              onSlotClick={onSlotClick}
+              onBulkSlotSelection={onBulkSlotSelection}
             />
           </div>
         </div>
