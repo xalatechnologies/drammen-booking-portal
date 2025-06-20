@@ -7,19 +7,29 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 import { nb } from 'date-fns/locale';
+import { usePriceCalculation } from '@/hooks/usePriceCalculation';
+import { PriceBreakdown } from '@/components/booking/PriceBreakdown';
 
 interface DateRangeStepProps {
   startDate?: Date;
   endDate?: Date;
   onStartDateChange: (date?: Date) => void;
   onEndDateChange: (date?: Date) => void;
+  selectedWeekdays?: number[];
+  selectedTimeSlots?: string[];
+  facilityId?: string;
+  actorType?: string;
 }
 
 export function DateRangeStep({
   startDate,
   endDate,
   onStartDateChange,
-  onEndDateChange
+  onEndDateChange,
+  selectedWeekdays = [],
+  selectedTimeSlots = [],
+  facilityId = "1",
+  actorType = "private-person"
 }: DateRangeStepProps) {
   // Get today's date for min attribute
   const today = new Date();
@@ -37,6 +47,26 @@ export function DateRangeStep({
   };
 
   const stats = calculateStats();
+
+  // Use price calculation hook for the selected period
+  const { calculation, isLoading } = usePriceCalculation({
+    facilityId,
+    zoneId: "zone-1", // Default zone
+    startDate,
+    endDate,
+    timeSlot: selectedTimeSlots.length > 0 ? selectedTimeSlots[0] : "09:00 - 11:00",
+    customerType: actorType as any,
+    bookingMode: 'recurring'
+  });
+
+  console.log('DateRangeStep - Price calculation:', {
+    calculation,
+    isLoading,
+    startDate,
+    endDate,
+    selectedTimeSlots,
+    actorType
+  });
 
   const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -171,6 +201,39 @@ export function DateRangeStep({
                   </div>
                 </div>
               </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Price Calculation */}
+      {startDate && endDate && (
+        <Card className="bg-gradient-to-r from-green-50 to-emerald-50 border-green-200 shadow-sm">
+          <CardContent className="p-6">
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                  <Clock className="h-5 w-5 text-green-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-green-900">Prisberegning</h3>
+                  <p className="text-green-700 text-sm">Estimert kostnad for perioden</p>
+                </div>
+              </div>
+
+              {calculation ? (
+                <PriceBreakdown 
+                  calculation={calculation}
+                  isLoading={isLoading}
+                  showDetailed={true}
+                />
+              ) : (
+                <div className="bg-white rounded-lg p-4 border border-green-200">
+                  <div className="text-center text-green-700">
+                    {isLoading ? 'Beregner pris...' : 'Velg dager og tidspunkt for prisberegning'}
+                  </div>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
