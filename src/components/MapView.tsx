@@ -65,8 +65,8 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location, viewMode, set
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4">
-      {/* Reusable Header */}
+    <div className="max-w-7xl mx-auto px-4 my-[12px]">
+      {/* Reusable Header with consistent positioning */}
       <ViewHeader 
         facilityCount={facilities.length}
         isLoading={facilitiesLoading}

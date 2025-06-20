@@ -104,7 +104,7 @@ const CalendarView: React.FC<CalendarViewWithToggleProps> = ({
   
   if (isLoading) {
     return (
-      <div className="max-w-7xl mx-auto px-4">
+      <div className="max-w-7xl mx-auto px-4 my-[12px]">
         <ViewHeader 
           facilityCount={0}
           isLoading={true}
@@ -120,7 +120,7 @@ const CalendarView: React.FC<CalendarViewWithToggleProps> = ({
 
   if (error) {
     return (
-      <div className="max-w-7xl mx-auto px-4">
+      <div className="max-w-7xl mx-auto px-4 my-[12px]">
         <ViewHeader 
           facilityCount={0}
           isLoading={false}
@@ -136,8 +136,8 @@ const CalendarView: React.FC<CalendarViewWithToggleProps> = ({
   }
   
   return (
-    <div className="max-w-7xl mx-auto px-4">
-      {/* Reusable Header */}
+    <div className="max-w-7xl mx-auto px-4 my-[12px]">
+      {/* Reusable Header with consistent positioning */}
       <ViewHeader 
         facilityCount={facilitiesWithBookings.length}
         isLoading={isLoading}
