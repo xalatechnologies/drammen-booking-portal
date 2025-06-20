@@ -1,11 +1,15 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { ApiResponse, PaginatedResponse, PaginationParams } from '@/types/api';
+import { Database } from '@/types/database';
+
+type OrganizationType = Database['public']['Enums']['organization_type'];
+type OrganizationStatus = Database['public']['Enums']['organization_status'];
 
 export interface Organization {
   id: string;
   name: string;
-  type: 'lag-foreninger' | 'paraply' | 'private-firma' | 'kommunale-enheter' | 'utdanning' | 'helse' | 'kultur' | 'frivillig';
+  type: OrganizationType;
   org_number?: string;
   contact_email: string;
   contact_phone?: string;
@@ -15,7 +19,7 @@ export interface Organization {
   address_city: string;
   address_postal_code: string;
   address_country: string;
-  status: 'active' | 'pending-verification' | 'suspended' | 'inactive';
+  status: OrganizationStatus;
   verification_level: 'unverified' | 'email-verified' | 'document-verified' | 'fully-verified';
   parent_organization_id?: string;
   founded_year?: number;
@@ -52,13 +56,13 @@ export class OrganizationService {
         .select('*', { count: 'exact' })
         .eq('is_active', true);
 
-      // Apply filters
+      // Apply filters with proper type casting
       if (filters?.type) {
-        query = query.eq('type', filters.type);
+        query = query.eq('type', filters.type as OrganizationType);
       }
       
       if (filters?.status) {
-        query = query.eq('status', filters.status);
+        query = query.eq('status', filters.status as OrganizationStatus);
       }
       
       if (filters?.search) {
@@ -207,7 +211,7 @@ export class OrganizationService {
         .from('organizations')
         .insert({
           ...organizationData,
-          status: 'pending-verification',
+          status: 'pending-verification' as OrganizationStatus,
           verification_level: 'unverified',
           is_active: true
         })

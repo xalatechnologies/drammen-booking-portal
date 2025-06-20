@@ -103,15 +103,21 @@ export class StrotimeService {
         };
       }
 
+      // Transform database response to match interface
+      const transformedData = (data || []).map(slot => ({
+        ...slot,
+        duration_minutes: slot.duration_minutes as 30 | 60
+      }));
+
       const totalPages = pagination ? Math.ceil((count || 0) / pagination.limit) : 1;
 
       return {
         success: true,
         data: {
-          data: data || [],
+          data: transformedData,
           pagination: {
             page: pagination?.page || 1,
-            limit: pagination?.limit || data?.length || 0,
+            limit: pagination?.limit || transformedData.length || 0,
             total: count || 0,
             totalPages,
             hasNext: pagination ? pagination.page < totalPages : false,
@@ -128,6 +134,33 @@ export class StrotimeService {
         }
       };
     }
+  }
+
+  // Alias method for backward compatibility
+  static async getAvailableStrøtimer(filters: { 
+    facilityId?: string; 
+    startDate?: Date; 
+    endDate?: Date; 
+  }): Promise<ApiResponse<StrotimeSlot[]>> {
+    const strotimeFilters: StrotimeFilters = {
+      facility_id: filters.facilityId ? parseInt(filters.facilityId) : undefined,
+      start_date: filters.startDate?.toISOString().split('T')[0],
+      end_date: filters.endDate?.toISOString().split('T')[0]
+    };
+
+    const result = await this.getAvailableSlots(undefined, strotimeFilters);
+    
+    if (result.success) {
+      return {
+        success: true,
+        data: result.data.data
+      };
+    }
+    
+    return {
+      success: false,
+      error: result.error
+    };
   }
 
   static async bookStrotimeSlot(
@@ -164,16 +197,17 @@ export class StrotimeService {
         };
       }
 
-      // Start transaction
-      const { data, error } = await supabase.rpc('book_strotime_slot', {
-        p_slot_id: slotId,
-        p_booking_data: {
+      // Create the booking
+      const { data, error } = await supabase
+        .from('strotime_bookings')
+        .insert({
           ...bookingData,
           strotime_slot_id: slotId,
           status: 'confirmed',
           total_price: slot.price_per_slot * bookingData.participants
-        }
-      });
+        })
+        .select()
+        .single();
 
       if (error) {
         return {
@@ -187,7 +221,10 @@ export class StrotimeService {
 
       return {
         success: true,
-        data
+        data: {
+          ...data,
+          status: data.status as 'confirmed' | 'cancelled' | 'no-show'
+        }
       };
     } catch (error) {
       return {
@@ -198,6 +235,23 @@ export class StrotimeService {
         }
       };
     }
+  }
+
+  // Alias method for backward compatibility
+  static async bookStrøtime(
+    slotId: string, 
+    formData: { name: string; email: string; phone: string }
+  ): Promise<ApiResponse<StrotimeBooking>> {
+    const bookingData = {
+      contact_name: formData.name,
+      contact_email: formData.email,
+      contact_phone: formData.phone,
+      participants: 1,
+      payment_status: 'pending',
+      total_price: 0 // Will be calculated in bookStrotimeSlot
+    };
+
+    return this.bookStrotimeSlot(slotId, bookingData);
   }
 
   static async getUserStrotimeBookings(
@@ -238,15 +292,21 @@ export class StrotimeService {
         };
       }
 
+      // Transform database response to match interface
+      const transformedData = (data || []).map(booking => ({
+        ...booking,
+        status: booking.status as 'confirmed' | 'cancelled' | 'no-show'
+      }));
+
       const totalPages = pagination ? Math.ceil((count || 0) / pagination.limit) : 1;
 
       return {
         success: true,
         data: {
-          data: data || [],
+          data: transformedData,
           pagination: {
             page: pagination?.page || 1,
-            limit: pagination?.limit || data?.length || 0,
+            limit: pagination?.limit || transformedData.length || 0,
             total: count || 0,
             totalPages,
             hasNext: pagination ? pagination.page < totalPages : false,
@@ -293,7 +353,10 @@ export class StrotimeService {
 
       return {
         success: true,
-        data
+        data: {
+          ...data,
+          status: data.status as 'confirmed' | 'cancelled' | 'no-show'
+        }
       };
     } catch (error) {
       return {

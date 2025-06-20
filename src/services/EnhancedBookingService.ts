@@ -1,6 +1,11 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { ApiResponse, PaginatedResponse, PaginationParams } from '@/types/api';
+import { Database } from '@/types/database';
+
+type BookingStatus = Database['public']['Enums']['booking_status'];
+type BookingType = Database['public']['Enums']['booking_type'];
+type ActorType = Database['public']['Enums']['actor_type'];
 
 export interface EnhancedBooking {
   id: string;
@@ -9,9 +14,9 @@ export interface EnhancedBooking {
   user_id: string;
   organization_id?: string;
   booking_reference: string;
-  status: 'draft' | 'pending-approval' | 'approved' | 'confirmed' | 'in-progress' | 'completed' | 'cancelled' | 'rejected' | 'no-show';
-  type: 'engangs' | 'fastlan' | 'rammetid' | 'strotimer';
-  actor_type: 'lag-foreninger' | 'paraply' | 'private-firma' | 'kommunale-enheter' | 'private-person';
+  status: BookingStatus;
+  type: BookingType;
+  actor_type: ActorType;
   purpose: string;
   event_type: 'training' | 'competition' | 'meeting' | 'celebration' | 'course' | 'conference' | 'performance' | 'exhibition' | 'drop-in' | 'other';
   expected_attendees: number;
@@ -54,17 +59,17 @@ export class EnhancedBookingService {
         .from('bookings')
         .select('*', { count: 'exact' });
 
-      // Apply filters
+      // Apply filters with proper type casting
       if (filters?.status) {
-        query = query.eq('status', filters.status);
+        query = query.eq('status', filters.status as BookingStatus);
       }
       
       if (filters?.type) {
-        query = query.eq('type', filters.type);
+        query = query.eq('type', filters.type as BookingType);
       }
       
       if (filters?.actor_type) {
-        query = query.eq('actor_type', filters.actor_type);
+        query = query.eq('actor_type', filters.actor_type as ActorType);
       }
       
       if (filters?.facility_id) {
@@ -256,7 +261,7 @@ export class EnhancedBookingService {
       const { data, error } = await supabase
         .from('bookings')
         .update({
-          status: 'cancelled',
+          status: 'cancelled' as BookingStatus,
           cancelled_at: new Date().toISOString(),
           cancellation_reason: reason,
           updated_at: new Date().toISOString()
