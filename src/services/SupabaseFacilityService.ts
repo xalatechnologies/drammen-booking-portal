@@ -5,6 +5,7 @@ import { Facility, FacilityFilters } from '@/types/facility';
 
 export class SupabaseFacilityService {
   private static readonly EDGE_FUNCTION_URL = 'https://szpdoihoxzlivothoyva.supabase.co/functions/v1/facilities';
+  private static readonly ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN6cGRvaWhveHpsaXZvdGhveXZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA0Mzk5MzksImV4cCI6MjA2NjAxNTkzOX0.4j3PYVkUpQZce-631weYhyICrUKfBk3LV5drs_tYExc';
 
   static async getFacilities(
     pagination?: PaginationParams,
@@ -32,7 +33,7 @@ export class SupabaseFacilityService {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': session ? `Bearer ${session.access_token}` : `Bearer ${supabase.supabaseKey}`,
+          'Authorization': session ? `Bearer ${session.access_token}` : `Bearer ${this.ANON_KEY}`,
         },
       });
 
@@ -61,7 +62,7 @@ export class SupabaseFacilityService {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': session ? `Bearer ${session.access_token}` : `Bearer ${supabase.supabaseKey}`,
+          'Authorization': session ? `Bearer ${session.access_token}` : `Bearer ${this.ANON_KEY}`,
         },
       });
 
@@ -90,7 +91,7 @@ export class SupabaseFacilityService {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': session ? `Bearer ${session.access_token}` : `Bearer ${supabase.supabaseKey}`,
+          'Authorization': session ? `Bearer ${session.access_token}` : `Bearer ${this.ANON_KEY}`,
         },
         body: JSON.stringify(facilityData),
       });
@@ -120,7 +121,7 @@ export class SupabaseFacilityService {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': session ? `Bearer ${session.access_token}` : `Bearer ${supabase.supabaseKey}`,
+          'Authorization': session ? `Bearer ${session.access_token}` : `Bearer ${this.ANON_KEY}`,
         },
         body: JSON.stringify(facilityData),
       });
@@ -150,7 +151,7 @@ export class SupabaseFacilityService {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': session ? `Bearer ${session.access_token}` : `Bearer ${supabase.supabaseKey}`,
+          'Authorization': session ? `Bearer ${session.access_token}` : `Bearer ${this.ANON_KEY}`,
         },
       });
 
@@ -179,7 +180,7 @@ export class SupabaseFacilityService {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': session ? `Bearer ${session.access_token}` : `Bearer ${supabase.supabaseKey}`,
+          'Authorization': session ? `Bearer ${session.access_token}` : `Bearer ${this.ANON_KEY}`,
         },
       });
 
