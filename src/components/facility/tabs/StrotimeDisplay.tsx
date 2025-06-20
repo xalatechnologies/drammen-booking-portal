@@ -6,28 +6,28 @@ import { Clock, Users, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { StrøtimeSlot } from '@/types/booking/strøtimer';
+import { StrotimeSlot } from '@/services/StrotimeService';
 import { StrotimeBookingModal } from './StrotimeBookingModal';
 
 interface StrotimeDisplayProps {
-  strøtimer: StrøtimeSlot[];
+  strøtimer: StrotimeSlot[];
   date: Date;
   onBookingComplete?: (booking: any) => void;
 }
 
 export function StrotimeDisplay({ strøtimer, date, onBookingComplete }: StrotimeDisplayProps) {
-  const [selectedStrøtime, setSelectedStrøtime] = useState<StrøtimeSlot | null>(null);
+  const [selectedStrøtime, setSelectedStrøtime] = useState<StrotimeSlot | null>(null);
   const [showBookingModal, setShowBookingModal] = useState(false);
 
   const dayStrøtimer = strøtimer.filter(slot => 
-    slot.date.toDateString() === date.toDateString() && slot.isAvailable
+    new Date(slot.slot_date).toDateString() === date.toDateString() && slot.is_available
   );
 
   if (dayStrøtimer.length === 0) {
     return null;
   }
 
-  const handleBookStrøtime = (strøtime: StrøtimeSlot) => {
+  const handleBookStrøtime = (strøtime: StrotimeSlot) => {
     setSelectedStrøtime(strøtime);
     setShowBookingModal(true);
   };
@@ -65,20 +65,20 @@ export function StrotimeDisplay({ strøtimer, date, onBookingComplete }: Strotim
                 <div className="flex justify-between items-start mb-3">
                   <div className="flex items-center gap-2 text-base font-bold text-gray-900">
                     <Clock className="h-5 w-5" />
-                    {strøtime.startTime} - {strøtime.endTime}
+                    {strøtime.start_time} - {strøtime.end_time}
                   </div>
                   <Badge variant="outline" className="text-sm px-2 py-1">
-                    {strøtime.duration} min
+                    {strøtime.duration_minutes} min
                   </Badge>
                 </div>
                 
                 <div className="text-base text-gray-600 mb-3 font-medium">
-                  {strøtime.zoneName}
+                  Zone {strøtime.zone_id}
                 </div>
                 
                 <div className="flex justify-between items-center">
                   <span className="text-lg font-bold text-orange-600">
-                    {strøtime.pricePerSlot} kr
+                    {strøtime.price_per_slot} kr
                   </span>
                   <Button
                     size="default"

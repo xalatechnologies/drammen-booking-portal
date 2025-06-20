@@ -1,8 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { addDays } from 'date-fns';
-import { StrøtimeSlot } from '@/types/booking/strøtimer';
-import { StrotimeService } from '@/services/StrotimeService';
+import { StrotimeService, StrotimeSlot } from '@/services/StrotimeService';
 
 interface UseStrotimerProps {
   facilityId?: string;
@@ -10,7 +9,7 @@ interface UseStrotimerProps {
 }
 
 export function useStrotimer({ facilityId, currentWeekStart }: UseStrotimerProps) {
-  const [strøtimer, setStrøtimer] = useState<StrøtimeSlot[]>([]);
+  const [strøtimer, setStrøtimer] = useState<StrotimeSlot[]>([]);
   const [loadingStrøtimer, setLoadingStrøtimer] = useState(false);
 
   // Fetch strøtimer for the current week
