@@ -12,7 +12,6 @@ interface LoginStepProps {
 
 export function LoginStep({ onBack, onContinue }: LoginStepProps) {
   const { login, isLoading } = useAuthStore();
-  const [selectedMethod, setSelectedMethod] = useState<'id-porten' | 'feide' | 'municipal' | null>(null);
 
   const handleLogin = async (method: 'id-porten' | 'feide' | 'municipal') => {
     try {
@@ -27,90 +26,67 @@ export function LoginStep({ onBack, onContinue }: LoginStepProps) {
   return (
     <Card>
       <CardHeader className="text-center">
-        <div className="flex items-center justify-center mb-4">
-          <div className="bg-blue-600 text-white p-3 rounded-lg mr-4">
-            <div className="w-8 h-8 bg-yellow-400 rounded"></div>
-          </div>
-          <div>
-            <CardTitle className="text-2xl font-bold text-gray-900">
-              DRAMMEN KOMMUNE
-            </CardTitle>
-          </div>
-        </div>
-        <p className="text-lg text-gray-700 mt-4">
-          Velg innloggingsmetode basert på hvem du er:
+        <CardTitle className="text-2xl font-bold text-gray-900 mb-2">
+          Velg innloggingsmetode
+        </CardTitle>
+        <p className="text-gray-600">
+          Velg hvordan du vil logge inn for å fortsette
         </p>
       </CardHeader>
-      <CardContent className="space-y-4">
-        {/* ID-porten Option */}
-        <div className="border border-gray-200 rounded-lg p-6 hover:border-blue-300 transition-colors">
-          <div className="flex items-start space-x-4">
-            <div className="bg-red-500 text-white p-3 rounded-lg flex-shrink-0">
-              <User className="h-6 w-6" />
+      <CardContent>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          {/* ID-porten Button */}
+          <div className="text-center">
+            <div className="bg-red-500 text-white p-4 rounded-lg mb-3 mx-auto w-16 h-16 flex items-center justify-center">
+              <User className="h-8 w-8" />
             </div>
-            <div className="flex-1">
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                Logg inn med ID-porten
-              </h3>
-              <p className="text-gray-600 mb-4">
-                For privatpersoner, lag og foreninger som skal søke om lån eller booke lokaler.
-              </p>
-              <Button 
-                onClick={() => handleLogin('id-porten')}
-                disabled={isLoading}
-                className="bg-red-500 hover:bg-red-600 text-white"
-              >
-                Logg inn via ID-porten
-              </Button>
-            </div>
+            <h3 className="font-semibold text-gray-900 mb-2">ID-porten</h3>
+            <p className="text-sm text-gray-600 mb-4 min-h-[3rem]">
+              For privatpersoner, lag og foreninger
+            </p>
+            <Button 
+              onClick={() => handleLogin('id-porten')}
+              disabled={isLoading}
+              className="bg-red-500 hover:bg-red-600 text-white w-full"
+            >
+              Logg inn
+            </Button>
           </div>
-        </div>
 
-        {/* Feide Option */}
-        <div className="border border-gray-200 rounded-lg p-6 hover:border-blue-300 transition-colors">
-          <div className="flex items-start space-x-4">
-            <div className="bg-blue-700 text-white p-3 rounded-lg flex-shrink-0">
-              <Users className="h-6 w-6" />
+          {/* Feide Button */}
+          <div className="text-center">
+            <div className="bg-blue-700 text-white p-4 rounded-lg mb-3 mx-auto w-16 h-16 flex items-center justify-center">
+              <Users className="h-8 w-8" />
             </div>
-            <div className="flex-1">
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                Logg inn med Feide
-              </h3>
-              <p className="text-gray-600 mb-4">
-                For ansatte i skole eller barnehage med Feide-bruker
-              </p>
-              <Button 
-                onClick={() => handleLogin('feide')}
-                disabled={isLoading}
-                className="bg-blue-700 hover:bg-blue-800 text-white"
-              >
-                Logg inn med Feide
-              </Button>
-            </div>
+            <h3 className="font-semibold text-gray-900 mb-2">Feide</h3>
+            <p className="text-sm text-gray-600 mb-4 min-h-[3rem]">
+              For ansatte i skole eller barnehage
+            </p>
+            <Button 
+              onClick={() => handleLogin('feide')}
+              disabled={isLoading}
+              className="bg-blue-700 hover:bg-blue-800 text-white w-full"
+            >
+              Logg inn
+            </Button>
           </div>
-        </div>
 
-        {/* Municipal Employee Option */}
-        <div className="border border-gray-200 rounded-lg p-6 hover:border-blue-300 transition-colors">
-          <div className="flex items-start space-x-4">
-            <div className="bg-gradient-to-br from-red-500 via-green-500 via-blue-500 to-yellow-500 p-3 rounded-lg flex-shrink-0">
-              <Building className="h-6 w-6 text-white" />
+          {/* Municipal Employee Button */}
+          <div className="text-center">
+            <div className="bg-green-600 text-white p-4 rounded-lg mb-3 mx-auto w-16 h-16 flex items-center justify-center">
+              <Building className="h-8 w-8" />
             </div>
-            <div className="flex-1">
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                Logg inn som kommunalt ansatt
-              </h3>
-              <p className="text-gray-600 mb-4">
-                For saksbehandlere og ansatte i kommunen
-              </p>
-              <Button 
-                onClick={() => handleLogin('municipal')}
-                disabled={isLoading}
-                className="bg-blue-600 hover:bg-blue-700 text-white"
-              >
-                Logg inn med kommunebruker
-              </Button>
-            </div>
+            <h3 className="font-semibold text-gray-900 mb-2">Kommunebruker</h3>
+            <p className="text-sm text-gray-600 mb-4 min-h-[3rem]">
+              For saksbehandlere og kommunalt ansatte
+            </p>
+            <Button 
+              onClick={() => handleLogin('municipal')}
+              disabled={isLoading}
+              className="bg-green-600 hover:bg-green-700 text-white w-full"
+            >
+              Logg inn
+            </Button>
           </div>
         </div>
 
