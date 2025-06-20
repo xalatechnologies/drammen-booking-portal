@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -86,57 +85,6 @@ const FacilityDetail = () => {
   // Use real zones if available, otherwise fall back to default
   const convertedZones = zones.length > 0 ? zones.map(convertZoneToBookingZone) : [defaultZone];
   const displayZones = convertedZones;
-
-  const handleSlotClick = (zoneId: string, date: Date, timeSlot: string, availability: string) => {
-    if (availability !== 'available') return;
-
-    const isSelected = selectedSlots.some(slot => 
-      slot.zoneId === zoneId &&
-      slot.date.toDateString() === date.toDateString() &&
-      slot.timeSlot === timeSlot
-    );
-
-    if (isSelected) {
-      setSelectedSlots(selectedSlots.filter(slot => 
-        !(slot.zoneId === zoneId &&
-          slot.date.toDateString() === date.toDateString() &&
-          slot.timeSlot === timeSlot)
-      ));
-    } else {
-      setSelectedSlots([...selectedSlots, { 
-        zoneId, 
-        date, 
-        timeSlot,
-        duration: 2 // Default 2 hours duration
-      }]);
-    }
-  };
-
-  const handleBulkSlotSelection = (slots: any[]) => {
-    console.log('FacilityDetail: handleBulkSlotSelection called with slots:', slots);
-    console.log('FacilityDetail: current selectedSlots before bulk add:', selectedSlots);
-    
-    // Filter out slots that are already selected to prevent duplicates
-    const newSlots = slots.filter(newSlot => 
-      !selectedSlots.some(existingSlot =>
-        existingSlot.zoneId === newSlot.zoneId &&
-        existingSlot.date.toDateString() === newSlot.date.toDateString() &&
-        existingSlot.timeSlot === newSlot.timeSlot
-      )
-    );
-    
-    console.log('FacilityDetail: filtered newSlots (not duplicates):', newSlots);
-    
-    if (newSlots.length > 0) {
-      setSelectedSlots(prev => {
-        const result = [...prev, ...newSlots];
-        console.log('FacilityDetail: final selectedSlots array:', result);
-        return result;
-      });
-    } else {
-      console.log('FacilityDetail: no new slots to add (all were duplicates)');
-    }
-  };
 
   const handleRemoveSlot = (zoneId: string, date: Date, timeSlot: string) => {
     console.log('FacilityDetail: handleRemoveSlot called:', { zoneId, date, timeSlot });
