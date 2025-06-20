@@ -1,14 +1,12 @@
 
 import React, { useState } from "react";
-import { MapPin, Users, Building, Search, Filter, X } from "lucide-react";
+import { MapPin, Users, Building, Filter, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 
 interface SearchFilterProps {
   date?: Date;
@@ -94,7 +92,6 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
 
   const hasActiveFilters = (): boolean => {
     return (
-      date !== undefined ||
       facilityType !== "all" ||
       location !== "all" ||
       accessibility !== "all" ||
@@ -106,14 +103,12 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
       hasEquipment ||
       hasParking ||
       hasWifi ||
-      allowsPhotography ||
-      searchTerm !== ""
+      allowsPhotography
     );
   };
 
   const getActiveFiltersCount = (): number => {
     let count = 0;
-    if (date !== undefined) count++;
     if (facilityType !== "all") count++;
     if (location !== "all") count++;
     if (accessibility !== "all") count++;
@@ -134,45 +129,34 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
         <div className="flex flex-col lg:flex-row gap-8 items-start lg:items-center justify-between">
           {/* Search inputs section */}
           <div className="flex flex-1 flex-col sm:flex-row gap-6 items-stretch sm:items-center">
-            {/* Search input */}
-            <div className="relative flex-1 min-w-0">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-              <Input
-                placeholder="Søk etter lokaler..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-12 h-14 text-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-xl"
-              />
-            </div>
-
             {/* Quick filters */}
-            <div className="flex flex-wrap gap-4">
+            <div className="flex flex-wrap gap-6">
               {/* Facility type */}
               <Select value={facilityType} onValueChange={setFacilityType}>
-                <SelectTrigger className="h-14 w-[160px] border-gray-300 hover:border-blue-500 text-lg rounded-xl">
-                  <Building className="mr-3 h-5 w-5" />
+                <SelectTrigger className="h-16 w-[180px] border-gray-300 hover:border-blue-500 text-xl rounded-xl">
+                  <Building className="mr-3 h-6 w-6" />
                   <SelectValue placeholder="Type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Alle typer</SelectItem>
-                  <SelectItem value="gymnasium">Gymnasium</SelectItem>
-                  <SelectItem value="meeting-room">Møterom</SelectItem>
-                  <SelectItem value="auditorium">Auditorium</SelectItem>
-                  <SelectItem value="sports-field">Sportsbane</SelectItem>
+                  <SelectItem value="all" className="text-xl">Alle typer</SelectItem>
+                  <SelectItem value="gymnasium" className="text-xl">Gymnasium</SelectItem>
+                  <SelectItem value="meeting-room" className="text-xl">Møterom</SelectItem>
+                  <SelectItem value="auditorium" className="text-xl">Auditorium</SelectItem>
+                  <SelectItem value="sports-field" className="text-xl">Sportsbane</SelectItem>
                 </SelectContent>
               </Select>
 
               {/* Location */}
               <Select value={location} onValueChange={setLocation}>
-                <SelectTrigger className="h-14 w-[140px] border-gray-300 hover:border-blue-500 text-lg rounded-xl">
-                  <MapPin className="mr-3 h-5 w-5" />
+                <SelectTrigger className="h-16 w-[160px] border-gray-300 hover:border-blue-500 text-xl rounded-xl">
+                  <MapPin className="mr-3 h-6 w-6" />
                   <SelectValue placeholder="Sted" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Alle steder</SelectItem>
-                  <SelectItem value="halleren">Halleren</SelectItem>
-                  <SelectItem value="city">Sentrum</SelectItem>
-                  <SelectItem value="plant">Planten</SelectItem>
+                  <SelectItem value="all" className="text-xl">Alle steder</SelectItem>
+                  <SelectItem value="halleren" className="text-xl">Halleren</SelectItem>
+                  <SelectItem value="city" className="text-xl">Sentrum</SelectItem>
+                  <SelectItem value="plant" className="text-xl">Planten</SelectItem>
                 </SelectContent>
               </Select>
 
@@ -180,12 +164,12 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
               <Button
                 variant="outline"
                 onClick={() => setShowAdvanced(!showAdvanced)}
-                className="h-14 px-6 border-gray-300 hover:border-blue-500 text-lg rounded-xl"
+                className="h-16 px-8 border-gray-300 hover:border-blue-500 text-xl rounded-xl"
               >
-                <Filter className="mr-3 h-5 w-5" />
+                <Filter className="mr-3 h-6 w-6" />
                 Flere filter
                 {(hasActiveFilters()) && (
-                  <Badge variant="secondary" className="ml-3 bg-blue-100 text-blue-700 text-sm">
+                  <Badge variant="secondary" className="ml-3 bg-blue-100 text-blue-700 text-lg">
                     {getActiveFiltersCount()}
                   </Badge>
                 )}
@@ -200,11 +184,11 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {/* Capacity slider */}
               <div>
-                <Label htmlFor="capacity" className="text-base font-medium block mb-3">
+                <Label htmlFor="capacity" className="text-lg font-medium block mb-4">
                   Kapasitet (antall personer)
                 </Label>
                 <div className="flex items-center gap-4">
-                  <Users className="h-5 w-5 text-gray-500" />
+                  <Users className="h-6 w-6 text-gray-500" />
                   <Slider
                     id="capacity"
                     defaultValue={capacity}
@@ -213,7 +197,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
                     onValueChange={handleCapacityChange}
                     className="flex-1"
                   />
-                  <span className="text-base text-gray-700 min-w-[80px]">
+                  <span className="text-lg text-gray-700 min-w-[80px]">
                     {capacity[0]} - {capacity[1]}
                   </span>
                 </div>
@@ -221,7 +205,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
 
               {/* Price range slider */}
               <div>
-                <Label htmlFor="price" className="text-base font-medium block mb-3">
+                <Label htmlFor="price" className="text-lg font-medium block mb-4">
                   Pris per time (NOK)
                 </Label>
                 <div className="flex items-center gap-4">
@@ -229,7 +213,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 24 24"
                     fill="currentColor"
-                    className="w-5 h-5 text-gray-500"
+                    className="w-6 h-6 text-gray-500"
                   >
                     <path
                       fillRule="evenodd"
@@ -246,7 +230,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
                     onValueChange={handlePriceRangeChange}
                     className="flex-1"
                   />
-                  <span className="text-base text-gray-700 min-w-[100px]">
+                  <span className="text-lg text-gray-700 min-w-[100px]">
                     {priceRange[0]} - {priceRange[1]}
                   </span>
                 </div>
@@ -254,29 +238,29 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
 
               {/* Accessibility filter */}
               <div>
-                <Label htmlFor="accessibility" className="text-base font-medium block mb-3">
+                <Label htmlFor="accessibility" className="text-lg font-medium block mb-4">
                   Tilgjengelighet
                 </Label>
                 <Select value={accessibility} onValueChange={setAccessibility}>
-                  <SelectTrigger className="w-full h-12 border-gray-300 text-base">
+                  <SelectTrigger className="w-full h-14 border-gray-300 text-lg">
                     <SelectValue placeholder="Velg tilgjengelighet" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">Alle</SelectItem>
-                    <SelectItem value="wheelchair">Rullestoltilpasset</SelectItem>
-                    <SelectItem value="hearing-loop">Teleslynge</SelectItem>
-                    <SelectItem value="visual-aids">Synshjelpemidler</SelectItem>
+                    <SelectItem value="all" className="text-lg">Alle</SelectItem>
+                    <SelectItem value="wheelchair" className="text-lg">Rullestoltilpasset</SelectItem>
+                    <SelectItem value="hearing-loop" className="text-lg">Teleslynge</SelectItem>
+                    <SelectItem value="visual-aids" className="text-lg">Synshjelpemidler</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               {/* Boolean filters */}
-              <div className="space-y-4">
-                <Label className="text-base font-medium block mb-3">
+              <div className="space-y-6">
+                <Label className="text-lg font-medium block mb-4">
                   Andre fasiliteter
                 </Label>
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="availableNow" className="text-base font-medium">
+                  <Label htmlFor="availableNow" className="text-lg font-medium">
                     Tilgjengelig nå
                   </Label>
                   <Switch
@@ -286,7 +270,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
                   />
                 </div>
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="hasEquipment" className="text-base font-medium">
+                  <Label htmlFor="hasEquipment" className="text-lg font-medium">
                     AV-utstyr
                   </Label>
                   <Switch
@@ -296,7 +280,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
                   />
                 </div>
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="hasParking" className="text-base font-medium">
+                  <Label htmlFor="hasParking" className="text-lg font-medium">
                     Parkering
                   </Label>
                   <Switch
@@ -306,7 +290,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
                   />
                 </div>
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="hasWifi" className="text-base font-medium">
+                  <Label htmlFor="hasWifi" className="text-lg font-medium">
                     WiFi
                   </Label>
                   <Switch
@@ -316,7 +300,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
                   />
                 </div>
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="allowsPhotography" className="text-base font-medium">
+                  <Label htmlFor="allowsPhotography" className="text-lg font-medium">
                     Tillater fotografering
                   </Label>
                   <Switch
@@ -333,9 +317,9 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
               <Button
                 variant="ghost"
                 onClick={clearFilters}
-                className="text-base text-gray-600 hover:bg-gray-100"
+                className="text-lg text-gray-600 hover:bg-gray-100"
               >
-                <X className="mr-2 h-5 w-5" />
+                <X className="mr-2 h-6 w-6" />
                 Fjern alle filtre
               </Button>
             </div>
