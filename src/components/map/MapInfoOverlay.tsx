@@ -1,6 +1,8 @@
 
 import React from 'react';
-import { MapPin } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { FacilityLocation } from './MapMarkers';
 
 interface MapInfoOverlayProps {
@@ -8,60 +10,70 @@ interface MapInfoOverlayProps {
 }
 
 export const MapInfoOverlay: React.FC<MapInfoOverlayProps> = ({ facilities }) => {
-  // Color palette for facility markers (same as in MapMarkers)
-  const markerColors = [
-    '#ef4444', // red
-    '#3b82f6', // blue
-    '#10b981', // emerald
-    '#f59e0b', // amber
-    '#8b5cf6', // violet
-    '#ec4899', // pink
-    '#06b6d4', // cyan
-  ];
+  const navigate = useNavigate();
+
+  const handleFacilityClick = (facilityId: number) => {
+    navigate(`/facilities/${facilityId}`);
+  };
 
   return (
-    <div className="absolute top-6 right-6 bg-white/95 backdrop-blur-md border border-gray-200 rounded-xl p-6 shadow-xl max-w-sm">
-      <div className="flex items-center gap-3 mb-4">
-        <div className="h-10 w-10 bg-blue-100 rounded-xl flex items-center justify-center">
-          <MapPin className="h-5 w-5 text-blue-600" />
-        </div>
-        <div>
-          <h3 className="font-bold text-gray-900 text-lg">Drammen Kommune</h3>
-          <p className="text-sm text-gray-600">Kommunale lokaler</p>
-        </div>
-      </div>
-      
-      <div className="mb-4">
-        <div className="flex items-center justify-between mb-3">
-          <span className="text-base font-semibold text-gray-700">Viser lokaler</span>
-          <span className="bg-blue-100 text-blue-800 text-base font-bold px-3 py-2 rounded-full">
-            {facilities.length}
-          </span>
-        </div>
-      </div>
-      
-      <div className="space-y-2 max-h-48 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
-        {facilities.slice(0, 4).map((facility, index) => {
-          const markerColor = markerColors[index % markerColors.length];
-          return (
-            <div key={facility.id} className="flex items-start gap-3 p-2 rounded-lg hover:bg-gray-50 transition-colors">
+    <div className="absolute top-4 left-4 z-10 max-w-sm">
+      <Card className="bg-white/95 backdrop-blur-sm shadow-lg border-0">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg font-semibold text-gray-900">
+            Viser lokaler
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <div className="space-y-3 max-h-80 overflow-y-auto">
+            {facilities.map((facility, index) => (
               <div 
-                className="h-4 w-4 mt-1 rounded-full flex-shrink-0 border-2 border-white shadow-md"
-                style={{ backgroundColor: markerColor }}
-              />
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-semibold text-gray-900 truncate">{facility.name}</p>
-                <p className="text-xs text-gray-600 truncate">{facility.address.split(',')[0]}</p>
+                key={facility.id}
+                className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors border border-gray-100"
+                onClick={() => handleFacilityClick(facility.id)}
+              >
+                {/* Facility Image */}
+                <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
+                  <img 
+                    src={facility.image || 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&auto=format&fit=crop'} 
+                    alt={facility.name}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = "https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&auto=format&fit=crop";
+                      target.onerror = null;
+                    }}
+                  />
+                </div>
+                
+                {/* Facility Info */}
+                <div className="flex-1 min-w-0">
+                  <h4 className="font-medium text-sm text-gray-900 truncate">
+                    {facility.name}
+                  </h4>
+                  <p className="text-xs text-gray-600 truncate">
+                    {facility.address}
+                  </p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <Badge 
+                      variant="secondary" 
+                      className="text-xs px-2 py-0.5"
+                    >
+                      {facility.capacity || 30} plasser
+                    </Badge>
+                  </div>
+                </div>
               </div>
-            </div>
-          );
-        })}
-        {facilities.length > 4 && (
-          <p className="text-sm text-gray-500 text-center pt-2 font-medium">
-            +{facilities.length - 4} flere lokaler
-          </p>
-        )}
-      </div>
+            ))}
+          </div>
+          
+          {facilities.length === 0 && (
+            <p className="text-sm text-gray-500 text-center py-4">
+              Ingen lokaler funnet
+            </p>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 };

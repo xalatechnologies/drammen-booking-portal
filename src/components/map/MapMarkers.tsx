@@ -21,6 +21,7 @@ interface MapMarkersProps {
 
 export const MapMarkers: React.FC<MapMarkersProps> = ({ map, facilities }) => {
   const markers = useRef<mapboxgl.Marker[]>([]);
+  const currentPopup = useRef<mapboxgl.Popup | null>(null);
 
   // Color palette for facility markers
   const markerColors = [
@@ -36,6 +37,17 @@ export const MapMarkers: React.FC<MapMarkersProps> = ({ map, facilities }) => {
   const clearMarkers = () => {
     markers.current.forEach(marker => marker.remove());
     markers.current = [];
+    if (currentPopup.current) {
+      currentPopup.current.remove();
+      currentPopup.current = null;
+    }
+  };
+
+  const closeCurrentPopup = () => {
+    if (currentPopup.current) {
+      currentPopup.current.remove();
+      currentPopup.current = null;
+    }
   };
 
   const addMarkers = () => {
@@ -69,7 +81,7 @@ export const MapMarkers: React.FC<MapMarkersProps> = ({ map, facilities }) => {
       icon.style.fontSize = '14px';
       markerEl.appendChild(icon);
 
-      // Create simple popup with facility info
+      // Create popup with facility info
       const popupHTML = `
         <div class="facility-popup-card" style="
           width: 280px;
@@ -125,8 +137,15 @@ export const MapMarkers: React.FC<MapMarkersProps> = ({ map, facilities }) => {
       // Add marker to map
       const marker = new mapboxgl.Marker(markerEl)
         .setLngLat([facility.lng, facility.lat])
-        .setPopup(popup)
         .addTo(map);
+
+      // Handle marker click to show popup (only one at a time)
+      markerEl.addEventListener('click', () => {
+        closeCurrentPopup(); // Close any existing popup
+        marker.setPopup(popup);
+        popup.addTo(map);
+        currentPopup.current = popup;
+      });
 
       markers.current.push(marker);
     });
