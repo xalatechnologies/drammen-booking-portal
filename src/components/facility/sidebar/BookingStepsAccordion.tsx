@@ -102,23 +102,17 @@ export function BookingStepsAccordion({
         zoneId: slot.zoneId,
         pricePerHour: basePrice,
         duration: duration,
-        customerType: formData.customerType,
-        contactDetails: {
+        organizationType: formData.customerType as any,
+        customerInfo: {
           name: formData.contactName,
           email: formData.contactEmail,
           phone: formData.contactPhone,
           organization: formData.organization
         },
-        bookingDetails: {
-          purpose: formData.purpose,
-          eventType: formData.eventType,
-          attendees: formData.attendees ? parseInt(formData.attendees) : undefined,
-          notes: formData.notes
-        },
+        specialRequirements: formData.notes,
         // Required fields for CartItem
         purpose: formData.purpose,
         expectedAttendees: formData.attendees ? parseInt(formData.attendees) : 1,
-        organizationType: formData.customerType as any,
         additionalServices: [],
         timeSlots: [{
           date: slot.date,
