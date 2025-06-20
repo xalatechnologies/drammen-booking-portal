@@ -96,7 +96,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({
   
   if (isLoading) {
     return (
-      <div className="mb-8 space-y-6">
+      <div className="max-w-7xl mx-auto px-4">
         <div className="flex justify-center items-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
         </div>
@@ -106,7 +106,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({
 
   if (error) {
     return (
-      <div className="mb-8 space-y-6">
+      <div className="max-w-7xl mx-auto px-4">
         <div className="text-center py-10 bg-red-50 rounded-lg border border-red-200">
           <h3 className="text-xl font-medium mb-2 text-red-800">Kunne ikke laste kalenderen</h3>
           <p className="text-red-600">Prøv igjen senere.</p>
@@ -116,40 +116,55 @@ const CalendarView: React.FC<CalendarViewProps> = ({
   }
   
   return (
-    <div className="mb-8 space-y-6">
-      {/* Enhanced Week Navigation */}
-      <WeekNavigation
-        currentWeekStart={currentWeekStart}
-        setCurrentWeekStart={setCurrentWeekStart}
-        canGoPrevious={canGoPrevious}
-      />
+    <div className="max-w-7xl mx-auto px-4">
+      {/* Header with facility count and view type */}
+      <div className="mb-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Calendar className="h-6 w-6 text-blue-600" />
+            <h2 className="text-2xl font-bold text-gray-900">Kalenderoversikt</h2>
+          </div>
+          <div className="text-sm text-gray-600">
+            <span>{facilitiesWithBookings.length} lokaler funnet</span>
+          </div>
+        </div>
+      </div>
 
-      {/* Enhanced Calendar Grid */}
-      <Card className="shadow-lg border-0">
-        <CalendarHeader />
-        <CardContent className="p-0">
-          {facilitiesWithBookings.length === 0 ? (
-            <div className="p-8 text-center text-gray-500">
-              <Calendar className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-              <p className="text-lg font-medium">Ingen lokaler funnet</p>
-              <p className="text-sm">Prøv å justere filtrene dine</p>
-            </div>
-          ) : (
-            <div className="space-y-0">
-              {facilitiesWithBookings.map((facility, facilityIndex) => (
-                <FacilityCalendarCard
-                  key={facility.id}
-                  facility={facility}
-                  facilityIndex={facilityIndex}
-                  days={days}
-                  timeSlots={timeSlots}
-                  isTimeSlotBooked={isTimeSlotBooked}
-                />
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      <div className="space-y-6">
+        {/* Enhanced Week Navigation */}
+        <WeekNavigation
+          currentWeekStart={currentWeekStart}
+          setCurrentWeekStart={setCurrentWeekStart}
+          canGoPrevious={canGoPrevious}
+        />
+
+        {/* Enhanced Calendar Grid */}
+        <Card className="shadow-lg border-0">
+          <CalendarHeader />
+          <CardContent className="p-0">
+            {facilitiesWithBookings.length === 0 ? (
+              <div className="p-8 text-center text-gray-500">
+                <Calendar className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                <p className="text-lg font-medium">Ingen lokaler funnet</p>
+                <p className="text-sm">Prøv å justere filtrene dine</p>
+              </div>
+            ) : (
+              <div className="space-y-0">
+                {facilitiesWithBookings.map((facility, facilityIndex) => (
+                  <FacilityCalendarCard
+                    key={facility.id}
+                    facility={facility}
+                    facilityIndex={facilityIndex}
+                    days={days}
+                    timeSlots={timeSlots}
+                    isTimeSlotBooked={isTimeSlotBooked}
+                  />
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };
