@@ -90,7 +90,19 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
   const hasAdvancedFilters = dateRange || accessibility && accessibility !== "all" || capacity[0] > 0 || capacity[1] < 200 || priceRange[0] > 0 || priceRange[1] < 5000 || availableNow || hasEquipment || hasParking || hasWifi || allowsPhotography;
   return <div className="mb-8">
       {/* Main Search Section */}
-      
+      <div className="bg-gradient-to-br from-slate-600 via-slate-700 to-slate-800 rounded-2xl p-8 shadow-2xl">
+        <div className="flex flex-col lg:flex-row gap-6 items-stretch">
+          {/* Search Input */}
+          <div className="lg:flex-1">
+            <SearchInput searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+          </div>
+
+          {/* Date Range Picker */}
+          <div className="lg:w-72">
+            <DateRangePicker dateRange={dateRange} setDateRange={setDateRange} />
+          </div>
+        </div>
+      </div>
 
       {/* Filters Section */}
       <div className="mt-6 bg-white/95 backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg p-6">
