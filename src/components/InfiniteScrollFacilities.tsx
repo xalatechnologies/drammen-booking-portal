@@ -3,13 +3,12 @@ import React, { useEffect, useState, useCallback } from "react";
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { Loader2, ArrowUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { FacilityCard } from "./facility/FacilityCard";
 import FacilityListItem from "./facility/FacilityListItem";
 import { useOptimizedFacilities } from "@/hooks/useOptimizedFacilities";
 import { FacilityFilters } from "@/types/facility";
 import { useNavigate } from "react-router-dom";
-import ViewModeToggle from "./search/ViewModeToggle";
+import ViewHeader from "./search/ViewHeader";
 
 interface InfiniteScrollFacilitiesProps {
   filters: FacilityFilters;
@@ -108,26 +107,56 @@ export function InfiniteScrollFacilities({
   };
 
   if (error) {
-    return <div className="text-center py-10 bg-red-50 rounded-lg border border-red-200 mx-4">
-        <h3 className="text-xl font-medium text-red-800 mb-2">Feil ved lasting</h3>
-        <p className="text-red-600">Kunne ikke laste lokaler. Prøv igjen senere.</p>
-      </div>;
+    return (
+      <div className="max-w-7xl mx-auto px-4">
+        <ViewHeader 
+          facilityCount={0}
+          isLoading={false}
+          viewMode={viewMode}
+          setViewMode={setViewMode}
+        />
+        <div className="text-center py-10 bg-red-50 rounded-lg border border-red-200">
+          <h3 className="text-xl font-medium text-red-800 mb-2">Feil ved lasting</h3>
+          <p className="text-red-600">Kunne ikke laste lokaler. Prøv igjen senere.</p>
+        </div>
+      </div>
+    );
   }
 
   if (page === 1 && isLoading) {
-    return <div className="flex items-center justify-center py-20">
-        <div className="text-center space-y-4">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto text-blue-600" />
-          <p className="text-gray-600 font-medium">Laster lokaler...</p>
+    return (
+      <div className="max-w-7xl mx-auto px-4">
+        <ViewHeader 
+          facilityCount={0}
+          isLoading={true}
+          viewMode={viewMode}
+          setViewMode={setViewMode}
+        />
+        <div className="flex items-center justify-center py-20">
+          <div className="text-center space-y-4">
+            <Loader2 className="h-8 w-8 animate-spin mx-auto text-blue-600" />
+            <p className="text-gray-600 font-medium">Laster lokaler...</p>
+          </div>
         </div>
-      </div>;
+      </div>
+    );
   }
 
   if (allFacilities.length === 0 && !isLoading) {
-    return <div className="text-center py-10 bg-gray-50 rounded-lg mx-4">
-        <h3 className="text-xl font-medium mb-2">Ingen lokaler funnet</h3>
-        <p className="text-gray-500">Prøv å endre søkekriteriene dine</p>
-      </div>;
+    return (
+      <div className="max-w-7xl mx-auto px-4">
+        <ViewHeader 
+          facilityCount={0}
+          isLoading={false}
+          viewMode={viewMode}
+          setViewMode={setViewMode}
+        />
+        <div className="text-center py-10 bg-gray-50 rounded-lg">
+          <h3 className="text-xl font-medium mb-2">Ingen lokaler funnet</h3>
+          <p className="text-gray-500">Prøv å endre søkekriteriene dine</p>
+        </div>
+      </div>
+    );
   }
 
   const LoadingSpinner = () => (
@@ -151,27 +180,13 @@ export function InfiniteScrollFacilities({
 
   return (
     <div className="relative max-w-7xl mx-auto px-4 my-[12px]">
-      {/* Enhanced Results summary with view toggle aligned */}
-      <div className="mb-8 flex flex-col md:flex-row gap-6 md:gap-0 items-start md:items-end justify-between">
-        <div className="flex items-center gap-6">
-          <div className="flex items-center gap-3">
-            <span className="text-4xl font-bold text-gray-900">
-              {pagination?.total || allFacilities.length}
-            </span>
-            <span className="text-xl font-semibold text-gray-700">lokaler</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Badge variant="secondary" className="text-lg px-6 py-3 font-medium text-gray-600 bg-gray-100">
-              {viewMode === "grid" ? "Rutenett visning" : "Liste visning"}
-            </Badge>
-          </div>
-        </div>
-        
-        {/* View mode toggle aligned with the results label */}
-        <div className="flex-shrink-0">
-          <ViewModeToggle viewMode={viewMode} setViewMode={setViewMode} />
-        </div>
-      </div>
+      {/* Reusable Header */}
+      <ViewHeader 
+        facilityCount={pagination?.total || allFacilities.length}
+        isLoading={isLoading}
+        viewMode={viewMode}
+        setViewMode={setViewMode}
+      />
 
       {/* Infinite Scroll Container */}
       <InfiniteScroll 
