@@ -10,7 +10,6 @@ import { ProgressIndicator } from '@/components/checkout/ProgressIndicator';
 import { EmptyCart } from '@/components/checkout/EmptyCart';
 import { ReviewStep } from '@/components/checkout/ReviewStep';
 import { LoginStep } from '@/components/checkout/LoginStep';
-import { ContactDetailsStep } from '@/components/checkout/ContactDetailsStep';
 import { ConfirmationStep } from '@/components/checkout/ConfirmationStep';
 import { OrderSummary } from '@/components/checkout/OrderSummary';
 
@@ -18,7 +17,7 @@ const CheckoutPage = () => {
   const navigate = useNavigate();
   const { items, removeFromCart, clearCart } = useCart();
   const { isAuthenticated } = useAuthStore();
-  const [step, setStep] = useState<'review' | 'login' | 'details' | 'confirm'>('review');
+  const [step, setStep] = useState<'review' | 'login' | 'confirm'>('review');
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -63,14 +62,14 @@ const CheckoutPage = () => {
   const handleContinueFromReview = () => {
     // Skip login step if user is already authenticated
     if (isAuthenticated) {
-      setStep('details');
+      setStep('confirm');
     } else {
       setStep('login');
     }
   };
 
   const handleContinueFromLogin = () => {
-    setStep('details');
+    setStep('confirm');
   };
 
   if (items.length === 0) {
@@ -111,19 +110,10 @@ const CheckoutPage = () => {
                 />
               )}
 
-              {step === 'details' && (
-                <ContactDetailsStep
-                  formData={formData}
-                  onFormDataChange={updateFormData}
-                  onBack={() => isAuthenticated ? setStep('review') : setStep('login')}
-                  onContinue={() => setStep('confirm')}
-                />
-              )}
-
               {step === 'confirm' && (
                 <ConfirmationStep
                   formData={formData}
-                  onBack={() => setStep('details')}
+                  onBack={() => isAuthenticated ? setStep('review') : setStep('login')}
                   onSubmit={handleSubmit}
                 />
               )}
