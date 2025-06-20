@@ -29,6 +29,17 @@ export function SelectedSlotsAccordion({
   // Add debugging to see what's in the array
   console.log('SelectedSlotsAccordion: selectedSlots array:', selectedSlots);
   console.log('SelectedSlotsAccordion: selectedSlots length:', selectedSlots.length);
+  
+  // Check for duplicates
+  const uniqueSlots = selectedSlots.filter((slot, index, self) => 
+    index === self.findIndex(s => 
+      s.zoneId === slot.zoneId && 
+      s.date.toISOString() === slot.date.toISOString() && 
+      s.timeSlot === slot.timeSlot
+    )
+  );
+  console.log('SelectedSlotsAccordion: unique slots length:', uniqueSlots.length);
+  console.log('SelectedSlotsAccordion: duplicates found:', selectedSlots.length - uniqueSlots.length);
 
   // Use actual length of selectedSlots array
   const totalSlots = selectedSlots.length;
