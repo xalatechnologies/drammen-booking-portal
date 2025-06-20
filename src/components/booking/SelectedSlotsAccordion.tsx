@@ -26,15 +26,27 @@ export function SelectedSlotsAccordion({
     return zone?.name || 'Ukjent sone';
   };
 
+  // Helper function to ensure date is a Date object
+  const ensureDate = (date: Date | string): Date => {
+    if (date instanceof Date) return date;
+    return new Date(date);
+  };
+
+  // Helper function to get date string for comparison
+  const getDateString = (date: Date | string): string => {
+    const dateObj = ensureDate(date);
+    return dateObj.toISOString();
+  };
+
   // Add debugging to see what's in the array
   console.log('SelectedSlotsAccordion: selectedSlots array:', selectedSlots);
   console.log('SelectedSlotsAccordion: selectedSlots length:', selectedSlots.length);
   
-  // Check for duplicates
+  // Check for duplicates with safe date handling
   const uniqueSlots = selectedSlots.filter((slot, index, self) => 
     index === self.findIndex(s => 
       s.zoneId === slot.zoneId && 
-      s.date.toISOString() === slot.date.toISOString() && 
+      getDateString(s.date) === getDateString(slot.date) && 
       s.timeSlot === slot.timeSlot
     )
   );
@@ -81,35 +93,38 @@ export function SelectedSlotsAccordion({
           </AccordionTrigger>
           <AccordionContent className="px-4 pb-4">
             <div className="space-y-2 max-h-48 overflow-y-auto">
-              {selectedSlots.map((slot, index) => (
-                <div key={`${slot.zoneId}-${slot.date.toISOString()}-${slot.timeSlot}-${index}`} 
-                     className="flex items-center justify-between p-3 bg-white rounded border border-navy-200/60 shadow-sm">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 text-navy-900 font-medium text-sm">
-                      <Calendar className="h-4 w-4" />
-                      {format(slot.date, 'EEE d. MMM', { locale: nb })}
-                    </div>
-                    <div className="flex items-center gap-4 text-navy-700 text-sm mt-1">
-                      <div className="flex items-center gap-1">
-                        <Clock className="h-3 w-3" />
-                        {slot.timeSlot}
+              {selectedSlots.map((slot, index) => {
+                const dateObj = ensureDate(slot.date);
+                return (
+                  <div key={`${slot.zoneId}-${getDateString(slot.date)}-${slot.timeSlot}-${index}`} 
+                       className="flex items-center justify-between p-3 bg-white rounded border border-navy-200/60 shadow-sm">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 text-navy-900 font-medium text-sm">
+                        <Calendar className="h-4 w-4" />
+                        {format(dateObj, 'EEE d. MMM', { locale: nb })}
                       </div>
-                      <div className="flex items-center gap-1">
-                        <MapPin className="h-3 w-3" />
-                        {getZoneName(slot.zoneId)}
+                      <div className="flex items-center gap-4 text-navy-700 text-sm mt-1">
+                        <div className="flex items-center gap-1">
+                          <Clock className="h-3 w-3" />
+                          {slot.timeSlot}
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <MapPin className="h-3 w-3" />
+                          {getZoneName(slot.zoneId)}
+                        </div>
                       </div>
                     </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onRemoveSlot(slot)}
+                      className="text-red-600 hover:text-red-800 hover:bg-red-50 h-8 w-8 p-0"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => onRemoveSlot(slot)}
-                    className="text-red-600 hover:text-red-800 hover:bg-red-50 h-8 w-8 p-0"
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </AccordionContent>
         </AccordionItem>

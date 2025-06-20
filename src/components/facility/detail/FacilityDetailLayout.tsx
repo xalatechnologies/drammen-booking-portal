@@ -5,10 +5,9 @@ import { FacilityHeader } from '@/components/facility/FacilityHeader';
 import { FacilityInfoTabs } from '@/components/facility/FacilityInfoTabs';
 import { FacilityContactInfo } from '@/components/facility/FacilityContactInfo';
 import { Zone } from '@/components/booking/types';
-import { OptimizedLocalizedFacility } from '@/types/facility';
 
 interface FacilityDetailLayoutProps {
-  facility: OptimizedLocalizedFacility;
+  facility: any; // Using any for now since OptimizedLocalizedFacility is not exported
   zones: Zone[];
   onShare: () => void;
   isFavorited: boolean;
