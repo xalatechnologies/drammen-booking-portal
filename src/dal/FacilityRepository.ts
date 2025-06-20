@@ -39,6 +39,15 @@ export class FacilityRepository extends BaseRepository<Facility, FacilityFilters
 
   constructor() {
     const convertedFacilities = localizedMockFacilities.map(convertLocalizedFacility);
+    // Add timeSlotDuration to some facilities for testing
+    convertedFacilities.forEach((facility, index) => {
+      // Set some facilities to use 2-hour slots for variety
+      if (index % 3 === 0) {
+        facility.timeSlotDuration = 2;
+      } else {
+        facility.timeSlotDuration = 1;
+      }
+    });
     super(convertedFacilities);
     this.zones = [...mockZones];
   }
@@ -171,7 +180,8 @@ export class FacilityRepository extends BaseRepository<Facility, FacilityFilters
       reviewCount: 0,
       pricePerHour: 500,
       amenities: request.equipment,
-      hasAutoApproval: false
+      hasAutoApproval: false,
+      timeSlotDuration: 1 // Default to 1-hour slots for new facilities
     };
   }
 

@@ -21,6 +21,7 @@ interface AvailabilityTabProps {
   currentPattern: any;
   onPatternChange: (pattern: any) => void;
   onPatternApply: (pattern: any) => void;
+  timeSlotDuration?: 1 | 2; // New prop for time slot duration
 }
 
 export function AvailabilityTab({
@@ -34,7 +35,8 @@ export function AvailabilityTab({
   facilityName,
   currentPattern,
   onPatternChange,
-  onPatternApply
+  onPatternApply,
+  timeSlotDuration = 1 // Default to 1-hour slots
 }: AvailabilityTabProps) {
   const [currentWeekStart, setCurrentWeekStart] = useState(() => 
     startOfWeek(new Date(), { weekStartsOn: 1 })
@@ -44,22 +46,38 @@ export function AvailabilityTab({
 
   const { getAvailabilityStatus, isSlotSelected } = useAvailabilityStatus(selectedSlots);
 
-  const timeSlots = useMemo(() => [
-    "08:00-09:00",
-    "09:00-10:00",
-    "10:00-11:00",
-    "11:00-12:00",
-    "12:00-13:00",
-    "13:00-14:00",
-    "14:00-15:00",
-    "15:00-16:00",
-    "16:00-17:00",
-    "17:00-18:00",
-    "18:00-19:00",
-    "19:00-20:00",
-    "20:00-21:00",
-    "21:00-22:00"
-  ], []);
+  const timeSlots = useMemo(() => {
+    if (timeSlotDuration === 2) {
+      // 2-hour slots
+      return [
+        "08:00-10:00",
+        "10:00-12:00", 
+        "12:00-14:00",
+        "14:00-16:00",
+        "16:00-18:00",
+        "18:00-20:00",
+        "20:00-22:00"
+      ];
+    } else {
+      // 1-hour slots (default)
+      return [
+        "08:00-09:00",
+        "09:00-10:00",
+        "10:00-11:00",
+        "11:00-12:00",
+        "12:00-13:00",
+        "13:00-14:00",
+        "14:00-15:00",
+        "15:00-16:00",
+        "16:00-17:00",
+        "17:00-18:00",
+        "18:00-19:00",
+        "19:00-20:00",
+        "20:00-21:00",
+        "21:00-22:00"
+      ];
+    }
+  }, [timeSlotDuration]);
 
   const handlePreviousWeek = useCallback(() => {
     setCurrentWeekStart(prev => addDays(prev, -7));

@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -243,6 +242,7 @@ const FacilityDetail = () => {
                   currentPattern={currentPattern}
                   onPatternChange={setCurrentPattern}
                   onPatternApply={handlePatternApply}
+                  timeSlotDuration={facility.timeSlotDuration || 1}
                 />
               </div>
             </div>
