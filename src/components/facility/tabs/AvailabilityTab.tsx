@@ -1,152 +1,129 @@
 
-import React, { useState } from "react";
-import { startOfWeek, isBefore, startOfDay, addDays } from "date-fns";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Zone } from "@/components/booking/types";
-import { ExistingBooking } from "@/utils/zoneConflictManager";
-import { EnhancedZoneConflictManager } from "@/utils/enhancedZoneConflictManager";
-import { RecurrencePattern, SelectedTimeSlot } from "@/utils/recurrenceEngine";
-import { AvailabilityTabContent } from "./AvailabilityTabContent";
-import { AvailabilityModals } from "./AvailabilityModals";
-import { usePatternHandler } from "./PatternHandler";
+import React, { useState, useCallback, useMemo } from 'react';
+import { addDays, startOfWeek } from 'date-fns';
+import { Zone } from '@/components/booking/types';
+import { SelectedTimeSlot } from '@/utils/recurrenceEngine';
+import { CalendarGrid } from './CalendarGrid';
+import { ResponsiveCalendarGrid } from './ResponsiveCalendarGrid';
+import { CalendarSidebar } from '../CalendarSidebar';
+import { WeekNavigation } from './WeekNavigation';
+import { TwoColumnAvailabilityLayout } from './TwoColumnAvailabilityLayout';
+import { useAvailabilityStatus } from './AvailabilityStatusManager';
 
 interface AvailabilityTabProps {
   zones: Zone[];
-  startDate: Date;
-  showLegend?: boolean;
-  facilityId?: string;
-  facilityName?: string;
-  openingHours?: string;
+  selectedSlots: SelectedTimeSlot[];
+  onSlotClick: (zoneId: string, date: Date, timeSlot: string, availability: string) => void;
+  onBulkSlotSelection: (slots: SelectedTimeSlot[]) => void;
+  onClearSlots: () => void;
+  onRemoveSlot: (zoneId: string, date: Date, timeSlot: string) => void;
+  facilityId: string;
+  facilityName: string;
+  currentPattern: any;
+  onPatternChange: (pattern: any) => void;
+  onPatternApply: (pattern: any) => void;
 }
 
-export function AvailabilityTab({ 
-  zones, 
-  startDate, 
-  showLegend = true,
-  facilityId = "",
-  facilityName = "",
-  openingHours = "08:00-22:00"
+export function AvailabilityTab({
+  zones,
+  selectedSlots,
+  onSlotClick,
+  onBulkSlotSelection,
+  onClearSlots,
+  onRemoveSlot,
+  facilityId,
+  facilityName,
+  currentPattern,
+  onPatternChange,
+  onPatternApply
 }: AvailabilityTabProps) {
-  const [currentWeekStart, setCurrentWeekStart] = useState(startOfWeek(startDate, { weekStartsOn: 1 }));
-  const [selectedSlots, setSelectedSlots] = useState<SelectedTimeSlot[]>([]);
-  const [showPatternBuilder, setShowPatternBuilder] = useState(false);
-  const [showBookingDrawer, setShowBookingDrawer] = useState(false);
-  const [showConflictWizard, setShowConflictWizard] = useState(false);
-  const [conflictResolutionData, setConflictResolutionData] = useState<any>(null);
-  const [currentPattern, setCurrentPattern] = useState<RecurrencePattern>({
-    type: 'weekly',
-    weekdays: [],
-    timeSlots: [],
-    interval: 1
-  });
-  
-  // Mock existing bookings for demo
-  const existingBookings: ExistingBooking[] = [
-    {
-      id: "1",
-      zoneId: "whole-facility",
-      date: new Date(2025, 5, 19),
-      timeSlot: "14:00",
-      bookedBy: "Drammen Fotballklubb"
-    },
-    {
-      id: "2", 
-      zoneId: "zone-1",
-      date: new Date(2025, 5, 20),
-      timeSlot: "10:00",
-      bookedBy: "Lokale Basketlag"
-    }
-  ];
+  const [currentWeekStart, setCurrentWeekStart] = useState(() => 
+    startOfWeek(new Date(), { weekStartsOn: 1 })
+  );
+  const [selectedZone, setSelectedZone] = useState(zones[0]);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
-  const conflictManager = new EnhancedZoneConflictManager(zones, existingBookings);
-  const today = startOfDay(new Date());
-  const currentWeekStartDay = startOfDay(currentWeekStart);
-  const canGoPrevious = !isBefore(addDays(currentWeekStartDay, -7), today);
+  const { getAvailabilityStatus, isSlotSelected } = useAvailabilityStatus(selectedSlots);
 
-  const { handlePatternApply } = usePatternHandler({
-    pattern: currentPattern,
-    zones,
-    currentWeekStart,
-    conflictManager,
-    onConflictDetected: (data) => {
-      setConflictResolutionData(data);
-      setShowConflictWizard(true);
-    },
-    onPatternApplied: setSelectedSlots,
-  });
+  const timeSlots = useMemo(() => [
+    "08:00-10:00",
+    "10:00-12:00", 
+    "12:00-14:00",
+    "14:00-16:00",
+    "16:00-18:00",
+    "18:00-20:00",
+    "20:00-22:00"
+  ], []);
 
-  const shouldShowTabs = zones.length > 1;
+  const handlePreviousWeek = useCallback(() => {
+    setCurrentWeekStart(prev => addDays(prev, -7));
+  }, []);
 
-  const renderZoneTab = (zone: Zone) => (
-    <AvailabilityTabContent
-      key={zone.id}
-      zone={zone}
-      zones={zones}
+  const handleNextWeek = useCallback(() => {
+    setCurrentWeekStart(prev => addDays(prev, 7));
+  }, []);
+
+  React.useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const calendarComponent = isMobile ? (
+    <ResponsiveCalendarGrid
+      zone={selectedZone}
       currentWeekStart={currentWeekStart}
-      setCurrentWeekStart={setCurrentWeekStart}
-      canGoPrevious={canGoPrevious}
+      timeSlots={timeSlots}
       selectedSlots={selectedSlots}
-      setSelectedSlots={setSelectedSlots}
-      conflictManager={conflictManager}
-      showLegend={showLegend}
-      onPatternBuilderOpen={() => setShowPatternBuilder(true)}
-      onBookingDrawerOpen={() => setShowBookingDrawer(true)}
-      setShowConflictWizard={setShowConflictWizard}
-      setConflictResolutionData={setConflictResolutionData}
-      currentPattern={currentPattern}
-      setCurrentPattern={setCurrentPattern}
-      facilityId={facilityId}
-      facilityName={facilityName}
-      openingHours={openingHours}
+      getAvailabilityStatus={getAvailabilityStatus}
+      isSlotSelected={isSlotSelected}
+      onSlotClick={onSlotClick}
+      onBulkSlotSelection={onBulkSlotSelection}
+    />
+  ) : (
+    <CalendarGrid
+      zone={selectedZone}
+      currentWeekStart={currentWeekStart}
+      timeSlots={timeSlots}
+      selectedSlots={selectedSlots}
+      getAvailabilityStatus={getAvailabilityStatus}
+      isSlotSelected={isSlotSelected}
+      onSlotClick={onSlotClick}
+      onBulkSlotSelection={onBulkSlotSelection}
     />
   );
 
   return (
-    <div className="space-y-6 font-inter">
-      {shouldShowTabs ? (
-        <Tabs defaultValue={zones[0]?.id} className="w-full">
-          <TabsList className="grid w-full grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1 h-auto p-1 bg-gray-100 rounded-lg">
-            {zones.map((zone) => (
-              <TabsTrigger 
-                key={zone.id} 
-                value={zone.id}
-                className="flex flex-col items-center p-3 h-auto data-[state=active]:bg-[#1e3a8a] data-[state=active]:text-white hover:bg-[#1e40af] hover:text-white transition-colors rounded-md font-inter"
-              >
-                <span className="font-medium text-base">{zone.name}</span>
-                <div className="flex items-center gap-4 mt-2 text-sm opacity-75">
-                  <div className="flex items-center gap-1">
-                    <span>{zone.capacity} plasser</span>
-                  </div>
-                </div>
-              </TabsTrigger>
-            ))}
-          </TabsList>
-
-          {zones.map((zone) => (
-            <TabsContent key={zone.id} value={zone.id} className="mt-6">
-              {renderZoneTab(zone)}
-            </TabsContent>
-          ))}
-        </Tabs>
-      ) : (
-        zones.length > 0 && renderZoneTab(zones[0])
-      )}
-
-      <AvailabilityModals
-        showPatternBuilder={showPatternBuilder}
-        showConflictWizard={showConflictWizard}
-        showBookingDrawer={showBookingDrawer}
-        currentPattern={currentPattern}
-        conflictResolutionData={conflictResolutionData}
-        selectedSlots={selectedSlots}
-        facilityId={facilityId}
-        facilityName={facilityName}
-        onPatternBuilderClose={() => setShowPatternBuilder(false)}
-        onConflictWizardClose={() => setShowConflictWizard(false)}
-        onBookingDrawerClose={() => setShowBookingDrawer(false)}
-        onPatternChange={setCurrentPattern}
-        onPatternApply={handlePatternApply}
-      />
-    </div>
+    <TwoColumnAvailabilityLayout
+      zones={zones}
+      selectedZone={selectedZone}
+      onZoneChange={setSelectedZone}
+      calendar={
+        <div className="space-y-4">
+          <WeekNavigation
+            currentWeekStart={currentWeekStart}
+            onPreviousWeek={handlePreviousWeek}
+            onNextWeek={handleNextWeek}
+          />
+          {calendarComponent}
+        </div>
+      }
+      sidebar={
+        <CalendarSidebar
+          selectedSlots={selectedSlots}
+          onClearSlots={onClearSlots}
+          onRemoveSlot={onRemoveSlot}
+          facilityId={facilityId}
+          facilityName={facilityName}
+          zones={zones}
+          currentPattern={currentPattern}
+          onPatternChange={onPatternChange}
+          onPatternApply={onPatternApply}
+        />
+      }
+    />
   );
 }
