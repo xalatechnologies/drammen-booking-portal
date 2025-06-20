@@ -9,7 +9,7 @@ import { format } from 'date-fns';
 import { nb } from 'date-fns/locale';
 import { SelectedTimeSlot, RecurrencePattern } from '@/utils/recurrenceEngine';
 import { Zone } from '@/components/booking/types';
-import { RecurrenceWizard } from './recurrence/RecurrenceWizard';
+import { SimpleRecurrenceDrawer } from './recurrence/SimpleRecurrenceDrawer';
 import { BookingStepsAccordion } from './sidebar/BookingStepsAccordion';
 
 interface CalendarSidebarProps {
@@ -35,7 +35,7 @@ export function CalendarSidebar({
   onPatternChange,
   onPatternApply
 }: CalendarSidebarProps) {
-  const [showRecurrenceWizard, setShowRecurrenceWizard] = useState(false);
+  const [showRecurrenceDrawer, setShowRecurrenceDrawer] = useState(false);
   const [openAccordion, setOpenAccordion] = useState<string[]>(['selected-slots']);
 
   const getZoneName = (zoneId: string) => {
@@ -62,7 +62,7 @@ export function CalendarSidebar({
           {/* Simple Recurrence Button */}
           <div className="mb-4">
             <Button
-              onClick={() => setShowRecurrenceWizard(true)}
+              onClick={() => setShowRecurrenceDrawer(true)}
               className="w-full bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 text-base"
               variant="outline"
             >
@@ -188,22 +188,17 @@ export function CalendarSidebar({
         </CardContent>
       </Card>
 
-      {/* Recurrence Wizard Modal */}
-      {showRecurrenceWizard && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-auto">
-            <RecurrenceWizard
-              pattern={currentPattern}
-              onPatternChange={onPatternChange}
-              onClose={() => setShowRecurrenceWizard(false)}
-              onApplyPattern={(pattern) => {
-                onPatternApply(pattern);
-                setShowRecurrenceWizard(false);
-              }}
-            />
-          </div>
-        </div>
-      )}
+      {/* Recurrence Drawer */}
+      <SimpleRecurrenceDrawer
+        isOpen={showRecurrenceDrawer}
+        onClose={() => setShowRecurrenceDrawer(false)}
+        pattern={currentPattern}
+        onPatternChange={onPatternChange}
+        onApplyPattern={(pattern) => {
+          onPatternApply(pattern);
+          setShowRecurrenceDrawer(false);
+        }}
+      />
     </div>
   );
 }
