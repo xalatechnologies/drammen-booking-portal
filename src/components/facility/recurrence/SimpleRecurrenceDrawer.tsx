@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -35,6 +35,13 @@ const weekdays = [
   { id: 0, label: 'Søndag' }
 ];
 
+interface DragState {
+  isDragging: boolean;
+  startIndex: number | null;
+  currentIndex: number | null;
+  previewSlots: string[];
+}
+
 export function SimpleRecurrenceDrawer({
   isOpen,
   onClose,
@@ -56,6 +63,13 @@ export function SimpleRecurrenceDrawer({
     pattern.endDate ? format(pattern.endDate, 'yyyy-MM-dd') : ''
   );
 
+  const [dragState, setDragState] = useState<DragState>({
+    isDragging: false,
+    startIndex: null,
+    currentIndex: null,
+    previewSlots: []
+  });
+
   const handleWeekdayToggle = (weekdayId: number) => {
     const newWeekdays = selectedWeekdays.includes(weekdayId)
       ? selectedWeekdays.filter(d => d !== weekdayId)
@@ -63,11 +77,124 @@ export function SimpleRecurrenceDrawer({
     setSelectedWeekdays(newWeekdays);
   };
 
+  const startDrag = useCallback((index: number, event: React.MouseEvent) => {
+    event.preventDefault();
+    console.log('Starting drag at index:', index);
+    setDragState({
+      isDragging: true,
+      startIndex: index,
+      currentIndex: index,
+      previewSlots: [timeSlots[index]]
+    });
+  }, []);
+
+  const updateDrag = useCallback((index: number) => {
+    if (!dragState.isDragging || dragState.startIndex === null) return;
+
+    console.log('Updating drag to index:', index, 'from start:', dragState.startIndex);
+
+    const startIndex = dragState.startIndex;
+    const endIndex = index;
+    const minIndex = Math.min(startIndex, endIndex);
+    const maxIndex = Math.max(startIndex, endIndex);
+    
+    const previewSlots = timeSlots.slice(minIndex, maxIndex + 1);
+    console.log('Preview slots:', previewSlots);
+    
+    setDragState(prev => ({
+      ...prev,
+      currentIndex: index,
+      previewSlots
+    }));
+  }, [dragState.isDragging, dragState.startIndex]);
+
+  const endDrag = useCallback(() => {
+    console.log('Ending drag with preview slots:', dragState.previewSlots);
+    
+    if (dragState.previewSlots.length > 0) {
+      // Add all preview slots that aren't already selected
+      const newSlots = dragState.previewSlots.filter(slot => !selectedTimeSlots.includes(slot));
+      const updatedSlots = [...selectedTimeSlots, ...newSlots];
+      
+      // Remove duplicates and sort
+      const uniqueSlots = [...new Set(updatedSlots)].sort();
+      console.log('Updated slots after drag:', uniqueSlots);
+      setSelectedTimeSlots(uniqueSlots);
+    }
+    
+    setDragState({
+      isDragging: false,
+      startIndex: null,
+      currentIndex: null,
+      previewSlots: []
+    });
+  }, [dragState.previewSlots, selectedTimeSlots]);
+
+  const cancelDrag = useCallback(() => {
+    console.log('Canceling drag');
+    setDragState({
+      isDragging: false,
+      startIndex: null,
+      currentIndex: null,
+      previewSlots: []
+    });
+  }, []);
+
   const handleTimeSlotToggle = (timeSlot: string) => {
+    if (dragState.isDragging) return; // Don't toggle during drag
+    
+    console.log('Toggling time slot:', timeSlot);
     const newTimeSlots = selectedTimeSlots.includes(timeSlot)
       ? selectedTimeSlots.filter(t => t !== timeSlot)
       : [...selectedTimeSlots, timeSlot];
-    setSelectedTimeSlots(newTimeSlots);
+    
+    // Remove duplicates and sort
+    const uniqueSlots = [...new Set(newTimeSlots)].sort();
+    console.log('Updated time slots:', uniqueSlots);
+    setSelectedTimeSlots(uniqueSlots);
+  };
+
+  const handleMouseDown = (index: number, event: React.MouseEvent) => {
+    console.log('Mouse down on index:', index);
+    startDrag(index, event);
+  };
+
+  const handleMouseEnter = (index: number) => {
+    if (dragState.isDragging) {
+      console.log('Mouse enter on index:', index);
+      updateDrag(index);
+    }
+  };
+
+  const handleMouseUp = () => {
+    if (dragState.isDragging) {
+      console.log('Mouse up - ending drag');
+      endDrag();
+    }
+  };
+
+  const handleClick = (slot: string, index: number, event: React.MouseEvent) => {
+    event.preventDefault();
+    if (!dragState.isDragging) {
+      console.log('Clicking slot:', slot);
+      handleTimeSlotToggle(slot);
+    }
+  };
+
+  const isSlotInPreview = (slot: string) => {
+    return dragState.previewSlots.includes(slot);
+  };
+
+  const getSlotStyle = (slot: string, isSelected: boolean, isInPreview: boolean) => {
+    if (isSelected) {
+      return 'bg-blue-600 hover:bg-blue-700 text-white border-2 border-blue-700';
+    }
+    
+    if (isInPreview) {
+      return 'bg-blue-200 hover:bg-blue-300 border-2 border-blue-400 text-blue-800';
+    }
+    
+    return 'bg-white hover:bg-gray-50 border border-gray-300 text-gray-700 cursor-pointer';
   };
 
   const handleApply = () => {
@@ -89,6 +216,9 @@ export function SimpleRecurrenceDrawer({
 
   const today = format(new Date(), 'yyyy-MM-dd');
 
+  // Remove duplicates from selected time slots for display
+  const uniqueSelectedSlots = [...new Set(selectedTimeSlots)];
+
   return (
     <Drawer open={isOpen} onOpenChange={onClose}>
       <DrawerContent className="max-w-4xl mx-auto max-h-[90vh]">
@@ -106,7 +236,12 @@ export function SimpleRecurrenceDrawer({
           </div>
         </DrawerHeader>
 
-        <div className="p-6 overflow-y-auto">
+        <div 
+          className="p-6 overflow-y-auto"
+          onMouseLeave={cancelDrag}
+          onMouseUp={handleMouseUp}
+          style={{ userSelect: 'none' }}
+        >
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Left Column */}
             <div className="space-y-6">
@@ -163,10 +298,7 @@ export function SimpleRecurrenceDrawer({
                   </div>
                 </CardContent>
               </Card>
-            </div>
 
-            {/* Right Column */}
-            <div className="space-y-6">
               {/* Weekdays */}
               <Card>
                 <CardHeader>
@@ -189,7 +321,10 @@ export function SimpleRecurrenceDrawer({
                   </div>
                 </CardContent>
               </Card>
+            </div>
 
+            {/* Right Column */}
+            <div className="space-y-6">
               {/* Time Slots */}
               <Card>
                 <CardHeader>
@@ -199,18 +334,55 @@ export function SimpleRecurrenceDrawer({
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-3 gap-2">
-                    {timeSlots.map((slot) => (
-                      <Button
-                        key={slot}
-                        variant={selectedTimeSlots.includes(slot) ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => handleTimeSlotToggle(slot)}
-                        className="text-xs"
-                      >
-                        {slot}
-                      </Button>
-                    ))}
+                  <div className="grid grid-cols-3 gap-2 mb-4">
+                    {timeSlots.map((slot, index) => {
+                      const isSelected = uniqueSelectedSlots.includes(slot);
+                      const isInPreview = isSlotInPreview(slot);
+                      const slotStyle = getSlotStyle(slot, isSelected, isInPreview);
+                      
+                      return (
+                        <button
+                          key={slot}
+                          className={`
+                            h-10 rounded-lg transition-all duration-200 text-xs font-medium select-none
+                            transform hover:scale-105 ${slotStyle}
+                          `}
+                          onMouseDown={(e) => handleMouseDown(index, e)}
+                          onMouseEnter={() => handleMouseEnter(index)}
+                          onClick={(e) => handleClick(slot, index, e)}
+                          style={{ userSelect: 'none' }}
+                        >
+                          <div className="flex items-center justify-center h-full">
+                            <span className="text-xs font-medium">
+                              {slot}
+                            </span>
+                            {isSelected && (
+                              <span className="text-xs ml-1">✓</span>
+                            )}
+                            {isInPreview && !isSelected && (
+                              <span className="text-xs ml-1">◯</span>
+                            )}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                  
+                  {uniqueSelectedSlots.length > 0 && (
+                    <div className="text-sm text-gray-600">
+                      <strong>{uniqueSelectedSlots.length} tidspunkt valgt</strong>
+                    </div>
+                  )}
+                  
+                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 mt-3">
+                    <p className="text-xs text-gray-600">
+                      <strong>Tips:</strong> Klikk på en time for å velge/fravelge den, eller klikk og dra for å velge flere timer på en gang.
+                    </p>
+                    {dragState.isDragging && (
+                      <p className="text-xs text-blue-600 mt-1">
+                        <strong>Velger:</strong> {dragState.previewSlots.length} tidspunkt
+                      </p>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -225,7 +397,7 @@ export function SimpleRecurrenceDrawer({
                 <p className="text-blue-800 text-sm">
                   {frequency === 'weekly' ? 'Hver uke' : frequency === 'biweekly' ? 'Annenhver uke' : 'Månedlig'} på{' '}
                   {selectedWeekdays.map(dayId => weekdays.find(wd => wd.id === dayId)?.label).join(', ')}{' '}
-                  kl. {selectedTimeSlots.join(', ')}
+                  kl. {uniqueSelectedSlots.join(', ')}
                 </p>
                 <p className="text-blue-700 text-sm mt-1">
                   Fra {startDate} til {endDate}
