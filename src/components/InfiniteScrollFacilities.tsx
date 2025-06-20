@@ -24,7 +24,6 @@ export function InfiniteScrollFacilities({
   const [hasMore, setHasMore] = useState(true);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const observerRef = useRef<HTMLDivElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
 
   const { facilities, pagination, isLoading, error } = useOptimizedFacilities({
     pagination: { page, limit: 6 },
@@ -44,7 +43,12 @@ export function InfiniteScrollFacilities({
       if (page === 1) {
         setAllFacilities(facilities);
       } else {
-        setAllFacilities(prev => [...prev, ...facilities]);
+        setAllFacilities(prev => {
+          // Avoid duplicates
+          const existingIds = new Set(prev.map(f => f.id));
+          const newFacilities = facilities.filter(f => !existingIds.has(f.id));
+          return [...prev, ...newFacilities];
+        });
       }
       
       if (pagination) {
@@ -57,40 +61,43 @@ export function InfiniteScrollFacilities({
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && hasMore && !isLoading) {
+        const entry = entries[0];
+        if (entry.isIntersecting && hasMore && !isLoading) {
+          console.log('Loading next page:', page + 1);
           setPage(prev => prev + 1);
         }
       },
-      { threshold: 0.1 }
+      { 
+        threshold: 0.1,
+        rootMargin: '50px'
+      }
     );
 
     if (observerRef.current) {
       observer.observe(observerRef.current);
     }
 
-    return () => observer.disconnect();
-  }, [hasMore, isLoading]);
+    return () => {
+      if (observerRef.current) {
+        observer.unobserve(observerRef.current);
+      }
+      observer.disconnect();
+    };
+  }, [hasMore, isLoading, page]);
 
   // Scroll position tracking
   useEffect(() => {
     const handleScroll = () => {
-      if (containerRef.current) {
-        const scrollTop = containerRef.current.scrollTop || window.scrollY;
-        setShowScrollTop(scrollTop > 400);
-      }
+      const scrollTop = window.scrollY;
+      setShowScrollTop(scrollTop > 400);
     };
 
-    const scrollContainer = containerRef.current || window;
-    scrollContainer.addEventListener('scroll', handleScroll);
-    return () => scrollContainer.removeEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const scrollToTop = () => {
-    if (containerRef.current) {
-      containerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
-    } else {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // Function to handle address click - navigate to map view with filters
@@ -140,7 +147,7 @@ export function InfiniteScrollFacilities({
   }
 
   return (
-    <div ref={containerRef} className="relative">
+    <div className="relative">
       {/* Results summary */}
       <div className="mb-6 flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -217,8 +224,18 @@ export function InfiniteScrollFacilities({
         </div>
       )}
 
-      {/* Infinite scroll trigger */}
-      <div ref={observerRef} className="h-4" />
+      {/* Infinite scroll trigger - This is the key element for intersection observer */}
+      {hasMore && (
+        <div 
+          ref={observerRef} 
+          className="h-10 flex items-center justify-center"
+        >
+          {/* Visual indicator when near end */}
+          {!isLoading && (
+            <div className="text-gray-400 text-sm">Laster flere...</div>
+          )}
+        </div>
+      )}
 
       {/* Scroll to top button */}
       {showScrollTop && (

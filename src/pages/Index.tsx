@@ -7,7 +7,6 @@ import SearchFilter from "@/components/SearchFilter";
 import FacilityList from "@/components/FacilityList";
 import MapView from "@/components/MapView";
 import CalendarView from "@/components/CalendarView";
-import GdprPopup from "@/components/GdprPopup";
 import { useFacilitiesPagination } from "@/hooks/useFacilities";
 import { FacilityFilters } from "@/types/facility";
 
@@ -130,42 +129,45 @@ const Index = () => {
       <GlobalHeader />
 
       <main id="main-content" className="flex-1 w-full">
-        {/* Content Area - Centered */}
-        <div className="content-center py-6">
-          <SearchFilter
-            date={date}
-            setDate={setDate}
-            facilityType={facilityType}
-            setFacilityType={setFacilityType}
-            location={location}
-            setLocation={setLocation}
-            viewMode={viewMode}
-            setViewMode={setViewMode}
-            accessibility={accessibility}
-            setAccessibility={setAccessibility}
-            capacity={capacity}
-            setCapacity={setCapacity}
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
-            priceRange={priceRange}
-            setPriceRange={setPriceRange}
-            availableNow={availableNow}
-            setAvailableNow={setAvailableNow}
-            hasEquipment={hasEquipment}
-            setHasEquipment={setHasEquipment}
-            hasParking={hasParking}
-            setHasParking={setHasParking}
-            hasWifi={hasWifi}
-            setHasWifi={setHasWifi}
-            allowsPhotography={allowsPhotography}
-            setAllowsPhotography={setAllowsPhotography}
-          />
+        {/* Sticky Search Filter */}
+        <div className="sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-sm">
+          <div className="content-center py-6">
+            <SearchFilter
+              date={date}
+              setDate={setDate}
+              facilityType={facilityType}
+              setFacilityType={setFacilityType}
+              location={location}
+              setLocation={setLocation}
+              viewMode={viewMode}
+              setViewMode={setViewMode}
+              accessibility={accessibility}
+              setAccessibility={setAccessibility}
+              capacity={capacity}
+              setCapacity={setCapacity}
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
+              priceRange={priceRange}
+              setPriceRange={setPriceRange}
+              availableNow={availableNow}
+              setAvailableNow={setAvailableNow}
+              hasEquipment={hasEquipment}
+              setHasEquipment={setHasEquipment}
+              hasParking={hasParking}
+              setHasParking={setHasParking}
+              hasWifi={hasWifi}
+              setHasWifi={setHasWifi}
+              allowsPhotography={allowsPhotography}
+              setAllowsPhotography={setAllowsPhotography}
+            />
+          </div>
+        </div>
 
+        {/* Content Area */}
+        <div className="content-center py-6">
           {renderContent()}
         </div>
       </main>
-
-      <GdprPopup />
     </div>
   );
 };
