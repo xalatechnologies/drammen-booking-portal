@@ -79,16 +79,18 @@ export function DateRangeStep({
               </div>
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
-            <CalendarComponent
-              mode="range"
-              selected={dateRange}
-              onSelect={handleDateRangeSelect}
-              numberOfMonths={2}
-              initialFocus
-              disabled={(date) => date < new Date()}
-              className="p-3 pointer-events-auto"
-            />
+          <PopoverContent className="w-auto p-0 z-50" align="start">
+            <div className="p-0">
+              <CalendarComponent
+                mode="range"
+                selected={dateRange}
+                onSelect={handleDateRangeSelect}
+                numberOfMonths={2}
+                initialFocus
+                disabled={(date) => date < new Date()}
+                className="p-3 pointer-events-auto border-0"
+              />
+            </div>
           </PopoverContent>
         </Popover>
       </div>
