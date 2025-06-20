@@ -1,10 +1,9 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { ApiResponse, PaginatedResponse, PaginationParams } from '@/types/api';
 import { Database } from '@/types/database';
 
 type OrganizationType = Database['public']['Enums']['organization_type'];
-type OrganizationStatus = Database['public']['Enums']['organization_status'];
+type OrganizationStatus = 'active' | 'inactive' | 'pending-verification' | 'suspended';
 
 export interface Organization {
   id: string;
