@@ -3,16 +3,19 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useFacilities, useFacilitiesPagination } from '@/hooks/useFacilities';
 import { FacilityCard } from './facility/FacilityCard';
 import FacilityListItem from './facility/FacilityListItem';
+import ViewHeader from './search/ViewHeader';
 import { FacilityFilters } from '@/types/facility';
 
 interface InfiniteScrollFacilitiesProps {
   filters: FacilityFilters;
   viewMode: "grid" | "list";
+  setViewMode?: (mode: "grid" | "map" | "calendar" | "list") => void;
 }
 
 export const InfiniteScrollFacilities: React.FC<InfiniteScrollFacilitiesProps> = ({
   filters,
   viewMode,
+  setViewMode
 }) => {
   const { pagination, nextPage } = useFacilitiesPagination(1, 6);
   const [allFacilities, setAllFacilities] = useState<any[]>([]);
@@ -96,16 +99,19 @@ export const InfiniteScrollFacilities: React.FC<InfiniteScrollFacilitiesProps> =
     currentPage
   });
 
-  if (isLoading && allFacilities.length === 0) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-    );
-  }
+  // Get total count from pagination info or fall back to current facilities count
+  const facilityCount = paginationInfo?.total || allFacilities.length;
 
   return (
     <div>
+      {/* ViewHeader component */}
+      <ViewHeader 
+        facilityCount={facilityCount}
+        isLoading={isLoading}
+        viewMode={viewMode}
+        setViewMode={setViewMode || (() => {})}
+      />
+
       {viewMode === "grid" ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {allFacilities.map((facility) => (
