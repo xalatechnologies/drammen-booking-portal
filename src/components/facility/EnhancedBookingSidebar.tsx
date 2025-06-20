@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -7,6 +7,7 @@ import { SelectedSlotsSection } from "./sidebar/SelectedSlotsSection";
 import { BookingDetailsSection } from "./sidebar/BookingDetailsSection";
 import { ReservationCartSection } from "./sidebar/ReservationCartSection";
 import { useCart } from "@/contexts/CartContext";
+import { useNavigate } from "react-router-dom";
 import { Clock, CalendarDays, MapPin } from "lucide-react";
 import { format } from "date-fns";
 import { nb } from "date-fns/locale";
@@ -33,7 +34,10 @@ export function EnhancedBookingSidebar({
   onSlotRemove,
   onBookingComplete
 }: EnhancedBookingSidebarProps) {
-  const { reservations } = useCart();
+  const { items, removeFromCart, getTotalPrice, getItemCount } = useCart();
+  const navigate = useNavigate();
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isBookingDetailsOpen, setIsBookingDetailsOpen] = useState(false);
   
   // Group slots by date for better organization
   const slotsByDate = selectedSlots.reduce((acc, slot) => {
@@ -48,7 +52,11 @@ export function EnhancedBookingSidebar({
   const totalPrice = selectedSlots.reduce((sum, slot) => sum + (slot.price || 0), 0);
   const totalDuration = selectedSlots.length; // Assuming each slot is 1 hour
 
-  if (selectedSlots.length === 0 && reservations.length === 0) {
+  const handleProceedToCheckout = () => {
+    navigate('/checkout');
+  };
+
+  if (selectedSlots.length === 0 && items.length === 0) {
     return (
       <Card className="w-full max-w-md">
         <CardHeader>
@@ -113,14 +121,38 @@ export function EnhancedBookingSidebar({
       {/* Booking Details Form */}
       {selectedSlots.length > 0 && (
         <BookingDetailsSection 
-          facilityId={facilityId}
-          selectedSlots={selectedSlots}
-          onBookingComplete={onBookingComplete}
+          isOpen={isBookingDetailsOpen}
+          onToggle={setIsBookingDetailsOpen}
+          formData={{
+            customerType: 'private',
+            contactName: '',
+            contactEmail: '',
+            contactPhone: '',
+            organization: '',
+            purpose: ''
+          }}
+          validationErrors={{}}
+          bookingErrors={[]}
+          onFormFieldChange={() => {}}
+          onContinueBooking={() => {}}
+          onResetBooking={() => {}}
+          isBookingInProgress={false}
+          canProceed={false}
+          requiresApproval={false}
+          isFormValid={false}
         />
       )}
 
       {/* Reservation Cart */}
-      <ReservationCartSection />
+      <ReservationCartSection 
+        isOpen={isCartOpen}
+        onToggle={setIsCartOpen}
+        cartItems={items}
+        itemCount={getItemCount()}
+        totalPrice={getTotalPrice()}
+        onRemoveItem={removeFromCart}
+        onProceedToCheckout={handleProceedToCheckout}
+      />
     </div>
   );
 }

@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { QueryClient } from '@/contexts/QueryClient';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { LocalizationProvider } from '@/contexts/LocalizationContext';
-import { CartProvider } from '@/contexts/CartProvider';
+import { CartProvider } from '@/contexts/CartContext';
 import { BookingStateProvider } from '@/contexts/BookingStateContext';
 import { GdprProvider } from '@/contexts/GdprContext';
 import Index from '@/pages/Index';
