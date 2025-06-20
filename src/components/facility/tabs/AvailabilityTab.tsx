@@ -21,7 +21,7 @@ interface AvailabilityTabProps {
   currentPattern: any;
   onPatternChange: (pattern: any) => void;
   onPatternApply: (pattern: any) => void;
-  timeSlotDuration?: number; // Now supports any number of hours
+  timeSlotDuration?: 1 | 2; // New prop for time slot duration
 }
 
 export function AvailabilityTab({
@@ -43,24 +43,41 @@ export function AvailabilityTab({
   );
   const [selectedZone, setSelectedZone] = useState(zones[0]);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-  const [customTimeSlotDuration, setCustomTimeSlotDuration] = useState(timeSlotDuration);
 
   const { getAvailabilityStatus, isSlotSelected } = useAvailabilityStatus(selectedSlots);
 
   const timeSlots = useMemo(() => {
-    const duration = customTimeSlotDuration;
-    const slots = [];
-    
-    // Generate slots from 08:00 to 22:00 based on duration
-    for (let hour = 8; hour < 22; hour += duration) {
-      const endHour = Math.min(hour + duration, 22);
-      const startTime = `${hour.toString().padStart(2, '0')}:00`;
-      const endTime = `${endHour.toString().padStart(2, '0')}:00`;
-      slots.push(`${startTime}-${endTime}`);
+    if (timeSlotDuration === 2) {
+      // 2-hour slots
+      return [
+        "08:00-10:00",
+        "10:00-12:00", 
+        "12:00-14:00",
+        "14:00-16:00",
+        "16:00-18:00",
+        "18:00-20:00",
+        "20:00-22:00"
+      ];
+    } else {
+      // 1-hour slots (default)
+      return [
+        "08:00-09:00",
+        "09:00-10:00",
+        "10:00-11:00",
+        "11:00-12:00",
+        "12:00-13:00",
+        "13:00-14:00",
+        "14:00-15:00",
+        "15:00-16:00",
+        "16:00-17:00",
+        "17:00-18:00",
+        "18:00-19:00",
+        "19:00-20:00",
+        "20:00-21:00",
+        "21:00-22:00"
+      ];
     }
-    
-    return slots;
-  }, [customTimeSlotDuration]);
+  }, [timeSlotDuration]);
 
   const handlePreviousWeek = useCallback(() => {
     setCurrentWeekStart(prev => addDays(prev, -7));
@@ -69,12 +86,6 @@ export function AvailabilityTab({
   const handleNextWeek = useCallback(() => {
     setCurrentWeekStart(prev => addDays(prev, 7));
   }, []);
-
-  const handleTimeSlotDurationChange = (value: number) => {
-    if (value >= 1 && value <= 14) {
-      setCustomTimeSlotDuration(value);
-    }
-  };
 
   React.useEffect(() => {
     const handleResize = () => {
@@ -111,45 +122,23 @@ export function AvailabilityTab({
 
   return (
     <div className="space-y-4">
-      {/* Zone Selection and Time Slot Duration */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-4">
-        <div className="flex items-center gap-4">
-          <label className="text-sm font-medium">Velg sone:</label>
-          <select 
-            value={selectedZone.id} 
-            onChange={(e) => {
-              const zone = zones.find(z => z.id === e.target.value);
-              if (zone) setSelectedZone(zone);
-            }}
-            className="px-3 py-2 border rounded-md"
-          >
-            {zones.map(zone => (
-              <option key={zone.id} value={zone.id}>
-                {zone.name}
-              </option>
-            ))}
-          </select>
-        </div>
-        
-        <div className="flex items-center gap-2">
-          <label className="text-sm font-medium">Tidsluke varighet:</label>
-          <input
-            type="number"
-            min="1"
-            max="14"
-            value={customTimeSlotDuration}
-            onChange={(e) => handleTimeSlotDurationChange(parseInt(e.target.value) || 1)}
-            className="w-16 px-2 py-1 border rounded text-center"
-          />
-          <span className="text-sm text-gray-600">timer</span>
-        </div>
-      </div>
-
-      {/* Helper Message */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
-        <p className="text-sm text-blue-800">
-          💡 <strong>Tip:</strong> Klikk på kalenderen for å velge tidspunkt, eller dra for å velge flere tidsluke på en gang. Du kan også justere tidsluke varighet ovenfor.
-        </p>
+      {/* Zone Selection */}
+      <div className="flex items-center gap-4 mb-4">
+        <label className="text-sm font-medium">Velg sone:</label>
+        <select 
+          value={selectedZone.id} 
+          onChange={(e) => {
+            const zone = zones.find(z => z.id === e.target.value);
+            if (zone) setSelectedZone(zone);
+          }}
+          className="px-3 py-2 border rounded-md"
+        >
+          {zones.map(zone => (
+            <option key={zone.id} value={zone.id}>
+              {zone.name}
+            </option>
+          ))}
+        </select>
       </div>
 
       {/* Two Column Layout */}
