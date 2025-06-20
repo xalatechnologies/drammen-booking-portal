@@ -12,4 +12,6 @@ export const facilityService = {
   updateFacility: SupabaseFacilityService.updateFacility.bind(SupabaseFacilityService),
   deleteFacility: SupabaseFacilityService.deleteFacility.bind(SupabaseFacilityService),
   getFacilityZones: SupabaseFacilityService.getFacilityZones.bind(SupabaseFacilityService),
+  getZonesByFacilityId: SupabaseFacilityService.getZonesByFacilityId.bind(SupabaseFacilityService),
+  getZoneById: SupabaseFacilityService.getZoneById.bind(SupabaseFacilityService),
 };

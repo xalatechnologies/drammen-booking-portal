@@ -46,7 +46,7 @@ class EnumService {
         shortLabel: item.enum_translations[0]?.short_label,
         displayOrder: item.display_order,
         isActive: item.is_active,
-        metadata: item.metadata
+        metadata: item.metadata as Record<string, any> || {}
       }));
 
       this.cache.set(cacheKey, options);

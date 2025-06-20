@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { CalendarDays, Filter, Search, MapPin, Building, Users, DollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -10,7 +11,7 @@ import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { ViewModeToggle } from "@/components/search/ViewModeToggle";
+import ViewModeToggle from "@/components/search/ViewModeToggle";
 import { useFacilityTypes, useLocations } from "@/hooks/useFilterOptions";
 import { useTranslation } from "@/i18n";
 

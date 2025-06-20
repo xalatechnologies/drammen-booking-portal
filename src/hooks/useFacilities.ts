@@ -26,7 +26,7 @@ export function useFacilities({ pagination, filters, sort }: UseFacilitiesParams
     refetch
   } = useQuery({
     queryKey,
-    queryFn: () => FacilityService.getFacilities(pagination, filters, sort),
+    queryFn: () => FacilityService.getFacilities(pagination, filters),
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
