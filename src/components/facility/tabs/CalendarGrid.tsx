@@ -55,7 +55,7 @@ export function CalendarGrid({
     
     const cell = (
       <button
-        className={`w-full h-6 rounded border transition-all duration-200 text-sm font-semibold ${statusStyle} ${
+        className={`w-full h-8 rounded border transition-all duration-200 text-base font-bold ${statusStyle} ${
           status === 'available' ? 'transform hover:scale-105' : ''
         }`}
         disabled={status !== 'available'}
@@ -64,11 +64,11 @@ export function CalendarGrid({
                status === 'busy' ? 'Opptatt' : 'Ikke tilgjengelig'}
       >
         <div className="flex items-center justify-center h-full">
-          <span className={`text-sm font-semibold ${isSelected ? 'text-white' : 'text-gray-700'}`}>
+          <span className={`text-base font-bold ${isSelected ? 'text-white' : 'text-gray-700'}`}>
             {startTime}
           </span>
           {isSelected && (
-            <span className="text-sm text-white ml-1">✓</span>
+            <span className="text-base text-white ml-1">✓</span>
           )}
         </div>
       </button>
@@ -96,13 +96,13 @@ export function CalendarGrid({
         </div>
 
         {/* Day Headers */}
-        <div className="grid grid-cols-7 gap-0.5 mb-2">
+        <div className="grid grid-cols-7 gap-1 mb-3">
           {weekDays.map((day, i) => {
             const holidayCheck = isNorwegianHoliday(day);
             const isToday = format(day, 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd');
             
             return (
-              <div key={i} className={`p-1 text-center rounded text-xs font-inter ${
+              <div key={i} className={`p-2 text-center rounded text-xs font-inter ${
                 isToday ? 'bg-blue-100 border border-blue-300' : 'bg-gray-50 border border-gray-200'
               }`}>
                 <div className={`text-xs font-medium ${isToday ? 'text-blue-800' : 'text-gray-700'}`}>
@@ -121,10 +121,10 @@ export function CalendarGrid({
           })}
         </div>
 
-        {/* Time Slots Grid - Compact Excel-like layout */}
-        <div className="space-y-0.5">
+        {/* Time Slots Grid - More spaced Excel-like layout */}
+        <div className="space-y-1">
           {timeSlots.map((timeSlot) => (
-            <div key={timeSlot} className="grid grid-cols-7 gap-0.5">
+            <div key={timeSlot} className="grid grid-cols-7 gap-1">
               {weekDays.map((day, dayIndex) => (
                 <div key={dayIndex} className="relative">
                   {renderTimeSlotCell(day, timeSlot, dayIndex)}
