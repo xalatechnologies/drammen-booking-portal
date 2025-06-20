@@ -51,8 +51,15 @@ export class FacilityRepository extends BaseRepository<Facility, FacilityFilters
     });
 
     console.log("FacilityRepository - Total facilities loaded:", convertedFacilities.length);
-    console.log("FacilityRepository - Multi-zone facilities:", 
-      convertedFacilities.filter(f => f.id === 999 || f.id === 998).map(f => ({ id: f.id, name: f.name }))
+    console.log("FacilityRepository - Sample facility data for search debugging:", 
+      convertedFacilities.slice(0, 3).map(f => ({ 
+        id: f.id, 
+        name: f.name, 
+        type: f.type, 
+        area: f.area, 
+        description: f.description.substring(0, 50) + "...",
+        suitableFor: f.suitableFor
+      }))
     );
     
     super(convertedFacilities);
@@ -70,25 +77,41 @@ export class FacilityRepository extends BaseRepository<Facility, FacilityFilters
     const filteredFacilities = facilities.filter(facility => {
       // Search term filter
       if (filters.searchTerm && filters.searchTerm.trim() !== "") {
-        const searchLower = filters.searchTerm.toLowerCase();
+        const searchLower = filters.searchTerm.toLowerCase().trim();
         console.log(`FacilityRepository.applyFilters - Searching for: "${searchLower}"`);
         
-        const matchesName = facility.name.toLowerCase().includes(searchLower);
-        const matchesDescription = facility.description.toLowerCase().includes(searchLower);
-        const matchesType = facility.type.toLowerCase().includes(searchLower);
-        const matchesArea = facility.area.toLowerCase().includes(searchLower);
-        const matchesActivity = facility.suitableFor.some(activity => 
-          activity.toLowerCase().includes(searchLower)
-        );
+        // More comprehensive search
+        const facilityData = {
+          name: facility.name.toLowerCase(),
+          description: facility.description.toLowerCase(),
+          type: facility.type.toLowerCase(),
+          area: facility.area.toLowerCase(),
+          suitableFor: facility.suitableFor.map(s => s.toLowerCase()),
+          equipment: facility.equipment.map(e => e.toLowerCase()),
+          amenities: (facility.amenities || []).map(a => a.toLowerCase())
+        };
         
-        const matchesSearch = matchesName || matchesDescription || matchesType || matchesArea || matchesActivity;
+        console.log(`FacilityRepository.applyFilters - Facility "${facility.name}" data:`, facilityData);
         
-        console.log(`FacilityRepository.applyFilters - Facility "${facility.name}":`, {
+        const matchesName = facilityData.name.includes(searchLower);
+        const matchesDescription = facilityData.description.includes(searchLower);
+        const matchesType = facilityData.type.includes(searchLower);
+        const matchesArea = facilityData.area.includes(searchLower);
+        const matchesActivity = facilityData.suitableFor.some(activity => activity.includes(searchLower));
+        const matchesEquipment = facilityData.equipment.some(equipment => equipment.includes(searchLower));
+        const matchesAmenities = facilityData.amenities.some(amenity => amenity.includes(searchLower));
+        
+        const matchesSearch = matchesName || matchesDescription || matchesType || matchesArea || matchesActivity || matchesEquipment || matchesAmenities;
+        
+        console.log(`FacilityRepository.applyFilters - Facility "${facility.name}" matches:`, {
+          searchTerm: searchLower,
           matchesName,
           matchesDescription,
           matchesType,
           matchesArea,
           matchesActivity,
+          matchesEquipment,
+          matchesAmenities,
           overall: matchesSearch
         });
         
@@ -180,6 +203,7 @@ export class FacilityRepository extends BaseRepository<Facility, FacilityFilters
     });
 
     console.log("FacilityRepository.applyFilters - Output facilities:", filteredFacilities.length);
+    console.log("FacilityRepository.applyFilters - Output facility names:", filteredFacilities.map(f => f.name));
     return filteredFacilities;
   }
 
@@ -206,7 +230,7 @@ export class FacilityRepository extends BaseRepository<Facility, FacilityFilters
       pricePerHour: 500,
       amenities: request.equipment,
       hasAutoApproval: false,
-      timeSlotDuration: 1 // Default to 1-hour slots for new facilities
+      timeSlotDuration: 1
     };
   }
 
