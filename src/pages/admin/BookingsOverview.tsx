@@ -8,6 +8,8 @@ import { format, parse, startOfWeek, getDay, isSameDay } from "date-fns";
 import { Calendar as BigCalendar, dateFnsLocalizer, Views } from 'react-big-calendar';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { nb } from 'date-fns/locale';
+import PageHeader from "@/components/admin/PageHeader";
+import { Check, Clock, Ban as BanIcon, List } from 'lucide-react';
 
 // Ekstra CSS for å sikre at event-farger vises tydelig
 const calendarStyle = `
@@ -169,6 +171,11 @@ const BookingsOverview: React.FC = () => {
   const [selectedDayBookings, setSelectedDayBookings] = useState<BookingOverview[] | null>(null);
   const [selectedDay, setSelectedDay] = useState<Date | null>(null);
 
+  const activeBookings = MOCK_BOOKINGS.filter(b => b.status === 'active').length;
+  const pendingBookings = MOCK_BOOKINGS.filter(b => b.status === 'pending').length;
+  const cancelledBookings = MOCK_BOOKINGS.filter(b => b.status === 'cancelled').length;
+  const totalBookings = MOCK_BOOKINGS.length;
+
   const filtered = MOCK_BOOKINGS.filter(b =>
     (facility === "all" || b.facility === facility) &&
     (status === "all" || b.status === status) &&
@@ -224,18 +231,43 @@ const BookingsOverview: React.FC = () => {
   }
 
   return (
-    <div className="space-y-8 max-w-full p-8" role="main" aria-labelledby="page-title">
+    <div className="space-y-8 w-full p-8" role="main" aria-labelledby="page-title">
       <style>{calendarStyle}</style>
-      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
-        <div>
-          <h1 id="page-title" className="text-3xl font-bold tracking-tight text-gray-900 mb-2">
-            Bookingoversikt
-          </h1>
-          <p className="text-lg text-gray-700 leading-relaxed">
-            Se og filtrer alle bookinger, søknader og sperringer på tvers av lokaler og soner.
-          </p>
-        </div>
-      </header>
+      <PageHeader
+        title="Bookingoversikt"
+        description="Se og filtrer alle bookinger, søknader og sperringer på tvers av lokaler og soner."
+      />
+
+      <div className="grid gap-6 md:grid-cols-4">
+        <Card>
+          <CardContent className="p-6">
+            <List className="h-6 w-6 text-gray-400 mb-4" />
+            <p className="text-2xl font-bold">{totalBookings}</p>
+            <p className="text-sm text-gray-600">Totalt antall bookinger</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-6">
+            <Check className="h-6 w-6 text-gray-400 mb-4" />
+            <p className="text-2xl font-bold">{activeBookings}</p>
+            <p className="text-sm text-gray-600">Aktive bookinger</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-6">
+            <Clock className="h-6 w-6 text-gray-400 mb-4" />
+            <p className="text-2xl font-bold">{pendingBookings}</p>
+            <p className="text-sm text-gray-600">Ventende søknader</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-6">
+            <BanIcon className="h-6 w-6 text-gray-400 mb-4" />
+            <p className="text-2xl font-bold">{cancelledBookings}</p>
+            <p className="text-sm text-gray-600">Avlyste bookinger</p>
+          </CardContent>
+        </Card>
+      </div>
 
       <Tabs value={tab} onValueChange={v => setTab(v as "table" | "calendar") }>
         <TabsList className="mb-6">

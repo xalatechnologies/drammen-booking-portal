@@ -43,24 +43,16 @@ const AdminSidebar = () => {
 
   const bookingItems = [
     {
-      title: "Lokaler",
-      path: "/admin/facilities",
-    },
-    {
       title: "Bookingoversikt",
       path: "/admin/bookings-overview",
     },
     {
-      title: "Eksterne kalendere",
-      path: "/admin/external-calendars",
-    },
-    {
-      title: "Godkjenningsprosesser",
-      path: "/admin/approvals",
+      title: "Lokaler",
+      path: "/admin/facilities",
     },
     {
       title: "Forespørsler",
-      path: "/admin/requests",
+      path: "/admin/approvals",
     },
   ];
 
@@ -93,14 +85,14 @@ const AdminSidebar = () => {
       title: "Systemkonfigurasjon",
       path: "/admin/system-config",
     },
+    {
+      title: "Eksterne kalendere",
+      path: "/admin/external-calendars",
+    },
     ...( ["systemadmin", "superadmin"].includes(currentUser.role) ? [
       {
-        title: "Roller",
+        title: "Roller & Tildelinger",
         path: "/admin/roles",
-      },
-      {
-        title: "Tildel roller",
-        path: "/admin/role-assignments",
       },
     ] : [] ),
   ];
@@ -150,8 +142,8 @@ const AdminSidebar = () => {
   };
 
   const renderMenuGroup = (items: any[], groupLabel: string) => (
-    <SidebarGroup className="mb-6">
-      <SidebarGroupLabel className="text-xs font-bold text-slate-500 uppercase tracking-[0.15em] mb-4 px-4 leading-5">
+    <SidebarGroup>
+      <SidebarGroupLabel className="text-sm font-bold text-slate-900 uppercase tracking-widest mb-3 leading-5">
         {groupLabel}
       </SidebarGroupLabel>
       <SidebarGroupContent>
@@ -194,7 +186,7 @@ const AdminSidebar = () => {
       style={{ ...( { ['--sidebar-width']: '20rem' } as any ) }}
       collapsible="icon"
     >
-      <SidebarContent className="px-2 sm:px-4 pt-8 sm:pt-16 pb-10 space-y-3 overflow-y-auto max-h-screen scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
+      <SidebarContent className="px-4 pt-8 sm:pt-16 pb-10 space-y-4 overflow-y-auto max-h-screen scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
         {renderMenuGroup(overviewItems, "OVERSIKT")}
         {renderMenuGroup(bookingItems, "BOOKING")}
         {renderMenuGroup(managementItems, "ADMINISTRASJON")}

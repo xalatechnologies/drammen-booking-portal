@@ -1,169 +1,276 @@
-import React, { useState } from "react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import React, { useState } from 'react';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { PlusCircle, Edit, Trash, UserPlus, Users, KeyRound } from 'lucide-react';
+import PageHeader from '@/components/admin/PageHeader';
 
+// Mock Data
 const initialRoles = [
-  { id: 1, name: "Fagsystemforvalter", permission: "full admin" },
-  { id: 2, name: "Administrator", permission: "full admin" },
-  { id: 3, name: "Saksbehandler", permission: "les/skriv" },
-  { id: 4, name: "Paraplyrepresentant", permission: "les/skriv" },
-  { id: 5, name: "Support", permission: "kun les" },
-  { id: 6, name: "Innbygger", permission: "kun les" },
+  { id: 'admin', name: 'Administrator', permissions: ['manage_bookings', 'manage_users', 'view_reports'] },
+  { id: 'editor', name: 'Saksbehandler', permissions: ['manage_bookings'] },
+  { id: 'viewer', name: 'Lesetilgang', permissions: ['view_reports'] },
 ];
 
-const permissionLevels = [
-  { value: "kun les", label: "Kun les" },
-  { value: "les/skriv", label: "Les/Skriv" },
-  { value: "full admin", label: "Full admin" },
+const initialUsers = [
+  { id: 'user1', name: 'Ola Normann' },
+  { id: 'user2', name: 'Kari Nordmann' },
+  { id: 'user3', name: 'Per Olsen' },
 ];
 
-const currentUser = { name: "Admin Bruker", role: "systemadmin" };
+const initialAssignments = [
+  { userId: 'user1', roleId: 'admin' },
+  { userId: 'user2', roleId: 'editor' },
+];
+
+const allPermissions = [
+  { id: 'manage_bookings', label: 'Administrere bookinger' },
+  { id: 'manage_users', label: 'Administrere brukere' },
+  { id: 'view_reports', label: 'Se rapporter' },
+  { id: 'manage_facilities', label: 'Administrere lokaler' },
+  { id: 'manage_roles', label: 'Administrere roller' },
+];
 
 const RolesPage = () => {
   const [roles, setRoles] = useState(initialRoles);
-  const [log, setLog] = useState([]);
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [editRole, setEditRole] = useState(null);
-  const [roleName, setRoleName] = useState("");
-  const [rolePermission, setRolePermission] = useState(permissionLevels[0].value);
+  const [users] = useState(initialUsers);
+  const [assignments, setAssignments] = useState(initialAssignments);
 
-  if (!["systemadmin", "superadmin"].includes(currentUser.role)) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Card className="max-w-md w-full">
-          <CardHeader>
-            <CardTitle>Ingen tilgang</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p>Du må være systemadministrator for å administrere roller.</p>
+  const [selectedRole, setSelectedRole] = useState<{ id: string; name: string; permissions: string[] } | null>(null);
+  const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
+
+  const [selectedUser, setSelectedUser] = useState<string>('');
+  const [selectedRoleForAssignment, setSelectedRoleForAssignment] = useState<string>('');
+  
+  const handleSaveRole = () => {
+    if (selectedRole) {
+      if (roles.some(r => r.id === selectedRole.id && r.id !== selectedRole.id)) {
+        // This is a new role with a duplicate ID, which should not happen with this logic
+        return; 
+      }
+      
+      if (roles.some(r => r.id === selectedRole.id)) {
+        // Edit existing role
+        setRoles(roles.map(r => (r.id === selectedRole.id ? selectedRole : r)));
+      } else {
+        // Add new role
+        setRoles([...roles, { ...selectedRole, id: selectedRole.name.toLowerCase().replace(' ', '_') }]);
+      }
+      setIsRoleModalOpen(false);
+      setSelectedRole(null);
+    }
+  };
+  
+  const handleAssignRole = () => {
+    if (selectedUser && selectedRoleForAssignment) {
+      const existingAssignment = assignments.find(a => a.userId === selectedUser);
+      if (existingAssignment) {
+        setAssignments(assignments.map(a => a.userId === selectedUser ? { ...a, roleId: selectedRoleForAssignment } : a));
+      } else {
+        setAssignments([...assignments, { userId: selectedUser, roleId: selectedRoleForAssignment }]);
+      }
+      setSelectedUser('');
+      setSelectedRoleForAssignment('');
+    }
+  };
+
+  const getUserRole = (userId: string) => {
+    const assignment = assignments.find(a => a.userId === userId);
+    const role = roles.find(r => r.id === assignment?.roleId);
+    return role ? role.name : 'Ingen rolle';
+  };
+  
+  return (
+    <div className="space-y-8 w-full p-8">
+      <PageHeader
+        title="Roller og Tildelinger"
+        description="Administrer brukerroller og tildel tilganger i systemet."
+        actions={
+          <Dialog open={isRoleModalOpen} onOpenChange={setIsRoleModalOpen}>
+            <DialogTrigger asChild>
+              <Button onClick={() => { setSelectedRole({id: '', name: '', permissions: []}); setIsRoleModalOpen(true);}}>
+                <PlusCircle className="mr-2 h-4 w-4" /> Opprett ny rolle
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>{selectedRole?.id ? 'Rediger rolle' : 'Opprett ny rolle'}</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4 py-4">
+                <div>
+                  <Label htmlFor="role-name">Rollenavn</Label>
+                  <Input id="role-name" value={selectedRole?.name || ''} onChange={(e) => setSelectedRole({...selectedRole!, name: e.target.value})} />
+                </div>
+                <div>
+                  <Label>Tillatelser</Label>
+                  <div className="space-y-2 mt-2">
+                    {allPermissions.map(p => (
+                      <div key={p.id} className="flex items-center space-x-2">
+                        <Checkbox 
+                          id={p.id}
+                          checked={selectedRole?.permissions.includes(p.id)}
+                          onCheckedChange={(checked) => {
+                            const newPermissions = checked
+                              ? [...selectedRole!.permissions, p.id]
+                              : selectedRole!.permissions.filter(perm => perm !== p.id);
+                            setSelectedRole({...selectedRole!, permissions: newPermissions});
+                          }}
+                        />
+                        <Label htmlFor={p.id}>{p.label}</Label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setIsRoleModalOpen(false)}>Avbryt</Button>
+                <Button onClick={handleSaveRole}>Lagre</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        }
+      />
+
+      <div className="grid gap-6 md:grid-cols-4">
+        <Card>
+          <CardContent className="p-6">
+            <KeyRound className="h-6 w-6 text-gray-400 mb-4" />
+            <p className="text-2xl font-bold">{roles.length}</p>
+            <p className="text-sm text-gray-600">Totalt antall roller</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-6">
+            <Users className="h-6 w-6 text-gray-400 mb-4" />
+            <p className="text-2xl font-bold">{assignments.length}</p>
+            <p className="text-sm text-gray-600">Brukere med tildelt rolle</p>
           </CardContent>
         </Card>
       </div>
-    );
-  }
 
-  const openAddDialog = () => {
-    setEditRole(null);
-    setRoleName("");
-    setRolePermission(permissionLevels[0].value);
-    setDialogOpen(true);
-  };
+      <Tabs defaultValue="roles" className="w-full">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="roles">Roller</TabsTrigger>
+          <TabsTrigger value="assignments">Tildelinger</TabsTrigger>
+        </TabsList>
+        <TabsContent value="roles">
+          <Card>
+            <CardHeader>
+              <CardTitle>Administrer Roller</CardTitle>
+              <CardDescription>Definer roller og tilknyttede tillatelser.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Rolle</TableHead>
+                    <TableHead>Tillatelser</TableHead>
+                    <TableHead className="text-right">Handlinger</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {roles.map(role => (
+                    <TableRow key={role.id}>
+                      <TableCell>{role.name}</TableCell>
+                      <TableCell>{role.permissions.join(', ')}</TableCell>
+                      <TableCell className="text-right">
+                         <Button variant="ghost" size="icon" onClick={() => { setSelectedRole(role); setIsRoleModalOpen(true); }}>
+                           <Edit className="h-4 w-4" />
+                         </Button>
+                         <Button variant="ghost" size="icon" onClick={() => setRoles(roles.filter(r => r.id !== role.id))}>
+                           <Trash className="h-4 w-4" />
+                         </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value="assignments">
+          <Card>
+            <CardHeader>
+              <CardTitle>Tildel Roller til Brukere</CardTitle>
+              <CardDescription>Knytt brukere til eksisterende roller for å gi dem tilgang.</CardDescription>
+            </CardHeader>
+            <CardContent>
+               <div className="flex items-end gap-4 mb-6">
+                <div>
+                  <Label>Bruker</Label>
+                  <Select value={selectedUser} onValueChange={setSelectedUser}>
+                    <SelectTrigger><SelectValue placeholder="Velg bruker" /></SelectTrigger>
+                    <SelectContent>
+                      {users.map(u => <SelectItem key={u.id} value={u.id}>{u.name}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label>Rolle</Label>
+                  <Select value={selectedRoleForAssignment} onValueChange={setSelectedRoleForAssignment}>
+                    <SelectTrigger><SelectValue placeholder="Velg rolle" /></SelectTrigger>
+                    <SelectContent>
+                      {roles.map(r => <SelectItem key={r.id} value={r.id}>{r.name}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <Button onClick={handleAssignRole}>
+                  <UserPlus className="mr-2 h-4 w-4" /> Tildel rolle
+                </Button>
+              </div>
 
-  const openEditDialog = (role) => {
-    setEditRole(role);
-    setRoleName(role.name);
-    setRolePermission(role.permission);
-    setDialogOpen(true);
-  };
-
-  const handleSave = () => {
-    if (editRole) {
-      setRoles(roles.map(r => r.id === editRole.id ? { ...r, name: roleName, permission: rolePermission } : r));
-      setLog([
-        { who: currentUser.name, when: new Date().toLocaleString(), what: `Endret rolle: ${editRole.name} → ${roleName}, rettighet: ${rolePermission}` },
-        ...log,
-      ]);
-    } else {
-      const newRole = { id: Date.now(), name: roleName, permission: rolePermission };
-      setRoles([ ...roles, newRole ]);
-      setLog([
-        { who: currentUser.name, when: new Date().toLocaleString(), what: `Opprettet rolle: ${roleName}, rettighet: ${rolePermission}` },
-        ...log,
-      ]);
-    }
-    setDialogOpen(false);
-  };
-
-  const handleDelete = (role) => {
-    setRoles(roles.filter(r => r.id !== role.id));
-    setLog([
-      { who: currentUser.name, when: new Date().toLocaleString(), what: `Slettet rolle: ${role.name}` },
-      ...log,
-    ]);
-  };
-
-  return (
-    <div className="space-y-8 w-full p-8" role="main" aria-labelledby="page-title">
-      <header className="mb-6">
-        <h1 className="text-3xl font-bold tracking-tight text-gray-900 mb-2">
-          Roller
-        </h1>
-        <p className="text-lg text-gray-700 leading-relaxed">
-          Administrer roller og tilgangsnivåer i systemet
-        </p>
-      </header>
-      <Card>
-        <CardHeader>
-          <CardTitle>Roller</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="mb-4 flex justify-end">
-            <Button onClick={openAddDialog}>Ny rolle</Button>
-          </div>
-          <table className="w-full border text-sm">
-            <thead>
-              <tr className="bg-gray-50">
-                <th className="p-2 text-left">Navn</th>
-                <th className="p-2 text-left">Rettighet</th>
-                <th className="p-2 text-right">Handlinger</th>
-              </tr>
-            </thead>
-            <tbody>
-              {roles.map(role => (
-                <tr key={role.id} className="border-t">
-                  <td className="p-2">{role.name}</td>
-                  <td className="p-2">{role.permission}</td>
-                  <td className="p-2 text-right space-x-2">
-                    <Button size="sm" variant="outline" onClick={() => openEditDialog(role)}>Rediger</Button>
-                    <Button size="sm" variant="destructive" onClick={() => handleDelete(role)}>Slett</Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </CardContent>
-      </Card>
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{editRole ? "Rediger rolle" : "Ny rolle"}</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <Input placeholder="Rollenavn" value={roleName} onChange={e => setRoleName(e.target.value)} />
-            <Select value={rolePermission} onValueChange={setRolePermission}>
-              <SelectTrigger>
-                <SelectValue placeholder="Velg rettighet" />
-              </SelectTrigger>
-              <SelectContent>
-                {permissionLevels.map(p => (
-                  <SelectItem key={p.value} value={p.value}>{p.label}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <DialogFooter>
-            <Button onClick={handleSave}>{editRole ? "Lagre" : "Opprett"}</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-      <Card className="mt-8">
-        <CardHeader>
-          <CardTitle>Endringslogg</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ul className="text-xs space-y-1">
-            {log.length === 0 && <li>Ingen endringer ennå.</li>}
-            {log.map((entry, i) => (
-              <li key={i}>
-                <span className="font-semibold">{entry.who}</span> – {entry.when}: {entry.what}
-              </li>
-            ))}
-          </ul>
-        </CardContent>
-      </Card>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Bruker</TableHead>
+                    <TableHead>Tildelt Rolle</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {users.map(user => (
+                    <TableRow key={user.id}>
+                      <TableCell>{user.name}</TableCell>
+                      <TableCell>{getUserRole(user.id)}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

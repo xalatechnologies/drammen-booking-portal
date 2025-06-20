@@ -7,20 +7,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Activity,
-  AlertTriangle,
-  Calendar,
-  CheckCircle2,
-  Clock,
-  Users,
-  Building,
-  Bell,
-  BarChart3,
-  Key,
-  ShieldAlert,
-  Ticket,
-} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -114,6 +100,19 @@ const Overview: React.FC = () => {
     }
   };
 
+  const translateStatus = (status: string) => {
+    switch (status) {
+      case "high":
+        return "Høy";
+      case "warning":
+        return "Advarsel";
+      case "pending":
+        return "Venter";
+      default:
+        return status;
+    }
+  };
+
   return (
     <div className="space-y-8 w-full p-8" role="main" aria-labelledby="page-title">
       <header className="mb-6">
@@ -129,15 +128,12 @@ const Overview: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
         <Card>
           <CardContent className="pt-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-500">Aktive bookinger</p>
-                <p className="text-2xl font-bold">{mockStats.activeBookings}</p>
-              </div>
-              <Calendar className="h-8 w-8 text-blue-500" />
+            <div>
+              <p className="text-sm font-medium text-gray-500">Aktive bookinger</p>
+              <p className="text-2xl font-bold">{mockStats.activeBookings}</p>
             </div>
-            <Button 
-              variant="link" 
+            <Button
+              variant="link"
               className="mt-2 p-0 h-auto text-sm"
               onClick={() => navigate("/admin/bookings-overview")}
             >
@@ -148,15 +144,12 @@ const Overview: React.FC = () => {
 
         <Card>
           <CardContent className="pt-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-500">Ventende forespørsler</p>
-                <p className="text-2xl font-bold">{mockStats.pendingRequests}</p>
-              </div>
-              <Clock className="h-8 w-8 text-yellow-500" />
+            <div>
+              <p className="text-sm font-medium text-gray-500">Ventende forespørsler</p>
+              <p className="text-2xl font-bold">{mockStats.pendingRequests}</p>
             </div>
-            <Button 
-              variant="link" 
+            <Button
+              variant="link"
               className="mt-2 p-0 h-auto text-sm"
               onClick={() => navigate("/admin/requests")}
             >
@@ -167,15 +160,12 @@ const Overview: React.FC = () => {
 
         <Card>
           <CardContent className="pt-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-500">Aktive brukere</p>
-                <p className="text-2xl font-bold">{mockStats.activeUsers}</p>
-              </div>
-              <Users className="h-8 w-8 text-green-500" />
+            <div>
+              <p className="text-sm font-medium text-gray-500">Aktive brukere</p>
+              <p className="text-2xl font-bold">{mockStats.activeUsers}</p>
             </div>
-            <Button 
-              variant="link" 
+            <Button
+              variant="link"
               className="mt-2 p-0 h-auto text-sm"
               onClick={() => navigate("/admin/users")}
             >
@@ -186,15 +176,12 @@ const Overview: React.FC = () => {
 
         <Card>
           <CardContent className="pt-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-500">Aktive lokaler</p>
-                <p className="text-2xl font-bold">{mockStats.activeFacilities}</p>
-              </div>
-              <Building className="h-8 w-8 text-purple-500" />
+            <div>
+              <p className="text-sm font-medium text-gray-500">Aktive lokaler</p>
+              <p className="text-2xl font-bold">{mockStats.activeFacilities}</p>
             </div>
-            <Button 
-              variant="link" 
+            <Button
+              variant="link"
               className="mt-2 p-0 h-auto text-sm"
               onClick={() => navigate("/admin/facilities")}
             >
@@ -205,15 +192,12 @@ const Overview: React.FC = () => {
 
         <Card>
           <CardContent className="pt-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-500">Planlagt vedlikehold</p>
-                <p className="text-2xl font-bold">{mockStats.upcomingMaintenance}</p>
-              </div>
-              <Activity className="h-8 w-8 text-orange-500" />
+            <div>
+              <p className="text-sm font-medium text-gray-500">Planlagt vedlikehold</p>
+              <p className="text-2xl font-bold">{mockStats.upcomingMaintenance}</p>
             </div>
-            <Button 
-              variant="link" 
+            <Button
+              variant="link"
               className="mt-2 p-0 h-auto text-sm"
               onClick={() => navigate("/admin/facilities")}
             >
@@ -224,15 +208,12 @@ const Overview: React.FC = () => {
 
         <Card>
           <CardContent className="pt-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-500">Åpne support-saker</p>
-                <p className="text-2xl font-bold">{mockStats.openSupportTickets}</p>
-              </div>
-              <Ticket className="h-8 w-8 text-red-500" />
+            <div>
+              <p className="text-sm font-medium text-gray-500">Åpne support-saker</p>
+              <p className="text-2xl font-bold">{mockStats.openSupportTickets}</p>
             </div>
-            <Button 
-              variant="link" 
+            <Button
+              variant="link"
               className="mt-2 p-0 h-auto text-sm"
               onClick={() => navigate("/admin/support-tickets")}
             >
@@ -269,7 +250,7 @@ const Overview: React.FC = () => {
                     <TableCell>{activity.time}</TableCell>
                     <TableCell>
                       <span className={getStatusColor(activity.status)}>
-                        ● {activity.status}
+                        ● {translateStatus(activity.status)}
                       </span>
                     </TableCell>
                   </TableRow>
@@ -284,10 +265,7 @@ const Overview: React.FC = () => {
           {/* Alerts */}
           <Card className="border-red-100">
             <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle>Systemvarsler</CardTitle>
-                <AlertTriangle className="h-5 w-5 text-red-500" />
-              </div>
+              <CardTitle>Systemvarsler</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -296,11 +274,6 @@ const Overview: React.FC = () => {
                     key={alert.id}
                     className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg"
                   >
-                    {alert.type === "error" ? (
-                      <ShieldAlert className="h-5 w-5 text-red-500 mt-0.5" />
-                    ) : (
-                      <AlertTriangle className="h-5 w-5 text-yellow-500 mt-0.5" />
-                    )}
                     <div>
                       <p className="font-medium">{alert.message}</p>
                       <p className="text-sm text-gray-500">{alert.time}</p>
@@ -316,7 +289,6 @@ const Overview: React.FC = () => {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle>Planlagt vedlikehold</CardTitle>
-                <Activity className="h-5 w-5 text-blue-500" />
               </div>
             </CardHeader>
             <CardContent>
@@ -326,7 +298,6 @@ const Overview: React.FC = () => {
                     key={maintenance.id}
                     className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg"
                   >
-                    <Clock className="h-5 w-5 text-blue-500 mt-0.5" />
                     <div>
                       <p className="font-medium">{maintenance.facility}</p>
                       <p className="text-sm text-gray-600">{maintenance.type}</p>
@@ -352,37 +323,33 @@ const Overview: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <Button
               variant="outline"
-              className="h-auto py-4 flex flex-col items-center gap-2"
+              className="h-auto py-4 flex flex-col items-center justify-center"
               onClick={() => navigate("/admin/facilities")}
             >
-              <Building className="h-6 w-6" />
               <span>Opprett nytt lokale</span>
             </Button>
             
             <Button
               variant="outline"
-              className="h-auto py-4 flex flex-col items-center gap-2"
+              className="h-auto py-4 flex flex-col items-center justify-center"
               onClick={() => navigate("/admin/support-tickets")}
             >
-              <Ticket className="h-6 w-6" />
               <span>Opprett support-sak</span>
             </Button>
             
             <Button
               variant="outline"
-              className="h-auto py-4 flex flex-col items-center gap-2"
+              className="h-auto py-4 flex flex-col items-center justify-center"
               onClick={() => navigate("/admin/notifications")}
             >
-              <Bell className="h-6 w-6" />
               <span>Send melding</span>
             </Button>
             
             <Button
               variant="outline"
-              className="h-auto py-4 flex flex-col items-center gap-2"
+              className="h-auto py-4 flex flex-col items-center justify-center"
               onClick={() => navigate("/admin/reports")}
             >
-              <BarChart3 className="h-6 w-6" />
               <span>Generer rapport</span>
             </Button>
           </div>
