@@ -1,8 +1,11 @@
+
 import React, { useState, useRef, useEffect } from "react";
 import { Search, MapPin, Building, Clock, Users } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { facilityRepository } from "@/dal/FacilityRepository";
+import { Facility } from "@/types/facility";
 
 interface SearchResult {
   id: string;
@@ -22,6 +25,7 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ onResultClick }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [results, setResults] = useState<SearchResult[]>([]);
+  const [facilities, setFacilities] = useState<Facility[]>([]);
   const searchRef = useRef<HTMLDivElement>(null);
   const { language } = useLanguage();
 
@@ -46,65 +50,90 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ onResultClick }) => {
 
   const t = translations[language];
 
-  // Mock data with images - in real app this would come from an API
-  const mockResults: SearchResult[] = [
-    {
-      id: "1",
-      type: "facility",
-      title: "Drammen Idrettshall",
-      subtitle: "Bragernes - Kapasitet: 200",
-      icon: <Building className="h-5 w-5" />,
-      url: "/facilities/1",
-      image: "/lovable-uploads/13aee1f6-e9d9-474b-9ed7-c656d703d19b.png"
-    },
-    {
-      id: "2", 
-      type: "facility",
-      title: "Konnerud Gymsal",
-      subtitle: "Konnerud - Kapasitet: 50",
-      icon: <Building className="h-5 w-5" />,
-      url: "/facilities/2",
-      image: "/lovable-uploads/97431924-b9fd-4ccd-b558-a9e90506c716.png"
-    },
-    {
-      id: "3",
-      type: "location",
-      title: "Drammen Sentrum",
-      subtitle: "15 lokaler tilgjengelig",
-      icon: <MapPin className="h-5 w-5" />,
-      url: "/?location=drammen-sentrum",
-      image: "/lovable-uploads/740258a0-d4f7-49b6-a8a6-9c994e75baae.png"
-    },
-    {
-      id: "4",
-      type: "category",
-      title: "Møterom",
-      subtitle: "12 lokaler tilgjengelig",
-      icon: <Users className="h-5 w-5" />,
-      url: "/?type=meeting-room",
-      image: "/lovable-uploads/bda6906f-cc9a-4d78-9e9e-84c342947fae.png"
-    },
-    {
-      id: "5",
-      type: "recent",
-      title: "Idrettshall Strømsø",
-      subtitle: "Søkt i går",
-      icon: <Clock className="h-5 w-5" />,
-      url: "/facilities/5",
-      image: "/lovable-uploads/a72ba2e2-f0a3-4561-bff6-17fa721a0c02.png"
-    }
-  ];
+  // Load facilities on component mount
+  useEffect(() => {
+    const loadFacilities = async () => {
+      console.log("GlobalSearch - Loading facilities...");
+      const result = await facilityRepository.findAll({ page: 1, limit: 100 });
+      if (result.success && result.data?.data) {
+        console.log("GlobalSearch - Loaded facilities:", result.data.data.length);
+        setFacilities(result.data.data);
+      }
+    };
+    loadFacilities();
+  }, []);
+
+  // Create search results from facilities and other data
+  const createSearchResults = (searchTerm: string): SearchResult[] => {
+    const searchLower = searchTerm.toLowerCase();
+    console.log("GlobalSearch - Searching for:", searchLower);
+    
+    const facilityResults: SearchResult[] = facilities
+      .filter(facility => {
+        const matchesName = facility.name.toLowerCase().includes(searchLower);
+        const matchesDescription = facility.description.toLowerCase().includes(searchLower);
+        const matchesType = facility.type.toLowerCase().includes(searchLower);
+        const matchesArea = facility.area.toLowerCase().includes(searchLower);
+        const matchesActivity = facility.suitableFor.some(activity => 
+          activity.toLowerCase().includes(searchLower)
+        );
+        
+        const matches = matchesName || matchesDescription || matchesType || matchesArea || matchesActivity;
+        
+        if (matches) {
+          console.log(`GlobalSearch - Found match: ${facility.name}`);
+        }
+        
+        return matches;
+      })
+      .slice(0, 6) // Limit facility results
+      .map(facility => ({
+        id: facility.id.toString(),
+        type: 'facility' as const,
+        title: facility.name,
+        subtitle: `${facility.area} - Kapasitet: ${facility.capacity}`,
+        icon: <Building className="h-5 w-5" />,
+        url: `/facilities/${facility.id}`,
+        image: facility.image
+      }));
+
+    // Add location results (unique areas from facilities)
+    const uniqueAreas = Array.from(new Set(facilities.map(f => f.area)))
+      .filter(area => area.toLowerCase().includes(searchLower))
+      .slice(0, 3)
+      .map(area => ({
+        id: `location-${area}`,
+        type: 'location' as const,
+        title: area,
+        subtitle: `${facilities.filter(f => f.area === area).length} lokaler tilgjengelig`,
+        icon: <MapPin className="h-5 w-5" />,
+        url: `/?location=${encodeURIComponent(area.toLowerCase().replace(' ', '-'))}`,
+      }));
+
+    // Add category results (unique types from facilities)
+    const uniqueTypes = Array.from(new Set(facilities.map(f => f.type)))
+      .filter(type => type.toLowerCase().includes(searchLower))
+      .slice(0, 3)
+      .map(type => ({
+        id: `category-${type}`,
+        type: 'category' as const,
+        title: type,
+        subtitle: `${facilities.filter(f => f.type === type).length} lokaler tilgjengelig`,
+        icon: <Users className="h-5 w-5" />,
+        url: `/?facilityType=${encodeURIComponent(type.toLowerCase().replace(' ', '-'))}`,
+      }));
+
+    console.log("GlobalSearch - Total results:", facilityResults.length + uniqueAreas.length + uniqueTypes.length);
+    
+    return [...facilityResults, ...uniqueAreas, ...uniqueTypes];
+  };
 
   useEffect(() => {
     if (searchTerm.length > 0) {
-      // Smart search logic - filter and rank results
-      const filtered = mockResults.filter(result => 
-        result.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        result.subtitle?.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+      const searchResults = createSearchResults(searchTerm);
       
       // Sort by relevance (exact matches first, then partial matches)
-      const sorted = filtered.sort((a, b) => {
+      const sorted = searchResults.sort((a, b) => {
         const aExact = a.title.toLowerCase().startsWith(searchTerm.toLowerCase());
         const bExact = b.title.toLowerCase().startsWith(searchTerm.toLowerCase());
         
@@ -121,12 +150,11 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ onResultClick }) => {
       setResults(sorted.slice(0, 8)); // Limit to 8 results
       setIsOpen(true);
     } else {
-      // Show recent searches when no search term
-      const recentResults = mockResults.filter(r => r.type === 'recent');
-      setResults(recentResults);
+      // Show empty results when no search term
+      setResults([]);
       setIsOpen(searchTerm.length === 0 && document.activeElement === searchRef.current?.querySelector('input'));
     }
-  }, [searchTerm]);
+  }, [searchTerm, facilities]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -140,6 +168,7 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ onResultClick }) => {
   }, []);
 
   const handleResultClick = (result: SearchResult) => {
+    console.log("GlobalSearch - Result clicked:", result.title);
     setSearchTerm("");
     setIsOpen(false);
     onResultClick?.(result);
@@ -175,7 +204,7 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ onResultClick }) => {
             <CommandList>
               {results.length === 0 ? (
                 <CommandEmpty className="py-8 text-center text-base text-gray-500">
-                  {t.noResults}
+                  {searchTerm.length > 0 ? t.noResults : "Skriv for å søke..."}
                 </CommandEmpty>
               ) : (
                 <>

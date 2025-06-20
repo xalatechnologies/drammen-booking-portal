@@ -71,16 +71,27 @@ export class FacilityRepository extends BaseRepository<Facility, FacilityFilters
       // Search term filter
       if (filters.searchTerm && filters.searchTerm.trim() !== "") {
         const searchLower = filters.searchTerm.toLowerCase();
-        const matchesSearch = 
-          facility.name.toLowerCase().includes(searchLower) ||
-          facility.description.toLowerCase().includes(searchLower) ||
-          facility.type.toLowerCase().includes(searchLower) ||
-          facility.area.toLowerCase().includes(searchLower) ||
-          facility.suitableFor.some(activity => 
-            activity.toLowerCase().includes(searchLower)
-          );
+        console.log(`FacilityRepository.applyFilters - Searching for: "${searchLower}"`);
         
-        console.log(`FacilityRepository.applyFilters - Search "${searchLower}" on ${facility.name}: ${matchesSearch}`);
+        const matchesName = facility.name.toLowerCase().includes(searchLower);
+        const matchesDescription = facility.description.toLowerCase().includes(searchLower);
+        const matchesType = facility.type.toLowerCase().includes(searchLower);
+        const matchesArea = facility.area.toLowerCase().includes(searchLower);
+        const matchesActivity = facility.suitableFor.some(activity => 
+          activity.toLowerCase().includes(searchLower)
+        );
+        
+        const matchesSearch = matchesName || matchesDescription || matchesType || matchesArea || matchesActivity;
+        
+        console.log(`FacilityRepository.applyFilters - Facility "${facility.name}":`, {
+          matchesName,
+          matchesDescription,
+          matchesType,
+          matchesArea,
+          matchesActivity,
+          overall: matchesSearch
+        });
+        
         if (!matchesSearch) return false;
       }
 
