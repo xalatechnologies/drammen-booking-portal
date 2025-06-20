@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { ArrowLeft, User, LogIn } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -136,39 +135,53 @@ export function BookingPricingStep({
   };
 
   const handleComplete = () => {
+    console.log('BookingPricingStep: handleComplete called, isAuthenticated:', isAuthenticated);
+    
     if (!isAuthenticated) {
+      console.log('BookingPricingStep: User not authenticated, showing login modal');
       setShowLoginModal(true);
       return;
     }
 
+    console.log('BookingPricingStep: User authenticated, proceeding with booking completion');
     // User is logged in, proceed with booking completion
     onComplete();
   };
 
   const handleLoginMethodSelect = (method: 'id-porten' | 'feide' | 'municipal') => {
+    console.log('BookingPricingStep: Login method selected:', method);
     setShowLoginModal(false);
     
     // Store current booking state for post-login redirect
-    sessionStorage.setItem('pending_booking', JSON.stringify({
+    const bookingState = {
       selectedSlots,
       facilityId,
       facilityName,
       actorType: convertActorType(actorType),
       bookingType
-    }));
+    };
     
-    // Navigate to appropriate login method
-    switch (method) {
-      case 'id-porten':
-        navigate('/login/id-porten');
-        break;
-      case 'feide':
-        navigate('/login/feide');
-        break;
-      case 'municipal':
-        navigate('/login/municipal');
-        break;
-    }
+    console.log('BookingPricingStep: Storing booking state:', bookingState);
+    sessionStorage.setItem('pending_booking', JSON.stringify(bookingState));
+    
+    // For now, simulate login by showing a toast and then completing the booking
+    // In a real app, this would redirect to the actual login provider
+    toast({
+      title: "Simulert innlogging",
+      description: `Simulerer innlogging med ${method}. I en ekte app ville dette redirecte til innloggingsleverandøren.`,
+    });
+
+    // Simulate successful login after a short delay
+    setTimeout(() => {
+      // In a real app, this would be handled by the login callback
+      toast({
+        title: "Innlogging vellykket",
+        description: "Du kan nå fullføre bookingen.",
+      });
+      
+      // Complete the booking after simulated login
+      onComplete();
+    }, 1500);
   };
 
   return (

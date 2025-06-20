@@ -11,6 +11,13 @@ interface LoginSelectionModalProps {
 }
 
 export function LoginSelectionModal({ isOpen, onClose, onLoginMethodSelect }: LoginSelectionModalProps) {
+  console.log('LoginSelectionModal: isOpen:', isOpen);
+
+  const handleMethodSelect = (method: 'id-porten' | 'feide' | 'municipal') => {
+    console.log('LoginSelectionModal: Method selected:', method);
+    onLoginMethodSelect(method);
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl p-8">
@@ -45,7 +52,7 @@ export function LoginSelectionModal({ isOpen, onClose, onLoginMethodSelect }: Lo
                   For privatpersoner, lag og foreninger som skal søke om lån eller booke lokaler.
                 </p>
                 <Button 
-                  onClick={() => onLoginMethodSelect('id-porten')}
+                  onClick={() => handleMethodSelect('id-porten')}
                   className="bg-red-500 hover:bg-red-600 text-white"
                 >
                   Logg inn via ID-porten
@@ -68,7 +75,7 @@ export function LoginSelectionModal({ isOpen, onClose, onLoginMethodSelect }: Lo
                   For ansatte i skole eller barnehage med Feide-bruker
                 </p>
                 <Button 
-                  onClick={() => onLoginMethodSelect('feide')}
+                  onClick={() => handleMethodSelect('feide')}
                   className="bg-blue-700 hover:bg-blue-800 text-white"
                 >
                   Logg inn med Feide
@@ -91,7 +98,7 @@ export function LoginSelectionModal({ isOpen, onClose, onLoginMethodSelect }: Lo
                   For saksbehandlere og ansatte i kommunen
                 </p>
                 <Button 
-                  onClick={() => onLoginMethodSelect('municipal')}
+                  onClick={() => handleMethodSelect('municipal')}
                   className="bg-blue-600 hover:bg-blue-700 text-white"
                 >
                   Logg inn med kommunebruker
