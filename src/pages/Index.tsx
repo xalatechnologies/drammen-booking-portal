@@ -8,7 +8,6 @@ import MapView from "@/components/MapView";
 import CalendarView from "@/components/CalendarView";
 import { useFacilitiesPagination } from "@/hooks/useFacilities";
 import { FacilityFilters } from "@/types/facility";
-
 const Index = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [date, setDate] = useState<Date>();
@@ -18,7 +17,7 @@ const Index = () => {
   const [accessibility, setAccessibility] = useState<string>("all");
   const [capacity, setCapacity] = useState<number[]>([0, 200]);
   const [searchTerm, setSearchTerm] = useState<string>("");
-  
+
   // Advanced filter states
   const [priceRange, setPriceRange] = useState<number[]>([0, 5000]);
   const [availableNow, setAvailableNow] = useState<boolean>(false);
@@ -35,7 +34,6 @@ const Index = () => {
     const urlCapacity = searchParams.get('capacity');
     const urlViewMode = searchParams.get('viewMode');
     const urlSearchTerm = searchParams.get('searchTerm');
-    
     if (urlFacilityType) setFacilityType(urlFacilityType);
     if (urlLocation) setLocation(urlLocation);
     if (urlAccessibility) setAccessibility(urlAccessibility);
@@ -55,75 +53,58 @@ const Index = () => {
   }, [searchParams, setSearchParams]);
 
   // Create amenities array from individual boolean states
-  const amenities = [
-    ...(hasEquipment ? ['av-equipment'] : []),
-    ...(hasParking ? ['parking'] : []),
-    ...(hasWifi ? ['wifi'] : []),
-    ...(allowsPhotography ? ['photography'] : [])
-  ];
+  const amenities = [...(hasEquipment ? ['av-equipment'] : []), ...(hasParking ? ['parking'] : []), ...(hasWifi ? ['wifi'] : []), ...(allowsPhotography ? ['photography'] : [])];
 
   // Create filters object with proper handling
   const filters: FacilityFilters = {
-    ...(searchTerm && searchTerm.trim() !== "" ? { searchTerm: searchTerm.trim() } : {}),
-    ...(facilityType && facilityType !== "all" ? { facilityType } : {}),
-    ...(location && location !== "all" ? { location } : {}),
-    ...(accessibility && accessibility !== "all" ? { accessibility } : {}),
-    ...(capacity && (capacity[0] > 0 || capacity[1] < 200) ? { capacity } : {}),
-    ...(date ? { date } : {}),
-    ...(priceRange && (priceRange[0] > 0 || priceRange[1] < 5000) ? { priceRange: { min: priceRange[0], max: priceRange[1] } } : {}),
-    ...(availableNow ? { availableNow } : {}),
-    ...(amenities.length > 0 ? { amenities } : {}),
+    ...(searchTerm && searchTerm.trim() !== "" ? {
+      searchTerm: searchTerm.trim()
+    } : {}),
+    ...(facilityType && facilityType !== "all" ? {
+      facilityType
+    } : {}),
+    ...(location && location !== "all" ? {
+      location
+    } : {}),
+    ...(accessibility && accessibility !== "all" ? {
+      accessibility
+    } : {}),
+    ...(capacity && (capacity[0] > 0 || capacity[1] < 200) ? {
+      capacity
+    } : {}),
+    ...(date ? {
+      date
+    } : {}),
+    ...(priceRange && (priceRange[0] > 0 || priceRange[1] < 5000) ? {
+      priceRange: {
+        min: priceRange[0],
+        max: priceRange[1]
+      }
+    } : {}),
+    ...(availableNow ? {
+      availableNow
+    } : {}),
+    ...(amenities.length > 0 ? {
+      amenities
+    } : {})
   };
-
   console.log("Index.tsx - Created filters:", filters);
-
   const renderContent = () => {
     switch (viewMode) {
       case "map":
-        return (
-          <MapView 
-            facilityType={facilityType} 
-            location={location}
-          />
-        );
+        return <MapView facilityType={facilityType} location={location} />;
       case "calendar":
-        return (
-          <CalendarView 
-            date={date}
-            facilityType={facilityType}
-            location={location}
-            accessibility={accessibility}
-            capacity={capacity}
-          />
-        );
+        return <CalendarView date={date} facilityType={facilityType} location={location} accessibility={accessibility} capacity={capacity} />;
       case "list":
       case "grid":
-        return (
-          <FacilityList 
-            filters={filters}
-            viewMode={viewMode}
-            setViewMode={setViewMode}
-          />
-        );
+        return <FacilityList filters={filters} viewMode={viewMode} setViewMode={setViewMode} />;
       default:
-        return (
-          <FacilityList 
-            filters={filters}
-            viewMode="grid"
-            setViewMode={setViewMode}
-          />
-        );
+        return <FacilityList filters={filters} viewMode="grid" setViewMode={setViewMode} />;
     }
   };
-
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex flex-col w-full">
+  return <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex flex-col w-full">
       {/* Skip to main content link for screen readers */}
-      <a 
-        href="#main-content" 
-        className="sr-only focus:not-sr-only focus:absolute focus:top-0 focus:left-0 bg-blue-600 text-white p-2 z-50 rounded-br-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
-        tabIndex={0}
-      >
+      <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-0 focus:left-0 bg-blue-600 text-white p-2 z-50 rounded-br-md focus:outline-none focus:ring-2 focus:ring-blue-500" tabIndex={0}>
         Hopp til hovedinnhold
       </a>
 
@@ -136,35 +117,8 @@ const Index = () => {
       <main id="main-content" className="flex-1 w-full pt-20">
         {/* Fixed Search Filter with more top spacing */}
         <div className="fixed top-28 left-0 right-0 z-40 bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-sm">
-          <div className="content-center py-8">
-            <SearchFilter
-              date={date}
-              setDate={setDate}
-              facilityType={facilityType}
-              setFacilityType={setFacilityType}
-              location={location}
-              setLocation={setLocation}
-              viewMode={viewMode}
-              setViewMode={setViewMode}
-              accessibility={accessibility}
-              setAccessibility={setAccessibility}
-              capacity={capacity}
-              setCapacity={setCapacity}
-              searchTerm={searchTerm}
-              setSearchTerm={setSearchTerm}
-              priceRange={priceRange}
-              setPriceRange={setPriceRange}
-              availableNow={availableNow}
-              setAvailableNow={setAvailableNow}
-              hasEquipment={hasEquipment}
-              setHasEquipment={setHasEquipment}
-              hasParking={hasParking}
-              setHasParking={setHasParking}
-              hasWifi={hasWifi}
-              setHasWifi={setHasWifi}
-              allowsPhotography={allowsPhotography}
-              setAllowsPhotography={setAllowsPhotography}
-            />
+          <div className="content-center py-0">
+            <SearchFilter date={date} setDate={setDate} facilityType={facilityType} setFacilityType={setFacilityType} location={location} setLocation={setLocation} viewMode={viewMode} setViewMode={setViewMode} accessibility={accessibility} setAccessibility={setAccessibility} capacity={capacity} setCapacity={setCapacity} searchTerm={searchTerm} setSearchTerm={setSearchTerm} priceRange={priceRange} setPriceRange={setPriceRange} availableNow={availableNow} setAvailableNow={setAvailableNow} hasEquipment={hasEquipment} setHasEquipment={setHasEquipment} hasParking={hasParking} setHasParking={setHasParking} hasWifi={hasWifi} setHasWifi={setHasWifi} allowsPhotography={allowsPhotography} setAllowsPhotography={setAllowsPhotography} />
           </div>
         </div>
 
@@ -173,8 +127,6 @@ const Index = () => {
           {renderContent()}
         </div>
       </main>
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
