@@ -5,6 +5,11 @@ import { ServiceBookingRepository } from './ServiceBookingRepository';
 import { FacilityRepository, facilityRepository } from './FacilityRepository';
 import { ZoneRepository, zoneRepository } from './ZoneRepository';
 
+// Create singleton instances for other repositories
+const bookingRepository = new BookingRepository();
+const additionalServiceRepository = new AdditionalServiceRepository();
+const serviceBookingRepository = new ServiceBookingRepository();
+
 // Export singleton instances
 export { 
   facilityRepository,
@@ -22,8 +27,3 @@ export {
   AdditionalServiceRepository,
   ServiceBookingRepository
 };
-
-// Create singleton instances for other repositories
-export const bookingRepository = new BookingRepository();
-export const additionalServiceRepository = new AdditionalServiceRepository();
-export const serviceBookingRepository = new ServiceBookingRepository();
