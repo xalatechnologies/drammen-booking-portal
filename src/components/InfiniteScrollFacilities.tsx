@@ -76,12 +76,14 @@ export function InfiniteScrollFacilities({
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
   const fetchMoreData = useCallback(() => {
     if (!isLoading && hasMore) {
       console.log('Loading next page:', page + 1);
       setPage(prev => prev + 1);
     }
   }, [isLoading, hasMore, page]);
+
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
@@ -104,12 +106,14 @@ export function InfiniteScrollFacilities({
     searchParams.set('focusFacility', facility.id.toString());
     navigate(`/?${searchParams.toString()}`);
   };
+
   if (error) {
     return <div className="text-center py-10 bg-red-50 rounded-lg border border-red-200 mx-4">
         <h3 className="text-xl font-medium text-red-800 mb-2">Feil ved lasting</h3>
         <p className="text-red-600">Kunne ikke laste lokaler. Prøv igjen senere.</p>
       </div>;
   }
+
   if (page === 1 && isLoading) {
     return <div className="flex items-center justify-center py-20">
         <div className="text-center space-y-4">
@@ -118,28 +122,37 @@ export function InfiniteScrollFacilities({
         </div>
       </div>;
   }
+
   if (allFacilities.length === 0 && !isLoading) {
     return <div className="text-center py-10 bg-gray-50 rounded-lg mx-4">
         <h3 className="text-xl font-medium mb-2">Ingen lokaler funnet</h3>
         <p className="text-gray-500">Prøv å endre søkekriteriene dine</p>
       </div>;
   }
-  const LoadingSpinner = () => <div className="flex items-center justify-center py-8">
+
+  const LoadingSpinner = () => (
+    <div className="flex items-center justify-center py-8">
       <div className="flex items-center gap-3 bg-white rounded-full px-6 py-3 shadow-lg border">
         <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
         <span className="text-gray-700 font-medium">Laster flere lokaler...</span>
       </div>
-    </div>;
-  const EndMessage = () => <div className="text-center py-8">
+    </div>
+  );
+
+  const EndMessage = () => (
+    <div className="text-center py-8">
       <div className="inline-flex items-center gap-2 bg-gray-100 rounded-full px-6 py-3">
         <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
         <span className="text-gray-600 font-medium">Du har sett alle tilgjengelige lokaler</span>
         <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
       </div>
-    </div>;
-  return <div className="relative max-w-7xl mx-auto px-4 my-[12px]">
+    </div>
+  );
+
+  return (
+    <div className="relative max-w-7xl mx-auto px-4 my-[12px]">
       {/* Enhanced Results summary with view toggle aligned */}
-      <div className="mb-12 flex flex-col md:flex-row gap-6 md:gap-0 items-start md:items-end justify-between">
+      <div className="mb-8 flex flex-col md:flex-row gap-6 md:gap-0 items-start md:items-end justify-between">
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-3">
             <span className="text-4xl font-bold text-gray-900">
@@ -173,15 +186,15 @@ export function InfiniteScrollFacilities({
       >
         {/* Facilities content */}
         {viewMode === "grid" ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-10 w-full mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 w-full mb-8">
             {allFacilities.map((facility, index) => (
-              <div key={`${facility.id}-${index}`} className="w-full">
+              <div key={`${facility.id}-${index}`} className="w-full h-full">
                 <FacilityCard facility={facility} onAddressClick={handleAddressClick} />
               </div>
             ))}
           </div>
         ) : (
-          <div className="space-y-8 w-full mb-8">
+          <div className="space-y-6 w-full mb-8">
             {allFacilities.map((facility, index) => (
               <div key={`${facility.id}-${index}`} className="w-full">
                 <FacilityListItem 
@@ -207,5 +220,6 @@ export function InfiniteScrollFacilities({
           <ArrowUp className="h-6 w-6" />
         </Button>
       )}
-    </div>;
+    </div>
+  );
 }

@@ -60,7 +60,7 @@ export function FacilityCard({ facility, onAddressClick }: FacilityCardProps) {
 
   return (
     <Card 
-      className="group overflow-hidden hover:shadow-2xl transition-all duration-500 hover:translate-y-[-8px] border-0 shadow-lg bg-white relative cursor-pointer focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-opacity-50"
+      className="group overflow-hidden hover:shadow-2xl transition-all duration-500 hover:translate-y-[-8px] border-0 shadow-lg bg-white relative cursor-pointer focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-opacity-50 h-full flex flex-col"
       onClick={() => navigate(`/facilities/${facility.id}`)}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -81,10 +81,12 @@ export function FacilityCard({ facility, onAddressClick }: FacilityCardProps) {
         onShare={handleShare}
       />
       
-      <FacilityCardContent
-        facility={facility}
-        onAddressClick={onAddressClick}
-      />
+      <div className="flex-1 flex flex-col">
+        <FacilityCardContent
+          facility={facility}
+          onAddressClick={onAddressClick}
+        />
+      </div>
 
       {/* Hover Effect Border */}
       <div className={`absolute inset-0 rounded-xl border-2 border-blue-400 transition-opacity duration-300 pointer-events-none ${isHovered ? 'opacity-100' : 'opacity-0'}`} />
