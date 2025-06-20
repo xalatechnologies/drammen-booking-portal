@@ -18,40 +18,52 @@ export function useGlobalSearch() {
     console.log('useGlobalSearch - Handling search result:', result);
     
     // Save to recent searches in localStorage
-    const recentSearches = JSON.parse(localStorage.getItem('recentSearches') || '[]');
-    const newSearch = {
-      id: result.id,
-      title: result.title,
-      type: result.type,
-      timestamp: Date.now()
-    };
-    
-    // Remove duplicate and add to beginning
-    const filtered = recentSearches.filter((search: any) => search.id !== result.id);
-    const updated = [newSearch, ...filtered].slice(0, 10); // Keep only 10 recent searches
-    localStorage.setItem('recentSearches', JSON.stringify(updated));
+    try {
+      const recentSearches = JSON.parse(localStorage.getItem('recentSearches') || '[]');
+      const newSearch = {
+        id: result.id,
+        title: result.title,
+        type: result.type,
+        timestamp: Date.now()
+      };
+      
+      // Remove duplicate and add to beginning
+      const filtered = recentSearches.filter((search: any) => search.id !== result.id);
+      const updated = [newSearch, ...filtered].slice(0, 10); // Keep only 10 recent searches
+      localStorage.setItem('recentSearches', JSON.stringify(updated));
+    } catch (error) {
+      console.error('Failed to save recent search:', error);
+    }
 
     // Navigate based on result type
     if (result.searchParams) {
       // For search results with parameters, navigate to home page with search params
       const searchParams = new URLSearchParams(result.searchParams);
-      navigate(`${result.url}?${searchParams.toString()}`);
+      const url = `${result.url}?${searchParams.toString()}`;
+      console.log('useGlobalSearch - Navigating to:', url);
+      navigate(url);
     } else {
       // For direct navigation (facilities)
+      console.log('useGlobalSearch - Navigating to:', result.url);
       navigate(result.url);
     }
   }, [navigate]);
 
   const getRecentSearches = useCallback((): GlobalSearchResult[] => {
-    const recentSearches = JSON.parse(localStorage.getItem('recentSearches') || '[]');
-    return recentSearches.map((search: any) => ({
-      id: search.id,
-      type: 'recent' as const,
-      title: search.title,
-      subtitle: `Søkt ${new Date(search.timestamp).toLocaleDateString()}`,
-      url: search.type === 'facility' ? `/facilities/${search.id}` : '/',
-      searchParams: search.type !== 'facility' ? { [search.type]: search.title } : undefined
-    }));
+    try {
+      const recentSearches = JSON.parse(localStorage.getItem('recentSearches') || '[]');
+      return recentSearches.map((search: any) => ({
+        id: search.id,
+        type: 'recent' as const,
+        title: search.title,
+        subtitle: `Søkt ${new Date(search.timestamp).toLocaleDateString()}`,
+        url: search.type === 'facility' ? `/facilities/${search.id}` : '/',
+        searchParams: search.type !== 'facility' ? { [search.type]: search.title } : undefined
+      }));
+    } catch (error) {
+      console.error('Failed to load recent searches:', error);
+      return [];
+    }
   }, []);
 
   return {
