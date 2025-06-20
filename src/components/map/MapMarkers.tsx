@@ -47,7 +47,7 @@ export const MapMarkers: React.FC<MapMarkersProps> = ({ map, facilities }) => {
       // Get color for this facility (cycle through colors if more facilities than colors)
       const markerColor = markerColors[index % markerColors.length];
       
-      // Create custom marker element
+      // Create simple marker element
       const markerEl = document.createElement('div');
       markerEl.className = 'facility-marker';
       markerEl.style.cssText = `
@@ -61,16 +61,7 @@ export const MapMarkers: React.FC<MapMarkersProps> = ({ map, facilities }) => {
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: transform 0.2s ease;
       `;
-      
-      // Add hover effect
-      markerEl.addEventListener('mouseenter', () => {
-        markerEl.style.transform = 'scale(1.1)';
-      });
-      markerEl.addEventListener('mouseleave', () => {
-        markerEl.style.transform = 'scale(1)';
-      });
       
       // Add icon to marker
       const icon = document.createElement('div');
@@ -78,53 +69,34 @@ export const MapMarkers: React.FC<MapMarkersProps> = ({ map, facilities }) => {
       icon.style.fontSize = '14px';
       markerEl.appendChild(icon);
 
-      // Create enhanced popup with facility card
+      // Create simple popup with facility info
       const popupHTML = `
         <div class="facility-popup-card" style="
           width: 280px;
           padding: 0;
           margin: 0;
-          border-radius: 12px;
+          border-radius: 8px;
           overflow: hidden;
-          box-shadow: 0 4px 20px rgba(0,0,0,0.15);
           cursor: pointer;
-          transition: transform 0.2s ease;
         " onclick="window.location.href='/facilities/${facility.id}'">
           <div style="
             width: 100%;
-            height: 160px;
+            height: 120px;
             background-image: url('${facility.image || 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&auto=format&fit=crop'}');
             background-size: cover;
             background-position: center;
-            position: relative;
-          ">
-            <div style="
-              position: absolute;
-              top: 8px;
-              right: 8px;
-              background: rgba(255,255,255,0.9);
-              padding: 4px 8px;
-              border-radius: 6px;
-              font-size: 12px;
-              font-weight: 600;
-              color: #374151;
-            ">
-              ${facility.capacity || 30} plasser
-            </div>
-          </div>
-          <div style="padding: 16px;">
+          "></div>
+          <div style="padding: 12px;">
             <h3 style="
               margin: 0 0 8px 0;
-              font-weight: 700;
+              font-weight: 600;
               font-size: 16px;
               color: #111827;
-              line-height: 1.3;
             ">${facility.name}</h3>
             <p style="
-              margin: 0 0 12px 0;
+              margin: 0 0 8px 0;
               font-size: 14px;
               color: #6b7280;
-              line-height: 1.4;
             ">${facility.address}</p>
             <div style="
               display: flex;
@@ -136,34 +108,18 @@ export const MapMarkers: React.FC<MapMarkersProps> = ({ map, facilities }) => {
                 background: #f3f4f6;
                 color: #374151;
                 padding: 4px 8px;
-                border-radius: 6px;
-                font-weight: 500;
-              ">${facility.type || 'Møterom'}</span>
-              <span style="
-                color: #059669;
-                font-weight: 600;
-              ">${facility.nextAvailable || 'Ledig nå'}</span>
-            </div>
-            <div style="
-              margin-top: 12px;
-              padding-top: 12px;
-              border-top: 1px solid #e5e7eb;
-              text-align: center;
-              color: #3b82f6;
-              font-weight: 600;
-              font-size: 13px;
-            ">
-              Klikk for detaljer →
+                border-radius: 4px;
+              ">${facility.capacity || 30} plasser</span>
+              <span style="color: #059669;">${facility.nextAvailable || 'Ledig nå'}</span>
             </div>
           </div>
         </div>
       `;
 
       const popup = new mapboxgl.Popup({ 
-        offset: 30,
+        offset: 25,
         closeButton: true,
-        closeOnClick: false,
-        className: 'facility-popup'
+        closeOnClick: false
       }).setHTML(popupHTML);
 
       // Add marker to map

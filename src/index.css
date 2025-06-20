@@ -76,40 +76,23 @@
   }
 }
 
-/* Custom styles for Mapbox popups */
+/* Simple styles for Mapbox popups */
 .mapboxgl-popup {
   max-width: 300px !important;
 }
 
 .mapboxgl-popup-content {
   padding: 0 !important;
-  border-radius: 12px !important;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.15) !important;
-}
-
-.facility-popup-card:hover {
-  transform: translateY(-2px);
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
 }
 
 .mapboxgl-popup-close-button {
   color: #6b7280 !important;
-  font-size: 18px !important;
-  font-weight: bold !important;
-  padding: 8px !important;
-  right: 8px !important;
-  top: 8px !important;
-  background: rgba(255,255,255,0.9) !important;
-  border-radius: 50% !important;
-  width: 28px !important;
-  height: 28px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-}
-
-.mapboxgl-popup-close-button:hover {
-  background: rgba(255,255,255,1) !important;
-  color: #374151 !important;
+  font-size: 16px !important;
+  padding: 4px !important;
+  right: 4px !important;
+  top: 4px !important;
 }
 
 .mapboxgl-popup-tip {
