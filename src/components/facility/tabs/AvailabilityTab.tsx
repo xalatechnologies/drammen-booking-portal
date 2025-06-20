@@ -7,8 +7,7 @@ import { CalendarGrid } from './CalendarGrid';
 import { ResponsiveCalendarGrid } from './ResponsiveCalendarGrid';
 import { CalendarSidebar } from '../CalendarSidebar';
 import { WeekNavigation } from './WeekNavigation';
-import { TwoColumnAvailabilityLayout } from './TwoColumnAvailabilityLayout';
-import { useAvailabilityStatus } from './AvailabilityStatusManager';
+import { useAvailabilityStatus } from './useAvailabilityStatus';
 
 interface AvailabilityTabProps {
   zones: Zone[];
@@ -97,33 +96,55 @@ export function AvailabilityTab({
   );
 
   return (
-    <TwoColumnAvailabilityLayout
-      zones={zones}
-      selectedZone={selectedZone}
-      onZoneChange={setSelectedZone}
-      calendar={
-        <div className="space-y-4">
-          <WeekNavigation
-            currentWeekStart={currentWeekStart}
-            onPreviousWeek={handlePreviousWeek}
-            onNextWeek={handleNextWeek}
-          />
-          {calendarComponent}
+    <div className="space-y-4">
+      {/* Zone Selection */}
+      <div className="flex items-center gap-4 mb-4">
+        <label className="text-sm font-medium">Velg sone:</label>
+        <select 
+          value={selectedZone.id} 
+          onChange={(e) => {
+            const zone = zones.find(z => z.id === e.target.value);
+            if (zone) setSelectedZone(zone);
+          }}
+          className="px-3 py-2 border rounded-md"
+        >
+          {zones.map(zone => (
+            <option key={zone.id} value={zone.id}>
+              {zone.name}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Two Column Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-10 gap-6">
+        {/* Calendar Column - 70% */}
+        <div className="lg:col-span-7">
+          <div className="space-y-4">
+            <WeekNavigation
+              currentWeekStart={currentWeekStart}
+              onWeekChange={setCurrentWeekStart}
+              canGoPrevious={true}
+            />
+            {calendarComponent}
+          </div>
         </div>
-      }
-      sidebar={
-        <CalendarSidebar
-          selectedSlots={selectedSlots}
-          onClearSlots={onClearSlots}
-          onRemoveSlot={onRemoveSlot}
-          facilityId={facilityId}
-          facilityName={facilityName}
-          zones={zones}
-          currentPattern={currentPattern}
-          onPatternChange={onPatternChange}
-          onPatternApply={onPatternApply}
-        />
-      }
-    />
+
+        {/* Sidebar Column - 30% */}
+        <div className="lg:col-span-3">
+          <CalendarSidebar
+            selectedSlots={selectedSlots}
+            onClearSlots={onClearSlots}
+            onRemoveSlot={onRemoveSlot}
+            facilityId={facilityId}
+            facilityName={facilityName}
+            zones={zones}
+            currentPattern={currentPattern}
+            onPatternChange={onPatternChange}
+            onPatternApply={onPatternApply}
+          />
+        </div>
+      </div>
+    </div>
   );
 }

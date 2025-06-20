@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -18,12 +17,18 @@ import { useTranslation } from "@/i18n";
 import { CartProvider } from "@/contexts/CartContext";
 import { MobileBookingPanel } from "@/components/facility/MobileBookingPanel";
 
+export default FacilityDetail;
+
 const FacilityDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [isFavorited, setIsFavorited] = useState(false);
   const { t } = useTranslation();
   const { facility, isLoading, error, notFound } = useOptimizedFacility(Number(id));
+
+  // State for availability tab
+  const [selectedSlots, setSelectedSlots] = useState<any[]>([]);
+  const [currentPattern, setCurrentPattern] = useState<any>({});
 
   // Enhanced zones with full zone management capabilities
   const zones: Zone[] = [{
@@ -67,6 +72,51 @@ const FacilityDetail = () => {
     features: ["Klimaanlegg", "Moderne lyd", "LED-belysning", "Sikkerhetskameraer"],
     isActive: true
   }];
+
+  const handleSlotClick = (zoneId: string, date: Date, timeSlot: string, availability: string) => {
+    if (availability !== 'available') return;
+
+    const isSelected = selectedSlots.some(slot => 
+      slot.zoneId === zoneId &&
+      slot.date.toDateString() === date.toDateString() &&
+      slot.timeSlot === timeSlot
+    );
+
+    if (isSelected) {
+      setSelectedSlots(selectedSlots.filter(slot => 
+        !(slot.zoneId === zoneId &&
+          slot.date.toDateString() === date.toDateString() &&
+          slot.timeSlot === timeSlot)
+      ));
+    } else {
+      setSelectedSlots([...selectedSlots, { 
+        zoneId, 
+        date, 
+        timeSlot,
+        duration: 1
+      }]);
+    }
+  };
+
+  const handleBulkSlotSelection = (slots: any[]) => {
+    setSelectedSlots(prev => [...prev, ...slots]);
+  };
+
+  const handleRemoveSlot = (zoneId: string, date: Date, timeSlot: string) => {
+    setSelectedSlots(selectedSlots.filter(slot => 
+      !(slot.zoneId === zoneId &&
+        slot.date.toDateString() === date.toDateString() &&
+        slot.timeSlot === timeSlot)
+    ));
+  };
+
+  const handleClearSlots = () => {
+    setSelectedSlots([]);
+  };
+
+  const handlePatternApply = (pattern: any) => {
+    setCurrentPattern(pattern);
+  };
 
   const handleShare = () => {
     if (navigator.share) {
@@ -184,10 +234,16 @@ const FacilityDetail = () => {
                 <h2 className="text-2xl font-bold mb-6">Tilgjengelighet og booking</h2>
                 <AvailabilityTab 
                   zones={zones} 
-                  startDate={new Date()} 
-                  facilityId={id} 
+                  selectedSlots={selectedSlots}
+                  onSlotClick={handleSlotClick}
+                  onBulkSlotSelection={handleBulkSlotSelection}
+                  onClearSlots={handleClearSlots}
+                  onRemoveSlot={handleRemoveSlot}
+                  facilityId={id || ""} 
                   facilityName={facility.name}
-                  openingHours={facility.openingHours}
+                  currentPattern={currentPattern}
+                  onPatternChange={setCurrentPattern}
+                  onPatternApply={handlePatternApply}
                 />
               </div>
             </div>
@@ -206,4 +262,3 @@ const FacilityDetail = () => {
       </div>
     </CartProvider>;
 };
-export default FacilityDetail;
