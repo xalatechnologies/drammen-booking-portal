@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { CalendarGrid } from './CalendarGrid';
 import { LegendDisplay } from './LegendDisplay';
-import { UnifiedBookingForm } from '@/components/booking/UnifiedBookingForm';
+import { SimplifiedBookingForm } from '@/components/booking/SimplifiedBookingForm';
 import { Zone } from '@/components/booking/types';
 import { SelectedTimeSlot } from '@/utils/recurrenceEngine';
 import { useAvailabilityStatus } from './useAvailabilityStatus';
@@ -59,12 +59,6 @@ export function AvailabilityTab({
     }), []
   );
 
-  // Generate week days
-  const weekDays = useMemo(() => 
-    Array.from({ length: 7 }, (_, i) => addDays(currentWeekStart, i)), 
-    [currentWeekStart]
-  );
-
   const selectedZone = zones.find(zone => zone.id === selectedZoneId);
 
   const handlePreviousWeek = () => {
@@ -81,66 +75,69 @@ export function AvailabilityTab({
 
   const handleAddToCart = (bookingData: any) => {
     console.log('Adding to cart:', bookingData);
-    // Handle add to cart logic
     onClearSlots();
   };
 
   const handleCompleteBooking = (bookingData: any) => {
     console.log('Completing booking:', bookingData);
-    // Handle complete booking logic
+  };
+
+  const handleRecurringBooking = () => {
+    console.log('Starting recurring booking process');
+    // Handle recurring booking logic
   };
 
   return (
     <div className="space-y-6">
-      {/* 60/40 Layout */}
+      {/* Full Width Zone Selection Header */}
+      <Card className="w-full">
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <MapPin className="h-5 w-5" />
+            Velg sone for booking
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-wrap gap-2">
+            {zones.map((zone) => (
+              <Button
+                key={zone.id}
+                variant={selectedZoneId === zone.id ? "default" : "outline"}
+                onClick={() => setSelectedZoneId(zone.id)}
+                className="flex items-center gap-2"
+              >
+                <Users className="h-4 w-4" />
+                {zone.name}
+                <Badge variant="secondary" className="ml-1">
+                  {zone.capacity} pers
+                </Badge>
+              </Button>
+            ))}
+          </div>
+          
+          {selectedZone && (
+            <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+              <h4 className="font-semibold text-blue-900 mb-2">{selectedZone.name}</h4>
+              <p className="text-sm text-blue-700 mb-3">{selectedZone.description}</p>
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <span className="font-medium text-blue-800">Kapasitet:</span>
+                  <span className="ml-2 text-blue-700">{selectedZone.capacity} personer</span>
+                </div>
+                <div>
+                  <span className="font-medium text-blue-800">Pris:</span>
+                  <span className="ml-2 text-blue-700">{selectedZone.pricePerHour} kr/time</span>
+                </div>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* 60/40 Layout for Calendar and Booking Form */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
         {/* Left Column - Calendar (60%) */}
         <div className="lg:col-span-3 space-y-4">
-          {/* Zone Selection */}
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <MapPin className="h-5 w-5" />
-                Velg sone for booking
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-wrap gap-2">
-                {zones.map((zone) => (
-                  <Button
-                    key={zone.id}
-                    variant={selectedZoneId === zone.id ? "default" : "outline"}
-                    onClick={() => setSelectedZoneId(zone.id)}
-                    className="flex items-center gap-2"
-                  >
-                    <Users className="h-4 w-4" />
-                    {zone.name}
-                    <Badge variant="secondary" className="ml-1">
-                      {zone.capacity} pers
-                    </Badge>
-                  </Button>
-                ))}
-              </div>
-              
-              {selectedZone && (
-                <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                  <h4 className="font-semibold text-blue-900 mb-2">{selectedZone.name}</h4>
-                  <p className="text-sm text-blue-700 mb-3">{selectedZone.description}</p>
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <span className="font-medium text-blue-800">Kapasitet:</span>
-                      <span className="ml-2 text-blue-700">{selectedZone.capacity} personer</span>
-                    </div>
-                    <div>
-                      <span className="font-medium text-blue-800">Pris:</span>
-                      <span className="ml-2 text-blue-700">{selectedZone.pricePerHour} kr/time</span>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
           {/* Week Navigation */}
           <div className="flex items-center justify-between">
             <Button variant="outline" onClick={handlePreviousWeek}>
@@ -183,13 +180,14 @@ export function AvailabilityTab({
         {/* Right Column - Booking Form (40%) */}
         <div className="lg:col-span-2">
           <div className="sticky top-6">
-            <UnifiedBookingForm
+            <SimplifiedBookingForm
               selectedSlots={selectedSlots}
               facilityId={facilityId}
               facilityName={facilityName}
               zones={zones}
               onAddToCart={handleAddToCart}
               onCompleteBooking={handleCompleteBooking}
+              onRecurringBooking={handleRecurringBooking}
               onSlotsCleared={onClearSlots}
             />
           </div>
