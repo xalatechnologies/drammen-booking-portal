@@ -30,7 +30,7 @@ export function CartDropdown({ onClose }: CartDropdownProps) {
     return (
       <div className="p-6 text-center">
         <ShoppingCart className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-        <p className="text-sm font-medium text-gray-500 mb-2">Din handlekurv er tom</p>
+        <p className="text-sm font-medium text-gray-500 mb-2">Din reservasjonskurv er tom</p>
         <p className="text-xs text-gray-400">Velg tidslukene du ønsker å reservere</p>
       </div>
     );
@@ -41,7 +41,7 @@ export function CartDropdown({ onClose }: CartDropdownProps) {
       {/* Header */}
       <div className="p-4 border-b bg-gray-50">
         <div className="flex items-center justify-between">
-          <h3 className="font-semibold text-lg">Handlekurv ({getItemCount()})</h3>
+          <h3 className="font-semibold text-lg">Reservasjonskurv ({getItemCount()})</h3>
           <Button 
             variant="ghost" 
             size="sm" 

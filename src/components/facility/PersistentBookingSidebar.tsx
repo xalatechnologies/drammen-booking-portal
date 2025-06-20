@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { ShoppingCart, X, CreditCard, Plus, Minus } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -53,15 +54,15 @@ export function PersistentBookingSidebar({
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-lg">
             <ShoppingCart className="h-5 w-5" />
-            {t('booking.cart.title')} ({getItemCount()})
+            Reservasjonskurv ({getItemCount()})
           </CardTitle>
         </CardHeader>
         <CardContent>
           {facilityCartItems.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
               <ShoppingCart className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-              <p className="text-sm font-medium">{t('booking.cart.empty')}</p>
-              <p className="text-xs mt-1 text-gray-400">{t('booking.cart.selectSlots')}</p>
+              <p className="text-sm font-medium">Reservasjonskurven er tom</p>
+              <p className="text-xs mt-1 text-gray-400">Velg tidslukene du ønsker å reservere</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -107,23 +108,23 @@ export function PersistentBookingSidebar({
               
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">{t('booking.cart.subtotal')}</span>
+                  <span className="text-sm text-gray-600">Subtotal</span>
                   <span className="font-medium">{getTotalPrice()} kr</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">{t('booking.cart.vat')}</span>
+                  <span className="text-sm text-gray-600">MVA (25%)</span>
                   <span className="font-medium">{Math.round(getTotalPrice() * 0.25)} kr</span>
                 </div>
                 <Separator />
                 <div className="flex justify-between items-center text-lg font-bold">
-                  <span>{t('booking.cart.total')}</span>
+                  <span>Total</span>
                   <span>{getTotalPrice() + Math.round(getTotalPrice() * 0.25)} kr</span>
                 </div>
               </div>
               
               <Button onClick={handleProceedToCheckout} className="w-full bg-[#1e3a8a] hover:bg-[#1e40af] font-medium text-base h-12 mt-4" disabled={getItemCount() === 0}>
                 <CreditCard className="h-5 w-5 mr-2" />
-                {t('booking.cart.proceedToCheckout')}
+                Gå til kassen
               </Button>
             </div>
           )}

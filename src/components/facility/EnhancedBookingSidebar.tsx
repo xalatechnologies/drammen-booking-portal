@@ -1,3 +1,4 @@
+
 import React, { useEffect } from "react";
 import { ShoppingCart, X, CreditCard, Calendar, CheckCircle2, User, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -335,7 +336,7 @@ export function EnhancedBookingSidebar({
             <CardHeader className="pb-3 cursor-pointer hover:bg-gray-50 transition-colors">
               <CardTitle className="flex items-center gap-2 text-lg">
                 <ShoppingCart className="h-5 w-5" />
-                {t('booking.cart.title')} ({getItemCount()})
+                Reservasjonskurv ({getItemCount()})
               </CardTitle>
             </CardHeader>
           </CollapsibleTrigger>
@@ -344,8 +345,8 @@ export function EnhancedBookingSidebar({
               {!hasCartItems ? (
                 <div className="text-center py-8 text-gray-500">
                   <ShoppingCart className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                  <p className="text-sm font-medium">{t('booking.cart.empty')}</p>
-                  <p className="text-xs mt-1 text-gray-400">Fullfør booking for å legge til i handlekurv</p>
+                  <p className="text-sm font-medium">Reservasjonskurven er tom</p>
+                  <p className="text-xs mt-1 text-gray-400">Fullfør booking for å legge til i reservasjonskurv</p>
                 </div>
               ) : (
                 <div className="space-y-4">
