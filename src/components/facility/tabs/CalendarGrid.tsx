@@ -55,7 +55,7 @@ export function CalendarGrid({
     
     const cell = (
       <button
-        className={`w-full h-8 rounded border transition-all duration-200 text-base font-bold ${statusStyle} ${
+        className={`w-full h-8 rounded border transition-all duration-200 text-base ${statusStyle} ${
           status === 'available' ? 'transform hover:scale-105' : ''
         }`}
         disabled={status !== 'available'}
@@ -64,7 +64,7 @@ export function CalendarGrid({
                status === 'busy' ? 'Opptatt' : 'Ikke tilgjengelig'}
       >
         <div className="flex items-center justify-center h-full">
-          <span className={`text-base font-bold ${isSelected ? 'text-white' : 'text-gray-700'}`}>
+          <span className={`text-base ${isSelected ? 'text-white' : 'text-gray-700'}`}>
             {startTime}
           </span>
           {isSelected && (
