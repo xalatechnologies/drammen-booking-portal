@@ -1,15 +1,12 @@
 
 import React from 'react';
-import { Calendar, Info, Clock, CalendarIcon } from 'lucide-react';
+import { Calendar, Info, Clock } from 'lucide-react';
 import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { format } from 'date-fns';
 import { nb } from 'date-fns/locale';
-import { cn } from '@/lib/utils';
 
 interface DateRangeStepProps {
   startDate?: Date;
@@ -26,6 +23,7 @@ export function DateRangeStep({
 }: DateRangeStepProps) {
   // Get today's date for min attribute
   const today = new Date();
+  const todayString = format(today, 'yyyy-MM-dd');
 
   // Calculate duration and other stats
   const calculateStats = () => {
@@ -39,6 +37,24 @@ export function DateRangeStep({
   };
 
   const stats = calculateStats();
+
+  const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (value) {
+      onStartDateChange(new Date(value));
+    } else {
+      onStartDateChange(undefined);
+    }
+  };
+
+  const handleEndDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (value) {
+      onEndDateChange(new Date(value));
+    } else {
+      onEndDateChange(undefined);
+    }
+  };
 
   return (
     <div className="space-y-8">
@@ -65,34 +81,13 @@ export function DateRangeStep({
                 <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                 Startdato
               </Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={cn(
-                      "w-full h-12 justify-start text-left font-normal border-2 border-gray-200 hover:border-blue-300",
-                      !startDate && "text-muted-foreground"
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {startDate ? (
-                      format(startDate, "dd.MM.yyyy", { locale: nb })
-                    ) : (
-                      <span>Velg startdato</span>
-                    )}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <CalendarComponent
-                    mode="single"
-                    selected={startDate}
-                    onSelect={onStartDateChange}
-                    disabled={(date) => date < today}
-                    initialFocus
-                    className="pointer-events-auto"
-                  />
-                </PopoverContent>
-              </Popover>
+              <Input
+                type="date"
+                value={startDate ? format(startDate, 'yyyy-MM-dd') : ''}
+                onChange={handleStartDateChange}
+                min={todayString}
+                className="h-12 text-base border-2 border-gray-200 focus:border-blue-400 focus:ring-blue-400"
+              />
               {startDate && (
                 <p className="text-sm text-green-600 font-medium">
                   {format(startDate, 'EEEE, dd. MMMM yyyy', { locale: nb })}
@@ -106,36 +101,13 @@ export function DateRangeStep({
                 <div className="w-2 h-2 bg-red-500 rounded-full"></div>
                 Sluttdato
               </Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={cn(
-                      "w-full h-12 justify-start text-left font-normal border-2 border-gray-200 hover:border-blue-300",
-                      !endDate && "text-muted-foreground"
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {endDate ? (
-                      format(endDate, "dd.MM.yyyy", { locale: nb })
-                    ) : (
-                      <span>Velg sluttdato</span>
-                    )}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <CalendarComponent
-                    mode="single"
-                    selected={endDate}
-                    onSelect={onEndDateChange}
-                    disabled={(date) => 
-                      date < today || (startDate && date <= startDate)
-                    }
-                    initialFocus
-                    className="pointer-events-auto"
-                  />
-                </PopoverContent>
-              </Popover>
+              <Input
+                type="date"
+                value={endDate ? format(endDate, 'yyyy-MM-dd') : ''}
+                onChange={handleEndDateChange}
+                min={startDate ? format(startDate, 'yyyy-MM-dd') : todayString}
+                className="h-12 text-base border-2 border-gray-200 focus:border-blue-400 focus:ring-blue-400"
+              />
               {endDate && (
                 <p className="text-sm text-red-600 font-medium">
                   {format(endDate, 'EEEE, dd. MMMM yyyy', { locale: nb })}
