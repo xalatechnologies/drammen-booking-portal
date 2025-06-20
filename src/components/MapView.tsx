@@ -8,7 +8,6 @@ import { MapLoadingState } from './map/MapLoadingState';
 import { MapErrorState } from './map/MapErrorState';
 import { useFacilities } from '@/hooks/useFacilities';
 import { FacilityFilters } from '@/types/facility';
-import { Map } from 'lucide-react';
 import mapboxgl from 'mapbox-gl';
 
 // Default token provided by user
@@ -64,23 +63,6 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location }) => {
 
   return (
     <div className="max-w-7xl mx-auto px-4">
-      {/* Header with facility count and view type */}
-      <div className="mb-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Map className="h-6 w-6 text-blue-600" />
-            <h2 className="text-2xl font-bold text-gray-900">Kartoversikt</h2>
-          </div>
-          <div className="text-sm text-gray-600">
-            {facilitiesLoading ? (
-              <span>Laster lokaler...</span>
-            ) : (
-              <span>{facilities.length} lokaler funnet</span>
-            )}
-          </div>
-        </div>
-      </div>
-
       {/* Map Content */}
       <Card className="min-h-[600px] relative overflow-hidden">
         <MapLoadingState isLoading={isLoading || facilitiesLoading} />

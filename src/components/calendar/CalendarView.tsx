@@ -117,19 +117,6 @@ const CalendarView: React.FC<CalendarViewProps> = ({
   
   return (
     <div className="max-w-7xl mx-auto px-4">
-      {/* Header with facility count and view type */}
-      <div className="mb-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Calendar className="h-6 w-6 text-blue-600" />
-            <h2 className="text-2xl font-bold text-gray-900">Kalenderoversikt</h2>
-          </div>
-          <div className="text-sm text-gray-600">
-            <span>{facilitiesWithBookings.length} lokaler funnet</span>
-          </div>
-        </div>
-      </div>
-
       <div className="space-y-6">
         {/* Enhanced Week Navigation */}
         <WeekNavigation
