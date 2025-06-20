@@ -39,13 +39,17 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location, viewMode, set
     filters
   });
 
-  // Convert facilities to map format
+  // Convert facilities to map format with enhanced data
   const facilityLocations = facilities.map(facility => ({
     id: facility.id,
     name: facility.name,
     address: facility.address,
     lat: 59.7440 + (Math.random() - 0.5) * 0.02, // Spread around Drammen
-    lng: 10.2052 + (Math.random() - 0.5) * 0.02
+    lng: 10.2052 + (Math.random() - 0.5) * 0.02,
+    image: facility.image,
+    type: facility.type,
+    capacity: facility.capacity,
+    nextAvailable: facility.nextAvailable
   }));
 
   const handleMapLoad = (mapInstance: mapboxgl.Map) => {

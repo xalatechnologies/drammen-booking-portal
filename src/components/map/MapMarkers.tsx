@@ -8,6 +8,10 @@ export interface FacilityLocation {
   address: string;
   lat: number;
   lng: number;
+  image?: string;
+  type?: string;
+  capacity?: number;
+  nextAvailable?: string;
 }
 
 interface MapMarkersProps {
@@ -47,35 +51,120 @@ export const MapMarkers: React.FC<MapMarkersProps> = ({ map, facilities }) => {
       const markerEl = document.createElement('div');
       markerEl.className = 'facility-marker';
       markerEl.style.cssText = `
-        width: 30px;
-        height: 30px;
+        width: 32px;
+        height: 32px;
         background-color: ${markerColor};
-        border: 2px solid white;
+        border: 3px solid white;
         border-radius: 50%;
         cursor: pointer;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        box-shadow: 0 3px 8px rgba(0,0,0,0.3);
         display: flex;
         align-items: center;
         justify-content: center;
+        transition: transform 0.2s ease;
       `;
+      
+      // Add hover effect
+      markerEl.addEventListener('mouseenter', () => {
+        markerEl.style.transform = 'scale(1.1)';
+      });
+      markerEl.addEventListener('mouseleave', () => {
+        markerEl.style.transform = 'scale(1)';
+      });
       
       // Add icon to marker
       const icon = document.createElement('div');
-      icon.innerHTML = '📍';
-      icon.style.fontSize = '12px';
+      icon.innerHTML = '🏢';
+      icon.style.fontSize = '14px';
       markerEl.appendChild(icon);
 
-      // Create popup
-      const popup = new mapboxgl.Popup({ 
-        offset: 25,
-        closeButton: true,
-        closeOnClick: false
-      }).setHTML(`
-        <div style="padding: 8px; min-width: 200px;">
-          <h3 style="margin: 0 0 4px 0; font-weight: bold; font-size: 14px;">${facility.name}</h3>
-          <p style="margin: 0; font-size: 12px; color: #666;">${facility.address}</p>
+      // Create enhanced popup with facility card
+      const popupHTML = `
+        <div class="facility-popup-card" style="
+          width: 280px;
+          padding: 0;
+          margin: 0;
+          border-radius: 12px;
+          overflow: hidden;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+          cursor: pointer;
+          transition: transform 0.2s ease;
+        " onclick="window.location.href='/facilities/${facility.id}'">
+          <div style="
+            width: 100%;
+            height: 160px;
+            background-image: url('${facility.image || 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&auto=format&fit=crop'}');
+            background-size: cover;
+            background-position: center;
+            position: relative;
+          ">
+            <div style="
+              position: absolute;
+              top: 8px;
+              right: 8px;
+              background: rgba(255,255,255,0.9);
+              padding: 4px 8px;
+              border-radius: 6px;
+              font-size: 12px;
+              font-weight: 600;
+              color: #374151;
+            ">
+              ${facility.capacity || 30} plasser
+            </div>
+          </div>
+          <div style="padding: 16px;">
+            <h3 style="
+              margin: 0 0 8px 0;
+              font-weight: 700;
+              font-size: 16px;
+              color: #111827;
+              line-height: 1.3;
+            ">${facility.name}</h3>
+            <p style="
+              margin: 0 0 12px 0;
+              font-size: 14px;
+              color: #6b7280;
+              line-height: 1.4;
+            ">${facility.address}</p>
+            <div style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              font-size: 12px;
+            ">
+              <span style="
+                background: #f3f4f6;
+                color: #374151;
+                padding: 4px 8px;
+                border-radius: 6px;
+                font-weight: 500;
+              ">${facility.type || 'Møterom'}</span>
+              <span style="
+                color: #059669;
+                font-weight: 600;
+              ">${facility.nextAvailable || 'Ledig nå'}</span>
+            </div>
+            <div style="
+              margin-top: 12px;
+              padding-top: 12px;
+              border-top: 1px solid #e5e7eb;
+              text-align: center;
+              color: #3b82f6;
+              font-weight: 600;
+              font-size: 13px;
+            ">
+              Klikk for detaljer →
+            </div>
+          </div>
         </div>
-      `);
+      `;
+
+      const popup = new mapboxgl.Popup({ 
+        offset: 30,
+        closeButton: true,
+        closeOnClick: false,
+        className: 'facility-popup'
+      }).setHTML(popupHTML);
 
       // Add marker to map
       const marker = new mapboxgl.Marker(markerEl)
