@@ -29,23 +29,25 @@ export function ReservationSummary({ reservation }: ReservationSummaryProps) {
   }, {} as Record<string, typeof timeSlots>);
 
   const dateKeys = Object.keys(slotsByDate).sort();
+  const totalSlots = timeSlots.length;
+  const totalDuration = timeSlots.reduce((sum, slot) => sum + (slot.duration || 2), 0);
 
   return (
-    <div className="flex items-start justify-between p-4 bg-gray-50 rounded-lg">
+    <div className="flex items-start justify-between w-full">
       <div className="flex-1 space-y-3">
         {/* Facility and Purpose */}
         <div className="flex items-start gap-3">
-          <MapPin className="h-5 w-5 text-blue-600 mt-0.5" />
-          <div>
-            <h3 className="font-semibold text-lg text-gray-900">{reservation.facilityName}</h3>
+          <MapPin className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
+          <div className="min-w-0 flex-1">
+            <h3 className="font-semibold text-lg text-gray-900 truncate">{reservation.facilityName}</h3>
             <div className="flex items-center gap-2 mt-1">
-              <FileText className="h-4 w-4 text-gray-500" />
-              <span className="text-sm text-gray-600">{reservation.purpose}</span>
+              <FileText className="h-4 w-4 text-gray-500 flex-shrink-0" />
+              <span className="text-sm text-gray-600 truncate">{reservation.purpose}</span>
             </div>
           </div>
         </div>
 
-        {/* Compact Time Information */}
+        {/* Time Information */}
         <div className="flex flex-wrap gap-4 text-sm">
           {dateKeys.length === 1 ? (
             // Single date - show inline
@@ -67,7 +69,7 @@ export function ReservationSummary({ reservation }: ReservationSummaryProps) {
           
           <div className="flex items-center gap-1">
             <Clock className="h-4 w-4 text-gray-500" />
-            <span>{timeSlots.length} tidspunkt</span>
+            <span>{totalSlots} tidspunkt ({totalDuration}t total)</span>
           </div>
 
           {reservation.expectedAttendees && (
@@ -78,16 +80,24 @@ export function ReservationSummary({ reservation }: ReservationSummaryProps) {
           )}
         </div>
 
-        {/* Time slots summary for single date */}
-        {dateKeys.length === 1 && (
+        {/* Time slots summary */}
+        {totalSlots <= 3 && (
           <div className="text-sm text-gray-600 ml-8">
-            {slotsByDate[dateKeys[0]].map((slot, index) => (
-              <span key={index}>
-                {slot.timeSlot}
-                {slot.zoneId !== 'whole-facility' && ` (${slot.zoneId})`}
-                {index < slotsByDate[dateKeys[0]].length - 1 ? ', ' : ''}
-              </span>
-            ))}
+            {dateKeys.map(dateKey => 
+              slotsByDate[dateKey].map((slot, index) => (
+                <span key={`${dateKey}-${index}`}>
+                  {slot.timeSlot}
+                  {slot.zoneId && slot.zoneId !== 'whole-facility' && ` (${slot.zoneId})`}
+                  {index < slotsByDate[dateKey].length - 1 || dateKeys.indexOf(dateKey) < dateKeys.length - 1 ? ', ' : ''}
+                </span>
+              ))
+            )}
+          </div>
+        )}
+
+        {totalSlots > 3 && (
+          <div className="text-sm text-gray-600 ml-8">
+            Første: {timeSlots[0].timeSlot} - Siste: {timeSlots[timeSlots.length - 1].timeSlot}
           </div>
         )}
       </div>
@@ -95,7 +105,7 @@ export function ReservationSummary({ reservation }: ReservationSummaryProps) {
       {/* Price and Customer Type */}
       <div className="text-right flex-shrink-0 ml-4">
         <div className="text-2xl font-bold text-green-600 mb-2">
-          {reservation.pricing.totalPrice} kr
+          {reservation.pricing?.totalPrice || (reservation.pricePerHour * (reservation.duration || 2))} kr
         </div>
         <Badge variant="outline" className="text-xs">
           {reservation.organizationType === 'business' ? 'Bedrift' : 

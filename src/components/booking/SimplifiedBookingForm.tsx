@@ -113,51 +113,57 @@ export function SimplifiedBookingForm({
     }
 
     try {
-      // Add each selected slot as a separate cart item
-      selectedSlots.forEach(slot => {
-        const zone = zones.find(z => z.id === slot.zoneId);
-        const pricePerHour = zone?.pricePerHour || 450;
-        const duration = slot.duration || 2;
+      // Calculate total pricing for all slots
+      const totalDuration = selectedSlots.reduce((total, slot) => total + (slot.duration || 2), 0);
+      const averagePricePerHour = zones.length > 0 ? 
+        selectedSlots.reduce((total, slot) => {
+          const zone = zones.find(z => z.id === slot.zoneId);
+          return total + (zone?.pricePerHour || 450);
+        }, 0) / selectedSlots.length : 450;
 
-        console.log('SimplifiedBookingForm: Adding slot to cart:', {
-          slot,
-          zone: zone?.name,
-          pricePerHour,
-          duration
-        });
+      const baseFacilityPrice = averagePricePerHour * totalDuration;
 
-        addToCart({
-          facilityId,
-          facilityName,
-          zoneId: slot.zoneId,
-          date: slot.date,
-          timeSlot: slot.timeSlot,
-          duration,
-          pricePerHour,
-          purpose: formData.purpose,
-          expectedAttendees: formData.attendees,
-          organizationType: formData.actorType === 'private-person' ? 'private' : 
-                          formData.actorType === 'lag-foreninger' ? 'organization' : 'business',
-          additionalServices: [],
-          timeSlots: [slot],
-          customerInfo: {
-            name: '',
-            email: '',
-            phone: ''
-          },
-          pricing: {
-            baseFacilityPrice: pricePerHour * duration,
-            servicesPrice: 0,
-            discounts: 0,
-            vatAmount: 0,
-            totalPrice: pricePerHour * duration
-          }
-        });
+      console.log('SimplifiedBookingForm: Creating single reservation with multiple slots:', {
+        facilityId,
+        facilityName,
+        selectedSlots,
+        totalDuration,
+        averagePricePerHour,
+        baseFacilityPrice
+      });
+
+      // Create a single cart item with all selected slots
+      addToCart({
+        facilityId,
+        facilityName,
+        zoneId: selectedSlots[0].zoneId, // Primary zone for backward compatibility
+        date: selectedSlots[0].date, // Primary date for backward compatibility
+        timeSlot: selectedSlots[0].timeSlot, // Primary time slot for backward compatibility
+        duration: totalDuration,
+        pricePerHour: averagePricePerHour,
+        purpose: formData.purpose,
+        expectedAttendees: formData.attendees,
+        organizationType: formData.actorType === 'private-person' ? 'private' : 
+                        formData.actorType === 'lag-foreninger' ? 'organization' : 'business',
+        additionalServices: [],
+        timeSlots: selectedSlots, // All selected slots in one reservation
+        customerInfo: {
+          name: '',
+          email: '',
+          phone: ''
+        },
+        pricing: {
+          baseFacilityPrice,
+          servicesPrice: 0,
+          discounts: 0,
+          vatAmount: 0,
+          totalPrice: baseFacilityPrice
+        }
       });
 
       toast({
         title: "Lagt til i handlekurv",
-        description: `${selectedSlots.length} tidspunkt er lagt til i handlekurven`,
+        description: `Reservasjon med ${selectedSlots.length} tidspunkt er lagt til i handlekurven`,
       });
 
       // Clear slots after successful addition

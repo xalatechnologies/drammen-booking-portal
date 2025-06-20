@@ -39,7 +39,8 @@ export const useCartStore = create<CartState>()(
       // Actions
       addToCart: (item) => {
         console.log('CartStore: Adding item to cart:', item);
-        const itemId = `${item.facilityId}-${item.purpose}-${Date.now()}`;
+        // Create unique ID based on facility, purpose, and timestamp to avoid duplicates
+        const itemId = `${item.facilityId}-${item.purpose.replace(/\s+/g, '-')}-${Date.now()}`;
         
         const newItem: CartItem = { 
           ...item, 

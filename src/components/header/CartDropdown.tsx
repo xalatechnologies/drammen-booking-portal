@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { ShoppingCart, X, CreditCard, Trash2 } from "lucide-react";
+import { ShoppingCart, X, CreditCard, Trash2, Calendar, Clock } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useTranslation } from "@/i18n/hooks/useTranslation";
 import { format } from "date-fns";
@@ -65,11 +65,9 @@ export function CartDropdown({ onClose }: CartDropdownProps) {
                 <p className="text-sm font-medium text-gray-900 truncate">
                   {item.facilityName}
                 </p>
-                <div className="flex items-center gap-2 mt-1">
-                  <Badge variant="outline" className="text-xs">
-                    {item.zoneId === 'whole-facility' ? t('booking.zones.wholeFacility') : item.zoneId}
-                  </Badge>
-                </div>
+                <p className="text-xs text-gray-600 truncate mt-1">
+                  {item.purpose}
+                </p>
               </div>
               <Button 
                 variant="ghost" 
@@ -81,15 +79,32 @@ export function CartDropdown({ onClose }: CartDropdownProps) {
               </Button>
             </div>
             
+            {/* Time slots summary */}
+            <div className="space-y-1 mb-2">
+              {item.timeSlots && item.timeSlots.length > 1 ? (
+                <div className="flex items-center gap-2 text-xs text-gray-600">
+                  <Calendar className="h-3 w-3" />
+                  <span>{item.timeSlots.length} tidspunkt</span>
+                  <Clock className="h-3 w-3 ml-2" />
+                  <span>{item.duration || (item.timeSlots.length * 2)}t total</span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 text-xs text-gray-600">
+                  <Calendar className="h-3 w-3" />
+                  <span>{format(new Date(item.date), 'dd.MM.yyyy')}</span>
+                  <Clock className="h-3 w-3 ml-2" />
+                  <span>{item.timeSlot}</span>
+                </div>
+              )}
+            </div>
+            
             <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs text-gray-600">
-                  {format(new Date(item.date), 'dd.MM.yyyy')}
-                </p>
-                <p className="text-xs text-gray-600">{item.timeSlot}</p>
-              </div>
+              <Badge variant="outline" className="text-xs">
+                {item.organizationType === 'private' ? 'Privat' : 
+                 item.organizationType === 'organization' ? 'Organisasjon' : 'Bedrift'}
+              </Badge>
               <Badge className="bg-green-100 text-green-800 text-xs">
-                {item.pricePerHour * item.duration} kr
+                {item.pricing?.totalPrice || (item.pricePerHour * (item.duration || 2))} kr
               </Badge>
             </div>
           </div>
