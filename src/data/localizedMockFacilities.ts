@@ -736,71 +736,79 @@ export const localizedMockFacilities: LocalizedFacility[] = [
   },
   {
     id: 999,
-    translations: {
-      NO: {
-        name: "Storsal Kulturhus - Multisone",
-        description: "Storsal med flere avdelinger som kan brukes separat eller sammen. Perfekt for teater, konserter, konferanser og workshops med fleksible romløsninger.",
-        type: "Kulturlokale",
-        area: "Drammen sentrum",
-        suitableFor: ["Teater", "Konsert", "Konferanser", "Workshop"],
-        equipment: ["Scene", "Lydanlegg", "Lysrigger", "Projektor"],
-        amenities: ["Scene", "Profesjonelt lydanlegg", "Garderober"],
-      },
-      EN: {
-        name: "Grand Hall Cultural Center - Multizone",
-        description: "Grand hall with multiple sections that can be used separately or together. Perfect for theater, concerts, conferences and workshops with flexible room solutions.",
-        type: "Cultural Facility",
-        area: "Drammen Center",
-        suitableFor: ["Theater", "Concert", "Conference", "Workshop"],
-        equipment: ["Stage", "Sound System", "Light Rig", "Projector"],
-        amenities: ["Stage", "Professional Sound System", "Dressing Rooms"],
-      }
+    name: {
+      NO: "Storsal Kulturhus - Multisone",
+      EN: "Grand Hall Cultural Center - Multizone"
     },
     address: "Storgata 15, Drammen",
+    type: "Kulturlokale",
+    area: "Drammen sentrum",
     image: "/lovable-uploads/13aee1f6-e9d9-474b-9ed7-c656d703d19b.png",
     nextAvailable: "I dag, 16:00",
     capacity: 200,
-    accessibility: ["Rullestoltilgjengelig", "Hørselssløyfe"],
+    accessibility: ["wheelchair", "hearing-loop"],
+    suitableFor: {
+      NO: ["Teater", "Konsert", "Konferanser", "Workshop"],
+      EN: ["Theater", "Concert", "Conference", "Workshop"]
+    },
+    equipment: {
+      NO: ["Scene", "Lydanlegg", "Lysrigger", "Projektor"],
+      EN: ["Stage", "Sound System", "Light Rig", "Projector"]
+    },
     openingHours: "Man-Fre: 08:00-22:00, Lør-Søn: 10:00-20:00",
+    description: {
+      NO: "Storsal med flere avdelinger som kan brukes separat eller sammen. Perfekt for teater, konserter, konferanser og workshops med fleksible romløsninger.",
+      EN: "Grand hall with multiple sections that can be used separately or together. Perfect for theater, concerts, conferences and workshops with flexible room solutions."
+    },
     rating: 4.8,
     reviewCount: 45,
     pricePerHour: 800,
+    amenities: {
+      NO: ["Scene", "Profesjonelt lydanlegg", "Garderober"],
+      EN: ["Stage", "Professional Sound System", "Dressing Rooms"]
+    },
     hasAutoApproval: false,
-    timeSlotDuration: 1
+    timeSlotDuration: 1,
+    lat: 59.7456,
+    lng: 10.2023
   },
   {
     id: 998,
-    translations: {
-      NO: {
-        name: "Idrettshall Mjøndalen - Fleksibel",
-        description: "Moderne idrettshall med tre separate soner som kan kombineres. Ideell for håndball, basketball, volleyball og badminton med mulighet for samtidig bruk av flere områder.",
-        type: "Idrettshall",
-        area: "Mjøndalen",
-        suitableFor: ["Håndball", "Basketball", "Volleyball", "Badminton"],
-        equipment: ["Basketkurver", "Håndballmål", "Nettstolper", "Tribuner"],
-        amenities: ["Moderne utstyr", "God ventilasjon", "Garderober"],
-      },
-      EN: {
-        name: "Mjøndalen Sports Hall - Flexible",
-        description: "Modern sports hall with three separate zones that can be combined. Ideal for handball, basketball, volleyball and badminton with the possibility of simultaneous use of multiple areas.",
-        type: "Sports Hall", 
-        area: "Mjøndalen",
-        suitableFor: ["Handball", "Basketball", "Volleyball", "Badminton"],
-        equipment: ["Basketball Hoops", "Handball Goals", "Net Posts", "Stands"],
-        amenities: ["Modern Equipment", "Good Ventilation", "Changing Rooms"],
-      }
+    name: {
+      NO: "Idrettshall Mjøndalen - Fleksibel",
+      EN: "Mjøndalen Sports Hall - Flexible"
     },
     address: "Idrettsveien 22, Mjøndalen",
+    type: "Idrettshall",
+    area: "Mjøndalen",
     image: "/lovable-uploads/13aee1f6-e9d9-474b-9ed7-c656d703d19b.png",
-    nextAvailable: "I morgen, 09:00", 
+    nextAvailable: "I morgen, 09:00",
     capacity: 150,
-    accessibility: ["Rullestoltilgjengelig"],
+    accessibility: ["wheelchair"],
+    suitableFor: {
+      NO: ["Håndball", "Basketball", "Volleyball", "Badminton"],
+      EN: ["Handball", "Basketball", "Volleyball", "Badminton"]
+    },
+    equipment: {
+      NO: ["Basketkurver", "Håndballmål", "Nettstolper", "Tribuner"],
+      EN: ["Basketball Hoops", "Handball Goals", "Net Posts", "Stands"]
+    },
     openingHours: "Man-Fre: 07:00-23:00, Lør-Søn: 09:00-21:00",
+    description: {
+      NO: "Moderne idrettshall med tre separate soner som kan kombineres. Ideell for håndball, basketball, volleyball og badminton med mulighet for samtidig bruk av flere områder.",
+      EN: "Modern sports hall with three separate zones that can be combined. Ideal for handball, basketball, volleyball and badminton with the possibility of simultaneous use of multiple areas."
+    },
     rating: 4.6,
     reviewCount: 32,
     pricePerHour: 600,
+    amenities: {
+      NO: ["Moderne utstyr", "God ventilasjon", "Garderober"],
+      EN: ["Modern Equipment", "Good Ventilation", "Changing Rooms"]
+    },
     hasAutoApproval: true,
-    timeSlotDuration: 2
+    timeSlotDuration: 2,
+    lat: 59.7234,
+    lng: 10.1934
   }
 ];
 
