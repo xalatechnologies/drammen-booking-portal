@@ -11,7 +11,7 @@ import { CalendarGrid } from './CalendarGrid';
 import { LegendDisplay } from './LegendDisplay';
 import { SimplifiedBookingForm } from '@/components/booking/SimplifiedBookingForm';
 import { Zone } from '@/components/booking/types';
-import { SelectedTimeSlot, RecurrencePattern } from '@/utils/recurrenceEngine';
+import { SelectedTimeSlot, RecurrencePattern, recurrenceEngine } from '@/utils/recurrenceEngine';
 import { useAvailabilityStatus } from './useAvailabilityStatus';
 import { AvailabilityModals } from './AvailabilityModals';
 
@@ -119,6 +119,22 @@ export function AvailabilityTab({
 
   const handlePatternApply = (pattern: RecurrencePattern) => {
     console.log('Applying pattern:', pattern);
+    
+    // Generate occurrences using the recurrence engine
+    if (pattern.timeSlots.length > 0 && pattern.weekdays.length > 0 && selectedZoneId) {
+      const occurrences = recurrenceEngine.generateOccurrences(
+        pattern,
+        currentWeekStart,
+        selectedZoneId,
+        12 // Generate up to 12 weeks
+      );
+      
+      console.log('Generated occurrences:', occurrences);
+      
+      // Add the generated slots to the selected slots
+      onBulkSlotSelection(occurrences);
+    }
+    
     if (onPatternApply) {
       onPatternApply(pattern);
     }
