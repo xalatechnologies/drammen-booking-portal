@@ -20,6 +20,10 @@ export function BookingPriceCalculation({
   actorType,
   onActorTypeChange
 }: BookingPriceCalculationProps) {
+  console.log('BookingPriceCalculation - selectedSlots:', selectedSlots);
+  console.log('BookingPriceCalculation - facilityId:', facilityId);
+  console.log('BookingPriceCalculation - actorType:', actorType);
+
   const firstSlot = selectedSlots[0];
   
   const { calculation, isLoading } = usePriceCalculation({
@@ -31,6 +35,9 @@ export function BookingPriceCalculation({
     bookingMode: selectedSlots.length > 1 ? 'recurring' : 'one-time'
   });
 
+  console.log('BookingPriceCalculation - calculation result:', calculation);
+  console.log('BookingPriceCalculation - isLoading:', isLoading);
+
   // Calculate total for all slots
   const totalCalculation = calculation ? {
     ...calculation,
@@ -41,6 +48,8 @@ export function BookingPriceCalculation({
       amount: item.amount * selectedSlots.length
     }))
   } : null;
+
+  console.log('BookingPriceCalculation - totalCalculation:', totalCalculation);
 
   return (
     <Card>

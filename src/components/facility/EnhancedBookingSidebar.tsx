@@ -43,7 +43,7 @@ export function EnhancedBookingSidebar({
       acc[dateKey] = [];
     }
     
-    // Create a unique ID for the slot
+    // Create a unique ID for the slot that matches what we'll use for removal
     const slotId = `${slot.zoneId}-${dateKey}-${slot.timeSlot}`;
     
     // Parse timeSlot to get start and end times
@@ -76,7 +76,9 @@ export function EnhancedBookingSidebar({
     navigate('/checkout');
   };
 
+  // Updated handleSlotRemove to match the ID generation logic
   const handleSlotRemove = (slotId: string) => {
+    console.log('Removing slot with ID:', slotId);
     onSlotRemove(slotId);
   };
 
