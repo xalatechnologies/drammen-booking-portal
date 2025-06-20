@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import { ArrowLeft, User, LogIn } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { SelectedTimeSlot } from '@/utils/recurrenceEngine';
@@ -9,6 +8,7 @@ import { Zone } from '@/components/booking/types';
 import { BookingOverviewCard } from './BookingOverviewCard';
 import { CustomerTypeSection } from './CustomerTypeSection';
 import { IntegratedPriceCalculation } from '@/components/booking/IntegratedPriceCalculation';
+import { LoginSelectionModal } from '@/components/auth/LoginSelectionModal';
 import { useTranslation } from '@/i18n/hooks/useTranslation';
 import { useCart } from '@/contexts/CartContext';
 import { useToast } from '@/hooks/use-toast';
@@ -57,6 +57,7 @@ export function BookingPricingStep({
   const { toast } = useToast();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   // Check if booking requires approval
   const requiresApproval = ['lag-foreninger', 'paraply'].includes(actorType);
@@ -119,26 +120,38 @@ export function BookingPricingStep({
 
   const handleComplete = () => {
     if (!isAuthenticated) {
-      // Store current booking state for post-login redirect
-      sessionStorage.setItem('pending_booking', JSON.stringify({
-        selectedSlots,
-        facilityId,
-        facilityName,
-        actorType: convertActorType(actorType),
-        bookingType
-      }));
-      
-      toast({
-        title: "Logg inn påkrevd",
-        description: "Du må logge inn for å fullføre reservasjonen",
-      });
-      
-      navigate('/login-selection');
+      setShowLoginModal(true);
       return;
     }
 
     // User is logged in, proceed with booking completion
     onComplete();
+  };
+
+  const handleLoginMethodSelect = (method: 'id-porten' | 'feide' | 'municipal') => {
+    setShowLoginModal(false);
+    
+    // Store current booking state for post-login redirect
+    sessionStorage.setItem('pending_booking', JSON.stringify({
+      selectedSlots,
+      facilityId,
+      facilityName,
+      actorType: convertActorType(actorType),
+      bookingType
+    }));
+    
+    // Navigate to appropriate login method
+    switch (method) {
+      case 'id-porten':
+        navigate('/login/id-porten');
+        break;
+      case 'feide':
+        navigate('/login/feide');
+        break;
+      case 'municipal':
+        navigate('/login/municipal');
+        break;
+    }
   };
 
   return (
@@ -191,6 +204,13 @@ export function BookingPricingStep({
           )}
         </Button>
       </div>
+
+      {/* Login Selection Modal */}
+      <LoginSelectionModal
+        isOpen={showLoginModal}
+        onClose={() => setShowLoginModal(false)}
+        onLoginMethodSelect={handleLoginMethodSelect}
+      />
     </>
   );
 }
