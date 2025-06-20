@@ -82,7 +82,7 @@ export const FacilityCalendarAccordion: React.FC<FacilityCalendarAccordionProps>
       description: calendarZone.description,
       isMainZone: true,
       capacity: calendarZone.capacity,
-      area: 100, // Default area
+      area: "100", // Changed from number to string
       equipment: [],
       features: [],
       accessibility: [],
