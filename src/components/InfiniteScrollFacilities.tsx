@@ -147,7 +147,7 @@ export function InfiniteScrollFacilities({
   return (
     <div className="relative">
       {/* Results summary */}
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-8 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
             {pagination?.total || allFacilities.length} lokaler
@@ -174,15 +174,15 @@ export function InfiniteScrollFacilities({
         endMessage={<EndMessage />}
         scrollThreshold={0.9}
         style={{ overflow: 'visible' }}
+        className="w-full"
       >
         {/* Facilities content */}
         {viewMode === "grid" ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 w-full">
             {allFacilities.map((facility, index) => (
               <div 
                 key={`${facility.id}-${index}`}
-                className="animate-scale-in"
-                style={{ animationDelay: `${(index % 6) * 50}ms` }}
+                className="w-full"
               >
                 <FacilityCard 
                   facility={facility} 
@@ -192,12 +192,11 @@ export function InfiniteScrollFacilities({
             ))}
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-6 w-full">
             {allFacilities.map((facility, index) => (
               <div 
                 key={`${facility.id}-${index}`}
-                className="animate-fade-in"
-                style={{ animationDelay: `${(index % 6) * 50}ms` }}
+                className="w-full"
               >
                 <FacilityListItem 
                   facility={facility}
