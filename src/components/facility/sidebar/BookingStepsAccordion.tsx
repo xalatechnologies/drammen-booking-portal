@@ -51,7 +51,7 @@ export function BookingStepsAccordion({
     return selectedSlots.reduce((total, slot) => {
       const zone = zones.find(z => z.id === slot.zoneId);
       const basePrice = zone?.pricePerHour || 225;
-      const duration = slot.duration || 2; // Use slot duration or default to 2
+      const duration = slot.duration || 2;
       let price = basePrice * duration;
       
       // Apply customer type discounts
@@ -98,9 +98,11 @@ export function BookingStepsAccordion({
       addToCart({
         facilityId,
         facilityName,
-        zoneName: getZoneName(slot.zoneId),
         date: slot.date,
         timeSlot: slot.timeSlot,
+        zoneId: slot.zoneId,
+        pricePerHour: basePrice,
+        duration: duration,
         price,
         customerType: formData.customerType,
         contactDetails: {
@@ -114,6 +116,24 @@ export function BookingStepsAccordion({
           eventType: formData.eventType,
           attendees: formData.attendees ? parseInt(formData.attendees) : undefined,
           notes: formData.notes
+        },
+        // Required fields for CartItem
+        purpose: formData.purpose,
+        expectedAttendees: formData.attendees ? parseInt(formData.attendees) : 1,
+        organizationType: formData.customerType as any,
+        additionalServices: [],
+        timeSlots: [{
+          date: slot.date,
+          timeSlot: slot.timeSlot,
+          zoneId: slot.zoneId,
+          duration: duration
+        }],
+        pricing: {
+          baseFacilityPrice: basePrice * duration,
+          servicesPrice: 0,
+          discounts: 0,
+          vatAmount: 0,
+          totalPrice: price
         }
       });
     });
