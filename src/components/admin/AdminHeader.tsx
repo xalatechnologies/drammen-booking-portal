@@ -1,6 +1,5 @@
-
-import React from "react";
-import { Bell, Search, Globe } from "lucide-react";
+import React, { useState } from "react";
+import { Bell, Search, Globe, Circle, ChevronDown } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,12 +12,63 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Logo from "@/components/header/Logo";
+import { SidebarTrigger } from "@/components/ui/sidebar";
+import { cn } from "@/lib/utils";
+import { useAdminRole, AdminRole } from "@/contexts/AdminRoleContext";
+
+type Notification = {
+  id: string;
+  title: string;
+  description: string;
+  timestamp: string;
+  read: boolean;
+};
+
+const initialNotifications: Notification[] = [
+  { id: "1", title: "Ny forespørsel om lokale", description: "Brandengen Skole ba om godkjenning", timestamp: "2 minutter siden", read: false },
+  { id: "2", title: "Brukerrolle oppdatert", description: "Thomas Hansen er nå administrator", timestamp: "1 time siden", read: false },
+  { id: "3", title: "Systemvarsel", description: "Planlagt vedlikehold i kveld kl. 23:00.", timestamp: "4 timer siden", read: true },
+  { id: "4", title: "Ny melding mottatt", description: "Du har en ny melding fra Per Olsen.", timestamp: "1 dag siden", read: false },
+];
+
+const roleNames: Record<AdminRole, string> = {
+  systemadmin: 'System Admin',
+  admin: 'Admin',
+  saksbehandler: 'Saksbehandler',
+};
+
+const roleAvatars: Record<AdminRole, { src: string; fallback: string }> = {
+  systemadmin: { src: 'https://i.pravatar.cc/150?u=system-admin', fallback: 'SA' },
+  admin: { src: 'https://i.pravatar.cc/150?u=admin', fallback: 'A' },
+  saksbehandler: { src: 'https://i.pravatar.cc/150?u=saksbehandler', fallback: 'SB' },
+};
 
 const AdminHeader = () => {
+  const [language, setLanguage] = useState("NO");
+  const [notifications, setNotifications] = useState<Notification[]>(initialNotifications);
+  const { currentRole, setCurrentRole, availableRoles } = useAdminRole();
+
+  const unreadCount = notifications.filter(n => !n.read).length;
+
+  const toggleLanguage = () => {
+    setLanguage(prev => prev === "NO" ? "EN" : "NO");
+  };
+
+  const handleMarkAsRead = (id: string) => {
+    setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
+  };
+  
+  const handleMarkAllAsRead = () => {
+    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+  };
+
   return (
-    <header className="border-b bg-white shadow-sm sticky top-0 z-50 pb-2">
+    <header className="border-b bg-white shadow-sm z-50 pb-2">
       <div className="flex h-16 items-center px-6">
         <div className="flex items-center gap-4 min-w-0">
+          <div className="md:hidden mr-2">
+            <SidebarTrigger />
+          </div>
           <Logo />
         </div>
         
@@ -38,26 +88,30 @@ const AdminHeader = () => {
         <div className="flex items-center gap-3 flex-shrink-0">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button 
-                variant="ghost" 
-                className="flex items-center gap-2 px-3 py-2 h-9 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:outline-none rounded-md"
-                aria-label="Velg språk"
-              >
-                <img src="/lovable-uploads/97431924-b9fd-4ccd-b558-a9e90506c716.png" alt="NO" className="w-4 h-3" />
-                <span>Norsk</span>
+              <Button variant="outline" className="h-9 px-3">
+                {roleNames[currentRole]}
+                <ChevronDown className="ml-2 h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="bg-white shadow-lg border border-gray-200">
-              <DropdownMenuItem className="text-sm py-2 hover:bg-gray-50">
-                <img src="/lovable-uploads/97431924-b9fd-4ccd-b558-a9e90506c716.png" alt="NO" className="w-4 h-3 mr-2" />
-                Norsk
-              </DropdownMenuItem>
-              <DropdownMenuItem className="text-sm py-2 hover:bg-gray-50">
-                <img src="/lovable-uploads/b12bcda3-d611-4e9e-bbcc-d53d2db38af9.png" alt="EN" className="w-4 h-3 mr-2" />
-                English
-              </DropdownMenuItem>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Bytt visningsrolle</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {availableRoles.map(role => (
+                <DropdownMenuItem key={role} onSelect={() => setCurrentRole(role)}>
+                  {roleNames[role]}
+                </DropdownMenuItem>
+              ))}
             </DropdownMenuContent>
           </DropdownMenu>
+
+          <Button 
+            variant="ghost" 
+            onClick={toggleLanguage}
+            className="flex items-center px-3 py-2 h-9 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:outline-none rounded-md"
+            aria-label={`Bytt språk til ${language === 'NO' ? 'Engelsk' : 'Norsk'}`}
+          >
+            <span>{language}</span>
+          </Button>
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -65,31 +119,50 @@ const AdminHeader = () => {
                 variant="ghost" 
                 size="icon" 
                 className="relative h-9 w-9 hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:outline-none rounded-md"
-                aria-label="Varsler - 3 uleste"
+                aria-label={`Varsler - ${unreadCount} uleste`}
               >
                 <Bell className="h-4 w-4 text-gray-600" />
-                <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-red-500 text-white text-xs flex items-center justify-center font-medium">
-                  3
-                </span>
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-red-500 text-white text-xs flex items-center justify-center font-medium">
+                    {unreadCount}
+                  </span>
+                )}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-80 bg-white shadow-lg border border-gray-200">
-              <DropdownMenuLabel className="text-base font-semibold">Varsler</DropdownMenuLabel>
+              <div className="flex justify-between items-center px-2 py-2">
+                <DropdownMenuLabel className="text-base font-semibold p-0">Varsler</DropdownMenuLabel>
+                {unreadCount > 0 && (
+                  <Button variant="link" size="sm" className="h-auto p-0 text-xs" onClick={handleMarkAllAsRead}>
+                    Marker alle som lest
+                  </Button>
+                )}
+              </div>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="py-3 cursor-pointer hover:bg-gray-50">
-                <div className="flex flex-col gap-1">
-                  <p className="text-sm font-medium text-gray-900">Ny forespørsel om lokale</p>
-                  <p className="text-xs text-gray-600">Brandengen Skole ba om godkjenning</p>
-                  <p className="text-xs text-gray-500">2 minutter siden</p>
-                </div>
-              </DropdownMenuItem>
-              <DropdownMenuItem className="py-3 cursor-pointer hover:bg-gray-50">
-                <div className="flex flex-col gap-1">
-                  <p className="text-sm font-medium text-gray-900">Brukerrolle oppdatert</p>
-                  <p className="text-xs text-gray-600">Thomas Hansen er nå administrator</p>
-                  <p className="text-xs text-gray-500">1 time siden</p>
-                </div>
-              </DropdownMenuItem>
+              {notifications.length > 0 ? (
+                notifications.map((notification) => (
+                  <DropdownMenuItem 
+                    key={notification.id}
+                    className="py-3 cursor-pointer hover:bg-gray-50 focus:bg-gray-100"
+                    onClick={() => handleMarkAsRead(notification.id)}
+                  >
+                    <div className="flex items-start gap-3 w-full">
+                      <div className="w-2 pt-1">
+                        {!notification.read && (
+                          <Circle className="h-2 w-2 text-blue-500 fill-current" />
+                        )}
+                      </div>
+                      <div className="flex flex-col gap-1 flex-1">
+                        <p className="text-sm font-medium text-gray-900">{notification.title}</p>
+                        <p className="text-xs text-gray-600">{notification.description}</p>
+                        <p className="text-xs text-gray-500">{notification.timestamp}</p>
+                      </div>
+                    </div>
+                  </DropdownMenuItem>
+                ))
+              ) : (
+                <p className="text-center text-sm text-gray-500 py-4">Ingen nye varsler</p>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
 
@@ -102,11 +175,13 @@ const AdminHeader = () => {
                 aria-label="Brukerprofil og innstillinger"
               >
                 <Avatar className="h-7 w-7">
-                  <AvatarImage src="/placeholder.svg" alt="Development User" />
-                  <AvatarFallback className="bg-blue-600 text-white text-xs font-medium">DU</AvatarFallback>
+                  <AvatarImage src={roleAvatars[currentRole].src} alt={roleNames[currentRole]} />
+                  <AvatarFallback className="bg-blue-600 text-white text-xs font-medium">
+                    {roleAvatars[currentRole].fallback}
+                  </AvatarFallback>
                 </Avatar>
                 <div className="hidden md:flex flex-col items-start">
-                  <span className="text-sm font-medium text-gray-900">Development User</span>
+                  <span className="text-sm font-medium text-gray-900">{roleNames[currentRole]}</span>
                 </div>
               </Button>
             </DropdownMenuTrigger>

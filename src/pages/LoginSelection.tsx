@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,7 +15,7 @@ const LoginSelection = () => {
     } else if (userType === "caseworker") {
       navigate("/caseworker");
     } else {
-      navigate("/");
+      navigate("/minside/bruker");
     }
   };
 
@@ -143,6 +142,20 @@ const LoginSelection = () => {
               </CardFooter>
             </Card>
           </div>
+
+          <div className="text-center mt-12">
+            <p className="text-lg text-gray-600">
+              Logger du inn på vegne av en paraplyorganisasjon?
+            </p>
+            <Button
+              variant="link"
+              className="text-lg text-blue-800"
+              onClick={() => navigate("/minside/paraply")}
+            >
+              Gå til Paraplyadministrator-visning
+            </Button>
+          </div>
+
         </div>
       </div>
 

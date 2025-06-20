@@ -1,332 +1,336 @@
-
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useNavigate } from "react-router-dom";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import {
-  Building,
-  AlertTriangle,
-  Clock,
-  CheckCircle,
-  Plus,
-  FileText,
-  Users,
-  BarChart3,
-  TrendingUp,
-  TrendingDown,
-  Calendar,
-  ClipboardList,
-  Settings,
-  Search,
-  Filter,
-  MoreVertical
-} from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { useAdminRole } from "@/contexts/AdminRoleContext";
 
-const OverviewPage = () => {
+// Mock data for development
+const mockStats = {
+  activeBookings: 156,
+  pendingRequests: 12,
+  activeUsers: 1243,
+  activeFacilities: 28,
+  upcomingMaintenance: 3,
+  openSupportTickets: 8,
+};
+
+const mockRecentActivity = [
+  {
+    id: 1,
+    type: "booking",
+    description: "Ny booking for Drammenshallen",
+    user: "Ole Hansen",
+    time: "10 min siden",
+    status: "pending",
+  },
+  {
+    id: 2,
+    type: "support",
+    description: "Support-sak: Problemer med adgang",
+    user: "Kari Nilsen",
+    time: "25 min siden",
+    status: "high",
+  },
+  {
+    id: 3,
+    type: "system",
+    description: "Systemvarsel: Høy CPU-bruk",
+    user: "System",
+    time: "1 time siden",
+    status: "warning",
+  },
+];
+
+const mockAlerts = [
+  {
+    id: 1,
+    type: "error",
+    message: "Feil i integrasjon med SimonsVoss låssystem",
+    time: "2 timer siden",
+  },
+  {
+    id: 2,
+    type: "warning",
+    message: "Drammenshallen nærmer seg kapasitetsgrense for neste uke",
+    time: "3 timer siden",
+  },
+];
+
+const mockUpcomingMaintenance = [
+  {
+    id: 1,
+    facility: "Drammenshallen",
+    type: "Rengjøring",
+    date: "I morgen, 06:00-08:00",
+  },
+  {
+    id: 2,
+    facility: "Galterud gymsal",
+    type: "Teknisk vedlikehold",
+    date: "23. juni, 12:00-16:00",
+  },
+];
+
+const mockNotifications = [
+  { id: "1", title: "Ny forespørsel om lokale", description: "Brandengen Skole ba om godkjenning", timestamp: "2 minutter siden", read: false },
+  { id: "2", title: "Brukerrolle oppdatert", description: "Thomas Hansen er nå administrator", timestamp: "1 time siden", read: false },
+  { id: "3", title: "Systemvarsel", description: "Planlagt vedlikehold i kveld kl. 23:00.", timestamp: "4 timer siden", read: true },
+  { id: "4", title: "Ny melding mottatt", description: "Du har en ny melding fra Per Olsen.", timestamp: "1 dag siden", read: false },
+];
+
+const Overview: React.FC = () => {
+  const navigate = useNavigate();
+  const { currentRole } = useAdminRole();
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "high":
+        return "text-red-500";
+      case "warning":
+        return "text-yellow-500";
+      case "pending":
+        return "text-blue-500";
+      default:
+        return "text-gray-500";
+    }
+  };
+
+  const translateStatus = (status: string) => {
+    switch (status) {
+      case "high":
+        return "Høy";
+      case "warning":
+        return "Advarsel";
+      case "pending":
+        return "Venter";
+      default:
+        return status;
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      {/* Header Section */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-2xl font-semibold text-gray-900 mb-2">Administrer og overvåk lokaler</h1>
-            <p className="text-base text-gray-600">Administrer og overvåk lokaler</p>
+    <div className="space-y-8 w-full p-8" role="main" aria-labelledby="page-title">
+      <header className="mb-6">
+        <h1 className="text-3xl font-bold tracking-tight text-gray-900 mb-2">
+          Dashboard
+        </h1>
+        <p className="text-lg text-gray-700 leading-relaxed">
+          Velkommen! Her er en rask oversikt tilpasset din rolle.
+        </p>
+      </header>
+
+      {/* Quick Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+        {['saksbehandler', 'admin', 'systemadmin'].includes(currentRole) && (
+          <>
+            <Card>
+              <CardContent className="pt-4">
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Aktive bookinger</p>
+                  <p className="text-2xl font-bold">{mockStats.activeBookings}</p>
+                </div>
+                <Button variant="link" className="mt-2 p-0 h-auto text-sm" onClick={() => navigate("/admin/bookings-overview")}>
+                  Se alle bookinger →
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="pt-4">
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Ventende forespørsler</p>
+                  <p className="text-2xl font-bold">{mockStats.pendingRequests}</p>
+                </div>
+                <Button variant="link" className="mt-2 p-0 h-auto text-sm" onClick={() => navigate("/admin/approvals")}>
+                  Behandle forespørsler →
+                </Button>
+              </CardContent>
+            </Card>
+          </>
+        )}
+
+        {['admin', 'systemadmin'].includes(currentRole) && (
+          <>
+            <Card>
+              <CardContent className="pt-4">
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Aktive brukere</p>
+                  <p className="text-2xl font-bold">{mockStats.activeUsers}</p>
+                </div>
+                <Button variant="link" className="mt-2 p-0 h-auto text-sm" onClick={() => navigate("/admin/users")}>
+                  Administrer brukere →
+                </Button>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-4">
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Åpne support-saker</p>
+                  <p className="text-2xl font-bold">{mockStats.openSupportTickets}</p>
+                </div>
+                <Button variant="link" className="mt-2 p-0 h-auto text-sm" onClick={() => navigate("/admin/support-tickets")}>
+                  Se support-saker →
+                </Button>
+              </CardContent>
+            </Card>
+          </>
+        )}
+
+        {['systemadmin'].includes(currentRole) && (
+          <>
+            <Card>
+              <CardContent className="pt-4">
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Aktive lokaler</p>
+                  <p className="text-2xl font-bold">{mockStats.activeFacilities}</p>
+                </div>
+                <Button variant="link" className="mt-2 p-0 h-auto text-sm" onClick={() => navigate("/admin/facilities")}>
+                  Se alle lokaler →
+                </Button>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-4">
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Planlagt vedlikehold</p>
+                  <p className="text-2xl font-bold">{mockStats.upcomingMaintenance}</p>
+                </div>
+                <Button variant="link" className="mt-2 p-0 h-auto text-sm" onClick={() => navigate("/admin/facilities")}>
+                  Se vedlikeholdsplan →
+                </Button>
+              </CardContent>
+            </Card>
+          </>
+        )}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Recent Activity - visible to all */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Siste aktivitet</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Hendelse</TableHead>
+                  <TableHead>Bruker</TableHead>
+                  <TableHead>Tid</TableHead>
+                  <TableHead>Status</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {mockRecentActivity.map((activity) => (
+                  <TableRow key={activity.id}>
+                    <TableCell>{activity.description}</TableCell>
+                    <TableCell>{activity.user}</TableCell>
+                    <TableCell>{activity.time}</TableCell>
+                    <TableCell>
+                      <span className={getStatusColor(activity.status)}>
+                        {translateStatus(activity.status)}
+                      </span>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+
+        {/* System Alerts - only for system admins */}
+        {currentRole === 'systemadmin' && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Systemvarsler</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {mockAlerts.map((alert) => (
+                  <div key={alert.id} className="flex items-start gap-3">
+                    <div
+                      className={`h-2 w-2 rounded-full mt-1.5 ${
+                        alert.type === "error" ? "bg-red-500" : "bg-yellow-400"
+                      }`}
+                    ></div>
+                    <div>
+                      <p className="text-sm font-medium">{alert.message}</p>
+                      <p className="text-xs text-gray-500">{alert.time}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+
+      {/* Quick Actions */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Hurtighandlinger</CardTitle>
+          <CardDescription>
+            Vanlige administrative oppgaver tilpasset din rolle
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {['saksbehandler', 'admin', 'systemadmin'].includes(currentRole) && (
+              <Button
+                variant="outline"
+                className="h-auto py-4 flex flex-col items-center justify-center"
+                onClick={() => navigate("/admin/facilities")}
+              >
+                <span>Opprett nytt lokale</span>
+              </Button>
+            )}
+            
+            {['admin', 'systemadmin'].includes(currentRole) && (
+              <>
+                <Button
+                  variant="outline"
+                  className="h-auto py-4 flex flex-col items-center justify-center"
+                  onClick={() => navigate("/admin/support-tickets")}
+                >
+                  <span>Opprett support-sak</span>
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  className="h-auto py-4 flex flex-col items-center justify-center"
+                  onClick={() => navigate("/admin/notifications")}
+                >
+                  <span>Send melding</span>
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  className="h-auto py-4 flex flex-col items-center justify-center"
+                  onClick={() => navigate("/admin/reports")}
+                >
+                  <span>Generer rapport</span>
+                </Button>
+              </>
+            )}
           </div>
-          <Button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 h-10 text-base font-medium">
-            <Plus className="h-4 w-4 mr-2" />
-            Ny Lokal
-          </Button>
-        </div>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid gap-6 md:grid-cols-4 mb-8">
-        <Card className="bg-white border border-gray-200 shadow-sm">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-2 bg-blue-50 rounded-lg">
-                <Building className="h-5 w-5 text-blue-600" />
-              </div>
-              <MoreVertical className="h-4 w-4 text-gray-400" />
-            </div>
-            <div className="mb-2">
-              <p className="text-2xl font-semibold text-gray-900">143</p>
-              <p className="text-sm text-gray-600">Totale Lokaler</p>
-            </div>
-            <div className="flex items-center text-sm">
-              <TrendingUp className="h-4 w-4 text-green-500 mr-1" />
-              <span className="text-green-600 font-medium">+5</span>
-              <span className="text-gray-500 ml-1">fra forrige måned</span>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white border border-gray-200 shadow-sm">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-2 bg-green-50 rounded-lg">
-                <CheckCircle className="h-5 w-5 text-green-600" />
-              </div>
-              <MoreVertical className="h-4 w-4 text-gray-400" />
-            </div>
-            <div className="mb-2">
-              <p className="text-2xl font-semibold text-gray-900">34</p>
-              <p className="text-sm text-gray-600">I Produksjon</p>
-            </div>
-            <div className="flex items-center text-sm">
-              <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-              <span className="text-green-600 font-medium">89%</span>
-              <span className="text-gray-500 ml-1">av totalt</span>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white border border-gray-200 shadow-sm">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-2 bg-amber-50 rounded-lg">
-                <Clock className="h-5 w-5 text-amber-600" />
-              </div>
-              <MoreVertical className="h-4 w-4 text-gray-400" />
-            </div>
-            <div className="mb-2">
-              <p className="text-2xl font-semibold text-gray-900">12</p>
-              <p className="text-sm text-gray-600">Ventende Godkjenninger</p>
-            </div>
-            <div className="flex items-center text-sm">
-              <div className="w-2 h-2 bg-amber-500 rounded-full mr-2"></div>
-              <span className="text-amber-600 font-medium">Trenger handling</span>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white border border-gray-200 shadow-sm">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-2 bg-red-50 rounded-lg">
-                <AlertTriangle className="h-5 w-5 text-red-600" />
-              </div>
-              <MoreVertical className="h-4 w-4 text-gray-400" />
-            </div>
-            <div className="mb-2">
-              <p className="text-2xl font-semibold text-gray-900">2</p>
-              <p className="text-sm text-gray-600">Kritiske Varsler</p>
-            </div>
-            <div className="flex items-center text-sm">
-              <AlertTriangle className="h-4 w-4 text-red-500 mr-1" />
-              <span className="text-red-600 font-medium">Krever oppmerksomhet</span>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Main Content */}
-      <div className="grid gap-6 lg:grid-cols-3">
-        {/* Lokaler Liste */}
-        <Card className="lg:col-span-2 bg-white border border-gray-200 shadow-sm">
-          <CardHeader className="border-b border-gray-100 pb-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="text-lg font-semibold text-gray-900">Alle Lokaler</CardTitle>
-                <p className="text-sm text-gray-600 mt-1">Administrer og overvåk alle lokaler</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" className="text-gray-600 border-gray-200">
-                  <Filter className="h-4 w-4 mr-2" />
-                  Alle Statuser
-                </Button>
-                <Button variant="outline" size="sm" className="text-gray-600 border-gray-200">
-                  Sorter etter dato
-                </Button>
-              </div>
-            </div>
-            <div className="mt-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <Input
-                  placeholder="Søk etter lokaler..."
-                  className="pl-10 bg-gray-50 border-gray-200 text-base"
-                />
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="p-0">
-            <div className="space-y-0">
-              <div className="flex items-center justify-between p-6 border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                <div className="flex items-center gap-4">
-                  <div className="p-2 bg-blue-50 rounded-lg">
-                    <Building className="h-5 w-5 text-blue-600" />
-                  </div>
-                  <div>
-                    <p className="font-medium text-gray-900">Drammen Idrettshall</p>
-                    <div className="flex items-center gap-4 mt-1">
-                      <span className="text-sm text-gray-500">Hovedhall</span>
-                      <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-                        Produksjon
-                      </Badge>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-4 text-sm text-gray-500">
-                  <div className="text-right">
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                      <span className="font-medium text-green-600">95% samsvar</span>
-                    </div>
-                    <p className="text-xs">Sist oppdatert: 2024-03-15</p>
-                  </div>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                        <MoreVertical className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem>Detaljer</DropdownMenuItem>
-                      <DropdownMenuItem>Administrer</DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between p-6 border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                <div className="flex items-center gap-4">
-                  <div className="p-2 bg-green-50 rounded-lg">
-                    <Building className="h-5 w-5 text-green-600" />
-                  </div>
-                  <div>
-                    <p className="font-medium text-gray-900">Strømsø Samfunnshus</p>
-                    <div className="flex items-center gap-4 mt-1">
-                      <span className="text-sm text-gray-500">Storhall</span>
-                      <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-                        Produksjon
-                      </Badge>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-4 text-sm text-gray-500">
-                  <div className="text-right">
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-amber-500 rounded-full"></div>
-                      <span className="font-medium text-amber-600">88% samsvar</span>
-                    </div>
-                    <p className="text-xs">Sist oppdatert: 2024-03-14</p>
-                  </div>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                        <MoreVertical className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem>Detaljer</DropdownMenuItem>
-                      <DropdownMenuItem>Administrer</DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between p-6 hover:bg-gray-50 transition-colors">
-                <div className="flex items-center gap-4">
-                  <div className="p-2 bg-amber-50 rounded-lg">
-                    <Building className="h-5 w-5 text-amber-600" />
-                  </div>
-                  <div>
-                    <p className="font-medium text-gray-900">Brandengen Skole</p>
-                    <div className="flex items-center gap-4 mt-1">
-                      <span className="text-sm text-gray-500">Gymsal</span>
-                      <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">
-                        Test
-                      </Badge>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-4 text-sm text-gray-500">
-                  <div className="text-right">
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                      <span className="font-medium text-green-600">92% samsvar</span>
-                    </div>
-                    <p className="text-xs">Sist oppdatert: 2024-03-13</p>
-                  </div>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                        <MoreVertical className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem>Detaljer</DropdownMenuItem>
-                      <DropdownMenuItem>Administrer</DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Quick Actions */}
-        <Card className="bg-white border border-gray-200 shadow-sm">
-          <CardHeader className="border-b border-gray-100 pb-4">
-            <CardTitle className="text-lg font-semibold text-gray-900">Hurtighandlinger</CardTitle>
-            <p className="text-sm text-gray-600">Vanlige administrative oppgaver</p>
-          </CardHeader>
-          <CardContent className="p-6">
-            <div className="space-y-4">
-              <Button className="w-full justify-start gap-3 h-12 bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200" variant="outline">
-                <div className="p-2 bg-blue-100 rounded-lg">
-                  <Clock className="h-4 w-4 text-blue-600" />
-                </div>
-                <div className="text-left">
-                  <p className="font-medium">Behandle Forespørsler</p>
-                  <p className="text-xs text-blue-600">12 ventende</p>
-                </div>
-              </Button>
-              
-              <Button className="w-full justify-start gap-3 h-12 bg-green-50 hover:bg-green-100 text-green-700 border-green-200" variant="outline">
-                <div className="p-2 bg-green-100 rounded-lg">
-                  <Building className="h-4 w-4 text-green-600" />
-                </div>
-                <div className="text-left">
-                  <p className="font-medium">Administrer Lokaler</p>
-                  <p className="text-xs text-green-600">143 aktive</p>
-                </div>
-              </Button>
-              
-              <Button className="w-full justify-start gap-3 h-12 bg-purple-50 hover:bg-purple-100 text-purple-700 border-purple-200" variant="outline">
-                <div className="p-2 bg-purple-100 rounded-lg">
-                  <Users className="h-4 w-4 text-purple-600" />
-                </div>
-                <div className="text-left">
-                  <p className="font-medium">Administrer Brukere</p>
-                  <p className="text-xs text-purple-600">Se alle</p>
-                </div>
-              </Button>
-              
-              <Button className="w-full justify-start gap-3 h-12 bg-gray-50 hover:bg-gray-100 text-gray-700 border-gray-200" variant="outline">
-                <div className="p-2 bg-gray-100 rounded-lg">
-                  <BarChart3 className="h-4 w-4 text-gray-600" />
-                </div>
-                <div className="text-left">
-                  <p className="font-medium">Se Rapporter</p>
-                  <p className="text-xs text-gray-600">Analytikk</p>
-                </div>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
 
-export default OverviewPage;
+export default Overview;
