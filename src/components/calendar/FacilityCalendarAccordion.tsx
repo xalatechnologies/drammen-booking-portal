@@ -8,7 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { CalendarGrid } from "../facility/tabs/CalendarGrid";
 import { addDays } from "date-fns";
 
-interface Zone {
+// Simplified Zone interface for calendar view
+interface CalendarZone {
   id: string;
   name: string;
   capacity: number;
@@ -24,7 +25,7 @@ interface FacilityWithZones {
   accessibility: string[];
   suitableFor: string[];
   image?: string;
-  zones: Zone[];
+  zones: CalendarZone[];
 }
 
 interface FacilityCalendarAccordionProps {
@@ -70,6 +71,57 @@ export const FacilityCalendarAccordion: React.FC<FacilityCalendarAccordionProps>
       const facilityId = zoneId.split('-')[1];
       window.location.href = `/facilities/${facilityId}?date=${date.toISOString().split('T')[0]}&time=${timeSlot}`;
     }
+  };
+
+  // Convert CalendarZone to the Zone type expected by CalendarGrid
+  const convertToZone = (calendarZone: CalendarZone, facilityId: number) => {
+    return {
+      id: calendarZone.id,
+      facilityId: facilityId.toString(),
+      name: calendarZone.name,
+      description: calendarZone.description,
+      isMainZone: true,
+      capacity: calendarZone.capacity,
+      area: 100, // Default area
+      equipment: [],
+      features: [],
+      accessibility: [],
+      pricing: {
+        basePrice: calendarZone.pricePerHour,
+        currency: 'NOK',
+        priceRules: [],
+        minimumBookingDuration: 60,
+        maximumBookingDuration: 480,
+        cancellationPolicy: {
+          freeUntilHours: 24,
+          partialRefundUntilHours: 12,
+          partialRefundPercentage: 50,
+          noRefundAfterHours: 0
+        }
+      },
+      availability: {
+        openingHours: [],
+        blackoutPeriods: [],
+        maintenanceSchedule: [],
+        recurringUnavailability: []
+      },
+      restrictions: {
+        requiresSupervision: false,
+        allowedActivities: [],
+        prohibitedActivities: [],
+        requiresTraining: false,
+        alcoholPermitted: false,
+        smokingPermitted: false,
+        petsAllowed: false,
+        cateringAllowed: true,
+        decorationsAllowed: true,
+        amplifiedSoundAllowed: true,
+        commercialUseAllowed: true
+      },
+      isActive: true,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
   };
 
   return (
@@ -159,7 +211,7 @@ export const FacilityCalendarAccordion: React.FC<FacilityCalendarAccordionProps>
                       <p className="text-sm text-gray-600 mt-1">{zone.description}</p>
                     </div>
                     <CalendarGrid
-                      zone={zone}
+                      zone={convertToZone(zone, facility.id)}
                       currentWeekStart={currentWeekStart}
                       timeSlots={timeSlots}
                       selectedSlots={[]}
@@ -181,7 +233,7 @@ export const FacilityCalendarAccordion: React.FC<FacilityCalendarAccordionProps>
                   <p className="text-sm text-gray-600 mt-1">{facility.zones[0].description}</p>
                 </div>
                 <CalendarGrid
-                  zone={facility.zones[0]}
+                  zone={convertToZone(facility.zones[0], facility.id)}
                   currentWeekStart={currentWeekStart}
                   timeSlots={timeSlots}
                   selectedSlots={[]}
