@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { DateRange } from "react-day-picker";
 import { X, Filter, Search, MapPin, Calendar, Users, Settings } from "lucide-react";
@@ -127,30 +128,32 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
         </div>
       </div>
 
-      {/* Advanced Filters Section */}
-      <div className="mt-6 bg-white/95 backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg p-6">
-        {/* Advanced Filters - Expandable */}
-        {showAdvanced && <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm animate-fade-in">
+      {/* Advanced Filters Section - Only show when showAdvanced is true */}
+      {showAdvanced && (
+        <div className="mt-6 bg-white/95 backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg p-6">
+          {/* Advanced Filters - Expandable */}
+          <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm animate-fade-in">
             <div className="flex items-center mb-6">
               <Settings className="h-5 w-5 text-slate-600 mr-3" />
               <h3 className="font-bold text-slate-900 text-lg">{t('search.labels.advancedFilters')}</h3>
             </div>
             <AdvancedFilters accessibility={accessibility} setAccessibility={setAccessibility} capacity={capacity} setCapacity={setCapacity} priceRange={priceRange} setPriceRange={setPriceRange} availableNow={availableNow} setAvailableNow={setAvailableNow} hasEquipment={hasEquipment} setHasEquipment={setHasEquipment} hasParking={hasParking} setHasParking={setHasParking} hasWifi={hasWifi} setHasWifi={setHasWifi} allowsPhotography={allowsPhotography} setAllowsPhotography={setAllowsPhotography} />
-          </div>}
+          </div>
 
-        {/* Active Filters */}
-        {hasActiveFilters && <div className="mt-4">
-            <ActiveFilters dateRange={dateRange} setDateRange={setDateRange} facilityType={facilityType} setFacilityType={setFacilityType} location={location} setLocation={setLocation} accessibility={accessibility} setAccessibility={setAccessibility} capacity={capacity} setCapacity={setCapacity} priceRange={priceRange} setPriceRange={setPriceRange} availableNow={availableNow} setAvailableNow={setAvailableNow} hasEquipment={hasEquipment} setHasEquipment={setHasEquipment} hasParking={hasParking} setHasParking={setHasParking} hasWifi={hasWifi} setHasWifi={setHasWifi} allowsPhotography={allowsPhotography} setAllowsPhotography={setAllowsPhotography} />
-          </div>}
+          {/* Active Filters */}
+          {hasActiveFilters && <div className="mt-4">
+              <ActiveFilters dateRange={dateRange} setDateRange={setDateRange} facilityType={facilityType} setFacilityType={setFacilityType} location={location} setLocation={setLocation} accessibility={accessibility} setAccessibility={setAccessibility} capacity={capacity} setCapacity={setCapacity} priceRange={priceRange} setPriceRange={setPriceRange} availableNow={availableNow} setAvailableNow={setAvailableNow} hasEquipment={hasEquipment} setHasEquipment={setHasEquipment} hasParking={hasParking} setHasParking={setHasParking} hasWifi={hasWifi} setHasWifi={setHasWifi} allowsPhotography={allowsPhotography} setAllowsPhotography={setAllowsPhotography} />
+            </div>}
 
-        {/* Clear Filters */}
-        {hasActiveFilters && <div className="flex justify-end mt-4">
-            <Button variant="ghost" size="sm" onClick={clearFilters} className="text-slate-500 hover:text-red-600 hover:bg-red-50 font-medium transition-colors duration-200">
-              <X className="h-4 w-4 mr-2" />
-              {t('search.actions.clearFilters')}
-            </Button>
-          </div>}
-      </div>
+          {/* Clear Filters */}
+          {hasActiveFilters && <div className="flex justify-end mt-4">
+              <Button variant="ghost" size="sm" onClick={clearFilters} className="text-slate-500 hover:text-red-600 hover:bg-red-50 font-medium transition-colors duration-200">
+                <X className="h-4 w-4 mr-2" />
+                {t('search.actions.clearFilters')}
+              </Button>
+            </div>}
+        </div>
+      )}
     </div>;
 };
 
