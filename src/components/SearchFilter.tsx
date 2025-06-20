@@ -10,6 +10,7 @@ import ViewModeToggle from "@/components/search/ViewModeToggle";
 import ActiveFilters from "@/components/search/ActiveFilters";
 import AdvancedFilters from "@/components/search/AdvancedFilters";
 import { useTranslation } from "@/i18n/hooks/useTranslation";
+
 interface SearchFilterProps {
   date?: Date;
   setDate: (date: Date | undefined) => void;
@@ -38,6 +39,7 @@ interface SearchFilterProps {
   allowsPhotography: boolean;
   setAllowsPhotography: (allows: boolean) => void;
 }
+
 const SearchFilter: React.FC<SearchFilterProps> = ({
   date,
   setDate,
@@ -71,6 +73,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
   } = useTranslation();
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [showAdvanced, setShowAdvanced] = useState(false);
+
   const clearFilters = () => {
     setDate(undefined);
     setDateRange(undefined);
@@ -86,30 +89,27 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
     setHasWifi(false);
     setAllowsPhotography(false);
   };
+
   const hasActiveFilters = date || dateRange || facilityType && facilityType !== "all" || location && location !== "all" || accessibility && accessibility !== "all" || capacity[0] > 0 || capacity[1] < 200 || searchTerm || priceRange[0] > 0 || priceRange[1] < 5000 || availableNow || hasEquipment || hasParking || hasWifi || allowsPhotography;
   const hasAdvancedFilters = dateRange || accessibility && accessibility !== "all" || capacity[0] > 0 || capacity[1] < 200 || priceRange[0] > 0 || priceRange[1] < 5000 || availableNow || hasEquipment || hasParking || hasWifi || allowsPhotography;
+
   return <div className="mb-8">
-      {/* Main Search Section */}
-      <div className="bg-gradient-to-br from-slate-600 via-slate-700 to-slate-800 rounded-2xl p-8 shadow-2xl">
+      {/* Main Filters Section - Soft Navy Blue Background */}
+      <div className="bg-slate-50 rounded-2xl p-8 shadow-lg border border-slate-200">
         <div className="flex flex-col lg:flex-row gap-6 items-stretch">
-          {/* Search Input */}
+          {/* Main Filter Selects */}
           <div className="lg:flex-1">
-            <SearchInput searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
-          </div>
-
-          {/* Date Range Picker */}
-          <div className="lg:w-72">
-            <DateRangePicker dateRange={dateRange} setDateRange={setDateRange} />
-          </div>
-        </div>
-      </div>
-
-      {/* Filters Section */}
-      <div className="mt-6 bg-white/95 backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg p-6">
-        {/* Quick Filters Row */}
-        <div className="flex flex-col lg:flex-row gap-6 items-stretch mb-6 mt-4">
-          <div className="lg:flex-1">
-            <FilterSelects facilityType={facilityType} setFacilityType={setFacilityType} location={location} setLocation={setLocation} accessibility={accessibility} setAccessibility={setAccessibility} capacity={capacity} setCapacity={setCapacity} showOnlyMain={true} />
+            <FilterSelects 
+              facilityType={facilityType} 
+              setFacilityType={setFacilityType} 
+              location={location} 
+              setLocation={setLocation} 
+              accessibility={accessibility} 
+              setAccessibility={setAccessibility} 
+              capacity={capacity} 
+              setCapacity={setCapacity} 
+              showOnlyMain={true} 
+            />
           </div>
 
           {/* Action Buttons */}
@@ -125,7 +125,10 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
             <ViewModeToggle viewMode={viewMode} setViewMode={setViewMode} />
           </div>
         </div>
+      </div>
 
+      {/* Advanced Filters Section */}
+      <div className="mt-6 bg-white/95 backdrop-blur-sm rounded-2xl border border-slate-200 shadow-lg p-6">
         {/* Advanced Filters - Expandable */}
         {showAdvanced && <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm animate-fade-in">
             <div className="flex items-center mb-6">
@@ -150,4 +153,5 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
       </div>
     </div>;
 };
+
 export default SearchFilter;
