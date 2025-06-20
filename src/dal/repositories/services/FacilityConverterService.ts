@@ -73,20 +73,23 @@ export class FacilityConverterService {
   }
 
   static updateFacilityFromRequest(existing: Facility, request: FacilityUpdateRequest): Facility {
-    // Start with the existing facility and apply updates
-    const updatedFacility: Facility = {
-      ...existing,
-      ...request
-    };
+    // Create a properly typed update object
+    const updates: Partial<Facility> = { ...request };
 
     // If openingHours is being updated, properly cast dayOfWeek values
     if (request.openingHours) {
-      updatedFacility.openingHours = request.openingHours.map(hour => ({
+      updates.openingHours = request.openingHours.map(hour => ({
         dayOfWeek: hour.dayOfWeek as 0 | 1 | 2 | 3 | 4 | 5 | 6,
         opens: hour.opens,
         closes: hour.closes
       }));
     }
+
+    // Start with the existing facility and apply updates
+    const updatedFacility: Facility = {
+      ...existing,
+      ...updates
+    };
 
     return updatedFacility;
   }
