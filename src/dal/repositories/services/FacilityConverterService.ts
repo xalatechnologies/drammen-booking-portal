@@ -73,7 +73,8 @@ export class FacilityConverterService {
   }
 
   static updateFacilityFromRequest(existing: Facility, request: FacilityUpdateRequest): Facility {
-    const updatedFacility = {
+    // Start with the existing facility and apply updates
+    const updatedFacility: Facility = {
       ...existing,
       ...request
     };
