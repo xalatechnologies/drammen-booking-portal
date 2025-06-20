@@ -30,7 +30,7 @@ export const useZone = (zoneId?: string) => {
       if (!response.success) {
         throw new Error(response.error?.message || 'Failed to fetch zone');
       }
-      return response.success ? response.data : null;
+      return response.data || null;
     },
     enabled: !!zoneId,
     staleTime: 1000 * 60 * 5, // 5 minutes
