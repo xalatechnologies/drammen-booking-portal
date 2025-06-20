@@ -73,12 +73,15 @@ export const MapMarkers: React.FC<MapMarkersProps> = ({ map, facilities }) => {
         display: flex;
         align-items: center;
         justify-content: center;
+        position: relative;
+        z-index: 1;
       `;
       
       // Add icon to marker
       const icon = document.createElement('div');
       icon.innerHTML = '🏢';
       icon.style.fontSize = '14px';
+      icon.style.pointerEvents = 'none';
       markerEl.appendChild(icon);
 
       // Create popup with facility info
@@ -90,7 +93,7 @@ export const MapMarkers: React.FC<MapMarkersProps> = ({ map, facilities }) => {
           border-radius: 8px;
           overflow: hidden;
           cursor: pointer;
-        " onclick="window.location.href='/facilities/${facility.id}'">
+        ">
           <div style="
             width: 100%;
             height: 120px;
@@ -140,11 +143,22 @@ export const MapMarkers: React.FC<MapMarkersProps> = ({ map, facilities }) => {
         .addTo(map);
 
       // Handle marker click to show popup (only one at a time)
-      markerEl.addEventListener('click', () => {
+      markerEl.addEventListener('click', (e) => {
+        e.stopPropagation();
         closeCurrentPopup(); // Close any existing popup
         marker.setPopup(popup);
         popup.addTo(map);
         currentPopup.current = popup;
+      });
+
+      // Handle popup content click to navigate to facility
+      popup.on('open', () => {
+        const popupContent = document.querySelector('.facility-popup-card');
+        if (popupContent) {
+          popupContent.addEventListener('click', () => {
+            window.location.href = `/facilities/${facility.id}`;
+          });
+        }
       });
 
       markers.current.push(marker);

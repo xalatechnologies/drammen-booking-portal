@@ -78,8 +78,8 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location, viewMode, set
         setViewMode={setViewMode}
       />
 
-      {/* Map Content */}
-      <Card className="min-h-[600px] relative overflow-hidden">
+      {/* Map Content - Made taller */}
+      <Card className="min-h-[800px] relative overflow-hidden">
         <MapLoadingState isLoading={isLoading || facilitiesLoading} />
         
         <MapErrorState 
