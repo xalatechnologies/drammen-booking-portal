@@ -9,7 +9,9 @@ interface WeekdaySelectorProps {
   onWeekdayToggle: (day: number) => void;
 }
 
-const weekdayNames = ['Søn', 'Man', 'Tir', 'Ons', 'Tor', 'Fre', 'Lør'];
+// Start with Monday (1) instead of Sunday (0)
+const weekdayNames = ['Man', 'Tir', 'Ons', 'Tor', 'Fre', 'Lør', 'Søn'];
+const weekdayValues = [1, 2, 3, 4, 5, 6, 0]; // Monday = 1, Sunday = 0
 
 export function WeekdaySelector({ selectedWeekdays, onWeekdayToggle }: WeekdaySelectorProps) {
   return (
@@ -29,12 +31,13 @@ export function WeekdaySelector({ selectedWeekdays, onWeekdayToggle }: WeekdaySe
       </div>
       <div className="flex gap-3 flex-wrap justify-center">
         {weekdayNames.map((day, index) => {
-          const isSelected = selectedWeekdays.includes(index);
+          const dayValue = weekdayValues[index];
+          const isSelected = selectedWeekdays.includes(dayValue);
           return (
             <Button
               key={index}
               variant={isSelected ? 'default' : 'outline'}
-              onClick={() => onWeekdayToggle(index)}
+              onClick={() => onWeekdayToggle(dayValue)}
               className={`w-20 h-20 p-0 text-lg font-bold transition-all transform hover:scale-110 relative ${
                 isSelected 
                   ? 'bg-green-600 hover:bg-green-700 text-white shadow-xl ring-4 ring-green-200' 

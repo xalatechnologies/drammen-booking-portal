@@ -8,7 +8,9 @@ interface WeekdayStepProps {
   onWeekdayToggle: (day: number) => void;
 }
 
-const weekdayNames = ['Søn', 'Man', 'Tir', 'Ons', 'Tor', 'Fre', 'Lør'];
+// Start with Monday (1) instead of Sunday (0)
+const weekdayNames = ['Man', 'Tir', 'Ons', 'Tor', 'Fre', 'Lør', 'Søn'];
+const weekdayValues = [1, 2, 3, 4, 5, 6, 0]; // Monday = 1, Sunday = 0
 
 export function WeekdayStep({ selectedWeekdays, onWeekdayToggle }: WeekdayStepProps) {
   return (
@@ -26,12 +28,13 @@ export function WeekdayStep({ selectedWeekdays, onWeekdayToggle }: WeekdayStepPr
 
       <div className="grid grid-cols-4 gap-4 max-w-2xl mx-auto">
         {weekdayNames.map((day, index) => {
-          const isSelected = selectedWeekdays.includes(index);
+          const dayValue = weekdayValues[index];
+          const isSelected = selectedWeekdays.includes(dayValue);
           return (
             <Button
               key={index}
               variant={isSelected ? 'default' : 'outline'}
-              onClick={() => onWeekdayToggle(index)}
+              onClick={() => onWeekdayToggle(dayValue)}
               className={`
                 h-16 text-lg font-medium transition-colors
                 ${isSelected 
