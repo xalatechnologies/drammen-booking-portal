@@ -55,7 +55,7 @@ export function ResponsiveCalendarGrid({
     
     const cell = (
       <button
-        className={`w-full h-10 md:h-12 rounded-lg transition-all duration-200 text-sm font-medium ${statusStyle} ${
+        className={`w-full h-12 md:h-14 rounded-lg transition-all duration-200 text-sm md:text-base font-medium ${statusStyle} ${
           status === 'available' ? 'transform active:scale-95 md:hover:scale-105' : ''
         }`}
         disabled={status !== 'available'}
@@ -64,11 +64,11 @@ export function ResponsiveCalendarGrid({
                status === 'busy' ? 'Opptatt' : 'Ikke tilgjengelig'}
       >
         <div className="flex flex-col items-center justify-center h-full">
-          <span className={`text-xs ${isSelected ? 'text-white' : 'text-gray-600'}`}>
+          <span className={`text-sm font-medium ${isSelected ? 'text-white' : 'text-gray-700'}`}>
             {startTime}
           </span>
           {isSelected && (
-            <span className="text-xs text-white mt-0.5">✓</span>
+            <span className="text-sm text-white mt-0.5">✓</span>
           )}
         </div>
       </button>
@@ -90,7 +90,7 @@ export function ResponsiveCalendarGrid({
       <CardContent className="p-3 md:p-4">
         {/* Week Header */}
         <div className="mb-4 text-center">
-          <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-2">
+          <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-2">
             {format(currentWeekStart, 'dd. MMM', { locale: nb })} - {format(addDays(currentWeekStart, 6), 'dd. MMM yyyy', { locale: nb })}
           </h3>
         </div>
@@ -104,13 +104,13 @@ export function ResponsiveCalendarGrid({
               const isToday = format(day, 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd');
               
               return (
-                <div key={i} className={`p-3 text-center rounded-lg font-inter ${
+                <div key={i} className={`p-4 text-center rounded-lg font-inter ${
                   isToday ? 'bg-blue-100 border-2 border-blue-300' : 'bg-gray-50 border border-gray-200'
                 }`}>
-                  <div className={`text-sm font-medium ${isToday ? 'text-blue-800' : 'text-gray-700'}`}>
+                  <div className={`text-base font-medium ${isToday ? 'text-blue-800' : 'text-gray-700'}`}>
                     {format(day, "EEE", { locale: nb })}
                   </div>
-                  <div className={`text-lg font-bold ${isToday ? 'text-blue-900' : 'text-gray-900'}`}>
+                  <div className={`text-xl font-bold ${isToday ? 'text-blue-900' : 'text-gray-900'}`}>
                     {format(day, "dd.MM", { locale: nb })}
                   </div>
                   {holidayCheck.isHoliday && (
@@ -169,7 +169,7 @@ export function ResponsiveCalendarGrid({
           <div className="space-y-3">
             {timeSlots.map((timeSlot) => (
               <div key={timeSlot} className="space-y-2">
-                <div className="text-sm font-medium text-gray-700 bg-gray-50 p-2 rounded text-center">
+                <div className="text-base font-medium text-gray-700 bg-gray-50 p-3 rounded text-center">
                   {timeSlot}
                 </div>
                 <div className="grid grid-cols-7 gap-1">
@@ -181,24 +181,6 @@ export function ResponsiveCalendarGrid({
                 </div>
               </div>
             ))}
-          </div>
-        </div>
-
-        {/* Legend */}
-        <div className="mt-6 flex flex-wrap gap-3 text-xs text-gray-600 justify-center">
-          <div className="flex items-center gap-1">
-            <div className="w-3 h-3 bg-green-100 border border-green-300 rounded"></div>
-            <span>Ledig</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <div className="w-3 h-3 bg-blue-500 rounded"></div>
-            <span>Valgt</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <div className="w-3 h-3 bg-red-50 border border-red-200 rounded relative">
-              <div className="absolute inset-0 border-t border-gray-400 transform rotate-12"></div>
-            </div>
-            <span>Opptatt</span>
           </div>
         </div>
       </CardContent>

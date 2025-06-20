@@ -23,15 +23,15 @@ export const CalendarTimeGrid: React.FC<CalendarTimeGridProps> = ({
       <div className="min-w-[800px]">
         {/* Day Headers */}
         <div className="grid grid-cols-8 mb-4">
-          <div className="p-3 bg-gray-50 flex items-center justify-center rounded-l-lg">
-            <span className="font-medium text-gray-700">Tidspunkter</span>
+          <div className="p-4 bg-gray-50 flex items-center justify-center rounded-l-lg">
+            <span className="font-medium text-gray-700 text-base">Tidspunkter</span>
           </div>
           {days.map((day, i) => {
             const unavailableCheck = isDateUnavailable(day);
             const holidayCheck = isNorwegianHoliday(day);
             const isToday = format(day, 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd');
             
-            let headerClass = "p-3 text-center rounded-lg ";
+            let headerClass = "p-4 text-center rounded-lg ";
             if (isToday) {
               headerClass += "bg-blue-100 border-2 border-blue-300";
             } else if (unavailableCheck.isUnavailable) {
@@ -51,10 +51,10 @@ export const CalendarTimeGrid: React.FC<CalendarTimeGridProps> = ({
             
             return (
               <div key={i} className={headerClass}>
-                <div className={`font-medium ${isToday ? 'text-blue-800' : 'text-gray-700'}`}>
+                <div className={`font-medium text-base ${isToday ? 'text-blue-800' : 'text-gray-700'}`}>
                   {format(day, "EEE", { locale: nb })}
                 </div>
-                <div className={`text-sm font-bold ${isToday ? 'text-blue-900' : 'text-gray-900'}`}>
+                <div className={`text-lg font-bold ${isToday ? 'text-blue-900' : 'text-gray-900'}`}>
                   {format(day, "dd.MM", { locale: nb })}
                 </div>
                 {holidayCheck.isHoliday && (
@@ -71,14 +71,14 @@ export const CalendarTimeGrid: React.FC<CalendarTimeGridProps> = ({
         <div className="space-y-2">
           {timeSlots.map((timeSlot, timeIndex) => (
             <div key={timeSlot} className="grid grid-cols-8 gap-2">
-              <div className="p-3 bg-gray-50 font-medium text-gray-700 flex items-center justify-center rounded-lg">
+              <div className="p-4 bg-gray-50 font-medium text-gray-700 flex items-center justify-center rounded-lg text-base">
                 {timeSlot}
               </div>
               {days.map((day, dayIndex) => {
                 const unavailableCheck = isDateUnavailable(new Date(day));
                 const isBooked = isTimeSlotBooked(facility.id, new Date(day), parseInt(timeSlot.split(':')[0]));
                 
-                let cellClass = "p-3 text-center relative h-12 rounded-lg transition-all duration-200 ";
+                let cellClass = "p-4 text-center relative h-14 rounded-lg transition-all duration-200 ";
                 let clickHandler = null;
                 let cellContent = timeSlot.split('-')[0]; // Show start time
 
@@ -112,31 +112,13 @@ export const CalendarTimeGrid: React.FC<CalendarTimeGridProps> = ({
                            isBooked ? 'Opptatt' : 'Ledig - klikk for å booke'}
                   >
                     <div className="flex items-center justify-center h-full">
-                      <span className="text-sm font-medium">{cellContent}</span>
+                      <span className="text-base font-medium">{cellContent}</span>
                     </div>
                   </div>
                 );
               })}
             </div>
           ))}
-        </div>
-
-        {/* Legend */}
-        <div className="mt-6 flex flex-wrap gap-4 text-xs text-gray-600 justify-center">
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-green-100 border border-green-300 rounded"></div>
-            <span>Ledig</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-red-100 border border-red-300 rounded relative">
-              <div className="absolute inset-0 border-t border-gray-400 transform rotate-12"></div>
-            </div>
-            <span>Opptatt</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-amber-100 border border-amber-300 rounded"></div>
-            <span>Helg</span>
-          </div>
         </div>
       </div>
     </div>

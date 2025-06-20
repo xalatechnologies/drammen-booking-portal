@@ -55,7 +55,7 @@ export function CalendarGrid({
     
     const cell = (
       <button
-        className={`w-full h-12 rounded-lg transition-all duration-200 text-sm font-medium ${statusStyle} ${
+        className={`w-full h-14 rounded-lg transition-all duration-200 text-base font-medium ${statusStyle} ${
           status === 'available' ? 'transform hover:scale-105' : ''
         }`}
         disabled={status !== 'available'}
@@ -64,11 +64,11 @@ export function CalendarGrid({
                status === 'busy' ? 'Opptatt' : 'Ikke tilgjengelig'}
       >
         <div className="flex flex-col items-center justify-center h-full">
-          <span className={`text-xs ${isSelected ? 'text-white' : 'text-gray-600'}`}>
+          <span className={`text-sm font-medium ${isSelected ? 'text-white' : 'text-gray-700'}`}>
             {startTime}
           </span>
           {isSelected && (
-            <span className="text-xs text-white mt-0.5">✓</span>
+            <span className="text-sm text-white mt-1">✓</span>
           )}
         </div>
       </button>
@@ -90,7 +90,7 @@ export function CalendarGrid({
       <CardContent className="p-4">
         {/* Week Header */}
         <div className="mb-6 text-center">
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">
             {format(currentWeekStart, 'dd. MMMM', { locale: nb })} - {format(addDays(currentWeekStart, 6), 'dd. MMMM yyyy', { locale: nb })}
           </h3>
         </div>
@@ -102,13 +102,13 @@ export function CalendarGrid({
             const isToday = format(day, 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd');
             
             return (
-              <div key={i} className={`p-3 text-center rounded-lg font-inter ${
+              <div key={i} className={`p-4 text-center rounded-lg font-inter ${
                 isToday ? 'bg-blue-100 border-2 border-blue-300' : 'bg-gray-50 border border-gray-200'
               }`}>
-                <div className={`text-sm font-medium ${isToday ? 'text-blue-800' : 'text-gray-700'}`}>
+                <div className={`text-base font-medium ${isToday ? 'text-blue-800' : 'text-gray-700'}`}>
                   {format(day, "EEE", { locale: nb })}
                 </div>
-                <div className={`text-lg font-bold ${isToday ? 'text-blue-900' : 'text-gray-900'}`}>
+                <div className={`text-xl font-bold ${isToday ? 'text-blue-900' : 'text-gray-900'}`}>
                   {format(day, "dd.MM", { locale: nb })}
                 </div>
                 {holidayCheck.isHoliday && (
@@ -132,24 +132,6 @@ export function CalendarGrid({
               ))}
             </div>
           ))}
-        </div>
-
-        {/* Legend */}
-        <div className="mt-6 flex flex-wrap gap-4 text-xs text-gray-600 justify-center">
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-green-100 border border-green-300 rounded"></div>
-            <span>Ledig</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-blue-500 rounded"></div>
-            <span>Valgt</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-red-50 border border-red-200 rounded relative">
-              <div className="absolute inset-0 border-t border-gray-400 transform rotate-12"></div>
-            </div>
-            <span>Opptatt</span>
-          </div>
         </div>
       </CardContent>
     </Card>
