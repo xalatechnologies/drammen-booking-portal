@@ -1,6 +1,6 @@
 
 import { BaseRepository } from '../BaseRepository';
-import { Facility, FacilityFilters } from '@/types/facility';
+import { Facility, FacilityFilters, OpeningHours } from '@/types/facility';
 import { localizedMockFacilities } from '@/data/localizedMockFacilities';
 import { getLocalizedFacility } from '@/utils/localizationHelper';
 import { FacilityFilterService } from './services/FacilityFilterService';
@@ -16,7 +16,7 @@ interface FacilityCreateRequest {
   accessibility: string[];
   suitableFor: string[];
   equipment: string[];
-  openingHours: { dayOfWeek: number; opens: string; closes: string; }[];
+  openingHours: OpeningHours[];
   image: string;
 }
 
