@@ -1,8 +1,6 @@
-
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import GlobalHeader from "@/components/GlobalHeader";
-import GlobalFooter from "@/components/GlobalFooter";
 import { Zone } from "@/components/booking/types";
 import { useOptimizedFacility } from "@/hooks/useOptimizedFacility";
 import { useZones } from "@/hooks/useZones";
@@ -163,8 +161,6 @@ const FacilityDetail = () => {
           area={facility.area} 
           openingHours={facility.openingHours} 
         />
-
-        <GlobalFooter />
       </div>
     </CartProvider>
   );
