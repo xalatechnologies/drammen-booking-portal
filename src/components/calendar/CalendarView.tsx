@@ -5,7 +5,7 @@ import { format, addDays, startOfWeek, isAfter, startOfDay } from "date-fns";
 import { Calendar } from "lucide-react";
 import { WeekNavigation } from "./WeekNavigation";
 import { CalendarHeader } from "./CalendarHeader";
-import { FacilityCalendarCard } from "./FacilityCalendarCard";
+import { FacilityCalendarAccordion } from "./FacilityCalendarAccordion";
 import { CalendarViewProps } from "./types";
 import { useFacilities } from "@/hooks/useFacilities";
 import { FacilityFilters } from "@/types/facility";
@@ -43,12 +43,12 @@ const CalendarView: React.FC<CalendarViewWithToggleProps> = ({
 
   // Use the centralized facilities service
   const { facilities, isLoading, error } = useFacilities({
-    pagination: { page: 1, limit: 50 }, // Get more facilities for calendar
+    pagination: { page: 1, limit: 50 },
     filters
   });
 
-  // Convert facilities to calendar format with mock bookings
-  const facilitiesWithBookings = facilities.map(facility => ({
+  // Convert facilities to calendar format with zones
+  const facilitiesWithZones = facilities.map(facility => ({
     id: facility.id,
     name: facility.name,
     location: facility.address.toLowerCase().includes('sentrum') ? 'drammen-sentrum' : 'konnerud',
@@ -57,51 +57,25 @@ const CalendarView: React.FC<CalendarViewWithToggleProps> = ({
     accessibility: facility.accessibility,
     address: facility.address,
     suitableFor: facility.suitableFor,
-    bookings: [
-      // Add some mock bookings for demonstration
-      ...(Math.random() > 0.5 ? [{
-        id: facility.id * 100 + 1,
-        facilityId: facility.id,
-        facilityName: facility.name,
-        date: new Date(2025, 4, 25 + Math.floor(Math.random() * 7), 14, 0),
-        endDate: new Date(2025, 4, 25 + Math.floor(Math.random() * 7), 16, 0),
-        status: "confirmed" as const
-      }] : []),
-      ...(Math.random() > 0.7 ? [{
-        id: facility.id * 100 + 2,
-        facilityId: facility.id,
-        facilityName: facility.name,
-        date: new Date(2025, 4, 26 + Math.floor(Math.random() * 7), 10, 0),
-        endDate: new Date(2025, 4, 26 + Math.floor(Math.random() * 7), 12, 0),
-        status: "pending" as const
+    image: facility.image,
+    zones: [
+      {
+        id: `zone-${facility.id}-1`,
+        name: "Hovedområde",
+        capacity: Math.floor(facility.capacity * 0.7),
+        pricePerHour: 250,
+        description: "Hovedområdet i lokalet"
+      },
+      ...(facility.capacity > 50 ? [{
+        id: `zone-${facility.id}-2`, 
+        name: "Seksjon B",
+        capacity: Math.floor(facility.capacity * 0.3),
+        pricePerHour: 150,
+        description: "Mindre seksjon av lokalet"
       }] : [])
     ]
   }));
 
-  const days = Array(7).fill(0).map((_, i) => addDays(currentWeekStart, i));
-
-  const isTimeSlotBooked = (facilityId: number, day: Date, hour: number) => {
-    const facility = facilitiesWithBookings.find(f => f.id === facilityId);
-    if (!facility) return false;
-    
-    return facility.bookings.some(booking => {
-      const bookingDate = new Date(booking.date);
-      const bookingEndDate = new Date(booking.endDate);
-      const slotStart = new Date(day.setHours(hour, 0, 0, 0));
-      const slotEnd = new Date(day.setHours(hour + 2, 0, 0, 0));
-      
-      return (
-        bookingDate.getDate() === day.getDate() &&
-        bookingDate.getMonth() === day.getMonth() &&
-        bookingDate.getFullYear() === day.getFullYear() &&
-        ((bookingDate <= slotStart && bookingEndDate > slotStart) ||
-         (bookingDate >= slotStart && bookingDate < slotEnd))
-      );
-    });
-  };
-
-  const timeSlots = ["08:00-10:00", "10:00-12:00", "12:00-14:00", "14:00-16:00", "16:00-18:00", "18:00-20:00", "20:00-22:00"];
-  
   if (isLoading) {
     return (
       <div className="max-w-7xl mx-auto px-4 my-[12px]">
@@ -137,45 +111,34 @@ const CalendarView: React.FC<CalendarViewWithToggleProps> = ({
   
   return (
     <div className="max-w-7xl mx-auto px-4 my-[12px]">
-      {/* Reusable Header with consistent positioning */}
       <ViewHeader 
-        facilityCount={facilitiesWithBookings.length}
+        facilityCount={facilitiesWithZones.length}
         isLoading={isLoading}
         viewMode={viewMode}
         setViewMode={setViewMode}
       />
 
       <div className="space-y-6">
-        {/* Enhanced Week Navigation */}
         <WeekNavigation
           currentWeekStart={currentWeekStart}
           setCurrentWeekStart={setCurrentWeekStart}
           canGoPrevious={canGoPrevious}
         />
 
-        {/* Enhanced Calendar Grid */}
         <Card className="shadow-lg border-0">
           <CalendarHeader />
           <CardContent className="p-0">
-            {facilitiesWithBookings.length === 0 ? (
+            {facilitiesWithZones.length === 0 ? (
               <div className="p-8 text-center text-gray-500">
                 <Calendar className="h-12 w-12 mx-auto mb-4 text-gray-300" />
                 <p className="text-lg font-medium">Ingen lokaler funnet</p>
                 <p className="text-sm">Prøv å justere filtrene dine</p>
               </div>
             ) : (
-              <div className="space-y-0">
-                {facilitiesWithBookings.map((facility, facilityIndex) => (
-                  <FacilityCalendarCard
-                    key={facility.id}
-                    facility={facility}
-                    facilityIndex={facilityIndex}
-                    days={days}
-                    timeSlots={timeSlots}
-                    isTimeSlotBooked={isTimeSlotBooked}
-                  />
-                ))}
-              </div>
+              <FacilityCalendarAccordion
+                facilities={facilitiesWithZones}
+                currentWeekStart={currentWeekStart}
+              />
             )}
           </CardContent>
         </Card>
