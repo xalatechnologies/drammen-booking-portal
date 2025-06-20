@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Bell, Search, Globe, Circle } from "lucide-react";
+import { Bell, Search, Globe, Circle, ChevronDown } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +14,7 @@ import {
 import Logo from "@/components/header/Logo";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
+import { useAdminRole, AdminRole } from "@/contexts/AdminRoleContext";
 
 type Notification = {
   id: string;
@@ -30,9 +31,22 @@ const initialNotifications: Notification[] = [
   { id: "4", title: "Ny melding mottatt", description: "Du har en ny melding fra Per Olsen.", timestamp: "1 dag siden", read: false },
 ];
 
+const roleNames: Record<AdminRole, string> = {
+  systemadmin: 'System Admin',
+  admin: 'Admin',
+  saksbehandler: 'Saksbehandler',
+};
+
+const roleAvatars: Record<AdminRole, { src: string; fallback: string }> = {
+  systemadmin: { src: 'https://i.pravatar.cc/150?u=system-admin', fallback: 'SA' },
+  admin: { src: 'https://i.pravatar.cc/150?u=admin', fallback: 'A' },
+  saksbehandler: { src: 'https://i.pravatar.cc/150?u=saksbehandler', fallback: 'SB' },
+};
+
 const AdminHeader = () => {
   const [language, setLanguage] = useState("NO");
   const [notifications, setNotifications] = useState<Notification[]>(initialNotifications);
+  const { currentRole, setCurrentRole, availableRoles } = useAdminRole();
 
   const unreadCount = notifications.filter(n => !n.read).length;
 
@@ -72,6 +86,24 @@ const AdminHeader = () => {
         </div>
 
         <div className="flex items-center gap-3 flex-shrink-0">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="h-9 px-3">
+                {roleNames[currentRole]}
+                <ChevronDown className="ml-2 h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Bytt visningsrolle</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {availableRoles.map(role => (
+                <DropdownMenuItem key={role} onSelect={() => setCurrentRole(role)}>
+                  {roleNames[role]}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
           <Button 
             variant="ghost" 
             onClick={toggleLanguage}
@@ -143,11 +175,13 @@ const AdminHeader = () => {
                 aria-label="Brukerprofil og innstillinger"
               >
                 <Avatar className="h-7 w-7">
-                  <AvatarImage src="https://i.pravatar.cc/150?u=system-admin" alt="System Admin" />
-                  <AvatarFallback className="bg-blue-600 text-white text-xs font-medium">SA</AvatarFallback>
+                  <AvatarImage src={roleAvatars[currentRole].src} alt={roleNames[currentRole]} />
+                  <AvatarFallback className="bg-blue-600 text-white text-xs font-medium">
+                    {roleAvatars[currentRole].fallback}
+                  </AvatarFallback>
                 </Avatar>
                 <div className="hidden md:flex flex-col items-start">
-                  <span className="text-sm font-medium text-gray-900">System Admin</span>
+                  <span className="text-sm font-medium text-gray-900">{roleNames[currentRole]}</span>
                 </div>
               </Button>
             </DropdownMenuTrigger>

@@ -16,6 +16,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useAdminRole } from "@/contexts/AdminRoleContext";
 
 // Mock data for development
 const mockStats = {
@@ -86,6 +87,7 @@ const mockUpcomingMaintenance = [
 
 const Overview: React.FC = () => {
   const navigate = useNavigate();
+  const { currentRole } = useAdminRole();
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -117,120 +119,103 @@ const Overview: React.FC = () => {
     <div className="space-y-8 w-full p-8" role="main" aria-labelledby="page-title">
       <header className="mb-6">
         <h1 className="text-3xl font-bold tracking-tight text-gray-900 mb-2">
-          Oversikt
+          Dashboard
         </h1>
         <p className="text-lg text-gray-700 leading-relaxed">
-          Oversikt over bookinger, brukere og systemstatus
+          Velkommen! Her er en rask oversikt tilpasset din rolle.
         </p>
       </header>
 
       {/* Quick Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-        <Card>
-          <CardContent className="pt-4">
-            <div>
-              <p className="text-sm font-medium text-gray-500">Aktive bookinger</p>
-              <p className="text-2xl font-bold">{mockStats.activeBookings}</p>
-            </div>
-            <Button
-              variant="link"
-              className="mt-2 p-0 h-auto text-sm"
-              onClick={() => navigate("/admin/bookings-overview")}
-            >
-              Se alle bookinger →
-            </Button>
-          </CardContent>
-        </Card>
+        {['saksbehandler', 'admin', 'systemadmin'].includes(currentRole) && (
+          <>
+            <Card>
+              <CardContent className="pt-4">
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Aktive bookinger</p>
+                  <p className="text-2xl font-bold">{mockStats.activeBookings}</p>
+                </div>
+                <Button variant="link" className="mt-2 p-0 h-auto text-sm" onClick={() => navigate("/admin/bookings-overview")}>
+                  Se alle bookinger →
+                </Button>
+              </CardContent>
+            </Card>
 
-        <Card>
-          <CardContent className="pt-4">
-            <div>
-              <p className="text-sm font-medium text-gray-500">Ventende forespørsler</p>
-              <p className="text-2xl font-bold">{mockStats.pendingRequests}</p>
-            </div>
-            <Button
-              variant="link"
-              className="mt-2 p-0 h-auto text-sm"
-              onClick={() => navigate("/admin/requests")}
-            >
-              Behandle forespørsler →
-            </Button>
-          </CardContent>
-        </Card>
+            <Card>
+              <CardContent className="pt-4">
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Ventende forespørsler</p>
+                  <p className="text-2xl font-bold">{mockStats.pendingRequests}</p>
+                </div>
+                <Button variant="link" className="mt-2 p-0 h-auto text-sm" onClick={() => navigate("/admin/approvals")}>
+                  Behandle forespørsler →
+                </Button>
+              </CardContent>
+            </Card>
+          </>
+        )}
 
-        <Card>
-          <CardContent className="pt-4">
-            <div>
-              <p className="text-sm font-medium text-gray-500">Aktive brukere</p>
-              <p className="text-2xl font-bold">{mockStats.activeUsers}</p>
-            </div>
-            <Button
-              variant="link"
-              className="mt-2 p-0 h-auto text-sm"
-              onClick={() => navigate("/admin/users")}
-            >
-              Administrer brukere →
-            </Button>
-          </CardContent>
-        </Card>
+        {['admin', 'systemadmin'].includes(currentRole) && (
+          <>
+            <Card>
+              <CardContent className="pt-4">
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Aktive brukere</p>
+                  <p className="text-2xl font-bold">{mockStats.activeUsers}</p>
+                </div>
+                <Button variant="link" className="mt-2 p-0 h-auto text-sm" onClick={() => navigate("/admin/users")}>
+                  Administrer brukere →
+                </Button>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-4">
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Åpne support-saker</p>
+                  <p className="text-2xl font-bold">{mockStats.openSupportTickets}</p>
+                </div>
+                <Button variant="link" className="mt-2 p-0 h-auto text-sm" onClick={() => navigate("/admin/support-tickets")}>
+                  Se support-saker →
+                </Button>
+              </CardContent>
+            </Card>
+          </>
+        )}
 
-        <Card>
-          <CardContent className="pt-4">
-            <div>
-              <p className="text-sm font-medium text-gray-500">Aktive lokaler</p>
-              <p className="text-2xl font-bold">{mockStats.activeFacilities}</p>
-            </div>
-            <Button
-              variant="link"
-              className="mt-2 p-0 h-auto text-sm"
-              onClick={() => navigate("/admin/facilities")}
-            >
-              Se alle lokaler →
-            </Button>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="pt-4">
-            <div>
-              <p className="text-sm font-medium text-gray-500">Planlagt vedlikehold</p>
-              <p className="text-2xl font-bold">{mockStats.upcomingMaintenance}</p>
-            </div>
-            <Button
-              variant="link"
-              className="mt-2 p-0 h-auto text-sm"
-              onClick={() => navigate("/admin/facilities")}
-            >
-              Se vedlikeholdsplan →
-            </Button>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="pt-4">
-            <div>
-              <p className="text-sm font-medium text-gray-500">Åpne support-saker</p>
-              <p className="text-2xl font-bold">{mockStats.openSupportTickets}</p>
-            </div>
-            <Button
-              variant="link"
-              className="mt-2 p-0 h-auto text-sm"
-              onClick={() => navigate("/admin/support-tickets")}
-            >
-              Se support-saker →
-            </Button>
-          </CardContent>
-        </Card>
+        {['systemadmin'].includes(currentRole) && (
+          <>
+            <Card>
+              <CardContent className="pt-4">
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Aktive lokaler</p>
+                  <p className="text-2xl font-bold">{mockStats.activeFacilities}</p>
+                </div>
+                <Button variant="link" className="mt-2 p-0 h-auto text-sm" onClick={() => navigate("/admin/facilities")}>
+                  Se alle lokaler →
+                </Button>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-4">
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Planlagt vedlikehold</p>
+                  <p className="text-2xl font-bold">{mockStats.upcomingMaintenance}</p>
+                </div>
+                <Button variant="link" className="mt-2 p-0 h-auto text-sm" onClick={() => navigate("/admin/facilities")}>
+                  Se vedlikeholdsplan →
+                </Button>
+              </CardContent>
+            </Card>
+          </>
+        )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Recent Activity */}
+        {/* Recent Activity - visible to all */}
         <Card>
           <CardHeader>
             <CardTitle>Siste aktivitet</CardTitle>
-            <CardDescription>
-              Oversikt over nylige hendelser i systemet
-            </CardDescription>
           </CardHeader>
           <CardContent>
             <Table>
@@ -250,7 +235,7 @@ const Overview: React.FC = () => {
                     <TableCell>{activity.time}</TableCell>
                     <TableCell>
                       <span className={getStatusColor(activity.status)}>
-                        ● {translateStatus(activity.status)}
+                        {translateStatus(activity.status)}
                       </span>
                     </TableCell>
                   </TableRow>
@@ -260,55 +245,31 @@ const Overview: React.FC = () => {
           </CardContent>
         </Card>
 
-        {/* System Status */}
-        <div className="space-y-6">
-          {/* Alerts */}
-          <Card className="border-red-100">
+        {/* System Alerts - only for system admins */}
+        {currentRole === 'systemadmin' && (
+          <Card>
             <CardHeader>
               <CardTitle>Systemvarsler</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 {mockAlerts.map((alert) => (
-                  <div
-                    key={alert.id}
-                    className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg"
-                  >
+                  <div key={alert.id} className="flex items-start gap-3">
+                    <div
+                      className={`h-2 w-2 rounded-full mt-1.5 ${
+                        alert.type === "error" ? "bg-red-500" : "bg-yellow-400"
+                      }`}
+                    ></div>
                     <div>
-                      <p className="font-medium">{alert.message}</p>
-                      <p className="text-sm text-gray-500">{alert.time}</p>
+                      <p className="text-sm font-medium">{alert.message}</p>
+                      <p className="text-xs text-gray-500">{alert.time}</p>
                     </div>
                   </div>
                 ))}
               </div>
             </CardContent>
           </Card>
-
-          {/* Upcoming Maintenance */}
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle>Planlagt vedlikehold</CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {mockUpcomingMaintenance.map((maintenance) => (
-                  <div
-                    key={maintenance.id}
-                    className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg"
-                  >
-                    <div>
-                      <p className="font-medium">{maintenance.facility}</p>
-                      <p className="text-sm text-gray-600">{maintenance.type}</p>
-                      <p className="text-sm text-gray-500">{maintenance.date}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        )}
       </div>
 
       {/* Quick Actions */}
@@ -316,42 +277,48 @@ const Overview: React.FC = () => {
         <CardHeader>
           <CardTitle>Hurtighandlinger</CardTitle>
           <CardDescription>
-            Vanlige administrative oppgaver
+            Vanlige administrative oppgaver tilpasset din rolle
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Button
-              variant="outline"
-              className="h-auto py-4 flex flex-col items-center justify-center"
-              onClick={() => navigate("/admin/facilities")}
-            >
-              <span>Opprett nytt lokale</span>
-            </Button>
+            {['saksbehandler', 'admin', 'systemadmin'].includes(currentRole) && (
+              <Button
+                variant="outline"
+                className="h-auto py-4 flex flex-col items-center justify-center"
+                onClick={() => navigate("/admin/facilities")}
+              >
+                <span>Opprett nytt lokale</span>
+              </Button>
+            )}
             
-            <Button
-              variant="outline"
-              className="h-auto py-4 flex flex-col items-center justify-center"
-              onClick={() => navigate("/admin/support-tickets")}
-            >
-              <span>Opprett support-sak</span>
-            </Button>
-            
-            <Button
-              variant="outline"
-              className="h-auto py-4 flex flex-col items-center justify-center"
-              onClick={() => navigate("/admin/notifications")}
-            >
-              <span>Send melding</span>
-            </Button>
-            
-            <Button
-              variant="outline"
-              className="h-auto py-4 flex flex-col items-center justify-center"
-              onClick={() => navigate("/admin/reports")}
-            >
-              <span>Generer rapport</span>
-            </Button>
+            {['admin', 'systemadmin'].includes(currentRole) && (
+              <>
+                <Button
+                  variant="outline"
+                  className="h-auto py-4 flex flex-col items-center justify-center"
+                  onClick={() => navigate("/admin/support-tickets")}
+                >
+                  <span>Opprett support-sak</span>
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  className="h-auto py-4 flex flex-col items-center justify-center"
+                  onClick={() => navigate("/admin/notifications")}
+                >
+                  <span>Send melding</span>
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  className="h-auto py-4 flex flex-col items-center justify-center"
+                  onClick={() => navigate("/admin/reports")}
+                >
+                  <span>Generer rapport</span>
+                </Button>
+              </>
+            )}
           </div>
         </CardContent>
       </Card>

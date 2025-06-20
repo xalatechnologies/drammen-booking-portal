@@ -1,5 +1,5 @@
 import React from "react";
-import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import AdminLayout from "@/components/admin/AdminLayout";
 import OverviewPage from "@/pages/admin/Overview";
 import FacilityManagementPage from "@/pages/admin/FacilityManagement";
@@ -19,39 +19,43 @@ import SupportTicketDetail from "@/pages/admin/SupportTicketDetail";
 import SystemConfiguration from "@/pages/admin/SystemConfiguration";
 import SLAConfiguration from "@/pages/admin/SLAConfiguration";
 import LockConfiguration from "@/pages/admin/LockConfiguration";
+import MonitoringPage from "./MonitoringPage";
+import IntegrationsPage from "./IntegrationsPage";
+import ExchangeIntegrationPage from "./ExchangeIntegrationPage";
+import AuditLogsPage from "./AuditLogsPage";
+import DataRetentionPage from "./DataRetentionPage";
+import AzureDeployPage from "./AzureDeployPage";
 
 const AdminDashboard = () => {
-  const location = useLocation();
-  
-  // If we're at the exact /admin path, show the overview
-  if (location.pathname === "/admin") {
-    return (
-      <AdminLayout>
-        <OverviewPage />
-      </AdminLayout>
-    );
-  }
-  
   return (
     <AdminLayout>
       <Routes>
-        <Route path="/" element={<OverviewPage />} />
-        <Route path="/facilities" element={<FacilityManagementPage />} />
-        <Route path="/bookings-overview" element={<BookingsOverview />} />
-        <Route path="/approvals" element={<ApprovalWorkflowsPage />} />
-        <Route path="/users" element={<UsersRolesPage />} />
-        <Route path="/reports" element={<ReportsAnalyticsPage />} />
-        <Route path="/notifications" element={<NotificationsPage />} />
-        <Route path="/profile" element={<ProfileSettingsPage />} />
-        <Route path="/roles" element={<RolesPage />} />
-        <Route path="/external-calendars" element={<ExternalCalendars />} />
-        <Route path="/message-templates" element={<MessageTemplates />} />
-        <Route path="/auth-providers" element={<AuthProvidersPage />} />
-        <Route path="/support-tickets" element={<SupportTicketsPage />} />
-        <Route path="/support-tickets/:ticketId" element={<SupportTicketDetail />} />
-        <Route path="/system-config" element={<SystemConfiguration />} />
-        <Route path="/sla-config" element={<SLAConfiguration />} />
-        <Route path="/lock-config" element={<LockConfiguration />} />
+        <Route index element={<OverviewPage />} />
+        <Route path="facilities" element={<FacilityManagementPage />} />
+        <Route path="bookings-overview" element={<BookingsOverview />} />
+        <Route path="approvals" element={<ApprovalWorkflowsPage />} />
+        <Route path="users" element={<UsersRolesPage />} />
+        <Route path="reports" element={<ReportsAnalyticsPage />} />
+        <Route path="notifications" element={<NotificationsPage />} />
+        <Route path="profile" element={<ProfileSettingsPage />} />
+        <Route path="roles" element={<RolesPage />} />
+        <Route path="external-calendars" element={<ExternalCalendars />} />
+        <Route path="message-templates" element={<MessageTemplates />} />
+        <Route path="auth-providers" element={<AuthProvidersPage />} />
+        <Route path="support-tickets" element={<SupportTicketsPage />} />
+        <Route path="support-tickets/:ticketId" element={<SupportTicketDetail />} />
+        <Route path="system-config" element={<SystemConfiguration />} />
+        <Route path="sla-config" element={<SLAConfiguration />} />
+        <Route path="lock-config" element={<LockConfiguration />} />
+
+        {/* Superadmin Routes */}
+        <Route path="monitoring" element={<MonitoringPage />} />
+        <Route path="integrations" element={<IntegrationsPage />} />
+        <Route path="integrations/exchange" element={<ExchangeIntegrationPage />} />
+        <Route path="audit-logs" element={<AuditLogsPage />} />
+        <Route path="data-retention" element={<DataRetentionPage />} />
+        <Route path="azure-deploy" element={<AzureDeployPage />} />
+
         <Route path="*" element={<Navigate to="/admin" replace />} />
       </Routes>
     </AdminLayout>
