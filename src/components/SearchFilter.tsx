@@ -1,8 +1,6 @@
-
 import React from "react";
 import { MapPin, Users, Building } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-
 interface SearchFilterProps {
   date?: Date;
   setDate: (date?: Date) => void;
@@ -31,7 +29,6 @@ interface SearchFilterProps {
   allowsPhotography: boolean;
   setAllowsPhotography: (allowsPhotography: boolean) => void;
 }
-
 const SearchFilter: React.FC<SearchFilterProps> = ({
   facilityType,
   setFacilityType,
@@ -40,7 +37,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
   accessibility,
   setAccessibility,
   capacity,
-  setCapacity,
+  setCapacity
 }) => {
   const handleCapacityChange = (value: string) => {
     switch (value) {
@@ -60,7 +57,6 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
         setCapacity([0, 200]);
     }
   };
-
   const getCapacityValue = () => {
     const [min, max] = capacity;
     if (min === 0 && max === 20) return "small";
@@ -69,10 +65,8 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
     if (min === 101 && max === 200) return "extra-large";
     return "all";
   };
-
-  return (
-    <div className="bg-slate-100 w-full">
-      <div className="w-full px-4 py-3">
+  return <div className="bg-slate-100 w-full">
+      <div className="w-full px-4 py-[33px] my-[22px]">
         {/* Single filter row - equally distributed */}
         <div className="flex flex-col lg:flex-row gap-3 items-stretch w-full">
           {/* Facility type */}
@@ -136,13 +130,8 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
             <Select value={accessibility} onValueChange={setAccessibility}>
               <SelectTrigger className="h-11 w-full border-gray-300 hover:border-blue-500 text-base rounded-lg">
                 <div className="flex items-center text-left">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                    className="mr-2 h-4 w-4"
-                  >
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="mr-2 h-4 w-4">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
                   </svg>
                   <SelectValue placeholder="Velg tilgjengelighet" />
                 </div>
@@ -157,8 +146,6 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
           </div>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default SearchFilter;
