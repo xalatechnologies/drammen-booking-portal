@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { DateRange } from "react-day-picker";
@@ -103,6 +102,7 @@ const Index = () => {
           <FacilityList 
             filters={filters}
             viewMode={viewMode}
+            setViewMode={setViewMode}
           />
         );
       default:
@@ -110,6 +110,7 @@ const Index = () => {
           <FacilityList 
             filters={filters}
             viewMode="grid"
+            setViewMode={setViewMode}
           />
         );
     }

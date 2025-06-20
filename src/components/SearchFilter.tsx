@@ -1,18 +1,14 @@
+
 import React, { useState } from "react";
-import { CalendarDays, MapPin, Users, Building, Search, Filter, X } from "lucide-react";
+import { MapPin, Users, Building, Search, Filter, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { format } from "date-fns";
-import { nb } from "date-fns/locale";
-import ViewModeToggle from "./search/ViewModeToggle";
 
 interface SearchFilterProps {
   date?: Date;
@@ -133,50 +129,28 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
 
   return (
     <div className="bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 py-6">
-        {/* Main search row with view toggle positioned lower */}
-        <div className="flex flex-col lg:flex-row gap-6 items-start lg:items-center justify-between">
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        {/* Main search row */}
+        <div className="flex flex-col lg:flex-row gap-8 items-start lg:items-center justify-between">
           {/* Search inputs section */}
-          <div className="flex flex-1 flex-col sm:flex-row gap-4 items-stretch sm:items-center">
+          <div className="flex flex-1 flex-col sm:flex-row gap-6 items-stretch sm:items-center">
             {/* Search input */}
             <div className="relative flex-1 min-w-0">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
               <Input
                 placeholder="Søk etter lokaler..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 h-12 text-base border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                className="pl-12 h-14 text-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-xl"
               />
             </div>
 
             {/* Quick filters */}
-            <div className="flex flex-wrap gap-2">
-              {/* Date picker */}
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button 
-                    variant="outline" 
-                    className="h-12 px-4 justify-start text-left font-normal border-gray-300 hover:border-blue-500"
-                  >
-                    <CalendarDays className="mr-2 h-4 w-4" />
-                    {date ? format(date, "d. MMM", { locale: nb }) : "Velg dato"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={date}
-                    onSelect={setDate}
-                    initialFocus
-                    locale={nb}
-                  />
-                </PopoverContent>
-              </Popover>
-
+            <div className="flex flex-wrap gap-4">
               {/* Facility type */}
               <Select value={facilityType} onValueChange={setFacilityType}>
-                <SelectTrigger className="h-12 w-[140px] border-gray-300 hover:border-blue-500">
-                  <Building className="mr-2 h-4 w-4" />
+                <SelectTrigger className="h-14 w-[160px] border-gray-300 hover:border-blue-500 text-lg rounded-xl">
+                  <Building className="mr-3 h-5 w-5" />
                   <SelectValue placeholder="Type" />
                 </SelectTrigger>
                 <SelectContent>
@@ -190,8 +164,8 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
 
               {/* Location */}
               <Select value={location} onValueChange={setLocation}>
-                <SelectTrigger className="h-12 w-[120px] border-gray-300 hover:border-blue-500">
-                  <MapPin className="mr-2 h-4 w-4" />
+                <SelectTrigger className="h-14 w-[140px] border-gray-300 hover:border-blue-500 text-lg rounded-xl">
+                  <MapPin className="mr-3 h-5 w-5" />
                   <SelectValue placeholder="Sted" />
                 </SelectTrigger>
                 <SelectContent>
@@ -206,36 +180,31 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
               <Button
                 variant="outline"
                 onClick={() => setShowAdvanced(!showAdvanced)}
-                className="h-12 px-4 border-gray-300 hover:border-blue-500"
+                className="h-14 px-6 border-gray-300 hover:border-blue-500 text-lg rounded-xl"
               >
-                <Filter className="mr-2 h-4 w-4" />
+                <Filter className="mr-3 h-5 w-5" />
                 Flere filter
                 {(hasActiveFilters()) && (
-                  <Badge variant="secondary" className="ml-2 bg-blue-100 text-blue-700">
+                  <Badge variant="secondary" className="ml-3 bg-blue-100 text-blue-700 text-sm">
                     {getActiveFiltersCount()}
                   </Badge>
                 )}
               </Button>
             </div>
           </div>
-
-          {/* View mode toggle - positioned lower with more spacing */}
-          <div className="flex-shrink-0 mt-4 lg:mt-0">
-            <ViewModeToggle viewMode={viewMode} setViewMode={setViewMode} />
-          </div>
         </div>
 
         {/* Advanced filters section */}
         {showAdvanced && (
-          <div className="mt-6 p-6 bg-gray-50 rounded-lg border border-gray-200">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="mt-8 p-8 bg-gray-50 rounded-xl border border-gray-200">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {/* Capacity slider */}
               <div>
-                <Label htmlFor="capacity" className="text-sm font-medium block mb-2">
+                <Label htmlFor="capacity" className="text-base font-medium block mb-3">
                   Kapasitet (antall personer)
                 </Label>
                 <div className="flex items-center gap-4">
-                  <Users className="h-4 w-4 text-gray-500" />
+                  <Users className="h-5 w-5 text-gray-500" />
                   <Slider
                     id="capacity"
                     defaultValue={capacity}
@@ -244,7 +213,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
                     onValueChange={handleCapacityChange}
                     className="flex-1"
                   />
-                  <span className="text-sm text-gray-700">
+                  <span className="text-base text-gray-700 min-w-[80px]">
                     {capacity[0]} - {capacity[1]}
                   </span>
                 </div>
@@ -252,7 +221,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
 
               {/* Price range slider */}
               <div>
-                <Label htmlFor="price" className="text-sm font-medium block mb-2">
+                <Label htmlFor="price" className="text-base font-medium block mb-3">
                   Pris per time (NOK)
                 </Label>
                 <div className="flex items-center gap-4">
@@ -260,7 +229,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 24 24"
                     fill="currentColor"
-                    className="w-4 h-4 text-gray-500"
+                    className="w-5 h-5 text-gray-500"
                   >
                     <path
                       fillRule="evenodd"
@@ -277,7 +246,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
                     onValueChange={handlePriceRangeChange}
                     className="flex-1"
                   />
-                  <span className="text-sm text-gray-700">
+                  <span className="text-base text-gray-700 min-w-[100px]">
                     {priceRange[0]} - {priceRange[1]}
                   </span>
                 </div>
@@ -285,11 +254,11 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
 
               {/* Accessibility filter */}
               <div>
-                <Label htmlFor="accessibility" className="text-sm font-medium block mb-2">
+                <Label htmlFor="accessibility" className="text-base font-medium block mb-3">
                   Tilgjengelighet
                 </Label>
                 <Select value={accessibility} onValueChange={setAccessibility}>
-                  <SelectTrigger className="w-full h-11 border-gray-300">
+                  <SelectTrigger className="w-full h-12 border-gray-300 text-base">
                     <SelectValue placeholder="Velg tilgjengelighet" />
                   </SelectTrigger>
                   <SelectContent>
@@ -302,12 +271,12 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
               </div>
 
               {/* Boolean filters */}
-              <div className="space-y-3">
-                <Label className="text-sm font-medium block mb-2">
+              <div className="space-y-4">
+                <Label className="text-base font-medium block mb-3">
                   Andre fasiliteter
                 </Label>
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="availableNow" className="text-sm font-medium">
+                  <Label htmlFor="availableNow" className="text-base font-medium">
                     Tilgjengelig nå
                   </Label>
                   <Switch
@@ -317,7 +286,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
                   />
                 </div>
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="hasEquipment" className="text-sm font-medium">
+                  <Label htmlFor="hasEquipment" className="text-base font-medium">
                     AV-utstyr
                   </Label>
                   <Switch
@@ -327,7 +296,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
                   />
                 </div>
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="hasParking" className="text-sm font-medium">
+                  <Label htmlFor="hasParking" className="text-base font-medium">
                     Parkering
                   </Label>
                   <Switch
@@ -337,7 +306,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
                   />
                 </div>
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="hasWifi" className="text-sm font-medium">
+                  <Label htmlFor="hasWifi" className="text-base font-medium">
                     WiFi
                   </Label>
                   <Switch
@@ -347,7 +316,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
                   />
                 </div>
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="allowsPhotography" className="text-sm font-medium">
+                  <Label htmlFor="allowsPhotography" className="text-base font-medium">
                     Tillater fotografering
                   </Label>
                   <Switch
@@ -360,13 +329,13 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
             </div>
 
             {/* Clear filters button */}
-            <div className="mt-6 flex justify-end">
+            <div className="mt-8 flex justify-end">
               <Button
                 variant="ghost"
                 onClick={clearFilters}
-                className="text-sm text-gray-600 hover:bg-gray-100"
+                className="text-base text-gray-600 hover:bg-gray-100"
               >
-                <X className="mr-2 h-4 w-4" />
+                <X className="mr-2 h-5 w-5" />
                 Fjern alle filtre
               </Button>
             </div>

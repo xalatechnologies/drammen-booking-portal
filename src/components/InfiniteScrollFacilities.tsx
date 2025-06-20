@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState, useCallback } from "react";
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { Loader2, ArrowUp } from "lucide-react";
@@ -8,15 +9,18 @@ import FacilityListItem from "./facility/FacilityListItem";
 import { useOptimizedFacilities } from "@/hooks/useOptimizedFacilities";
 import { FacilityFilters } from "@/types/facility";
 import { useNavigate } from "react-router-dom";
+import ViewModeToggle from "./search/ViewModeToggle";
 
 interface InfiniteScrollFacilitiesProps {
   filters: FacilityFilters;
   viewMode: "grid" | "list";
+  setViewMode: (mode: "grid" | "map" | "calendar" | "list") => void;
 }
 
 export function InfiniteScrollFacilities({
   filters,
-  viewMode
+  viewMode,
+  setViewMode
 }: InfiniteScrollFacilitiesProps) {
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
@@ -134,20 +138,25 @@ export function InfiniteScrollFacilities({
       </div>
     </div>;
   return <div className="relative max-w-7xl mx-auto px-4 my-[12px]">
-      {/* Enhanced Results summary */}
-      <div className="mb-12 flex items-center justify-between">
-        <div className="flex items-center gap-4">
+      {/* Enhanced Results summary with view toggle aligned */}
+      <div className="mb-12 flex flex-col md:flex-row gap-6 md:gap-0 items-start md:items-end justify-between">
+        <div className="flex items-center gap-6">
           <div className="flex items-center gap-3">
-            <span className="text-3xl font-bold text-gray-900">
+            <span className="text-4xl font-bold text-gray-900">
               {pagination?.total || allFacilities.length}
             </span>
             <span className="text-xl font-semibold text-gray-700">lokaler</span>
           </div>
           <div className="flex items-center gap-2">
-            <Badge variant="secondary" className="text-base px-4 py-2 font-medium text-gray-600 bg-gray-100">
+            <Badge variant="secondary" className="text-lg px-6 py-3 font-medium text-gray-600 bg-gray-100">
               {viewMode === "grid" ? "Rutenett visning" : "Liste visning"}
             </Badge>
           </div>
+        </div>
+        
+        {/* View mode toggle aligned with the results label */}
+        <div className="flex-shrink-0">
+          <ViewModeToggle viewMode={viewMode} setViewMode={setViewMode} />
         </div>
       </div>
 
