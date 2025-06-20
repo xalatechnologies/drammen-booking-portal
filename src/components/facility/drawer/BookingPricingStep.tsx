@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { ArrowLeft, User, LogIn } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -10,7 +11,7 @@ import { CustomerTypeSection } from './CustomerTypeSection';
 import { IntegratedPriceCalculation } from '@/components/booking/IntegratedPriceCalculation';
 import { LoginSelectionModal } from '@/components/auth/LoginSelectionModal';
 import { useTranslation } from '@/i18n/hooks/useTranslation';
-import { useCart } from '@/contexts/CartContext';
+import { useCartStore } from '@/stores/useCartStore';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores/useAuthStore';
@@ -54,7 +55,7 @@ export function BookingPricingStep({
   onAddToCart
 }: BookingPricingStepProps) {
   const { t } = useTranslation();
-  const { addToCart } = useCart();
+  const { addToCart } = useCartStore();
   const { toast } = useToast();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuthStore();
@@ -66,6 +67,8 @@ export function BookingPricingStep({
 
   const handleAddToCart = () => {
     try {
+      console.log('BookingPricingStep: Adding to cart, selectedSlots:', selectedSlots);
+      
       // Set facility context in booking store
       setFacilityContext(facilityId, facilityName);
       
@@ -77,6 +80,15 @@ export function BookingPricingStep({
         const zone = zones.find(z => z.id === slot.zoneId);
         const pricePerHour = zone?.pricePerHour || 450;
         const duration = slot.duration || 2;
+        
+        console.log('BookingPricingStep: Adding slot to cart:', {
+          facilityId,
+          facilityName,
+          slot,
+          pricePerHour,
+          duration,
+          cartActorType
+        });
         
         addToCart({
           facilityId,
@@ -111,9 +123,10 @@ export function BookingPricingStep({
         description: `${selectedSlots.length} tidspunkt er lagt til i handlekurven`,
       });
 
-      // Call the parent's onAddToCart to reset state
+      // Call the parent's onAddToCart to reset state ONLY after successful addition
       onAddToCart();
     } catch (error) {
+      console.error('BookingPricingStep: Error adding to cart:', error);
       toast({
         title: "Feil",
         description: "Kunne ikke legge til i handlekurv. Prøv igjen.",

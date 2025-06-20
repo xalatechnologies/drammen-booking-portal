@@ -38,6 +38,7 @@ export const useCartStore = create<CartState>()(
 
       // Actions
       addToCart: (item) => {
+        console.log('CartStore: Adding item to cart:', item);
         const itemId = `${item.facilityId}-${item.purpose}-${Date.now()}`;
         
         const newItem: CartItem = { 
@@ -62,6 +63,8 @@ export const useCartStore = create<CartState>()(
         };
         
         const newItems = [...get().items, newItem];
+        console.log('CartStore: New items array:', newItems);
+        
         set({
           items: newItems,
           totalPrice: calculateTotalPrice(newItems),
@@ -70,6 +73,7 @@ export const useCartStore = create<CartState>()(
       },
 
       removeFromCart: (itemId) => {
+        console.log('CartStore: Removing item from cart:', itemId);
         const newItems = get().items.filter(item => item.id !== itemId);
         set({
           items: newItems,
@@ -79,6 +83,7 @@ export const useCartStore = create<CartState>()(
       },
 
       updateItem: (itemId, updates) => {
+        console.log('CartStore: Updating item:', itemId, updates);
         const newItems = get().items.map(item => 
           item.id === itemId ? { ...item, ...updates } : item
         );
@@ -90,6 +95,7 @@ export const useCartStore = create<CartState>()(
       },
 
       clearCart: () => {
+        console.log('CartStore: Clearing cart');
         set({
           items: [],
           totalPrice: 0,

@@ -38,6 +38,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     getItemCount
   } = useCartStore();
 
+  console.log('CartContext: Current cart state:', { items, totalPrice, itemCount });
+
   return (
     <CartContext.Provider value={{
       items,
