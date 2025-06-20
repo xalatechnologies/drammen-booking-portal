@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, ShoppingCart, Shield } from "lucide-react";
+import { Menu, Clock, Shield } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
@@ -69,7 +69,7 @@ const GlobalHeader = () => {
           {/* Privacy/GDPR Menu */}
           <DropdownMenu open={privacyOpen} onOpenChange={setPrivacyOpen}>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="p-2 hover:bg-gray-100">
+              <Button variant="ghost" className="hover:bg-gray-100">
                 <Shield className="h-6 w-6" />
               </Button>
             </DropdownMenuTrigger>
@@ -86,11 +86,11 @@ const GlobalHeader = () => {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {/* Cart Icon with Dropdown */}
+          {/* Selected Times Icon with Dropdown */}
           <Popover open={cartOpen} onOpenChange={setCartOpen}>
             <PopoverTrigger asChild>
-              <Button variant="ghost" className="relative p-2 hover:bg-gray-100">
-                <ShoppingCart className="h-6 w-6" />
+              <Button variant="ghost" className="relative hover:bg-gray-100">
+                <Clock className="h-6 w-6" />
                 {itemCount > 0 && (
                   <Badge 
                     className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center text-xs bg-red-500 text-white rounded-full animate-pulse"
