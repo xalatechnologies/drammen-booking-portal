@@ -16,6 +16,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Circle } from "lucide-react";
 
 // Mock data for development
 const mockStats = {
@@ -82,6 +83,13 @@ const mockUpcomingMaintenance = [
     type: "Teknisk vedlikehold",
     date: "23. juni, 12:00-16:00",
   },
+];
+
+const mockNotifications = [
+  { id: "1", title: "Ny forespørsel om lokale", description: "Brandengen Skole ba om godkjenning", timestamp: "2 minutter siden", read: false },
+  { id: "2", title: "Brukerrolle oppdatert", description: "Thomas Hansen er nå administrator", timestamp: "1 time siden", read: false },
+  { id: "3", title: "Systemvarsel", description: "Planlagt vedlikehold i kveld kl. 23:00.", timestamp: "4 timer siden", read: true },
+  { id: "4", title: "Ny melding mottatt", description: "Du har en ny melding fra Per Olsen.", timestamp: "1 dag siden", read: false },
 ];
 
 const Overview: React.FC = () => {
@@ -257,6 +265,32 @@ const Overview: React.FC = () => {
                 ))}
               </TableBody>
             </Table>
+          </CardContent>
+        </Card>
+
+        {/* Notifications */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Siste Varsler</CardTitle>
+            <CardDescription>
+              Uleste varsler vises øverst
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {mockNotifications.sort((a, b) => a.read === b.read ? 0 : a.read ? 1 : -1).map((notification) => (
+                <div key={notification.id} className="flex items-start gap-3">
+                  {!notification.read && (
+                    <Circle className="h-2 w-2 mt-1.5 text-blue-500 fill-current" />
+                  )}
+                  <div className={`flex flex-col gap-0.5 ${notification.read ? 'pl-5 text-gray-500' : ''}`}>
+                      <p className="text-sm font-medium">{notification.title}</p>
+                      <p className="text-xs">{notification.description}</p>
+                      <p className="text-xs text-gray-400">{notification.timestamp}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </CardContent>
         </Card>
 
