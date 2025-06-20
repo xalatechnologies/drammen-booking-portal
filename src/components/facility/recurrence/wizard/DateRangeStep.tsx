@@ -1,13 +1,10 @@
 
 import React from 'react';
-import { Calendar, CalendarDays } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Calendar as CalendarComponent } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { format } from 'date-fns';
 import { nb } from 'date-fns/locale';
-import { cn } from '@/lib/utils';
-import { DateRange } from 'react-day-picker';
 
 interface DateRangeStepProps {
   startDate?: Date;
@@ -22,17 +19,36 @@ export function DateRangeStep({
   onStartDateChange,
   onEndDateChange
 }: DateRangeStepProps) {
-  const [dateRange, setDateRange] = React.useState<DateRange | undefined>({
-    from: startDate,
-    to: endDate,
-  });
-
-  const handleDateRangeSelect = (range: DateRange | undefined) => {
-    console.log('Date range selected:', range);
-    setDateRange(range);
-    onStartDateChange(range?.from);
-    onEndDateChange(range?.to);
+  const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (value) {
+      const date = new Date(value);
+      console.log('Start date selected:', date);
+      onStartDateChange(date);
+    } else {
+      onStartDateChange(undefined);
+    }
   };
+
+  const handleEndDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (value) {
+      const date = new Date(value);
+      console.log('End date selected:', date);
+      onEndDateChange(date);
+    } else {
+      onEndDateChange(undefined);
+    }
+  };
+
+  // Format dates for input fields (YYYY-MM-DD)
+  const formatDateForInput = (date?: Date) => {
+    if (!date) return '';
+    return format(date, 'yyyy-MM-dd');
+  };
+
+  // Get today's date for min attribute
+  const today = format(new Date(), 'yyyy-MM-dd');
 
   return (
     <div className="space-y-6">
@@ -47,65 +63,46 @@ export function DateRangeStep({
       </div>
 
       <div className="space-y-4">
-        <label className="block text-sm font-medium text-gray-700">
-          Velg tidsperiode (klikk og dra for å velge periode)
-        </label>
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              className={cn(
-                "w-full justify-start text-left font-normal h-auto py-3",
-                !dateRange?.from && "text-muted-foreground"
-              )}
-            >
-              <CalendarDays className="mr-2 h-4 w-4" />
-              <div className="flex flex-col items-start">
-                {dateRange?.from ? (
-                  <>
-                    <span className="text-sm font-medium">
-                      {format(dateRange.from, 'dd.MM.yyyy', { locale: nb })}
-                      {dateRange.to && (
-                        <> - {format(dateRange.to, 'dd.MM.yyyy', { locale: nb })}</>
-                      )}
-                    </span>
-                    <span className="text-xs text-gray-500">
-                      {dateRange.to ? 'Periode valgt' : 'Velg sluttdato'}
-                    </span>
-                  </>
-                ) : (
-                  <span>Velg startdato og sluttdato</span>
-                )}
-              </div>
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0 z-50" align="start">
-            <div className="p-0">
-              <CalendarComponent
-                mode="range"
-                selected={dateRange}
-                onSelect={handleDateRangeSelect}
-                numberOfMonths={2}
-                initialFocus
-                disabled={(date) => date < new Date()}
-                className="p-3 pointer-events-auto border-0"
-              />
-            </div>
-          </PopoverContent>
-        </Popover>
+        <div className="space-y-2">
+          <Label htmlFor="start-date" className="text-sm font-medium text-gray-700">
+            Startdato
+          </Label>
+          <Input
+            id="start-date"
+            type="date"
+            value={formatDateForInput(startDate)}
+            onChange={handleStartDateChange}
+            min={today}
+            className="w-full"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="end-date" className="text-sm font-medium text-gray-700">
+            Sluttdato
+          </Label>
+          <Input
+            id="end-date"
+            type="date"
+            value={formatDateForInput(endDate)}
+            onChange={handleEndDateChange}
+            min={formatDateForInput(startDate) || today}
+            className="w-full"
+          />
+        </div>
       </div>
 
-      {dateRange?.from && dateRange?.to && (
+      {startDate && endDate && (
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
           <div className="flex items-center gap-2 text-blue-800">
-            <CalendarDays className="h-4 w-4" />
+            <Calendar className="h-4 w-4" />
             <span className="font-medium">Valgt periode:</span>
           </div>
           <p className="text-blue-700 mt-1">
-            Fra {format(dateRange.from, 'dd.MM.yyyy', { locale: nb })} til {format(dateRange.to, 'dd.MM.yyyy', { locale: nb })}
+            Fra {format(startDate, 'dd.MM.yyyy', { locale: nb })} til {format(endDate, 'dd.MM.yyyy', { locale: nb })}
           </p>
           <p className="text-blue-600 text-sm mt-1">
-            {Math.ceil((dateRange.to.getTime() - dateRange.from.getTime()) / (1000 * 60 * 60 * 24)) + 1} dager
+            {Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1} dager
           </p>
         </div>
       )}
