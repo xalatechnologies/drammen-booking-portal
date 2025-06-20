@@ -51,15 +51,19 @@ export function CalendarSidebar({
     return acc;
   }, {} as Record<string, SelectedTimeSlot[]>);
 
+  const handleBookingClick = () => {
+    setOpenAccordion(['booking-steps']);
+  };
+
   return (
-    <div className="space-y-4 h-full">
+    <div className="space-y-4 h-full text-base">
       <Card className="sticky top-4">
         <CardContent className="p-4">
           {/* Simple Recurrence Button */}
           <div className="mb-4">
             <Button
               onClick={() => setShowRecurrenceWizard(true)}
-              className="w-full bg-white hover:bg-gray-50 text-gray-700 border border-gray-300"
+              className="w-full bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 text-base"
               variant="outline"
             >
               <Repeat className="h-4 w-4 mr-2" />
@@ -81,13 +85,13 @@ export function CalendarSidebar({
                     <Calendar className="h-4 w-4 text-green-600" />
                   </div>
                   <div className="text-left">
-                    <div className="font-semibold">Valgte tidspunkt</div>
+                    <div className="font-semibold text-base">Valgte tidspunkt</div>
                     <div className="text-sm text-gray-600">
                       {selectedSlots.length} {selectedSlots.length === 1 ? 'tidspunkt' : 'tidspunkt'} valgt
                     </div>
                   </div>
                   {selectedSlots.length > 0 && (
-                    <Badge variant="secondary" className="ml-auto">
+                    <Badge variant="secondary" className="ml-auto text-sm">
                       {selectedSlots.length}
                     </Badge>
                   )}
@@ -97,18 +101,18 @@ export function CalendarSidebar({
                 {selectedSlots.length === 0 ? (
                   <div className="text-center py-6 text-gray-500">
                     <Clock className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                    <p className="text-sm">Ingen tidspunkt valgt</p>
-                    <p className="text-xs mt-1">Klikk på kalenderen for å velge tidspunkt</p>
+                    <p className="text-base">Ingen tidspunkt valgt</p>
+                    <p className="text-sm mt-1">Klikk på kalenderen for å velge tidspunkt</p>
                   </div>
                 ) : (
                   <div className="space-y-3">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm font-medium">Valgte tidspunkt:</span>
+                      <span className="text-base font-medium">Valgte tidspunkt:</span>
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={onClearSlots}
-                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                        className="text-red-600 hover:text-red-700 hover:bg-red-50 text-sm"
                       >
                         <X className="h-4 w-4 mr-1" />
                         Fjern alle
@@ -118,14 +122,14 @@ export function CalendarSidebar({
                     <div className="space-y-2 max-h-60 overflow-y-auto">
                       {Object.entries(groupedSlots).map(([dateKey, daySlots]) => (
                         <div key={dateKey} className="space-y-1">
-                          <div className="text-sm font-medium text-gray-700">
+                          <div className="text-base font-medium text-gray-700">
                             {format(new Date(dateKey), 'EEEE dd. MMMM', { locale: nb })}
                           </div>
                           {daySlots.map((slot, index) => (
                             <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded border">
                               <div className="flex-1">
-                                <div className="text-sm font-medium">{slot.timeSlot}</div>
-                                <div className="text-xs text-gray-600">{getZoneName(slot.zoneId)}</div>
+                                <div className="text-base font-medium">{slot.timeSlot}</div>
+                                <div className="text-sm text-gray-600">{getZoneName(slot.zoneId)}</div>
                               </div>
                               <Button
                                 variant="ghost"
@@ -139,6 +143,17 @@ export function CalendarSidebar({
                           ))}
                         </div>
                       ))}
+                    </div>
+
+                    {/* Book Button inside selected slots accordion */}
+                    <div className="mt-4 pt-3 border-t">
+                      <Button
+                        onClick={handleBookingClick}
+                        className="w-full bg-blue-600 hover:bg-blue-700 text-white text-base"
+                        size="lg"
+                      >
+                        Book {selectedSlots.length} tidspunkt
+                      </Button>
                     </div>
                   </div>
                 )}
@@ -154,7 +169,7 @@ export function CalendarSidebar({
                       <ShoppingCart className="h-4 w-4 text-orange-600" />
                     </div>
                     <div className="text-left">
-                      <div className="font-semibold">Fullfør booking</div>
+                      <div className="font-semibold text-base">Fullfør booking</div>
                       <div className="text-sm text-gray-600">Legg til detaljer og bekreft</div>
                     </div>
                   </div>
