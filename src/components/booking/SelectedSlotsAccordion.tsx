@@ -26,6 +26,10 @@ export function SelectedSlotsAccordion({
     return zone?.name || 'Ukjent sone';
   };
 
+  // Add debugging to see what's in the array
+  console.log('SelectedSlotsAccordion: selectedSlots array:', selectedSlots);
+  console.log('SelectedSlotsAccordion: selectedSlots length:', selectedSlots.length);
+
   // Use actual length of selectedSlots array
   const totalSlots = selectedSlots.length;
 
