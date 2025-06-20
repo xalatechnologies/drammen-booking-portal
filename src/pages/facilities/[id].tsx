@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import GlobalHeader from "@/components/GlobalHeader";
@@ -105,6 +106,23 @@ const FacilityDetail = () => {
     }
   };
 
+  // Convert opening hours to string format for MobileBookingPanel
+  const formatOpeningHours = (openingHours: any) => {
+    if (typeof openingHours === 'string') return openingHours;
+    if (Array.isArray(openingHours)) {
+      // Convert to a simple string representation
+      const weekdays = openingHours.filter(h => h.dayOfWeek >= 1 && h.dayOfWeek <= 5);
+      const weekends = openingHours.filter(h => h.dayOfWeek === 0 || h.dayOfWeek === 6);
+      
+      if (weekdays.length > 0 && weekends.length > 0) {
+        return `Man-Fre: ${weekdays[0].opens}-${weekdays[0].closes}, Lør-Søn: ${weekends[0].opens}-${weekends[0].closes}`;
+      } else if (weekdays.length > 0) {
+        return `Man-Fre: ${weekdays[0].opens}-${weekdays[0].closes}`;
+      }
+    }
+    return "Se detaljer";
+  };
+
   // Loading state
   if (isLoading || zonesLoading) {
     return <LoadingState />;
@@ -159,7 +177,7 @@ const FacilityDetail = () => {
           facilityId={id || ""} 
           capacity={facility.capacity} 
           area={facility.area} 
-          openingHours={facility.openingHours} 
+          openingHours={formatOpeningHours(facility.openingHours)} 
         />
       </div>
     </CartProvider>

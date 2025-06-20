@@ -4,7 +4,7 @@ import { Search, MapPin, Building, Clock, Users } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { facilityRepository } from "@/dal/FacilityRepository";
+import { facilityRepository } from "@/dal/repositories";
 import { Facility } from "@/types/facility";
 
 interface SearchResult {

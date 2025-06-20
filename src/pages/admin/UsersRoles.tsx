@@ -61,11 +61,11 @@ const UsersRolesPage = () => {
   const userCount = users.filter(u => u.role === 'user').length;
   const totalUsers = users.length;
 
-  const form = useForm({
+  const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       username: "",
-      role: "user" as const
+      role: "user"
     },
   });
 

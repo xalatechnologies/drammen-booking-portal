@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
@@ -22,7 +23,6 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
 } from "@/components/ui/sidebar";
-import { useTranslation } from "react-i18next";
 
 const UmbrellaSidebar = () => {
   const navigate = useNavigate();
@@ -125,4 +125,4 @@ const UmbrellaSidebar = () => {
   );
 };
 
-export default UmbrellaSidebar; 
+export default UmbrellaSidebar;
