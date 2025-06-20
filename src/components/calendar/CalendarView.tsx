@@ -10,7 +10,10 @@ import { CalendarViewProps } from "./types";
 import { useFacilities } from "@/hooks/useFacilities";
 import { FacilityFilters } from "@/types/facility";
 import ViewHeader from "../search/ViewHeader";
-import { PersistentBookingSidebar } from "../facility/PersistentBookingSidebar";
+import { UnifiedBookingForm } from "../booking/UnifiedBookingForm";
+import { SelectedTimeSlot } from "@/utils/recurrenceEngine";
+import { useCart } from "@/contexts/CartContext";
+import { useNavigate } from "react-router-dom";
 
 interface CalendarViewWithToggleProps extends CalendarViewProps {
   viewMode: "grid" | "map" | "calendar" | "list";
@@ -28,6 +31,9 @@ const CalendarView: React.FC<CalendarViewWithToggleProps> = ({
 }) => {
   const [currentWeekStart, setCurrentWeekStart] = useState(startOfWeek(date || new Date(), { weekStartsOn: 1 }));
   const [selectedFacilityId, setSelectedFacilityId] = useState<string | null>(null);
+  const [selectedSlots, setSelectedSlots] = useState<SelectedTimeSlot[]>([]);
+  const { addToCart } = useCart();
+  const navigate = useNavigate();
   
   // Check if we can go to previous week (prevent going to past dates)
   const today = startOfDay(new Date());
@@ -83,6 +89,49 @@ const CalendarView: React.FC<CalendarViewWithToggleProps> = ({
     ? facilitiesWithZones.find(f => f.id.toString() === selectedFacilityId)
     : null;
 
+  const handleSlotSelection = (facilityId: string, slots: SelectedTimeSlot[]) => {
+    setSelectedFacilityId(facilityId);
+    setSelectedSlots(slots);
+  };
+
+  const handleAddToCart = (bookingData: any) => {
+    // Add to cart logic here
+    addToCart({
+      facilityId: bookingData.facilityId,
+      facilityName: bookingData.facilityName,
+      purpose: bookingData.formData.purpose,
+      timeSlots: bookingData.selectedSlots,
+      organizationType: bookingData.formData.actorType,
+      expectedAttendees: bookingData.formData.attendees,
+      additionalServices: [],
+      pricing: {
+        baseFacilityPrice: 250 * bookingData.selectedSlots.length,
+        servicesPrice: 0,
+        discounts: 0,
+        vatAmount: 0,
+        totalPrice: 250 * bookingData.selectedSlots.length
+      },
+      // Legacy fields for compatibility
+      date: bookingData.selectedSlots[0]?.date || new Date(),
+      timeSlot: bookingData.selectedSlots[0]?.timeSlot || '',
+      zoneId: bookingData.selectedSlots[0]?.zoneId || '',
+      pricePerHour: 250
+    });
+    
+    // Clear selections
+    setSelectedSlots([]);
+    setSelectedFacilityId(null);
+  };
+
+  const handleCompleteBooking = (bookingData: any) => {
+    navigate('/checkout', { state: { bookingData } });
+  };
+
+  const handleClearSlots = () => {
+    setSelectedSlots([]);
+    setSelectedFacilityId(null);
+  };
+
   if (isLoading) {
     return (
       <div className="max-w-7xl mx-auto px-4 my-[12px]">
@@ -126,8 +175,8 @@ const CalendarView: React.FC<CalendarViewWithToggleProps> = ({
       />
 
       <div className="flex gap-6">
-        {/* Main Calendar Content */}
-        <div className="flex-1 space-y-6">
+        {/* Main Calendar Content - 60% */}
+        <div className="w-3/5 space-y-6">
           <WeekNavigation
             currentWeekStart={currentWeekStart}
             setCurrentWeekStart={setCurrentWeekStart}
@@ -148,23 +197,56 @@ const CalendarView: React.FC<CalendarViewWithToggleProps> = ({
                   facilities={facilitiesWithZones}
                   currentWeekStart={currentWeekStart}
                   onFacilitySelect={setSelectedFacilityId}
+                  onSlotSelection={handleSlotSelection}
                 />
               )}
             </CardContent>
           </Card>
         </div>
 
-        {/* Reservation Sidebar */}
-        {selectedFacility && (
-          <div className="w-80 flex-shrink-0">
-            <div className="sticky top-4">
-              <PersistentBookingSidebar
-                facilityName={selectedFacility.name}
-                facilityId={selectedFacility.id.toString()}
-              />
-            </div>
+        {/* Booking Sidebar - 40% */}
+        <div className="w-2/5">
+          <div className="sticky top-4">
+            <UnifiedBookingForm
+              selectedSlots={selectedSlots}
+              facilityId={selectedFacilityId || ''}
+              facilityName={selectedFacility?.name || ''}
+              zones={selectedFacility?.zones.map(zone => ({
+                ...zone,
+                equipment: [],
+                area: "100 m²",
+                parentZoneId: undefined,
+                isMainZone: true,
+                subZones: [],
+                bookingRules: {
+                  minBookingDuration: 1,
+                  maxBookingDuration: 8,
+                  allowedTimeSlots: [],
+                  bookingTypes: ['one-time', 'recurring', 'fixed-lease'],
+                  advanceBookingDays: 90,
+                  cancellationHours: 24
+                },
+                adminInfo: {
+                  contactPersonName: "Facility Manager",
+                  contactPersonEmail: "manager@drammen.kommune.no",
+                  specialInstructions: zone.description,
+                  maintenanceSchedule: []
+                },
+                layout: {
+                  coordinates: { x: 0, y: 0, width: 100, height: 100 },
+                  entryPoints: ["Hovedinngang"]
+                },
+                accessibility: [],
+                features: [],
+                restrictions: [],
+                isActive: true
+              })) || []}
+              onAddToCart={handleAddToCart}
+              onCompleteBooking={handleCompleteBooking}
+              onSlotsCleared={handleClearSlots}
+            />
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

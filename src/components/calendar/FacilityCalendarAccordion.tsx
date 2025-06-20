@@ -1,7 +1,7 @@
-
 import React from "react";
 import { Accordion } from "@/components/ui/accordion";
 import { FacilityAccordionItem } from "./FacilityAccordionItem";
+import { SelectedTimeSlot } from "@/utils/recurrenceEngine";
 
 // Simplified Zone interface for calendar view
 interface CalendarZone {
@@ -27,12 +27,14 @@ interface FacilityCalendarAccordionProps {
   facilities: FacilityWithZones[];
   currentWeekStart: Date;
   onFacilitySelect?: (facilityId: string) => void;
+  onSlotSelection?: (facilityId: string, slots: SelectedTimeSlot[]) => void;
 }
 
 export const FacilityCalendarAccordion: React.FC<FacilityCalendarAccordionProps> = ({
   facilities,
   currentWeekStart,
   onFacilitySelect,
+  onSlotSelection,
 }) => {
   // Generate hourly time slots from 08:00 to 22:00
   const timeSlots = Array.from({ length: 14 }, (_, i) => {
@@ -63,15 +65,24 @@ export const FacilityCalendarAccordion: React.FC<FacilityCalendarAccordionProps>
   const isSlotSelected = () => false; // No selection in calendar view
 
   const handleSlotClick = (zoneId: string, date: Date, timeSlot: string, availability: string) => {
-    if (availability === 'available') {
-      // Extract facility ID and select it for the sidebar
+    if (availability === 'available' && onSlotSelection) {
+      // Extract facility ID from zone ID
       const facilityId = zoneId.split('-')[1];
+      
+      // Create a selected slot
+      const newSlot: SelectedTimeSlot = {
+        zoneId,
+        date,
+        timeSlot
+      };
+      
+      // For now, just pass single slot - in future this could handle multiple selections
+      onSlotSelection(facilityId, [newSlot]);
+      
+      // Also trigger facility selection for sidebar
       if (onFacilitySelect) {
         onFacilitySelect(facilityId);
       }
-      
-      // Navigate to facility booking page with pre-selected time
-      window.location.href = `/facilities/${facilityId}?date=${date.toISOString().split('T')[0]}&time=${timeSlot}`;
     }
   };
 
