@@ -1,14 +1,18 @@
 
-import React, { useState, useCallback, useMemo } from 'react';
-import { addDays, startOfWeek } from 'date-fns';
+import React, { useState, useMemo } from 'react';
+import { format, addDays, startOfWeek } from 'date-fns';
+import { nb } from 'date-fns/locale';
+import { ChevronLeft, ChevronRight, Calendar, Clock, Users, MapPin } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+import { CalendarGrid } from './CalendarGrid';
+import { LegendDisplay } from './LegendDisplay';
+import { UnifiedBookingForm } from '@/components/booking/UnifiedBookingForm';
 import { Zone } from '@/components/booking/types';
 import { SelectedTimeSlot } from '@/utils/recurrenceEngine';
-import { CalendarGrid } from './CalendarGrid';
-import { ResponsiveCalendarGrid } from './ResponsiveCalendarGrid';
-import { CalendarSidebar } from '../CalendarSidebar';
-import { WeekNavigation } from './WeekNavigation';
 import { useAvailabilityStatus } from './useAvailabilityStatus';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface AvailabilityTabProps {
   zones: Zone[];
@@ -19,10 +23,10 @@ interface AvailabilityTabProps {
   onRemoveSlot: (zoneId: string, date: Date, timeSlot: string) => void;
   facilityId: string;
   facilityName: string;
-  currentPattern: any;
-  onPatternChange: (pattern: any) => void;
-  onPatternApply: (pattern: any) => void;
-  timeSlotDuration?: 1 | 2; // New prop for time slot duration
+  currentPattern?: any;
+  onPatternChange?: (pattern: any) => void;
+  onPatternApply?: (pattern: any) => void;
+  timeSlotDuration?: number;
 }
 
 export function AvailabilityTab({
@@ -37,152 +41,159 @@ export function AvailabilityTab({
   currentPattern,
   onPatternChange,
   onPatternApply,
-  timeSlotDuration = 1 // Default to 1-hour slots
+  timeSlotDuration = 1
 }: AvailabilityTabProps) {
   const [currentWeekStart, setCurrentWeekStart] = useState(() => 
     startOfWeek(new Date(), { weekStartsOn: 1 })
   );
-  const [selectedZone, setSelectedZone] = useState(zones[0]);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [selectedZoneId, setSelectedZoneId] = useState(zones[0]?.id || '');
 
-  const { getAvailabilityStatus, isSlotSelected } = useAvailabilityStatus(selectedSlots);
+  const { getAvailabilityStatus, isSlotSelected } = useAvailabilityStatus({
+    selectedSlots,
+    facilityId,
+    zoneId: selectedZoneId
+  });
 
-  const timeSlots = useMemo(() => {
-    if (timeSlotDuration === 2) {
-      // 2-hour slots
-      return [
-        "08:00-10:00",
-        "10:00-12:00", 
-        "12:00-14:00",
-        "14:00-16:00",
-        "16:00-18:00",
-        "18:00-20:00",
-        "20:00-22:00"
-      ];
-    } else {
-      // 1-hour slots (default)
-      return [
-        "08:00-09:00",
-        "09:00-10:00",
-        "10:00-11:00",
-        "11:00-12:00",
-        "12:00-13:00",
-        "13:00-14:00",
-        "14:00-15:00",
-        "15:00-16:00",
-        "16:00-17:00",
-        "17:00-18:00",
-        "18:00-19:00",
-        "19:00-20:00",
-        "20:00-21:00",
-        "21:00-22:00"
-      ];
-    }
-  }, [timeSlotDuration]);
+  // Generate time slots from 08:00 to 22:00
+  const timeSlots = useMemo(() => 
+    Array.from({ length: 14 }, (_, i) => {
+      const hour = 8 + i;
+      const nextHour = hour + 1;
+      return `${hour.toString().padStart(2, '0')}:00-${nextHour.toString().padStart(2, '0')}:00`;
+    }), []
+  );
 
-  const handlePreviousWeek = useCallback(() => {
+  // Generate week days
+  const weekDays = useMemo(() => 
+    Array.from({ length: 7 }, (_, i) => addDays(currentWeekStart, i)), 
+    [currentWeekStart]
+  );
+
+  const selectedZone = zones.find(zone => zone.id === selectedZoneId);
+
+  const handlePreviousWeek = () => {
     setCurrentWeekStart(prev => addDays(prev, -7));
-  }, []);
+  };
 
-  const handleNextWeek = useCallback(() => {
+  const handleNextWeek = () => {
     setCurrentWeekStart(prev => addDays(prev, 7));
-  }, []);
+  };
 
-  React.useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
+  const handleSlotClick = (date: Date, timeSlot: string) => {
+    const availability = getAvailabilityStatus(selectedZoneId, date, timeSlot);
+    onSlotClick(selectedZoneId, date, timeSlot, availability.status);
+  };
 
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  const handleAddToCart = (bookingData: any) => {
+    console.log('Adding to cart:', bookingData);
+    // Handle add to cart logic
+    onClearSlots();
+  };
 
-  const renderCalendarForZone = (zone: Zone) => {
-    const calendarComponent = isMobile ? (
-      <ResponsiveCalendarGrid
-        zone={zone}
-        currentWeekStart={currentWeekStart}
-        timeSlots={timeSlots}
-        selectedSlots={selectedSlots}
-        getAvailabilityStatus={getAvailabilityStatus}
-        isSlotSelected={isSlotSelected}
-        onSlotClick={onSlotClick}
-        onBulkSlotSelection={onBulkSlotSelection}
-      />
-    ) : (
-      <CalendarGrid
-        zone={zone}
-        currentWeekStart={currentWeekStart}
-        timeSlots={timeSlots}
-        selectedSlots={selectedSlots}
-        getAvailabilityStatus={getAvailabilityStatus}
-        isSlotSelected={isSlotSelected}
-        onSlotClick={onSlotClick}
-        onBulkSlotSelection={onBulkSlotSelection}
-      />
-    );
-
-    return (
-      <div className="space-y-4">
-        <WeekNavigation
-          currentWeekStart={currentWeekStart}
-          onWeekChange={setCurrentWeekStart}
-          canGoPrevious={true}
-        />
-        {calendarComponent}
-      </div>
-    );
+  const handleCompleteBooking = (bookingData: any) => {
+    console.log('Completing booking:', bookingData);
+    // Handle complete booking logic
   };
 
   return (
-    <div className="space-y-4">
-      {/* Helper Message */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-        <p className="text-sm text-blue-800">
-          💡 <strong>Tips:</strong> Klikk på kalenderen for å velge enkelt tidspunkt, eller dra over flere ruter for å velge flere tidspunkt samtidig.
-        </p>
-      </div>
-
-      {/* Two Column Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-10 gap-6">
-        {/* Calendar Column - 70% */}
-        <div className="lg:col-span-7">
-          {zones.length > 1 ? (
-            <Tabs value={selectedZone.id} onValueChange={(value) => {
-              const zone = zones.find(z => z.id === value);
-              if (zone) setSelectedZone(zone);
-            }}>
-              <TabsList className="grid w-full grid-cols-2 lg:grid-cols-3">
-                {zones.map(zone => (
-                  <TabsTrigger key={zone.id} value={zone.id} className="text-sm">
+    <div className="space-y-6">
+      {/* 60/40 Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+        {/* Left Column - Calendar (60%) */}
+        <div className="lg:col-span-3 space-y-4">
+          {/* Zone Selection */}
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <MapPin className="h-5 w-5" />
+                Velg sone for booking
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-wrap gap-2">
+                {zones.map((zone) => (
+                  <Button
+                    key={zone.id}
+                    variant={selectedZoneId === zone.id ? "default" : "outline"}
+                    onClick={() => setSelectedZoneId(zone.id)}
+                    className="flex items-center gap-2"
+                  >
+                    <Users className="h-4 w-4" />
                     {zone.name}
-                  </TabsTrigger>
+                    <Badge variant="secondary" className="ml-1">
+                      {zone.capacity} pers
+                    </Badge>
+                  </Button>
                 ))}
-              </TabsList>
-              {zones.map(zone => (
-                <TabsContent key={zone.id} value={zone.id} className="mt-6">
-                  {renderCalendarForZone(zone)}
-                </TabsContent>
-              ))}
-            </Tabs>
-          ) : (
-            renderCalendarForZone(zones[0])
-          )}
+              </div>
+              
+              {selectedZone && (
+                <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                  <h4 className="font-semibold text-blue-900 mb-2">{selectedZone.name}</h4>
+                  <p className="text-sm text-blue-700 mb-3">{selectedZone.description}</p>
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <span className="font-medium text-blue-800">Kapasitet:</span>
+                      <span className="ml-2 text-blue-700">{selectedZone.capacity} personer</span>
+                    </div>
+                    <div>
+                      <span className="font-medium text-blue-800">Pris:</span>
+                      <span className="ml-2 text-blue-700">{selectedZone.pricePerHour} kr/time</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Week Navigation */}
+          <div className="flex items-center justify-between">
+            <Button variant="outline" onClick={handlePreviousWeek}>
+              <ChevronLeft className="h-4 w-4 mr-2" />
+              Forrige uke
+            </Button>
+            <div className="text-center">
+              <h3 className="text-lg font-semibold">
+                {format(currentWeekStart, 'dd. MMMM', { locale: nb })} - {format(addDays(currentWeekStart, 6), 'dd. MMMM yyyy', { locale: nb })}
+              </h3>
+            </div>
+            <Button variant="outline" onClick={handleNextWeek}>
+              Neste uke
+              <ChevronRight className="h-4 w-4 ml-2" />
+            </Button>
+          </div>
+
+          {/* Calendar Grid */}
+          <Card>
+            <CardContent className="p-0">
+              <CalendarGrid
+                weekDays={weekDays}
+                timeSlots={timeSlots}
+                selectedZoneId={selectedZoneId}
+                getAvailabilityStatus={getAvailabilityStatus}
+                isSlotSelected={isSlotSelected}
+                onSlotClick={handleSlotClick}
+              />
+            </CardContent>
+          </Card>
+
+          {/* Legend */}
+          <LegendDisplay />
         </div>
 
-        {/* Sidebar Column - 30% */}
-        <div className="lg:col-span-3">
-          <CalendarSidebar
-            selectedSlots={selectedSlots}
-            onClearSlots={onClearSlots}
-            onRemoveSlot={onRemoveSlot}
-            facilityId={facilityId}
-            facilityName={facilityName}
-            zones={zones}
-            currentPattern={currentPattern}
-            onPatternChange={onPatternChange}
-            onPatternApply={onPatternApply}
-          />
+        {/* Right Column - Booking Form (40%) */}
+        <div className="lg:col-span-2">
+          <div className="sticky top-6">
+            <UnifiedBookingForm
+              selectedSlots={selectedSlots}
+              facilityId={facilityId}
+              facilityName={facilityName}
+              zones={zones}
+              onAddToCart={handleAddToCart}
+              onCompleteBooking={handleCompleteBooking}
+              onSlotsCleared={onClearSlots}
+            />
+          </div>
         </div>
       </div>
     </div>

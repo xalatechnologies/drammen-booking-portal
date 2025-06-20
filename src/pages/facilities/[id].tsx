@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -98,7 +99,7 @@ const FacilityDetail = () => {
         zoneId, 
         date, 
         timeSlot,
-        duration: 1
+        duration: 2 // Default 2 hours duration
       }]);
     }
   };
@@ -233,7 +234,7 @@ const FacilityDetail = () => {
               </div>
             </div>
 
-            {/* Full Width Calendar Section - Moved outside tabs */}
+            {/* Full Width Calendar Section - Updated with Unified Booking Form */}
             <div className="w-full mb-12">
               <div className="bg-white border border-gray-200 rounded-lg p-6">
                 <h2 className="text-2xl font-bold mb-6">Tilgjengelighet og booking</h2>
