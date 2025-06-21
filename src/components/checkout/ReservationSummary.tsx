@@ -32,6 +32,25 @@ export function ReservationSummary({ reservation }: ReservationSummaryProps) {
   const totalSlots = timeSlots.length;
   const totalDuration = timeSlots.reduce((sum, slot) => sum + (slot.duration || 2), 0);
 
+  // Determine booking type based on pattern
+  const getBookingType = () => {
+    if (totalSlots === 1) {
+      return 'Timeleie';
+    } else if (dateKeys.length > 1) {
+      // Multiple dates - could be recurring
+      const uniqueDays = new Set(timeSlots.map(slot => format(new Date(slot.date), 'EEEE', { locale: nb })));
+      if (uniqueDays.size === 1) {
+        return 'Fastlån';
+      }
+      return 'Timeleie';
+    } else {
+      // Multiple slots same day
+      return 'Timeleie';
+    }
+  };
+
+  const bookingType = getBookingType();
+
   return (
     <div className="flex items-start justify-between w-full">
       <div className="flex-1 space-y-3">
@@ -46,7 +65,7 @@ export function ReservationSummary({ reservation }: ReservationSummaryProps) {
             </div>
             <div className="mt-1">
               <Badge variant="secondary" className="text-xs">
-                Reservasjonspakke med {totalSlots} tidspunkt
+                {bookingType} • {totalDuration} timer
               </Badge>
             </div>
           </div>
@@ -74,7 +93,7 @@ export function ReservationSummary({ reservation }: ReservationSummaryProps) {
           
           <div className="flex items-center gap-1">
             <Clock className="h-4 w-4 text-gray-500" />
-            <span>{totalSlots} tidspunkt ({totalDuration}t total)</span>
+            <span>{totalDuration} timer totalt</span>
           </div>
 
           {reservation.expectedAttendees && (
