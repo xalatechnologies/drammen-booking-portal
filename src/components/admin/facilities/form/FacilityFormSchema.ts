@@ -6,7 +6,7 @@ export const facilityFormSchema = z.object({
   name: z.string().min(1, "Facility name is required"),
   type: z.string().min(1, "Facility type is required"),
   area: z.string().min(1, "Area is required"),
-  description: z.string().optional(),
+  description: z.string().max(500, "Description cannot exceed 500 characters").optional(),
   capacity: z.number().min(1, "Capacity must be at least 1"),
   area_sqm: z.number().min(0, "Area must be positive").optional(),
   
@@ -18,7 +18,7 @@ export const facilityFormSchema = z.object({
   
   // Contact Information
   contact_name: z.string().optional(),
-  contact_email: z.string().email("Valid email is required").optional(),
+  contact_email: z.string().email("Valid email is required").optional().or(z.literal("")),
   contact_phone: z.string().optional(),
   
   // Configuration
@@ -42,11 +42,11 @@ export const facilityFormSchema = z.object({
   latitude: z.number().optional(),
   longitude: z.number().optional(),
   
-  // Season
+  // Season & Availability - Enhanced
   season_from: z.string().optional(),
   season_to: z.string().optional(),
   
-  // Features
+  // Features - Enhanced
   is_featured: z.boolean().default(false),
 });
 
@@ -73,7 +73,7 @@ export const BOOKING_TYPES = [
 ] as const;
 
 export const EQUIPMENT_OPTIONS = [
-  "Projecter", "Sound system", "Microphones", "Lighting", "Wi-Fi",
+  "Projector", "Sound system", "Microphones", "Lighting", "Wi-Fi",
   "Parking", "Kitchen", "Changing rooms", "Storage", "First aid",
   "Football goals", "Basketball hoops", "Volleyball nets", "Gymnastics equipment"
 ] as const;
