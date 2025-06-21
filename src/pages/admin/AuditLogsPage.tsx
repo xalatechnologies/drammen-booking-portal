@@ -105,7 +105,7 @@ const AuditLogsPage = () => {
                     <div className="text-sm text-gray-900">2023-08-01 10:00:00</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <Badge variant="success">{tSync("admin.auditLogs.status.success", "Success")}</Badge>
+                    <Badge variant="default">{tSync("admin.auditLogs.status.success", "Success")}</Badge>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <Button variant="outline" size="sm">{tSync("admin.auditLogs.actions.view", "View")}</Button>

@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { PageHeader } from "@/components/layouts";
 import { Button } from "@/components/ui/button";
@@ -7,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Plus, Settings, Calendar, Sync, AlertCircle } from "lucide-react";
+import { Plus, Settings, Calendar, Search, AlertCircle } from "lucide-react";
 import { PageLayout } from "@/components/layouts";
 import { useTranslation } from "@/hooks/useTranslation";
 
@@ -43,12 +44,24 @@ const ExternalCalendarsPage = () => {
     lastSync: "2024-03-14 14:30",
     syncFrequency: "Daily"
   }];
-  const filteredCalendars = externalCalendars.filter(calendar => calendar.name.toLowerCase().includes(searchTerm.toLowerCase()) && (filterType === "all" || calendar.type === filterType));
+  
+  const filteredCalendars = externalCalendars.filter(calendar => 
+    calendar.name.toLowerCase().includes(searchTerm.toLowerCase()) && 
+    (filterType === "all" || calendar.type === filterType)
+  );
+
   return (
     <PageLayout>
-      <PageHeader title={tSync("admin.externalCalendars.title", "External Calendars")} description={tSync("admin.externalCalendars.description", "Manage external calendar integrations")} actions={<Button><Plus className="h-4 w-4 mr-2" />
-          {tSync("admin.externalCalendars.addCalendar", "Add Calendar")}
-        </Button>} />
+      <PageHeader 
+        title={tSync("admin.externalCalendars.title", "External Calendars")} 
+        description={tSync("admin.externalCalendars.description", "Manage external calendar integrations")} 
+        actions={
+          <Button>
+            <Plus className="h-4 w-4 mr-2" />
+            {tSync("admin.externalCalendars.addCalendar", "Add Calendar")}
+          </Button>
+        } 
+      />
       <Card>
         <CardHeader>
           <CardTitle>{tSync("admin.externalCalendars.calendarList", "Calendar List")}</CardTitle>
@@ -56,8 +69,13 @@ const ExternalCalendarsPage = () => {
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 grid-cols-1 md:grid-cols-3">
-            <Input type="search" placeholder={tSync("admin.externalCalendars.searchCalendar", "Search calendar...")} value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
-            <Select value={filterType} onValueChange={setType => setFilterType(setType)}>
+            <Input 
+              type="search" 
+              placeholder={tSync("admin.externalCalendars.searchCalendar", "Search calendar...")} 
+              value={searchTerm} 
+              onChange={e => setSearchTerm(e.target.value)} 
+            />
+            <Select value={filterType} onValueChange={setFilterType}>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder={tSync("admin.externalCalendars.selectType", "Select Type")} />
               </SelectTrigger>
@@ -86,27 +104,35 @@ const ExternalCalendarsPage = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {filteredCalendars.map(calendar => <tr key={calendar.id}>
+                {filteredCalendars.map(calendar => 
+                  <tr key={calendar.id}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{calendar.name}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{calendar.type}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><Badge variant={calendar.status === "Active" ? "success" : "default"}>{calendar.status}</Badge></td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <Badge variant={calendar.status === "Active" ? "default" : "secondary"}>{calendar.status}</Badge>
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{calendar.lastSync}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{calendar.syncFrequency}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <Button variant="ghost" size="sm"><Settings className="h-4 w-4 mr-2" />
+                      <Button variant="ghost" size="sm">
+                        <Settings className="h-4 w-4 mr-2" />
                         {tSync("admin.externalCalendars.settings", "Settings")}
                       </Button>
-                      <Button variant="ghost" size="sm"><Sync className="h-4 w-4 mr-2" />
+                      <Button variant="ghost" size="sm">
+                        <Search className="h-4 w-4 mr-2" />
                         {tSync("admin.externalCalendars.syncNow", "Sync Now")}
                       </Button>
                     </td>
-                  </tr>)}
+                  </tr>
+                )}
               </tbody>
             </table>
-            {filteredCalendars.length === 0 && <div className="text-center py-4">
+            {filteredCalendars.length === 0 && 
+              <div className="text-center py-4">
                 <AlertCircle className="h-6 w-6 mx-auto text-gray-400 mb-2" />
                 <p className="text-sm text-gray-500">{tSync("admin.externalCalendars.noCalendars", "No external calendars found")}</p>
-              </div>}
+              </div>
+            }
           </div>
         </CardContent>
       </Card>
