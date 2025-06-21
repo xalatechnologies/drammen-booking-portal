@@ -2,7 +2,7 @@
 import React from 'react';
 import { TranslationMigrationTool } from '@/components/translation/TranslationMigrationTool';
 import { TranslatedFacilityGrid } from '@/components/facility/TranslatedFacilityGrid';
-import { LanguageToggle } from '@/components/header/LanguageToggle';
+import LanguageToggle from '@/components/header/LanguageToggle';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTranslation } from '@/hooks/useTranslation';
 

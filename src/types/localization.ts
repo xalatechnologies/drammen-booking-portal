@@ -28,6 +28,13 @@ export interface LocalizedFacility extends Omit<Facility, 'name' | 'description'
   // Ensure lat/lng are always present for localized facilities
   lat: number;
   lng: number;
+  
+  // Make these optional to fix compatibility with old data
+  pricePerHour?: number;
+  accessibility?: string[];
+  hasAutoApproval?: boolean;
+  nextAvailable?: string;
+  timeSlotDuration?: 1 | 2;
 }
 
 export interface LocalizedAdditionalService extends Omit<AdditionalService, 'name' | 'description' | 'shortDescription' | 'metadata'> {

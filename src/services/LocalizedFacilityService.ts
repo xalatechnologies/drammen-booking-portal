@@ -1,160 +1,100 @@
 
-import { Facility, FacilityFilters, FacilitySortOptions } from "@/types/facility";
-import { Zone } from "@/types/zone";
-import { PaginatedResponse, PaginationParams, ApiResponse } from "@/types/api";
-import { LocalizedFacilityRepository } from "@/dal/repositories/LocalizedFacilityRepository";
-import { LocalizedFacility } from "@/types/localization";
-import { Language } from "@/i18n/types";
-import { localizedMockFacilities } from "@/data/localizedMockFacilities";
+import { LocalizedFacility } from '@/types/localization';
+import { localizedMockFacilities } from '@/data/localizedMockFacilities';
+import { Language } from '@/i18n/types';
+import { FacilityFilters, FacilitySortOptions } from '@/types/facility';
+import { PaginationParams, PaginatedResponse } from '@/types/api';
 
-// Create singleton instance with initial data
-const localizedFacilityRepository = new LocalizedFacilityRepository(localizedMockFacilities);
+class LocalizedFacilityServiceClass {
+  private currentLanguage: Language = 'NO';
 
-// Simulate API delay
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
-export class LocalizedFacilityService {
-  static setLanguage(language: Language) {
-    localizedFacilityRepository.setLanguage(language);
+  setLanguage(language: Language) {
+    this.currentLanguage = language;
   }
 
-  static async getFacilities(
+  async getFacilities(
     pagination: PaginationParams,
     filters?: FacilityFilters,
     sort?: FacilitySortOptions
-  ): Promise<ApiResponse<PaginatedResponse<Facility>>> {
-    try {
-      await delay(300); // Simulate network delay
+  ): Promise<PaginatedResponse<LocalizedFacility[]>> {
+    let facilities = [...localizedMockFacilities];
 
-      const result = await localizedFacilityRepository.findAll(
-        pagination,
-        filters,
-        sort?.field,
-        sort?.direction
+    // Apply filters
+    if (filters?.type && filters.type.length > 0) {
+      facilities = facilities.filter(f => filters.type!.includes(f.type));
+    }
+
+    if (filters?.area && filters.area.length > 0) {
+      facilities = facilities.filter(f => filters.area!.includes(f.area));
+    }
+
+    if (filters?.search) {
+      const searchTerm = filters.search.toLowerCase();
+      facilities = facilities.filter(f => 
+        f.name[this.currentLanguage].toLowerCase().includes(searchTerm) ||
+        f.description[this.currentLanguage].toLowerCase().includes(searchTerm)
       );
-
-      return result;
-    } catch (error) {
-      return {
-        success: false,
-        error: {
-          message: "Failed to fetch facilities",
-          details: error,
-        },
-      };
     }
+
+    // Apply sorting
+    if (sort?.sortBy) {
+      facilities.sort((a, b) => {
+        let aValue: any;
+        let bValue: any;
+
+        switch (sort.sortBy) {
+          case 'name':
+            aValue = a.name[this.currentLanguage];
+            bValue = b.name[this.currentLanguage];
+            break;
+          case 'price':
+            aValue = a.price_per_hour;
+            bValue = b.price_per_hour;
+            break;
+          case 'rating':
+            aValue = a.rating || 0;
+            bValue = b.rating || 0;
+            break;
+          case 'capacity':
+            aValue = a.capacity;
+            bValue = b.capacity;
+            break;
+          default:
+            return 0;
+        }
+
+        if (aValue < bValue) return sort.order === 'asc' ? -1 : 1;
+        if (aValue > bValue) return sort.order === 'asc' ? 1 : -1;
+        return 0;
+      });
+    }
+
+    // Apply pagination
+    const total = facilities.length;
+    const totalPages = Math.ceil(total / pagination.limit);
+    const startIndex = (pagination.page - 1) * pagination.limit;
+    const endIndex = startIndex + pagination.limit;
+    const paginatedFacilities = facilities.slice(startIndex, endIndex);
+
+    return {
+      success: true,
+      data: {
+        data: paginatedFacilities,
+        pagination: {
+          page: pagination.page,
+          limit: pagination.limit,
+          total,
+          totalPages,
+          hasNext: pagination.page < totalPages,
+          hasPrev: pagination.page > 1,
+        },
+      },
+    };
   }
 
-  // New method for raw facilities
-  static async getRawFacilities(
-    pagination: PaginationParams,
-    filters?: FacilityFilters,
-    sort?: FacilitySortOptions
-  ): Promise<ApiResponse<PaginatedResponse<LocalizedFacility>>> {
-    try {
-      await delay(300);
-
-      const result = await localizedFacilityRepository.findAllRaw(
-        pagination,
-        filters,
-        sort?.field,
-        sort?.direction
-      );
-
-      return result;
-    } catch (error) {
-      return {
-        success: false,
-        error: {
-          message: "Failed to fetch facilities",
-          details: error,
-        },
-      };
-    }
-  }
-
-  static async getFacilityById(id: number): Promise<ApiResponse<Facility>> {
-    try {
-      await delay(200);
-
-      const result = await localizedFacilityRepository.findById(id.toString());
-      return result;
-    } catch (error) {
-      return {
-        success: false,
-        error: {
-          message: "Failed to fetch facility",
-          details: error,
-        },
-      };
-    }
-  }
-
-  static async getZonesByFacilityId(facilityId: string): Promise<ApiResponse<Zone[]>> {
-    try {
-      await delay(150);
-
-      const result = await localizedFacilityRepository.getZonesByFacilityId(facilityId);
-      return result;
-    } catch (error) {
-      return {
-        success: false,
-        error: {
-          message: "Failed to fetch zones",
-          details: error,
-        },
-      };
-    }
-  }
-
-  static async getZoneById(zoneId: string): Promise<ApiResponse<Zone>> {
-    try {
-      await delay(150);
-
-      const result = await localizedFacilityRepository.getZoneById(zoneId);
-      return result;
-    } catch (error) {
-      return {
-        success: false,
-        error: {
-          message: "Failed to fetch zone",
-          details: error,
-        },
-      };
-    }
-  }
-
-  static async getFacilitiesByType(type: string): Promise<ApiResponse<Facility[]>> {
-    try {
-      await delay(250);
-
-      const result = await localizedFacilityRepository.getFacilitiesByType(type);
-      return result;
-    } catch (error) {
-      return {
-        success: false,
-        error: {
-          message: "Failed to fetch facilities by type",
-          details: error,
-        },
-      };
-    }
-  }
-
-  static async getFacilitiesByArea(area: string): Promise<ApiResponse<Facility[]>> {
-    try {
-      await delay(250);
-
-      const result = await localizedFacilityRepository.getFacilitiesByArea(area);
-      return result;
-    } catch (error) {
-      return {
-        success: false,
-        error: {
-          message: "Failed to fetch facilities by area",
-          details: error,
-        },
-      };
-    }
+  async getFacilityById(id: number): Promise<LocalizedFacility | null> {
+    return localizedMockFacilities.find(f => f.id === id) || null;
   }
 }
+
+export const LocalizedFacilityService = new LocalizedFacilityServiceClass();
