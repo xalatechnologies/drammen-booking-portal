@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Plus, Search, Filter, Grid3X3, List, Table, Calendar, Settings } from "lucide-react";
+import { Plus, Search, Filter, Grid3X3, List, Table, Calendar, Settings, Map } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,6 +11,11 @@ import { FacilityService } from "@/services/facilityService";
 import { EnhancedFacilityForm } from "./form/EnhancedFacilityForm";
 import { FacilityCalendarView } from "./calendar/FacilityCalendarView";
 import { FacilityDetailView } from "./detail/FacilityDetailView";
+import { MapContainer } from "@/components/map/MapContainer";
+import { MapMarkers } from "@/components/map/MapMarkers";
+import { MapLoadingState } from "@/components/map/MapLoadingState";
+import { MapErrorState } from "@/components/map/MapErrorState";
+import mapboxgl from 'mapbox-gl';
 
 interface FacilityListViewProps {
   selectedFacilityId?: number;
@@ -18,7 +23,10 @@ interface FacilityListViewProps {
 }
 
 type ViewMode = 'list' | 'form' | 'calendar' | 'detail';
-type DisplayMode = 'grid' | 'list' | 'table';
+type DisplayMode = 'grid' | 'list' | 'table' | 'map';
+
+// Default token for map functionality
+const DEFAULT_MAPBOX_TOKEN = 'pk.eyJ1IjoieGFsYXRlY2hub2xvZ2llc2FzIiwiYSI6ImNtYmh0anh6NTAweDEycXF6cm9xbDFtb2IifQ.81xizRmOh6TLUEsG0EVSEg';
 
 export const FacilityListView: React.FC<FacilityListViewProps> = ({
   selectedFacilityId,
@@ -30,6 +38,11 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState("all");
   const [filterStatus, setFilterStatus] = useState("all");
+  
+  // Map state
+  const [map, setMap] = useState<mapboxgl.Map | null>(null);
+  const [isMapLoading, setIsMapLoading] = useState<boolean>(false);
+  const [mapError, setMapError] = useState<string>('');
 
   const { data: facilitiesResponse, isLoading, refetch } = useQuery({
     queryKey: ['facilities'],
@@ -50,6 +63,19 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
     
     return matchesSearch && matchesType && matchesStatus;
   });
+
+  // Convert facilities to map format
+  const facilityLocations = filteredFacilities.map(facility => ({
+    id: facility.id,
+    name: facility.name,
+    address: `${facility.address_street}, ${facility.address_city}`,
+    lat: facility.latitude || (59.7440 + (Math.random() - 0.5) * 0.02), // Use actual coordinates or spread around Drammen
+    lng: facility.longitude || (10.2052 + (Math.random() - 0.5) * 0.02),
+    image: facility.image_url,
+    type: facility.type,
+    capacity: facility.capacity,
+    nextAvailable: facility.next_available || "Available now"
+  }));
 
   const handleAddNew = () => {
     setSelectedFacility(null);
@@ -253,6 +279,27 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
     </Card>
   );
 
+  const renderFacilityMap = () => (
+    <Card className="min-h-[600px] relative overflow-hidden">
+      <MapLoadingState isLoading={isMapLoading || isLoading} />
+      
+      <MapErrorState 
+        error={mapError} 
+        isLoading={isMapLoading || isLoading} 
+        onRetry={handleMapRetry} 
+      />
+      
+      <MapContainer
+        onMapLoad={handleMapLoad}
+        onMapError={handleMapError}
+        onLoadingChange={setIsMapLoading}
+        mapboxToken={DEFAULT_MAPBOX_TOKEN}
+      />
+      
+      <MapMarkers map={map} facilities={facilityLocations} />
+    </Card>
+  );
+
   const renderFacilityContent = () => {
     if (isLoading) {
       return <div className="text-center py-8">Loading facilities...</div>;
@@ -273,6 +320,8 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
         return renderFacilityList();
       case 'table':
         return renderFacilityTable();
+      case 'map':
+        return renderFacilityMap();
       default:
         return renderFacilityGrid();
     }
@@ -307,6 +356,19 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
       />
     );
   }
+
+  const handleMapLoad = (mapInstance: mapboxgl.Map) => {
+    setMap(mapInstance);
+  };
+
+  const handleMapError = (errorMessage: string) => {
+    setMapError(errorMessage);
+  };
+
+  const handleMapRetry = () => {
+    setMapError('');
+    window.location.reload();
+  };
 
   return (
     <div className="w-full space-y-6 p-6">
@@ -376,6 +438,9 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
                 </ToggleGroupItem>
                 <ToggleGroupItem value="table" aria-label="Table view">
                   <Table className="h-4 w-4" />
+                </ToggleGroupItem>
+                <ToggleGroupItem value="map" aria-label="Map view">
+                  <Map className="h-4 w-4" />
                 </ToggleGroupItem>
               </ToggleGroup>
             </div>
