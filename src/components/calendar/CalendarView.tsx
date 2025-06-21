@@ -8,6 +8,7 @@ import { CalendarErrorState } from "./components/CalendarErrorState";
 import { CalendarEmptyState } from "./components/CalendarEmptyState";
 import { useSlotSelection } from "@/hooks/useSlotSelection";
 import { useCartStore } from "@/stores/useCartStore";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { AvailabilityTab } from "@/components/facility/tabs/AvailabilityTab";
 
 interface CalendarViewWithToggleProps extends CalendarViewProps {
@@ -67,6 +68,7 @@ const CalendarView: React.FC<CalendarViewWithToggleProps> = ({
     if (bookingData.selectedSlots && bookingData.selectedSlots.length > 0) {
       const slot = bookingData.selectedSlots[0]; // Take first slot for cart item
       const zone = allZones.find(z => z.id === slot.zoneId);
+      const totalPrice = (zone?.pricePerHour || 450) * (slot.duration || 1);
       
       addToCart({
         facilityId: bookingData.facilityId || 'all',
@@ -82,7 +84,14 @@ const CalendarView: React.FC<CalendarViewWithToggleProps> = ({
         eventType: bookingData.formData?.activityType || 'other',
         specialRequirements: bookingData.formData?.additionalInfo || '',
         timeSlots: bookingData.selectedSlots,
-        additionalServices: []
+        additionalServices: [],
+        pricing: {
+          baseFacilityPrice: totalPrice,
+          servicesPrice: 0,
+          discounts: 0,
+          vatAmount: 0,
+          totalPrice: totalPrice
+        }
       });
       
       // Clear selection after adding to cart
@@ -116,17 +125,54 @@ const CalendarView: React.FC<CalendarViewWithToggleProps> = ({
       {facilitiesWithZones.length === 0 ? (
         <CalendarEmptyState />
       ) : (
-        <AvailabilityTab
-          zones={allZones}
-          selectedSlots={selectedSlots}
-          onSlotClick={handleSlotClick}
-          onBulkSlotSelection={handleBulkSlotSelection}
-          onClearSlots={clearSelection}
-          onRemoveSlot={handleRemoveSlot}
-          facilityId={'all'}
-          facilityName={displayFacility?.name || 'Alle lokaler'}
-          timeSlotDuration={1}
-        />
+        <Accordion type="multiple" className="w-full space-y-4">
+          {facilitiesWithZones.map((facility) => (
+            <AccordionItem 
+              key={facility.id} 
+              value={`facility-${facility.id}`}
+              className="border rounded-lg bg-white shadow-sm"
+            >
+              <AccordionTrigger className="px-6 py-4 hover:no-underline">
+                <div className="flex items-center justify-between w-full pr-4">
+                  <div className="text-left">
+                    <h3 className="text-xl font-semibold text-gray-900">{facility.name}</h3>
+                    <p className="text-gray-600 mt-1">{facility.address}</p>
+                    <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
+                      <span>Kapasitet: {facility.capacity} personer</span>
+                      <span>{facility.zones.length} soner tilgjengelig</span>
+                    </div>
+                  </div>
+                </div>
+              </AccordionTrigger>
+              
+              <AccordionContent className="px-6 pb-6">
+                <AvailabilityTab
+                  zones={facility.zones.map(zone => ({
+                    id: zone.id,
+                    name: zone.name,
+                    capacity: zone.capacity,
+                    pricePerHour: zone.pricePerHour,
+                    description: zone.description,
+                    area: "120 m²",
+                    equipment: [],
+                    accessibility: [],
+                    images: []
+                  }))}
+                  selectedSlots={selectedSlots.filter(slot => 
+                    facility.zones.some(zone => zone.id === slot.zoneId)
+                  )}
+                  onSlotClick={handleSlotClick}
+                  onBulkSlotSelection={handleBulkSlotSelection}
+                  onClearSlots={clearSelection}
+                  onRemoveSlot={handleRemoveSlot}
+                  facilityId={facility.id.toString()}
+                  facilityName={facility.name}
+                  timeSlotDuration={1}
+                />
+              </AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
       )}
     </div>
   );
