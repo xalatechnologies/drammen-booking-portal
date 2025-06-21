@@ -1,31 +1,14 @@
 
-import { BaseRepository } from '../BaseRepository';
+import { SupabaseRepository } from '../SupabaseRepository';
 import { Facility, FacilityFilters } from '@/types/facility';
 import { SupabaseFacilityService } from '@/services/SupabaseFacilityService';
 import { PaginationParams, ApiResponse, PaginatedResponse } from '@/types/api';
 
-export class SupabaseFacilityRepository extends BaseRepository<Facility, FacilityFilters, Partial<Facility>, Partial<Facility>> {
+export class SupabaseFacilityRepository extends SupabaseRepository<Facility> {
+  protected tableName = 'facilities';
+
   constructor() {
-    super([]); // No in-memory data needed
-  }
-
-  protected getId(facility: Facility): string {
-    return facility.id.toString();
-  }
-
-  protected applyFilters(facilities: Facility[], filters: FacilityFilters): Facility[] {
-    // Filters are applied server-side via the edge function
-    return facilities;
-  }
-
-  protected createEntity(request: Partial<Facility>): Facility {
-    // This will be handled by the edge function
-    throw new Error('Use createAsync instead');
-  }
-
-  protected updateEntity(existing: Facility, request: Partial<Facility>): Facility {
-    // This will be handled by the edge function
-    throw new Error('Use updateAsync instead');
+    super();
   }
 
   // Override base methods to use Supabase edge functions

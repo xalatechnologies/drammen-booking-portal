@@ -8,9 +8,9 @@ import { supabase } from '@/integrations/supabase/client';
 
 // Define local filters interface that matches the actual usage
 interface LocalFacilityFilters {
-  type?: string[];
-  area?: string[];
-  search?: string;
+  facilityType?: string;
+  location?: string;
+  searchTerm?: string;
 }
 
 export class LocalizedFacilityRepository extends SupabaseRepository<LocalizedFacility> {
@@ -22,28 +22,28 @@ export class LocalizedFacilityRepository extends SupabaseRepository<LocalizedFac
 
   async findAllRaw(
     pagination: PaginationParams,
-    filters?: LocalFacilityFilters,
+    filters?: FacilityFilters,
     orderBy?: string,
     orderDirection: 'asc' | 'desc' = 'asc'
   ): Promise<RepositoryResponse<PaginatedResponse<LocalizedFacility>>> {
     try {
       let query = supabase
-        .from(this.tableName as any)
+        .from('facilities')
         .select(`
           *,
           facility_translations(*),
           facility_images(*)
         `, { count: 'exact' });
 
-      // Apply filters
-      if (filters?.type && filters.type.length > 0) {
-        query = query.in('type', filters.type);
+      // Apply filters based on standard FacilityFilters
+      if (filters?.facilityType) {
+        query = query.eq('type', filters.facilityType);
       }
-      if (filters?.area && filters.area.length > 0) {
-        query = query.in('area', filters.area);
+      if (filters?.location) {
+        query = query.or(`address_city.ilike.%${filters.location}%,area.ilike.%${filters.location}%`);
       }
-      if (filters?.search) {
-        query = query.or(`name.ilike.%${filters.search}%,description.ilike.%${filters.search}%`);
+      if (filters?.searchTerm) {
+        query = query.or(`name.ilike.%${filters.searchTerm}%,description.ilike.%${filters.searchTerm}%`);
       }
 
       // Apply sorting
@@ -111,7 +111,7 @@ export class LocalizedFacilityRepository extends SupabaseRepository<LocalizedFac
   async findByIdRaw(id: string): Promise<RepositoryResponse<LocalizedFacility | null>> {
     try {
       const { data, error } = await supabase
-        .from(this.tableName as any)
+        .from('facilities')
         .select(`
           *,
           facility_translations(*),
@@ -192,7 +192,7 @@ export class LocalizedFacilityRepository extends SupabaseRepository<LocalizedFac
   async getRawFacilitiesByType(type: string): Promise<RepositoryResponse<LocalizedFacility[]>> {
     try {
       const { data, error } = await supabase
-        .from(this.tableName as any)
+        .from('facilities')
         .select(`
           *,
           facility_translations(*),
@@ -221,7 +221,7 @@ export class LocalizedFacilityRepository extends SupabaseRepository<LocalizedFac
   async getRawFacilitiesByArea(area: string): Promise<RepositoryResponse<LocalizedFacility[]>> {
     try {
       const { data, error } = await supabase
-        .from(this.tableName as any)
+        .from('facilities')
         .select(`
           *,
           facility_translations(*),

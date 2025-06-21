@@ -129,7 +129,6 @@ export class OrganizationRepository extends SupabaseRepository<Organization> {
       status: dbRow.status,
       verificationLevel: dbRow.verification_level,
       parentOrganizationId: dbRow.parent_organization_id,
-      foundedYear: dbRow.founded_year,
       memberCount: dbRow.member_count,
       isActive: dbRow.is_active,
       createdAt: new Date(dbRow.created_at),

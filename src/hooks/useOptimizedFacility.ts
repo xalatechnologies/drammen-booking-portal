@@ -14,7 +14,7 @@ export function useOptimizedFacility(id: number | string) {
     error,
     refetch
   } = useQuery({
-    queryKey: ['facility', facilityId],
+    queryKey: ['optimized-facility', facilityId],
     queryFn: () => OptimizedLocalizedFacilityService.getRawFacilityById(facilityId),
     enabled: !isNaN(facilityId) && facilityId > 0,
     staleTime: 0, // No cache - always fetch fresh data
@@ -31,7 +31,7 @@ export function useOptimizedFacility(id: number | string) {
     facility,
     isLoading,
     error: response?.error || error,
-    notFound: response?.error && response.error.message.includes('NOT_FOUND'),
+    notFound: response?.error?.includes('NOT_FOUND'),
     refetch,
   };
 }

@@ -1,5 +1,5 @@
 
-import { BaseRepository } from '../BaseRepository';
+import { SupabaseRepository } from '../SupabaseRepository';
 import { Facility, FacilityFilters, OpeningHours } from '@/types/facility';
 import { supabaseFacilityRepository } from './SupabaseFacilityRepository';
 import { PaginationParams, ApiResponse, PaginatedResponse } from '@/types/api';
@@ -27,27 +27,12 @@ interface FacilityUpdateRequest extends Partial<FacilityCreateRequest> {
   hasAutoApproval?: boolean;
 }
 
-export class FacilityRepository extends BaseRepository<Facility, FacilityFilters, FacilityCreateRequest, FacilityUpdateRequest> {
+export class FacilityRepository extends SupabaseRepository<Facility> {
+  protected tableName = 'facilities';
+
   constructor() {
-    super([]); // No mock data needed anymore
+    super();
     console.log("FacilityRepository - Now using Supabase backend");
-  }
-
-  protected getId(facility: Facility): string {
-    return facility.id.toString();
-  }
-
-  protected applyFilters(facilities: Facility[], filters: FacilityFilters): Facility[] {
-    // Delegate to Supabase repository
-    return facilities;
-  }
-
-  protected createEntity(request: FacilityCreateRequest): Facility {
-    throw new Error('Use createAsync instead - now handled by Supabase');
-  }
-
-  protected updateEntity(existing: Facility, request: FacilityUpdateRequest): Facility {
-    throw new Error('Use updateAsync instead - now handled by Supabase');
   }
 
   // Override all methods to use Supabase backend

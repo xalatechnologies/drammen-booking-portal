@@ -8,11 +8,11 @@ export const localizedMockServiceData: Record<string, AdditionalService[]> = {
       name: "Catering tjeneste",
       description: "Profesjonell catering for arrangementer",
       category: "catering",
-      basePrice: 150,
+      base_price: 150,
       unit: "per person",
-      isActive: true,
-      createdAt: new Date(),
-      updatedAt: new Date()
+      is_active: true,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
     }
   ],
   'EN': [
@@ -21,11 +21,11 @@ export const localizedMockServiceData: Record<string, AdditionalService[]> = {
       name: "Catering Service",
       description: "Professional catering for events",
       category: "catering",
-      basePrice: 150,
+      base_price: 150,
       unit: "per person",
-      isActive: true,
-      createdAt: new Date(),
-      updatedAt: new Date()
+      is_active: true,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
     }
   ]
 };

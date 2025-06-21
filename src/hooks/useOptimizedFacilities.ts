@@ -1,6 +1,6 @@
 
 import { useQuery } from "@tanstack/react-query";
-import { LocalizedFacilityService } from "@/services/LocalizedFacilityService";
+import { OptimizedLocalizedFacilityService } from "@/services/OptimizedLocalizedFacilityService";
 import { FacilityFilters, FacilitySortOptions } from "@/types/facility";
 import { PaginationParams } from "@/types/api";
 import { useLocalization } from "@/contexts/LocalizationContext";
@@ -19,22 +19,21 @@ export function useOptimizedFacilities({
 }: UseFacilitiesParams) {
   const { getLocalizedFacility, language } = useLocalization();
 
-  // Use getFacilities instead of getRawFacilities
   const {
     data: response,
     isLoading,
     error,
     refetch
   } = useQuery({
-    queryKey: ['facilities', pagination, filters, sort],
-    queryFn: () => LocalizedFacilityService.getFacilities(pagination, filters, sort),
+    queryKey: ['optimized-facilities', pagination, filters, sort],
+    queryFn: () => OptimizedLocalizedFacilityService.getRawFacilities(pagination, filters, sort),
     staleTime: 0, // No cache - always fetch fresh data
     gcTime: 30 * 1000, // Keep in memory for 30 seconds only
   });
 
   // Transform the data based on current language (memoized)
   const facilities = useMemo(() => {
-    if (!response?.success || !response.data.data) return [];
+    if (!response?.data?.data) return [];
     const transformed = response.data.data.map(facility => getLocalizedFacility(facility));
     
     // Debug logging to see actual facility types and areas
@@ -46,7 +45,7 @@ export function useOptimizedFacilities({
     return transformed;
   }, [response, getLocalizedFacility]);
 
-  const paginationInfo = response?.success ? {
+  const paginationInfo = response?.data ? {
     page: response.data.pagination.page,
     limit: response.data.pagination.limit,
     total: response.data.pagination.total,
@@ -59,7 +58,7 @@ export function useOptimizedFacilities({
     facilities,
     pagination: paginationInfo,
     isLoading,
-    error: response?.success === false ? response.error : error,
+    error: response?.error || error,
     refetch,
   };
 }

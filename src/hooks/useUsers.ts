@@ -1,18 +1,27 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { userRepository } from '@/dal/UserRepository';
-import { UserService } from '@/services/UserService';
 import { PaginationParams } from '@/types/api';
 
 export function useUsers(pagination: PaginationParams) {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['users', pagination],
     queryFn: async () => {
-      const result = await UserService.getUsers(pagination);
-      if (!result.success) {
-        throw new Error(result.error?.message || 'Failed to fetch users');
+      const result = await userRepository.findAll(pagination);
+      if (result.error) {
+        throw new Error(result.error);
       }
-      return result.data;
+      return {
+        data: result.data,
+        pagination: {
+          page: pagination.page,
+          limit: pagination.limit,
+          total: result.data.length,
+          totalPages: Math.ceil(result.data.length / pagination.limit),
+          hasNext: pagination.page * pagination.limit < result.data.length,
+          hasPrev: pagination.page > 1
+        }
+      };
     }
   });
 
@@ -29,9 +38,9 @@ export function useUser(id: string) {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['user', id],
     queryFn: async () => {
-      const result = await UserService.getUserById(id);
-      if (!result.success) {
-        throw new Error(result.error?.message || 'Failed to fetch user');
+      const result = await userRepository.findById(id);
+      if (result.error) {
+        throw new Error(result.error);
       }
       return result.data;
     },
@@ -70,9 +79,9 @@ export function useUsersByRole(role: string) {
 export function useUpdateUser() {
   return {
     updateUser: async (id: string, data: any) => {
-      const result = await UserService.updateUser(id, data);
-      if (!result.success) {
-        throw new Error(result.error?.message || 'Failed to update user');
+      const result = await userRepository.update(id, data);
+      if (result.error) {
+        throw new Error(result.error);
       }
       return result.data;
     }

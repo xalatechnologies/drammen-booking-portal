@@ -124,8 +124,8 @@ export class AdditionalServicesService {
 
     const service = serviceResult.data;
     
-    // Use basePrice instead of base_price
-    const basePrice = service.basePrice || 0;
+    // Use base_price from database model
+    const basePrice = service.base_price || 0;
     const totalPrice = basePrice * quantity;
 
     return {

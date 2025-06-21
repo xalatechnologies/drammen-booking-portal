@@ -4,10 +4,9 @@ import { Zone } from "@/types/zone";
 import { PaginatedResponse, PaginationParams, RepositoryResponse } from "@/types/api";
 import { LocalizedFacilityRepository } from "@/dal/repositories/LocalizedFacilityRepository";
 import { LocalizedFacility } from "@/types/localization";
-import { localizedMockFacilities } from "@/data/localizedMockFacilities";
 
-// Create singleton instance with initial data
-const localizedFacilityRepository = new LocalizedFacilityRepository(localizedMockFacilities);
+// Create singleton instance
+const localizedFacilityRepository = new LocalizedFacilityRepository();
 
 // Simulate API delay
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
