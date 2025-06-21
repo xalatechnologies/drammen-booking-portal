@@ -4,6 +4,7 @@ import { FacilityService } from "@/services/facilityService";
 import { FacilityFilters, FacilitySortOptions } from "@/types/facility";
 import { PaginationParams } from "@/types/api";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useState, useCallback } from "react";
 
 interface UseFacilitiesParams {
   pagination: PaginationParams;
@@ -51,9 +52,22 @@ export function useFacilities({
   };
 }
 
-// Export pagination helper function
-export function useFacilitiesPagination(page: number, limit: number) {
+// Export pagination helper function with proper navigation methods
+export function useFacilitiesPagination(initialPage: number, initialLimit: number) {
+  const [page, setPage] = useState(initialPage);
+  const [limit] = useState(initialLimit);
+
+  const nextPage = useCallback(() => {
+    setPage(prev => prev + 1);
+  }, []);
+
+  const goToPage = useCallback((newPage: number) => {
+    setPage(newPage);
+  }, []);
+
   return {
-    pagination: { page, limit }
+    pagination: { page, limit },
+    nextPage,
+    goToPage
   };
 }

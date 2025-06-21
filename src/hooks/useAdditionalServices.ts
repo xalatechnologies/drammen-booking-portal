@@ -1,93 +1,72 @@
 
-import { useQuery } from '@tanstack/react-query';
-import { AdditionalServicesService } from '@/services/AdditionalServicesService';
-import { ServiceCategory } from '@/types/additionalServices';
-import { ActorType } from '@/types/pricing';
+import { useQuery } from "@tanstack/react-query";
+import { AdditionalServicesService } from "@/services/AdditionalServicesService";
+import { ServiceFilters } from "@/types/additionalServices";
+import { PaginationParams } from "@/types/api";
+import { useLanguage } from "@/contexts/LanguageContext";
 
-export function useAdditionalServices(facilityId: string, category?: ServiceCategory) {
-  const { data, isLoading, error } = useQuery({
-    queryKey: ['additional-services', facilityId, category],
-    queryFn: async () => {
-      if (category) {
-        const result = await AdditionalServicesService.getServicesByCategory(category, facilityId);
-        if (!result.success) {
-          throw new Error(result.error?.message || 'Failed to fetch services');
-        }
-        return result.data || [];
-      } else {
-        const result = await AdditionalServicesService.getServices(
-          { page: 1, limit: 100 },
-          { facilityId, isActive: true }
-        );
-        if (result.error) {
-          throw new Error(result.error);
-        }
-        return result.data?.data || [];
-      }
-    },
-    enabled: !!facilityId
+interface UseAdditionalServicesParams {
+  pagination: PaginationParams;
+  filters?: ServiceFilters;
+}
+
+export function useAdditionalServices({
+  pagination,
+  filters
+}: UseAdditionalServicesParams) {
+  const { language } = useLanguage();
+
+  const {
+    data: response,
+    isLoading,
+    error,
+    refetch
+  } = useQuery({
+    queryKey: ['additionalServices', language, pagination, filters],
+    queryFn: () => AdditionalServicesService.getServices(pagination, filters),
+    staleTime: 0,
+    gcTime: 30 * 1000,
   });
 
+  const services = response?.success ? response.data?.data || [] : [];
+  const paginationInfo = response?.success ? {
+    page: response.data?.pagination?.page || pagination.page,
+    limit: response.data?.pagination?.limit || pagination.limit,
+    total: response.data?.pagination?.total || 0,
+    totalPages: response.data?.pagination?.totalPages || 0,
+    hasNext: response.data?.pagination?.hasNext || false,
+    hasPrev: response.data?.pagination?.hasPrev || false
+  } : null;
+
   return {
-    services: data || [],
+    services: services || [],
+    pagination: paginationInfo,
     isLoading,
-    error
+    error: response?.success === false ? response.error?.message || "Failed to fetch services" : error?.message,
+    refetch,
   };
 }
 
-export function useServicePricing() {
-  const calculateServicePrice = async (
-    serviceId: string,
-    quantity: number,
-    actorType: ActorType,
-    attendees?: number
-  ) => {
-    const result = await AdditionalServicesService.calculateServicePrice(
-      serviceId,
-      quantity,
-      actorType,
-      attendees
-    );
-    
-    return result; // Return the full API response with success/data structure
-  };
+export function useAdditionalService(id: string) {
+  const { language } = useLanguage();
 
-  const validateServiceAvailability = async (
-    serviceId: string,
-    requestedDate: Date,
-    timeSlot?: string
-  ) => {
-    const result = await AdditionalServicesService.validateServiceAvailability(
-      serviceId,
-      requestedDate,
-      timeSlot
-    );
-    
-    return result; // Return the full API response with success/data structure
-  };
-
-  return {
-    calculateServicePrice,
-    validateServiceAvailability
-  };
-}
-
-export function usePopularServices(facilityId: string, limit?: number) {
-  const { data, isLoading, error } = useQuery({
-    queryKey: ['popular-services', facilityId, limit],
-    queryFn: async () => {
-      const result = await AdditionalServicesService.getPopularServices(facilityId, limit);
-      if (!result.success) {
-        throw new Error(result.error?.message || 'Failed to fetch popular services');
-      }
-      return result.data || [];
-    },
-    enabled: !!facilityId
+  const {
+    data: response,
+    isLoading,
+    error,
+    refetch
+  } = useQuery({
+    queryKey: ['additionalService', id, language],
+    queryFn: () => AdditionalServicesService.getServiceById(id),
+    enabled: !!id,
+    staleTime: 0,
+    gcTime: 30 * 1000,
   });
 
   return {
-    services: data || [],
+    service: response?.success ? response.data : null,
     isLoading,
-    error
+    error: response?.success === false ? response.error?.message || "Failed to fetch service" : error?.message,
+    refetch,
   };
 }
