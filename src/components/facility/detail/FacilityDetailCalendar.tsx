@@ -4,6 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Zone } from "@/components/booking/types";
 import { SelectedTimeSlot } from "@/utils/recurrenceEngine";
 import { CalendarWithBooking } from "@/components/shared/CalendarWithBooking";
+import { useCart } from "@/contexts/CartContext";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
 
 interface FacilityDetailCalendarProps {
   zones: Zone[];
@@ -36,6 +39,10 @@ export const FacilityDetailCalendar: React.FC<FacilityDetailCalendarProps> = ({
   facilityName,
   timeSlotDuration = 1
 }) => {
+  const { addToCart } = useCart();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
   // Mock availability function - replace with real implementation
   const getAvailabilityStatus = useCallback((zoneId: string, date: Date, timeSlot: string) => {
     const now = new Date();
@@ -68,7 +75,66 @@ export const FacilityDetailCalendar: React.FC<FacilityDetailCalendarProps> = ({
   const handleContinueBooking = useCallback(() => {
     // Navigate to booking form or show booking modal
     console.log('Continue with booking:', selectedSlots);
-  }, [selectedSlots]);
+    navigate('/checkout');
+  }, [selectedSlots, navigate]);
+
+  const handleAddToCart = useCallback((bookingData: any) => {
+    // Add each selected slot to cart
+    bookingData.selectedSlots.forEach((slot: SelectedTimeSlot) => {
+      const zone = zones.find(z => z.id === slot.zoneId);
+      const duration = slot.duration || 1;
+      const pricePerHour = zone?.pricePerHour || 450;
+      
+      addToCart({
+        facilityId: bookingData.facilityId,
+        facilityName: bookingData.facilityName,
+        date: slot.date,
+        timeSlot: slot.timeSlot,
+        zoneId: slot.zoneId,
+        pricePerHour,
+        duration,
+        organizationType: bookingData.formData.actorType as any,
+        purpose: bookingData.formData.purpose,
+        expectedAttendees: bookingData.formData.attendees,
+        additionalServices: [],
+        timeSlots: [{
+          date: slot.date,
+          timeSlot: slot.timeSlot,
+          zoneId: slot.zoneId,
+          duration
+        }],
+        pricing: {
+          baseFacilityPrice: pricePerHour * duration,
+          servicesPrice: 0,
+          discounts: 0,
+          vatAmount: 0,
+          totalPrice: pricePerHour * duration
+        },
+        customerInfo: {
+          name: '',
+          email: '',
+          phone: ''
+        }
+      });
+    });
+
+    toast({
+      title: "Lagt til i handlekurv",
+      description: `${bookingData.selectedSlots.length} tidspunkt lagt til`,
+    });
+
+    // Clear selections after adding to cart
+    onClearSlots();
+  }, [zones, addToCart, toast, onClearSlots]);
+
+  const handleCompleteBooking = useCallback((bookingData: any) => {
+    // Add to cart first, then navigate to checkout
+    handleAddToCart(bookingData);
+    
+    setTimeout(() => {
+      navigate('/checkout');
+    }, 500);
+  }, [handleAddToCart, navigate]);
 
   return (
     <div className="container mx-auto mt-8 px-4 lg:px-0">
@@ -89,6 +155,8 @@ export const FacilityDetailCalendar: React.FC<FacilityDetailCalendarProps> = ({
             onRemoveSlot={onRemoveSlot}
             onClearSlots={onClearSlots}
             onContinueBooking={handleContinueBooking}
+            onAddToCart={handleAddToCart}
+            onCompleteBooking={handleCompleteBooking}
             getAvailabilityStatus={getAvailabilityStatus}
             isSlotSelected={isSlotSelected}
             timeSlotDuration={timeSlotDuration}

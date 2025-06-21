@@ -15,6 +15,8 @@ interface CalendarWithBookingProps {
   onRemoveSlot: (zoneId: string, date: Date, timeSlot: string) => void;
   onClearSlots: () => void;
   onContinueBooking?: () => void;
+  onAddToCart?: (bookingData: any) => void;
+  onCompleteBooking?: (bookingData: any) => void;
   getAvailabilityStatus: (zoneId: string, date: Date, timeSlot: string) => { status: string; conflict: any };
   isSlotSelected: (zoneId: string, date: Date, timeSlot: string) => boolean;
   timeSlotDuration?: number;
@@ -32,6 +34,8 @@ export const CalendarWithBooking: React.FC<CalendarWithBookingProps> = ({
   onRemoveSlot,
   onClearSlots,
   onContinueBooking,
+  onAddToCart,
+  onCompleteBooking,
   getAvailabilityStatus,
   isSlotSelected,
   timeSlotDuration = 1,
@@ -67,6 +71,8 @@ export const CalendarWithBooking: React.FC<CalendarWithBookingProps> = ({
             onRemoveSlot={onRemoveSlot}
             onClearSlots={onClearSlots}
             onContinueBooking={onContinueBooking}
+            onAddToCart={onAddToCart}
+            onCompleteBooking={onCompleteBooking}
             compact={compact}
           />
         </div>

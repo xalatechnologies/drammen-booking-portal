@@ -54,7 +54,10 @@ export function CalendarGrid({
   };
 
   const handleMouseDown = (day: Date, timeSlot: string, event: React.MouseEvent) => {
+    // Get the ORIGINAL availability status from the function, not from previous state
     const { status } = getAvailabilityStatus(zone.id, day, timeSlot);
+    console.log('CalendarGrid: handleMouseDown - status:', status, 'for slot:', { zoneId: zone.id, day, timeSlot });
+    
     if (status === 'available' && onBulkSlotSelection) {
       event.preventDefault();
       startDrag(zone.id, day, timeSlot, event);
@@ -79,15 +82,24 @@ export function CalendarGrid({
     }
   };
 
-  const handleClick = (day: Date, timeSlot: string, status: string, event: React.MouseEvent) => {
-    // Only handle single clicks if we're not dragging
-    if (!dragState.isDragging) {
-      console.log('CalendarGrid: single click on slot:', { zoneId: zone.id, day, timeSlot, status });
+  const handleClick = (day: Date, timeSlot: string, event: React.MouseEvent) => {
+    // Prevent click if we just finished dragging
+    if (dragState.isDragging) {
+      return;
+    }
+    
+    // Get the FRESH availability status
+    const { status } = getAvailabilityStatus(zone.id, day, timeSlot);
+    console.log('CalendarGrid: single click - fresh status:', status, 'for slot:', { zoneId: zone.id, day, timeSlot });
+    
+    // Only proceed with click if available
+    if (status === 'available') {
       onSlotClick(zone.id, day, timeSlot, status);
     }
   };
 
   const renderTimeSlotCell = (day: Date, timeSlot: string, dayIndex: number) => {
+    // Always get fresh availability status
     const { status, conflict } = getAvailabilityStatus(zone.id, day, timeSlot);
     const isSelected = isSlotSelected(zone.id, day, timeSlot);
     const isInPreview = isSlotInPreview(zone.id, day, timeSlot);
@@ -104,7 +116,7 @@ export function CalendarGrid({
         onMouseDown={(e) => handleMouseDown(day, timeSlot, e)}
         onMouseEnter={() => handleMouseEnter(day, timeSlot)}
         onMouseUp={handleMouseUp}
-        onClick={(e) => handleClick(day, timeSlot, status, e)}
+        onClick={(e) => handleClick(day, timeSlot, e)}
         title={status === 'available' ? `Book ${timeSlot}` : 
                status === 'busy' ? 'Opptatt' : 'Ikke tilgjengelig'}
         style={{ userSelect: 'none' }}

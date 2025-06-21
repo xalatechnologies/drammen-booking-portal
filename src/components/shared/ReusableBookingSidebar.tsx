@@ -1,14 +1,25 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Clock, Users, MapPin, Calendar, X } from "lucide-react";
+import { Clock, Users, MapPin, Calendar, X, ShoppingCart, CreditCard } from "lucide-react";
 import { format } from "date-fns";
 import { nb } from "date-fns/locale";
 import { Zone } from "@/components/booking/types";
 import { SelectedTimeSlot } from "@/utils/recurrenceEngine";
+import { BookingFormFields } from "@/components/booking/BookingFormFields";
+import { BookingActionButtons } from "@/components/booking/BookingActionButtons";
+import { ActorType } from "@/types/pricing";
+
+interface BookingFormData {
+  purpose: string;
+  attendees: number;
+  activityType: string;
+  additionalInfo: string;
+  actorType: ActorType | '';
+}
 
 interface ReusableBookingSidebarProps {
   facilityName: string;
@@ -18,6 +29,8 @@ interface ReusableBookingSidebarProps {
   onRemoveSlot: (zoneId: string, date: Date, timeSlot: string) => void;
   onClearSlots: () => void;
   onContinueBooking?: () => void;
+  onAddToCart?: (bookingData: any) => void;
+  onCompleteBooking?: (bookingData: any) => void;
   compact?: boolean;
 }
 
@@ -29,8 +42,20 @@ export const ReusableBookingSidebar: React.FC<ReusableBookingSidebarProps> = ({
   onRemoveSlot,
   onClearSlots,
   onContinueBooking,
+  onAddToCart,
+  onCompleteBooking,
   compact = false
 }) => {
+  const [formData, setFormData] = useState<BookingFormData>({
+    purpose: '',
+    attendees: 1,
+    activityType: '',
+    additionalInfo: '',
+    actorType: ''
+  });
+
+  const [termsAccepted, setTermsAccepted] = useState(false);
+
   const totalSlots = selectedSlots.length;
   const totalHours = selectedSlots.reduce((sum, slot) => sum + (slot.duration || 1), 0);
   
@@ -53,6 +78,40 @@ export const ReusableBookingSidebar: React.FC<ReusableBookingSidebarProps> = ({
     });
     return acc;
   }, {} as Record<string, SelectedTimeSlot[]>);
+
+  const updateFormData = (updates: Partial<BookingFormData>) => {
+    setFormData(prev => ({ ...prev, ...updates }));
+  };
+
+  const isFormValid = () => {
+    return selectedSlots.length > 0 &&
+           formData.purpose &&
+           formData.activityType &&
+           formData.actorType &&
+           termsAccepted;
+  };
+
+  const handleAddToCart = () => {
+    if (onAddToCart && isFormValid()) {
+      onAddToCart({
+        selectedSlots,
+        facilityId,
+        facilityName,
+        formData
+      });
+    }
+  };
+
+  const handleCompleteBooking = () => {
+    if (onCompleteBooking && isFormValid()) {
+      onCompleteBooking({
+        selectedSlots,
+        facilityId,
+        facilityName,
+        formData
+      });
+    }
+  };
 
   if (totalSlots === 0) {
     return (
@@ -110,7 +169,7 @@ export const ReusableBookingSidebar: React.FC<ReusableBookingSidebarProps> = ({
         <Separator />
 
         {/* Selected Slots */}
-        <div className="space-y-3 max-h-64 overflow-y-auto">
+        <div className="space-y-3 max-h-32 overflow-y-auto">
           {Object.entries(slotsByDate).map(([dateKey, daySlots]) => (
             <div key={dateKey} className="space-y-2">
               <h4 className="font-medium text-sm text-gray-700">
@@ -155,6 +214,17 @@ export const ReusableBookingSidebar: React.FC<ReusableBookingSidebarProps> = ({
 
         <Separator />
 
+        {/* Booking Form Fields */}
+        <div className="space-y-4">
+          <h4 className="font-medium text-gray-700">Booking detaljer</h4>
+          <BookingFormFields
+            formData={formData}
+            onUpdateFormData={updateFormData}
+          />
+        </div>
+
+        <Separator />
+
         {/* Price Summary */}
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
@@ -166,16 +236,14 @@ export const ReusableBookingSidebar: React.FC<ReusableBookingSidebarProps> = ({
           </p>
         </div>
 
-        {/* Action Button */}
-        {onContinueBooking && (
-          <Button 
-            onClick={onContinueBooking}
-            className="w-full bg-[#1e3a8a] hover:bg-[#1e40af]"
-            disabled={totalSlots === 0}
-          >
-            Fortsett med booking
-          </Button>
-        )}
+        {/* Action Buttons */}
+        <BookingActionButtons
+          termsAccepted={termsAccepted}
+          onTermsAcceptedChange={setTermsAccepted}
+          onAddToCart={handleAddToCart}
+          onCompleteBooking={handleCompleteBooking}
+          isFormValid={isFormValid()}
+        />
       </CardContent>
     </Card>
   );
