@@ -5,6 +5,7 @@ import { MapContainer } from "@/components/map/MapContainer";
 import { MapMarkers } from "@/components/map/MapMarkers";
 import { MapLoadingState } from "@/components/map/MapLoadingState";
 import { MapErrorState } from "@/components/map/MapErrorState";
+import { MapLegend } from "@/components/map/MapLegend";
 import mapboxgl from 'mapbox-gl';
 
 // Default token for map functionality
@@ -67,6 +68,11 @@ export const FacilityMapView: React.FC<FacilityMapViewProps> = ({
       />
       
       <MapMarkers map={map} facilities={facilityLocations} />
+      
+      {/* Add legend when map is loaded and not in error state */}
+      {map && !mapError && !isMapLoading && !isLoading && (
+        <MapLegend facilities={facilityLocations} />
+      )}
     </Card>
   );
 };
