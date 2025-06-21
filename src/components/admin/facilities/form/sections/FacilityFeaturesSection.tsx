@@ -11,7 +11,7 @@ interface FacilityFeaturesSectionProps {
 
 export const FacilityFeaturesSection: React.FC<FacilityFeaturesSectionProps> = ({ form }) => {
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <FormField
         control={form.control}
         name="equipment"

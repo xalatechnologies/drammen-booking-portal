@@ -11,22 +11,20 @@ interface FacilityAddressSectionProps {
 
 export const FacilityAddressSection: React.FC<FacilityAddressSectionProps> = ({ form }) => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div className="md:col-span-2">
-        <FormField
-          control={form.control}
-          name="address_street"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Street Address *</FormLabel>
-              <FormControl>
-                <Input placeholder="Street name and number" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      </div>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <FormField
+        control={form.control}
+        name="address_street"
+        render={({ field }) => (
+          <FormItem className="md:col-span-2">
+            <FormLabel>Street Address *</FormLabel>
+            <FormControl>
+              <Input placeholder="Street name and number" {...field} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
 
       <FormField
         control={form.control}
@@ -70,47 +68,45 @@ export const FacilityAddressSection: React.FC<FacilityAddressSectionProps> = ({ 
         )}
       />
 
-      <div className="grid grid-cols-2 gap-4">
-        <FormField
-          control={form.control}
-          name="latitude"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Latitude</FormLabel>
-              <FormControl>
-                <Input 
-                  type="number" 
-                  step="any"
-                  placeholder="59.7428"
-                  {...field}
-                  onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+      <FormField
+        control={form.control}
+        name="latitude"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Latitude</FormLabel>
+            <FormControl>
+              <Input 
+                type="number" 
+                step="any"
+                placeholder="59.7428"
+                {...field}
+                onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
 
-        <FormField
-          control={form.control}
-          name="longitude"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Longitude</FormLabel>
-              <FormControl>
-                <Input 
-                  type="number" 
-                  step="any"
-                  placeholder="10.2045"
-                  {...field}
-                  onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      </div>
+      <FormField
+        control={form.control}
+        name="longitude"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Longitude</FormLabel>
+            <FormControl>
+              <Input 
+                type="number" 
+                step="any"
+                placeholder="10.2045"
+                {...field}
+                onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
     </div>
   );
 };

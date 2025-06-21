@@ -11,7 +11,7 @@ interface FacilityContactSectionProps {
 
 export const FacilityContactSection: React.FC<FacilityContactSectionProps> = ({ form }) => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       <FormField
         control={form.control}
         name="contact_name"
@@ -40,25 +40,23 @@ export const FacilityContactSection: React.FC<FacilityContactSectionProps> = ({ 
         )}
       />
 
-      <div className="md:col-span-2">
-        <FormField
-          control={form.control}
-          name="contact_email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Contact Email</FormLabel>
-              <FormControl>
-                <Input 
-                  type="email" 
-                  placeholder="contact@facility.com" 
-                  {...field} 
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      </div>
+      <FormField
+        control={form.control}
+        name="contact_email"
+        render={({ field }) => (
+          <FormItem className="md:col-span-2">
+            <FormLabel>Contact Email</FormLabel>
+            <FormControl>
+              <Input 
+                type="email" 
+                placeholder="contact@facility.com" 
+                {...field} 
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
     </div>
   );
 };

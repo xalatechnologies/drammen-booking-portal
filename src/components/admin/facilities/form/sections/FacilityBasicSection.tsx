@@ -13,7 +13,7 @@ interface FacilityBasicSectionProps {
 
 export const FacilityBasicSection: React.FC<FacilityBasicSectionProps> = ({ form }) => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       <FormField
         control={form.control}
         name="name"
@@ -105,25 +105,23 @@ export const FacilityBasicSection: React.FC<FacilityBasicSectionProps> = ({ form
         )}
       />
 
-      <div className="md:col-span-2">
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Description</FormLabel>
-              <FormControl>
-                <Textarea 
-                  placeholder="Describe the facility and its features"
-                  className="min-h-[100px]"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      </div>
+      <FormField
+        control={form.control}
+        name="description"
+        render={({ field }) => (
+          <FormItem className="md:col-span-2">
+            <FormLabel>Description</FormLabel>
+            <FormControl>
+              <Textarea 
+                placeholder="Describe the facility and its features"
+                className="min-h-[100px]"
+                {...field}
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
     </div>
   );
 };
