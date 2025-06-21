@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Clock, MapPin, Users, FileText } from 'lucide-react';
+import { Calendar, Clock, MapPin, Users, FileText, Package } from 'lucide-react';
 import { CartItem } from '@/types/cart';
 import { format } from 'date-fns';
 import { nb } from 'date-fns/locale';
@@ -37,12 +37,17 @@ export function ReservationSummary({ reservation }: ReservationSummaryProps) {
       <div className="flex-1 space-y-3">
         {/* Facility and Purpose */}
         <div className="flex items-start gap-3">
-          <MapPin className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
+          <Package className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
           <div className="min-w-0 flex-1">
             <h3 className="font-semibold text-lg text-gray-900 truncate">{reservation.facilityName}</h3>
             <div className="flex items-center gap-2 mt-1">
               <FileText className="h-4 w-4 text-gray-500 flex-shrink-0" />
               <span className="text-sm text-gray-600 truncate">{reservation.purpose}</span>
+            </div>
+            <div className="mt-1">
+              <Badge variant="secondary" className="text-xs">
+                Reservasjonspakke med {totalSlots} tidspunkt
+              </Badge>
             </div>
           </div>
         </div>
@@ -105,7 +110,7 @@ export function ReservationSummary({ reservation }: ReservationSummaryProps) {
       {/* Price and Customer Type */}
       <div className="text-right flex-shrink-0 ml-4">
         <div className="text-2xl font-bold text-green-600 mb-2">
-          {reservation.pricing?.totalPrice || (reservation.pricePerHour * (reservation.duration || 2))} kr
+          {reservation.pricing?.totalPrice || (reservation.pricePerHour * totalDuration)} kr
         </div>
         <Badge variant="outline" className="text-xs">
           {reservation.organizationType === 'business' ? 'Bedrift' : 
