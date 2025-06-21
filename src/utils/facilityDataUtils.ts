@@ -1,5 +1,5 @@
 
-import { Facility, OpeningHours, Zone } from '@/types/facility';
+import { Facility, OpeningHours, Zone, FacilityImage } from '@/types/facility';
 
 export class FacilityDataUtils {
   /**
@@ -30,6 +30,29 @@ export class FacilityDataUtils {
     const imageToUse = featuredImage || facilityImages[0];
     
     return imageToUse?.image_url || fallbackImage;
+  }
+
+  /**
+   * Transforms database images to frontend FacilityImage format
+   */
+  static transformImages(facilityId: number, dbImages?: any[]): FacilityImage[] {
+    if (!dbImages || !Array.isArray(dbImages)) {
+      return [];
+    }
+
+    return dbImages.map(img => ({
+      id: img.id || '',
+      facility_id: facilityId,
+      image_url: img.image_url || '',
+      alt_text: img.alt_text || null,
+      caption: img.caption || null,
+      display_order: img.display_order || 0,
+      is_featured: img.is_featured || false,
+      file_size: img.file_size || null,
+      uploaded_by: img.uploaded_by || null,
+      uploaded_at: img.uploaded_at || new Date().toISOString(),
+      created_at: img.created_at || new Date().toISOString()
+    }));
   }
 
   /**

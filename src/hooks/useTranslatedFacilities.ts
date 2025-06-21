@@ -42,6 +42,8 @@ export const useTranslatedFacilities = () => {
         const openingHours = FacilityDataUtils.transformOpeningHours(facility.facility_opening_hours);
         const zones = FacilityDataUtils.transformZones(facility.zones);
         const season = FacilityDataUtils.formatSeason(facility.season_from, facility.season_to);
+        const images = FacilityDataUtils.transformImages(facility.id, facility.facility_images);
+        const featuredImage = images.find(img => img.is_featured);
 
         // Return facility with proper type mapping
         const processedFacility: Facility = {
@@ -93,8 +95,8 @@ export const useTranslatedFacilities = () => {
           nextAvailable: facility.next_available || 'Available now',
           openingHours,
           zones,
-          featuredImage: facility.facility_images?.find(img => img.is_featured),
-          images: facility.facility_images || [],
+          featuredImage,
+          images,
           timeSlotDuration: (facility.time_slot_duration || 1) as 1 | 2,
           season,
           availableTimes: []
@@ -145,6 +147,8 @@ export const useTranslatedFacility = (id: number) => {
       const openingHours = FacilityDataUtils.transformOpeningHours(facility.facility_opening_hours);
       const zones = FacilityDataUtils.transformZones(facility.zones);
       const season = FacilityDataUtils.formatSeason(facility.season_from, facility.season_to);
+      const images = FacilityDataUtils.transformImages(facility.id, facility.facility_images);
+      const featuredImage = images.find(img => img.is_featured);
 
       const processedFacility: Facility = {
         // Direct database field mapping
@@ -195,8 +199,8 @@ export const useTranslatedFacility = (id: number) => {
         nextAvailable: facility.next_available || 'Available now',
         openingHours,
         zones,
-        featuredImage: facility.facility_images?.find(img => img.is_featured),
-        images: facility.facility_images || [],
+        featuredImage,
+        images,
         timeSlotDuration: (facility.time_slot_duration || 1) as 1 | 2,
         season,
         availableTimes: []
