@@ -12,6 +12,8 @@ interface Facility {
   capacity: number;
   equipment: string[];
   suitableFor: string[];
+  type?: string;
+  amenities?: string[];
 }
 
 interface FacilityCardContentProps {
@@ -24,6 +26,64 @@ export function FacilityCardContent({
   onAddressClick
 }: FacilityCardContentProps) {
   const { t } = useTranslation();
+
+  // Derive suitable activities from facility data if suitableFor is empty
+  const getSuitableActivities = () => {
+    if (facility.suitableFor && facility.suitableFor.length > 0) {
+      return facility.suitableFor;
+    }
+
+    // Derive from facility type and equipment
+    const activities = [];
+    
+    if (facility.type) {
+      switch (facility.type.toLowerCase()) {
+        case 'sports-hall':
+        case 'idrettshall':
+          activities.push('Basketball', 'Volleyball', 'Badminton');
+          break;
+        case 'conference-room':
+        case 'konferanserom':
+          activities.push('Meetings', 'Presentations', 'Workshops');
+          break;
+        case 'meeting-room':
+        case 'møterom':
+          activities.push('Small meetings', 'Interviews');
+          break;
+        case 'cultural-hall':
+        case 'kulturhus':
+          activities.push('Events', 'Performances', 'Gatherings');
+          break;
+        default:
+          activities.push('Various activities');
+      }
+    }
+
+    // Add based on equipment
+    if (facility.equipment && facility.equipment.length > 0) {
+      if (facility.equipment.some(eq => eq.toLowerCase().includes('av') || eq.toLowerCase().includes('projector'))) {
+        activities.push('Presentations');
+      }
+      if (facility.equipment.some(eq => eq.toLowerCase().includes('sound') || eq.toLowerCase().includes('lyd'))) {
+        activities.push('Events');
+      }
+    }
+
+    // Add based on amenities
+    if (facility.amenities && facility.amenities.length > 0) {
+      if (facility.amenities.some(am => am.toLowerCase().includes('kitchen') || am.toLowerCase().includes('kjøkken'))) {
+        activities.push('Catering events');
+      }
+      if (facility.amenities.some(am => am.toLowerCase().includes('parking'))) {
+        activities.push('Large events');
+      }
+    }
+
+    // Remove duplicates and return
+    return [...new Set(activities)];
+  };
+
+  const suitableActivities = getSuitableActivities();
 
   return (
     <div className="p-6">
@@ -47,26 +107,28 @@ export function FacilityCardContent({
       </div>
 
       {/* Suitable For Tags */}
-      <div className="mb-6">
-        <div className="flex flex-wrap gap-2">
-          {Array.isArray(facility.suitableFor) && facility.suitableFor.slice(0, 2).map((activity, index) => (
-            <Badge 
-              key={index} 
-              className="bg-blue-50 text-blue-700 border-blue-200 font-medium px-4 py-2 text-base hover:bg-blue-100 transition-colors"
-            >
-              {activity}
-            </Badge>
-          ))}
-          {Array.isArray(facility.suitableFor) && facility.suitableFor.length > 2 && (
-            <Badge 
-              variant="outline" 
-              className="bg-gray-50 text-gray-600 border-gray-300 font-medium px-4 py-2 text-base"
-            >
-              +{facility.suitableFor.length - 2}
-            </Badge>
-          )}
+      {suitableActivities.length > 0 && (
+        <div className="mb-6">
+          <div className="flex flex-wrap gap-2">
+            {suitableActivities.slice(0, 2).map((activity, index) => (
+              <Badge 
+                key={index} 
+                className="bg-blue-50 text-blue-700 border-blue-200 font-medium px-4 py-2 text-base hover:bg-blue-100 transition-colors"
+              >
+                {activity}
+              </Badge>
+            ))}
+            {suitableActivities.length > 2 && (
+              <Badge 
+                variant="outline" 
+                className="bg-gray-50 text-gray-600 border-gray-300 font-medium px-4 py-2 text-base"
+              >
+                +{suitableActivities.length - 2}
+              </Badge>
+            )}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
