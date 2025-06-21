@@ -28,7 +28,7 @@ export function CheckoutBreadcrumb() {
         </BreadcrumbItem>
         <BreadcrumbSeparator />
         <BreadcrumbItem>
-          <BreadcrumbPage>Checkout</BreadcrumbPage>
+          <BreadcrumbPage>Fullfør reservasjon</BreadcrumbPage>
         </BreadcrumbItem>
       </BreadcrumbList>
     </Breadcrumb>
