@@ -47,8 +47,10 @@ export const useTranslationStore = create<TranslationState>()(
       initializeTranslations: async () => {
         try {
           set({ initializationError: null });
+          console.log('Initializing translation service...');
           await translationService.initialize();
           set({ isInitialized: true });
+          console.log('Translation service initialized successfully');
         } catch (error) {
           console.error('Failed to initialize translations:', error);
           set({ 

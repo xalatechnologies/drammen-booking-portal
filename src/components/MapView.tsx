@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card } from './ui/card';
 import { MapContainer } from './map/MapContainer';
@@ -38,8 +39,11 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location, viewMode, set
     filters
   });
 
+  // Ensure facilities is always an array
+  const facilitiesArray = Array.isArray(facilities) ? facilities : (facilities ? [facilities] : []);
+
   // Convert facilities to map format with enhanced data
-  const facilityLocations = facilities.map(facility => ({
+  const facilityLocations = facilitiesArray.map(facility => ({
     id: facility.id,
     name: facility.name,
     address: facility.address,
@@ -71,7 +75,7 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location, viewMode, set
     <div className="max-w-7xl mx-auto px-4 my-[12px]">
       {/* Reusable Header with consistent positioning */}
       <ViewHeader 
-        facilityCount={facilities.length}
+        facilityCount={facilitiesArray.length}
         isLoading={facilitiesLoading}
         viewMode={viewMode}
         setViewMode={setViewMode}

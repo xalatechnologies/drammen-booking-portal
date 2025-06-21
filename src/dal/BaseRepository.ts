@@ -1,217 +1,153 @@
 
-import { PaginatedResponse, PaginationParams, ApiResponse } from '@/types/api';
+import { supabase } from '@/integrations/supabase/client';
+import { PaginationParams, PaginatedResponse, RepositoryResponse } from '@/types/api';
 
-export abstract class BaseRepository<T, TFilters = any, TCreateRequest = any, TUpdateRequest = any> {
-  protected data: T[] = [];
-  
-  constructor(initialData: T[]) {
-    this.data = [...initialData];
+export abstract class BaseRepository<T> {
+  protected tableName: string;
+
+  constructor(tableName: string) {
+    this.tableName = tableName;
   }
 
-  // Generic CRUD operations
   async findAll(
     pagination?: PaginationParams,
-    filters?: TFilters,
-    sortField?: keyof T,
-    sortDirection: 'asc' | 'desc' = 'asc'
-  ): Promise<ApiResponse<PaginatedResponse<T>>> {
+    orderBy?: string,
+    orderDirection: 'asc' | 'desc' = 'asc'
+  ): Promise<RepositoryResponse<T[]>> {
     try {
-      let filteredData = [...this.data];
+      let query = supabase.from(this.tableName).select('*', { count: 'exact' });
 
-      // Apply filters
-      if (filters) {
-        filteredData = this.applyFilters(filteredData, filters);
+      if (orderBy) {
+        query = query.order(orderBy, { ascending: orderDirection === 'asc' });
       }
 
-      // Apply sorting
-      if (sortField) {
-        filteredData = this.applySorting(filteredData, sortField, sortDirection);
-      }
-
-      // Apply pagination
       if (pagination) {
-        const startIndex = (pagination.page - 1) * pagination.limit;
-        const endIndex = startIndex + pagination.limit;
-        const paginatedData = filteredData.slice(startIndex, endIndex);
-        const totalPages = Math.ceil(filteredData.length / pagination.limit);
+        const from = (pagination.page - 1) * pagination.limit;
+        const to = from + pagination.limit - 1;
+        query = query.range(from, to);
+      }
 
+      const { data, error, count } = await query;
+
+      if (error) {
         return {
-          success: true,
-          data: {
-            data: paginatedData,
-            pagination: {
-              page: pagination.page,
-              limit: pagination.limit,
-              total: filteredData.length,
-              totalPages,
-              hasNext: pagination.page < totalPages,
-              hasPrev: pagination.page > 1,
-            },
-          },
+          data: [],
+          error: error.message
         };
       }
 
       return {
-        success: true,
-        data: {
-          data: filteredData,
-          pagination: {
-            page: 1,
-            limit: filteredData.length,
-            total: filteredData.length,
-            totalPages: 1,
-            hasNext: false,
-            hasPrev: false,
-          },
-        },
+        data: data || []
       };
-    } catch (error) {
+    } catch (error: any) {
       return {
-        success: false,
-        error: {
-          message: 'Failed to fetch data',
-          details: error,
-        },
+        data: [],
+        error: error.message
       };
     }
   }
 
-  async findById(id: string): Promise<ApiResponse<T>> {
+  async findById(id: string): Promise<RepositoryResponse<T | null>> {
     try {
-      const item = this.data.find(item => this.getId(item) === id);
-      
-      if (!item) {
+      const { data, error } = await supabase
+        .from(this.tableName)
+        .select('*')
+        .eq('id', id)
+        .maybeSingle();
+
+      if (error) {
         return {
-          success: false,
-          error: {
-            message: 'Item not found',
-            code: 'NOT_FOUND',
-          },
+          data: null,
+          error: error.message
         };
       }
 
       return {
-        success: true,
-        data: item,
+        data: data as T | null
       };
-    } catch (error) {
+    } catch (error: any) {
       return {
-        success: false,
-        error: {
-          message: 'Failed to fetch item',
-          details: error,
-        },
+        data: null,
+        error: error.message
       };
     }
   }
 
-  async create(createRequest: TCreateRequest): Promise<ApiResponse<T>> {
+  async create(data: Partial<T>): Promise<RepositoryResponse<T | null>> {
     try {
-      const newItem = this.createEntity(createRequest);
-      this.data.push(newItem);
+      const { data: result, error } = await supabase
+        .from(this.tableName)
+        .insert(data)
+        .select()
+        .maybeSingle();
 
-      return {
-        success: true,
-        data: newItem,
-      };
-    } catch (error) {
-      return {
-        success: false,
-        error: {
-          message: 'Failed to create item',
-          details: error,
-        },
-      };
-    }
-  }
-
-  async update(id: string, updateRequest: TUpdateRequest): Promise<ApiResponse<T>> {
-    try {
-      const index = this.data.findIndex(item => this.getId(item) === id);
-      
-      if (index === -1) {
+      if (error) {
         return {
-          success: false,
-          error: {
-            message: 'Item not found',
-            code: 'NOT_FOUND',
-          },
+          data: null,
+          error: error.message
         };
       }
 
-      const updatedItem = this.updateEntity(this.data[index], updateRequest);
-      this.data[index] = updatedItem;
-
       return {
-        success: true,
-        data: updatedItem,
+        data: result as T | null
       };
-    } catch (error) {
+    } catch (error: any) {
       return {
-        success: false,
-        error: {
-          message: 'Failed to update item',
-          details: error,
-        },
+        data: null,
+        error: error.message
       };
     }
   }
 
-  async delete(id: string): Promise<ApiResponse<boolean>> {
+  async update(id: string, data: Partial<T>): Promise<RepositoryResponse<T | null>> {
     try {
-      const index = this.data.findIndex(item => this.getId(item) === id);
-      
-      if (index === -1) {
+      const { data: result, error } = await supabase
+        .from(this.tableName)
+        .update(data)
+        .eq('id', id)
+        .select()
+        .maybeSingle();
+
+      if (error) {
         return {
-          success: false,
-          error: {
-            message: 'Item not found',
-            code: 'NOT_FOUND',
-          },
+          data: null,
+          error: error.message
         };
       }
 
-      this.data.splice(index, 1);
-
       return {
-        success: true,
-        data: true,
+        data: result as T | null
       };
-    } catch (error) {
+    } catch (error: any) {
       return {
-        success: false,
-        error: {
-          message: 'Failed to delete item',
-          details: error,
-        },
+        data: null,
+        error: error.message
       };
     }
   }
 
-  // Abstract methods to be implemented by concrete repositories
-  protected abstract getId(item: T): string;
-  protected abstract applyFilters(data: T[], filters: TFilters): T[];
-  protected abstract createEntity(createRequest: TCreateRequest): T;
-  protected abstract updateEntity(existing: T, updateRequest: TUpdateRequest): T;
+  async delete(id: string): Promise<RepositoryResponse<boolean>> {
+    try {
+      const { error } = await supabase
+        .from(this.tableName)
+        .delete()
+        .eq('id', id);
 
-  // Default sorting implementation
-  protected applySorting(data: T[], sortField: keyof T, sortDirection: 'asc' | 'desc'): T[] {
-    return [...data].sort((a, b) => {
-      const aValue = a[sortField];
-      const bValue = b[sortField];
+      if (error) {
+        return {
+          data: false,
+          error: error.message
+        };
+      }
 
-      if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
-      if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
-      return 0;
-    });
-  }
-
-  // Utility methods
-  protected generateId(): string {
-    return `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
-  }
-
-  protected getCurrentTimestamp(): Date {
-    return new Date();
+      return {
+        data: true
+      };
+    } catch (error: any) {
+      return {
+        data: false,
+        error: error.message
+      };
+    }
   }
 }

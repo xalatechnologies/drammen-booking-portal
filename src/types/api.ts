@@ -14,13 +14,19 @@ export interface PaginationInfo {
 }
 
 export interface PaginatedResponse<T> {
-  data: T;
+  data: T[];
   pagination: PaginationInfo;
 }
 
 export interface ApiResponse<T> {
   success: boolean;
   data?: T;
+  error?: string;
+}
+
+// Repository response types - simplified for direct data access
+export interface RepositoryResponse<T> {
+  data: T;
   error?: string;
 }
 
