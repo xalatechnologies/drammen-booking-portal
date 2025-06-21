@@ -5,13 +5,20 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { CoreFacility, FacilityView } from '@/types/translation';
 import { facilityTranslationService } from '@/services/FacilityTranslationService';
 import { transformDatabaseFacility } from '@/utils/facilityTransformer';
+import { useTranslationStore } from '@/stores/useTranslationStore';
 
 export const useTranslatedFacilities = () => {
   const { language } = useLanguage();
+  const { isInitialized, initializeTranslations } = useTranslationStore();
 
   return useQuery({
     queryKey: ['translated-facilities', language],
     queryFn: async (): Promise<FacilityView[]> => {
+      // Ensure translation service is initialized
+      if (!isInitialized) {
+        await initializeTranslations();
+      }
+
       // Get facilities from database
       const { data: facilities, error } = await supabase
         .from('facilities')
@@ -36,11 +43,17 @@ export const useTranslatedFacilities = () => {
 
 export const useTranslatedFacility = (id: number) => {
   const { language } = useLanguage();
+  const { isInitialized, initializeTranslations } = useTranslationStore();
 
   return useQuery({
     queryKey: ['translated-facility', id, language],
     queryFn: async (): Promise<FacilityView | null> => {
       if (!id) return null;
+
+      // Ensure translation service is initialized
+      if (!isInitialized) {
+        await initializeTranslations();
+      }
 
       // Get facility from database
       const { data: facility, error } = await supabase

@@ -16,7 +16,7 @@ class LocalizedFacilityServiceClass {
     pagination: PaginationParams,
     filters?: FacilityFilters,
     sort?: FacilitySortOptions
-  ): Promise<PaginatedResponse<LocalizedFacility[]>> {
+  ): Promise<LocalizedFacility[]> {
     let facilities = [...localizedMockFacilities];
 
     // Apply filters
@@ -70,26 +70,11 @@ class LocalizedFacilityServiceClass {
     }
 
     // Apply pagination
-    const total = facilities.length;
-    const totalPages = Math.ceil(total / pagination.limit);
     const startIndex = (pagination.page - 1) * pagination.limit;
     const endIndex = startIndex + pagination.limit;
     const paginatedFacilities = facilities.slice(startIndex, endIndex);
 
-    return {
-      success: true,
-      data: {
-        data: paginatedFacilities,
-        pagination: {
-          page: pagination.page,
-          limit: pagination.limit,
-          total,
-          totalPages,
-          hasNext: pagination.page < totalPages,
-          hasPrev: pagination.page > 1,
-        },
-      },
-    };
+    return paginatedFacilities;
   }
 
   async getFacilityById(id: number): Promise<LocalizedFacility | null> {
