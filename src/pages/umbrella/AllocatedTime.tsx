@@ -25,6 +25,11 @@ const AllocatedTimePage: React.FC = () => {
   const [selectedPartialBlock, setSelectedPartialBlock] = useState<any>(null);
   const [activeEditTab, setActiveEditTab] = useState("distribute");
 
+  // Filter states
+  const [searchQuery, setSearchQuery] = useState("");
+  const [locationFilter, setLocationFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
+
   // Mock data for demonstration
   const allocatedTimeBlocks = [
     {
@@ -104,6 +109,26 @@ const AllocatedTimePage: React.FC = () => {
     }
   ];
 
+  // Filtered data
+  const filteredTimeBlocks = allocatedTimeBlocks.filter((block) => {
+    // Search filter
+    const searchMatch = searchQuery === "" || 
+      block.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (block.distributedTo && block.distributedTo.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      block.weekdays.some(day => day.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      block.timeSlot.toLowerCase().includes(searchQuery.toLowerCase());
+
+    // Location filter
+    const locationMatch = locationFilter === "all" || 
+      block.location.toLowerCase() === locationFilter.toLowerCase();
+
+    // Status filter
+    const statusMatch = statusFilter === "all" || 
+      block.status.toLowerCase() === statusFilter.toLowerCase();
+
+    return searchMatch && locationMatch && statusMatch;
+  });
+
   const handleDistribute = (timeBlock: any) => {
     setSelectedTimeBlock(timeBlock);
     setIsDistributionDialogOpen(true);
@@ -138,6 +163,12 @@ const AllocatedTimePage: React.FC = () => {
     // Mock export functionality
     console.log(`Exporting to ${format}...`);
     // In real implementation, this would call an API endpoint
+  };
+
+  const clearFilters = () => {
+    setSearchQuery("");
+    setLocationFilter("all");
+    setStatusFilter("all");
   };
 
   const getStatusBadge = (status: string, timeBlock: any) => {
@@ -202,8 +233,10 @@ const AllocatedTimePage: React.FC = () => {
               <Input
                 placeholder={t("umbrella.allocatedTime.overview.searchPlaceholder", undefined, "Søk etter lokasjon eller aktør...")}
                 className="max-w-md"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
               />
-              <Select>
+              <Select value={locationFilter} onValueChange={setLocationFilter}>
                 <SelectTrigger className="w-[180px]">
                   <SelectValue placeholder={t("umbrella.allocatedTime.overview.filterLocation", undefined, "Filtrer lokasjon")} />
                 </SelectTrigger>
@@ -214,7 +247,7 @@ const AllocatedTimePage: React.FC = () => {
                   <SelectItem value="konnerudhallen">Konnerudhallen</SelectItem>
                 </SelectContent>
               </Select>
-              <Select>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger className="w-[180px]">
                   <SelectValue placeholder={t("umbrella.allocatedTime.overview.filterStatus", undefined, "Filtrer status")} />
                 </SelectTrigger>
@@ -222,7 +255,7 @@ const AllocatedTimePage: React.FC = () => {
                   <SelectItem value="all">{t("umbrella.common.all", undefined, "Alle statuser")}</SelectItem>
                   <SelectItem value="fordelt">{t("umbrella.allocatedTime.overview.statusDistributed", undefined, "Fordelt")}</SelectItem>
                   <SelectItem value="ufordelt">{t("umbrella.allocatedTime.overview.statusUndistributed", undefined, "Ufordelt")}</SelectItem>
-                  <SelectItem value="delvis">{t("umbrella.allocatedTime.overview.statusPartially", undefined, "Delvis fordelt")}</SelectItem>
+                  <SelectItem value="delvis fordelt">{t("umbrella.allocatedTime.overview.statusPartially", undefined, "Delvis fordelt")}</SelectItem>
                 </SelectContent>
               </Select>
               <div className="flex gap-2">
@@ -251,6 +284,44 @@ const AllocatedTimePage: React.FC = () => {
               </div>
             </div>
 
+            {/* Active filters indicator */}
+            {(searchQuery || locationFilter !== "all" || statusFilter !== "all") && (
+              <div className="mb-4 flex items-center justify-between p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="flex items-center space-x-2">
+                  <Filter className="w-4 h-4 text-blue-600" />
+                  <span className="text-sm font-medium text-blue-800">Aktive filtre:</span>
+                  {searchQuery && (
+                    <Badge variant="secondary" className="text-xs">
+                      Søk: "{searchQuery}"
+                    </Badge>
+                  )}
+                  {locationFilter !== "all" && (
+                    <Badge variant="secondary" className="text-xs">
+                      Lokasjon: {locationFilter}
+                    </Badge>
+                  )}
+                  {statusFilter !== "all" && (
+                    <Badge variant="secondary" className="text-xs">
+                      Status: {statusFilter}
+                    </Badge>
+                  )}
+                </div>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={clearFilters}
+                  className="text-blue-600 hover:text-blue-800"
+                >
+                  Nullstill filtre
+                </Button>
+              </div>
+            )}
+
+            {/* Results count */}
+            <div className="mb-4 text-sm text-gray-600">
+              Viser {filteredTimeBlocks.length} av {allocatedTimeBlocks.length} resultater
+            </div>
+
             <Tabs value={selectedView} onValueChange={setSelectedView}>
               <TabsList className="mb-4">
                 <TabsTrigger value="table">{t("umbrella.allocatedTime.overview.tableView", undefined, "Tabell")}</TabsTrigger>
@@ -272,7 +343,7 @@ const AllocatedTimePage: React.FC = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {allocatedTimeBlocks.map((block) => (
+                    {filteredTimeBlocks.map((block) => (
                       <TableRow key={block.id}>
                         <TableCell className="font-medium">{block.location}</TableCell>
                         <TableCell>{block.weekdays.join(", ")}</TableCell>

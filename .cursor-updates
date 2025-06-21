@@ -64,4 +64,11 @@
   3. **Endre** - Edit existing assignments or recall them
   4. **Frigi** - Release time with date range and time selection
 - **Simplified action buttons** - Removed separate Plus button, now only one Settings button for all actions
+- **Implemented functional search and filtering**:
+  - **Real-time search** - Search across location, actor, weekdays, and time slots
+  - **Location filter** - Filter by specific locations (Drammenshallen, Åssidenhallen, Konnerudhallen)
+  - **Status filter** - Filter by distribution status (Fordelt, Ufordelt, Delvis fordelt)
+  - **Active filters indicator** - Shows which filters are currently applied
+  - **Clear filters button** - Easy way to reset all filters
+  - **Results counter** - Shows how many results are displayed vs total
 - Build completed successfully with no errors 
