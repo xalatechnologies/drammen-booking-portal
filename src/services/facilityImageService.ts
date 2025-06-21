@@ -11,7 +11,7 @@ export const FacilityImageService = {
       .order('display_order', { ascending: true });
     
     if (error) throw error;
-    return data as FacilityImage[];
+    return data || [];
   },
 
   async getFeaturedImage(facilityId: number): Promise<FacilityImage | null> {
@@ -23,7 +23,7 @@ export const FacilityImageService = {
       .maybeSingle();
     
     if (error) throw error;
-    return data as FacilityImage | null;
+    return data;
   },
 
   async getFirstImage(facilityId: number): Promise<FacilityImage | null> {
@@ -36,7 +36,7 @@ export const FacilityImageService = {
       .maybeSingle();
     
     if (error) throw error;
-    return data as FacilityImage | null;
+    return data;
   },
 
   async uploadImage(file: File, facilityId: number): Promise<FacilityImage> {
@@ -71,7 +71,7 @@ export const FacilityImageService = {
       .single();
 
     if (dbError) throw dbError;
-    return imageRecord as FacilityImage;
+    return imageRecord;
   },
 
   async deleteImage(imageId: string): Promise<void> {
@@ -92,7 +92,7 @@ export const FacilityImageService = {
       .single();
     
     if (error) throw error;
-    return data as FacilityImage;
+    return data;
   },
 
   async setFeaturedImage(facilityId: number, imageId: string): Promise<void> {

@@ -98,6 +98,7 @@ const FacilityListItem: React.FC<FacilityListItemProps> = ({
           {/* Image Section - 3 columns */}
           <div className="col-span-3">
             <FacilityListItemImage
+              facilityId={facility.id}
               image={facility.image}
               facilityName={facility.name}
               facilityType={facility.type}

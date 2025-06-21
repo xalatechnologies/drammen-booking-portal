@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -17,19 +16,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-
-interface FacilityImage {
-  id: string;
-  facility_id: number;
-  image_url: string;
-  alt_text?: string;
-  caption?: string;
-  display_order: number;
-  is_featured: boolean;
-  file_size?: number;
-  uploaded_by?: string;
-  uploaded_at: string;
-}
+import { FacilityImage } from "@/types/facility";
 
 interface FacilityImageManagementProps {
   facilityId: number;
@@ -52,7 +39,7 @@ export const FacilityImageManagement: React.FC<FacilityImageManagementProps> = (
         .order('display_order', { ascending: true });
       
       if (error) throw error;
-      return data as FacilityImage[];
+      return data || [];
     },
     enabled: !!facilityId,
   });

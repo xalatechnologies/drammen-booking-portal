@@ -49,6 +49,7 @@ export interface FacilityImage {
   file_size?: number;
   uploaded_by?: string;
   uploaded_at: string;
+  created_at: string;
 }
 
 export interface FacilityFilters {
