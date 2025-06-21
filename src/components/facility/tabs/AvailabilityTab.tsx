@@ -1,7 +1,8 @@
+
 import React, { useState, useMemo } from 'react';
 import { format, addDays, startOfWeek } from 'date-fns';
 import { nb } from 'date-fns/locale';
-import { ChevronLeft, ChevronRight, Calendar, Clock, Users, MapPin, RotateCcw } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar, Clock, Users, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -142,64 +143,31 @@ export function AvailabilityTab({
 
   return (
     <div className="space-y-6">
-      {/* Full Width Zone Selection Header */}
+      {/* Simplified Zone Selection Header */}
       <Card className="w-full">
         <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-xl">
-            <MapPin className="h-6 w-6" />
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <MapPin className="h-5 w-5" />
             Velg sone for booking
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-2">
             {zones.map((zone) => (
               <Button
                 key={zone.id}
                 variant={selectedZoneId === zone.id ? "default" : "outline"}
                 onClick={() => setSelectedZoneId(zone.id)}
-                className="flex items-center gap-2 text-base px-4 py-2"
-                size="lg"
+                className="flex items-center gap-2 text-sm px-3 py-2"
+                size="sm"
               >
-                <Users className="h-5 w-5" />
                 {zone.name}
-                <Badge variant="secondary" className="ml-1 text-sm">
-                  {zone.capacity} pers
+                <Badge variant="secondary" className="ml-1 text-xs">
+                  {zone.area || "120 m²"}
                 </Badge>
               </Button>
             ))}
           </div>
-          
-          {selectedZone && (
-            <div className="mt-6 p-6 bg-blue-50 rounded-lg border border-blue-200">
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <h4 className="font-semibold text-blue-900 mb-3 text-xl">{selectedZone.name}</h4>
-                  <p className="text-blue-700 mb-4 text-lg leading-relaxed">{selectedZone.description}</p>
-                  <div className="grid grid-cols-2 gap-6 text-lg">
-                    <div>
-                      <span className="font-medium text-blue-800">Kapasitet:</span>
-                      <span className="ml-2 text-blue-700">{selectedZone.capacity} personer</span>
-                    </div>
-                    <div>
-                      <span className="font-medium text-blue-800">Område:</span>
-                      <span className="ml-2 text-blue-700">{selectedZone.area || "120 m²"}</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="ml-6">
-                  <Button
-                    onClick={handleRecurringBooking}
-                    variant="outline"
-                    size="lg"
-                    className="border-purple-600 text-purple-600 hover:bg-purple-50 text-lg px-6 py-3"
-                  >
-                    <RotateCcw className="h-5 w-5 mr-2" />
-                    Gjentakende booking
-                  </Button>
-                </div>
-              </div>
-            </div>
-          )}
         </CardContent>
       </Card>
 
@@ -258,6 +226,7 @@ export function AvailabilityTab({
               onCompleteBooking={handleCompleteBooking}
               onSlotsCleared={onClearSlots}
               onRemoveSlot={onRemoveSlot}
+              onRecurringBooking={handleRecurringBooking}
             />
           </div>
         </div>
