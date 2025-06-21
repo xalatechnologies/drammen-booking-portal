@@ -223,16 +223,4 @@ export class AdditionalServicesService {
       };
     }
   }
-
-  static calculateServicePrice(
-    service: AdditionalService,
-    quantity: number,
-    actorType: string,
-    timeSlot?: string
-  ): number {
-    const basePrice = service.pricing.basePrice;
-    const multiplier = service.pricing.actorTypeMultipliers?.[actorType as keyof typeof service.pricing.actorTypeMultipliers] || 1;
-    
-    return basePrice * quantity * multiplier;
-  }
 }

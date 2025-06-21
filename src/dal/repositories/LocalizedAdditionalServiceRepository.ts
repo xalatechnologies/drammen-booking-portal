@@ -1,12 +1,14 @@
-
 import { BaseRepository } from '@/dal/BaseRepository';
 import { Language } from '@/i18n/types';
 import { AdditionalService, ServiceFilters } from '@/types/additionalServices';
 import { RepositoryResponse, PaginationParams, PaginatedResponse } from '@/types/api';
-import { localizedMockServiceData } from '@/data/additionalServices/localizedMockServiceData';
 
 export class LocalizedAdditionalServiceRepository extends BaseRepository<AdditionalService> {
   private currentLanguage: Language = 'NO';
+  private servicesData: Record<string, AdditionalService[]> = {
+    'NO': [],
+    'EN': []
+  };
 
   setLanguage(language: Language) {
     this.currentLanguage = language;
@@ -33,7 +35,7 @@ export class LocalizedAdditionalServiceRepository extends BaseRepository<Additio
 
   protected createEntity(data: Partial<AdditionalService>): AdditionalService {
     return {
-      id: data.id || '',
+      id: data.id || this.generateId(),
       name: data.name || '',
       category: data.category || 'equipment',
       description: data.description || '',
@@ -82,7 +84,7 @@ export class LocalizedAdditionalServiceRepository extends BaseRepository<Additio
     filters?: ServiceFilters
   ): Promise<RepositoryResponse<PaginatedResponse<AdditionalService>>> {
     try {
-      const services = localizedMockServiceData[this.currentLanguage] || [];
+      const services = this.servicesData[this.currentLanguage] || [];
       const filteredServices = this.applyFilters(services, { ...filters, searchTerm });
       
       const total = filteredServices.length;
@@ -123,7 +125,7 @@ export class LocalizedAdditionalServiceRepository extends BaseRepository<Additio
 
   async findById(id: string): Promise<RepositoryResponse<AdditionalService | null>> {
     try {
-      const services = localizedMockServiceData[this.currentLanguage] || [];
+      const services = this.servicesData[this.currentLanguage] || [];
       const service = services.find(s => s.id === id);
       
       return {
@@ -195,11 +197,11 @@ export class LocalizedAdditionalServiceRepository extends BaseRepository<Additio
   }
 
   async getServicesByCategory(category: string): Promise<AdditionalService[]> {
-    const services = localizedMockServiceData[this.currentLanguage] || [];
+    const services = this.servicesData[this.currentLanguage] || [];
     return services.filter(service => service.category === category);
   }
 
   async getAllServices(): Promise<AdditionalService[]> {
-    return localizedMockServiceData[this.currentLanguage] || [];
+    return this.servicesData[this.currentLanguage] || [];
   }
 }

@@ -1,11 +1,10 @@
 
 import { OptimizedLocalizedFacilityRepository } from '@/dal/repositories/OptimizedLocalizedFacilityRepository';
 import { LocalizedFacility } from '@/types/localization';
-import { localizedMockFacilities } from '@/data/localizedMockFacilities';
 import { FacilityFilters, FacilitySortOptions } from '@/types/facility';
 import { PaginationParams, ApiResponse, PaginatedResponse } from '@/types/api';
 
-// Create repository instance with mock data
+// Create repository instance
 const repository = new OptimizedLocalizedFacilityRepository();
 
 export class LocalizedFacilityService {
@@ -15,12 +14,10 @@ export class LocalizedFacilityService {
     sort?: FacilitySortOptions
   ): Promise<ApiResponse<PaginatedResponse<LocalizedFacility>>> {
     try {
-      // Get current language facilities - default to Norwegian
-      const currentFacilities = localizedMockFacilities['NO'] || [];
+      // Use empty facilities array for now - should be populated from database
+      let facilities: LocalizedFacility[] = [];
       
       // Apply filters
-      let facilities = [...currentFacilities];
-      
       if (filters) {
         if (filters.facilityType) {
           facilities = facilities.filter(f => f.type === filters.facilityType);
@@ -98,13 +95,10 @@ export class LocalizedFacilityService {
 
   static async getFacilityById(id: string): Promise<ApiResponse<LocalizedFacility | null>> {
     try {
-      const facilityId = parseInt(id, 10);
-      const currentFacilities = localizedMockFacilities['NO'] || [];
-      const facility = currentFacilities.find(f => f.id === facilityId);
-      
+      // Return null for now - should fetch from database
       return {
         success: true,
-        data: facility || null
+        data: null
       };
     } catch (error) {
       return {

@@ -1,4 +1,3 @@
-
 import { BaseRepository } from "@/dal/BaseRepository";
 import { Facility, FacilityFilters } from "@/types/facility";
 import { Zone } from "@/types/zone";
@@ -6,11 +5,10 @@ import { PaginatedResponse, RepositoryResponse } from "@/types/api";
 import { LocalizedFacility } from "@/types/localization";
 
 export class OptimizedLocalizedFacilityRepository extends BaseRepository<LocalizedFacility> {
-  private localizedFacilities: LocalizedFacility[];
+  private localizedFacilities: LocalizedFacility[] = [];
 
-  constructor(initialData: LocalizedFacility[]) {
+  constructor() {
     super();
-    this.localizedFacilities = initialData;
   }
 
   // Implement required abstract methods

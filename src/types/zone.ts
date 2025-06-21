@@ -1,13 +1,12 @@
-
 export interface Zone {
   id: string;
-  facilityId: string;
+  facilityId: string; // Changed from facility_id
   name: string;
   description?: string;
-  isMainZone: boolean;
-  parentZoneId?: string;
+  isMainZone: boolean; // Changed from is_main_zone
+  parentZoneId?: string; // Changed from parent_zone_id
   capacity: number;
-  area: number; // Square meters
+  area: number; // Square meters (area_sqm in DB)
   floor?: string;
   coordinates?: ZoneCoordinates;
   equipment: string[];
@@ -19,6 +18,15 @@ export interface Zone {
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
+  
+  // Database fields that need mapping
+  bookableIndependently?: boolean; // Changed from bookable_independently
+  coordinatesX?: number; // Changed from coordinates_x
+  coordinatesY?: number; // Changed from coordinates_y
+  coordinatesWidth?: number; // Changed from coordinates_width
+  coordinatesHeight?: number; // Changed from coordinates_height
+  accessibilityFeatures?: string[]; // Changed from accessibility_features
+  status?: string;
 }
 
 export interface ZoneCoordinates {
