@@ -90,16 +90,17 @@ export function FacilityCardContent({
         {facility.description}
       </p>
 
-      {/* Capacity */}
-      <div className="flex items-center gap-3 text-gray-600 mb-5">
-        <Users className="h-5 w-5" />
-        <span className="text-base font-medium">{t('facility.details.capacity')}: {facility.capacity}</span>
-      </div>
+      {/* Capacity and Suitable For on the same line */}
+      <div className="flex items-center justify-between mb-6">
+        {/* Capacity */}
+        <div className="flex items-center gap-3 text-gray-600">
+          <Users className="h-5 w-5" />
+          <span className="text-base font-medium">{t('facility.details.capacity')}: {facility.capacity}</span>
+        </div>
 
-      {/* Suitable For Tags - Multiple on one line */}
-      {suitableActivities.length > 0 && (
-        <div className="mb-6">
-          <div className="flex flex-wrap gap-2">
+        {/* Suitable For Tags */}
+        {suitableActivities.length > 0 && (
+          <div className="flex flex-wrap gap-2 justify-end">
             {suitableActivities.slice(0, maxVisibleTags).map((activity, index) => (
               <Badge 
                 key={index}
@@ -117,8 +118,8 @@ export function FacilityCardContent({
               </Badge>
             )}
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }

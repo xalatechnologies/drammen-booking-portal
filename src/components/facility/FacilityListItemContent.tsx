@@ -94,17 +94,18 @@ export function FacilityListItemContent({
         </p>
       </div>
 
-      {/* Capacity */}
-      <div className="flex items-center gap-2 text-gray-600 mb-4">
-        <Users className="h-5 w-5" />
-        <span className="font-medium text-base">{facility.capacity} personer</span>
-      </div>
-
-      {/* Bottom section with Suitable For and Action Buttons */}
+      {/* Bottom section with Capacity, Suitable For and Action Buttons */}
       <div className="flex items-center justify-between">
-        {/* Suitable For - Limited to one line */}
-        <div className="flex flex-wrap gap-2 flex-1 overflow-hidden">
-          <div className="flex gap-2 items-center min-w-0">
+        {/* Capacity and Suitable For */}
+        <div className="flex items-center gap-6 flex-1 min-w-0">
+          {/* Capacity */}
+          <div className="flex items-center gap-2 text-gray-600">
+            <Users className="h-5 w-5" />
+            <span className="font-medium text-base">{facility.capacity} personer</span>
+          </div>
+
+          {/* Suitable For - on the same line */}
+          <div className="flex gap-2 items-center min-w-0 flex-1">
             {suitableForArray.slice(0, maxVisibleTags).map((activity, index) => (
               <Badge 
                 key={index} 
