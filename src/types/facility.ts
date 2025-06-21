@@ -1,4 +1,3 @@
-
 export interface Facility {
   id: number;
   name: string;
@@ -17,10 +16,10 @@ export interface Facility {
   rating?: number;
   reviewCount?: number;
   pricePerHour?: number;
-  area_sqm?: number; // Added this property
+  area_sqm?: number;
   amenities?: string[];
   hasAutoApproval?: boolean;
-  timeSlotDuration?: 1 | 2; // New option: 1 for 1-hour slots, 2 for 2-hour slots
+  timeSlotDuration?: 1 | 2;
   availableTimes?: {
     date: Date;
     slots: {
@@ -35,6 +34,21 @@ export interface Facility {
   };
   allowedBookingTypes: ('engangslån' | 'fastlån' | 'rammetid' | 'strøtimer')[];
   zones: Zone[];
+  featuredImage?: FacilityImage;
+  images?: FacilityImage[];
+}
+
+export interface FacilityImage {
+  id: string;
+  facility_id: number;
+  image_url: string;
+  alt_text?: string;
+  caption?: string;
+  display_order: number;
+  is_featured: boolean;
+  file_size?: number;
+  uploaded_by?: string;
+  uploaded_at: string;
 }
 
 export interface FacilityFilters {
@@ -53,6 +67,7 @@ export interface FacilitySortOptions {
   field: 'name' | 'capacity' | 'pricePerHour' | 'rating';
   direction: 'asc' | 'desc';
 }
+
 export interface Zone {
   id: string;
   name: string;
@@ -83,4 +98,4 @@ export interface OpeningHours {
   dayOfWeek: 0 | 1 | 2 | 3 | 4 | 5 | 6; // 0 = Sunday, 1 = Monday, etc.
   opens: string; // HH:mm format
   closes: string; // HH:mm format
-} 
+}

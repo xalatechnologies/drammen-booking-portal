@@ -4,12 +4,14 @@ import { Heart, Share2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/i18n";
+import { useQuery } from "@tanstack/react-query";
+import { FacilityImageService } from "@/services/facilityImageService";
 
 interface FacilityCardImageProps {
   facility: {
     id: number;
     name: string;
-    image: string;
+    image?: string; // Fallback for backward compatibility
     type: string;
     area: string;
   };
@@ -26,11 +28,34 @@ export function FacilityCardImage({
 }: FacilityCardImageProps) {
   const { t } = useTranslation();
 
+  // Get featured image from database
+  const { data: featuredImage } = useQuery({
+    queryKey: ['facility-featured-image', facility.id],
+    queryFn: () => FacilityImageService.getFeaturedImage(facility.id),
+  });
+
+  // Fallback to first image if no featured image
+  const { data: firstImage } = useQuery({
+    queryKey: ['facility-first-image', facility.id],
+    queryFn: () => FacilityImageService.getFirstImage(facility.id),
+    enabled: !featuredImage,
+  });
+
+  // Get the image URL with fallbacks
+  const imageUrl = featuredImage?.image_url || 
+                   firstImage?.image_url || 
+                   facility.image || 
+                   "https://images.unsplash.com/photo-1525361147853-4bf9f54a0e98?w=600&auto=format&fit=crop";
+
+  const altText = featuredImage?.alt_text || 
+                  firstImage?.alt_text || 
+                  t('facility.image.alt', { name: facility.name });
+
   return (
     <div className="relative h-48 overflow-hidden">
       <img 
-        src={facility.image} 
-        alt={t('facility.image.alt', { name: facility.name })} 
+        src={imageUrl} 
+        alt={altText} 
         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
         onError={(e) => {
           const target = e.target as HTMLImageElement;
@@ -64,7 +89,7 @@ export function FacilityCardImage({
         </Button>
       </div>
 
-      {/* Type and Area Badges */}
+      {/* Type Badge */}
       <div className="absolute top-4 left-4 flex flex-col gap-2">
         <Badge className="bg-white/95 backdrop-blur-sm text-gray-800 border-0 font-semibold px-4 py-2 text-base shadow-lg">
           {t(`facility.types.${facility.type}`, {}, facility.type)}

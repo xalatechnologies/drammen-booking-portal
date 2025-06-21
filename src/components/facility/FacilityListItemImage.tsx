@@ -1,25 +1,52 @@
 
 import React from "react";
 import { Badge } from "@/components/ui/badge";
+import { useQuery } from "@tanstack/react-query";
+import { FacilityImageService } from "@/services/facilityImageService";
 
 interface FacilityListItemImageProps {
-  image: string;
+  facilityId: number;
+  image?: string; // Fallback for backward compatibility
   facilityName: string;
   facilityType: string;
   area: string;
 }
 
 export function FacilityListItemImage({
+  facilityId,
   image,
   facilityName,
   facilityType,
   area
 }: FacilityListItemImageProps) {
+  // Get featured image from database
+  const { data: featuredImage } = useQuery({
+    queryKey: ['facility-featured-image', facilityId],
+    queryFn: () => FacilityImageService.getFeaturedImage(facilityId),
+  });
+
+  // Fallback to first image if no featured image
+  const { data: firstImage } = useQuery({
+    queryKey: ['facility-first-image', facilityId],
+    queryFn: () => FacilityImageService.getFirstImage(facilityId),
+    enabled: !featuredImage,
+  });
+
+  // Get the image URL with fallbacks
+  const imageUrl = featuredImage?.image_url || 
+                   firstImage?.image_url || 
+                   image || 
+                   "https://images.unsplash.com/photo-1525361147853-4bf9f54a0e98?w=600&auto=format&fit=crop";
+
+  const altText = featuredImage?.alt_text || 
+                  firstImage?.alt_text || 
+                  `Bilde av ${facilityName}`;
+
   return (
     <div className="h-full w-full relative overflow-hidden">
       <img 
-        src={image} 
-        alt={`Bilde av ${facilityName}`} 
+        src={imageUrl} 
+        alt={altText} 
         className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110" 
         onError={(e) => {
           const target = e.target as HTMLImageElement;
