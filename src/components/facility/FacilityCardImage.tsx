@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/i18n";
 import { useQuery } from "@tanstack/react-query";
-import { FacilityImageService } from "@/services/facilityImageService";
+import { FacilityImageService } from "@/services/FacilityImageService";
 
 interface FacilityCardImageProps {
   facility: {
@@ -50,6 +50,8 @@ export function FacilityCardImage({
   const altText = featuredImage?.alt_text || 
                   firstImage?.alt_text || 
                   t('facility.image.alt', { name: facility.name });
+
+  console.log('FacilityCardImage - Final image URL:', imageUrl, 'for facility:', facility.id);
 
   return (
     <div className="relative h-48 overflow-hidden">

@@ -2,7 +2,7 @@
 import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
-import { FacilityImageService } from "@/services/facilityImageService";
+import { FacilityImageService } from "@/services/FacilityImageService";
 
 interface FacilityListItemImageProps {
   facilityId: number;
@@ -41,6 +41,8 @@ export function FacilityListItemImage({
   const altText = featuredImage?.alt_text || 
                   firstImage?.alt_text || 
                   `Bilde av ${facilityName}`;
+
+  console.log('FacilityListItemImage - Final image URL:', imageUrl, 'for facility:', facilityId);
 
   return (
     <div className="h-full w-full relative overflow-hidden">
