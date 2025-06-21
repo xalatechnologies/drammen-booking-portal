@@ -2,6 +2,15 @@
 import { CoreFacility } from '@/types/translation';
 
 export const transformDatabaseFacility = (facility: any): CoreFacility => {
+  // Compute the address from individual fields
+  const addressParts = [
+    facility.address_street,
+    facility.address_city,
+    facility.address_postal_code
+  ].filter(Boolean);
+  
+  const computedAddress = addressParts.join(', ') || 'Address not available';
+
   return {
     id: facility.id,
     address_street: facility.address_street,
@@ -35,6 +44,15 @@ export const transformDatabaseFacility = (facility: any): CoreFacility => {
     created_at: facility.created_at,
     updated_at: facility.updated_at,
     area_sqm: facility.area_sqm,
+    
+    // Computed fields
+    address: computedAddress,
+    image: facility.image_url || 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&auto=format&fit=crop',
+    pricePerHour: facility.price_per_hour,
+    accessibility: facility.accessibility_features || [],
+    suitableFor: [],
+    hasAutoApproval: facility.has_auto_approval,
+    nextAvailable: facility.next_available || 'Available now',
     openingHours: [],
     zones: [],
     availableTimes: []
