@@ -39,122 +39,127 @@ export const FacilityDetailView: React.FC<FacilityDetailViewProps> = ({
   const [activeTab, setActiveTab] = useState("overview");
 
   return (
-    <div className="w-full space-y-6 p-6">
-      {/* Header */}
+    <div className="w-full space-y-4 p-4">
+      {/* Compact Header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <Button variant="outline" onClick={onBack}>
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Facilities
+        <div className="flex items-center space-x-3">
+          <Button variant="outline" size="sm" onClick={onBack}>
+            <ArrowLeft className="w-4 h-4 mr-1" />
+            Back
           </Button>
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">{facility.name}</h1>
-            <p className="text-gray-600">{facility.address_street}, {facility.address_city}</p>
+            <h1 className="text-2xl font-bold text-gray-900">{facility.name}</h1>
+            <div className="flex items-center text-sm text-gray-600 mt-1">
+              <MapPin className="w-3 h-3 mr-1" />
+              {facility.address_street}, {facility.address_city}
+            </div>
           </div>
         </div>
-        <div className="flex space-x-3">
-          <Button variant="outline" onClick={onCalendar}>
-            <Calendar className="w-4 h-4 mr-2" />
+        <div className="flex space-x-2">
+          <Button variant="outline" size="sm" onClick={onCalendar}>
+            <Calendar className="w-4 h-4 mr-1" />
             Calendar
           </Button>
-          <Button onClick={onEdit}>
-            <Edit className="w-4 h-4 mr-2" />
-            Edit Facility
+          <Button size="sm" onClick={onEdit}>
+            <Edit className="w-4 h-4 mr-1" />
+            Edit
           </Button>
         </div>
       </div>
 
-      {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="p-4">
+      {/* Compact Stats Grid */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <Card className="border-0 shadow-sm">
+          <CardContent className="p-3">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Status</p>
+                <p className="text-xs text-gray-600 mb-1">Status</p>
                 <Badge
                   variant={facility.status === 'active' ? 'default' : 
                           facility.status === 'maintenance' ? 'secondary' : 'destructive'}
-                  className="mt-1"
+                  className="text-xs"
                 >
                   {facility.status}
                 </Badge>
               </div>
-              <Settings className="h-8 w-8 text-gray-400" />
+              <Settings className="h-5 w-5 text-gray-400" />
             </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardContent className="p-4">
+        <Card className="border-0 shadow-sm">
+          <CardContent className="p-3">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Capacity</p>
-                <p className="text-2xl font-bold">{facility.capacity}</p>
+                <p className="text-xs text-gray-600 mb-1">Capacity</p>
+                <p className="text-lg font-bold">{facility.capacity}</p>
               </div>
-              <Users className="h-8 w-8 text-gray-400" />
+              <Users className="h-5 w-5 text-gray-400" />
             </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardContent className="p-4">
+        <Card className="border-0 shadow-sm">
+          <CardContent className="p-3">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Price/Hour</p>
-                <p className="text-2xl font-bold">{facility.price_per_hour} NOK</p>
+                <p className="text-xs text-gray-600 mb-1">Price/Hour</p>
+                <p className="text-lg font-bold">{facility.price_per_hour} NOK</p>
               </div>
-              <Euro className="h-8 w-8 text-gray-400" />
+              <Euro className="h-5 w-5 text-gray-400" />
             </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardContent className="p-4">
+        <Card className="border-0 shadow-sm">
+          <CardContent className="p-3">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Time Slots</p>
-                <p className="text-2xl font-bold">{facility.time_slot_duration}h</p>
+                <p className="text-xs text-gray-600 mb-1">Time Slots</p>
+                <p className="text-lg font-bold">{facility.time_slot_duration}h</p>
               </div>
-              <Clock className="h-8 w-8 text-gray-400" />
+              <Clock className="h-5 w-5 text-gray-400" />
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Detailed Information Tabs */}
+      {/* Enhanced Tabs with Better Spacing */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-6">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="zones">Zones</TabsTrigger>
-          <TabsTrigger value="hours">Hours</TabsTrigger>
-          <TabsTrigger value="images">Images</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
-          <TabsTrigger value="settings">Settings</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-6 h-10">
+          <TabsTrigger value="overview" className="text-xs">Overview</TabsTrigger>
+          <TabsTrigger value="zones" className="text-xs">Zones</TabsTrigger>
+          <TabsTrigger value="hours" className="text-xs">Hours</TabsTrigger>
+          <TabsTrigger value="images" className="text-xs">Images</TabsTrigger>
+          <TabsTrigger value="analytics" className="text-xs">Analytics</TabsTrigger>
+          <TabsTrigger value="settings" className="text-xs">Settings</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="overview" className="space-y-6">
-          <FacilityBasicInfo facility={facility} />
-        </TabsContent>
+        <div className="mt-4">
+          <TabsContent value="overview" className="space-y-4 mt-0">
+            <FacilityBasicInfo facility={facility} />
+          </TabsContent>
 
-        <TabsContent value="zones" className="space-y-6">
-          <FacilityZonesSection facility={facility} />
-        </TabsContent>
+          <TabsContent value="zones" className="space-y-4 mt-0">
+            <FacilityZonesSection facility={facility} />
+          </TabsContent>
 
-        <TabsContent value="hours" className="space-y-6">
-          <FacilityOpeningHours facility={facility} />
-        </TabsContent>
+          <TabsContent value="hours" className="space-y-4 mt-0">
+            <FacilityOpeningHours facility={facility} />
+          </TabsContent>
 
-        <TabsContent value="images" className="space-y-6">
-          <FacilityImageGallery facility={facility} />
-        </TabsContent>
+          <TabsContent value="images" className="space-y-4 mt-0">
+            <FacilityImageGallery facility={facility} />
+          </TabsContent>
 
-        <TabsContent value="analytics" className="space-y-6">
-          <FacilityAnalytics facility={facility} />
-        </TabsContent>
+          <TabsContent value="analytics" className="space-y-4 mt-0">
+            <FacilityAnalytics facility={facility} />
+          </TabsContent>
 
-        <TabsContent value="settings" className="space-y-6">
-          <FacilitySettingsSection facility={facility} />
-        </TabsContent>
+          <TabsContent value="settings" className="space-y-4 mt-0">
+            <FacilitySettingsSection facility={facility} />
+          </TabsContent>
+        </div>
       </Tabs>
     </div>
   );
