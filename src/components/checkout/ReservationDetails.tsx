@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { FileText, User, Calendar, Users, Info } from 'lucide-react';
+import { FileText, User, Calendar, Users, Info, Activity } from 'lucide-react';
 import { CartItem } from '@/types/cart';
 
 interface ReservationDetailsProps {
@@ -55,19 +55,17 @@ export function ReservationDetails({ reservation }: ReservationDetailsProps) {
               <span className="text-gray-600">{getActorTypeLabel(reservation.organizationType)}</span>
             </div>
           </div>
+
+          <div className="flex items-center gap-3">
+            <Activity className="h-5 w-5 text-gray-500 flex-shrink-0" />
+            <div>
+              <span className="font-medium text-gray-700 block">Activity type</span>
+              <span className="text-gray-600">{getEventTypeLabel(reservation.eventType)}</span>
+            </div>
+          </div>
         </div>
         
         <div className="space-y-4">
-          {reservation.eventType && (
-            <div className="flex items-center gap-3">
-              <Calendar className="h-5 w-5 text-gray-500 flex-shrink-0" />
-              <div>
-                <span className="font-medium text-gray-700 block">Arrangementstype</span>
-                <span className="text-gray-600">{getEventTypeLabel(reservation.eventType)}</span>
-              </div>
-            </div>
-          )}
-          
           <div className="flex items-center gap-3">
             <Users className="h-5 w-5 text-gray-500 flex-shrink-0" />
             <div>
@@ -83,7 +81,7 @@ export function ReservationDetails({ reservation }: ReservationDetailsProps) {
           <div className="flex items-start gap-3">
             <Info className="h-5 w-5 text-gray-500 mt-0.5 flex-shrink-0" />
             <div>
-              <span className="font-medium text-gray-700 block">Spesielle krav</span>
+              <span className="font-medium text-gray-700 block">Tillegsopplysninger</span>
               <p className="text-gray-600 mt-1">{reservation.specialRequirements}</p>
             </div>
           </div>
