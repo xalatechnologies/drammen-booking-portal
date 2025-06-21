@@ -1,3 +1,4 @@
+
 import React from "react";
 import { ShoppingCart, X, CreditCard, Calendar, Clock, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -107,9 +108,9 @@ export function ReservationCartSection({
                     duration: item.duration
                   }];
                   
-                  const totalDuration = timeSlots.reduce((sum: number, slot: any) => {
-                    return sum + (slot.duration || 2);
-                  }, 0);
+                  // Calculate total duration properly - each slot is typically 1 hour
+                  const totalDuration = timeSlots.length; // Each time slot = 1 hour
+                  const numberOfSlots = timeSlots.length;
                   
                   const bookingType = getBookingType(item);
                   
@@ -127,24 +128,12 @@ export function ReservationCartSection({
                           <div className="flex items-center gap-3 text-xs text-gray-600 mb-2">
                             <div className="flex items-center gap-1">
                               <Calendar className="h-3 w-3" />
-                              <span>
-                                {timeSlots.length === 1 
-                                  ? (() => {
-                                      const dateValue = timeSlots[0].date instanceof Date ? timeSlots[0].date : new Date(timeSlots[0].date);
-                                      return format(dateValue, 'dd.MM.yyyy', { locale: nb });
-                                    })()
-                                  : (() => {
-                                      const firstDate = timeSlots[0].date instanceof Date ? timeSlots[0].date : new Date(timeSlots[0].date);
-                                      const lastDate = timeSlots[timeSlots.length - 1].date instanceof Date ? timeSlots[timeSlots.length - 1].date : new Date(timeSlots[timeSlots.length - 1].date);
-                                      return `${format(firstDate, 'dd.MM', { locale: nb })} - ${format(lastDate, 'dd.MM.yyyy', { locale: nb })}`;
-                                    })()
-                                }
-                              </span>
+                              <span>{numberOfSlots} tidspunkt</span>
                             </div>
                             
                             <div className="flex items-center gap-1">
                               <Clock className="h-3 w-3" />
-                              <span>{totalDuration}t</span>
+                              <span>{totalDuration}t total</span>
                             </div>
                             
                             {item.expectedAttendees && (

@@ -23,8 +23,9 @@ const calculateTotalPrice = (items: CartItem[]): number => {
     if (item.pricing) {
       return total + item.pricing.totalPrice;
     }
-    const duration = item.timeSlots.reduce((sum, slot) => sum + (slot.duration || 2), 0);
-    return total + (item.pricePerHour * duration);
+    // Calculate based on number of time slots (each slot = 1 hour typically)
+    const numberOfSlots = item.timeSlots.length;
+    return total + (item.pricePerHour * numberOfSlots);
   }, 0);
 };
 
@@ -54,7 +55,7 @@ export const useCartStore = create<CartState>()(
             date: item.date,
             timeSlot: item.timeSlot,
             zoneId: item.zoneId,
-            duration: item.duration
+            duration: item.duration || 1 // Default to 1 hour per slot
           };
 
           // Check if this exact time slot already exists
@@ -66,15 +67,15 @@ export const useCartStore = create<CartState>()(
 
           if (!slotExists) {
             const updatedTimeSlots = [...existingPackage.timeSlots, newTimeSlot];
-            const totalDuration = updatedTimeSlots.reduce((sum, slot) => sum + (slot.duration || 2), 0);
+            const numberOfSlots = updatedTimeSlots.length;
             
             const updatedPackage = {
               ...existingPackage,
               timeSlots: updatedTimeSlots,
               pricing: {
                 ...existingPackage.pricing,
-                baseFacilityPrice: item.pricePerHour * totalDuration,
-                totalPrice: item.pricePerHour * totalDuration
+                baseFacilityPrice: item.pricePerHour * numberOfSlots,
+                totalPrice: item.pricePerHour * numberOfSlots
               }
             };
 
@@ -91,6 +92,7 @@ export const useCartStore = create<CartState>()(
         } else {
           // Create a new reservation package
           const packageId = `${item.facilityId}-${item.purpose.replace(/\s+/g, '-')}-${Date.now()}`;
+          const slotDuration = item.duration || 1; // Default to 1 hour per slot
           
           const newPackage: CartItem = { 
             ...item, 
@@ -102,14 +104,14 @@ export const useCartStore = create<CartState>()(
               date: item.date,
               timeSlot: item.timeSlot,
               zoneId: item.zoneId,
-              duration: item.duration
+              duration: slotDuration
             }],
             pricing: item.pricing || {
-              baseFacilityPrice: item.pricePerHour * (item.duration || 2),
+              baseFacilityPrice: item.pricePerHour * slotDuration,
               servicesPrice: 0,
               discounts: 0,
               vatAmount: 0,
-              totalPrice: item.pricePerHour * (item.duration || 2)
+              totalPrice: item.pricePerHour * slotDuration
             }
           };
           
