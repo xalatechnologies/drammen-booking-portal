@@ -1,4 +1,3 @@
-
 import { userRepository } from '@/dal/UserRepository';
 import { User, UserFilters, UserCreateRequest, UserUpdateRequest, UserRole } from '@/types/user';
 import { PaginationParams, ApiResponse, PaginatedResponse } from '@/types/api';
@@ -89,8 +88,8 @@ export class UserService {
 
     const userData = {
       ...request,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
+      createdAt: new Date().toISOString(), // Use createdAt instead of created_at
+      updatedAt: new Date().toISOString(), // Use updatedAt instead of updated_at
       isActive: true,
       lastLoginAt: null,
       permissions: request.permissions || [],
@@ -143,7 +142,7 @@ export class UserService {
 
     const updateData = {
       ...request,
-      updated_at: new Date().toISOString()
+      updatedAt: new Date().toISOString() // Use updatedAt instead of updated_at
     };
 
     const result = await userRepository.update(id, updateData);
@@ -252,7 +251,7 @@ export class UserService {
     const result = await userRepository.update(userId, {
       role: newRole,
       permissions: permissions || [],
-      updated_at: new Date().toISOString()
+      updatedAt: new Date().toISOString() // Use updatedAt instead of updated_at
     });
 
     if (result.error) {
@@ -273,7 +272,7 @@ export class UserService {
     
     const result = await userRepository.update(userId, {
       isActive: false,
-      updated_at: new Date().toISOString()
+      updatedAt: new Date().toISOString() // Use updatedAt instead of updated_at
     });
 
     if (result.error) {
@@ -294,7 +293,7 @@ export class UserService {
     
     const result = await userRepository.update(userId, {
       isActive: true,
-      updated_at: new Date().toISOString()
+      updatedAt: new Date().toISOString() // Use updatedAt instead of updated_at
     });
 
     if (result.error) {

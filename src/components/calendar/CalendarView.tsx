@@ -215,6 +215,7 @@ const CalendarView: React.FC<CalendarViewWithToggleProps> = ({
                 ...zone,
                 equipment: [],
                 area: "100 m²",
+                amenities: [], // Add missing amenities property
                 parentZoneId: undefined,
                 isMainZone: true,
                 subZones: [],

@@ -1,4 +1,3 @@
-
 import { BookingCore, BookingStatus, EventType, AgeGroup } from './booking/bookingCore';
 import { BookingTiming, RecurrencePattern } from './booking/bookingTiming';
 import { BookingService, BookingPricing, PriceDiscount, PriceSurcharge, PriceTax, PriceBreakdownItem } from './booking/bookingPricing';
@@ -53,6 +52,20 @@ export interface BookingAttachment {
   url: string;
   uploadedBy: string;
   uploadedAt: Date;
+}
+
+export interface BookingConflict {
+  id: string;
+  booking_id: string;
+  conflict_type: string;
+  conflict_description: string;
+  conflict_severity: string;
+  resolved: boolean;
+  created_at: string;
+  conflicting_booking_id?: string;
+  resolved_by?: string;
+  resolved_at?: string;
+  resolution_notes?: string;
 }
 
 export interface BookingFilters {

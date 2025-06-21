@@ -1,57 +1,59 @@
-
-import { useAuthStore } from '@/stores/useAuthStore';
-import { useCartStore } from '@/stores/useCartStore';
-import { useBookingStore } from '@/stores/useBookingStore';
+import { useUserStore } from '@/stores/useUserStore';
 import { useFacilityStore } from '@/stores/useFacilityStore';
-import { useUIStore } from '@/stores/useUIStore';
 import { useZoneStore } from '@/stores/useZoneStore';
 import { useAdditionalServicesStore } from '@/stores/useAdditionalServicesStore';
 
-export function useGlobalState() {
-  const auth = useAuthStore();
-  const cart = useCartStore();
-  const booking = useBookingStore();
-  const facility = useFacilityStore();
-  const ui = useUIStore();
-  const zone = useZoneStore();
-  const additionalServices = useAdditionalServicesStore();
-
-  // Global reset function
-  const resetAllStores = () => {
-    auth.logout();
-    cart.clearCart();
-    booking.resetBooking();
-    facility.reset();
-    zone.reset();
-    additionalServices.reset();
-    ui.clearNotifications();
+export const useGlobalState = () => {
+  const user = useUserStore(state => state.user);
+  const setUser = useUserStore(state => state.setUser);
+  const logout = useUserStore(state => state.logout);
+  
+  const facilities = useFacilityStore(state => state.facilities);
+  const currentFacility = useFacilityStore(state => state.currentFacility);
+  const setCurrentFacility = useFacilityStore(state => state.setCurrentFacility);
+  
+  const zones = useZoneStore(state => state.zones);
+  const currentZone = useZoneStore(state => state.currentZone);
+  const setCurrentZone = useZoneStore(state => state.setCurrentZone);
+  
+  const services = useAdditionalServicesStore(state => state.services);
+  const selectedService = useAdditionalServicesStore(state => state.selectedService);
+  const setSelectedService = useAdditionalServicesStore(state => state.setSelectedService);
+  const clearError = useAdditionalServicesStore(state => state.clearError); // Use clearError instead of reset
+  
+  const resetAll = () => {
+    logout();
+    setCurrentFacility(null);
+    setCurrentZone(null);
+    setSelectedService(null);
+    clearError(); // Use clearError method
   };
-
-  // Global loading state
-  const isGlobalLoading = ui.globalLoading || facility.isLoading || booking.isSubmitting || zone.isLoading || additionalServices.isLoading;
-
+  
+  const isLoading = useAdditionalServicesStore(state => state.loading); // Use loading instead of isLoading
+  
   return {
-    // Store instances
-    auth,
-    cart,
-    booking,
-    facility,
-    ui,
-    zone,
-    additionalServices,
+    // User state
+    user,
+    setUser,
+    logout,
+    
+    // Facility state
+    facilities,
+    currentFacility,
+    setCurrentFacility,
+    
+    // Zone state
+    zones,
+    currentZone,
+    setCurrentZone,
+    
+    // Services state
+    services,
+    selectedService,
+    setSelectedService,
     
     // Global actions
-    resetAllStores,
-    isGlobalLoading,
-    
-    // Quick access to common states
-    isAuthenticated: auth.isAuthenticated,
-    user: auth.user,
-    cartItems: cart.items,
-    cartTotal: cart.totalPrice,
-    selectedSlots: booking.selectedSlots,
-    currentFacility: facility.currentFacility,
-    currentZone: zone.currentZone,
-    notifications: ui.notifications
+    resetAll,
+    isLoading
   };
-}
+};

@@ -45,6 +45,7 @@ const FacilityDetail = () => {
     name: t('facility.booking.wholeVenue'),
     capacity: facility?.capacity || 30,
     equipment: facility?.equipment || ["Projektor", "Lydanlegg", "Whiteboard"],
+    amenities: facility?.accessibility || [], // Add missing amenities property
     pricePerHour: facility?.pricePerHour || 450,
     description: t('facility.booking.wholeVenueDescription'),
     area: facility?.area || "120 m²",

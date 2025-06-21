@@ -98,14 +98,20 @@ export const useZoneStore = create<ZoneState>()(
 
       // Async actions
       fetchZones: async (facilityId) => {
-        const { setLoading, setError, setZones, pagination } = get();
+        const { setLoading, setError, setZones } = get();
         setLoading(true);
         setError(null);
 
         try {
-          const result = await ZoneService.getZones(pagination, { facilityId });
+          let result;
+          if (facilityId) {
+            result = await ZoneService.getZonesByFacility(parseInt(facilityId));
+          } else {
+            result = await ZoneService.getZones();
+          }
+          
           if (result.success && result.data) {
-            setZones(result.data.data || [], result.data.pagination?.total || 0);
+            setZones(result.data, result.data.length);
           } else {
             setError(result.error?.message || 'Failed to fetch zones');
           }
@@ -141,7 +147,53 @@ export const useZoneStore = create<ZoneState>()(
         setError(null);
 
         try {
-          const result = await ZoneService.createZone(zoneData);
+          const completeZoneData = {
+            name: zoneData.name || '',
+            facilityId: zoneData.facilityId || '',
+            isMainZone: zoneData.isMainZone || false,
+            capacity: zoneData.capacity || 1,
+            area: zoneData.area || 0,
+            features: zoneData.features || [],
+            accessibility: zoneData.accessibility || [],
+            pricing: zoneData.pricing || {
+              basePrice: 0,
+              currency: 'NOK',
+              priceRules: [],
+              minimumBookingDuration: 60,
+              maximumBookingDuration: 480,
+              cancellationPolicy: {
+                freeUntilHours: 24,
+                partialRefundUntilHours: 12,
+                partialRefundPercentage: 50,
+                noRefundAfterHours: 2
+              }
+            },
+            availability: zoneData.availability || {
+              openingHours: [],
+              blackoutPeriods: [],
+              maintenanceSchedule: [],
+              recurringUnavailability: []
+            },
+            restrictions: zoneData.restrictions || {
+              requiresSupervision: false,
+              allowedActivities: [],
+              prohibitedActivities: [],
+              requiresTraining: false,
+              alcoholPermitted: false,
+              smokingPermitted: false,
+              petsAllowed: false,
+              cateringAllowed: true,
+              decorationsAllowed: true,
+              amplifiedSoundAllowed: false,
+              commercialUseAllowed: false
+            },
+            isActive: zoneData.isActive !== undefined ? zoneData.isActive : true,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            ...zoneData
+          };
+
+          const result = await ZoneService.createZone(completeZoneData);
           if (result.success && result.data) {
             addZone(result.data);
           } else {
