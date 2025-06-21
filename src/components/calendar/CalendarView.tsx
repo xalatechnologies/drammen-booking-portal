@@ -7,6 +7,8 @@ import { useCalendarView } from "@/hooks/useCalendarView";
 import { CalendarLoadingState } from "./components/CalendarLoadingState";
 import { CalendarErrorState } from "./components/CalendarErrorState";
 import { CalendarEmptyState } from "./components/CalendarEmptyState";
+import { useSlotSelection } from "@/hooks/useSlotSelection";
+import { useCartStore } from "@/stores/useCartStore";
 
 interface CalendarViewWithToggleProps extends CalendarViewProps {
   viewMode: "grid" | "map" | "calendar" | "list";
@@ -43,20 +45,56 @@ const CalendarView: React.FC<CalendarViewWithToggleProps> = ({
     capacity: capacityRange
   });
 
-  // Simplified slot handling - no state management, just direct cart operations
-  const handleSlotClick = (zoneId: string, date: Date, timeSlot: string, availability: string) => {
-    console.log('CalendarView: Slot clicked, but not storing in state');
-    // Direct booking flow would go here
-  };
+  // Use slot selection hook for managing selected slots
+  const {
+    selectedSlots,
+    handleSlotClick,
+    handleBulkSlotSelection,
+    clearSelection
+  } = useSlotSelection();
 
-  const handleBulkSlotSelection = (slots: any[]) => {
-    console.log('CalendarView: Bulk selection, but not storing in state');
-    // Direct booking flow would go here
+  // Cart store for handling bookings
+  const { addToCart } = useCartStore();
+
+  const handleRemoveSlot = (zoneId: string, date: Date, timeSlot: string) => {
+    handleSlotClick(zoneId, date, timeSlot, 'available');
   };
 
   const handleAddToCart = (bookingData: any) => {
     console.log('CalendarView: Adding to cart:', bookingData);
-    // Cart operations happen here
+    
+    // Convert booking data to cart format
+    if (bookingData.selectedSlots && bookingData.selectedSlots.length > 0) {
+      const slot = bookingData.selectedSlots[0]; // Take first slot for cart item
+      const zone = allZones.find(z => z.id === slot.zoneId);
+      
+      addToCart({
+        facilityId: bookingData.facilityId || 'all',
+        facilityName: bookingData.facilityName || 'Alle lokaler',
+        zoneName: zone?.name || 'Hovedlokale',
+        date: slot.date,
+        timeSlot: slot.timeSlot,
+        zoneId: slot.zoneId,
+        duration: slot.duration || 1,
+        pricePerHour: zone?.pricePerHour || 450,
+        purpose: bookingData.formData?.purpose || 'Booking fra kalender',
+        expectedAttendees: bookingData.formData?.attendees || 1,
+        organizationType: bookingData.formData?.actorType || 'private',
+        eventType: bookingData.formData?.activityType || 'other',
+        specialRequirements: bookingData.formData?.additionalInfo || '',
+        timeSlots: bookingData.selectedSlots,
+        additionalServices: []
+      });
+      
+      // Clear selection after adding to cart
+      clearSelection();
+    }
+  };
+
+  const handleContinueBooking = () => {
+    console.log('CalendarView: Continue booking');
+    // Navigate to checkout or booking flow
+    navigate('/checkout');
   };
 
   if (isLoading) {
@@ -83,14 +121,21 @@ const CalendarView: React.FC<CalendarViewWithToggleProps> = ({
           facilityName={displayFacility?.name || 'Alle lokaler'}
           facilityId={'all'}
           zones={allZones}
-          selectedSlots={[]} // No selected slots state
+          selectedSlots={selectedSlots}
           onSlotClick={handleSlotClick}
           onBulkSlotSelection={handleBulkSlotSelection}
-          onRemoveSlot={() => {}} // No removal needed
-          onClearSlots={() => {}} // No clearing needed
+          onRemoveSlot={handleRemoveSlot}
+          onClearSlots={clearSelection}
           onAddToCart={handleAddToCart}
+          onContinueBooking={handleContinueBooking}
           getAvailabilityStatus={getAvailabilityStatus}
-          isSlotSelected={() => false} // Never selected
+          isSlotSelected={(zoneId: string, date: Date, timeSlot: string) => 
+            selectedSlots.some(slot => 
+              slot.zoneId === zoneId && 
+              slot.date.getTime() === date.getTime() && 
+              slot.timeSlot === timeSlot
+            )
+          }
           timeSlotDuration={1}
           layout="horizontal"
           compact={false}
