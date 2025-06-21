@@ -226,6 +226,8 @@ export const umbrellaTranslations = {
         statusUndistributed: "Ufordelt",
         statusPartially: "Delvis fordelt",
         export: "Eksporter",
+        exportExcel: "Eksporter til Excel med metadata",
+        exportPDF: "Eksporter til PDF med metadata",
         location: "Lokasjon",
         weekdays: "Ukedag(er)",
         timeSlot: "Klokkeslett",
@@ -233,7 +235,29 @@ export const umbrellaTranslations = {
         status: "Status",
         distributedTo: "Fordelt til",
         actions: "Handlinger",
-        calendarComingSoon: "Kalendervisning kommer snart"
+        calendarComingSoon: "Kalendervisning kommer snart",
+        tooltips: {
+          assign: "Tildel tid til underaktør",
+          distribute: "Fordel tid til underaktør",
+          edit: "Endre tildeling",
+          release: "Frigi tildelt tid",
+          partialDetails: "Klikk for å se detaljer om fordeling"
+        }
+      },
+      assign: {
+        title: "Tildel ufordelt tid",
+        description: "Velg aktør og tildel tid som ikke er fordelt",
+        selectActor: "Velg aktør",
+        selectActorPlaceholder: "Velg aktør...",
+        selectDates: "Velg dato(er)",
+        assign: "Tildel"
+      },
+      partialDetails: {
+        title: "Detaljer for delvis fordeling",
+        description: "Oversikt over fordelt og ledig tid",
+        distributed: "Fordelt tid",
+        available: "Ledig tid",
+        close: "Lukk"
       },
       distribute: {
         title: "Viderefordel rammetid",
@@ -529,6 +553,8 @@ export const umbrellaTranslations = {
         statusUndistributed: "Undistributed",
         statusPartially: "Partially distributed",
         export: "Export",
+        exportExcel: "Export to Excel with metadata",
+        exportPDF: "Export to PDF with metadata",
         location: "Location",
         weekdays: "Weekday(s)",
         timeSlot: "Time",
@@ -536,10 +562,32 @@ export const umbrellaTranslations = {
         status: "Status",
         distributedTo: "Distributed to",
         actions: "Actions",
-        calendarComingSoon: "Calendar view coming soon"
+        calendarComingSoon: "Calendar view coming soon",
+        tooltips: {
+          assign: "Assign time to subcontractor",
+          distribute: "Distribute time to subcontractor",
+          edit: "Edit allocation",
+          release: "Release allocated time",
+          partialDetails: "Click for details about distribution"
+        }
+      },
+      assign: {
+        title: "Assign undistributed time",
+        description: "Select actor and assign time that is not distributed",
+        selectActor: "Select Actor",
+        selectActorPlaceholder: "Select actor...",
+        selectDates: "Select date(s)",
+        assign: "Assign"
+      },
+      partialDetails: {
+        title: "Details for partially distributed time",
+        description: "Overview of distributed and available time",
+        distributed: "Distributed time",
+        available: "Available time",
+        close: "Close"
       },
       distribute: {
-        title: "Redistribute Allocated Time",
+        title: "Distribute time",
         description: "Select actor and assign time",
         selectActor: "Select Actor",
         selectActorPlaceholder: "Select actor...",
