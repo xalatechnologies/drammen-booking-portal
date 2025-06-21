@@ -1,8 +1,11 @@
+
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Activity, Info, Server, Cloud, RefreshCw, Shield } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { RefreshCw, Server, Cloud, CheckCircle } from "lucide-react";
+import PageHeader from "@/components/admin/PageHeader";
 
 const MOCK_ENVIRONMENTS = [
   { id: "dev", name: "Utvikling", status: "OK", lastDeploy: "2024-06-18 10:00" },
@@ -17,7 +20,7 @@ const MOCK_BACKUP_HISTORY = [
   { date: "2024-06-16 03:00", status: "OK" },
 ];
 
-const currentUser = { name: "Admin Bruker", role: "systemadmin" }; // Bytt til 'systemadmin' eller 'superadmin' for full tilgang
+const currentUser = { name: "Admin Bruker", role: "systemadmin" };
 
 const AzureDeployPage: React.FC = () => {
   const [env, setEnv] = useState("prod");
@@ -32,10 +35,10 @@ const AzureDeployPage: React.FC = () => {
       <div className="flex items-center justify-center min-h-screen">
         <Card className="max-w-md w-full">
           <CardHeader>
-            <CardTitle>Ingen tilgang</CardTitle>
+            <CardTitle className="text-2xl">Ingen tilgang</CardTitle>
           </CardHeader>
           <CardContent>
-            <p>Du må være systemadministrator for å se og endre Azure/Deploy-innstillinger.</p>
+            <p className="text-lg">Du må være systemadministrator for å se og endre Azure/Deploy-innstillinger.</p>
           </CardContent>
         </Card>
       </div>
@@ -48,7 +51,7 @@ const AzureDeployPage: React.FC = () => {
 
   function handleDeploy() {
     setDeploying(true);
-    setTimeout(() => setDeploying(false), 1500); // mock
+    setTimeout(() => setDeploying(false), 1500);
   }
 
   function handleBackup() {
@@ -60,96 +63,140 @@ const AzureDeployPage: React.FC = () => {
   }
 
   return (
-    <div className="space-y-8 w-full p-8" role="main" aria-labelledby="page-title">
-      <header className="mb-6">
-        <h1 id="page-title" className="text-3xl font-bold tracking-tight text-gray-900 mb-2">
-          Azure/Deploy
-        </h1>
-        <p className="text-lg text-gray-700 leading-relaxed">
-          Administrer Azure-ressurser og deployment-innstillinger
-        </p>
-      </header>
+    <div className="w-full space-y-8 p-8">
+      <PageHeader
+        title="Azure/Deploy"
+        description="Administrer Azure-ressurser og deployment-innstillinger for optimal systemdrift"
+        actions={
+          <Button onClick={handleDeploy} disabled={deploying} size="lg" className="text-base px-6 py-3">
+            <RefreshCw className={deploying ? "animate-spin" : ""} size={20} />
+            Trigger deploy
+          </Button>
+        }
+      />
+      
       {/* Miljøkonfigurasjon */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Miljøstatus</CardTitle>
+      <Card className="shadow-lg border-0">
+        <CardHeader className="pb-6">
+          <CardTitle className="text-2xl font-bold text-gray-900">Miljøstatus</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col md:flex-row gap-6 items-start md:items-center">
-            <div className="flex flex-col gap-2">
-              <label className="font-medium">Velg miljø</label>
-              <select value={env} onChange={handleEnvChange} className="border rounded px-3 py-2">
+          <div className="flex flex-col md:flex-row gap-8 items-start md:items-center">
+            <div className="flex flex-col gap-3">
+              <label className="font-medium text-base text-gray-900">Velg miljø</label>
+              <select 
+                value={env} 
+                onChange={handleEnvChange} 
+                className="border-2 rounded-lg px-4 py-3 text-base min-w-[200px] focus:border-blue-500"
+              >
                 {MOCK_ENVIRONMENTS.map(e => (
                   <option key={e.id} value={e.id}>{e.name}</option>
                 ))}
               </select>
             </div>
-            <div className="flex flex-col gap-2">
-              <span className="text-sm text-gray-700">Status: <span className="font-semibold text-green-700">{MOCK_ENVIRONMENTS.find(e => e.id === env)?.status}</span></span>
-              <span className="text-sm text-gray-700">Siste deploy: {MOCK_ENVIRONMENTS.find(e => e.id === env)?.lastDeploy}</span>
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center gap-2">
+                <span className="text-base text-gray-700">Status:</span>
+                <Badge variant="default" className="text-sm">
+                  {MOCK_ENVIRONMENTS.find(e => e.id === env)?.status}
+                </Badge>
+              </div>
+              <span className="text-base text-gray-700">
+                Siste deploy: {MOCK_ENVIRONMENTS.find(e => e.id === env)?.lastDeploy}
+              </span>
             </div>
           </div>
         </CardContent>
       </Card>
+      
       {/* Deployment-strategi */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Deployment-strategi</CardTitle>
+      <Card className="shadow-lg border-0">
+        <CardHeader className="pb-6">
+          <CardTitle className="text-2xl font-bold text-gray-900">Deployment-strategi</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col md:flex-row gap-6 items-start md:items-center">
-            <div className="flex flex-col gap-2">
-              <label className="font-medium">Strategi</label>
-              <select value={deploy.strategy} onChange={e => setDeploy({ ...deploy, strategy: e.target.value })} className="border rounded px-3 py-2">
+          <div className="flex flex-col md:flex-row gap-8 items-start md:items-center">
+            <div className="flex flex-col gap-3">
+              <label className="font-medium text-base text-gray-900">Strategi</label>
+              <select 
+                value={deploy.strategy} 
+                onChange={e => setDeploy({ ...deploy, strategy: e.target.value })} 
+                className="border-2 rounded-lg px-4 py-3 text-base min-w-[200px] focus:border-blue-500"
+              >
                 <option>Blue/Green</option>
                 <option>Rolling</option>
                 <option>Canary</option>
               </select>
             </div>
-            <div className="flex flex-col gap-2">
-              <span className="text-sm text-gray-700">Status: <span className="font-semibold text-green-700">{deploy.status}</span></span>
-              <span className="text-sm text-gray-700">Siste deploy: {deploy.lastDeploy}</span>
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center gap-2">
+                <span className="text-base text-gray-700">Status:</span>
+                <Badge variant="default" className="text-sm">
+                  {deploy.status}
+                </Badge>
+              </div>
+              <span className="text-base text-gray-700">
+                Siste deploy: {deploy.lastDeploy}
+              </span>
             </div>
-            <Button onClick={handleDeploy} disabled={deploying} className="mt-2 md:mt-0">
-              <RefreshCw className={deploying ? "animate-spin" : ""} size={18} /> Trigger deploy
-            </Button>
           </div>
         </CardContent>
       </Card>
+      
       {/* Backup-plan */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Backup-plan</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col md:flex-row gap-6 items-start md:items-center mb-4">
-            <div className="flex flex-col gap-2">
-              <label className="font-medium">Frekvens</label>
-              <select value={backup.frequency} onChange={e => setBackup({ ...backup, frequency: e.target.value })} className="border rounded px-3 py-2">
-                <option>Daglig</option>
-                <option>Ukentlig</option>
-                <option>Månedlig</option>
-              </select>
-            </div>
-            <div className="flex flex-col gap-2">
-              <span className="text-sm text-gray-700">Siste backup: {backup.lastBackup}</span>
-              <span className="text-sm text-gray-700">Retention: {backup.retention}</span>
-              <span className="text-sm text-gray-700">Status: <span className="font-semibold text-green-700">{backup.status}</span></span>
-            </div>
-            <Button onClick={handleBackup} disabled={backupRunning} className="mt-2 md:mt-0">
-              <RefreshCw className={backupRunning ? "animate-spin" : ""} size={18} /> Ta backup nå
+      <Card className="shadow-lg border-0">
+        <CardHeader className="pb-6">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-2xl font-bold text-gray-900">Backup-plan</CardTitle>
+            <Button onClick={handleBackup} disabled={backupRunning} size="lg" className="text-base px-6 py-3">
+              <RefreshCw className={backupRunning ? "animate-spin" : ""} size={20} />
+              Ta backup nå
             </Button>
           </div>
-          <div>
-            <span className="font-medium">Backup-historikk:</span>
-            <ul className="mt-2 text-sm text-gray-700">
-              {backupHistory.map((b, i) => (
-                <li key={i} className="flex items-center gap-2">
-                  <Cloud className="h-4 w-4 text-blue-500" />
-                  {b.date} <span className={b.status === "OK" ? "text-green-700" : "text-red-700"}>{b.status}</span>
-                </li>
-              ))}
-            </ul>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="space-y-6">
+              <div className="flex flex-col gap-3">
+                <label className="font-medium text-base text-gray-900">Frekvens</label>
+                <select 
+                  value={backup.frequency} 
+                  onChange={e => setBackup({ ...backup, frequency: e.target.value })} 
+                  className="border-2 rounded-lg px-4 py-3 text-base focus:border-blue-500"
+                >
+                  <option>Daglig</option>
+                  <option>Ukentlig</option>
+                  <option>Månedlig</option>
+                </select>
+              </div>
+              <div className="space-y-2">
+                <div className="text-base text-gray-700">Siste backup: {backup.lastBackup}</div>
+                <div className="text-base text-gray-700">Retention: {backup.retention}</div>
+                <div className="flex items-center gap-2">
+                  <span className="text-base text-gray-700">Status:</span>
+                  <Badge variant="default" className="text-sm">
+                    {backup.status}
+                  </Badge>
+                </div>
+              </div>
+            </div>
+            <div className="space-y-4">
+              <span className="font-medium text-lg text-gray-900">Backup-historikk:</span>
+              <ul className="space-y-3">
+                {backupHistory.map((b, i) => (
+                  <li key={i} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <Cloud className="h-5 w-5 text-blue-500" />
+                    <span className="text-base text-gray-700">{b.date}</span>
+                    <Badge 
+                      variant={b.status === "OK" ? "default" : "destructive"}
+                      className="text-sm"
+                    >
+                      {b.status}
+                    </Badge>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -157,4 +204,4 @@ const AzureDeployPage: React.FC = () => {
   );
 };
 
-export default AzureDeployPage; 
+export default AzureDeployPage;

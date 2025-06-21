@@ -1,12 +1,14 @@
+
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Shield, Edit, RefreshCw, Info } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Shield, Edit, RefreshCw, Info, Plus } from "lucide-react";
+import PageHeader from "@/components/admin/PageHeader";
 
-// Mock data for providers
 const MOCK_PROVIDERS = [
   {
     id: "bankid",
@@ -45,55 +47,76 @@ const AuthProvidersPage: React.FC = () => {
 
   function handleScimSync() {
     setScimSyncing(true);
-    setTimeout(() => setScimSyncing(false), 1500); // mock
+    setTimeout(() => setScimSyncing(false), 1500);
   }
 
   return (
-    <div className="space-y-8 w-full p-8" role="main" aria-labelledby="page-title">
-      <header className="mb-6">
-        <h1 id="page-title" className="text-3xl font-bold tracking-tight text-gray-900 mb-2">
-          Autentisering
-        </h1>
-        <p className="text-lg text-gray-700 leading-relaxed">
-          Administrer innloggingstjenester (OIDC/SCIM) for brukere og grupper. <span title="Støttede leverandører: BankID, Vipps, Entra ID."><Info className="inline h-4 w-4 text-gray-400 align-text-bottom ml-1" /></span>
-        </p>
-      </header>
-      <Card>
-        <CardHeader>
-          <CardTitle>Konfigurerte autentiseringstjenester</CardTitle>
+    <div className="w-full space-y-8 p-8">
+      <PageHeader
+        title="Autentisering"
+        description="Administrer innloggingstjenester (OIDC/SCIM) for brukere og grupper. Støttede leverandører: BankID, Vipps, Entra ID."
+        actions={
+          <Button size="lg" className="text-base px-6 py-3">
+            <Plus className="w-5 h-5 mr-2" />
+            Legg til leverandør
+          </Button>
+        }
+      />
+      
+      <Card className="shadow-lg border-0">
+        <CardHeader className="pb-6">
+          <CardTitle className="text-2xl font-bold text-gray-900">Konfigurerte autentiseringstjenester</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow>
-                  <TableHead>Navn</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>SCIM</TableHead>
-                  <TableHead></TableHead>
+                <TableRow className="bg-gray-50 border-b-2">
+                  <TableHead className="text-base font-semibold text-gray-900 py-6">Navn</TableHead>
+                  <TableHead className="text-base font-semibold text-gray-900 py-6">Type</TableHead>
+                  <TableHead className="text-base font-semibold text-gray-900 py-6">Status</TableHead>
+                  <TableHead className="text-base font-semibold text-gray-900 py-6">SCIM</TableHead>
+                  <TableHead className="w-32 text-base font-semibold text-gray-900 py-6">Handlinger</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {MOCK_PROVIDERS.map((prov) => (
-                  <TableRow key={prov.id}>
-                    <TableCell>{prov.name}</TableCell>
-                    <TableCell>{prov.type}</TableCell>
-                    <TableCell>
-                      <span className={prov.status === "Aktiv" ? "text-green-700 font-semibold" : "text-gray-500"}>{prov.status}</span>
+                  <TableRow key={prov.id} className="hover:bg-blue-50 transition-colors duration-200">
+                    <TableCell className="text-base py-6 font-medium">{prov.name}</TableCell>
+                    <TableCell className="text-base py-6">{prov.type}</TableCell>
+                    <TableCell className="py-6">
+                      <Badge 
+                        variant={prov.status === "Aktiv" ? "default" : "secondary"}
+                        className="text-sm px-3 py-1"
+                      >
+                        {prov.status}
+                      </Badge>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="py-6">
                       {prov.supportsScim ? (
-                        <Button size="sm" variant="outline" onClick={handleScimSync} disabled={scimSyncing}>
-                          <RefreshCw className={scimSyncing ? "animate-spin" : ""} size={16} /> Synkroniser
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          onClick={handleScimSync} 
+                          disabled={scimSyncing}
+                          className="text-sm px-4 py-2"
+                        >
+                          <RefreshCw className={`${scimSyncing ? "animate-spin" : ""} w-4 h-4 mr-2`} />
+                          Synkroniser
                         </Button>
                       ) : (
-                        <span className="text-gray-400">–</span>
+                        <span className="text-gray-400 text-base">–</span>
                       )}
                     </TableCell>
-                    <TableCell>
-                      <Button size="sm" variant="outline" onClick={() => handleEdit(prov)}>
-                        <Edit size={16} className="mr-1" /> Rediger
+                    <TableCell className="py-6">
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        onClick={() => handleEdit(prov)}
+                        className="text-sm px-4 py-2"
+                      >
+                        <Edit size={16} className="mr-2" /> 
+                        Rediger
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -103,34 +126,51 @@ const AuthProvidersPage: React.FC = () => {
           </div>
         </CardContent>
       </Card>
+      
       <Dialog open={!!editProvider} onOpenChange={handleClose}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Rediger {editProvider?.name}</DialogTitle>
+            <DialogTitle className="text-2xl">Rediger {editProvider?.name}</DialogTitle>
           </DialogHeader>
-          <form className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-1">Client ID <span title="OIDC Client ID"><Info className="inline h-4 w-4 text-gray-400 align-text-bottom ml-1" /></span></label>
-              <Input placeholder="client-id-123" defaultValue="" />
+          <form className="space-y-6">
+            <div className="space-y-3">
+              <label className="block text-base font-medium text-gray-900">
+                Client ID 
+                <Info className="inline h-4 w-4 text-gray-400 align-text-bottom ml-1" title="OIDC Client ID" />
+              </label>
+              <Input placeholder="client-id-123" defaultValue="" className="h-12 text-base" />
             </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">Client Secret <span title="OIDC Client Secret"><Info className="inline h-4 w-4 text-gray-400 align-text-bottom ml-1" /></span></label>
-              <Input placeholder="••••••••" type="password" defaultValue="" />
+            <div className="space-y-3">
+              <label className="block text-base font-medium text-gray-900">
+                Client Secret 
+                <Info className="inline h-4 w-4 text-gray-400 align-text-bottom ml-1" title="OIDC Client Secret" />
+              </label>
+              <Input placeholder="••••••••" type="password" defaultValue="" className="h-12 text-base" />
             </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">Discovery URL <span title="OIDC Discovery URL"><Info className="inline h-4 w-4 text-gray-400 align-text-bottom ml-1" /></span></label>
-              <Input placeholder="https://login.example.com/.well-known/openid-configuration" defaultValue="" />
+            <div className="space-y-3">
+              <label className="block text-base font-medium text-gray-900">
+                Discovery URL 
+                <Info className="inline h-4 w-4 text-gray-400 align-text-bottom ml-1" title="OIDC Discovery URL" />
+              </label>
+              <Input placeholder="https://login.example.com/.well-known/openid-configuration" defaultValue="" className="h-12 text-base" />
             </div>
             {editProvider?.supportsScim && (
-              <div>
-                <label className="block text-sm font-medium mb-1">SCIM-endepunkt <span title="SCIM API-endepunkt"><Info className="inline h-4 w-4 text-gray-400 align-text-bottom ml-1" /></span></label>
-                <Input placeholder="https://scim.example.com/v2/" defaultValue="" />
+              <div className="space-y-3">
+                <label className="block text-base font-medium text-gray-900">
+                  SCIM-endepunkt 
+                  <Info className="inline h-4 w-4 text-gray-400 align-text-bottom ml-1" title="SCIM API-endepunkt" />
+                </label>
+                <Input placeholder="https://scim.example.com/v2/" defaultValue="" className="h-12 text-base" />
               </div>
             )}
           </form>
-          <DialogFooter className="mt-4">
-            <Button variant="outline" onClick={handleClose}>Avbryt</Button>
-            <Button type="submit" onClick={handleClose}>Lagre</Button>
+          <DialogFooter className="mt-8">
+            <Button variant="outline" onClick={handleClose} size="lg" className="text-base px-6 py-3">
+              Avbryt
+            </Button>
+            <Button type="submit" onClick={handleClose} size="lg" className="text-base px-6 py-3">
+              Lagre
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -138,4 +178,4 @@ const AuthProvidersPage: React.FC = () => {
   );
 };
 
-export default AuthProvidersPage; 
+export default AuthProvidersPage;

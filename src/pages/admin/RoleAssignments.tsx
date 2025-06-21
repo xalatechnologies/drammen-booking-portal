@@ -4,6 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
+import { Users, UserPlus, Shield } from "lucide-react";
+import PageHeader from "@/components/admin/PageHeader";
 
 const mockUser = { name: "Superadmin Bruker", isSuperadmin: true };
 const mockRoles = [
@@ -50,10 +53,10 @@ const RoleAssignmentsPage = () => {
       <div className="flex items-center justify-center min-h-screen">
         <Card className="max-w-md w-full">
           <CardHeader>
-            <CardTitle>Ingen tilgang</CardTitle>
+            <CardTitle className="text-2xl">Ingen tilgang</CardTitle>
           </CardHeader>
           <CardContent>
-            <p>Du må være systemadministrator for å tildele roller.</p>
+            <p className="text-lg">Du må være systemadministrator for å tildele roller.</p>
           </CardContent>
         </Card>
       </div>
@@ -101,49 +104,76 @@ const RoleAssignmentsPage = () => {
   };
 
   return (
-    <div className="space-y-8 w-full p-8" role="main" aria-labelledby="page-title">
-      <header className="mb-6">
-        <h1 className="text-3xl font-bold tracking-tight text-gray-900 mb-2">
-          Rolletildelinger
-        </h1>
-        <p className="text-lg text-gray-700 leading-relaxed">
-          Tildel roller til brukere og grupper
-        </p>
-      </header>
-      <Card>
-        <CardHeader>
-          <CardTitle>Tildel roller</CardTitle>
+    <div className="w-full space-y-8 p-8">
+      <PageHeader
+        title="Rolletildelinger"
+        description="Tildel roller til brukere og grupper for å administrere tilgangskontroll i systemet"
+      />
+      
+      <Card className="shadow-lg border-0">
+        <CardHeader className="pb-6">
+          <CardTitle className="text-2xl font-bold text-gray-900">Tildel roller</CardTitle>
         </CardHeader>
         <CardContent>
-          <Tabs value={tab} onValueChange={setTab} className="mb-6">
-            <TabsList className="w-full flex">
-              <TabsTrigger value="users" className="flex-1">Brukere</TabsTrigger>
-              <TabsTrigger value="groups" className="flex-1">Azure AD-grupper</TabsTrigger>
+          <Tabs value={tab} onValueChange={setTab} className="mb-8">
+            <TabsList className="w-full grid grid-cols-2 h-14 bg-white border border-gray-200 rounded-lg p-1">
+              <TabsTrigger 
+                value="users" 
+                className="text-base py-3 data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+              >
+                <Users className="w-5 h-5 mr-2" />
+                Brukere
+              </TabsTrigger>
+              <TabsTrigger 
+                value="groups" 
+                className="text-base py-3 data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+              >
+                <Shield className="w-5 h-5 mr-2" />
+                Azure AD-grupper
+              </TabsTrigger>
             </TabsList>
+            
             <TabsContent value="users">
               <div className="overflow-x-auto">
-                <table className="w-full min-w-[600px] text-sm">
-                  <thead>
-                    <tr className="bg-gray-50">
-                      <th className="p-2 text-left">Navn</th>
-                      <th className="p-2 text-left">Roller</th>
-                      <th className="p-2 text-right">Handlinger</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {mockUsers.map(user => (
-                      <tr key={user.id} className="border-t">
-                        <td className="p-2">{user.name}</td>
-                        <td className="p-2">{(userAssignments[user.id] || []).join(", ") || <span className="text-gray-400">Ingen</span>}</td>
-                        <td className="p-2 text-right">
-                          <Button size="sm" variant="outline" onClick={() => openAssignDialog(user.id, "user")}>Tildel / Endre</Button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                <div className="min-w-[600px]">
+                  <div className="grid grid-cols-12 gap-4 p-4 bg-gray-50 rounded-lg font-semibold text-base text-gray-900 border-b-2">
+                    <div className="col-span-4">Navn</div>
+                    <div className="col-span-6">Roller</div>
+                    <div className="col-span-2 text-right">Handlinger</div>
+                  </div>
+                  {mockUsers.map(user => (
+                    <div key={user.id} className="grid grid-cols-12 gap-4 p-4 border-b hover:bg-blue-50 transition-colors duration-200">
+                      <div className="col-span-4 text-base font-medium">{user.name}</div>
+                      <div className="col-span-6 text-base">
+                        {(userAssignments[user.id] || []).length > 0 ? (
+                          <div className="flex flex-wrap gap-2">
+                            {(userAssignments[user.id] || []).map(role => (
+                              <Badge key={role} variant="default" className="text-sm">
+                                {role}
+                              </Badge>
+                            ))}
+                          </div>
+                        ) : (
+                          <span className="text-gray-400">Ingen</span>
+                        )}
+                      </div>
+                      <div className="col-span-2 text-right">
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          onClick={() => openAssignDialog(user.id, "user")}
+                          className="text-sm px-4 py-2"
+                        >
+                          <UserPlus className="w-4 h-4 mr-2" />
+                          Tildel
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </TabsContent>
+            
             <TabsContent value="groups">
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[600px] text-sm">
@@ -171,6 +201,7 @@ const RoleAssignmentsPage = () => {
           </Tabs>
         </CardContent>
       </Card>
+      
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>
           <DialogHeader>
@@ -189,6 +220,7 @@ const RoleAssignmentsPage = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      
       <Card className="mt-8">
         <CardHeader>
           <CardTitle>Endringslogg</CardTitle>
@@ -208,4 +240,4 @@ const RoleAssignmentsPage = () => {
   );
 };
 
-export default RoleAssignmentsPage; 
+export default RoleAssignmentsPage;

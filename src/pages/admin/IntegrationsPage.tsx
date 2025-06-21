@@ -1,10 +1,12 @@
+
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Input } from "@/components/ui/input";
-import { Activity, Key, Link2, Mail, Phone, Info, Briefcase } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Activity, Key, Link2, Mail, Phone, Info, Briefcase, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import PageHeader from "@/components/admin/PageHeader";
 
 const MOCK_API_KEYS = [
   { id: "key1", name: "Frontend", value: "sk_live_1234...abcd", active: true },
@@ -34,98 +36,157 @@ const IntegrationsPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-10 w-full p-8" role="main" aria-labelledby="page-title">
-      <header className="mb-6">
-        <h1 id="page-title" className="text-3xl font-bold tracking-tight text-gray-900 mb-2">
-          Integrasjoner
-        </h1>
-        <p className="text-lg text-gray-700 leading-relaxed">
-          Administrer API-nøkler, webhooks og eksterne tjenester. <span title="Støttede tjenester: Sendinblue, Twilio, Aktørregister."><Info className="inline h-4 w-4 text-gray-400 align-text-bottom ml-1" /></span>
-        </p>
-      </header>
+    <div className="w-full space-y-8 p-8">
+      <PageHeader
+        title="Integrasjoner"
+        description="Administrer API-nøkler, webhooks og eksterne tjenester. Støttede tjenester: Sendinblue, Twilio, Aktørregister."
+      />
+      
       {/* API-nøkler */}
-      <Card>
-        <CardHeader>
-          <CardTitle>API-nøkler</CardTitle>
+      <Card className="shadow-lg border-0">
+        <CardHeader className="pb-6">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-2xl font-bold text-gray-900">API-nøkler</CardTitle>
+            <Button size="lg" className="text-base px-6 py-3">
+              <Plus className="w-5 h-5 mr-2" />
+              Opprett ny nøkkel
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow>
-                  <TableHead>Navn</TableHead>
-                  <TableHead>Nøkkel</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead></TableHead>
+                <TableRow className="bg-gray-50 border-b-2">
+                  <TableHead className="text-base font-semibold text-gray-900 py-6">Navn</TableHead>
+                  <TableHead className="text-base font-semibold text-gray-900 py-6">Nøkkel</TableHead>
+                  <TableHead className="text-base font-semibold text-gray-900 py-6">Status</TableHead>
+                  <TableHead className="w-32 text-base font-semibold text-gray-900 py-6">Handlinger</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {apiKeys.map(key => (
-                  <TableRow key={key.id}>
-                    <TableCell>{key.name}</TableCell>
-                    <TableCell><span className="font-mono text-xs">{key.value}</span></TableCell>
-                    <TableCell>{key.active ? <span className="text-green-700 font-semibold">Aktiv</span> : <span className="text-gray-500">Inaktiv</span>}</TableCell>
-                    <TableCell><Button size="sm" variant="outline">Deaktiver</Button></TableCell>
+                  <TableRow key={key.id} className="hover:bg-blue-50 transition-colors duration-200">
+                    <TableCell className="text-base py-6 font-medium">{key.name}</TableCell>
+                    <TableCell className="py-6">
+                      <span className="font-mono text-sm bg-gray-100 px-3 py-2 rounded">{key.value}</span>
+                    </TableCell>
+                    <TableCell className="py-6">
+                      <Badge 
+                        variant={key.active ? "default" : "secondary"}
+                        className="text-sm px-3 py-1"
+                      >
+                        {key.active ? "Aktiv" : "Inaktiv"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="py-6">
+                      <Button size="sm" variant="outline" className="text-sm px-4 py-2">
+                        Deaktiver
+                      </Button>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
           </div>
-          <Button className="mt-4">Opprett ny nøkkel</Button>
         </CardContent>
       </Card>
+      
       {/* Webhooks */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Webhooks</CardTitle>
+      <Card className="shadow-lg border-0">
+        <CardHeader className="pb-6">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-2xl font-bold text-gray-900">Webhooks</CardTitle>
+            <Button size="lg" className="text-base px-6 py-3">
+              <Plus className="w-5 h-5 mr-2" />
+              Legg til webhook
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow>
-                  <TableHead>URL</TableHead>
-                  <TableHead>Event</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead></TableHead>
+                <TableRow className="bg-gray-50 border-b-2">
+                  <TableHead className="text-base font-semibold text-gray-900 py-6">URL</TableHead>
+                  <TableHead className="text-base font-semibold text-gray-900 py-6">Event</TableHead>
+                  <TableHead className="text-base font-semibold text-gray-900 py-6">Status</TableHead>
+                  <TableHead className="w-32 text-base font-semibold text-gray-900 py-6">Handlinger</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {webhooks.map(wh => (
-                  <TableRow key={wh.id}>
-                    <TableCell>{wh.url}</TableCell>
-                    <TableCell>{wh.event}</TableCell>
-                    <TableCell>{wh.active ? <span className="text-green-700 font-semibold">Aktiv</span> : <span className="text-gray-500">Inaktiv</span>}</TableCell>
-                    <TableCell><Button size="sm" variant="outline">Test</Button></TableCell>
+                  <TableRow key={wh.id} className="hover:bg-blue-50 transition-colors duration-200">
+                    <TableCell className="text-base py-6">{wh.url}</TableCell>
+                    <TableCell className="text-base py-6">{wh.event}</TableCell>
+                    <TableCell className="py-6">
+                      <Badge 
+                        variant={wh.active ? "default" : "secondary"}
+                        className="text-sm px-3 py-1"
+                      >
+                        {wh.active ? "Aktiv" : "Inaktiv"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="py-6">
+                      <Button size="sm" variant="outline" className="text-sm px-4 py-2">
+                        Test
+                      </Button>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
           </div>
-          <Button className="mt-4">Legg til webhook</Button>
         </CardContent>
       </Card>
+      
       {/* Eksterne tjenester */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Eksterne tjenester</CardTitle>
+      <Card className="shadow-lg border-0">
+        <CardHeader className="pb-6">
+          <CardTitle className="text-2xl font-bold text-gray-900">Eksterne tjenester</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {services.map(svc => (
               <div 
                 key={svc.id} 
-                className={`border rounded-lg p-4 flex flex-col gap-2 bg-slate-50 ${svc.path ? 'cursor-pointer hover:shadow-lg hover:border-blue-500 transition-all' : ''}`}
+                className={`border-2 rounded-xl p-6 flex flex-col gap-4 bg-white hover:shadow-lg transition-all duration-300 ${
+                  svc.path ? 'cursor-pointer hover:border-blue-500 hover:shadow-blue-100' : ''
+                }`}
                 onClick={() => handleServiceClick(svc.path)}
               >
-                <div className="flex items-center gap-2 mb-2">
-                  <svc.icon className="h-6 w-6 text-blue-700" />
-                  <span className="font-semibold text-lg">{svc.name}</span>
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="p-3 bg-blue-100 rounded-lg">
+                    <svc.icon className="h-6 w-6 text-blue-700" />
+                  </div>
+                  <span className="font-semibold text-xl text-gray-900">{svc.name}</span>
                 </div>
-                <div className="text-sm text-gray-700">Status: <span className={svc.status === "Aktiv" ? "text-green-700 font-semibold" : "text-gray-500"}>{svc.status}</span></div>
-                {svc.apiUrl && <div className="text-xs text-gray-500">API-url: {svc.apiUrl}</div>}
-                {svc.token && <div className="text-xs text-gray-500">Token: {svc.token}</div>}
-                {!svc.path && <Button size="sm" variant="outline" className="mt-2">Test tilkobling</Button>}
+                <div className="space-y-2">
+                  <div className="text-base text-gray-700">
+                    Status: 
+                    <Badge 
+                      variant={svc.status === "Aktiv" ? "default" : "secondary"}
+                      className="ml-2 text-sm"
+                    >
+                      {svc.status}
+                    </Badge>
+                  </div>
+                  {svc.apiUrl && (
+                    <div className="text-sm text-gray-500 break-all">
+                      API-url: {svc.apiUrl}
+                    </div>
+                  )}
+                  {svc.token && (
+                    <div className="text-sm text-gray-500">
+                      Token: {svc.token}
+                    </div>
+                  )}
+                </div>
+                {!svc.path && (
+                  <Button size="sm" variant="outline" className="mt-4 text-sm">
+                    Test tilkobling
+                  </Button>
+                )}
               </div>
             ))}
           </div>
@@ -135,4 +196,4 @@ const IntegrationsPage: React.FC = () => {
   );
 };
 
-export default IntegrationsPage; 
+export default IntegrationsPage;
