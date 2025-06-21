@@ -116,7 +116,7 @@ export function FacilityListItemContent({
   };
 
   const suitableActivities = getSuitableActivities();
-  const maxVisibleTags = 2;
+  const maxVisibleTags = 3;
 
   console.log('FacilityListItemContent - Facility:', facility.name, 'SuitableFor:', facility.suitableFor, 'Type:', facility.type, 'Area:', facility.area, 'Derived activities:', suitableActivities);
 
