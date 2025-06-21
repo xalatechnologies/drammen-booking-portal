@@ -86,4 +86,4 @@ export function BookingStatusCard({
   );
 }
 
-export { BookingStatusCardProps };
+export type { BookingStatusCardProps };

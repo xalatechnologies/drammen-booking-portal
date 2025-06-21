@@ -5,7 +5,17 @@ import { BookingsTabs } from '@/components/bookings/BookingsTabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { PaymentForm } from '@/components/booking/PaymentForm';
-import { BookingStatusCard } from '@/components/booking/BookingStatusCard';
+import { BookingStatusCard, BookingStatus } from '@/components/booking/BookingStatusCard';
+
+interface Booking {
+  id: string;
+  status: 'pending' | 'confirmed' | 'cancelled' | 'draft';
+  facilityName: string;
+  bookingReference: string;
+  amount: number;
+  approvalDate?: Date;
+  paymentDueDate?: Date;
+}
 
 export default function BookingsPage() {
   const [activeTab, setActiveTab] = useState('all');
@@ -26,10 +36,10 @@ export default function BookingsPage() {
   };
 
   // Mock bookings data
-  const mockBookings = [
+  const mockBookings: Booking[] = [
     {
       id: '1',
-      status: 'pending' as const,
+      status: 'pending',
       facilityName: 'Drammen Sportshall',
       bookingReference: 'BOK-2024-001',
       amount: 1500,
@@ -37,7 +47,7 @@ export default function BookingsPage() {
     },
     {
       id: '2', 
-      status: 'confirmed' as const,
+      status: 'confirmed',
       facilityName: 'Konferanserom A',
       bookingReference: 'BOK-2024-002',
       amount: 800,

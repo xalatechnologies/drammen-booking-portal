@@ -2,10 +2,9 @@
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { ActorType } from '@/types/pricing';
-import { PricingMode } from '@/types/pricingModes';
 import { SelectedTimeSlot } from '@/utils/recurrenceEngine';
 import { enhancedPricingEngine } from '@/utils/enhancedPricingEngine';
-import { PricingModeSelector } from './PricingModeSelector';
+import { PricingModeSelector, PricingMode } from './PricingModeSelector';
 
 interface EnhancedPriceCalculationCardProps {
   selectedSlots: SelectedTimeSlot[];
@@ -55,8 +54,8 @@ export function EnhancedPriceCalculationCard({
     );
   }
 
-  // Get available pricing modes for this zone
-  const availableModes = enhancedPricingEngine.getAvailablePricingModes(firstSlot.zoneId);
+  // Get available pricing modes for this zone - filter to only hourly and package
+  const availableModes: PricingMode[] = ['hourly', 'package'];
   
   // Calculate pricing for all selected slots
   let totalCalculation = null;
@@ -70,7 +69,7 @@ export function EnhancedPriceCalculationCard({
       endDate,
       actorType as ActorType,
       firstSlot.timeSlot,
-      pricingMode,
+      pricingMode === 'hourly' ? 'hourly' : 'package',
       selectedSlots.length > 1 ? 'fastlan' : 'engangs',
       activityType
     );
@@ -100,8 +99,8 @@ export function EnhancedPriceCalculationCard({
 
         {/* Pricing Mode Selector */}
         <PricingModeSelector
-          value={pricingMode}
-          onChange={setPricingMode}
+          selectedMode={pricingMode}
+          onModeChange={setPricingMode}
           availableModes={availableModes}
         />
         
@@ -149,9 +148,9 @@ export function EnhancedPriceCalculationCard({
               </div>
             )}
 
-            {pricingMode === 'fixed' && (
+            {pricingMode === 'package' && (
               <div className="mt-3 p-2 bg-green-100 rounded text-sm text-green-800">
-                💡 Fastpris gjelder for hele perioden uavhengig av antall tidspunkt
+                💡 Pakke pris gjelder for hele perioden
               </div>
             )}
           </div>

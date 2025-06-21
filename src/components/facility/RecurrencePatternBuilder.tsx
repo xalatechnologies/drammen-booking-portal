@@ -1,31 +1,85 @@
 
-import React from 'react';
+import React, { useState } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { RecurrencePattern, SelectedTimeSlot } from '@/utils/recurrenceEngine';
-import { RecurrenceWizard } from './recurrence/RecurrenceWizard';
 
 interface RecurrencePatternBuilderProps {
   pattern: RecurrencePattern;
   onPatternChange: (pattern: RecurrencePattern) => void;
-  onClose: () => void;
-  onApply?: (pattern: RecurrencePattern) => void;
-  selectedSlots?: SelectedTimeSlot[];
-  facilityId?: string;
+  onApply: (pattern: RecurrencePattern) => void;
+  onCancel: () => void;
+  selectedSlots: SelectedTimeSlot[];
+  facilityId: string;
 }
 
-export function RecurrencePatternBuilder({ 
-  pattern, 
-  onPatternChange, 
-  onClose, 
+export function RecurrencePatternBuilder({
+  pattern,
+  onPatternChange,
   onApply,
+  onCancel,
   selectedSlots,
-  facilityId 
+  facilityId
 }: RecurrencePatternBuilderProps) {
+  const [currentPattern, setCurrentPattern] = useState<RecurrencePattern>(pattern);
+
+  const handlePatternUpdate = (updates: Partial<RecurrencePattern>) => {
+    const newPattern = { ...currentPattern, ...updates };
+    setCurrentPattern(newPattern);
+    onPatternChange(newPattern);
+  };
+
+  const handleApply = () => {
+    onApply(currentPattern);
+  };
+
   return (
-    <RecurrenceWizard
-      pattern={pattern}
-      onPatternChange={onPatternChange}
-      onClose={onClose}
-      onApplyPattern={onApply}
-    />
+    <Card>
+      <CardContent className="p-6 space-y-6">
+        <div>
+          <h3 className="text-lg font-semibold mb-4">Opprett gjentakende booking</h3>
+          <p className="text-gray-600 mb-6">
+            Konfigurer hvordan denne bookingen skal gjentas over tid.
+          </p>
+        </div>
+
+        {/* Pattern configuration would go here */}
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-2">Frekvens</label>
+            <select 
+              value={currentPattern.frequency || 'weekly'}
+              onChange={(e) => handlePatternUpdate({ frequency: e.target.value as any })}
+              className="w-full p-2 border rounded-md"
+            >
+              <option value="daily">Daglig</option>
+              <option value="weekly">Ukentlig</option>
+              <option value="monthly">Månedlig</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-2">Antall gjentakelser</label>
+            <input
+              type="number"
+              value={currentPattern.count || 1}
+              onChange={(e) => handlePatternUpdate({ count: parseInt(e.target.value) })}
+              className="w-full p-2 border rounded-md"
+              min="1"
+              max="52"
+            />
+          </div>
+        </div>
+
+        <div className="flex gap-3 pt-4">
+          <Button variant="outline" onClick={onCancel} className="flex-1">
+            Avbryt
+          </Button>
+          <Button onClick={handleApply} className="flex-1">
+            Opprett gjentakende booking
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
