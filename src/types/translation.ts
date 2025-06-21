@@ -1,4 +1,33 @@
 
+import { Language } from '@/i18n/types';
+
+export interface TranslationKey {
+  id: string;
+  key_path: string;
+  namespace: string;
+  description?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Translation {
+  id: string;
+  translation_key_id: string;
+  language_code: Language;
+  value: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface FacilityContentKey {
+  id: string;
+  facility_id: number;
+  content_type: 'name' | 'description' | 'suitableFor' | 'equipment' | 'amenities';
+  content_key: string;
+  created_at: string;
+}
+
 export interface CoreFacility {
   id: number;
   address_street: string;
@@ -44,4 +73,26 @@ export interface CoreFacility {
   openingHours: any[];
   zones: any[];
   availableTimes: any[];
+}
+
+export interface FacilityView extends CoreFacility {
+  // Translated fields
+  name: string;
+  description: string;
+  suitableFor: string[];
+  equipment: string[];
+  amenities: string[];
+  
+  // Computed fields for backwards compatibility
+  address: string;
+  image: string;
+  pricePerHour: number;
+  accessibility: string[];
+  hasAutoApproval: boolean;
+  nextAvailable: string;
+  timeSlotDuration: 1 | 2;
+  season: {
+    from: string;
+    to: string;
+  };
 }
