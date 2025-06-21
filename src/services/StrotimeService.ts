@@ -179,8 +179,7 @@ export class StrotimeService {
         return {
           success: false,
           error: {
-            message: 'Slot not available',
-            code: 'SLOT_UNAVAILABLE'
+            message: 'Slot not available'
           }
         };
       }
@@ -190,8 +189,7 @@ export class StrotimeService {
         return {
           success: false,
           error: {
-            message: 'Not enough capacity',
-            code: 'INSUFFICIENT_CAPACITY'
+            message: 'Not enough capacity'
           }
         };
       }

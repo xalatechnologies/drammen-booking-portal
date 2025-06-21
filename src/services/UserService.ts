@@ -1,3 +1,4 @@
+
 import { userRepository } from '@/dal/UserRepository';
 import { User, UserFilters, UserCreateRequest, UserUpdateRequest, UserRole } from '@/types/user';
 import { PaginationParams, ApiResponse, PaginatedResponse, RepositoryResponse } from '@/types/api';
@@ -12,7 +13,7 @@ export class UserService {
   ): Promise<ApiResponse<PaginatedResponse<User>>> {
     // Add delay to simulate API call
     await new Promise(resolve => setTimeout(resolve, 200));
-    const result = await userRepository.findAll(pagination, filters, sortField);
+    const result = await userRepository.findAll(pagination, filters?.searchTerm, sortField);
     
     // Convert RepositoryResponse to ApiResponse
     if (result.error) {
@@ -88,14 +89,12 @@ export class UserService {
 
     const userData = {
       ...request,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      isActive: true,
-      profile: {
-        firstName: request.profile?.firstName || '',
-        lastName: request.profile?.lastName || '',
-        preferredLanguage: request.profile?.preferredLanguage || 'NO'
-      }
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      is_active: true,
+      last_login_at: null,
+      permissions: [],
+      preferred_language: 'NO' as const
     };
 
     const result = await userRepository.create(userData);
@@ -179,30 +178,40 @@ export class UserService {
   }
 
   async updateLastLogin(id: string): Promise<ApiResponse<User>> {
-    return userRepository.updateLastLogin(id);
+    const result = await userRepository.updateLastLogin(id);
+    
+    if (result.error) {
+      return {
+        success: false,
+        error: { message: result.error }
+      };
+    }
+    
+    return {
+      success: true,
+      data: result.data!
+    };
   }
 
   async authenticateUser(email: string, password: string): Promise<ApiResponse<User>> {
     await new Promise(resolve => setTimeout(resolve, 500)); // Simulate auth delay
     
     const userResult = await userRepository.findByEmail(email);
-    if (!userResult.success) {
+    if (userResult.error) {
       return {
         success: false,
         error: {
-          message: 'Invalid email or password',
-          code: 'AUTHENTICATION_FAILED'
+          message: 'Invalid email or password'
         }
       };
     }
 
     const user = userResult.data!;
-    if (!user.isActive) {
+    if (!user.is_active) {
       return {
         success: false,
         error: {
-          message: 'User account is inactive',
-          code: 'ACCOUNT_INACTIVE'
+          message: 'User account is inactive'
         }
       };
     }
@@ -222,26 +231,62 @@ export class UserService {
   async changeUserRole(userId: string, newRole: UserRole, permissions?: any[]): Promise<ApiResponse<User>> {
     await new Promise(resolve => setTimeout(resolve, 300));
     
-    return userRepository.update(userId, {
+    const result = await userRepository.update(userId, {
       role: newRole,
       permissions: permissions || []
     });
+
+    if (result.error) {
+      return {
+        success: false,
+        error: { message: result.error }
+      };
+    }
+    
+    return {
+      success: true,
+      data: result.data!
+    };
   }
 
   async deactivateUser(userId: string, reason?: string): Promise<ApiResponse<User>> {
     await new Promise(resolve => setTimeout(resolve, 250));
     
-    return userRepository.update(userId, {
-      isActive: false
+    const result = await userRepository.update(userId, {
+      is_active: false
     });
+
+    if (result.error) {
+      return {
+        success: false,
+        error: { message: result.error }
+      };
+    }
+    
+    return {
+      success: true,
+      data: result.data!
+    };
   }
 
   async reactivateUser(userId: string): Promise<ApiResponse<User>> {
     await new Promise(resolve => setTimeout(resolve, 250));
     
-    return userRepository.update(userId, {
-      isActive: true
+    const result = await userRepository.update(userId, {
+      is_active: true
     });
+
+    if (result.error) {
+      return {
+        success: false,
+        error: { message: result.error }
+      };
+    }
+    
+    return {
+      success: true,
+      data: result.data!
+    };
   }
 
   // Statistics and reporting
@@ -254,11 +299,14 @@ export class UserService {
     await new Promise(resolve => setTimeout(resolve, 200));
     
     const allUsersResult = await userRepository.findAll();
-    if (!allUsersResult.success) {
-      return allUsersResult as any;
+    if (allUsersResult.error) {
+      return {
+        success: false,
+        error: { message: allUsersResult.error }
+      };
     }
 
-    const users = allUsersResult.data!.data;
+    const users = allUsersResult.data || [];
     const now = new Date();
     const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
     
@@ -279,10 +327,10 @@ export class UserService {
       success: true,
       data: {
         totalUsers: users.length,
-        activeUsers: users.filter(u => u.isActive).length,
+        activeUsers: users.filter(u => u.is_active).length,
         usersByRole,
         recentlyActive: users.filter(u => 
-          u.lastLoginAt && u.lastLoginAt > weekAgo
+          u.last_login_at && new Date(u.last_login_at) > weekAgo
         ).length
       }
     };

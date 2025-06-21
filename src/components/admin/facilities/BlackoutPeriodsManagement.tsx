@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -37,7 +38,7 @@ export const BlackoutPeriodsManagement: React.FC<BlackoutPeriodsManagementProps>
     queryFn: () => FacilityService.getFacilities({ page: 1, limit: 100 }, {}, {}),
   });
 
-  const { data: blackoutsResponse, isLoading } = useQuery({
+  const { data: blackoutsData, isLoading } = useQuery({
     queryKey: ['facility-blackouts', editingFacilityId],
     queryFn: () => editingFacilityId ? FacilityBlackoutService.getBlackoutsByFacility(editingFacilityId) : null,
     enabled: !!editingFacilityId,
@@ -82,7 +83,7 @@ export const BlackoutPeriodsManagement: React.FC<BlackoutPeriodsManagementProps>
   });
 
   const facilities = facilitiesResponse?.success ? facilitiesResponse.data?.data || [] : [];
-  const blackouts = blackoutsResponse?.success ? blackoutsResponse.data?.data || [] : [];
+  const blackouts = blackoutsData || [];
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

@@ -1,53 +1,60 @@
 
-import { Zone as BookingZone } from '@/components/booking/types';
-import { Zone as TypesZone } from '@/types/zone';
+import { Zone } from '@/types/zone';
 
-export function convertZoneToBookingZone(zone: TypesZone): BookingZone {
+export function convertToLegacyZone(zone: Zone): any {
   return {
     id: zone.id,
     name: zone.name,
+    facilityId: zone.facility_id.toString(),
+    type: zone.type,
     capacity: zone.capacity,
-    equipment: zone.equipment,
-    pricePerHour: zone.pricing.basePrice,
-    description: zone.description || '',
-    area: `${zone.area} m²`,
-    parentZoneId: zone.parentZoneId,
-    isMainZone: zone.isMainZone,
-    subZones: [], // Could be derived from child zones if needed
-    bookingRules: {
-      minBookingDuration: Math.floor(zone.pricing.minimumBookingDuration / 60), // Convert minutes to hours
-      maxBookingDuration: Math.floor(zone.pricing.maximumBookingDuration / 60), // Convert minutes to hours
-      allowedTimeSlots: generateTimeSlots(),
-      bookingTypes: ['one-time', 'recurring', 'fixed-lease'],
-      advanceBookingDays: 90,
-      cancellationHours: zone.pricing.cancellationPolicy.freeUntilHours
+    description: zone.description,
+    isMainZone: zone.is_main_zone,
+    parentZoneId: zone.parent_zone_id,
+    bookableIndependently: zone.bookable_independently,
+    areaSqm: zone.area_sqm,
+    floor: zone.floor,
+    coordinates: {
+      x: zone.coordinates_x || 0,
+      y: zone.coordinates_y || 0,
+      width: zone.coordinates_width || 0,
+      height: zone.coordinates_height || 0
     },
-    adminInfo: {
-      contactPersonName: "Facility Manager",
-      contactPersonEmail: "manager@drammen.kommune.no",
-      specialInstructions: zone.description || '',
-      maintenanceSchedule: zone.availability.maintenanceSchedule.map(m => ({
-        day: new Date(m.startDate).toLocaleDateString('no-NO', { weekday: 'long' }),
-        startTime: m.startDate.toTimeString().slice(0, 5),
-        endTime: m.endDate.toTimeString().slice(0, 5)
-      }))
+    equipment: zone.equipment || [],
+    accessibilityFeatures: zone.accessibility_features || [],
+    status: zone.status,
+    createdAt: zone.created_at,
+    updatedAt: zone.updated_at,
+    dimensions: {
+      width: zone.coordinates_width || 0,
+      length: zone.coordinates_height || 0,
+      height: 3
     },
-    layout: {
-      coordinates: zone.coordinates || { x: 0, y: 0, width: 100, height: 100 },
-      entryPoints: ["Hovedinngang"]
-    },
-    accessibility: zone.accessibility,
-    features: zone.features,
-    restrictions: zone.restrictions.prohibitedActivities,
-    isActive: zone.isActive
+    conflictRules: []
   };
 }
 
-function generateTimeSlots(): string[] {
-  return [
-    "08:00-09:00", "09:00-10:00", "10:00-11:00", "11:00-12:00",
-    "12:00-13:00", "13:00-14:00", "14:00-15:00", "15:00-16:00",
-    "16:00-17:00", "17:00-18:00", "18:00-19:00", "19:00-20:00",
-    "20:00-21:00", "21:00-22:00"
-  ];
+export function convertFromLegacyZone(legacyZone: any): Zone {
+  return {
+    id: legacyZone.id,
+    name: legacyZone.name,
+    facility_id: parseInt(legacyZone.facilityId),
+    type: legacyZone.type,
+    capacity: legacyZone.capacity,
+    description: legacyZone.description,
+    is_main_zone: legacyZone.isMainZone,
+    parent_zone_id: legacyZone.parentZoneId,
+    bookable_independently: legacyZone.bookableIndependently,
+    area_sqm: legacyZone.areaSqm,
+    floor: legacyZone.floor,
+    coordinates_x: legacyZone.coordinates?.x || 0,
+    coordinates_y: legacyZone.coordinates?.y || 0,
+    coordinates_width: legacyZone.coordinates?.width || 0,
+    coordinates_height: legacyZone.coordinates?.height || 0,
+    equipment: legacyZone.equipment || [],
+    accessibility_features: legacyZone.accessibilityFeatures || [],
+    status: legacyZone.status,
+    created_at: legacyZone.createdAt,
+    updated_at: legacyZone.updatedAt
+  };
 }

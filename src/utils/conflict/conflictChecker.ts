@@ -1,127 +1,96 @@
 
-import { Zone, BookingConflict } from "@/components/booking/types";
-import { ExistingBooking } from "./types";
+import { Booking, BookingConflict } from '@/types/booking';
+import { Zone } from '@/types/zone';
 
-export class ConflictChecker {
-  constructor(
-    protected zones: Zone[],
-    protected existingBookings: ExistingBooking[]
-  ) {}
+export function checkForConflicts(
+  booking: Booking,
+  existingBookings: Booking[],
+  zones: Zone[]
+): BookingConflict[] {
+  const conflicts: BookingConflict[] = [];
+  const bookingStart = new Date(booking.start_date);
+  const bookingEnd = new Date(booking.end_date);
 
-  /**
-   * Check if a zone booking conflicts with existing bookings
-   */
-  checkZoneConflict(
-    zoneId: string,
-    date: Date,
-    timeSlot: string
-  ): BookingConflict | null {
-    const zone = this.zones.find(z => z.id === zoneId);
-    if (!zone) return null;
+  // Check for overlapping bookings in the same zone
+  const overlappingBookings = existingBookings.filter(existing => {
+    if (existing.id === booking.id) return false;
+    if (existing.zone_id !== booking.zone_id) return false;
+    if (existing.status === 'cancelled') return false;
 
-    const dateKey = date.toDateString();
-    
-    // Check direct conflicts (same zone, same time)
-    const directConflict = this.existingBookings.find(booking => 
-      booking.zoneId === zoneId && 
-      booking.date.toDateString() === dateKey && 
-      booking.timeSlot === timeSlot
-    );
+    const existingStart = new Date(existing.start_date);
+    const existingEnd = new Date(existing.end_date);
 
-    if (directConflict) {
-      return {
-        conflictType: 'zone-conflict',
-        conflictingBookingId: directConflict.id,
-        conflictingZoneId: directConflict.zoneId,
-        conflictingZoneName: zone.name,
-        timeSlot,
-        date,
-        bookedBy: directConflict.bookedBy
-      };
-    }
+    return bookingStart < existingEnd && bookingEnd > existingStart;
+  });
 
-    // If booking the main zone (whole facility), check if any sub-zones are booked
-    if (zone.isMainZone && zone.subZones) {
-      for (const subZoneId of zone.subZones) {
-        const subZoneConflict = this.existingBookings.find(booking => 
-          booking.zoneId === subZoneId && 
-          booking.date.toDateString() === dateKey && 
-          booking.timeSlot === timeSlot
-        );
+  overlappingBookings.forEach(conflicting => {
+    conflicts.push({
+      id: `conflict-${Date.now()}-${Math.random()}`,
+      booking_id: booking.id,
+      conflict_type: 'time_overlap',
+      conflict_description: `Overlapping booking in the same zone`,
+      conflict_severity: 'high',
+      resolved: false,
+      created_at: new Date().toISOString(),
+      conflicting_booking_id: conflicting.id,
+      resolved_by: null,
+      resolved_at: null,
+      resolution_notes: null
+    });
+  });
 
-        if (subZoneConflict) {
-          const subZone = this.zones.find(z => z.id === subZoneId);
-          return {
-            conflictType: 'sub-zone-conflict',
-            conflictingBookingId: subZoneConflict.id,
-            conflictingZoneId: subZoneConflict.zoneId,
-            conflictingZoneName: subZone?.name || 'Ukjent sone',
-            timeSlot,
-            date,
-            bookedBy: subZoneConflict.bookedBy
-          };
-        }
-      }
-    }
+  // Check for zone conflicts (mutually exclusive zones)
+  const currentZone = zones.find(z => z.id === booking.zone_id);
+  if (currentZone?.conflictRules) {
+    currentZone.conflictRules.forEach(rule => {
+      const conflictingZoneBookings = existingBookings.filter(existing => {
+        if (existing.id === booking.id) return false;
+        if (existing.zone_id !== rule.conflictingZoneId) return false;
+        if (existing.status === 'cancelled') return false;
 
-    // If booking a sub-zone, check if the main zone is booked
-    if (zone.parentZoneId) {
-      const mainZoneConflict = this.existingBookings.find(booking => 
-        booking.zoneId === zone.parentZoneId && 
-        booking.date.toDateString() === dateKey && 
-        booking.timeSlot === timeSlot
-      );
+        const existingStart = new Date(existing.start_date);
+        const existingEnd = new Date(existing.end_date);
 
-      if (mainZoneConflict) {
-        const mainZone = this.zones.find(z => z.id === zone.parentZoneId);
-        return {
-          conflictType: 'whole-facility-conflict',
-          conflictingBookingId: mainZoneConflict.id,
-          conflictingZoneId: mainZoneConflict.zoneId,
-          conflictingZoneName: mainZone?.name || 'Hele lokalet',
-          timeSlot,
-          date,
-          bookedBy: mainZoneConflict.bookedBy
-        };
-      }
-    }
+        return bookingStart < existingEnd && bookingEnd > existingStart;
+      });
 
-    return null;
+      conflictingZoneBookings.forEach(conflicting => {
+        conflicts.push({
+          id: `conflict-${Date.now()}-${Math.random()}`,
+          booking_id: booking.id,
+          conflict_type: 'zone_conflict',
+          conflict_description: `Zone conflict: ${rule.description}`,
+          conflict_severity: rule.type === 'mutually_exclusive' ? 'high' : 'medium',
+          resolved: false,
+          created_at: new Date().toISOString(),
+          conflicting_booking_id: conflicting.id,
+          resolved_by: null,
+          resolved_at: null,
+          resolution_notes: null
+        });
+      });
+    });
   }
 
-  /**
-   * Check if a zone can be booked for multiple time slots (for recurring bookings)
-   */
-  checkMultiSlotAvailability(
-    zoneId: string,
-    dates: Date[],
-    timeSlot: string
-  ): { available: boolean; conflicts: BookingConflict[] } {
-    const conflicts: BookingConflict[] = [];
-    
-    for (const date of dates) {
-      const conflict = this.checkZoneConflict(zoneId, date, timeSlot);
-      if (conflict) {
-        conflicts.push(conflict);
-      }
-    }
+  return conflicts;
+}
 
-    return {
-      available: conflicts.length === 0,
-      conflicts
-    };
-  }
-
-  protected getConflictReason(conflict: BookingConflict): 'booked' | 'maintenance' | 'whole-facility-booked' | 'sub-zone-conflict' {
-    switch (conflict.conflictType) {
-      case 'zone-conflict':
-        return 'booked';
-      case 'whole-facility-conflict':
-        return 'whole-facility-booked';
-      case 'sub-zone-conflict':
-        return 'sub-zone-conflict';
-      default:
-        return 'booked';
-    }
-  }
+export function resolveConflict(
+  conflictId: string,
+  resolution: 'approve_both' | 'reject_new' | 'modify_time',
+  notes?: string
+): BookingConflict {
+  return {
+    id: conflictId,
+    booking_id: '',
+    conflict_type: 'resolved',
+    conflict_description: `Conflict resolved: ${resolution}`,
+    conflict_severity: 'low',
+    resolved: true,
+    created_at: new Date().toISOString(),
+    conflicting_booking_id: null,
+    resolved_by: 'admin',
+    resolved_at: new Date().toISOString(),
+    resolution_notes: notes || null
+  };
 }

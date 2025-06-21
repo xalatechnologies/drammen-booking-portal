@@ -1,50 +1,55 @@
 
-import { Zone, ZoneAvailabilityStatus, BookingConflict } from "@/components/booking/types";
-import { ConflictChecker } from "./conflictChecker";
-import { ExistingBooking, ConflictReason } from "./types";
+import { Zone } from '@/types/zone';
+import { ZoneAvailabilityStatus } from '@/components/booking/types';
 
-export class AvailabilityUtils extends ConflictChecker {
-  constructor(zones: Zone[], existingBookings: ExistingBooking[]) {
-    super(zones, existingBookings);
-  }
+export function checkZoneAvailability(
+  zone: Zone,
+  startTime: Date,
+  endTime: Date,
+  existingBookings: any[] = []
+): ZoneAvailabilityStatus {
+  const conflicts: string[] = [];
+  const restrictions: string[] = [];
 
-  /**
-   * Get availability status for all zones for a specific date and time
-   */
-  getZoneAvailabilityStatus(date: Date, timeSlot: string): ZoneAvailabilityStatus[] {
-    return this.zones.map(zone => {
-      const conflict = this.checkZoneConflict(zone.id, date, timeSlot);
-      
-      return {
-        zoneId: zone.id,
-        date,
-        timeSlot,
-        isAvailable: !conflict && zone.isActive,
-        conflictReason: conflict ? this.getConflictReason(conflict) : undefined,
-        conflictDetails: conflict || undefined
-      };
-    });
-  }
-
-  /**
-   * Get available alternative zones when a preferred zone is unavailable
-   */
-  getAlternativeZones(
-    preferredZoneId: string,
-    date: Date,
-    timeSlot: string,
-    requiredCapacity: number
-  ): Zone[] {
-    const availabilityStatuses = this.getZoneAvailabilityStatus(date, timeSlot);
+  // Check for overlapping bookings
+  const overlappingBookings = existingBookings.filter(booking => {
+    const bookingStart = new Date(booking.start_date);
+    const bookingEnd = new Date(booking.end_date);
     
-    return this.zones.filter(zone => {
-      const status = availabilityStatuses.find(s => s.zoneId === zone.id);
-      return (
-        zone.id !== preferredZoneId &&
-        status?.isAvailable &&
-        zone.capacity >= requiredCapacity &&
-        zone.isActive
-      );
-    });
+    return (
+      (startTime < bookingEnd && endTime > bookingStart) &&
+      booking.zone_id === zone.id &&
+      booking.status !== 'cancelled'
+    );
+  });
+
+  if (overlappingBookings.length > 0) {
+    conflicts.push(`Zone is already booked for ${overlappingBookings.length} overlapping time slots`);
   }
+
+  // Check zone status
+  if (zone.status !== 'active') {
+    restrictions.push(`Zone is currently ${zone.status}`);
+  }
+
+  const isAvailable = conflicts.length === 0 && restrictions.length === 0;
+
+  return {
+    zoneId: zone.id,
+    isAvailable,
+    conflicts,
+    restrictions
+  };
+}
+
+export function findAvailableZones(
+  zones: Zone[],
+  startTime: Date,
+  endTime: Date,
+  existingBookings: any[] = []
+): Zone[] {
+  return zones.filter(zone => {
+    const availability = checkZoneAvailability(zone, startTime, endTime, existingBookings);
+    return availability.isAvailable;
+  });
 }

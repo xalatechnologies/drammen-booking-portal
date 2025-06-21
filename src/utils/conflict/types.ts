@@ -1,22 +1,27 @@
 
-import { Zone, BookingConflict, ZoneAvailabilityStatus } from "@/components/booking/types";
-
-export interface ExistingBooking {
-  id: string;
-  zoneId: string;
-  date: Date;
-  timeSlot: string;
-  bookedBy: string;
-}
+import { Booking } from '@/types/booking';
+import { ZoneAvailabilityStatus } from '@/components/booking/types';
 
 export interface ConflictCheckResult {
-  conflict: BookingConflict | null;
-  isAvailable: boolean;
+  hasConflicts: boolean;
+  conflictingBookings: Booking[];
+  availableAlternatives: AlternativeSlot[];
 }
 
-export interface MultiSlotCheckResult {
-  available: boolean;
-  conflicts: BookingConflict[];
+export interface AlternativeSlot {
+  startTime: Date;
+  endTime: Date;
+  zoneId: string;
+  zoneName: string;
+  reason: string;
 }
 
-export type ConflictReason = 'booked' | 'maintenance' | 'whole-facility-booked' | 'sub-zone-conflict';
+export interface ConflictRule {
+  id: string;
+  sourceZoneId: string;
+  conflictingZoneId: string;
+  type: 'mutually_exclusive' | 'partial_overlap' | 'noise_conflict';
+  description: string;
+}
+
+export { ZoneAvailabilityStatus };
