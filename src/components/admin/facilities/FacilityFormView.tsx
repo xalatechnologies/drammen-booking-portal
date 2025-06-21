@@ -1,228 +1,535 @@
-
-import React, { useState, useEffect } from "react";
+import React from "react";
+import { useForm } from "react-hook-form";
+import { useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Save, Trash2 } from "lucide-react";
-import { useFacility } from "@/hooks/useFacility";
-import { Facility } from "@/types/facility";
-import PageHeader from "@/components/admin/PageHeader";
-import FacilityBasicInfoForm from "./FacilityBasicInfoForm";
-import FacilityImageUpload from "./FacilityImageUpload";
-import OpeningHoursManagement from "./OpeningHoursManagement";
-import ZoneManagementView from "./ZoneManagementView";
+import { FacilityService } from "@/services/facilityService";
+import { ZoneManagementView } from "./ZoneManagementView";
+import { OpeningHoursManagement } from "./OpeningHoursManagement";
+import { BlackoutPeriodsManagement } from "./BlackoutPeriodsManagement";
+import { PricingRulesManagement } from "./PricingRulesManagement";
+import { FacilityAnalyticsDashboard } from "./FacilityAnalyticsDashboard";
+import { ArrowLeft } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
 
 interface FacilityFormViewProps {
-  facilityId?: number;
-  onBack: () => void;
+  facility?: any;
+  onSuccess: () => void;
+  onCancel: () => void;
 }
 
 export const FacilityFormView: React.FC<FacilityFormViewProps> = ({
-  facilityId,
-  onBack,
+  facility,
+  onSuccess,
+  onCancel
 }) => {
-  const { facility: existingFacility, isLoading } = useFacility(facilityId || 0);
-  const [facility, setFacility] = useState<Partial<Facility>>({
-    name: "",
-    type: "",
-    address: "",
-    area: "",
-    description: "",
-    capacity: 1,
-    area_sqm: null,
-    pricePerHour: 450,
-    status: "active",
-    image: "",
-    amenities: [],
-    accessibility: [],
-    equipment: [],
-    hasAutoApproval: false,
+  const isEditing = !!facility;
+  
+  const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm({
+    defaultValues: {
+      name: facility?.name || "",
+      type: facility?.type || "",
+      address_street: facility?.address_street || "",
+      address_city: facility?.address_city || "",
+      address_postal_code: facility?.address_postal_code || "",
+      area: facility?.area || "",
+      description: facility?.description || "",
+      capacity: facility?.capacity || 1,
+      price_per_hour: facility?.price_per_hour || 450,
+      status: facility?.status || "active",
+      has_auto_approval: facility?.has_auto_approval || false,
+      contact_email: facility?.contact_email || "",
+      contact_phone: facility?.contact_phone || "",
+      contact_name: facility?.contact_name || "",
+    }
   });
-  const [images, setImages] = useState<string[]>([]);
-  const [isSaving, setIsSaving] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const isEditMode = !!facilityId;
+  const mutation = useMutation({
+    mutationFn: (data: any) => {
+      if (isEditing) {
+        return FacilityService.updateFacility(facility.id.toString(), data);
+      } else {
+        return FacilityService.createFacility(data);
+      }
+    },
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: `Facility ${isEditing ? 'updated' : 'created'} successfully`,
+      });
+      onSuccess();
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || `Failed to ${isEditing ? 'update' : 'create'} facility`,
+        variant: "destructive",
+      });
+    },
+  });
 
-  // Load existing facility data
-  useEffect(() => {
-    if (existingFacility) {
-      setFacility(existingFacility);
-      setImages(existingFacility.image ? [existingFacility.image] : []);
-    }
-  }, [existingFacility]);
-
-  const validateForm = (): boolean => {
-    const newErrors: Record<string, string> = {};
-
-    if (!facility.name?.trim()) {
-      newErrors.name = "Navn er påkrevd";
-    }
-    if (!facility.type) {
-      newErrors.type = "Type er påkrevd";
-    }
-    if (!facility.address?.trim()) {
-      newErrors.address = "Adresse er påkrevd";
-    }
-    if (!facility.area?.trim()) {
-      newErrors.area = "Område er påkrevd";
-    }
-    if (!facility.capacity || facility.capacity < 1) {
-      newErrors.capacity = "Kapasitet må være minst 1";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+  const onSubmit = (data: any) => {
+    mutation.mutate(data);
   };
-
-  const handleSave = async () => {
-    if (!validateForm()) {
-      return;
-    }
-
-    setIsSaving(true);
-    try {
-      const facilityData = {
-        ...facility,
-        image: images[0] || null, // Use first image as main image
-      };
-
-      // TODO: Implement actual save logic here
-      console.log("Saving facility:", facilityData);
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      alert(isEditMode ? "Facilitet oppdatert!" : "Facilitet opprettet!");
-      onBack();
-    } catch (error) {
-      console.error("Error saving facility:", error);
-      alert("Feil ved lagring av facilitet");
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  const handleDelete = async () => {
-    if (!isEditMode) return;
-    
-    const confirmed = confirm("Er du sikker på at du vil slette denne fasiliteten?");
-    if (!confirmed) return;
-
-    try {
-      // TODO: Implement actual delete logic here
-      console.log("Deleting facility:", facilityId);
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      alert("Facilitet slettet!");
-      onBack();
-    } catch (error) {
-      console.error("Error deleting facility:", error);
-      alert("Feil ved sletting av facilitet");
-    }
-  };
-
-  if (isLoading && isEditMode) {
-    return (
-      <div className="w-full p-8 text-center">
-        <div className="text-lg text-gray-500">Laster facilitet...</div>
-      </div>
-    );
-  }
 
   return (
-    <div className="w-full space-y-6 p-8">
-      <PageHeader
-        title={isEditMode ? `Rediger: ${facility.name}` : "Ny facilitet"}
-        description={isEditMode ? "Oppdater fasilitets informasjon og innstillinger" : "Opprett en ny facilitet med all nødvendig informasjon"}
-        actions={
-          <div className="flex items-center space-x-4">
-            <Button variant="outline" onClick={onBack} size="lg" className="text-base px-6 py-3">
-              <ArrowLeft className="w-5 h-5 mr-2" />
-              Tilbake
-            </Button>
-            {isEditMode && (
-              <Button 
-                variant="destructive" 
-                onClick={handleDelete} 
-                size="lg" 
-                className="text-base px-6 py-3"
-              >
-                <Trash2 className="w-5 h-5 mr-2" />
-                Slett
-              </Button>
-            )}
-            <Button 
-              onClick={handleSave} 
-              disabled={isSaving} 
-              size="lg" 
-              className="text-base px-6 py-3"
-            >
-              <Save className="w-5 h-5 mr-2" />
-              {isSaving ? "Lagrer..." : "Lagre"}
-            </Button>
-          </div>
-        }
-      />
+    <div className="w-full space-y-8 p-8">
+      <div className="flex items-center space-x-4">
+        <Button variant="outline" size="lg" onClick={onCancel} className="text-base px-6 py-3">
+          <ArrowLeft className="w-5 h-5 mr-2" />
+          Back to Facilities
+        </Button>
+        <h1 className="text-4xl font-bold text-gray-900">
+          {isEditing ? `Edit: ${facility.name}` : 'Add New Facility'}
+        </h1>
+      </div>
 
-      <Card className="shadow-lg border-0">
-        <CardContent className="p-0">
-          <Tabs defaultValue="basic" className="w-full">
-            <TabsList className="grid w-full grid-cols-4 h-14 bg-gray-50 rounded-none">
-              <TabsTrigger value="basic" className="text-base py-3">
-                Grunninfo
-              </TabsTrigger>
-              <TabsTrigger value="images" className="text-base py-3">
-                Bilder
-              </TabsTrigger>
-              <TabsTrigger value="hours" className="text-base py-3">
-                Åpningstider
-              </TabsTrigger>
-              <TabsTrigger value="zones" className="text-base py-3">
-                Soner
-              </TabsTrigger>
-            </TabsList>
+      {isEditing ? (
+        <Tabs defaultValue="details" className="w-full">
+          <TabsList className="grid w-full grid-cols-6 h-14 bg-white border border-gray-200 rounded-lg p-1">
+            <TabsTrigger value="details" className="text-base py-3 data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+              Facility Details
+            </TabsTrigger>
+            <TabsTrigger value="zones" className="text-base py-3 data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+              Zones
+            </TabsTrigger>
+            <TabsTrigger value="hours" className="text-base py-3 data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+              Opening Hours
+            </TabsTrigger>
+            <TabsTrigger value="blackouts" className="text-base py-3 data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+              Blackouts
+            </TabsTrigger>
+            <TabsTrigger value="pricing" className="text-base py-3 data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+              Pricing
+            </TabsTrigger>
+            <TabsTrigger value="analytics" className="text-base py-3 data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+              Analytics
+            </TabsTrigger>
+          </TabsList>
 
-            <div className="p-6">
-              <TabsContent value="basic" className="mt-0">
-                <FacilityBasicInfoForm
-                  facility={facility}
-                  onUpdate={(updates) => setFacility(prev => ({ ...prev, ...updates }))}
-                  errors={errors}
-                />
-              </TabsContent>
+          <TabsContent value="details" className="mt-8">
+            <Card className="shadow-lg border-0">
+              <CardHeader className="pb-6">
+                <CardTitle className="text-2xl font-bold text-gray-900">Facility Information</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-3">
+                      <Label htmlFor="name" className="text-base font-medium">Name *</Label>
+                      <Input
+                        id="name"
+                        className="h-12 text-base"
+                        {...register("name", { required: "Name is required" })}
+                      />
+                      {errors.name && (
+                        <p className="text-sm text-red-500">{errors.name.message as string}</p>
+                      )}
+                    </div>
 
-              <TabsContent value="images" className="mt-0">
-                <FacilityImageUpload
-                  images={images}
-                  onImagesChange={setImages}
-                  maxImages={5}
-                />
-              </TabsContent>
+                    <div className="space-y-3">
+                      <Label htmlFor="type" className="text-base font-medium">Type *</Label>
+                      <Select onValueChange={(value) => setValue("type", value)} defaultValue={watch("type")}>
+                        <SelectTrigger className="h-12 text-base">
+                          <SelectValue placeholder="Select facility type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="gym">Gym</SelectItem>
+                          <SelectItem value="hall">Hall</SelectItem>
+                          <SelectItem value="court">Court</SelectItem>
+                          <SelectItem value="room">Room</SelectItem>
+                          <SelectItem value="field">Field</SelectItem>
+                          <SelectItem value="pool">Pool</SelectItem>
+                          <SelectItem value="auditorium">Auditorium</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
 
-              <TabsContent value="hours" className="mt-0">
-                <OpeningHoursManagement
-                  facilityId={facilityId}
-                  openingHours={facility.openingHours || []}
-                  onOpeningHoursChange={(hours) => setFacility(prev => ({ ...prev, openingHours: hours }))}
-                />
-              </TabsContent>
+                    <div className="space-y-3">
+                      <Label htmlFor="area" className="text-base font-medium">Area *</Label>
+                      <Select onValueChange={(value) => setValue("area", value)} defaultValue={watch("area")}>
+                        <SelectTrigger className="h-12 text-base">
+                          <SelectValue placeholder="Select area" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="drammen-sentrum">Drammen Sentrum</SelectItem>
+                          <SelectItem value="stromso">Strømsø</SelectItem>
+                          <SelectItem value="bragernes">Bragernes</SelectItem>
+                          <SelectItem value="tanganvik">Tangen/Åsvik</SelectItem>
+                          <SelectItem value="other">Other</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
 
-              <TabsContent value="zones" className="mt-0">
-                {facilityId ? (
-                  <ZoneManagementView facilityId={facilityId} />
-                ) : (
-                  <div className="text-center py-8 text-gray-500">
-                    <p className="text-base">Lagre fasiliteten først for å administrere soner</p>
+                    <div className="space-y-3">
+                      <Label htmlFor="status" className="text-base font-medium">Status</Label>
+                      <Select onValueChange={(value) => setValue("status", value)} defaultValue={watch("status")}>
+                        <SelectTrigger className="h-12 text-base">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="active">Active</SelectItem>
+                          <SelectItem value="maintenance">Maintenance</SelectItem>
+                          <SelectItem value="inactive">Inactive</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-3">
+                      <Label htmlFor="capacity" className="text-base font-medium">Capacity *</Label>
+                      <Input
+                        id="capacity"
+                        type="number"
+                        min="1"
+                        className="h-12 text-base"
+                        {...register("capacity", { 
+                          required: "Capacity is required",
+                          min: { value: 1, message: "Capacity must be at least 1" }
+                        })}
+                      />
+                      {errors.capacity && (
+                        <p className="text-sm text-red-500">{errors.capacity.message as string}</p>
+                      )}
+                    </div>
+
+                    <div className="space-y-3">
+                      <Label htmlFor="price_per_hour" className="text-base font-medium">Price per Hour (NOK) *</Label>
+                      <Input
+                        id="price_per_hour"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        className="h-12 text-base"
+                        {...register("price_per_hour", { 
+                          required: "Price is required",
+                          min: { value: 0, message: "Price cannot be negative" }
+                        })}
+                      />
+                      {errors.price_per_hour && (
+                        <p className="text-sm text-red-500">{errors.price_per_hour.message as string}</p>
+                      )}
+                    </div>
                   </div>
-                )}
-              </TabsContent>
-            </div>
-          </Tabs>
-        </CardContent>
-      </Card>
+
+                  <div className="space-y-6">
+                    <h3 className="text-xl font-semibold text-gray-900">Address</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      <div className="space-y-3 md:col-span-2">
+                        <Label htmlFor="address_street" className="text-base font-medium">Street Address *</Label>
+                        <Input
+                          id="address_street"
+                          className="h-12 text-base"
+                          {...register("address_street", { required: "Street address is required" })}
+                        />
+                        {errors.address_street && (
+                          <p className="text-sm text-red-500">{errors.address_street.message as string}</p>
+                        )}
+                      </div>
+
+                      <div className="space-y-3">
+                        <Label htmlFor="address_postal_code" className="text-base font-medium">Postal Code *</Label>
+                        <Input
+                          id="address_postal_code"
+                          className="h-12 text-base"
+                          {...register("address_postal_code", { required: "Postal code is required" })}
+                        />
+                        {errors.address_postal_code && (
+                          <p className="text-sm text-red-500">{errors.address_postal_code.message as string}</p>
+                        )}
+                      </div>
+
+                      <div className="space-y-3">
+                        <Label htmlFor="address_city" className="text-base font-medium">City *</Label>
+                        <Input
+                          id="address_city"
+                          className="h-12 text-base"
+                          {...register("address_city", { required: "City is required" })}
+                        />
+                        {errors.address_city && (
+                          <p className="text-sm text-red-500">{errors.address_city.message as string}</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-6">
+                    <h3 className="text-xl font-semibold text-gray-900">Contact Information</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      <div className="space-y-3">
+                        <Label htmlFor="contact_name" className="text-base font-medium">Contact Name</Label>
+                        <Input id="contact_name" className="h-12 text-base" {...register("contact_name")} />
+                      </div>
+
+                      <div className="space-y-3">
+                        <Label htmlFor="contact_email" className="text-base font-medium">Contact Email</Label>
+                        <Input id="contact_email" type="email" className="h-12 text-base" {...register("contact_email")} />
+                      </div>
+
+                      <div className="space-y-3">
+                        <Label htmlFor="contact_phone" className="text-base font-medium">Contact Phone</Label>
+                        <Input id="contact_phone" className="h-12 text-base" {...register("contact_phone")} />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <Label htmlFor="description" className="text-base font-medium">Description</Label>
+                    <Textarea
+                      id="description"
+                      rows={4}
+                      className="text-base resize-none"
+                      {...register("description")}
+                      placeholder="Enter facility description..."
+                    />
+                  </div>
+
+                  <div className="flex items-center space-x-3">
+                    <Checkbox
+                      id="has_auto_approval"
+                      checked={watch("has_auto_approval")}
+                      onCheckedChange={(checked) => setValue("has_auto_approval", checked)}
+                      className="w-5 h-5"
+                    />
+                    <Label htmlFor="has_auto_approval" className="text-base font-medium">Enable automatic booking approval</Label>
+                  </div>
+
+                  <div className="flex justify-end space-x-4 pt-6">
+                    <Button variant="outline" type="button" size="lg" onClick={onCancel} className="text-base px-8 py-3">
+                      Cancel
+                    </Button>
+                    <Button type="submit" size="lg" disabled={mutation.isPending} className="text-base px-8 py-3">
+                      {mutation.isPending ? "Saving..." : (isEditing ? "Update Facility" : "Create Facility")}
+                    </Button>
+                  </div>
+                </form>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="zones" className="mt-8">
+            <ZoneManagementView selectedFacilityId={facility.id} />
+          </TabsContent>
+
+          <TabsContent value="hours" className="mt-8">
+            <OpeningHoursManagement selectedFacilityId={facility.id} />
+          </TabsContent>
+
+          <TabsContent value="blackouts" className="mt-8">
+            <BlackoutPeriodsManagement selectedFacilityId={facility.id} />
+          </TabsContent>
+
+          <TabsContent value="pricing" className="mt-8">
+            <PricingRulesManagement selectedFacilityId={facility.id} />
+          </TabsContent>
+
+          <TabsContent value="analytics" className="mt-8">
+            <FacilityAnalyticsDashboard selectedFacilityId={facility.id} />
+          </TabsContent>
+        </Tabs>
+      ) : (
+        <Card className="shadow-lg border-0">
+          <CardHeader className="pb-6">
+            <CardTitle className="text-2xl font-bold text-gray-900">New Facility Information</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-3">
+                  <Label htmlFor="name" className="text-base font-medium">Name *</Label>
+                  <Input
+                    id="name"
+                    className="h-12 text-base"
+                    {...register("name", { required: "Name is required" })}
+                  />
+                  {errors.name && (
+                    <p className="text-sm text-red-500">{errors.name.message as string}</p>
+                  )}
+                </div>
+
+                <div className="space-y-3">
+                  <Label htmlFor="type" className="text-base font-medium">Type *</Label>
+                  <Select onValueChange={(value) => setValue("type", value)} defaultValue={watch("type")}>
+                    <SelectTrigger className="h-12 text-base">
+                      <SelectValue placeholder="Select facility type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="gym">Gym</SelectItem>
+                      <SelectItem value="hall">Hall</SelectItem>
+                      <SelectItem value="court">Court</SelectItem>
+                      <SelectItem value="room">Room</SelectItem>
+                      <SelectItem value="field">Field</SelectItem>
+                      <SelectItem value="pool">Pool</SelectItem>
+                      <SelectItem value="auditorium">Auditorium</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-3">
+                  <Label htmlFor="area" className="text-base font-medium">Area *</Label>
+                  <Select onValueChange={(value) => setValue("area", value)} defaultValue={watch("area")}>
+                    <SelectTrigger className="h-12 text-base">
+                      <SelectValue placeholder="Select area" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="drammen-sentrum">Drammen Sentrum</SelectItem>
+                      <SelectItem value="stromso">Strømsø</SelectItem>
+                      <SelectItem value="bragernes">Bragernes</SelectItem>
+                      <SelectItem value="tanganvik">Tangen/Åsvik</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-3">
+                  <Label htmlFor="status" className="text-base font-medium">Status</Label>
+                  <Select onValueChange={(value) => setValue("status", value)} defaultValue={watch("status")}>
+                    <SelectTrigger className="h-12 text-base">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="active">Active</SelectItem>
+                      <SelectItem value="maintenance">Maintenance</SelectItem>
+                      <SelectItem value="inactive">Inactive</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-3">
+                  <Label htmlFor="capacity" className="text-base font-medium">Capacity *</Label>
+                  <Input
+                    id="capacity"
+                    type="number"
+                    min="1"
+                    className="h-12 text-base"
+                    {...register("capacity", { 
+                      required: "Capacity is required",
+                      min: { value: 1, message: "Capacity must be at least 1" }
+                    })}
+                  />
+                  {errors.capacity && (
+                    <p className="text-sm text-red-500">{errors.capacity.message as string}</p>
+                  )}
+                </div>
+
+                <div className="space-y-3">
+                  <Label htmlFor="price_per_hour" className="text-base font-medium">Price per Hour (NOK) *</Label>
+                  <Input
+                    id="price_per_hour"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    className="h-12 text-base"
+                    {...register("price_per_hour", { 
+                      required: "Price is required",
+                      min: { value: 0, message: "Price cannot be negative" }
+                    })}
+                  />
+                  {errors.price_per_hour && (
+                    <p className="text-sm text-red-500">{errors.price_per_hour.message as string}</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="space-y-6">
+                <h3 className="text-xl font-semibold text-gray-900">Address</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="space-y-3 md:col-span-2">
+                    <Label htmlFor="address_street" className="text-base font-medium">Street Address *</Label>
+                    <Input
+                      id="address_street"
+                      className="h-12 text-base"
+                      {...register("address_street", { required: "Street address is required" })}
+                    />
+                    {errors.address_street && (
+                      <p className="text-sm text-red-500">{errors.address_street.message as string}</p>
+                    )}
+                  </div>
+
+                  <div className="space-y-3">
+                    <Label htmlFor="address_postal_code" className="text-base font-medium">Postal Code *</Label>
+                    <Input
+                      id="address_postal_code"
+                      className="h-12 text-base"
+                      {...register("address_postal_code", { required: "Postal code is required" })}
+                    />
+                    {errors.address_postal_code && (
+                      <p className="text-sm text-red-500">{errors.address_postal_code.message as string}</p>
+                    )}
+                  </div>
+
+                  <div className="space-y-3">
+                    <Label htmlFor="address_city" className="text-base font-medium">City *</Label>
+                    <Input
+                      id="address_city"
+                      className="h-12 text-base"
+                      {...register("address_city", { required: "City is required" })}
+                    />
+                    {errors.address_city && (
+                      <p className="text-sm text-red-500">{errors.address_city.message as string}</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-6">
+                <h3 className="text-xl font-semibold text-gray-900">Contact Information</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="space-y-3">
+                    <Label htmlFor="contact_name" className="text-base font-medium">Contact Name</Label>
+                    <Input id="contact_name" className="h-12 text-base" {...register("contact_name")} />
+                  </div>
+
+                  <div className="space-y-3">
+                    <Label htmlFor="contact_email" className="text-base font-medium">Contact Email</Label>
+                    <Input id="contact_email" type="email" className="h-12 text-base" {...register("contact_email")} />
+                  </div>
+
+                  <div className="space-y-3">
+                    <Label htmlFor="contact_phone" className="text-base font-medium">Contact Phone</Label>
+                    <Input id="contact_phone" className="h-12 text-base" {...register("contact_phone")} />
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <Label htmlFor="description" className="text-base font-medium">Description</Label>
+                <Textarea
+                  id="description"
+                  rows={4}
+                  className="text-base resize-none"
+                  {...register("description")}
+                  placeholder="Enter facility description..."
+                />
+              </div>
+
+              <div className="flex items-center space-x-3">
+                <Checkbox
+                  id="has_auto_approval"
+                  checked={watch("has_auto_approval")}
+                  onCheckedChange={(checked) => setValue("has_auto_approval", checked)}
+                  className="w-5 h-5"
+                />
+                <Label htmlFor="has_auto_approval" className="text-base font-medium">Enable automatic booking approval</Label>
+              </div>
+
+              <div className="flex justify-end space-x-4 pt-6">
+                <Button variant="outline" type="button" size="lg" onClick={onCancel} className="text-base px-8 py-3">
+                  Cancel
+                </Button>
+                <Button type="submit" size="lg" disabled={mutation.isPending} className="text-base px-8 py-3">
+                  {mutation.isPending ? "Creating..." : "Create Facility"}
+                </Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };
