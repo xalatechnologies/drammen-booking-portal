@@ -18,4 +18,18 @@
   - `AllocatedTime.tsx` - Allocated time overview
 - All text is now primarily in Norwegian with English fallbacks
 - Fixed translation function calls to use proper parameter order
+- Build completed successfully with no errors
+
+## 2024-12-19 - Redesign Overview Page for Umbrella Administrators
+
+- Completely redesigned the Overview page to be more targeted and functional for umbrella administrators
+- Added four main sections as requested:
+  1. **Mine tildelte tider (Rammetid)** - Calendar overview with utilization metrics and status
+  2. **Fordelinger til klubber/foreninger** - List of time distributions with edit/recall actions
+  3. **Frigitt tid** - Overview of released time (automatic/manual) with conversion status
+  4. **Historikk og logg** - Activity log showing who did what and when
+- Added **Varsler** sidebar with relevant notifications (expiring times, unused hours, etc.)
+- Updated translation file with new Norwegian terms for the redesigned sections
+- Improved UI with better visual hierarchy and actionable elements
+- Added mock data to demonstrate the functionality
 - Build completed successfully with no errors 

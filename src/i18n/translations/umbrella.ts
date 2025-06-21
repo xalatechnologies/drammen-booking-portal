@@ -26,8 +26,40 @@ export const umbrellaTranslations = {
 
     // Overview page
     overview: {
-      title: "Oversikt",
-      description: "Dashboard oversikt og sammendrag av nøkkeltall",
+      title: "Oversiktsside for Paraplyorganisasjon",
+      description: "Administrer tildelt rammetid og fordeling til underaktører",
+      allocatedTime: {
+        title: "Mine tildelte tider (Rammetid)",
+        description: "Kalenderoversikt over rammetid og status",
+        total: "Totalt tildelt",
+        used: "Fordelt",
+        remaining: "Ufordelt",
+        utilization: "Utnyttelse",
+        viewCalendar: "Se kalenderoversikt"
+      },
+      distributions: {
+        title: "Fordelinger til klubber/foreninger",
+        description: "Liste over hvilke tider som er fordelt til hvem",
+        hours: "timer",
+        edit: "Endre",
+        recall: "Tilbakekall"
+      },
+      releasedTime: {
+        title: "Frigitt tid",
+        description: "Oversikt over tider som er frigitt (automatisk eller manuelt)",
+        released: "Frigitt",
+        converted: "Konvertert til strøtimer",
+        notConverted: "Ikke konvertert"
+      },
+      notifications: {
+        title: "Varsler",
+        description: "Kun relevante varsler"
+      },
+      history: {
+        title: "Historikk og logg",
+        description: "Hvem som har gjort hva",
+        viewAll: "Se all historikk"
+      },
       cards: {
         bookings: {
           title: "Reservasjoner",
@@ -215,7 +247,9 @@ export const umbrellaTranslations = {
       approved: "Godkjent",
       rejected: "Avvist",
       completed: "Fullført",
-      cancelled: "Kansellert"
+      cancelled: "Kansellert",
+      new: "Ny",
+      adjust: "Juster tid"
     }
   },
   EN: {
@@ -245,8 +279,40 @@ export const umbrellaTranslations = {
 
     // Overview page
     overview: {
-      title: "Overview",
-      description: "Dashboard overview and summary of key metrics",
+      title: "Umbrella Organization Overview",
+      description: "Manage allocated time and distribution to subcontractors",
+      allocatedTime: {
+        title: "My Allocated Time (Frame Time)",
+        description: "Calendar overview of frame time and status",
+        total: "Total Allocated",
+        used: "Distributed",
+        remaining: "Undistributed",
+        utilization: "Utilization",
+        viewCalendar: "View Calendar Overview"
+      },
+      distributions: {
+        title: "Distributions to clubs/associations",
+        description: "List of which times are distributed to whom",
+        hours: "hours",
+        edit: "Edit",
+        recall: "Recall"
+      },
+      releasedTime: {
+        title: "Released Time",
+        description: "Overview of times that have been released (automatic or manual)",
+        released: "Released",
+        converted: "Converted to spare hours",
+        notConverted: "Not converted"
+      },
+      notifications: {
+        title: "Notifications",
+        description: "Only relevant notifications"
+      },
+      history: {
+        title: "History and Log",
+        description: "Who has done what",
+        viewAll: "View All History"
+      },
       cards: {
         bookings: {
           title: "Bookings",
@@ -434,7 +500,9 @@ export const umbrellaTranslations = {
       approved: "Approved",
       rejected: "Rejected",
       completed: "Completed",
-      cancelled: "Cancelled"
+      cancelled: "Cancelled",
+      new: "New",
+      adjust: "Adjust Time"
     }
   }
 }; 
