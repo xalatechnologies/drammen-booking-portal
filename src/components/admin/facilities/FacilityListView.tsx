@@ -93,7 +93,7 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
     if (isLoading) {
       return (
         <div className="text-center py-8">
-          {tSync("common.actions.loading", "Loading facilities...")}
+          {tSync("admin.common.loading", "Laster...")}
         </div>
       );
     }
@@ -101,7 +101,7 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
     if (filteredFacilities.length === 0) {
       return (
         <div className="text-center py-8 text-gray-500">
-          {tSync("facility.search.noResults", "No facilities found matching your criteria.")}
+          {tSync("admin.facilities.search.noResults", "Ingen lokaler funnet som matcher dine kriterier.")}
         </div>
       );
     }
@@ -166,7 +166,7 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
             {tSync("admin.facilities.management", "Facilities Management")}
           </h1>
           <p className="text-gray-600">
-            {tSync("admin.sidebar.descriptions.facilities", "Manage facility information, availability, and settings")}
+            {tSync("admin.facilities.pageDescription", "Administrer lokalinformasjon, tilgjengelighet og innstillinger")}
           </p>
         </div>
         <Button onClick={handleAddNew} className="flex items-center gap-2">

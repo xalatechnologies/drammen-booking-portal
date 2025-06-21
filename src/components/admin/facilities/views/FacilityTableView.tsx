@@ -1,10 +1,10 @@
 
 import React from "react";
-import { Grid3X3, Calendar, Settings } from "lucide-react";
+import { Eye, Calendar, Settings, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useTranslation } from "@/hooks/useTranslation";
 
 interface FacilityTableViewProps {
@@ -22,90 +22,112 @@ export const FacilityTableView: React.FC<FacilityTableViewProps> = ({
 }) => {
   const { tSync } = useTranslation();
 
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'active':
+        return 'bg-green-100 text-green-800';
+      case 'maintenance':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'inactive':
+        return 'bg-red-100 text-red-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
   return (
-    <TooltipProvider>
-      <Card>
-        <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <table className="w-full text-lg">
-              <thead className="border-b bg-gray-50">
-                <tr>
-                  <th className="text-left p-5 font-medium text-lg">Name</th>
-                  <th className="text-left p-5 font-medium text-lg">Type</th>
-                  <th className="text-left p-5 font-medium text-lg">Location</th>
-                  <th className="text-left p-5 font-medium text-lg">Capacity</th>
-                  <th className="text-left p-5 font-medium text-lg">Area (m²)</th>
-                  <th className="text-left p-5 font-medium text-lg">Status</th>
-                  <th className="text-left p-5 font-medium text-lg">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {facilities.map((facility) => (
-                  <tr key={facility.id} className="border-b hover:bg-gray-50">
-                    <td className="p-5">
-                      <div>
-                        <div className="font-medium text-lg">{facility.name}</div>
-                        <div className="text-base text-gray-500">{facility.area}</div>
-                      </div>
-                    </td>
-                    <td className="p-5 text-base">{facility.type}</td>
-                    <td className="p-5 text-base">
-                      {facility.address_street}, {facility.address_city}
-                    </td>
-                    <td className="p-5 text-base">{facility.capacity} people</td>
-                    <td className="p-5 text-base">{facility.area_sqm || 'N/A'} m²</td>
-                    <td className="p-5">
-                      <Badge
-                        variant={facility.status === 'active' ? 'default' : 
-                                facility.status === 'maintenance' ? 'secondary' : 'destructive'}
-                        className="text-sm"
-                      >
-                        {facility.status}
-                      </Badge>
-                    </td>
-                    <td className="p-5">
-                      <div className="flex gap-2">
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button variant="outline" size="sm" onClick={() => onView(facility)}>
-                              <Grid3X3 className="h-4 w-4" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>{tSync('admin.facilities.actions.view_details', 'View facility details')}</p>
-                          </TooltipContent>
-                        </Tooltip>
-                        
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button variant="outline" size="sm" onClick={() => onCalendar(facility)}>
-                              <Calendar className="h-4 w-4" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>{tSync('admin.facilities.actions.view_calendar', 'View calendar')}</p>
-                          </TooltipContent>
-                        </Tooltip>
-                        
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button variant="outline" size="sm" onClick={() => onEdit(facility)}>
-                              <Settings className="h-4 w-4" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>{tSync('admin.facilities.actions.edit_settings', 'Edit facility settings')}</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </CardContent>
-      </Card>
-    </TooltipProvider>
+    <Card>
+      <CardContent className="p-0">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="text-base font-semibold">
+                {tSync("admin.facilities.table.name", "Name")}
+              </TableHead>
+              <TableHead className="text-base font-semibold">
+                {tSync("admin.facilities.details.type", "Type:")}
+              </TableHead>
+              <TableHead className="text-base font-semibold">
+                {tSync("admin.facilities.details.capacity", "Kapasitet:")}
+              </TableHead>
+              <TableHead className="text-base font-semibold">
+                {tSync("admin.facilities.table.location", "Location")}
+              </TableHead>
+              <TableHead className="text-base font-semibold">
+                {tSync("admin.facilities.table.status", "Status")}
+              </TableHead>
+              <TableHead className="text-base font-semibold text-right">
+                {tSync("admin.facilities.table.actions", "Actions")}
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {facilities.map((facility) => (
+              <TableRow key={facility.id} className="hover:bg-gray-50">
+                <TableCell className="font-medium text-base">
+                  <div className="flex flex-col">
+                    <span className="font-semibold">{facility.name}</span>
+                    <span className="text-sm text-gray-500">{facility.area}</span>
+                  </div>
+                </TableCell>
+                <TableCell className="text-base">
+                  <Badge variant="outline" className="text-sm">
+                    {tSync(`admin.facilities.types.${facility.type}`, facility.type)}
+                  </Badge>
+                </TableCell>
+                <TableCell className="text-base">
+                  {facility.capacity} {tSync("admin.facilities.details.people", "personer")}
+                </TableCell>
+                <TableCell className="text-base">
+                  <div className="flex items-center gap-1 text-gray-600">
+                    <MapPin className="h-4 w-4" />
+                    <span className="text-sm">
+                      {facility.address_city || tSync("admin.facilities.details.notAvailable", "Ikke tilgjengelig")}
+                    </span>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <Badge className={`text-sm ${getStatusColor(facility.status)}`}>
+                    {tSync(`admin.facilities.status.${facility.status}`, facility.status)}
+                  </Badge>
+                </TableCell>
+                <TableCell className="text-right">
+                  <div className="flex justify-end gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onView(facility)}
+                      className="h-8 px-2"
+                      aria-label={tSync("admin.facilities.actions.view_details", "Se detaljer om lokalet")}
+                    >
+                      <Eye className="h-4 w-4" />
+                      <span className="sr-only">{tSync("admin.facilities.actions.view", "Vis")}</span>
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onCalendar(facility)}
+                      className="h-8 px-2"
+                      aria-label={tSync("admin.facilities.actions.view_calendar", "Se kalender")}
+                    >
+                      <Calendar className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onEdit(facility)}
+                      className="h-8 px-2"
+                      aria-label={tSync("admin.facilities.actions.edit_settings", "Rediger lokale innstillinger")}
+                    >
+                      <Settings className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
   );
 };

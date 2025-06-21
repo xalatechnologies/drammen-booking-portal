@@ -27,30 +27,60 @@ type Notification = {
   read: boolean;
 };
 
-const initialNotifications: Notification[] = [
-  { id: "1", title: "Ny forespørsel om lokale", description: "Brandengen Skole ba om godkjenning", timestamp: "2 minutter siden", read: false },
-  { id: "2", title: "Brukerrolle oppdatert", description: "Thomas Hansen er nå administrator", timestamp: "1 time siden", read: false },
-  { id: "3", title: "Systemvarsel", description: "Planlagt vedlikehold i kveld kl. 23:00.", timestamp: "4 timer siden", read: true },
-  { id: "4", title: "Ny melding mottatt", description: "Du har en ny melding fra Per Olsen.", timestamp: "1 dag siden", read: false },
-];
-
-const roleNames: Record<AdminRole, string> = {
-  systemadmin: 'System Admin',
-  admin: 'Admin',
-  saksbehandler: 'Saksbehandler',
-};
-
-const roleAvatars: Record<AdminRole, { src: string; fallback: string }> = {
-  systemadmin: { src: 'https://i.pravatar.cc/150?u=system-admin', fallback: 'SA' },
-  admin: { src: 'https://i.pravatar.cc/150?u=admin', fallback: 'A' },
-  saksbehandler: { src: 'https://i.pravatar.cc/150?u=saksbehandler', fallback: 'SB' },
-};
-
 const AdminHeader = () => {
-  const [notifications, setNotifications] = useState<Notification[]>(initialNotifications);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const { currentRole, setCurrentRole, availableRoles } = useAdminRole();
   const { tSync } = useTranslation();
   const { language, toggleLanguage } = useLanguage();
+
+  // Use database translations for notifications
+  const initialNotifications: Notification[] = [
+    { 
+      id: "1", 
+      title: tSync("admin.notifications.newFacilityRequest.title", "Ny forespørsel om lokale"), 
+      description: tSync("admin.notifications.newFacilityRequest.description", "Brandengen Skole ba om godkjenning"), 
+      timestamp: `2 ${tSync("admin.notifications.time.minutesAgo", "minutter siden")}`, 
+      read: false 
+    },
+    { 
+      id: "2", 
+      title: tSync("admin.notifications.userRoleUpdated.title", "Brukerrolle oppdatert"), 
+      description: tSync("admin.notifications.userRoleUpdated.description", "Thomas Hansen er nå administrator"), 
+      timestamp: `1 ${tSync("admin.notifications.time.hourAgo", "time siden")}`, 
+      read: false 
+    },
+    { 
+      id: "3", 
+      title: tSync("admin.notifications.systemAlert.title", "Systemvarsel"), 
+      description: tSync("admin.notifications.systemAlert.description", "Planlagt vedlikehold i kveld kl. 23:00."), 
+      timestamp: `4 ${tSync("admin.notifications.time.hoursAgo", "timer siden")}`, 
+      read: true 
+    },
+    { 
+      id: "4", 
+      title: tSync("admin.notifications.newMessage.title", "Ny melding mottatt"), 
+      description: tSync("admin.notifications.newMessage.description", "Du har en ny melding fra Per Olsen."), 
+      timestamp: `1 ${tSync("admin.notifications.time.dayAgo", "dag siden")}`, 
+      read: false 
+    },
+  ];
+
+  // Initialize notifications on mount
+  React.useEffect(() => {
+    setNotifications(initialNotifications);
+  }, [language]); // Re-initialize when language changes
+
+  const roleNames: Record<AdminRole, string> = {
+    systemadmin: tSync('admin.roles.systemadmin', 'System Admin'),
+    admin: tSync('admin.roles.admin', 'Admin'),
+    saksbehandler: tSync('admin.roles.saksbehandler', 'Saksbehandler'),
+  };
+
+  const roleAvatars: Record<AdminRole, { src: string; fallback: string }> = {
+    systemadmin: { src: 'https://i.pravatar.cc/150?u=system-admin', fallback: 'SA' },
+    admin: { src: 'https://i.pravatar.cc/150?u=admin', fallback: 'A' },
+    saksbehandler: { src: 'https://i.pravatar.cc/150?u=saksbehandler', fallback: 'SB' },
+  };
 
   const unreadCount = notifications.filter(n => !n.read).length;
 
