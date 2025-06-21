@@ -77,19 +77,19 @@ const CheckoutPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex flex-col">
       <GlobalHeader />
-      <div className="flex-grow py-12">
-        <div className="container mx-auto px-4 max-w-7xl">
-          {/* Enhanced Header */}
-          <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">Fullfør reservasjon</h1>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Gjennomgå og bekreft dine reservasjoner for å sikre din booking
+      <div className="flex-grow py-8">
+        <div className="container mx-auto px-4 max-w-6xl">
+          {/* Compact Header */}
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Fullfør reservasjon</h1>
+            <p className="text-gray-600">
+              Gjennomgå og bekreft dine reservasjoner
             </p>
           </div>
 
           <ProgressIndicator currentStep={step} isAuthenticated={isAuthenticated} />
 
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
             <div className="xl:col-span-2">
               {step === 'review' && (
                 <ReviewStep

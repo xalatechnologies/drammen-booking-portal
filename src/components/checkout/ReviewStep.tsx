@@ -23,40 +23,40 @@ export function ReviewStep({
 
   return (
     <div className="space-y-6">
-      {/* Elegant Summary Header */}
-      <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl">
-        <CardContent className="p-8">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
-                <ShoppingCart className="h-6 w-6 text-white" />
+      {/* Compact Summary */}
+      <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+        <CardContent className="p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                <ShoppingCart className="h-5 w-5 text-white" />
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-gray-900">Dine reservasjoner</h2>
-                <p className="text-gray-600">Gjennomgå detaljene før du fortsetter</p>
+                <h2 className="text-xl font-bold text-gray-900">Gjennomgå reservasjoner</h2>
+                <p className="text-sm text-gray-600">{items.length} reservasjon{items.length !== 1 ? 'er' : ''} • {totalSlots} tidspunkt</p>
               </div>
             </div>
             <div className="text-right">
-              <div className="text-3xl font-bold text-blue-600">{items.length}</div>
-              <div className="text-sm text-gray-500">reservasjon{items.length !== 1 ? 'er' : ''}</div>
+              <div className="text-2xl font-bold text-blue-600">{items.reduce((sum, item) => sum + (item.pricing?.totalPrice || 0), 0)} kr</div>
+              <div className="text-xs text-gray-500">inkl. MVA</div>
             </div>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-blue-50 rounded-xl p-4 text-center">
-              <Calendar className="h-8 w-8 text-blue-600 mx-auto mb-2" />
-              <div className="text-2xl font-bold text-blue-900">{totalSlots}</div>
-              <div className="text-sm text-blue-700">tidspunkt totalt</div>
+          <div className="grid grid-cols-3 gap-4 text-center">
+            <div className="bg-blue-50 rounded-lg p-3">
+              <Calendar className="h-5 w-5 text-blue-600 mx-auto mb-1" />
+              <div className="text-lg font-bold text-blue-900">{totalSlots}</div>
+              <div className="text-xs text-blue-700">tidspunkt</div>
             </div>
-            <div className="bg-green-50 rounded-xl p-4 text-center">
-              <MapPin className="h-8 w-8 text-green-600 mx-auto mb-2" />
-              <div className="text-2xl font-bold text-green-900">{new Set(items.map(item => item.facilityId)).size}</div>
-              <div className="text-sm text-green-700">ulike fasiliteter</div>
+            <div className="bg-green-50 rounded-lg p-3">
+              <MapPin className="h-5 w-5 text-green-600 mx-auto mb-1" />
+              <div className="text-lg font-bold text-green-900">{new Set(items.map(item => item.facilityId)).size}</div>
+              <div className="text-xs text-green-700">fasiliteter</div>
             </div>
-            <div className="bg-purple-50 rounded-xl p-4 text-center">
-              <ShoppingCart className="h-8 w-8 text-purple-600 mx-auto mb-2" />
-              <div className="text-2xl font-bold text-purple-900">{items.reduce((sum, item) => sum + (item.pricing?.totalPrice || 0), 0)}</div>
-              <div className="text-sm text-purple-700">kr totalt</div>
+            <div className="bg-purple-50 rounded-lg p-3">
+              <ShoppingCart className="h-5 w-5 text-purple-600 mx-auto mb-1" />
+              <div className="text-lg font-bold text-purple-900">{items.reduce((sum, item) => sum + (item.timeSlots?.reduce((total, slot) => total + (slot.duration || 2), 0) || 2), 0)}</div>
+              <div className="text-xs text-purple-700">timer totalt</div>
             </div>
           </div>
         </CardContent>
@@ -70,11 +70,11 @@ export function ReviewStep({
       />
       
       {/* Continue Button */}
-      <Card className="bg-gradient-to-r from-blue-600 to-indigo-600 border-0 shadow-xl">
-        <CardContent className="p-6">
+      <Card className="bg-gradient-to-r from-blue-600 to-indigo-600 border-0 shadow-lg">
+        <CardContent className="p-4">
           <Button 
             onClick={onContinue} 
-            className="w-full h-14 text-lg bg-white text-blue-600 hover:bg-blue-50 font-semibold"
+            className="w-full h-12 text-lg bg-white text-blue-600 hover:bg-blue-50 font-semibold"
           >
             Fortsett til kontaktopplysninger →
           </Button>
