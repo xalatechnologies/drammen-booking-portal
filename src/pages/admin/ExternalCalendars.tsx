@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -134,10 +135,9 @@ const ExternalCalendars: React.FC = () => {
                 </div>
                 
                 <Button 
-                  className="mt-6 w-fit" 
+                  className="mt-6 w-fit text-base px-8 py-4"
                   disabled={icsEvents.length === 0}
                   size="lg"
-                  className="text-base px-8 py-4"
                 >
                   Blokker tidene i systemet
                 </Button>
@@ -147,49 +147,49 @@ const ExternalCalendars: React.FC = () => {
         </TabsContent>
         
         <TabsContent value="exchange">
-          <Card>
-            <CardHeader>
-              <CardTitle>Exchange/Outlook-synkronisering</CardTitle>
+          <Card className="shadow-lg border-0">
+            <CardHeader className="pb-6">
+              <CardTitle className="text-2xl font-bold text-gray-900">Exchange/Outlook-synkronisering</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-6">
                 <div className="flex items-center gap-3 mb-2">
                   <RefreshCw className="h-5 w-5 text-blue-600 animate-spin-slow" />
-                  <span className="font-medium">Synkroniserer med Exchange (mock)...</span>
+                  <span className="font-medium text-base">Synkroniserer med Exchange (mock)...</span>
                 </div>
                 <div className="overflow-x-auto mt-2">
                   <Table>
                     <TableHeader>
-                      <TableRow>
-                        <TableHead>Start</TableHead>
-                        <TableHead>Slutt</TableHead>
-                        <TableHead>Emne</TableHead>
-                        <TableHead>Sted</TableHead>
-                        <TableHead>Beskrivelse</TableHead>
+                      <TableRow className="bg-gray-50 border-b-2">
+                        <TableHead className="text-base font-semibold text-gray-900 py-6">Start</TableHead>
+                        <TableHead className="text-base font-semibold text-gray-900 py-6">Slutt</TableHead>
+                        <TableHead className="text-base font-semibold text-gray-900 py-6">Emne</TableHead>
+                        <TableHead className="text-base font-semibold text-gray-900 py-6">Sted</TableHead>
+                        <TableHead className="text-base font-semibold text-gray-900 py-6">Beskrivelse</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {exchangeEvents.length === 0 ? (
                         <TableRow>
-                          <TableCell colSpan={5} className="text-center text-gray-500 py-8">
+                          <TableCell colSpan={5} className="text-center text-gray-500 py-16 text-lg">
                             Ingen hendelser funnet fra Exchange.
                           </TableCell>
                         </TableRow>
                       ) : (
                         exchangeEvents.map(ev => (
-                          <TableRow key={ev.id}>
-                            <TableCell>{ev.start.replace("T", " ").replace(":00", "")}</TableCell>
-                            <TableCell>{ev.end.replace("T", " ").replace(":00", "")}</TableCell>
-                            <TableCell>{ev.subject}</TableCell>
-                            <TableCell>{ev.location}</TableCell>
-                            <TableCell>{ev.body}</TableCell>
+                          <TableRow key={ev.id} className="hover:bg-blue-50 transition-colors duration-200">
+                            <TableCell className="text-base py-6">{ev.start.replace("T", " ").replace(":00", "")}</TableCell>
+                            <TableCell className="text-base py-6">{ev.end.replace("T", " ").replace(":00", "")}</TableCell>
+                            <TableCell className="text-base py-6 font-medium">{ev.subject}</TableCell>
+                            <TableCell className="text-base py-6">{ev.location}</TableCell>
+                            <TableCell className="text-base py-6">{ev.body}</TableCell>
                           </TableRow>
                         ))
                       )}
                     </TableBody>
                   </Table>
                 </div>
-                <Button className="mt-4 w-fit" disabled={exchangeEvents.length === 0}>
+                <Button className="mt-6 w-fit text-base px-8 py-4" disabled={exchangeEvents.length === 0} size="lg">
                   Blokker tidene i systemet
                 </Button>
               </div>

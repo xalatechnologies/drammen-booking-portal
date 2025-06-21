@@ -72,7 +72,46 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground text-base;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+  
+  /* Enhanced global font sizes */
+  h1 { @apply text-4xl font-bold; }
+  h2 { @apply text-3xl font-semibold; }
+  h3 { @apply text-2xl font-medium; }
+  h4 { @apply text-xl font-medium; }
+  h5 { @apply text-lg font-medium; }
+  h6 { @apply text-base font-medium; }
+  
+  p { @apply text-base; }
+  
+  /* Enhanced form elements */
+  input, textarea, select {
+    @apply text-base;
+    font-size: 16px !important;
+  }
+  
+  /* Enhanced button text */
+  button {
+    @apply text-base;
+  }
+  
+  /* Enhanced navigation and menu items */
+  nav a, .nav-item {
+    @apply text-base;
+  }
+  
+  /* Enhanced table text */
+  table td, table th {
+    @apply text-base;
+  }
+  
+  /* Enhanced placeholder text */
+  ::placeholder {
+    @apply text-base;
+    font-size: 16px !important;
   }
 }
 
