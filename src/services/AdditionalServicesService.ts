@@ -1,4 +1,3 @@
-
 import { AdditionalService, ServiceFilters } from '@/types/additionalServices';
 import { PaginatedResponse, PaginationParams, RepositoryResponse, ApiResponse } from '@/types/api';
 import { LocalizedAdditionalServiceRepository } from '@/dal/repositories/LocalizedAdditionalServiceRepository';
@@ -10,35 +9,34 @@ const localizedAdditionalServiceRepository = new LocalizedAdditionalServiceRepos
 // Simulate API delay
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
+// Helper function to convert RepositoryResponse to ApiResponse
+function convertToApiResponse<T>(result: RepositoryResponse<T>): ApiResponse<T> {
+  return {
+    success: !result.error,
+    data: result.data,
+    error: result.error ? { message: result.error } : undefined
+  };
+}
+
 export class AdditionalServicesService {
   static async getServices(
     pagination: PaginationParams,
     filters?: ServiceFilters
-  ): Promise<RepositoryResponse<PaginatedResponse<AdditionalService>>> {
+  ): Promise<ApiResponse<PaginatedResponse<AdditionalService>>> {
     try {
       await delay(300);
 
-      const result = await localizedAdditionalServiceRepository.findAll(
+      const result = await localizedAdditionalServiceRepository.findAllWithPagination(
         pagination,
         filters?.searchTerm,
         filters
       );
 
-      return result;
+      return convertToApiResponse(result);
     } catch (error) {
       return {
-        data: {
-          data: [],
-          pagination: {
-            page: pagination.page,
-            limit: pagination.limit,
-            total: 0,
-            totalPages: 0,
-            hasNext: false,
-            hasPrev: false
-          }
-        },
-        error: "Failed to fetch additional services"
+        success: false,
+        error: { message: "Failed to fetch additional services" }
       };
     }
   }
@@ -70,58 +68,58 @@ export class AdditionalServicesService {
     }
   }
 
-  static async getServiceById(id: string): Promise<RepositoryResponse<AdditionalService | null>> {
+  static async getServiceById(id: string): Promise<ApiResponse<AdditionalService | null>> {
     try {
       await delay(200);
 
       const result = await localizedAdditionalServiceRepository.findById(id);
-      return result;
+      return convertToApiResponse(result);
     } catch (error) {
       return {
-        data: null,
-        error: "Failed to fetch additional service"
+        success: false,
+        error: { message: "Failed to fetch additional service" }
       };
     }
   }
 
-  static async createService(serviceData: Partial<AdditionalService>): Promise<RepositoryResponse<AdditionalService>> {
+  static async createService(serviceData: Partial<AdditionalService>): Promise<ApiResponse<AdditionalService>> {
     try {
       await delay(250);
 
       const result = await localizedAdditionalServiceRepository.create(serviceData);
-      return result;
+      return convertToApiResponse(result);
     } catch (error) {
       return {
-        data: null,
-        error: "Failed to create additional service"
+        success: false,
+        error: { message: "Failed to create additional service" }
       };
     }
   }
 
-  static async updateService(id: string, serviceData: Partial<AdditionalService>): Promise<RepositoryResponse<AdditionalService>> {
+  static async updateService(id: string, serviceData: Partial<AdditionalService>): Promise<ApiResponse<AdditionalService>> {
     try {
       await delay(250);
 
       const result = await localizedAdditionalServiceRepository.update(id, serviceData);
-      return result;
+      return convertToApiResponse(result);
     } catch (error) {
       return {
-        data: null,
-        error: "Failed to update additional service"
+        success: false,
+        error: { message: "Failed to update additional service" }
       };
     }
   }
 
-  static async deleteService(id: string): Promise<RepositoryResponse<boolean>> {
+  static async deleteService(id: string): Promise<ApiResponse<boolean>> {
     try {
       await delay(200);
 
       const result = await localizedAdditionalServiceRepository.delete(id);
-      return result;
+      return convertToApiResponse(result);
     } catch (error) {
       return {
-        data: false,
-        error: "Failed to delete additional service"
+        success: false,
+        error: { message: "Failed to delete additional service" }
       };
     }
   }

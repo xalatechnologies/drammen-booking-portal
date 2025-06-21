@@ -78,7 +78,8 @@ export class LocalizedAdditionalServiceRepository extends BaseRepository<Additio
     };
   }
 
-  async findAll(
+  // Override base findAll to match expected signature for services
+  async findAllWithPagination(
     pagination: PaginationParams,
     searchTerm?: string,
     filters?: ServiceFilters
@@ -118,6 +119,25 @@ export class LocalizedAdditionalServiceRepository extends BaseRepository<Additio
             hasPrev: false
           }
         },
+        error: "Failed to fetch services"
+      };
+    }
+  }
+
+  // Keep base repository findAll for compatibility
+  async findAll(
+    pagination?: PaginationParams,
+    orderBy?: string,
+    orderDirection?: "asc" | "desc"
+  ): Promise<RepositoryResponse<AdditionalService[]>> {
+    try {
+      const services = this.servicesData[this.currentLanguage] || [];
+      return {
+        data: services
+      };
+    } catch (error) {
+      return {
+        data: [],
         error: "Failed to fetch services"
       };
     }

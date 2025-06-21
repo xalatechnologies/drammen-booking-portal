@@ -11,7 +11,8 @@ import {
 } from "@/components/ui/carousel";
 import { FacilityCard } from "@/components/facility/FacilityCard";
 import { useTranslation } from "@/i18n/hooks/useTranslation";
-import { useLocalizedFacilities } from "@/hooks/useLocalizedFacilities";
+import { useFacilities } from "@/hooks/useFacilities";
+import { useLocalization } from "@/contexts/LocalizationContext";
 
 interface SimilarFacilitiesSliderProps {
   currentFacilityId: string;
@@ -20,18 +21,20 @@ interface SimilarFacilitiesSliderProps {
 export function SimilarFacilitiesSlider({ currentFacilityId }: SimilarFacilitiesSliderProps) {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { getLocalizedFacility } = useLocalization();
 
-  // Use the localized facilities hook to get properly translated data
-  const { facilities } = useLocalizedFacilities({
+  // Use the facilities hook to get facility data
+  const { facilities } = useFacilities({
     pagination: { page: 1, limit: 6 },
     filters: {}
   });
 
   // Filter out the current facility and take up to 5 similar ones
-  // No need for manual conversion - the hook now returns localized data
+  // Convert localized facilities to regular facilities for the FacilityCard
   const similarFacilities = facilities
     .filter(facility => facility.id.toString() !== currentFacilityId)
-    .slice(0, 5);
+    .slice(0, 5)
+    .map(facility => getLocalizedFacility(facility));
 
   const handleAddressClick = (e: React.MouseEvent, facility: any) => {
     e.stopPropagation();

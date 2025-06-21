@@ -1,8 +1,9 @@
 
 import React from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { useLocalizedFacilities } from "@/hooks/useLocalizedFacilities";
+import { useFacilities } from "@/hooks/useFacilities";
 import { useFacilitiesPagination } from "@/hooks/useFacilities";
+import { useLocalization } from "@/contexts/LocalizationContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -10,8 +11,9 @@ import { Globe, Check, X } from "lucide-react";
 
 export function LocalizationTestComprehensive() {
   const { language, toggleLanguage } = useLanguage();
+  const { getLocalizedFacility } = useLocalization();
   const { pagination } = useFacilitiesPagination(1, 3);
-  const { facilities, isLoading, error } = useLocalizedFacilities({
+  const { facilities, isLoading, error } = useFacilities({
     pagination,
     filters: {}
   });
@@ -49,11 +51,14 @@ export function LocalizationTestComprehensive() {
 
   const t = translations[language];
 
+  // Convert localized facilities to regular facilities for display
+  const localizedFacilities = facilities.map(facility => getLocalizedFacility(facility));
+
   const isLocalizationWorking = () => {
-    if (!facilities || facilities.length === 0) return false;
+    if (!localizedFacilities || localizedFacilities.length === 0) return false;
     
     // Check if facility names are properly localized (not objects)
-    const firstFacility = facilities[0];
+    const firstFacility = localizedFacilities[0];
     return typeof firstFacility.name === 'string' && 
            typeof firstFacility.description === 'string' &&
            Array.isArray(firstFacility.suitableFor);
@@ -92,20 +97,20 @@ export function LocalizationTestComprehensive() {
               </div>
 
               <div className="text-sm text-gray-600">
-                <p>{t.facilitiesCount}: {facilities?.length || 0}</p>
+                <p>{t.facilitiesCount}: {localizedFacilities?.length || 0}</p>
                 
                 {isLoading && <p>{t.loading}</p>}
                 {error && <p className="text-red-600">{t.error}: {error.message}</p>}
                 
-                {facilities && facilities.length > 0 && (
+                {localizedFacilities && localizedFacilities.length > 0 && (
                   <div className="mt-2">
                     <p className="font-medium">{t.firstFacility}:</p>
                     <div className="ml-4 space-y-1">
-                      <p>Name: {facilities[0].name}</p>
-                      <p>Type: {facilities[0].type}</p>
-                      <p>Area: {facilities[0].area}</p>
+                      <p>Name: {localizedFacilities[0].name}</p>
+                      <p>Type: {localizedFacilities[0].type}</p>
+                      <p>Area: {localizedFacilities[0].area}</p>
                       <div className="flex flex-wrap gap-1">
-                        {facilities[0].suitableFor?.slice(0, 3).map((activity, i) => (
+                        {localizedFacilities[0].suitableFor?.slice(0, 3).map((activity, i) => (
                           <Badge key={i} variant="outline" className="text-xs">
                             {activity}
                           </Badge>
