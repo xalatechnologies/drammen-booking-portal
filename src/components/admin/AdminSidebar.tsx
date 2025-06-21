@@ -125,7 +125,7 @@ const AdminSidebar: React.FC = () => {
         
 
         {/* Navigation */}
-        <nav className="flex-1 p-6">
+        <nav className="flex-1 p-6 py-[80px]">
           <ul className="space-y-3">
             {menuItems.map(item => {
             const isActive = location.pathname === item.href;
