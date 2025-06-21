@@ -9,15 +9,6 @@ export class SupabaseFacilityService {
   private static adaptDatabaseToFacility(dbFacility: any): Facility {
     console.log('SupabaseFacilityService - Raw facility from DB:', dbFacility);
     
-    // Create address from database fields - ensure all fields are preserved
-    const addressParts = [
-      dbFacility.address_street,
-      dbFacility.address_city,
-      dbFacility.address_postal_code
-    ].filter(part => part && part.trim() !== '');
-    
-    const address = addressParts.length > 0 ? addressParts.join(', ') : '';
-
     // Get image from facility_images or fallback
     let image = 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&auto=format&fit=crop';
     
@@ -30,7 +21,11 @@ export class SupabaseFacilityService {
       }
     }
 
-    console.log('SupabaseFacilityService - Computed address:', address);
+    console.log('SupabaseFacilityService - Address fields from DB:', {
+      street: dbFacility.address_street,
+      city: dbFacility.address_city,
+      postal: dbFacility.address_postal_code
+    });
     console.log('SupabaseFacilityService - Using image:', image);
 
     // Direct mapping - keep all database fields as they are
@@ -73,9 +68,9 @@ export class SupabaseFacilityService {
       area_sqm: dbFacility.area_sqm,
       image_url: image,
 
-      // Computed/legacy fields for backward compatibility
-      address,
-      image,
+      // Computed/legacy fields for backward compatibility - use utility functions
+      address: '', // Will be computed by utility
+      image, // Direct assignment
       pricePerHour: dbFacility.price_per_hour || 450,
       accessibility: dbFacility.accessibility_features || [],
       suitableFor: [],

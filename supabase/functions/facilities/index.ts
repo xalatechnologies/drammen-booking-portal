@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
@@ -62,13 +61,14 @@ serve(async (req) => {
           )
         }
 
-        // Fetch single facility with all related data
+        // Fetch single facility with all related data - return RAW database fields
         const { data: facility, error: facilityError } = await supabaseClient
           .from('facilities')
           .select(`
             *,
             facility_opening_hours(day_of_week, open_time, close_time, is_open),
-            zones(id, name, type, capacity, description, bookable_independently, equipment, accessibility_features, status, area_sqm)
+            zones(id, name, type, capacity, description, bookable_independently, equipment, accessibility_features, status, area_sqm),
+            facility_images(id, image_url, alt_text, is_featured, display_order, caption)
           `)
           .eq('id', facilityId)
           .eq('status', 'active')
@@ -82,41 +82,9 @@ serve(async (req) => {
           )
         }
 
-        // Transform the facility data to match frontend expectations
-        const transformedFacility = {
-          id: facility.id,
-          name: facility.name,
-          address: `${facility.address_street}, ${facility.address_city}`,
-          type: facility.type,
-          area: facility.area,
-          description: facility.description,
-          capacity: facility.capacity,
-          image: facility.image_url || 'https://images.unsplash.com/photo-1525361147853-4bf9f54a0e98?w=600&auto=format&fit=crop',
-          nextAvailable: facility.next_available || 'Available now',
-          accessibility: facility.accessibility_features || [],
-          suitableFor: [],
-          equipment: facility.equipment || [],
-          rating: facility.rating || 4.0,
-          reviewCount: facility.review_count || 0,
-          pricePerHour: facility.price_per_hour,
-          amenities: facility.amenities || [],
-          hasAutoApproval: facility.has_auto_approval,
-          timeSlotDuration: facility.time_slot_duration || 1,
-          openingHours: facility.facility_opening_hours?.map(oh => ({
-            dayOfWeek: oh.day_of_week,
-            opens: oh.open_time,
-            closes: oh.close_time
-          })) || [],
-          season: {
-            from: facility.season_from || '2024-01-01',
-            to: facility.season_to || '2024-12-31'
-          },
-          allowedBookingTypes: facility.allowed_booking_types || ['engangs'],
-          zones: facility.zones || []
-        }
-
+        // Return RAW facility data without transformation - let frontend handle it
         return new Response(
-          JSON.stringify({ success: true, data: transformedFacility }),
+          JSON.stringify({ success: true, data: facility }),
           { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         )
       }
@@ -126,12 +94,13 @@ serve(async (req) => {
       const limit = parseInt(url.searchParams.get('limit') || '10')
       const offset = (page - 1) * limit
 
-      // Build query
+      // Build query - return RAW database fields
       let query = supabaseClient
         .from('facilities')
         .select(`
           *,
-          facility_opening_hours(day_of_week, open_time, close_time, is_open)
+          facility_opening_hours(day_of_week, open_time, close_time, is_open),
+          facility_images(id, image_url, alt_text, is_featured, display_order, caption)
         `, { count: 'exact' })
         .eq('status', 'active')
 
@@ -175,38 +144,8 @@ serve(async (req) => {
         )
       }
 
-      // Transform facilities data
-      const transformedFacilities = facilities?.map(facility => ({
-        id: facility.id,
-        name: facility.name,
-        address: `${facility.address_street}, ${facility.address_city}`,
-        type: facility.type,
-        area: facility.area,
-        description: facility.description,
-        capacity: facility.capacity,
-        image: facility.image_url || 'https://images.unsplash.com/photo-1525361147853-4bf9f54a0e98?w=600&auto=format&fit=crop',
-        nextAvailable: facility.next_available || 'Available now',
-        accessibility: facility.accessibility_features || [],
-        suitableFor: [],
-        equipment: facility.equipment || [],
-        rating: facility.rating || 4.0,
-        reviewCount: facility.review_count || 0,
-        pricePerHour: facility.price_per_hour,
-        amenities: facility.amenities || [],
-        hasAutoApproval: facility.has_auto_approval,
-        timeSlotDuration: facility.time_slot_duration || 1,
-        openingHours: facility.facility_opening_hours?.map(oh => ({
-          dayOfWeek: oh.day_of_week,
-          opens: oh.open_time,
-          closes: oh.close_time
-        })) || [],
-        season: {
-          from: facility.season_from || '2024-01-01',
-          to: facility.season_to || '2024-12-31'
-        },
-        allowedBookingTypes: facility.allowed_booking_types || ['engangs'],
-        zones: []
-      })) || []
+      // Return RAW facilities data without transformation - let frontend handle it
+      console.log('Edge function - Raw facilities from DB:', facilities?.[0]);
 
       // Calculate pagination
       const totalPages = Math.ceil((count || 0) / limit)
@@ -217,7 +156,7 @@ serve(async (req) => {
         JSON.stringify({
           success: true,
           data: {
-            data: transformedFacilities,
+            data: facilities || [],
             pagination: {
               page,
               limit,
