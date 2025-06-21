@@ -3,31 +3,48 @@ import { Facility } from '@/types/facility';
 
 export class FacilityConverterService {
   static convertToDisplayFormat(facility: any): Facility {
-    // Compute the address from individual fields
+    // Compute the address from individual fields with proper fallbacks
     const addressParts = [
       facility.address_street,
       facility.address_city,
       facility.address_postal_code
-    ].filter(Boolean);
+    ].filter(part => part && part.trim() !== '');
     
-    const computedAddress = addressParts.join(', ') || 'Address not available';
+    const computedAddress = addressParts.length > 0 
+      ? addressParts.join(', ') 
+      : 'Address not available';
+
+    // Ensure proper image URL with fallback
+    const imageUrl = facility.image_url || 
+      facility.image || 
+      'https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&auto=format&fit=crop';
+
+    console.log('FacilityConverterService - Converting facility:', {
+      id: facility.id,
+      name: facility.name,
+      address_street: facility.address_street,
+      address_city: facility.address_city,
+      address_postal_code: facility.address_postal_code,
+      computedAddress,
+      imageUrl
+    });
 
     return {
       ...facility,
       // Computed fields for backward compatibility
       address: computedAddress,
-      image: facility.image_url || 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&auto=format&fit=crop',
-      pricePerHour: facility.price_per_hour,
-      accessibility: facility.accessibility_features || [],
+      image: imageUrl,
+      pricePerHour: facility.price_per_hour || facility.pricePerHour || 0,
+      accessibility: facility.accessibility_features || facility.accessibility || [],
       suitableFor: this.inferSuitableFor(facility.type),
-      hasAutoApproval: facility.has_auto_approval,
-      nextAvailable: facility.next_available || 'Available now',
-      timeSlotDuration: facility.time_slot_duration as 1 | 2,
-      openingHours: [],
-      zones: [],
+      hasAutoApproval: facility.has_auto_approval ?? facility.hasAutoApproval ?? false,
+      nextAvailable: facility.next_available || facility.nextAvailable || 'Available now',
+      timeSlotDuration: (facility.time_slot_duration || facility.timeSlotDuration || 1) as 1 | 2,
+      openingHours: facility.openingHours || [],
+      zones: facility.zones || [],
       season: {
-        from: facility.season_from || '',
-        to: facility.season_to || ''
+        from: facility.season_from || facility.season?.from || '',
+        to: facility.season_to || facility.season?.to || ''
       }
     };
   }
