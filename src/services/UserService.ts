@@ -89,15 +89,24 @@ export class UserService {
 
     const userData = {
       ...request,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
       isActive: true,
       lastLoginAt: null,
       permissions: request.permissions || [],
       profile: {
         firstName: request.firstName,
         lastName: request.lastName,
-        preferredLanguage: 'NO' as const
+        preferredLanguage: 'NO' as const,
+        notifications: {
+          email: true,
+          sms: false,
+          push: true
+        },
+        bookingPreferences: {
+          defaultDuration: 120,
+          autoRebook: false
+        }
       }
     };
 
@@ -134,7 +143,7 @@ export class UserService {
 
     const updateData = {
       ...request,
-      updatedAt: new Date()
+      updated_at: new Date().toISOString()
     };
 
     const result = await userRepository.update(id, updateData);
@@ -243,7 +252,7 @@ export class UserService {
     const result = await userRepository.update(userId, {
       role: newRole,
       permissions: permissions || [],
-      updatedAt: new Date()
+      updated_at: new Date().toISOString()
     });
 
     if (result.error) {
@@ -264,7 +273,7 @@ export class UserService {
     
     const result = await userRepository.update(userId, {
       isActive: false,
-      updatedAt: new Date()
+      updated_at: new Date().toISOString()
     });
 
     if (result.error) {
@@ -285,7 +294,7 @@ export class UserService {
     
     const result = await userRepository.update(userId, {
       isActive: true,
-      updatedAt: new Date()
+      updated_at: new Date().toISOString()
     });
 
     if (result.error) {

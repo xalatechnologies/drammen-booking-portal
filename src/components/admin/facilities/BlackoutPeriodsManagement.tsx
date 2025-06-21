@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { FacilityBlackoutService } from '@/services/FacilityBlackoutService';
 import { FacilityBlackoutPeriod } from '@/types/facility';
@@ -21,10 +22,10 @@ export function BlackoutPeriodsManagement({ facilityId }: BlackoutPeriodsManagem
   const fetchBlackoutPeriods = async () => {
     setLoading(true);
     try {
-      const response = await FacilityBlackoutService.getBlackoutPeriods(facilityId);
+      const response = await FacilityBlackoutService.getBlackoutsByFacility(parseInt(facilityId));
       
-      if (response.success) {
-        setBlackoutPeriods(response.data || []);
+      if (response.data) {
+        setBlackoutPeriods(response.data);
       } else {
         setError('Failed to fetch blackout periods');
       }
@@ -41,19 +42,21 @@ export function BlackoutPeriodsManagement({ facilityId }: BlackoutPeriodsManagem
     try {
       const newPeriod = {
         facility_id: parseInt(facilityId),
-        start_date: startDate,
-        end_date: endDate,
+        start_date: new Date(startDate),
+        end_date: new Date(endDate),
         reason: reason,
+        type: 'maintenance' as const,
+        created_by: 'admin',
       };
-      const response = await FacilityBlackoutService.createBlackoutPeriod(newPeriod);
-      if (response.success) {
-        setBlackoutPeriods([...blackoutPeriods, response.data!]);
+      const response = await FacilityBlackoutService.createBlackout(newPeriod);
+      if (response.data) {
+        setBlackoutPeriods([...blackoutPeriods, response.data]);
         setStartDate('');
         setEndDate('');
         setReason('');
         await fetchBlackoutPeriods();
       } else {
-        setError(response.error?.message || 'Failed to add blackout period');
+        setError('Failed to add blackout period');
       }
     } catch (err) {
       setError('An error occurred while adding the blackout period');
@@ -66,18 +69,25 @@ export function BlackoutPeriodsManagement({ facilityId }: BlackoutPeriodsManagem
     setLoading(true);
     setError(null);
     try {
-      const response = await FacilityBlackoutService.deleteBlackoutPeriod(periodId);
-      if (response.success) {
+      const response = await FacilityBlackoutService.deleteBlackout(periodId);
+      if (response.data) {
         setBlackoutPeriods(blackoutPeriods.filter(period => period.id !== periodId));
         await fetchBlackoutPeriods();
       } else {
-        setError(response.error?.message || 'Failed to remove blackout period');
+        setError('Failed to remove blackout period');
       }
     } catch (err) {
       setError('An error occurred while removing the blackout period');
     } finally {
       setLoading(false);
     }
+  };
+
+  const formatDate = (date: Date | string) => {
+    if (typeof date === 'string') {
+      return new Date(date).toLocaleDateString();
+    }
+    return date.toLocaleDateString();
   };
 
   if (loading) {
@@ -141,7 +151,7 @@ export function BlackoutPeriodsManagement({ facilityId }: BlackoutPeriodsManagem
             {blackoutPeriods.map((period) => (
               <div key={period.id} className="flex items-center justify-between p-3 border rounded">
                 <div>
-                  {period.start_date} - {period.end_date}: {period.reason}
+                  {formatDate(period.start_date)} - {formatDate(period.end_date)}: {period.reason}
                 </div>
                 <button
                   onClick={() => handleRemoveBlackoutPeriod(period.id)}

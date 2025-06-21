@@ -13,20 +13,20 @@ interface ConflictTooltipProps {
 
 export function ConflictTooltip({ conflict, children }: ConflictTooltipProps) {
   const getConflictMessage = () => {
-    switch (conflict.conflictType) {
+    switch (conflict.conflict_type) {
       case 'zone-conflict':
-        return `Booket av ${conflict.bookedBy}`;
+        return `Booket av bruker`;
       case 'whole-facility-conflict':
-        return `Hele lokalet er booket av ${conflict.bookedBy}`;
+        return `Hele lokalet er booket av bruker`;
       case 'sub-zone-conflict':
-        return `${conflict.conflictingZoneName} er booket av ${conflict.bookedBy}`;
+        return `Sone er booket av bruker`;
       default:
         return 'Ikke tilgjengelig';
     }
   };
 
   const getConflictIcon = () => {
-    switch (conflict.conflictType) {
+    switch (conflict.conflict_type) {
       case 'whole-facility-conflict':
         return <AlertTriangle className="h-3 w-3 text-orange-500" />;
       default:
@@ -35,15 +35,19 @@ export function ConflictTooltip({ conflict, children }: ConflictTooltipProps) {
   };
 
   // Safely format the date with validation
-  const formatSafeDate = (date: Date) => {
-    if (!date || !isValid(date)) {
-      console.warn('Invalid date passed to ConflictTooltip:', date);
+  const formatSafeDate = (dateString?: string) => {
+    if (!dateString) {
+      return 'Ugyldig dato';
+    }
+    const date = new Date(dateString);
+    if (!isValid(date)) {
+      console.warn('Invalid date passed to ConflictTooltip:', dateString);
       return 'Ugyldig dato';
     }
     try {
       return format(date, 'EEEE dd.MM.yyyy', { locale: nb });
     } catch (error) {
-      console.error('Error formatting date in ConflictTooltip:', error, date);
+      console.error('Error formatting date in ConflictTooltip:', error, dateString);
       return 'Ugyldig dato';
     }
   };
@@ -63,7 +67,7 @@ export function ConflictTooltip({ conflict, children }: ConflictTooltipProps) {
             <div className="text-sm text-gray-600">
               <div className="flex items-center gap-1 mb-1">
                 <Clock className="h-3 w-3" />
-                <span>{formatSafeDate(conflict.date)} kl. {conflict.timeSlot}</span>
+                <span>{formatSafeDate(conflict.created_at)}</span>
               </div>
               <div>{getConflictMessage()}</div>
             </div>

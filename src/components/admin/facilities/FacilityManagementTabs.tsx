@@ -47,7 +47,9 @@ export const FacilityManagementTabs: React.FC<FacilityManagementTabsProps> = ({
         </TabsContent>
 
         <TabsContent value="blackouts" className="space-y-4">
-          <BlackoutPeriodsManagement selectedFacilityId={selectedFacilityId} />
+          {selectedFacilityId && (
+            <BlackoutPeriodsManagement facilityId={selectedFacilityId.toString()} />
+          )}
         </TabsContent>
 
         <TabsContent value="pricing" className="space-y-4">

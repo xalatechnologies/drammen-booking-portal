@@ -45,8 +45,9 @@ export const useAdditionalServicesStore = create<AdditionalServicesState>((set, 
       const result = await additionalServiceRepository.findAllWithFilters(pagination, filters);
       
       if (result.error) {
+        const errorMessage = typeof result.error === 'string' ? result.error : result.error.message;
         set({ 
-          error: typeof result.error === 'string' ? result.error : result.error.message,
+          error: errorMessage,
           loading: false 
         });
         return;
@@ -77,8 +78,9 @@ export const useAdditionalServicesStore = create<AdditionalServicesState>((set, 
       const result = await additionalServiceRepository.findById(id);
       
       if (result.error) {
+        const errorMessage = typeof result.error === 'string' ? result.error : result.error.message;
         set({ 
-          error: typeof result.error === 'string' ? result.error : result.error.message,
+          error: errorMessage,
           loading: false 
         });
         return;
@@ -109,8 +111,9 @@ export const useAdditionalServicesStore = create<AdditionalServicesState>((set, 
       const result = await additionalServiceRepository.create(dataWithTimestamps);
       
       if (result.error) {
+        const errorMessage = typeof result.error === 'string' ? result.error : result.error.message;
         set({ 
-          error: typeof result.error === 'string' ? result.error : result.error.message,
+          error: errorMessage,
           loading: false 
         });
         return;
@@ -136,8 +139,9 @@ export const useAdditionalServicesStore = create<AdditionalServicesState>((set, 
       });
       
       if (result.error) {
+        const errorMessage = typeof result.error === 'string' ? result.error : result.error.message;
         set({ 
-          error: typeof result.error === 'string' ? result.error : result.error.message,
+          error: errorMessage,
           loading: false 
         });
         return;
@@ -160,8 +164,9 @@ export const useAdditionalServicesStore = create<AdditionalServicesState>((set, 
       const result = await additionalServiceRepository.delete(id);
       
       if (result.error) {
+        const errorMessage = typeof result.error === 'string' ? result.error : result.error.message;
         set({ 
-          error: typeof result.error === 'string' ? result.error : result.error.message,
+          error: errorMessage,
           loading: false 
         });
         return;
