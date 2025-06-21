@@ -1,15 +1,9 @@
+
 import React, { useState, useCallback } from "react";
-import { format, addDays, startOfWeek } from "date-fns";
-import { nb } from "date-fns/locale";
-import { ChevronLeft, ChevronRight, Calendar, Clock, Users, MapPin, RotateCcw } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { Zone } from "@/components/booking/types";
-import { SelectedTimeSlot, RecurrencePattern, recurrenceEngine } from "@/utils/recurrenceEngine";
-import { useAvailabilityStatus } from "../tabs/useAvailabilityStatus";
-import { BookingForm } from '@/components/booking/BookingForm';
+import { SelectedTimeSlot } from "@/utils/recurrenceEngine";
+import { CalendarWithBooking } from "@/components/shared/CalendarWithBooking";
 
 interface FacilityDetailCalendarProps {
   zones: Zone[];
@@ -35,69 +29,65 @@ export const FacilityDetailCalendar: React.FC<FacilityDetailCalendarProps> = ({
   onRemoveSlot,
   facilityId,
   facilityName,
-  currentPattern,
-  onPatternChange,
-  onPatternApply,
   timeSlotDuration = 1
 }) => {
-  const [currentWeekStart, setCurrentWeekStart] = useState(() =>
-    startOfWeek(new Date(), { weekStartsOn: 1 })
-  );
+  // Mock availability function - replace with real implementation
+  const getAvailabilityStatus = useCallback((zoneId: string, date: Date, timeSlot: string) => {
+    const now = new Date();
+    const timeHour = parseInt(timeSlot.split(':')[0]);
+    const slotDateTime = new Date(date);
+    slotDateTime.setHours(timeHour, 0, 0, 0);
+    
+    if (slotDateTime < now) {
+      return { status: 'unavailable', conflict: null };
+    }
 
-  const handlePreviousWeek = () => {
-    setCurrentWeekStart(prev => addDays(prev, -7));
-  };
+    // Mock random availability
+    const isBooked = Math.random() > 0.8;
+    return { 
+      status: isBooked ? 'busy' : 'available', 
+      conflict: isBooked ? { type: 'existing-booking', details: 'Allerede booket' } : null 
+    };
+  }, []);
 
-  const handleNextWeek = () => {
-    setCurrentWeekStart(prev => addDays(prev, 7));
-  };
+  const isSlotSelected = useCallback((zoneId: string, date: Date, timeSlot: string) => {
+    return selectedSlots.some(slot => 
+      slot.zoneId === zoneId &&
+      slot.date.toDateString() === date.toDateString() &&
+      slot.timeSlot === timeSlot
+    );
+  }, [selectedSlots]);
+
+  const handleContinueBooking = useCallback(() => {
+    // Navigate to booking form or show booking modal
+    console.log('Continue with booking:', selectedSlots);
+  }, [selectedSlots]);
 
   return (
     <div className="container mx-auto mt-8 px-4 lg:px-0">
       <Card className="shadow-lg border-0">
-        <CardHeader className="flex flex-col sm:flex-row items-center justify-between space-y-2 sm:space-y-0 pb-2">
+        <CardHeader>
           <CardTitle className="text-2xl font-semibold tracking-tight">
-            Tilgjengelighet
+            Tilgjengelighet og booking
           </CardTitle>
-          <div className="space-x-2">
-            <Button variant="outline" size="sm" onClick={handlePreviousWeek}>
-              <ChevronLeft className="h-4 w-4 mr-2" />
-              Forrige
-            </Button>
-            <Button variant="outline" size="sm" onClick={handleNextWeek}>
-              Neste
-              <ChevronRight className="h-4 w-4 ml-2" />
-            </Button>
-          </div>
         </CardHeader>
-        <CardContent className="p-0">
-          <div className="grid grid-cols-1 lg:grid-cols-5">
-            {/* Calendar Section */}
-            <div className="lg:col-span-3 p-4">
-              {/* Calendar Component Here */}
-              <p>Kalender kommer her...</p>
-            </div>
-
-            {/* Booking Form Section */}
-            <div className="lg:col-span-2">
-              <div className="sticky top-6">
-                <BookingForm
-                  selectedSlots={selectedSlots}
-                  facilityId={facilityId}
-                  facilityName={facilityName}
-                  zones={zones}
-                  onAddToCart={(bookingData) => {
-                    console.log('FacilityDetailCalendar: Booking added to cart:', bookingData);
-                  }}
-                  onCompleteBooking={(bookingData) => {
-                    console.log('FacilityDetailCalendar: Booking completed:', bookingData);
-                  }}
-                  onSlotsCleared={onClearSlots}
-                  onRemoveSlot={onRemoveSlot}
-                />
-              </div>
-            </div>
-          </div>
+        <CardContent>
+          <CalendarWithBooking
+            facilityName={facilityName}
+            facilityId={facilityId}
+            zones={zones}
+            selectedSlots={selectedSlots}
+            onSlotClick={onSlotClick}
+            onBulkSlotSelection={onBulkSlotSelection}
+            onRemoveSlot={onRemoveSlot}
+            onClearSlots={onClearSlots}
+            onContinueBooking={handleContinueBooking}
+            getAvailabilityStatus={getAvailabilityStatus}
+            isSlotSelected={isSlotSelected}
+            timeSlotDuration={timeSlotDuration}
+            layout="horizontal"
+            compact={false}
+          />
         </CardContent>
       </Card>
     </div>
