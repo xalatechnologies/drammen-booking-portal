@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { PageHeader } from "@/components/layouts";
@@ -6,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Search, Filter, TrendingUp, Calendar, User, Clock } from "lucide-react";
+import { Plus, Search, Filter, Calendar, User, Clock } from "lucide-react";
 import { BookingService } from "@/services/BookingService";
 import { useTranslation } from "@/hooks/useTranslation";
 
@@ -14,6 +15,7 @@ const BookingsOverviewPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterFacility, setFilterFacility] = useState("all");
+  const [filterType, setFilterType] = useState("all");
   const { tSync } = useTranslation();
 
   const { data: bookingsResponse, isLoading, refetch } = useQuery({
