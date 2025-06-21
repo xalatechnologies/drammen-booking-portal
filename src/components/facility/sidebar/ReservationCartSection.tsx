@@ -1,4 +1,3 @@
-
 import React from "react";
 import { ShoppingCart, X, CreditCard, Calendar, Clock, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -27,6 +26,18 @@ const getActorTypeLabel = (actorType: string) => {
     case 'lag-foreninger': return 'Lag/Foreninger';
     case 'paraply': return 'Paraplyorganisasjon';
     default: return 'Ukjent';
+  }
+};
+
+const getEventTypeLabel = (eventType?: string) => {
+  switch (eventType) {
+    case 'sport': return 'Sport';
+    case 'cultural': return 'Kultur';
+    case 'meeting': return 'Møte';
+    case 'training': return 'Trening';
+    case 'competition': return 'Konkurranse';
+    case 'other': return 'Annet';
+    default: return 'Ikke spesifisert';
   }
 };
 
@@ -113,7 +124,7 @@ export function ReservationCartSection({
                             </Badge>
                           </div>
                           
-                          <div className="flex items-center gap-3 text-xs text-gray-600 mb-1">
+                          <div className="flex items-center gap-3 text-xs text-gray-600 mb-2">
                             <div className="flex items-center gap-1">
                               <Calendar className="h-3 w-3" />
                               <span>
@@ -144,11 +155,27 @@ export function ReservationCartSection({
                             )}
                           </div>
                           
-                          <p className="text-xs text-gray-500 truncate mb-1">{item.purpose}</p>
+                          <div className="space-y-1">
+                            <p className="text-xs text-gray-500 truncate">{item.purpose}</p>
+                            
+                            {item.eventType && (
+                              <p className="text-xs text-gray-500">
+                                <span className="font-medium">Type:</span> {getEventTypeLabel(item.eventType)}
+                              </p>
+                            )}
+                            
+                            {item.specialRequirements && (
+                              <p className="text-xs text-gray-500 truncate">
+                                <span className="font-medium">Tillegg:</span> {item.specialRequirements}
+                              </p>
+                            )}
+                          </div>
                           
-                          <Badge variant="outline" className="text-xs">
-                            {getActorTypeLabel(item.organizationType)}
-                          </Badge>
+                          <div className="mt-2">
+                            <Badge variant="outline" className="text-xs">
+                              {getActorTypeLabel(item.organizationType)}
+                            </Badge>
+                          </div>
                         </div>
                         
                         <Button
