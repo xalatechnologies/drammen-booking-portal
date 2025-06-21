@@ -10,7 +10,6 @@ import PageHeader from "@/components/admin/PageHeader";
 import FacilityBasicInfoForm from "./FacilityBasicInfoForm";
 import FacilityImageUpload from "./FacilityImageUpload";
 import { OpeningHoursManagement } from "./OpeningHoursManagement";
-import { ZoneManagementView } from "./ZoneManagementView";
 
 interface FacilityFormViewProps {
   facilityId?: number;
@@ -201,7 +200,6 @@ export const FacilityFormView: React.FC<FacilityFormViewProps> = ({
 
               <TabsContent value="hours" className="mt-0">
                 <OpeningHoursManagement
-                  facilityId={facilityId}
                   openingHours={facility.openingHours || []}
                   onOpeningHoursChange={(hours) => setFacility(prev => ({ ...prev, openingHours: hours }))}
                 />
