@@ -1,8 +1,7 @@
-
 import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
-import { FacilityImageService } from "@/services/FacilityImageService";
+import { FacilityImageService } from "@/services/facilityImageService";
 
 interface FacilityListItemImageProps {
   facilityId: number;
