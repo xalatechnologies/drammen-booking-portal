@@ -4,6 +4,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
 }
 
 serve(async (req) => {
@@ -189,6 +190,8 @@ serve(async (req) => {
         )
       }
 
+      console.log('Creating facility with data:', facilityData)
+
       const { data: facility, error } = await supabaseClient
         .from('facilities')
         .insert([{
@@ -196,14 +199,16 @@ serve(async (req) => {
           address_street: facilityData.address_street || '',
           address_city: facilityData.address_city || '',
           address_postal_code: facilityData.address_postal_code || '',
+          address_country: facilityData.address_country || 'Norway',
           type: facilityData.type,
           area: facilityData.area,
           description: facilityData.description,
           capacity: facilityData.capacity || 1,
+          area_sqm: facilityData.area_sqm || null,
           accessibility_features: facilityData.accessibility_features || [],
           equipment: facilityData.equipment || [],
-          price_per_hour: facilityData.price_per_hour || 450,
           amenities: facilityData.amenities || [],
+          price_per_hour: facilityData.price_per_hour || 450,
           has_auto_approval: facilityData.has_auto_approval || false,
           time_slot_duration: facilityData.time_slot_duration || 1,
           allowed_booking_types: facilityData.allowed_booking_types || ['engangs'],
@@ -211,7 +216,14 @@ serve(async (req) => {
           season_to: facilityData.season_to,
           contact_name: facilityData.contact_name,
           contact_email: facilityData.contact_email,
-          contact_phone: facilityData.contact_phone
+          contact_phone: facilityData.contact_phone,
+          booking_lead_time_hours: facilityData.booking_lead_time_hours || 2,
+          max_advance_booking_days: facilityData.max_advance_booking_days || 365,
+          cancellation_deadline_hours: facilityData.cancellation_deadline_hours || 24,
+          latitude: facilityData.latitude,
+          longitude: facilityData.longitude,
+          is_featured: facilityData.is_featured || false,
+          status: facilityData.status || 'active'
         }])
         .select()
         .single()
@@ -248,13 +260,52 @@ serve(async (req) => {
       }
 
       const updateData = await req.json()
+      console.log('Updating facility', facilityId, 'with data:', updateData)
       
+      // Clean the update data - remove any frontend-specific fields that don't exist in the database
+      const cleanUpdateData = {
+        name: updateData.name,
+        address_street: updateData.address_street,
+        address_city: updateData.address_city,
+        address_postal_code: updateData.address_postal_code,
+        address_country: updateData.address_country,
+        type: updateData.type,
+        area: updateData.area,
+        description: updateData.description,
+        capacity: updateData.capacity,
+        area_sqm: updateData.area_sqm,
+        accessibility_features: updateData.accessibility_features,
+        equipment: updateData.equipment,
+        amenities: updateData.amenities,
+        price_per_hour: updateData.price_per_hour,
+        has_auto_approval: updateData.has_auto_approval,
+        time_slot_duration: updateData.time_slot_duration,
+        allowed_booking_types: updateData.allowed_booking_types,
+        season_from: updateData.season_from,
+        season_to: updateData.season_to,
+        contact_name: updateData.contact_name,
+        contact_email: updateData.contact_email,
+        contact_phone: updateData.contact_phone,
+        booking_lead_time_hours: updateData.booking_lead_time_hours,
+        max_advance_booking_days: updateData.max_advance_booking_days,
+        cancellation_deadline_hours: updateData.cancellation_deadline_hours,
+        latitude: updateData.latitude,
+        longitude: updateData.longitude,
+        is_featured: updateData.is_featured,
+        status: updateData.status,
+        updated_at: new Date().toISOString()
+      }
+
+      // Remove undefined values
+      Object.keys(cleanUpdateData).forEach(key => {
+        if (cleanUpdateData[key] === undefined) {
+          delete cleanUpdateData[key]
+        }
+      })
+
       const { data: facility, error } = await supabaseClient
         .from('facilities')
-        .update({
-          ...updateData,
-          updated_at: new Date().toISOString()
-        })
+        .update(cleanUpdateData)
         .eq('id', facilityId)
         .select()
         .single()
@@ -267,6 +318,7 @@ serve(async (req) => {
         )
       }
 
+      console.log('Facility updated successfully:', facility)
       return new Response(
         JSON.stringify({ success: true, data: facility }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { Facility, FacilityFilters } from '@/types/facility';
 import { PaginationParams, ApiResponse, PaginatedResponse } from '@/types/api';
@@ -236,6 +237,8 @@ export class SupabaseFacilityService {
 
   static async createFacility(facilityData: Partial<Facility>): Promise<ApiResponse<Facility>> {
     try {
+      console.log('SupabaseFacilityService.createFacility - Data being sent:', facilityData);
+
       const response = await fetch(`${this.BASE_URL}/facilities`, {
         method: 'POST',
         headers: {
@@ -245,7 +248,14 @@ export class SupabaseFacilityService {
         body: JSON.stringify(facilityData),
       });
 
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('SupabaseFacilityService.createFacility - HTTP error:', response.status, errorText);
+        throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`);
+      }
+
       const result = await response.json();
+      console.log('SupabaseFacilityService.createFacility - Response:', result);
       
       if (result.success && result.data) {
         return {
@@ -256,6 +266,7 @@ export class SupabaseFacilityService {
 
       return result;
     } catch (error) {
+      console.error('SupabaseFacilityService.createFacility - Error:', error);
       return {
         success: false,
         error: { message: error instanceof Error ? error.message : 'Unknown error occurred' }
@@ -265,6 +276,8 @@ export class SupabaseFacilityService {
 
   static async updateFacility(id: number, facilityData: Partial<Facility>): Promise<ApiResponse<Facility>> {
     try {
+      console.log('SupabaseFacilityService.updateFacility - ID:', id, 'Data being sent:', facilityData);
+
       const response = await fetch(`${this.BASE_URL}/facilities/${id}`, {
         method: 'PUT',
         headers: {
@@ -274,7 +287,14 @@ export class SupabaseFacilityService {
         body: JSON.stringify(facilityData),
       });
 
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('SupabaseFacilityService.updateFacility - HTTP error:', response.status, errorText);
+        throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`);
+      }
+
       const result = await response.json();
+      console.log('SupabaseFacilityService.updateFacility - Response:', result);
       
       if (result.success && result.data) {
         return {
@@ -285,6 +305,7 @@ export class SupabaseFacilityService {
 
       return result;
     } catch (error) {
+      console.error('SupabaseFacilityService.updateFacility - Error:', error);
       return {
         success: false,
         error: { message: error instanceof Error ? error.message : 'Unknown error occurred' }
