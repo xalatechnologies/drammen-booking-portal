@@ -1,12 +1,13 @@
 
 import React from "react";
-import { ShoppingCart, X, CreditCard } from "lucide-react";
+import { ShoppingCart, X, CreditCard, Calendar, Clock, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { format } from "date-fns";
+import { nb } from "date-fns/locale";
 
 interface ReservationCartSectionProps {
   isOpen: boolean;
@@ -17,6 +18,45 @@ interface ReservationCartSectionProps {
   onRemoveItem: (id: string) => void;
   onProceedToCheckout: () => void;
 }
+
+const getActorTypeLabel = (actorType: string) => {
+  switch (actorType) {
+    case 'private': return 'Privatperson';
+    case 'business': return 'Bedrift';
+    case 'organization': return 'Organisasjon';
+    case 'lag-foreninger': return 'Lag/Foreninger';
+    case 'paraply': return 'Paraplyorganisasjon';
+    default: return 'Ukjent';
+  }
+};
+
+const getBookingType = (item: any) => {
+  const timeSlots = item.timeSlots || [{
+    date: item.date,
+    timeSlot: item.timeSlot,
+    zoneId: item.zoneId,
+    duration: item.duration
+  }];
+  
+  if (timeSlots.length === 1) {
+    return 'Enkelt booking';
+  }
+  
+  const dateKeys = [...new Set(timeSlots.map((slot: any) => {
+    const dateValue = slot.date instanceof Date ? slot.date : new Date(slot.date);
+    return format(dateValue, 'yyyy-MM-dd');
+  }))];
+  if (dateKeys.length > 1) {
+    const uniqueDays = new Set(timeSlots.map((slot: any) => {
+      const dateValue = slot.date instanceof Date ? slot.date : new Date(slot.date);
+      return format(dateValue, 'EEEE', { locale: nb });
+    }));
+    if (uniqueDays.size === 1) {
+      return 'Fastlån';
+    }
+  }
+  return 'Flere tidspunkt';
+};
 
 export function ReservationCartSection({
   isOpen,
@@ -48,40 +88,87 @@ export function ReservationCartSection({
               </div>
             ) : (
               <div className="space-y-4">
-                {cartItems.map((item) => (
-                  <div key={item.id} className="border rounded-lg p-4 bg-gray-50">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Badge variant="outline" className="text-xs font-medium">
-                            {item.zoneId === 'whole-facility' ? 'Hele lokalet' : item.zoneId}
+                {cartItems.map((item) => {
+                  const timeSlots = item.timeSlots || [{
+                    date: item.date,
+                    timeSlot: item.timeSlot,
+                    zoneId: item.zoneId,
+                    duration: item.duration
+                  }];
+                  
+                  const totalDuration = timeSlots.reduce((sum: number, slot: any) => {
+                    return sum + (slot.duration || 2);
+                  }, 0);
+                  
+                  const bookingType = getBookingType(item);
+                  
+                  return (
+                    <div key={item.id} className="border rounded-lg p-4 bg-gray-50">
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <h3 className="text-sm font-semibold text-gray-900">{item.facilityName}</h3>
+                            <Badge variant="secondary" className="text-xs">
+                              {bookingType}
+                            </Badge>
+                          </div>
+                          
+                          <div className="flex items-center gap-3 text-xs text-gray-600 mb-1">
+                            <div className="flex items-center gap-1">
+                              <Calendar className="h-3 w-3" />
+                              <span>
+                                {timeSlots.length === 1 
+                                  ? (() => {
+                                      const dateValue = timeSlots[0].date instanceof Date ? timeSlots[0].date : new Date(timeSlots[0].date);
+                                      return format(dateValue, 'dd.MM.yyyy', { locale: nb });
+                                    })()
+                                  : (() => {
+                                      const firstDate = timeSlots[0].date instanceof Date ? timeSlots[0].date : new Date(timeSlots[0].date);
+                                      const lastDate = timeSlots[timeSlots.length - 1].date instanceof Date ? timeSlots[timeSlots.length - 1].date : new Date(timeSlots[timeSlots.length - 1].date);
+                                      return `${format(firstDate, 'dd.MM', { locale: nb })} - ${format(lastDate, 'dd.MM.yyyy', { locale: nb })}`;
+                                    })()
+                                }
+                              </span>
+                            </div>
+                            
+                            <div className="flex items-center gap-1">
+                              <Clock className="h-3 w-3" />
+                              <span>{totalDuration}t</span>
+                            </div>
+                            
+                            {item.expectedAttendees && (
+                              <div className="flex items-center gap-1">
+                                <Users className="h-3 w-3" />
+                                <span>{item.expectedAttendees}</span>
+                              </div>
+                            )}
+                          </div>
+                          
+                          <p className="text-xs text-gray-500 truncate mb-1">{item.purpose}</p>
+                          
+                          <Badge variant="outline" className="text-xs">
+                            {getActorTypeLabel(item.organizationType)}
                           </Badge>
                         </div>
-                        <p className="text-sm font-medium text-gray-900">
-                          {format(new Date(item.date), 'dd.MM.yyyy')}
-                        </p>
-                        <p className="text-sm text-gray-600">{item.timeSlot}</p>
+                        
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => onRemoveItem(item.id)}
+                          className="p-1 h-auto text-gray-400 hover:text-red-500 ml-2"
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => onRemoveItem(item.id)}
-                        className="p-1 h-auto text-gray-400 hover:text-red-500"
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                    
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-500">2t</span>
+                      
+                      <div className="flex items-center justify-end">
+                        <Badge className="bg-green-100 text-green-800 font-medium">
+                          {item.pricing?.totalPrice || (item.pricePerHour * totalDuration)} kr
+                        </Badge>
                       </div>
-                      <Badge className="bg-green-100 text-green-800 font-medium">
-                        {item.pricePerHour * 2} kr
-                      </Badge>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
                 
                 <Separator />
                 
