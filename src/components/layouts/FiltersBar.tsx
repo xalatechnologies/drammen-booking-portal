@@ -19,23 +19,23 @@ export const FiltersBar: React.FC<FiltersBarProps> = ({
   const defaultSearchPlaceholder = searchPlaceholder || tSync("common.search.placeholder", "Search...");
 
   return (
-    <div className={cn("flex flex-col md:flex-row gap-4 items-start md:items-center justify-between", className)}>
-      <div className="flex flex-1 gap-4 items-center">
+    <div className={cn("flex flex-col md:flex-row gap-2 items-start md:items-center justify-between", className)}>
+      <div className="flex flex-1 gap-2 items-center">
         {onSearchChange && (
-          <div className="relative max-w-md">
+          <div className="relative flex-1 lg:flex-[2] max-w-md lg:max-w-lg">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
             <Input
               placeholder={defaultSearchPlaceholder}
               value={searchTerm}
               onChange={(e) => onSearchChange(e.target.value)}
-              className="pl-10"
+              className="pl-10 h-12"
             />
           </div>
         )}
         
         {selectFilters.map((filter) => (
           <Select key={filter.id} value={filter.value} onValueChange={filter.onChange}>
-            <SelectTrigger className="w-[200px]">
+            <SelectTrigger className="w-[200px] h-12">
               <SelectValue placeholder={filter.label} />
             </SelectTrigger>
             <SelectContent>
@@ -50,7 +50,7 @@ export const FiltersBar: React.FC<FiltersBarProps> = ({
       </div>
       
       {children && (
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
           {children}
         </div>
       )}

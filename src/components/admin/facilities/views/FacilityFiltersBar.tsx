@@ -30,8 +30,8 @@ export const FacilityFiltersBar: React.FC<FacilityFiltersBarProps> = ({
   return (
     <Card>
       <CardContent className="p-4">
-        <div className="flex flex-col lg:flex-row gap-4">
-          <div className="flex-1">
+        <div className="flex flex-col lg:flex-row gap-2">
+          <div className="flex-1 lg:flex-[2]">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
               <Input
@@ -42,7 +42,7 @@ export const FacilityFiltersBar: React.FC<FacilityFiltersBarProps> = ({
               />
             </div>
           </div>
-          <div className="flex gap-4 items-center">
+          <div className="flex gap-2 items-center">
             <Select value={filterType} onValueChange={setFilterType}>
               <SelectTrigger className="w-[180px] h-12 text-base">
                 <SelectValue placeholder={tSync("admin.facilities.search.filterByType", "Filter by type")} />
