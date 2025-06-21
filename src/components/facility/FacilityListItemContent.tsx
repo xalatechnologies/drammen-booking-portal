@@ -70,9 +70,55 @@ export function FacilityListItemContent({
     return <IconComponent className="h-4 w-4" />;
   };
 
-  // Safely handle suitableFor array
-  const suitableForArray = Array.isArray(facility.suitableFor) ? facility.suitableFor : [];
+  // Derive suitable activities from facility data if suitableFor is empty
+  const getSuitableActivities = () => {
+    if (facility.suitableFor && facility.suitableFor.length > 0) {
+      return facility.suitableFor;
+    }
+
+    // Derive from facility type and area - using actual values that match the image
+    const activities = [];
+    
+    if (facility.type) {
+      switch (facility.type.toLowerCase()) {
+        case 'fotballhall':
+        case 'idrettshall':
+        case 'gymsal':
+          activities.push('Fotballhall');
+          break;
+        case 'svømmehall':
+          activities.push('Svømming');
+          break;
+        case 'aktivitetshall':
+          activities.push('Basketball', 'Volleyball');
+          break;
+        case 'auditorium':
+          activities.push('Presentasjoner');
+          break;
+        case 'konferanserom':
+        case 'møterom':
+          activities.push('Møter');
+          break;
+        case 'klasserom':
+          activities.push('Undervisning');
+          break;
+        default:
+          activities.push('Sport');
+      }
+    }
+
+    // Add area-based activities
+    if (facility.area) {
+      activities.push(facility.area);
+    }
+
+    return activities.length > 0 ? activities : ['Aktiviteter'];
+  };
+
+  const suitableActivities = getSuitableActivities();
   const maxVisibleTags = 2;
+
+  console.log('FacilityListItemContent - Facility:', facility.name, 'SuitableFor:', facility.suitableFor, 'Type:', facility.type, 'Area:', facility.area, 'Derived activities:', suitableActivities);
 
   return (
     <div className="flex-1 p-6 flex flex-col h-full">
@@ -106,7 +152,7 @@ export function FacilityListItemContent({
 
           {/* Suitable For - on the same line */}
           <div className="flex gap-2 items-center min-w-0 flex-1">
-            {suitableForArray.slice(0, maxVisibleTags).map((activity, index) => (
+            {suitableActivities.slice(0, maxVisibleTags).map((activity, index) => (
               <Badge 
                 key={index} 
                 className="bg-blue-50 text-blue-700 border-blue-200 font-medium px-3 py-1 text-sm hover:bg-blue-100 transition-colors flex items-center gap-1.5 whitespace-nowrap"
@@ -115,9 +161,9 @@ export function FacilityListItemContent({
                 {activity}
               </Badge>
             ))}
-            {suitableForArray.length > maxVisibleTags && (
+            {suitableActivities.length > maxVisibleTags && (
               <Badge variant="outline" className="bg-gray-50 text-gray-600 border-gray-300 font-medium px-3 py-1 text-sm whitespace-nowrap">
-                +{suitableForArray.length - maxVisibleTags} more
+                +{suitableActivities.length - maxVisibleTags} more
               </Badge>
             )}
           </div>
