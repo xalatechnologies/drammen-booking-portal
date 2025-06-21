@@ -19,8 +19,8 @@ export function useAdditionalServices(facilityId: string, category?: ServiceCate
           { page: 1, limit: 100 },
           { facilityId, isActive: true }
         );
-        if (!result.success) {
-          throw new Error(result.error?.message || 'Failed to fetch services');
+        if (result.error) {
+          throw new Error(result.error);
         }
         return result.data?.data || [];
       }
@@ -40,17 +40,13 @@ export function useServicePricing() {
     serviceId: string,
     quantity: number,
     actorType: ActorType,
-    attendees?: number,
-    timeSlot?: string,
-    date?: Date
+    attendees?: number
   ) => {
     const result = await AdditionalServicesService.calculateServicePrice(
       serviceId,
       quantity,
       actorType,
-      attendees,
-      timeSlot,
-      date
+      attendees
     );
     
     return result; // Return the full API response with success/data structure

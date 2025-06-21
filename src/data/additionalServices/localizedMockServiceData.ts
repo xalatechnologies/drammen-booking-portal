@@ -8,11 +8,10 @@ export const localizedMockServiceData: Record<string, AdditionalService[]> = {
       name: "Catering tjeneste",
       description: "Profesjonell catering for arrangementer",
       category: "catering",
-      base_price: 150,
       unit: "per person",
       is_active: true,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
+      createdAt: new Date(), // Changed from created_at
+      updatedAt: new Date(), // Changed from updated_at
       
       // Required fields for compatibility
       facilityIds: [],
@@ -42,9 +41,7 @@ export const localizedMockServiceData: Record<string, AdditionalService[]> = {
       metadata: {
         tags: []
       },
-      isActive: true,
-      createdAt: new Date(),
-      updatedAt: new Date()
+      isActive: true
     }
   ],
   'EN': [
@@ -53,11 +50,10 @@ export const localizedMockServiceData: Record<string, AdditionalService[]> = {
       name: "Catering Service",
       description: "Professional catering for events",
       category: "catering",
-      base_price: 150,
       unit: "per person",
       is_active: true,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
+      createdAt: new Date(), // Changed from created_at
+      updatedAt: new Date(), // Changed from updated_at
       
       // Required fields for compatibility
       facilityIds: [],
@@ -87,9 +83,7 @@ export const localizedMockServiceData: Record<string, AdditionalService[]> = {
       metadata: {
         tags: []
       },
-      isActive: true,
-      createdAt: new Date(),
-      updatedAt: new Date()
+      isActive: true
     }
   ]
 };

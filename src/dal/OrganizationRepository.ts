@@ -129,6 +129,15 @@ export class OrganizationRepository extends SupabaseRepository<Organization> {
       verificationLevel: dbRow.verification_level,
       parentOrganizationId: dbRow.parent_organization_id,
       isActive: dbRow.is_active,
+      metadata: {
+        website: dbRow.website,
+        description: dbRow.description,
+        foundedYear: dbRow.founded_year,
+        memberCount: dbRow.member_count,
+        vatNumber: dbRow.vat_number,
+        bankAccount: dbRow.bank_account
+      },
+      contacts: [], // This would need to be fetched separately or joined
       createdAt: new Date(dbRow.created_at),
       updatedAt: new Date(dbRow.updated_at)
     };

@@ -3,65 +3,30 @@ export interface Organization {
   id: string;
   name: string;
   type: OrganizationType;
-  orgNumber?: string; // Norwegian organization number
+  orgNumber?: string;
   contactEmail: string;
   contactPhone?: string;
-  address: Address;
+  address: {
+    street: string;
+    city: string;
+    postalCode: string;
+    country: string;
+  };
   status: OrganizationStatus;
   verificationLevel: VerificationLevel;
   parentOrganizationId?: string;
   isActive: boolean;
+  metadata?: {
+    website?: string;
+    description?: string;
+    foundedYear?: number;
+    memberCount?: number;
+    vatNumber?: string;
+    bankAccount?: string;
+  };
+  contacts?: OrganizationContact[];
   createdAt: Date;
   updatedAt: Date;
-  metadata: OrganizationMetadata;
-  contacts: OrganizationContact[];
-}
-
-export type OrganizationType =
-  | 'lag-foreninger'      // Sports clubs and associations
-  | 'paraply'             // Umbrella organizations
-  | 'private-firma'       // Private companies
-  | 'kommunale-enheter'   // Municipal units
-  | 'utdanning'           // Educational institutions
-  | 'helse'               // Healthcare organizations
-  | 'kultur'              // Cultural organizations
-  | 'frivillig';          // Voluntary organizations
-
-export type OrganizationStatus = 
-  | 'active'
-  | 'pending-verification'
-  | 'suspended'
-  | 'inactive';
-
-export type VerificationLevel =
-  | 'unverified'
-  | 'email-verified'
-  | 'document-verified'
-  | 'fully-verified';
-
-export interface Address {
-  street: string;
-  city: string;
-  postalCode: string;
-  country: string;
-  coordinates?: {
-    lat: number;
-    lng: number;
-  };
-}
-
-export interface OrganizationMetadata {
-  foundedYear?: number;
-  memberCount?: number;
-  website?: string;
-  description?: string;
-  socialMedia?: {
-    facebook?: string;
-    instagram?: string;
-    website?: string;
-  };
-  bankAccount?: string;
-  vatNumber?: string;
 }
 
 export interface OrganizationContact {
@@ -71,12 +36,23 @@ export interface OrganizationContact {
   isPrimary: boolean;
   canMakeBookings: boolean;
   canApproveBookings: boolean;
+  canManageMembers: boolean;
 }
 
-export interface OrganizationFilters {
-  type?: OrganizationType;
-  status?: OrganizationStatus;
-  verificationLevel?: VerificationLevel;
-  searchTerm?: string;
-  city?: string;
-}
+export type OrganizationType = 
+  | 'lag-foreninger'
+  | 'paraply'
+  | 'private-firma'
+  | 'kommunale-enheter';
+
+export type OrganizationStatus = 
+  | 'pending-verification'
+  | 'verified'
+  | 'suspended'
+  | 'inactive';
+
+export type VerificationLevel = 
+  | 'unverified'
+  | 'email-verified'
+  | 'document-verified'
+  | 'fully-verified';

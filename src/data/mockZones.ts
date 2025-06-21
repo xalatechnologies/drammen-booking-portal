@@ -5,7 +5,7 @@ export const mockZones: Zone[] = [
   {
     id: "1",
     name: "Hele lokalet",
-    facility_id: 1,
+    facilityId: "1", // Changed from facility_id
     type: "room",
     capacity: 30,
     description: "Complete facility with all equipment",

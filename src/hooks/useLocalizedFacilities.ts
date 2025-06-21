@@ -36,21 +36,21 @@ export function useLocalizedFacilities({
   });
 
   // Handle response properly - check if it's a direct array or wrapped response
-  const facilities = Array.isArray(response) ? response : (response?.success ? response.data?.data : []);
-  const paginationInfo = Array.isArray(response) ? null : (response?.success ? {
-    page: response.data.pagination.page,
-    limit: response.data.pagination.limit,
-    total: response.data.pagination.total,
-    totalPages: response.data.pagination.totalPages,
-    hasNext: response.data.pagination.hasNext,
-    hasPrev: response.data.pagination.hasPrev
-  } : null);
+  const facilities = response?.success ? response.data?.data || [] : [];
+  const paginationInfo = response?.success ? {
+    page: response.data?.pagination?.page || pagination.page,
+    limit: response.data?.pagination?.limit || pagination.limit,
+    total: response.data?.pagination?.total || 0,
+    totalPages: response.data?.pagination?.totalPages || 0,
+    hasNext: response.data?.pagination?.hasNext || false,
+    hasPrev: response.data?.pagination?.hasPrev || false
+  } : null;
 
   return {
     facilities: facilities || [],
     pagination: paginationInfo,
     isLoading,
-    error: Array.isArray(response) ? undefined : (response?.success === false ? response.error : error),
+    error: response?.success === false ? response.error : error,
     refetch,
   };
 }
