@@ -11,15 +11,15 @@ interface FacilityContactSectionProps {
 
 export const FacilityContactSection: React.FC<FacilityContactSectionProps> = ({ form }) => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <FormField
         control={form.control}
         name="contact_name"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="text-sm font-medium">Contact Name</FormLabel>
+            <FormLabel>Contact Name</FormLabel>
             <FormControl>
-              <Input placeholder="Contact person name" className="h-9 text-sm" {...field} />
+              <Input placeholder="Contact person name" {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -31,9 +31,9 @@ export const FacilityContactSection: React.FC<FacilityContactSectionProps> = ({ 
         name="contact_phone"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="text-sm font-medium">Contact Phone</FormLabel>
+            <FormLabel>Contact Phone</FormLabel>
             <FormControl>
-              <Input placeholder="+47 123 45 678" className="h-9 text-sm" {...field} />
+              <Input placeholder="+47 123 45 678" {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -46,12 +46,11 @@ export const FacilityContactSection: React.FC<FacilityContactSectionProps> = ({ 
           name="contact_email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-sm font-medium">Contact Email</FormLabel>
+              <FormLabel>Contact Email</FormLabel>
               <FormControl>
                 <Input 
                   type="email" 
                   placeholder="contact@facility.com" 
-                  className="h-9 text-sm"
                   {...field} 
                 />
               </FormControl>

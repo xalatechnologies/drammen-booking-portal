@@ -13,15 +13,15 @@ interface FacilityBasicSectionProps {
 
 export const FacilityBasicSection: React.FC<FacilityBasicSectionProps> = ({ form }) => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <FormField
         control={form.control}
         name="name"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="text-sm font-medium">Facility Name *</FormLabel>
+            <FormLabel>Facility Name *</FormLabel>
             <FormControl>
-              <Input placeholder="Enter facility name" className="h-9 text-sm" {...field} />
+              <Input placeholder="Enter facility name" {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -33,10 +33,10 @@ export const FacilityBasicSection: React.FC<FacilityBasicSectionProps> = ({ form
         name="type"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="text-sm font-medium">Facility Type *</FormLabel>
+            <FormLabel>Facility Type *</FormLabel>
             <Select onValueChange={field.onChange} defaultValue={field.value}>
               <FormControl>
-                <SelectTrigger className="h-9 text-sm">
+                <SelectTrigger>
                   <SelectValue placeholder="Select facility type" />
                 </SelectTrigger>
               </FormControl>
@@ -58,9 +58,9 @@ export const FacilityBasicSection: React.FC<FacilityBasicSectionProps> = ({ form
         name="area"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="text-sm font-medium">Area/Location *</FormLabel>
+            <FormLabel>Area/Location *</FormLabel>
             <FormControl>
-              <Input placeholder="e.g., Drammen, Kongsberg" className="h-9 text-sm" {...field} />
+              <Input placeholder="e.g., Drammen, Kongsberg" {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -72,12 +72,11 @@ export const FacilityBasicSection: React.FC<FacilityBasicSectionProps> = ({ form
         name="capacity"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="text-sm font-medium">Capacity *</FormLabel>
+            <FormLabel>Capacity *</FormLabel>
             <FormControl>
               <Input 
                 type="number" 
                 placeholder="Number of people"
-                className="h-9 text-sm"
                 {...field}
                 onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
               />
@@ -92,12 +91,11 @@ export const FacilityBasicSection: React.FC<FacilityBasicSectionProps> = ({ form
         name="area_sqm"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="text-sm font-medium">Area (m²)</FormLabel>
+            <FormLabel>Area (m²)</FormLabel>
             <FormControl>
               <Input 
                 type="number" 
                 placeholder="Square meters"
-                className="h-9 text-sm"
                 {...field}
                 onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
               />
@@ -113,11 +111,11 @@ export const FacilityBasicSection: React.FC<FacilityBasicSectionProps> = ({ form
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-sm font-medium">Description</FormLabel>
+              <FormLabel>Description</FormLabel>
               <FormControl>
                 <Textarea 
                   placeholder="Describe the facility and its features"
-                  className="min-h-[80px] text-sm"
+                  className="min-h-[100px]"
                   {...field}
                 />
               </FormControl>

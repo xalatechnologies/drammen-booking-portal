@@ -10,10 +10,10 @@ import AdminUserProfile from "./header/AdminUserProfile";
 
 const AdminHeader = () => {
   return (
-    <header className="border-b bg-white shadow-sm z-50" style={{ height: "5rem" }}>
-      <div className="flex h-20 items-center px-6">
-        <div className="flex items-center gap-4 min-w-0">
-          <div className="md:hidden mr-2">
+    <header className="border-b bg-white shadow-sm z-50" style={{ height: "6rem" }}>
+      <div className="flex h-24 items-center px-8">
+        <div className="flex items-center gap-6 min-w-0">
+          <div className="md:hidden mr-3">
             <SidebarTrigger />
           </div>
           <Logo />
@@ -21,7 +21,7 @@ const AdminHeader = () => {
         
         <AdminSearchBar />
 
-        <div className="flex items-center gap-3 flex-shrink-0">
+        <div className="flex items-center gap-4 flex-shrink-0">
           <AdminRoleSwitcher />
           <AdminLanguageToggle />
           <AdminNotifications />
