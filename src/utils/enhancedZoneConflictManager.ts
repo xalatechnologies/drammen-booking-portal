@@ -223,6 +223,11 @@ export class EnhancedZoneConflictManager extends ZoneConflictManager {
           endDate: booking.endDate,
           durationMinutes: Math.floor((booking.endDate.getTime() - booking.startDate.getTime()) / 60000),
           
+          // Missing required properties from Booking interface
+          duration: Math.floor((booking.endDate.getTime() - booking.startDate.getTime()) / 60000),
+          timeSlot: `${booking.startDate.toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' })}-${booking.endDate.toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' })}`,
+          isRecurring: false,
+          
           // Database field mappings
           user_id: booking.userId,
           facility_id: parseInt(facility.id),
