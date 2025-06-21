@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { PageHeader } from "@/components/layouts";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Plus, Search, Filter, Edit2, Trash2, User, Search as SearchIcon, Phone } from "lucide-react";
+import { useTranslation } from "@/i18n/hooks/useTranslation";
 
 const mockUsers = [
   { id: 1, name: 'Ola Nordmann', email: 'ola@drammenif.no', phone: '98765432', organization: 'Drammen IF', role: 'Leder', status: 'Aktiv' },
@@ -19,6 +19,7 @@ const UsersPage = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [filterRole, setFilterRole] = useState("all");
     const [filterStatus, setFilterStatus] = useState("all");
+    const { t } = useTranslation();
 
     const filteredUsers = mockUsers.filter(user => {
         const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -32,48 +33,48 @@ const UsersPage = () => {
     return (
         <div className="space-y-8">
             <PageHeader 
-                title="Brukere & Organisasjoner"
-                description="Administrer tilgang og roller for brukere i paraplysystemet."
+                title={t("umbrella.users.title", undefined, "Brukere & Organisasjoner")}
+                description={t("umbrella.users.description", undefined, "Administrer tilgang og roller for brukere i paraplysystemet.")}
                 actions={
                     <Button>
                         <Plus className="mr-2 h-4 w-4" />
-                        Legg til bruker
+                        {t("umbrella.users.addUser", undefined, "Legg til bruker")}
                     </Button>
                 }
             />
             
             <Card>
                 <CardHeader>
-                    <CardTitle>Alle brukere</CardTitle>
-                    <CardDescription>Oversikt over alle registrerte brukere og deres organisasjoner.</CardDescription>
+                    <CardTitle>{t("umbrella.users.allUsers", undefined, "Alle brukere")}</CardTitle>
+                    <CardDescription>{t("umbrella.users.allUsersDescription", undefined, "Oversikt over alle registrerte brukere og deres organisasjoner.")}</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <div className="mb-6 flex flex-col sm:flex-row gap-4">
                         <Input
-                            placeholder="Søk etter navn, e-post eller organisasjon..."
+                            placeholder={t("umbrella.users.search.placeholder", undefined, "Søk etter navn, e-post eller organisasjon...")}
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             className="max-w-md"
                         />
                         <Select value={filterRole} onValueChange={setFilterRole}>
                             <SelectTrigger className="w-[180px]">
-                                <SelectValue placeholder="Filtrer etter rolle" />
+                                <SelectValue placeholder={t("umbrella.users.search.filterByRole", undefined, "Filtrer etter rolle")} />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="all">Alle roller</SelectItem>
-                                <SelectItem value="Leder">Leder</SelectItem>
-                                <SelectItem value="Kontakt">Kontakt</SelectItem>
-                                <SelectItem value="Ansvarlig">Ansvarlig</SelectItem>
+                                <SelectItem value="all">{t("umbrella.users.search.allRoles", undefined, "Alle roller")}</SelectItem>
+                                <SelectItem value="Leder">{t("umbrella.users.roles.leader", undefined, "Leder")}</SelectItem>
+                                <SelectItem value="Kontakt">{t("umbrella.users.roles.contact", undefined, "Kontakt")}</SelectItem>
+                                <SelectItem value="Ansvarlig">{t("umbrella.users.roles.responsible", undefined, "Ansvarlig")}</SelectItem>
                             </SelectContent>
                         </Select>
                         <Select value={filterStatus} onValueChange={setFilterStatus}>
                             <SelectTrigger className="w-[180px]">
-                                <SelectValue placeholder="Filtrer etter status" />
+                                <SelectValue placeholder={t("umbrella.users.search.filterByStatus", undefined, "Filtrer etter status")} />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="all">Alle statuser</SelectItem>
-                                <SelectItem value="Aktiv">Aktiv</SelectItem>
-                                <SelectItem value="Inaktiv">Inaktiv</SelectItem>
+                                <SelectItem value="all">{t("umbrella.users.search.allStatuses", undefined, "Alle statuser")}</SelectItem>
+                                <SelectItem value="Aktiv">{t("umbrella.users.status.active", undefined, "Aktiv")}</SelectItem>
+                                <SelectItem value="Inaktiv">{t("umbrella.users.status.inactive", undefined, "Inaktiv")}</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>

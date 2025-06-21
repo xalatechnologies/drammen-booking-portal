@@ -14,6 +14,7 @@ import { accessibilityTranslations } from '../translations/accessibility';
 import { paymentTranslations } from '../translations/payment';
 import { searchTranslations } from '../translations/search';
 import { heroTranslations } from '../translations/hero';
+import { umbrellaTranslations } from '../translations/umbrella';
 import { TranslationParams, TranslationFunction } from '../types';
 
 type TranslationPath = string;
@@ -36,7 +37,8 @@ export function useTranslation() {
     accessibility: accessibilityTranslations[language],
     payment: paymentTranslations[language],
     search: searchTranslations[language],
-    hero: heroTranslations[language]
+    hero: heroTranslations[language],
+    umbrella: umbrellaTranslations[language]
   };
 
   const t: TranslationFunction = (path: TranslationPath, params?: TranslationParams, defaultValue?: string): string => {

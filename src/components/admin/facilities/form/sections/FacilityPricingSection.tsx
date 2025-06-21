@@ -1,4 +1,3 @@
-
 import React from "react";
 import { UseFormReturn } from "react-hook-form";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage, FormDescription } from "@/components/ui/form";
@@ -186,11 +185,11 @@ export const FacilityPricingSection: React.FC<FacilityPricingSectionProps> = ({ 
               </div>
               <div className="flex justify-between">
                 <span>{tSync("admin.facilities.form.pricing.cancellationFee", "Cancellation Fee:")}</span>
-                <span className="font-medium">50% if < 24h</span>
+                <span className="font-medium">50% if &lt; 24h</span>
               </div>
               <div className="flex justify-between">
                 <span>{tSync("admin.facilities.form.pricing.lateFee", "Late Booking Fee:")}</span>
-                <span className="font-medium">25% if < 2h</span>
+                <span className="font-medium">25% if &lt; 2h</span>
               </div>
             </div>
           </div>

@@ -2,27 +2,29 @@ import React, { useState } from "react";
 import { PageHeader } from "@/components/layouts";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "@/i18n/hooks/useTranslation";
 
 const AllocatedTimePage: React.FC = () => {
-  const [allocatedTime, setAllocatedTime] = useState("8 hours");
+  const [allocatedTime, setAllocatedTime] = useState("8 timer");
+  const { t } = useTranslation();
 
   return (
     <div>
       <PageHeader
-        title="Allocated Time"
-        description="View and manage your allocated time."
+        title={t("umbrella.allocatedTime.title", undefined, "Tildelt Rammetid")}
+        description={t("umbrella.allocatedTime.description", undefined, "Oversikt over tildelt rammetid for organisasjonen")}
       />
 
       <Card>
         <CardHeader>
-          <CardTitle>Your Allocated Time</CardTitle>
+          <CardTitle>{t("umbrella.allocatedTime.allocatedTime", undefined, "Tildelt tid")}</CardTitle>
           <CardDescription>
-            Here you can see how much time has been allocated to you.
+            {t("umbrella.allocatedTime.allocatedTimeDescription", undefined, "Se og administrer tildelt rammetid")}
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <p>Allocated Time: {allocatedTime}</p>
-          <Button>Adjust Time</Button>
+          <p>{t("umbrella.allocatedTime.totalAllocated", undefined, "Totalt tildelt")}: {allocatedTime}</p>
+          <Button>{t("umbrella.common.adjust", undefined, "Juster tid")}</Button>
         </CardContent>
       </Card>
     </div>

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { PageHeader } from "@/components/layouts";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useTranslation } from "@/i18n/hooks/useTranslation";
 
 const mockMessages = [
   { id: 1, from: 'Drammen Kommune Kultur', title: 'Viktig informasjon om sesongstart 2024/2025', date: '2024-08-15', read: false },
@@ -10,11 +11,13 @@ const mockMessages = [
 ];
 
 const MessagesPage = () => {
+    const { t } = useTranslation();
+    
     return (
         <div className="space-y-8">
             <PageHeader 
-                title="Meldinger og Varsler"
-                description="Her finner du viktig informasjon og varsler fra kommunen."
+                title={t("umbrella.messages.title", undefined, "Meldinger og Varsler")}
+                description={t("umbrella.messages.description", undefined, "Administrer systemmeldinger og varsler")}
             />
             <div className="space-y-4">
                 {mockMessages.map((message) => (
@@ -25,7 +28,7 @@ const MessagesPage = () => {
                                     <CardTitle className="text-lg">{message.title}</CardTitle>
                                     <CardDescription>Fra: {message.from} - {message.date}</CardDescription>
                                 </div>
-                                {!message.read && <Badge>Ny</Badge>}
+                                {!message.read && <Badge>{t("umbrella.common.new", undefined, "Ny")}</Badge>}
                             </div>
                         </CardHeader>
                     </Card>

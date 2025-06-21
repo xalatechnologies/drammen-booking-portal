@@ -1,1 +1,21 @@
 - Refactored the pricing engine to generate a detailed, sequential calculation breakdown and created comprehensive documentation with extensive use cases for all price groups. 
+
+# Cursor Updates
+
+## 2024-12-19 - Umbrella Pages Norwegian Translation
+
+- Created comprehensive Norwegian translation file `src/i18n/translations/umbrella.ts` with translations for all umbrella pages
+- Updated `src/i18n/hooks/useTranslation.ts` to include umbrella translations
+- Translated all umbrella components and pages to use Norwegian as primary language:
+  - `UmbrellaSidebar.tsx` - Navigation menu items
+  - `UmbrellaHeader.tsx` - Header notifications and user menu
+  - `Overview.tsx` - Dashboard overview page
+  - `Users.tsx` - User management page
+  - `Distribution.tsx` - Time distribution management
+  - `HistoryLog.tsx` - Activity log and history
+  - `Messages.tsx` - System messages and notifications
+  - `ReleaseTime.tsx` - Time release functionality
+  - `AllocatedTime.tsx` - Allocated time overview
+- All text is now primarily in Norwegian with English fallbacks
+- Fixed translation function calls to use proper parameter order
+- Build completed successfully with no errors 

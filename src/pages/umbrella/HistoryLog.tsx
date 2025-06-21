@@ -3,6 +3,7 @@ import { PageHeader } from "@/components/layouts";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useTranslation } from "@/i18n/hooks/useTranslation";
 
 const mockHistory = [
   { id: 1, user: 'Admin Bruker', userAvatar: 'https://i.pravatar.cc/150?u=admin', action: 'Endret fordeling for Drammen Turn', date: '2024-10-25 14:30' },
@@ -11,23 +12,26 @@ const mockHistory = [
 ];
 
 const HistoryLogPage = () => {
+    const { t } = useTranslation();
+    
     return (
         <div className="space-y-8">
             <PageHeader 
-                title="Logg og Historikk"
-                description="Se en fullstendig oversikt over alle endringer gjort i fordelingsprosessen."
+                title={t("umbrella.historyLog.title", undefined, "Historikk og Logg")}
+                description={t("umbrella.historyLog.description", undefined, "Se historikk over alle endringer og aktiviteter")}
             />
             <Card>
                 <CardHeader>
-                    <CardTitle>Endringslogg</CardTitle>
+                    <CardTitle>{t("umbrella.historyLog.activityLog", undefined, "Aktivitetslogg")}</CardTitle>
+                    <CardDescription>{t("umbrella.historyLog.activityLogDescription", undefined, "Detaljert oversikt over alle systemaktivitetene")}</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead>Hvem</TableHead>
-                                <TableHead>Handling</TableHead>
-                                <TableHead>Dato og Tid</TableHead>
+                                <TableHead>{t("umbrella.historyLog.user", undefined, "Bruker")}</TableHead>
+                                <TableHead>{t("umbrella.historyLog.action", undefined, "Handling")}</TableHead>
+                                <TableHead>{t("umbrella.historyLog.date", undefined, "Dato")}</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
