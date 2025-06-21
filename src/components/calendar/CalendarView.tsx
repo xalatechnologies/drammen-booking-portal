@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { format, addDays, startOfWeek, isAfter, startOfDay } from "date-fns";
@@ -14,6 +13,7 @@ import { UnifiedBookingForm } from "../booking/UnifiedBookingForm";
 import { SelectedTimeSlot } from "@/utils/recurrenceEngine";
 import { useCart } from "@/contexts/CartContext";
 import { useNavigate } from "react-router-dom";
+import { BookingForm } from "../booking/BookingForm";
 
 interface CalendarViewWithToggleProps extends CalendarViewProps {
   viewMode: "grid" | "map" | "calendar" | "list";
@@ -207,7 +207,7 @@ const CalendarView: React.FC<CalendarViewWithToggleProps> = ({
         {/* Booking Sidebar - 40% */}
         <div className="w-2/5">
           <div className="sticky top-4">
-            <UnifiedBookingForm
+            <BookingForm
               selectedSlots={selectedSlots}
               facilityId={selectedFacilityId || ''}
               facilityName={selectedFacility?.name || ''}

@@ -11,8 +11,10 @@ import { BookingActionButtons } from './BookingActionButtons';
 import { BookingService, BookingFormData } from '@/services/BookingService';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { AlertTriangle } from 'lucide-react';
 
-interface SimplifiedBookingFormProps {
+interface BookingFormProps {
   selectedSlots: SelectedTimeSlot[];
   facilityId: string;
   facilityName: string;
@@ -23,7 +25,7 @@ interface SimplifiedBookingFormProps {
   onRemoveSlot?: (zoneId: string, date: Date, timeSlot: string) => void;
 }
 
-export function SimplifiedBookingForm({
+export function BookingForm({
   selectedSlots,
   facilityId,
   facilityName,
@@ -32,9 +34,9 @@ export function SimplifiedBookingForm({
   onCompleteBooking,
   onSlotsCleared,
   onRemoveSlot
-}: SimplifiedBookingFormProps) {
-  console.log('SimplifiedBookingForm: Rendering with selectedSlots:', selectedSlots);
-  console.log('SimplifiedBookingForm: facilityId:', facilityId, 'facilityName:', facilityName);
+}: BookingFormProps) {
+  console.log('BookingForm: Rendering with selectedSlots:', selectedSlots);
+  console.log('BookingForm: facilityId:', facilityId, 'facilityName:', facilityName);
   
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -48,19 +50,22 @@ export function SimplifiedBookingForm({
     termsAccepted: false
   });
 
+  const [conflicts, setConflicts] = useState<any[]>([]);
+
   const updateFormData = (updates: Partial<BookingFormData>) => {
     setFormData(prev => ({ ...prev, ...updates }));
   };
 
   const handleRemoveSlot = (slot: SelectedTimeSlot) => {
-    console.log('SimplifiedBookingForm: handleRemoveSlot called:', slot);
+    console.log('BookingForm: handleRemoveSlot called:', slot);
     if (onRemoveSlot) {
       onRemoveSlot(slot.zoneId, slot.date, slot.timeSlot);
     }
   };
 
   const handleClearAll = () => {
-    console.log('SimplifiedBookingForm: handleClearAll called');
+    console.log('BookingForm: handleClearAll called');
+    setConflicts([]);
     if (onSlotsCleared) {
       onSlotsCleared();
     }
@@ -77,7 +82,7 @@ export function SimplifiedBookingForm({
   };
 
   const handleAddToCart = async () => {
-    console.log('SimplifiedBookingForm: handleAddToCart called');
+    console.log('BookingForm: handleAddToCart called');
 
     const result = await BookingService.addToCart({
       selectedSlots,
@@ -93,7 +98,8 @@ export function SimplifiedBookingForm({
         description: result.message,
       });
 
-      // Clear slots after successful addition
+      // Clear conflicts and slots after successful addition
+      setConflicts([]);
       if (onSlotsCleared) {
         onSlotsCleared();
       }
@@ -108,6 +114,11 @@ export function SimplifiedBookingForm({
         });
       }
     } else {
+      // Handle conflicts
+      if (result.conflicts) {
+        setConflicts(result.conflicts);
+      }
+      
       toast({
         title: "Feil",
         description: result.message,
@@ -117,7 +128,7 @@ export function SimplifiedBookingForm({
   };
 
   const handleCompleteBooking = async () => {
-    console.log('SimplifiedBookingForm: handleCompleteBooking called');
+    console.log('BookingForm: handleCompleteBooking called');
 
     const result = await BookingService.completeBooking({
       selectedSlots,
@@ -146,6 +157,11 @@ export function SimplifiedBookingForm({
         });
       }
     } else {
+      // Handle conflicts
+      if (result.conflicts) {
+        setConflicts(result.conflicts);
+      }
+      
       toast({
         title: "Feil",
         description: result.message,
@@ -172,6 +188,20 @@ export function SimplifiedBookingForm({
   return (
     <Card className="w-full">
       <CardContent className="space-y-5 p-5">
+        {/* Conflict Warning */}
+        {conflicts.length > 0 && (
+          <Alert variant="destructive">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertDescription>
+              {conflicts.length === 1 
+                ? "Det valgte tidspunktet har en konflikt med en eksisterende booking." 
+                : `${conflicts.length} av de valgte tidspunktene har konflikter med eksisterende bookinger.`
+              }
+              Vennligst velg andre tidspunkt eller kontakt oss for å løse konflikten.
+            </AlertDescription>
+          </Alert>
+        )}
+
         {/* Selected Times Overview Accordion */}
         <SelectedSlotsAccordion
           selectedSlots={selectedSlots}

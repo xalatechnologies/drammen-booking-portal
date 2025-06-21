@@ -4,6 +4,10 @@ import { ActorType } from '@/types/pricing';
 import { useCartStore } from '@/stores/useCartStore';
 import { useToast } from '@/hooks/use-toast';
 import { Zone } from '@/components/booking/types';
+import { BookingRepository } from '@/dal/repositories/BookingRepository';
+import { ApiResponse } from '@/types/api';
+import { Booking, BookingCreateRequest, BookingUpdateRequest, BookingFilters } from '@/types/booking';
+import { PaginationParams } from '@/types/api';
 
 export interface BookingFormData {
   purpose: string;
@@ -21,6 +25,14 @@ export interface BookingServiceParams {
   zones?: Zone[];
   formData: BookingFormData;
 }
+
+export interface ConflictCheckResult {
+  hasConflict: boolean;
+  conflictingBookings: Booking[];
+  availableAlternatives: any[];
+}
+
+const bookingRepository = new BookingRepository();
 
 export class BookingService {
   static validateBookingData(params: BookingServiceParams): boolean {
@@ -55,7 +67,114 @@ export class BookingService {
     };
   }
 
-  static async addToCart(params: BookingServiceParams): Promise<{ success: boolean; message: string }> {
+  // Conflict handling methods
+  static async checkBookingConflicts(
+    zoneId: string,
+    startDate: Date,
+    endDate: Date,
+    excludeBookingId?: string
+  ): Promise<ApiResponse<ConflictCheckResult>> {
+    try {
+      const result = await bookingRepository.checkBookingConflicts(zoneId, startDate, endDate, excludeBookingId);
+      
+      if (result.error) {
+        return {
+          success: false,
+          error: {
+            message: 'Failed to check booking conflicts',
+            details: result.error
+          }
+        };
+      }
+
+      return {
+        success: true,
+        data: result.data || { hasConflict: false, conflictingBookings: [], availableAlternatives: [] }
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: {
+          message: 'Failed to check booking conflicts',
+          details: error
+        }
+      };
+    }
+  }
+
+  static async checkAvailability(
+    zoneId: string,
+    date: Date,
+    timeSlots: string[]
+  ): Promise<ApiResponse<Record<string, boolean>>> {
+    try {
+      // Mock implementation - in real app this would check actual bookings
+      const availability: Record<string, boolean> = {};
+      
+      for (const timeSlot of timeSlots) {
+        const [startTime, endTime] = timeSlot.split('-');
+        const [startHour, startMin] = startTime.split(':').map(Number);
+        const [endHour, endMin] = endTime.split(':').map(Number);
+        
+        const startDateTime = new Date(date);
+        startDateTime.setHours(startHour, startMin, 0, 0);
+        
+        const endDateTime = new Date(date);
+        endDateTime.setHours(endHour, endMin, 0, 0);
+        
+        const conflictResult = await this.checkBookingConflicts(zoneId, startDateTime, endDateTime);
+        availability[timeSlot] = conflictResult.success && !conflictResult.data?.hasConflict;
+      }
+      
+      return {
+        success: true,
+        data: availability
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: {
+          message: 'Failed to check availability',
+          details: error
+        }
+      };
+    }
+  }
+
+  static async validateSlotsForConflicts(selectedSlots: SelectedTimeSlot[]): Promise<{
+    validSlots: SelectedTimeSlot[];
+    conflictedSlots: SelectedTimeSlot[];
+    conflicts: ConflictCheckResult[];
+  }> {
+    const validSlots: SelectedTimeSlot[] = [];
+    const conflictedSlots: SelectedTimeSlot[] = [];
+    const conflicts: ConflictCheckResult[] = [];
+
+    for (const slot of selectedSlots) {
+      const [startTime, endTime] = slot.timeSlot.split('-');
+      const [startHour, startMin] = startTime.split(':').map(Number);
+      const [endHour, endMin] = endTime.split(':').map(Number);
+      
+      const startDateTime = new Date(slot.date);
+      startDateTime.setHours(startHour, startMin, 0, 0);
+      
+      const endDateTime = new Date(slot.date);
+      endDateTime.setHours(endHour, endMin, 0, 0);
+
+      const conflictResult = await this.checkBookingConflicts(slot.zoneId, startDateTime, endDateTime);
+      
+      if (conflictResult.success && conflictResult.data?.hasConflict) {
+        conflictedSlots.push(slot);
+        conflicts.push(conflictResult.data);
+      } else {
+        validSlots.push(slot);
+      }
+    }
+
+    return { validSlots, conflictedSlots, conflicts };
+  }
+
+  static async addToCart(params: BookingServiceParams): Promise<{ success: boolean; message: string; conflicts?: ConflictCheckResult[] }> {
     try {
       if (!this.validateBookingData(params)) {
         return {
@@ -65,6 +184,18 @@ export class BookingService {
       }
 
       const { selectedSlots, facilityId, facilityName, zones, formData } = params;
+
+      // Check for conflicts before adding to cart
+      const conflictValidation = await this.validateSlotsForConflicts(selectedSlots);
+      
+      if (conflictValidation.conflictedSlots.length > 0) {
+        return {
+          success: false,
+          message: `${conflictValidation.conflictedSlots.length} tidspunkt har konflikter og kan ikke bookes`,
+          conflicts: conflictValidation.conflicts
+        };
+      }
+
       const { totalDuration, averagePricePerHour, baseFacilityPrice } = this.calculateTotalPricing(selectedSlots, zones);
 
       // Get cart store
@@ -112,7 +243,7 @@ export class BookingService {
     }
   }
 
-  static async completeBooking(params: BookingServiceParams): Promise<{ success: boolean; message: string }> {
+  static async completeBooking(params: BookingServiceParams): Promise<{ success: boolean; message: string; conflicts?: ConflictCheckResult[] }> {
     try {
       const addToCartResult = await this.addToCart(params);
       
@@ -132,5 +263,140 @@ export class BookingService {
         message: "Kunne ikke fullføre reservasjonen. Prøv igjen."
       };
     }
+  }
+
+  // Additional methods for useBookings hook compatibility
+  static async getBookings(pagination?: PaginationParams, filters?: BookingFilters): Promise<ApiResponse<Booking[]>> {
+    try {
+      const result = await bookingRepository.findAllWithFilters(pagination, filters);
+      return {
+        success: true,
+        data: result.data || []
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: {
+          message: 'Failed to fetch bookings',
+          details: error
+        }
+      };
+    }
+  }
+
+  static async getBookingById(id: string): Promise<ApiResponse<Booking>> {
+    try {
+      const result = await bookingRepository.getById(id);
+      if (result.error || !result.data) {
+        return {
+          success: false,
+          error: {
+            message: 'Booking not found',
+            details: result.error
+          }
+        };
+      }
+      return {
+        success: true,
+        data: result.data
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: {
+          message: 'Failed to fetch booking',
+          details: error
+        }
+      };
+    }
+  }
+
+  static async getBookingsByFacility(facilityId: string): Promise<ApiResponse<Booking[]>> {
+    try {
+      const result = await bookingRepository.getBookingsByFacility(facilityId);
+      return {
+        success: true,
+        data: result.data || []
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: {
+          message: 'Failed to fetch facility bookings',
+          details: error
+        }
+      };
+    }
+  }
+
+  static async getBookingsByZone(zoneId: string): Promise<ApiResponse<Booking[]>> {
+    try {
+      const result = await bookingRepository.getBookingsByZone(zoneId);
+      return {
+        success: true,
+        data: result.data || []
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: {
+          message: 'Failed to fetch zone bookings',
+          details: error
+        }
+      };
+    }
+  }
+
+  static async getConflictingBookings(zoneId: string, startDate: Date, endDate: Date): Promise<ApiResponse<ConflictCheckResult>> {
+    return this.checkBookingConflicts(zoneId, startDate, endDate);
+  }
+
+  // Placeholder methods for full CRUD operations
+  static async createBooking(request: BookingCreateRequest): Promise<ApiResponse<Booking>> {
+    // Implementation would go here
+    return {
+      success: false,
+      error: { message: 'Not implemented yet' }
+    };
+  }
+
+  static async updateBooking(id: string, request: BookingUpdateRequest): Promise<ApiResponse<Booking>> {
+    // Implementation would go here
+    return {
+      success: false,
+      error: { message: 'Not implemented yet' }
+    };
+  }
+
+  static async cancelBooking(id: string, reason?: string): Promise<ApiResponse<Booking>> {
+    // Implementation would go here
+    return {
+      success: false,
+      error: { message: 'Not implemented yet' }
+    };
+  }
+
+  static async approveBooking(id: string, notes?: string): Promise<ApiResponse<Booking>> {
+    // Implementation would go here
+    return {
+      success: false,
+      error: { message: 'Not implemented yet' }
+    };
+  }
+
+  static async rejectBooking(id: string, reason: string): Promise<ApiResponse<Booking>> {
+    // Implementation would go here
+    return {
+      success: false,
+      error: { message: 'Not implemented yet' }
+    };
+  }
+
+  static async createRecurringBooking(request: BookingCreateRequest, pattern: any): Promise<ApiResponse<Booking[]>> {
+    // Implementation would go here
+    return {
+      success: false,
+      error: { message: 'Not implemented yet' }
+    };
   }
 }

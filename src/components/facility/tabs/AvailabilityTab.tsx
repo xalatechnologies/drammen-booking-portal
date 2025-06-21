@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { format, addDays, startOfWeek } from 'date-fns';
 import { nb } from 'date-fns/locale';
@@ -9,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { CalendarGrid } from './CalendarGrid';
 import { LegendDisplay } from './LegendDisplay';
-import { SimplifiedBookingForm } from '@/components/booking/SimplifiedBookingForm';
+import { BookingForm } from '@/components/booking/BookingForm';
 import { Zone } from '@/components/booking/types';
 import { SelectedTimeSlot, RecurrencePattern, recurrenceEngine } from '@/utils/recurrenceEngine';
 import { useAvailabilityStatus } from './useAvailabilityStatus';
@@ -250,7 +249,7 @@ export function AvailabilityTab({
         {/* Right Column - Booking Form (40%) */}
         <div className="lg:col-span-2">
           <div className="sticky top-6">
-            <SimplifiedBookingForm
+            <BookingForm
               selectedSlots={selectedSlots}
               facilityId={facilityId}
               facilityName={facilityName}
