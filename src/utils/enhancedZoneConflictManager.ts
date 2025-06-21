@@ -1,3 +1,4 @@
+
 import { ZoneConflictManager } from "./zoneConflictManager";
 import { Zone } from "@/components/booking/types";
 import { BookingService } from "@/services/BookingService";
@@ -206,63 +207,72 @@ export class EnhancedZoneConflictManager extends ZoneConflictManager {
         booking.startDate <= endDate &&
         booking.endDate >= startDate
       )
-      .map(booking => ({
-        // Core booking properties that match Booking interface
-        id: booking.id,
-        user_id: booking.userId,
-        facility_id: parseInt(this.zones.find(z => z.id === zoneId)?.facilityId || '1'),
-        zone_id: booking.zoneId,
-        start_date: booking.startDate,
-        end_date: booking.endDate,
-        duration_minutes: Math.floor((booking.endDate.getTime() - booking.startDate.getTime()) / 60000),
+      .map(booking => {
+        const zone = this.zones.find(z => z.id === zoneId);
+        const facility = zone ? { id: zone.facilityId, name: 'Facility Name' } : { id: '1', name: 'Unknown Facility' };
         
-        // Required Booking properties with defaults
-        type: 'engangs' as const,
-        status: 'confirmed' as const,
-        approval_status: 'not-required' as const,
-        event_type: 'other' as const,
-        expected_attendees: 1,
-        age_group: 'mixed' as const,
-        actor_type: 'private-person' as const,
-        contact_name: 'Unknown',
-        contact_email: 'unknown@example.com',
-        contact_phone: '',
-        purpose: booking.purpose,
-        description: booking.purpose,
-        special_requirements: '',
-        requires_approval: false,
-        base_price: 0,
-        services_price: 0,
-        total_price: 0,
-        payment_status: 'pending',
-        booking_reference: `REF-${booking.id}`,
-        created_at: new Date(),
-        updated_at: new Date(),
-        
-        // Additional Booking interface properties
-        eventType: 'other' as const,
-        expectedAttendees: 1,
-        ageGroup: 'mixed' as const,
-        contactName: 'Unknown',
-        contactEmail: 'unknown@example.com',
-        contactPhone: '',
-        additionalServices: [],
-        pricing: {
-          basePrice: 0,
-          servicesPrice: 0,
-          totalPrice: 0,
-          currency: 'NOK'
-        },
-        requiresApproval: false,
-        approvalStatus: 'not-required' as const,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        notes: [],
-        attachments: [],
-        conflicts: [],
-        recurrence: null,
-        cancellation: null
-      }));
+        return {
+          // Core booking properties that match Booking interface
+          id: booking.id,
+          user_id: booking.userId,
+          facility_id: parseInt(facility.id),
+          zone_id: booking.zoneId,
+          start_date: booking.startDate,
+          end_date: booking.endDate,
+          duration_minutes: Math.floor((booking.endDate.getTime() - booking.startDate.getTime()) / 60000),
+          
+          // Required Booking properties with defaults
+          type: 'engangs' as const,
+          status: 'confirmed' as const,
+          approval_status: 'not-required' as const,
+          event_type: 'other' as const,
+          expected_attendees: 1,
+          age_group: 'mixed' as const,
+          actor_type: 'private-person' as const,
+          contact_name: 'Unknown',
+          contact_email: 'unknown@example.com',
+          contact_phone: '',
+          purpose: booking.purpose,
+          description: booking.purpose,
+          special_requirements: '',
+          requires_approval: false,
+          base_price: 0,
+          services_price: 0,
+          total_price: 0,
+          payment_status: 'pending',
+          booking_reference: `REF-${booking.id}`,
+          created_at: new Date(),
+          updated_at: new Date(),
+          
+          // Additional Booking interface properties
+          facilityId: facility.id,
+          facilityName: facility.name,
+          zoneId: booking.zoneId,
+          zoneName: zone?.name || 'Unknown Zone',
+          eventType: 'other' as const,
+          expectedAttendees: 1,
+          ageGroup: 'mixed' as const,
+          contactName: 'Unknown',
+          contactEmail: 'unknown@example.com',
+          contactPhone: '',
+          additionalServices: [],
+          pricing: {
+            basePrice: 0,
+            servicesPrice: 0,
+            totalPrice: 0,
+            currency: 'NOK'
+          },
+          requiresApproval: false,
+          approvalStatus: 'not-required' as const,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          notes: [],
+          attachments: [],
+          conflicts: [],
+          recurrence: null,
+          cancellation: null
+        } as Booking;
+      });
 
     const hasConflicts = conflictingBookings.length > 0;
 
