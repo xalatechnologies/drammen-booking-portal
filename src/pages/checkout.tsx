@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import GlobalHeader from '@/components/GlobalHeader';
@@ -10,7 +11,6 @@ import { EmptyCart } from '@/components/checkout/EmptyCart';
 import { ReviewStep } from '@/components/checkout/ReviewStep';
 import { LoginStep } from '@/components/checkout/LoginStep';
 import { ConfirmationStep } from '@/components/checkout/ConfirmationStep';
-import { OrderSummary } from '@/components/checkout/OrderSummary';
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
@@ -43,7 +43,6 @@ const CheckoutPage = () => {
     await new Promise(resolve => setTimeout(resolve, 1000));
     
     clearCart();
-    // Navigate to bookings page instead of confirmation page
     navigate('/bookings');
   };
 
@@ -52,7 +51,6 @@ const CheckoutPage = () => {
   };
 
   const handleContinueFromReview = () => {
-    // Skip login step if user is already authenticated
     if (isAuthenticated) {
       setStep('confirm');
     } else {
@@ -80,40 +78,34 @@ const CheckoutPage = () => {
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <GlobalHeader />
       <div className="flex-grow py-8">
-        <div className="container mx-auto px-4 max-w-6xl">
+        <div className="container mx-auto px-4 max-w-4xl">
           <CheckoutHeader onBack={() => navigate(-1)} />
           <ProgressIndicator currentStep={step} isAuthenticated={isAuthenticated} />
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2">
-              {step === 'review' && (
-                <ReviewStep
-                  items={items}
-                  onEditReservation={handleEditReservation}
-                  onRemoveReservation={handleRemoveReservation}
-                  onContinue={handleContinueFromReview}
-                />
-              )}
+          <div className="w-full">
+            {step === 'review' && (
+              <ReviewStep
+                items={items}
+                onEditReservation={handleEditReservation}
+                onRemoveReservation={handleRemoveReservation}
+                onContinue={handleContinueFromReview}
+              />
+            )}
 
-              {step === 'login' && !isAuthenticated && (
-                <LoginStep
-                  onBack={() => setStep('review')}
-                  onContinue={handleContinueFromLogin}
-                />
-              )}
+            {step === 'login' && !isAuthenticated && (
+              <LoginStep
+                onBack={() => setStep('review')}
+                onContinue={handleContinueFromLogin}
+              />
+            )}
 
-              {step === 'confirm' && (
-                <ConfirmationStep
-                  formData={formData}
-                  onBack={() => isAuthenticated ? setStep('review') : setStep('login')}
-                  onSubmit={handleSubmit}
-                />
-              )}
-            </div>
-
-            <div className="lg:col-span-1">
-              <OrderSummary items={items} customerType={formData.customerType} />
-            </div>
+            {step === 'confirm' && (
+              <ConfirmationStep
+                formData={formData}
+                onBack={() => isAuthenticated ? setStep('review') : setStep('login')}
+                onSubmit={handleSubmit}
+              />
+            )}
           </div>
         </div>
       </div>
