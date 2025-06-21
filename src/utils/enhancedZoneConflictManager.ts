@@ -212,8 +212,18 @@ export class EnhancedZoneConflictManager extends ZoneConflictManager {
         const facility = zone ? { id: zone.facilityId, name: 'Facility Name' } : { id: '1', name: 'Unknown Facility' };
         
         return {
-          // Core booking properties that match Booking interface
+          // Core booking properties with correct camelCase naming
           id: booking.id,
+          userId: booking.userId,
+          facilityId: facility.id,
+          facilityName: facility.name,
+          zoneId: booking.zoneId,
+          zoneName: zone?.name || 'Unknown Zone',
+          startDate: booking.startDate,
+          endDate: booking.endDate,
+          durationMinutes: Math.floor((booking.endDate.getTime() - booking.startDate.getTime()) / 60000),
+          
+          // Database field mappings
           user_id: booking.userId,
           facility_id: parseInt(facility.id),
           zone_id: booking.zoneId,
@@ -229,6 +239,7 @@ export class EnhancedZoneConflictManager extends ZoneConflictManager {
           expected_attendees: 1,
           age_group: 'mixed' as const,
           actor_type: 'private-person' as const,
+          actorType: 'private-person' as const,
           contact_name: 'Unknown',
           contact_email: 'unknown@example.com',
           contact_phone: '',
@@ -245,10 +256,6 @@ export class EnhancedZoneConflictManager extends ZoneConflictManager {
           updated_at: new Date(),
           
           // Additional Booking interface properties
-          facilityId: facility.id,
-          facilityName: facility.name,
-          zoneId: booking.zoneId,
-          zoneName: zone?.name || 'Unknown Zone',
           eventType: 'other' as const,
           expectedAttendees: 1,
           ageGroup: 'mixed' as const,
