@@ -57,7 +57,7 @@ export const FacilityHeader: React.FC<FacilityHeaderProps> = ({ facility }) => {
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
-          {facility.suitableFor.slice(0, 3).map((activity, i) => (
+          {facility.suitableFor && facility.suitableFor.slice(0, 3).map((activity, i) => (
             <Badge
               key={i}
               className="bg-blue-100 text-blue-800 border-blue-200 text-base px-4 py-2"
@@ -65,7 +65,7 @@ export const FacilityHeader: React.FC<FacilityHeaderProps> = ({ facility }) => {
               {activity}
             </Badge>
           ))}
-          {facility.accessibility.includes("wheelchair") && (
+          {facility.accessibility && facility.accessibility.includes("wheelchair") && (
             <Badge className="bg-green-100 text-green-800 border-green-200 text-base px-4 py-2">
               Rullestol
             </Badge>
