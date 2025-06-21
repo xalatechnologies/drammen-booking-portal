@@ -185,7 +185,7 @@ export const EnhancedFacilityListView: React.FC<EnhancedFacilityListViewProps> =
     const csvContent = [
       ['ID', 'Name', 'Type', 'Area', 'Status', 'Capacity', 'Price/Hour'].join(','),
       ...filteredFacilities.map(f => 
-        [f.id, f.name, f.type, f.area, f.status, f.capacity, f.price_per_hour].join(',')
+        [f.id, f.name, f.type, f.area, f.status, f.capacity, f.pricePerHour || f.price_per_hour || 0].join(',')
       )
     ].join('\n');
 
@@ -327,8 +327,8 @@ export const EnhancedFacilityListView: React.FC<EnhancedFacilityListViewProps> =
                 <SelectItem value="name-desc">Name Z-A</SelectItem>
                 <SelectItem value="capacity-asc">Capacity Low-High</SelectItem>
                 <SelectItem value="capacity-desc">Capacity High-Low</SelectItem>
-                <SelectItem value="price_per_hour-asc">Price Low-High</SelectItem>
-                <SelectItem value="price_per_hour-desc">Price High-Low</SelectItem>
+                <SelectItem value="pricePerHour-asc">Price Low-High</SelectItem>
+                <SelectItem value="pricePerHour-desc">Price High-Low</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -415,7 +415,7 @@ export const EnhancedFacilityListView: React.FC<EnhancedFacilityListViewProps> =
                         <div className="font-medium">{facility.name}</div>
                         <div className="text-sm text-muted-foreground flex items-center">
                           <MapPin className="w-3 h-3 mr-1" />
-                          {facility.address_street}, {facility.address_city}
+                          {facility.address_street || facility.address}, {facility.address_city || facility.city}
                         </div>
                       </div>
                     </div>
@@ -428,7 +428,7 @@ export const EnhancedFacilityListView: React.FC<EnhancedFacilityListViewProps> =
                     </Badge>
                   </TableCell>
                   <TableCell>{facility.capacity}</TableCell>
-                  <TableCell>{facility.price_per_hour} kr</TableCell>
+                  <TableCell>{facility.pricePerHour || facility.price_per_hour || 0} kr</TableCell>
                   <TableCell onClick={(e) => e.stopPropagation()}>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
