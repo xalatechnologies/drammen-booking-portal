@@ -103,32 +103,32 @@ const AdminHeader = () => {
     })));
   };
   return (
-    <header className="border-b bg-white shadow-sm z-50 pb-2 py-[20px]" style={{ height: LAYOUT_CONSTANTS.HEADER_HEIGHT }}>
-      <div className="flex h-20 items-center px-6">
-        <div className="flex items-center gap-4 min-w-0">
-          <div className="md:hidden mr-2">
+    <header className="border-b bg-white shadow-sm z-50" style={{ height: "6rem" }}>
+      <div className="flex h-24 items-center px-8">
+        <div className="flex items-center gap-6 min-w-0">
+          <div className="md:hidden mr-3">
             <SidebarTrigger />
           </div>
           <Logo />
         </div>
         
-        <div className="flex-1 flex justify-center px-8">
-          <div className="flex items-center gap-4 w-full max-w-lg">
+        <div className="flex-1 flex justify-center px-12">
+          <div className="flex items-center gap-6 w-full max-w-2xl">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
               <Input 
                 placeholder={tSync("admin.header.searchPlaceholder", "Search all content...")} 
-                className="pl-10 h-10 text-base bg-gray-50 border-gray-200 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none focus:border-blue-500" 
+                className="pl-12 h-12 text-base bg-gray-50 border-gray-200 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none focus:border-blue-500 rounded-lg" 
                 aria-label={tSync("admin.header.searchPlaceholder", "Search the system")} 
               />
             </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-3 flex-shrink-0">
+        <div className="flex items-center gap-4 flex-shrink-0">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="h-9 px-3">
+              <Button variant="outline" className="h-11 px-4 text-sm font-medium">
                 {roleNames[currentRole]}
                 <ChevronDown className="ml-2 h-4 w-4" />
               </Button>
@@ -144,21 +144,22 @@ const AdminHeader = () => {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <Button variant="ghost" onClick={toggleLanguage} className="flex items-center px-3 py-2 h-9 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:outline-none rounded-md" aria-label={`Bytt språk til ${language === 'NO' ? 'Engelsk' : 'Norsk'}`}>
+          <Button variant="ghost" onClick={toggleLanguage} className="flex items-center px-4 py-2 h-11 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:outline-none rounded-lg" aria-label={`Bytt språk til ${language === 'NO' ? 'Engelsk' : 'Norsk'}`}>
+            <Globe className="mr-2 h-4 w-4" />
             <span>{language}</span>
           </Button>
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="relative h-9 w-9 hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:outline-none rounded-md" aria-label={`${tSync("admin.header.notifications", "Varsler")} - ${unreadCount} uleste`}>
-                <Bell className="h-4 w-4 text-gray-600" />
-                {unreadCount > 0 && <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-red-500 text-white text-xs flex items-center justify-center font-medium">
+              <Button variant="ghost" size="icon" className="relative h-11 w-11 hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:outline-none rounded-lg" aria-label={`${tSync("admin.header.notifications", "Varsler")} - ${unreadCount} uleste`}>
+                <Bell className="h-5 w-5 text-gray-600" />
+                {unreadCount > 0 && <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center font-medium">
                     {unreadCount}
                   </span>}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-80 bg-white shadow-lg border border-gray-200">
-              <div className="flex justify-between items-center px-2 py-2">
+              <div className="flex justify-between items-center px-3 py-3">
                 <DropdownMenuLabel className="text-base font-semibold p-0">
                   {tSync("admin.header.notifications", "Varsler")}
                 </DropdownMenuLabel>
@@ -186,8 +187,8 @@ const AdminHeader = () => {
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="relative h-9 gap-2 px-2 hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:outline-none rounded-md" aria-label={tSync("admin.header.userProfile", "Brukerprofil og innstillinger")}>
-                <Avatar className="h-7 w-7">
+              <Button variant="ghost" size="sm" className="relative h-11 gap-3 px-3 hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:outline-none rounded-lg" aria-label={tSync("admin.header.userProfile", "Brukerprofil og innstillinger")}>
+                <Avatar className="h-8 w-8">
                   <AvatarImage src={roleAvatars[currentRole].src} alt={roleNames[currentRole]} />
                   <AvatarFallback className="bg-blue-600 text-white text-xs font-medium">
                     {roleAvatars[currentRole].fallback}

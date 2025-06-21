@@ -8,9 +8,9 @@ export const LAYOUT_CONSTANTS = {
   PAGE_BACKGROUND: "bg-gray-50",
   CARD_BACKGROUND: "bg-white",
   
-  // Layout dimensions - increased header height
+  // Layout dimensions - increased header height further
   SIDEBAR_WIDTH: "20rem", // 320px
-  HEADER_HEIGHT: "5rem", // 80px (increased from 4rem/64px)
+  HEADER_HEIGHT: "6rem", // 96px (increased from 5rem/80px)
   
   // Typography - keeping original values
   PAGE_TITLE: "text-3xl font-bold text-gray-900",
