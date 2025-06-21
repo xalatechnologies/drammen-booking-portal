@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { DateRange } from "react-day-picker";
@@ -90,6 +91,7 @@ const Index = () => {
     } : {})
   };
   console.log("Index.tsx - Created filters:", filters);
+  
   const renderContent = () => {
     switch (viewMode) {
       case "map":
@@ -98,9 +100,17 @@ const Index = () => {
         return <CalendarView date={date} facilityType={facilityType} location={location} accessibility={accessibility} capacity={capacity} viewMode={viewMode} setViewMode={setViewMode} />;
       case "list":
       case "grid":
-        return <FacilityList filters={filters} viewMode={viewMode} setViewMode={setViewMode} />;
+        return (
+          <div className="max-w-7xl mx-auto px-4 my-[12px]">
+            <FacilityList filters={filters} viewMode={viewMode} setViewMode={setViewMode} />
+          </div>
+        );
       default:
-        return <FacilityList filters={filters} viewMode="grid" setViewMode={setViewMode} />;
+        return (
+          <div className="max-w-7xl mx-auto px-4 my-[12px]">
+            <FacilityList filters={filters} viewMode="grid" setViewMode={setViewMode} />
+          </div>
+        );
     }
   };
 
@@ -151,7 +161,7 @@ const Index = () => {
         </div>
 
         {/* Scrollable Content Area with reduced top padding */}
-        <div className="pt-40 px-4 py-6">
+        <div className="pt-40">
           {renderContent()}
         </div>
       </main>

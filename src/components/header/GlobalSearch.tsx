@@ -27,6 +27,7 @@ interface GlobalSearchProps {
 const GlobalSearch: React.FC<GlobalSearchProps> = ({ onResultClick }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isOpen, setIsOpen] = useState(false);
+  const [hasInteracted, setHasInteracted] = useState(false);
   const [results, setResults] = useState<SearchResult[]>([]);
   const [facilities, setFacilities] = useState<Facility[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -180,6 +181,9 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ onResultClick }) => {
   };
 
   useEffect(() => {
+    // Only create search results if user has interacted with the input
+    if (!hasInteracted) return;
+    
     const searchResults = createSearchResults(searchTerm);
     
     // Sort by relevance (exact matches first, then partial matches)
@@ -198,8 +202,8 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ onResultClick }) => {
     });
     
     setResults(sorted.slice(0, 8)); // Limit to 8 results
-    setIsOpen(searchTerm.length > 0 || sorted.length > 0);
-  }, [searchTerm, facilities]);
+    setIsOpen(sorted.length > 0 || searchTerm.length > 0);
+  }, [searchTerm, facilities, hasInteracted]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -211,6 +215,27 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ onResultClick }) => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  const handleInputFocus = () => {
+    setHasInteracted(true);
+    if (searchTerm.length === 0) {
+      // Show recent searches when focusing on empty input
+      const recentSearches = getRecentSearches();
+      const recentResults = recentSearches.map(search => ({
+        ...search,
+        icon: <Clock className="h-5 w-5" />
+      }));
+      setResults(recentResults);
+      setIsOpen(recentResults.length > 0);
+    } else {
+      setIsOpen(true);
+    }
+  };
+
+  const handleSearchTermChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+    setHasInteracted(true);
+  };
 
   const handleResultClick = (result: SearchResult) => {
     console.log("GlobalSearch - Result clicked:", result.title, result);
@@ -245,17 +270,14 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ onResultClick }) => {
         <Input
           placeholder={t.placeholder}
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          onFocus={() => {
-            const searchResults = createSearchResults(searchTerm);
-            setIsOpen(searchTerm.length > 0 || searchResults.length > 0);
-          }}
+          onChange={handleSearchTermChange}
+          onFocus={handleInputFocus}
           className="pl-12 pr-4 h-12 bg-gray-50 border-gray-200 focus:bg-white focus:border-gray-400 text-base font-medium placeholder:text-base placeholder:font-medium"
           autoComplete="off"
         />
       </div>
 
-      {isOpen && (
+      {isOpen && hasInteracted && (
         <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 shadow-xl z-50 max-h-[500px] overflow-hidden">
           <Command>
             <CommandList>
