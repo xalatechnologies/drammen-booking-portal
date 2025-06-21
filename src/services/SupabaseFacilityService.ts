@@ -8,6 +8,12 @@ export class SupabaseFacilityService {
 
   private static adaptDatabaseToFacility(dbFacility: any): Facility {
     console.log('SupabaseFacilityService - Raw facility from DB:', dbFacility);
+    console.log('SupabaseFacilityService - Address fields from raw DB:', {
+      street: dbFacility.address_street,
+      city: dbFacility.address_city,
+      postal: dbFacility.address_postal_code,
+      country: dbFacility.address_country
+    });
     
     // Get image from facility_images or fallback
     let image = 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&auto=format&fit=crop';
@@ -21,11 +27,6 @@ export class SupabaseFacilityService {
       }
     }
 
-    console.log('SupabaseFacilityService - Address fields from DB:', {
-      street: dbFacility.address_street,
-      city: dbFacility.address_city,
-      postal: dbFacility.address_postal_code
-    });
     console.log('SupabaseFacilityService - Using image:', image);
 
     // Direct mapping - keep all database fields as they are
@@ -88,6 +89,25 @@ export class SupabaseFacilityService {
       availableTimes: []
     };
 
+    console.log('SupabaseFacilityService - Facility before address computation:', {
+      id: facility.id,
+      name: facility.name,
+      address_street: facility.address_street,
+      address_city: facility.address_city,
+      address_postal_code: facility.address_postal_code,
+      address_country: facility.address_country
+    });
+
+    // Compute address from individual fields
+    const addressParts = [
+      facility.address_street?.trim(),
+      facility.address_city?.trim(),
+      facility.address_postal_code?.trim()
+    ].filter(part => part && part !== '');
+    
+    facility.address = addressParts.length > 0 ? addressParts.join(', ') : 'Address not available';
+    
+    console.log('SupabaseFacilityService - Final computed address:', facility.address);
     console.log('SupabaseFacilityService - Final adapted facility:', facility);
     return facility;
   }
