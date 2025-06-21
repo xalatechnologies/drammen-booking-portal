@@ -1,64 +1,51 @@
 
-import React from "react";
-import { BookingStatusCard, BookingStatus } from "@/components/booking/BookingStatusCard";
-import { Card, CardContent } from "@/components/ui/card";
-import { format } from "date-fns";
-import { nb } from "date-fns/locale";
+import React from 'react';
+import { Card } from '@/components/ui/card';
+import { BookingStatusCard, BookingStatus } from '@/components/booking/BookingStatusCard';
 
 interface Booking {
-  id: number;
-  facilityName: string;
-  location: string;
-  date: Date;
-  endDate: Date;
+  id: string;
   status: BookingStatus;
-  bookingNumber: string;
-  amount?: number;
+  facilityName: string;
+  bookingReference: string;
+  amount: number;
   approvalDate?: Date;
   paymentDueDate?: Date;
 }
 
 interface BookingsListProps {
-  bookings: Booking[];
-  onPayNow: (booking: Booking) => void;
+  bookings?: Booking[];
+  onPayNow?: (bookingId: string) => void;
+  onViewDetails?: (bookingId: string) => void;
 }
 
-export function BookingsList({ bookings, onPayNow }: BookingsListProps) {
+export function BookingsList({ 
+  bookings = [], 
+  onPayNow = () => {}, 
+  onViewDetails = () => {} 
+}: BookingsListProps) {
+  if (bookings.length === 0) {
+    return (
+      <Card className="p-6 text-center">
+        <p className="text-gray-500">Ingen bookinger funnet</p>
+      </Card>
+    );
+  }
+
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div className="space-y-4">
       {bookings.map((booking) => (
-        <div key={booking.id} className="space-y-4">
-          <BookingStatusCard
-            status={booking.status}
-            facilityName={booking.facilityName}
-            bookingReference={booking.bookingNumber}
-            amount={booking.amount}
-            approvalDate={booking.approvalDate}
-            paymentDueDate={booking.paymentDueDate}
-            onPayNow={() => onPayNow(booking)}
-            onViewDetails={() => console.log('View details for', booking.id)}
-          />
-          
-          {/* Booking Details Card */}
-          <Card className="border-gray-200">
-            <CardContent className="p-4">
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-gray-700">Dato og tid:</span>
-                  <span className="text-sm text-gray-900">
-                    {format(booking.date, "EEEE d. MMMM yyyy", {locale: nb})} 
-                    {" kl. "}
-                    {format(booking.date, "HH:mm")} - {format(booking.endDate, "HH:mm")}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-gray-700">Lokasjon:</span>
-                  <span className="text-sm text-gray-900 text-right">{booking.location}</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        <BookingStatusCard
+          key={booking.id}
+          status={booking.status}
+          facilityName={booking.facilityName}
+          bookingReference={booking.bookingReference}
+          amount={booking.amount}
+          approvalDate={booking.approvalDate}
+          paymentDueDate={booking.paymentDueDate}
+          onPayNow={() => onPayNow(booking.id)}
+          onViewDetails={() => onViewDetails(booking.id)}
+        />
       ))}
     </div>
   );

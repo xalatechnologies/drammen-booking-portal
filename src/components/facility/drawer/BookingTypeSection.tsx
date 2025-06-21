@@ -5,8 +5,8 @@ import { BookingTypeSelector } from '@/components/booking/BookingTypeSelector';
 import { BookingType } from '@/types/pricing';
 
 interface BookingTypeSectionProps {
-  value: BookingType;
-  onChange: (type: BookingType) => void;
+  value: string;
+  onChange: (type: string) => void;
 }
 
 export function BookingTypeSection({ value, onChange }: BookingTypeSectionProps) {
@@ -14,8 +14,8 @@ export function BookingTypeSection({ value, onChange }: BookingTypeSectionProps)
     <Card>
       <CardContent className="p-4">
         <BookingTypeSelector
-          value={value}
-          onChange={onChange}
+          selectedType={value}
+          onTypeChange={onChange}
         />
       </CardContent>
     </Card>

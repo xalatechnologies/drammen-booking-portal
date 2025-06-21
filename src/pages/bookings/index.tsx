@@ -16,14 +16,47 @@ export default function BookingsPage() {
     setShowPayment(false);
   };
 
+  const handlePayNow = (bookingId: string) => {
+    console.log('Pay now for booking:', bookingId);
+    setShowPayment(true);
+  };
+
+  const handleViewDetails = (bookingId: string) => {
+    console.log('View details for booking:', bookingId);
+  };
+
+  // Mock bookings data
+  const mockBookings = [
+    {
+      id: '1',
+      status: 'pending' as const,
+      facilityName: 'Drammen Sportshall',
+      bookingReference: 'BOK-2024-001',
+      amount: 1500,
+      paymentDueDate: new Date()
+    },
+    {
+      id: '2', 
+      status: 'confirmed' as const,
+      facilityName: 'Konferanserom A',
+      bookingReference: 'BOK-2024-002',
+      amount: 800,
+      approvalDate: new Date()
+    }
+  ];
+
   return (
     <div className="container mx-auto py-8">
       <h1 className="text-2xl font-bold mb-6">Mine bookinger</h1>
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
-          <BookingsTabs activeTab={activeTab} onTabChange={setActiveTab} />
-          <BookingsList />
+          <BookingsTabs selectedTab={activeTab} onTabChange={setActiveTab} />
+          <BookingsList 
+            bookings={mockBookings}
+            onPayNow={handlePayNow}
+            onViewDetails={handleViewDetails}
+          />
         </div>
         
         <div className="space-y-4">

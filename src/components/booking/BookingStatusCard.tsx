@@ -4,13 +4,38 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Clock, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 
+export enum BookingStatus {
+  DRAFT = 'draft',
+  PENDING = 'pending',
+  CONFIRMED = 'confirmed',
+  CANCELLED = 'cancelled'
+}
+
 interface BookingStatusCardProps {
   status: string;
   title?: string;
   children?: React.ReactNode;
+  facilityName?: string;
+  bookingReference?: string;
+  amount?: number;
+  approvalDate?: Date;
+  paymentDueDate?: Date;
+  onPayNow?: () => void;
+  onViewDetails?: () => void;
 }
 
-export function BookingStatusCard({ status, title = 'Status', children }: BookingStatusCardProps) {
+export function BookingStatusCard({ 
+  status, 
+  title = 'Status', 
+  children,
+  facilityName,
+  bookingReference,
+  amount,
+  approvalDate,
+  paymentDueDate,
+  onPayNow,
+  onViewDetails
+}: BookingStatusCardProps) {
   const getStatusConfig = (status: string) => {
     switch (status.toLowerCase()) {
       case 'confirmed':
@@ -40,8 +65,25 @@ export function BookingStatusCard({ status, title = 'Status', children }: Bookin
         <Badge variant={variant} className="mb-3">
           {label}
         </Badge>
+        {facilityName && (
+          <div className="text-sm text-gray-600 mb-2">
+            <strong>Fasilietet:</strong> {facilityName}
+          </div>
+        )}
+        {bookingReference && (
+          <div className="text-sm text-gray-600 mb-2">
+            <strong>Referanse:</strong> {bookingReference}
+          </div>
+        )}
+        {amount && (
+          <div className="text-sm text-gray-600 mb-2">
+            <strong>Beløp:</strong> {amount} kr
+          </div>
+        )}
         {children}
       </CardContent>
     </Card>
   );
 }
+
+export { BookingStatusCardProps };

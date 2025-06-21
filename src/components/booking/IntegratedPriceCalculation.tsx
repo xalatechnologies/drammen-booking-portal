@@ -2,22 +2,31 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { SelectedTimeSlot } from '@/utils/recurrenceEngine';
+import { ActorType, BookingType } from '@/types/pricing';
 
 interface IntegratedPriceCalculationProps {
-  basePricePerHour: number;
-  totalHours: number;
+  selectedSlots: SelectedTimeSlot[];
+  facilityId: string;
+  actorType: ActorType;
+  bookingType?: BookingType;
+  basePricePerHour?: number;
   actorTypeMultiplier?: number;
   servicesPrice?: number;
   discounts?: number;
 }
 
 export function IntegratedPriceCalculation({
-  basePricePerHour,
-  totalHours,
+  selectedSlots,
+  facilityId,
+  actorType,
+  bookingType = 'engangs',
+  basePricePerHour = 450,
   actorTypeMultiplier = 1,
   servicesPrice = 0,
   discounts = 0
 }: IntegratedPriceCalculationProps) {
+  const totalHours = selectedSlots.reduce((total, slot) => total + (slot.duration || 1), 0);
   const basePrice = basePricePerHour * totalHours;
   const adjustedPrice = basePrice * actorTypeMultiplier;
   const totalPrice = adjustedPrice + servicesPrice - discounts;

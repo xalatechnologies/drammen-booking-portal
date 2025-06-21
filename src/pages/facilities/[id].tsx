@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import GlobalHeader from "@/components/GlobalHeader";
@@ -49,7 +48,6 @@ const FacilityDetail = () => {
     pricePerHour: facility?.pricePerHour || 450,
     description: t('facility.booking.wholeVenueDescription'),
     area: facility?.area || "120 m²",
-    isMainZone: true,
     subZones: ["zone-1", "zone-2"],
     bookingRules: {
       minBookingDuration: 2,
