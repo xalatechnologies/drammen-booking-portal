@@ -2,8 +2,9 @@
 import { SupabaseRepository } from '../SupabaseRepository';
 import { LocalizedFacility } from '@/types/localization';
 import { Zone } from '@/types/zone';
-import { FacilityFilters, FacilitySortOptions } from '@/types/facility';
+import { FacilityFilters } from '@/types/facility';
 import { PaginationParams, PaginatedResponse, RepositoryResponse } from '@/types/api';
+import { supabase } from '@/integrations/supabase/client';
 
 export class LocalizedFacilityRepository extends SupabaseRepository<LocalizedFacility> {
   protected tableName = 'facilities';

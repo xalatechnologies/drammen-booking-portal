@@ -1,6 +1,8 @@
 
 import { SupabaseRepository } from '../SupabaseRepository';
 import { AdditionalService, ServiceFilters } from '@/types/additionalServices';
+import { PaginationParams, RepositoryResponse } from '@/types/api';
+import { supabase } from '@/integrations/supabase/client';
 
 interface AdditionalServiceCreateRequest extends Omit<AdditionalService, 'id' | 'created_at' | 'updated_at'> {}
 interface AdditionalServiceUpdateRequest extends Partial<AdditionalServiceCreateRequest> {}

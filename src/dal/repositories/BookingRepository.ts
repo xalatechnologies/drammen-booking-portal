@@ -1,6 +1,8 @@
 
 import { SupabaseRepository } from '../SupabaseRepository';
 import { Booking, BookingFilters, BookingCreateRequest, BookingUpdateRequest } from '@/types/booking';
+import { PaginationParams, RepositoryResponse } from '@/types/api';
+import { supabase } from '@/integrations/supabase/client';
 
 export class BookingRepository extends SupabaseRepository<Booking> {
   protected tableName = 'bookings';

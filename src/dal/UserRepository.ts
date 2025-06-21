@@ -1,6 +1,8 @@
 
 import { SupabaseRepository } from './SupabaseRepository';
 import { User, UserFilters, UserCreateRequest, UserUpdateRequest } from '@/types/user';
+import { RepositoryResponse } from '@/types/api';
+import { supabase } from '@/integrations/supabase/client';
 
 export class UserRepository extends SupabaseRepository<User> {
   protected tableName = 'profiles';

@@ -1,6 +1,8 @@
 
 import { SupabaseRepository } from './SupabaseRepository';
-import { Organization, OrganizationFilters, OrganizationType, OrganizationStatus, VerificationLevel, OrganizationMetadata } from '@/types/organization';
+import { Organization, OrganizationType, OrganizationStatus, VerificationLevel } from '@/types/organization';
+import { RepositoryResponse } from '@/types/api';
+import { supabase } from '@/integrations/supabase/client';
 
 interface OrganizationCreateRequest {
   name: string;

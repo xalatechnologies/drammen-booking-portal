@@ -10,8 +10,8 @@ export function useAdditionalServices(facilityId: string, category?: ServiceCate
     queryFn: async () => {
       if (category) {
         const result = await AdditionalServicesService.getServicesByCategory(category, facilityId);
-        if (result.error) {
-          throw new Error(result.error);
+        if (!result.success) {
+          throw new Error(result.error?.message || 'Failed to fetch services');
         }
         return result.data || [];
       } else {
@@ -19,8 +19,8 @@ export function useAdditionalServices(facilityId: string, category?: ServiceCate
           { page: 1, limit: 100 },
           { facilityId, isActive: true }
         );
-        if (result.error) {
-          throw new Error(result.error);
+        if (!result.success) {
+          throw new Error(result.error?.message || 'Failed to fetch services');
         }
         return result.data?.data || [];
       }
@@ -53,8 +53,8 @@ export function useServicePricing() {
       date
     );
     
-    if (result.error) {
-      throw new Error(result.error);
+    if (!result.success) {
+      throw new Error(result.error?.message || 'Failed to calculate price');
     }
     
     return result.data;
@@ -71,8 +71,8 @@ export function useServicePricing() {
       timeSlot
     );
     
-    if (result.error) {
-      throw new Error(result.error);
+    if (!result.success) {
+      throw new Error(result.error?.message || 'Failed to validate availability');
     }
     
     return result.data;
@@ -89,8 +89,8 @@ export function usePopularServices(facilityId: string, limit?: number) {
     queryKey: ['popular-services', facilityId, limit],
     queryFn: async () => {
       const result = await AdditionalServicesService.getPopularServices(facilityId, limit);
-      if (result.error) {
-        throw new Error(result.error);
+      if (!result.success) {
+        throw new Error(result.error?.message || 'Failed to fetch popular services');
       }
       return result.data || [];
     },

@@ -1,6 +1,8 @@
 
 import { SupabaseRepository } from '../SupabaseRepository';
 import { ServiceBooking, ServiceBookingStatus } from '@/types/additionalServices';
+import { PaginationParams, RepositoryResponse } from '@/types/api';
+import { supabase } from '@/integrations/supabase/client';
 
 interface ServiceBookingFilters {
   bookingId?: string;
