@@ -125,7 +125,11 @@ const CalendarView: React.FC<CalendarViewWithToggleProps> = ({
       {facilitiesWithZones.length === 0 ? (
         <CalendarEmptyState />
       ) : (
-        <Accordion type="multiple" className="w-full space-y-4">
+        <Accordion 
+          type="multiple" 
+          defaultValue={[`facility-${facilitiesWithZones[0]?.id}`]} 
+          className="w-full space-y-4"
+        >
           {facilitiesWithZones.map((facility) => (
             <AccordionItem 
               key={facility.id} 
@@ -156,7 +160,13 @@ const CalendarView: React.FC<CalendarViewWithToggleProps> = ({
                     area: "120 m²",
                     equipment: [],
                     accessibility: [],
-                    images: []
+                    images: [],
+                    facilityId: facility.id.toString(),
+                    isMainZone: true,
+                    subZones: [],
+                    amenities: [],
+                    features: [],
+                    bookingRules: []
                   }))}
                   selectedSlots={selectedSlots.filter(slot => 
                     facility.zones.some(zone => zone.id === slot.zoneId)
