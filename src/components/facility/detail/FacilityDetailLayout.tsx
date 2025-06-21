@@ -4,6 +4,7 @@ import { AirBnbStyleGallery } from '@/components/facility/AirBnbStyleGallery';
 import { FacilityHeader } from '@/components/facility/FacilityHeader';
 import { FacilityInfoTabs } from '@/components/facility/FacilityInfoTabs';
 import { FacilityContactInfo } from '@/components/facility/FacilityContactInfo';
+import { FacilityDetailZones } from './FacilityDetailZones';
 import { Zone } from '@/components/booking/types';
 
 interface FacilityDetailLayoutProps {
@@ -45,6 +46,20 @@ export function FacilityDetailLayout({
           onToggleFavorite={onToggleFavorite} 
         />
       </div>
+
+      {/* Zones Section */}
+      {zones && zones.length > 0 && (
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            Tilgjengelige soner
+          </h2>
+          <FacilityDetailZones 
+            zones={zones} 
+            facilityId={facility.id.toString()} 
+            facilityName={facility.name}
+          />
+        </div>
+      )}
 
       {/* Main Content Layout - 70% / 30% */}
       <div className="grid grid-cols-1 lg:grid-cols-10 gap-8 mb-12">
