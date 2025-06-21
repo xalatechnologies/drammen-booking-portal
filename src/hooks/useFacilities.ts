@@ -1,9 +1,8 @@
 
 import { useQuery } from "@tanstack/react-query";
-import { FacilityService } from "@/services/FacilityService";
+import { FacilityService } from "@/services/facilityService";
 import { FacilityFilters, FacilitySortOptions } from "@/types/facility";
 import { PaginationParams } from "@/types/api";
-import { useServices } from "./useServices";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 interface UseFacilitiesParams {
@@ -17,9 +16,6 @@ export function useFacilities({
   filters,
   sort
 }: UseFacilitiesParams) {
-  // Ensure services are language-aware
-  useServices();
-  
   // Get current language to include in query key
   const { language } = useLanguage();
 
