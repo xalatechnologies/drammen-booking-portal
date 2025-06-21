@@ -31,33 +31,29 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
   // Fetch facilities with pagination
   const { 
     facilities, 
-    pagination,
     isLoading, 
     error 
   } = useFacilities({
-    pagination: {
-      page: currentPage,
-      limit: itemsPerPage,
-    },
-    filters: {
-      searchTerm: filters.searchTerm,
-      facilityType: filters.facilityType,
-      location: filters.area, // Map area to location in filters
-    }
+    page: currentPage,
+    limit: itemsPerPage,
+    searchTerm: filters.searchTerm,
+    facilityType: filters.facilityType,
+    status: filters.status,
+    area: filters.area
   });
 
   // Get unique values for filter dropdowns
   const facilityTypes = useMemo(() => {
-    if (!facilities) return [];
-    const types = [...new Set(facilities.map((f: Facility) => f.type))];
-    return types.filter(Boolean) as string[];
-  }, [facilities]);
+    if (!facilities?.data) return [];
+    const types = [...new Set(facilities.data.map(f => f.type))];
+    return types.filter(Boolean);
+  }, [facilities?.data]);
 
   const areas = useMemo(() => {
-    if (!facilities) return [];
-    const areaList = [...new Set(facilities.map((f: Facility) => f.area))];
-    return areaList.filter(Boolean) as string[];
-  }, [facilities]);
+    if (!facilities?.data) return [];
+    const areaList = [...new Set(facilities.data.map(f => f.area))];
+    return areaList.filter(Boolean);
+  }, [facilities?.data]);
 
   const handleFiltersChange = useCallback((newFilters: typeof filters) => {
     setFilters(newFilters);
@@ -95,8 +91,8 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
     );
   }
 
-  const totalPages = pagination ? Math.ceil(pagination.total / itemsPerPage) : 1;
-  const totalItems = pagination?.total || 0;
+  const totalPages = facilities?.pagination ? Math.ceil(facilities.pagination.total / itemsPerPage) : 1;
+  const totalItems = facilities?.pagination?.total || 0;
 
   return (
     <div className="w-full space-y-6 p-8">
@@ -125,13 +121,13 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
         </CardHeader>
         <CardContent className="p-0">
           <FacilityTable
-            facilities={facilities || []}
+            facilities={facilities?.data || []}
             onEdit={handleEditFacility}
             onView={handleViewFacility}
             isLoading={isLoading}
           />
           
-          {facilities && facilities.length > 0 && (
+          {facilities?.data && facilities.data.length > 0 && (
             <FacilityPagination
               currentPage={currentPage}
               totalPages={totalPages}

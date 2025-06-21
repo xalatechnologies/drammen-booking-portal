@@ -100,7 +100,7 @@ const FacilityFilters: React.FC<FacilityFiltersProps> = ({
                     <SelectValue placeholder="Alle typer" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">Alle typer</SelectItem>
+                    <SelectItem value="">Alle typer</SelectItem>
                     {facilityTypes.map((type) => (
                       <SelectItem key={type} value={type}>
                         {type}
@@ -119,7 +119,7 @@ const FacilityFilters: React.FC<FacilityFiltersProps> = ({
                     <SelectValue placeholder="Alle statuser" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">Alle statuser</SelectItem>
+                    <SelectItem value="">Alle statuser</SelectItem>
                     <SelectItem value="active">Aktiv</SelectItem>
                     <SelectItem value="maintenance">Vedlikehold</SelectItem>
                     <SelectItem value="inactive">Inaktiv</SelectItem>
@@ -136,7 +136,7 @@ const FacilityFilters: React.FC<FacilityFiltersProps> = ({
                     <SelectValue placeholder="Alle områder" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">Alle områder</SelectItem>
+                    <SelectItem value="">Alle områder</SelectItem>
                     {areas.map((areaOption) => (
                       <SelectItem key={areaOption} value={areaOption}>
                         {areaOption}
