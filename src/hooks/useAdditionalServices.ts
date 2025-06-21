@@ -3,7 +3,6 @@ import { useQuery } from '@tanstack/react-query';
 import { AdditionalServicesService } from '@/services/AdditionalServicesService';
 import { ServiceCategory } from '@/types/additionalServices';
 import { ActorType } from '@/types/pricing';
-import { ApiResponse, ServicePriceCalculation } from '@/types/api';
 
 export function useAdditionalServices(facilityId: string, category?: ServiceCategory) {
   const { data, isLoading, error } = useQuery({
@@ -11,19 +10,19 @@ export function useAdditionalServices(facilityId: string, category?: ServiceCate
     queryFn: async () => {
       if (category) {
         const result = await AdditionalServicesService.getServicesByCategory(category, facilityId);
-        if (result.success) {
-          return result.data || [];
+        if (result.error) {
+          throw new Error(result.error);
         }
-        throw new Error(result.error?.message || 'Failed to fetch services');
+        return result.data || [];
       } else {
         const result = await AdditionalServicesService.getServices(
           { page: 1, limit: 100 },
           { facilityId, isActive: true }
         );
-        if (result.success) {
-          return result.data?.data || [];
+        if (result.error) {
+          throw new Error(result.error);
         }
-        throw new Error(result.error?.message || 'Failed to fetch services');
+        return result.data?.data || [];
       }
     },
     enabled: !!facilityId
@@ -44,25 +43,21 @@ export function useServicePricing() {
     attendees?: number,
     timeSlot?: string,
     date?: Date
-  ): Promise<ApiResponse<ServicePriceCalculation>> => {
-    try {
-      const result = await AdditionalServicesService.calculateServicePrice(
-        serviceId,
-        quantity,
-        actorType,
-        attendees,
-        timeSlot,
-        date
-      );
-      return result;
-    } catch (error) {
-      return {
-        success: false,
-        error: {
-          message: error instanceof Error ? error.message : 'Failed to calculate service price'
-        }
-      };
+  ) => {
+    const result = await AdditionalServicesService.calculateServicePrice(
+      serviceId,
+      quantity,
+      actorType,
+      attendees,
+      timeSlot,
+      date
+    );
+    
+    if (result.error) {
+      throw new Error(result.error);
     }
+    
+    return result.data;
   };
 
   const validateServiceAvailability = async (
@@ -70,11 +65,17 @@ export function useServicePricing() {
     requestedDate: Date,
     timeSlot?: string
   ) => {
-    return AdditionalServicesService.validateServiceAvailability(
+    const result = await AdditionalServicesService.validateServiceAvailability(
       serviceId,
       requestedDate,
       timeSlot
     );
+    
+    if (result.error) {
+      throw new Error(result.error);
+    }
+    
+    return result.data;
   };
 
   return {
@@ -88,10 +89,10 @@ export function usePopularServices(facilityId: string, limit?: number) {
     queryKey: ['popular-services', facilityId, limit],
     queryFn: async () => {
       const result = await AdditionalServicesService.getPopularServices(facilityId, limit);
-      if (result.success) {
-        return result.data || [];
+      if (result.error) {
+        throw new Error(result.error);
       }
-      throw new Error(result.error?.message || 'Failed to fetch popular services');
+      return result.data || [];
     },
     enabled: !!facilityId
   });

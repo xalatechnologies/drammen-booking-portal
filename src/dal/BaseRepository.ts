@@ -1,12 +1,11 @@
 
-import { supabase } from '@/integrations/supabase/client';
 import { PaginationParams, RepositoryResponse } from '@/types/api';
 
 export abstract class BaseRepository<T extends Record<string, any>> {
-  protected tableName: string;
+  protected data: T[];
 
-  constructor(tableName: string) {
-    this.tableName = tableName;
+  constructor(initialData: T[] = []) {
+    this.data = [...initialData];
   }
 
   async findAll(
@@ -15,29 +14,29 @@ export abstract class BaseRepository<T extends Record<string, any>> {
     orderDirection: 'asc' | 'desc' = 'asc'
   ): Promise<RepositoryResponse<T[]>> {
     try {
-      let query = supabase.from(this.tableName).select('*', { count: 'exact' });
+      let filteredData = [...this.data];
 
+      // Apply sorting if specified
       if (orderBy) {
-        query = query.order(orderBy, { ascending: orderDirection === 'asc' });
+        filteredData.sort((a, b) => {
+          const aValue = a[orderBy];
+          const bValue = b[orderBy];
+          
+          if (aValue < bValue) return orderDirection === 'asc' ? -1 : 1;
+          if (aValue > bValue) return orderDirection === 'asc' ? 1 : -1;
+          return 0;
+        });
       }
 
+      // Apply pagination if specified
       if (pagination) {
         const from = (pagination.page - 1) * pagination.limit;
-        const to = from + pagination.limit - 1;
-        query = query.range(from, to);
-      }
-
-      const { data, error, count } = await query;
-
-      if (error) {
-        return {
-          data: [],
-          error: error.message
-        };
+        const to = from + pagination.limit;
+        filteredData = filteredData.slice(from, to);
       }
 
       return {
-        data: (data as T[]) || []
+        data: filteredData
       };
     } catch (error: any) {
       return {
@@ -49,21 +48,9 @@ export abstract class BaseRepository<T extends Record<string, any>> {
 
   async findById(id: string): Promise<RepositoryResponse<T | null>> {
     try {
-      const { data, error } = await supabase
-        .from(this.tableName)
-        .select('*')
-        .eq('id', id)
-        .maybeSingle();
-
-      if (error) {
-        return {
-          data: null,
-          error: error.message
-        };
-      }
-
+      const item = this.data.find(item => this.getId(item) === id);
       return {
-        data: data as T | null
+        data: item || null
       };
     } catch (error: any) {
       return {
@@ -75,21 +62,10 @@ export abstract class BaseRepository<T extends Record<string, any>> {
 
   async create(data: Omit<T, 'id' | 'created_at' | 'updated_at'>): Promise<RepositoryResponse<T | null>> {
     try {
-      const { data: result, error } = await supabase
-        .from(this.tableName)
-        .insert(data as any)
-        .select()
-        .maybeSingle();
-
-      if (error) {
-        return {
-          data: null,
-          error: error.message
-        };
-      }
-
+      const newItem = this.createEntity(data);
+      this.data.push(newItem);
       return {
-        data: result as T | null
+        data: newItem
       };
     } catch (error: any) {
       return {
@@ -101,22 +77,19 @@ export abstract class BaseRepository<T extends Record<string, any>> {
 
   async update(id: string, data: Partial<Omit<T, 'id' | 'created_at'>>): Promise<RepositoryResponse<T | null>> {
     try {
-      const { data: result, error } = await supabase
-        .from(this.tableName)
-        .update(data as any)
-        .eq('id', id)
-        .select()
-        .maybeSingle();
-
-      if (error) {
+      const index = this.data.findIndex(item => this.getId(item) === id);
+      if (index === -1) {
         return {
           data: null,
-          error: error.message
+          error: 'Item not found'
         };
       }
 
+      const updatedItem = this.updateEntity(this.data[index], data);
+      this.data[index] = updatedItem;
+      
       return {
-        data: result as T | null
+        data: updatedItem
       };
     } catch (error: any) {
       return {
@@ -128,18 +101,15 @@ export abstract class BaseRepository<T extends Record<string, any>> {
 
   async delete(id: string): Promise<RepositoryResponse<boolean>> {
     try {
-      const { error } = await supabase
-        .from(this.tableName)
-        .delete()
-        .eq('id', id);
-
-      if (error) {
+      const index = this.data.findIndex(item => this.getId(item) === id);
+      if (index === -1) {
         return {
           data: false,
-          error: error.message
+          error: 'Item not found'
         };
       }
 
+      this.data.splice(index, 1);
       return {
         data: true
       };
@@ -149,5 +119,19 @@ export abstract class BaseRepository<T extends Record<string, any>> {
         error: error.message
       };
     }
+  }
+
+  // Abstract methods that must be implemented by subclasses
+  protected abstract getId(item: T): string;
+  protected abstract createEntity(data: Omit<T, 'id' | 'created_at' | 'updated_at'>): T;
+  protected abstract updateEntity(existing: T, data: Partial<Omit<T, 'id' | 'created_at'>>): T;
+
+  // Utility methods for subclasses
+  protected generateId(): string {
+    return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  }
+
+  protected getCurrentTimestamp(): Date {
+    return new Date();
   }
 }

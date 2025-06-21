@@ -1,26 +1,53 @@
 
 import { AdditionalService, ServiceCategory, ServiceFilters } from '@/types/additionalServices';
 import { ActorType } from '@/types/pricing';
-import { PaginatedResponse, PaginationParams, ApiResponse } from '@/types/api';
+import { PaginatedResponse, PaginationParams, RepositoryResponse } from '@/types/api';
 import { additionalServiceRepository } from '@/dal/repositories';
 import { ServicePricingEngine } from '@/utils/servicePricingEngine';
 
-// Simulate API delay
+// Simulate API delay for realistic UX
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export class AdditionalServicesService {
   static async getServices(
     pagination: PaginationParams,
     filters?: ServiceFilters
-  ): Promise<ApiResponse<PaginatedResponse<AdditionalService>>> {
+  ): Promise<RepositoryResponse<PaginatedResponse<AdditionalService>>> {
     try {
       await delay(200);
       const result = await additionalServiceRepository.findAll(pagination, filters);
-      return result;
-    } catch (error) {
+      
+      // Convert to paginated response format
+      const paginatedResult: PaginatedResponse<AdditionalService> = {
+        data: result.data || [],
+        pagination: {
+          page: pagination.page,
+          limit: pagination.limit,
+          total: (result.data || []).length,
+          totalPages: Math.ceil((result.data || []).length / pagination.limit),
+          hasNext: pagination.page * pagination.limit < (result.data || []).length,
+          hasPrev: pagination.page > 1
+        }
+      };
+
       return {
-        success: false,
-        error: { message: "Failed to fetch services", details: error },
+        data: paginatedResult,
+        error: result.error
+      };
+    } catch (error: any) {
+      return {
+        data: {
+          data: [],
+          pagination: {
+            page: pagination.page,
+            limit: pagination.limit,
+            total: 0,
+            totalPages: 0,
+            hasNext: false,
+            hasPrev: false
+          }
+        },
+        error: error.message
       };
     }
   }
@@ -28,7 +55,7 @@ export class AdditionalServicesService {
   static async getServicesByCategory(
     category: ServiceCategory,
     facilityId?: string
-  ): Promise<ApiResponse<AdditionalService[]>> {
+  ): Promise<RepositoryResponse<AdditionalService[]>> {
     try {
       await delay(150);
       const filters: ServiceFilters = {
@@ -43,13 +70,13 @@ export class AdditionalServicesService {
       );
       
       return {
-        success: true,
-        data: result.data?.data || []
+        data: result.data || [],
+        error: result.error
       };
-    } catch (error) {
+    } catch (error: any) {
       return {
-        success: false,
-        error: { message: "Failed to fetch services by category", details: error },
+        data: [],
+        error: error.message
       };
     }
   }
@@ -57,7 +84,7 @@ export class AdditionalServicesService {
   static async getPopularServices(
     facilityId: string,
     limit?: number
-  ): Promise<ApiResponse<AdditionalService[]>> {
+  ): Promise<RepositoryResponse<AdditionalService[]>> {
     try {
       await delay(100);
       const filters: ServiceFilters = {
@@ -71,18 +98,18 @@ export class AdditionalServicesService {
       );
       
       // Filter popular services (those with 'popular' tag)
-      const popularServices = (result.data?.data || []).filter(service =>
+      const popularServices = (result.data || []).filter(service =>
         service.metadata.tags.includes('popular')
       );
       
       return {
-        success: true,
-        data: popularServices
+        data: popularServices,
+        error: result.error
       };
-    } catch (error) {
+    } catch (error: any) {
       return {
-        success: false,
-        error: { message: "Failed to fetch popular services", details: error },
+        data: [],
+        error: error.message
       };
     }
   }
@@ -94,19 +121,19 @@ export class AdditionalServicesService {
     attendees?: number,
     timeSlot?: string,
     date?: Date
-  ) {
+  ): Promise<RepositoryResponse<any>> {
     try {
       await delay(50);
       
       const serviceResult = await additionalServiceRepository.findById(serviceId);
-      if (!serviceResult.success || !serviceResult.data) {
+      if (!serviceResult.data) {
         return {
-          success: false,
-          error: { message: "Service not found" }
+          data: null,
+          error: serviceResult.error || "Service not found"
         };
       }
 
-      return ServicePricingEngine.calculateServicePrice(
+      const calculation = ServicePricingEngine.calculateServicePrice(
         serviceResult.data,
         quantity,
         actorType,
@@ -114,10 +141,15 @@ export class AdditionalServicesService {
         timeSlot,
         date
       );
-    } catch (error) {
+
       return {
-        success: false,
-        error: { message: "Failed to calculate service price", details: error },
+        data: calculation.data,
+        error: calculation.error
+      };
+    } catch (error: any) {
+      return {
+        data: null,
+        error: error.message
       };
     }
   }
@@ -126,15 +158,15 @@ export class AdditionalServicesService {
     serviceId: string,
     requestedDate: Date,
     timeSlot?: string
-  ): Promise<ApiResponse<boolean>> {
+  ): Promise<RepositoryResponse<boolean>> {
     try {
       await delay(100);
       
       const serviceResult = await additionalServiceRepository.findById(serviceId);
-      if (!serviceResult.success || !serviceResult.data) {
+      if (!serviceResult.data) {
         return {
-          success: false,
-          error: { message: "Service not found" }
+          data: false,
+          error: serviceResult.error || "Service not found"
         };
       }
 
@@ -142,20 +174,20 @@ export class AdditionalServicesService {
       
       // Check if service is always available
       if (service.availability.isAlwaysAvailable) {
-        return { success: true, data: true };
+        return { data: true };
       }
 
       // Check lead time
       const now = new Date();
       const leadTimeMs = service.availability.leadTimeHours * 60 * 60 * 1000;
       if (requestedDate.getTime() - now.getTime() < leadTimeMs) {
-        return { success: true, data: false };
+        return { data: false };
       }
 
       // Check max advance booking
       const maxAdvanceMs = service.availability.maxAdvanceBookingDays * 24 * 60 * 60 * 1000;
       if (requestedDate.getTime() - now.getTime() > maxAdvanceMs) {
-        return { success: true, data: false };
+        return { data: false };
       }
 
       // Check blackout periods
@@ -164,28 +196,14 @@ export class AdditionalServicesService {
       );
       
       if (isBlackedOut) {
-        return { success: true, data: false };
+        return { data: false };
       }
 
-      // Check available time slots if specified
-      if (service.availability.availableTimeSlots && timeSlot) {
-        const dayOfWeek = requestedDate.getDay();
-        const availableSlot = service.availability.availableTimeSlots.find(slot =>
-          slot.dayOfWeek === dayOfWeek
-        );
-        
-        if (!availableSlot) {
-          return { success: true, data: false };
-        }
-        
-        // TODO: Check if timeSlot falls within availableSlot time range
-      }
-
-      return { success: true, data: true };
-    } catch (error) {
+      return { data: true };
+    } catch (error: any) {
       return {
-        success: false,
-        error: { message: "Failed to validate service availability", details: error },
+        data: false,
+        error: error.message
       };
     }
   }
