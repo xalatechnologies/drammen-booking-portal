@@ -70,18 +70,6 @@ export function ReservationAccordion({
     }
   };
 
-  const calculateSlotDuration = (timeSlot: string) => {
-    // Parse time slot like "08:00-09:00" to calculate actual duration
-    const match = timeSlot.match(/(\d{2}):(\d{2})-(\d{2}):(\d{2})/);
-    if (match) {
-      const [, startHour, startMin, endHour, endMin] = match.map(Number);
-      const startMinutes = startHour * 60 + startMin;
-      const endMinutes = endHour * 60 + endMin;
-      return (endMinutes - startMinutes) / 60; // Return duration in hours
-    }
-    return 2; // Default fallback
-  };
-
   return (
     <div className="space-y-4">
       {uniqueReservations.map((reservation) => {
@@ -92,10 +80,9 @@ export function ReservationAccordion({
           duration: reservation.duration
         }];
         
-        // Calculate total duration by parsing actual time slots
+        // Calculate total duration using the actual duration from booking data
         const totalDuration = timeSlots.reduce((sum, slot) => {
-          const slotDuration = calculateSlotDuration(slot.timeSlot);
-          return sum + slotDuration;
+          return sum + (slot.duration || 2);
         }, 0);
         
         const bookingType = getBookingType(reservation);
@@ -187,93 +174,57 @@ export function ReservationAccordion({
                 <AccordionContent className="px-6 pb-6">
                   <div className="space-y-6 pt-4 border-t border-gray-100">
                     {/* Booking Details */}
-                    <div className="grid md:grid-cols-2 gap-6">
-                      <div className="space-y-4">
-                        <h4 className="font-medium text-gray-900 flex items-center gap-2">
-                          <Info className="h-4 w-4 text-blue-600" />
-                          Booking detaljer
-                        </h4>
+                    <div className="space-y-4">
+                      <h4 className="font-medium text-gray-900 flex items-center gap-2">
+                        <Info className="h-4 w-4 text-blue-600" />
+                        Booking detaljer
+                      </h4>
+                      
+                      <div className="space-y-3 text-sm">
+                        <div className="flex items-start gap-3">
+                          <FileText className="h-4 w-4 text-gray-500 mt-0.5 flex-shrink-0" />
+                          <div>
+                            <span className="font-medium text-gray-700">Formål:</span>
+                            <p className="text-gray-600 mt-1">{reservation.purpose}</p>
+                          </div>
+                        </div>
                         
-                        <div className="space-y-3 text-sm">
+                        <div className="flex items-center gap-3">
+                          <User className="h-4 w-4 text-gray-500 flex-shrink-0" />
+                          <div>
+                            <span className="font-medium text-gray-700">Aktør type:</span>
+                            <span className="text-gray-600 ml-2">{getActorTypeLabel(reservation.organizationType)}</span>
+                          </div>
+                        </div>
+                        
+                        {reservation.eventType && (
+                          <div className="flex items-center gap-3">
+                            <Calendar className="h-4 w-4 text-gray-500 flex-shrink-0" />
+                            <div>
+                              <span className="font-medium text-gray-700">Arrangementstype:</span>
+                              <span className="text-gray-600 ml-2">{getEventTypeLabel(reservation.eventType)}</span>
+                            </div>
+                          </div>
+                        )}
+                        
+                        <div className="flex items-center gap-3">
+                          <Users className="h-4 w-4 text-gray-500 flex-shrink-0" />
+                          <div>
+                            <span className="font-medium text-gray-700">Forventet antall deltakere:</span>
+                            <span className="text-gray-600 ml-2">{reservation.expectedAttendees}</span>
+                          </div>
+                        </div>
+
+                        {reservation.specialRequirements && (
                           <div className="flex items-start gap-3">
-                            <FileText className="h-4 w-4 text-gray-500 mt-0.5 flex-shrink-0" />
+                            <Info className="h-4 w-4 text-gray-500 mt-0.5 flex-shrink-0" />
                             <div>
-                              <span className="font-medium text-gray-700">Formål:</span>
-                              <p className="text-gray-600 mt-1">{reservation.purpose}</p>
+                              <span className="font-medium text-gray-700">Spesielle krav:</span>
+                              <p className="text-gray-600 mt-1">{reservation.specialRequirements}</p>
                             </div>
                           </div>
-                          
-                          <div className="flex items-center gap-3">
-                            <User className="h-4 w-4 text-gray-500 flex-shrink-0" />
-                            <div>
-                              <span className="font-medium text-gray-700">Aktør type:</span>
-                              <span className="text-gray-600 ml-2">{getActorTypeLabel(reservation.organizationType)}</span>
-                            </div>
-                          </div>
-                          
-                          {reservation.eventType && (
-                            <div className="flex items-center gap-3">
-                              <Calendar className="h-4 w-4 text-gray-500 flex-shrink-0" />
-                              <div>
-                                <span className="font-medium text-gray-700">Arrangementstype:</span>
-                                <span className="text-gray-600 ml-2">{getEventTypeLabel(reservation.eventType)}</span>
-                              </div>
-                            </div>
-                          )}
-                          
-                          <div className="flex items-center gap-3">
-                            <Users className="h-4 w-4 text-gray-500 flex-shrink-0" />
-                            <div>
-                              <span className="font-medium text-gray-700">Forventet antall deltakere:</span>
-                              <span className="text-gray-600 ml-2">{reservation.expectedAttendees}</span>
-                            </div>
-                          </div>
-
-                          {reservation.specialRequirements && (
-                            <div className="flex items-start gap-3">
-                              <Info className="h-4 w-4 text-gray-500 mt-0.5 flex-shrink-0" />
-                              <div>
-                                <span className="font-medium text-gray-700">Spesielle krav:</span>
-                                <p className="text-gray-600 mt-1">{reservation.specialRequirements}</p>
-                              </div>
-                            </div>
-                          )}
-                        </div>
+                        )}
                       </div>
-
-                      {/* Contact Information - Only show if available */}
-                      {reservation.customerInfo && (
-                        <div className="space-y-4">
-                          <h4 className="font-medium text-gray-900 flex items-center gap-2">
-                            <User className="h-4 w-4 text-blue-600" />
-                            Kontaktinformasjon
-                          </h4>
-                          
-                          <div className="space-y-2 text-sm">
-                            <div>
-                              <span className="font-medium text-gray-700">Navn:</span>
-                              <span className="text-gray-600 ml-2">{reservation.customerInfo.name}</span>
-                            </div>
-                            
-                            <div>
-                              <span className="font-medium text-gray-700">E-post:</span>
-                              <span className="text-gray-600 ml-2">{reservation.customerInfo.email}</span>
-                            </div>
-                            
-                            <div>
-                              <span className="font-medium text-gray-700">Telefon:</span>
-                              <span className="text-gray-600 ml-2">{reservation.customerInfo.phone}</span>
-                            </div>
-                            
-                            {reservation.customerInfo.organization && (
-                              <div>
-                                <span className="font-medium text-gray-700">Organisasjon:</span>
-                                <span className="text-gray-600 ml-2">{reservation.customerInfo.organization}</span>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      )}
                     </div>
 
                     {/* Detailed Time Slots */}
@@ -284,7 +235,6 @@ export function ReservationAccordion({
                       </h4>
                       <div className="grid gap-2">
                         {timeSlots.map((slot, index) => {
-                          const slotDuration = calculateSlotDuration(slot.timeSlot);
                           return (
                             <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded text-sm">
                               <div className="flex items-center gap-3">
@@ -292,7 +242,7 @@ export function ReservationAccordion({
                                   {format(new Date(slot.date), 'EEEE dd.MM.yyyy', { locale: nb })}
                                 </span>
                                 <span className="text-gray-600">{slot.timeSlot}</span>
-                                <span className="text-gray-500">({slotDuration}t)</span>
+                                <span className="text-gray-500">({slot.duration || 2}t)</span>
                               </div>
                               <span className="text-gray-600 text-xs">
                                 {slot.zoneId === 'whole-facility' ? 'Hele lokalet' : slot.zoneId}
