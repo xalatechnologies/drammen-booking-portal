@@ -190,7 +190,7 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
                 <p className="text-sm text-gray-600 line-clamp-1">
                   {facility.address_street}, {facility.address_city}
                 </p>
-              </CardContent>
+              </CardHeader>
               <CardContent className="pt-0">
                 <div className="space-y-2 mb-4">
                   <div className="flex justify-between text-sm">
