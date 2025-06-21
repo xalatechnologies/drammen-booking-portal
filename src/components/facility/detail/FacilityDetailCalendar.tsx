@@ -1,3 +1,4 @@
+
 import React, { useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Zone } from "@/components/booking/types";
@@ -6,6 +7,7 @@ import { CalendarWithBooking } from "@/components/shared/CalendarWithBooking";
 import { useCart } from "@/contexts/CartContext";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { getStableAvailabilityStatus } from "@/utils/availabilityUtils";
 
 interface FacilityDetailCalendarProps {
   zones: Zone[];
@@ -27,18 +29,6 @@ const ensureDate = (date: Date | string): Date => {
   return date instanceof Date ? date : new Date(date);
 };
 
-// Create a stable hash for consistent availability
-const createStableHash = (zoneId: string, date: Date, timeSlot: string): number => {
-  const str = `${zoneId}-${date.toDateString()}-${timeSlot}`;
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    const char = str.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash = hash & hash; // Convert to 32-bit integer
-  }
-  return Math.abs(hash);
-};
-
 export const FacilityDetailCalendar: React.FC<FacilityDetailCalendarProps> = ({
   zones,
   selectedSlots,
@@ -53,27 +43,6 @@ export const FacilityDetailCalendar: React.FC<FacilityDetailCalendarProps> = ({
   const { addToCart } = useCart();
   const navigate = useNavigate();
   const { toast } = useToast();
-
-  // Stable availability function - no random behavior
-  const getAvailabilityStatus = useCallback((zoneId: string, date: Date, timeSlot: string) => {
-    const now = new Date();
-    const timeHour = parseInt(timeSlot.split(':')[0]);
-    const slotDateTime = new Date(date);
-    slotDateTime.setHours(timeHour, 0, 0, 0);
-    
-    if (slotDateTime < now) {
-      return { status: 'unavailable', conflict: null };
-    }
-
-    // Use stable hash instead of random to determine if slot is booked
-    const hash = createStableHash(zoneId, date, timeSlot);
-    const isBooked = (hash % 10) < 2; // 20% of slots are "busy"
-    
-    return { 
-      status: isBooked ? 'busy' : 'available', 
-      conflict: isBooked ? { type: 'existing-booking', details: 'Allerede booket' } : null 
-    };
-  }, []);
 
   const isSlotSelected = useCallback((zoneId: string, date: Date, timeSlot: string) => {
     return selectedSlots.some(slot => {
@@ -170,7 +139,7 @@ export const FacilityDetailCalendar: React.FC<FacilityDetailCalendarProps> = ({
             onContinueBooking={handleContinueBooking}
             onAddToCart={handleAddToCart}
             onCompleteBooking={handleCompleteBooking}
-            getAvailabilityStatus={getAvailabilityStatus}
+            getAvailabilityStatus={getStableAvailabilityStatus}
             isSlotSelected={isSlotSelected}
             timeSlotDuration={timeSlotDuration}
             layout="horizontal"
