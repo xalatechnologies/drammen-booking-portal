@@ -34,7 +34,7 @@ export class OrganizationRepository extends SupabaseRepository<Organization> {
   async findByOrgNumber(orgNumber: string): Promise<RepositoryResponse<Organization | null>> {
     try {
       const { data, error } = await supabase
-        .from(this.tableName)
+        .from('organizations')
         .select('*')
         .eq('org_number', orgNumber)
         .maybeSingle();
@@ -47,7 +47,7 @@ export class OrganizationRepository extends SupabaseRepository<Organization> {
       }
 
       return {
-        data: data as Organization | null
+        data: data ? this.mapToOrganization(data) : null
       };
     } catch (error: any) {
       return {
@@ -60,7 +60,7 @@ export class OrganizationRepository extends SupabaseRepository<Organization> {
   async findVerified(): Promise<RepositoryResponse<Organization[]>> {
     try {
       const { data, error } = await supabase
-        .from(this.tableName)
+        .from('organizations')
         .select('*')
         .in('verification_level', ['document-verified', 'fully-verified']);
 
@@ -72,7 +72,7 @@ export class OrganizationRepository extends SupabaseRepository<Organization> {
       }
 
       return {
-        data: (data as Organization[]) || []
+        data: data ? data.map(item => this.mapToOrganization(item)) : []
       };
     } catch (error: any) {
       return {
@@ -85,7 +85,7 @@ export class OrganizationRepository extends SupabaseRepository<Organization> {
   async updateVerificationLevel(id: string, level: VerificationLevel): Promise<RepositoryResponse<Organization | null>> {
     try {
       const { data, error } = await supabase
-        .from(this.tableName)
+        .from('organizations')
         .update({
           verification_level: level,
           updated_at: new Date().toISOString()
@@ -102,7 +102,7 @@ export class OrganizationRepository extends SupabaseRepository<Organization> {
       }
 
       return {
-        data: data as Organization | null
+        data: data ? this.mapToOrganization(data) : null
       };
     } catch (error: any) {
       return {
@@ -110,6 +110,35 @@ export class OrganizationRepository extends SupabaseRepository<Organization> {
         error: error.message
       };
     }
+  }
+
+  private mapToOrganization(dbRow: any): Organization {
+    return {
+      id: dbRow.id,
+      name: dbRow.name,
+      type: dbRow.type,
+      orgNumber: dbRow.org_number,
+      contactEmail: dbRow.contact_email,
+      contactPhone: dbRow.contact_phone,
+      website: dbRow.website,
+      description: dbRow.description,
+      address: {
+        street: dbRow.address_street,
+        city: dbRow.address_city,
+        postalCode: dbRow.address_postal_code,
+        country: dbRow.address_country
+      },
+      status: dbRow.status,
+      verificationLevel: dbRow.verification_level,
+      vatNumber: dbRow.vat_number,
+      bankAccount: dbRow.bank_account,
+      parentOrganizationId: dbRow.parent_organization_id,
+      foundedYear: dbRow.founded_year,
+      memberCount: dbRow.member_count,
+      isActive: dbRow.is_active,
+      createdAt: new Date(dbRow.created_at),
+      updatedAt: new Date(dbRow.updated_at)
+    };
   }
 }
 

@@ -11,7 +11,7 @@ export abstract class SupabaseRepository<T extends Record<string, any>> {
     orderDirection: 'asc' | 'desc' = 'asc'
   ): Promise<RepositoryResponse<T[]>> {
     try {
-      let query = supabase.from(this.tableName as any).select('*', { count: 'exact' });
+      let query = supabase.from(this.tableName).select('*', { count: 'exact' });
 
       if (orderBy) {
         query = query.order(orderBy, { ascending: orderDirection === 'asc' });
@@ -46,7 +46,7 @@ export abstract class SupabaseRepository<T extends Record<string, any>> {
   async findById(id: string): Promise<RepositoryResponse<T | null>> {
     try {
       const { data, error } = await supabase
-        .from(this.tableName as any)
+        .from(this.tableName)
         .select('*')
         .eq('id', id)
         .maybeSingle();
@@ -72,7 +72,7 @@ export abstract class SupabaseRepository<T extends Record<string, any>> {
   async create(data: Omit<T, 'id' | 'created_at' | 'updated_at'>): Promise<RepositoryResponse<T | null>> {
     try {
       const { data: result, error } = await supabase
-        .from(this.tableName as any)
+        .from(this.tableName)
         .insert(data as any)
         .select()
         .maybeSingle();
@@ -98,7 +98,7 @@ export abstract class SupabaseRepository<T extends Record<string, any>> {
   async update(id: string, data: Partial<Omit<T, 'id' | 'created_at'>>): Promise<RepositoryResponse<T | null>> {
     try {
       const { data: result, error } = await supabase
-        .from(this.tableName as any)
+        .from(this.tableName)
         .update(data as any)
         .eq('id', id)
         .select()
@@ -125,7 +125,7 @@ export abstract class SupabaseRepository<T extends Record<string, any>> {
   async delete(id: string): Promise<RepositoryResponse<boolean>> {
     try {
       const { error } = await supabase
-        .from(this.tableName as any)
+        .from(this.tableName)
         .delete()
         .eq('id', id);
 
