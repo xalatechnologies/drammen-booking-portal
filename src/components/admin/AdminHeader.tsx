@@ -1,107 +1,14 @@
-import React, { useState } from "react";
-import { Bell, Search, Globe, Circle, ChevronDown } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+
+import React from "react";
 import Logo from "@/components/header/Logo";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { cn } from "@/lib/utils";
-import { useAdminRole, AdminRole } from "@/contexts/AdminRoleContext";
-import { useTranslation } from "@/hooks/useTranslation";
-import { useLanguage } from "@/contexts/LanguageContext";
-import { LAYOUT_CONSTANTS } from "@/components/layouts/constants";
-
-type Notification = {
-  id: string;
-  title: string;
-  description: string;
-  timestamp: string;
-  read: boolean;
-};
+import AdminSearchBar from "./header/AdminSearchBar";
+import AdminRoleSwitcher from "./header/AdminRoleSwitcher";
+import AdminLanguageToggle from "./header/AdminLanguageToggle";
+import AdminNotifications from "./header/AdminNotifications";
+import AdminUserProfile from "./header/AdminUserProfile";
 
 const AdminHeader = () => {
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const {
-    currentRole,
-    setCurrentRole,
-    availableRoles
-  } = useAdminRole();
-  const {
-    tSync
-  } = useTranslation();
-  const {
-    language,
-    toggleLanguage
-  } = useLanguage();
-
-  // Use database translations for notifications
-  const initialNotifications: Notification[] = [{
-    id: "1",
-    title: tSync("admin.notifications.newFacilityRequest.title", "Ny forespørsel om lokale"),
-    description: tSync("admin.notifications.newFacilityRequest.description", "Brandengen Skole ba om godkjenning"),
-    timestamp: `2 ${tSync("admin.notifications.time.minutesAgo", "minutter siden")}`,
-    read: false
-  }, {
-    id: "2",
-    title: tSync("admin.notifications.userRoleUpdated.title", "Brukerrolle oppdatert"),
-    description: tSync("admin.notifications.userRoleUpdated.description", "Thomas Hansen er nå administrator"),
-    timestamp: `1 ${tSync("admin.notifications.time.hourAgo", "time siden")}`,
-    read: false
-  }, {
-    id: "3",
-    title: tSync("admin.notifications.systemAlert.title", "Systemvarsel"),
-    description: tSync("admin.notifications.systemAlert.description", "Planlagt vedlikehold i kveld kl. 23:00."),
-    timestamp: `4 ${tSync("admin.notifications.time.hoursAgo", "timer siden")}`,
-    read: true
-  }, {
-    id: "4",
-    title: tSync("admin.notifications.newMessage.title", "Ny melding mottatt"),
-    description: tSync("admin.notifications.newMessage.description", "Du har en ny melding fra Per Olsen."),
-    timestamp: `1 ${tSync("admin.notifications.time.dayAgo", "dag siden")}`,
-    read: false
-  }];
-
-  // Initialize notifications on mount
-  React.useEffect(() => {
-    setNotifications(initialNotifications);
-  }, [language]); // Re-initialize when language changes
-
-  const roleNames: Record<AdminRole, string> = {
-    systemadmin: tSync('admin.roles.systemadmin', 'System Admin'),
-    admin: tSync('admin.roles.admin', 'Admin'),
-    saksbehandler: tSync('admin.roles.saksbehandler', 'Saksbehandler')
-  };
-  const roleAvatars: Record<AdminRole, {
-    src: string;
-    fallback: string;
-  }> = {
-    systemadmin: {
-      src: 'https://i.pravatar.cc/150?u=system-admin',
-      fallback: 'SA'
-    },
-    admin: {
-      src: 'https://i.pravatar.cc/150?u=admin',
-      fallback: 'A'
-    },
-    saksbehandler: {
-      src: 'https://i.pravatar.cc/150?u=saksbehandler',
-      fallback: 'SB'
-    }
-  };
-  const unreadCount = notifications.filter(n => !n.read).length;
-  const handleMarkAsRead = (id: string) => {
-    setNotifications(prev => prev.map(n => n.id === id ? {
-      ...n,
-      read: true
-    } : n));
-  };
-  const handleMarkAllAsRead = () => {
-    setNotifications(prev => prev.map(n => ({
-      ...n,
-      read: true
-    })));
-  };
   return (
     <header className="border-b bg-white shadow-sm z-50" style={{ height: "6rem" }}>
       <div className="flex h-24 items-center px-8">
@@ -112,110 +19,13 @@ const AdminHeader = () => {
           <Logo />
         </div>
         
-        <div className="flex-1 flex justify-center px-12">
-          <div className="flex items-center gap-6 w-full max-w-2xl">
-            <div className="relative flex-1">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-              <Input 
-                placeholder={tSync("admin.header.searchPlaceholder", "Search all content...")} 
-                className="pl-12 h-12 text-base bg-gray-50 border-gray-200 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none focus:border-blue-500 rounded-lg" 
-                aria-label={tSync("admin.header.searchPlaceholder", "Search the system")} 
-              />
-            </div>
-          </div>
-        </div>
+        <AdminSearchBar />
 
         <div className="flex items-center gap-4 flex-shrink-0">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="h-11 px-4 text-sm font-medium">
-                {roleNames[currentRole]}
-                <ChevronDown className="ml-2 h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>
-                {tSync("admin.header.switchRole", "Bytt visningsrolle")}
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              {availableRoles.map(role => <DropdownMenuItem key={role} onSelect={() => setCurrentRole(role)}>
-                  {roleNames[role]}
-                </DropdownMenuItem>)}
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <Button variant="ghost" onClick={toggleLanguage} className="flex items-center px-4 py-2 h-11 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:outline-none rounded-lg" aria-label={`Bytt språk til ${language === 'NO' ? 'Engelsk' : 'Norsk'}`}>
-            <Globe className="mr-2 h-4 w-4" />
-            <span>{language}</span>
-          </Button>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="relative h-11 w-11 hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:outline-none rounded-lg" aria-label={`${tSync("admin.header.notifications", "Varsler")} - ${unreadCount} uleste`}>
-                <Bell className="h-5 w-5 text-gray-600" />
-                {unreadCount > 0 && <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center font-medium">
-                    {unreadCount}
-                  </span>}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-80 bg-white shadow-lg border border-gray-200">
-              <div className="flex justify-between items-center px-3 py-3">
-                <DropdownMenuLabel className="text-base font-semibold p-0">
-                  {tSync("admin.header.notifications", "Varsler")}
-                </DropdownMenuLabel>
-                {unreadCount > 0 && <Button variant="link" size="sm" className="h-auto p-0 text-xs" onClick={handleMarkAllAsRead}>
-                    {tSync("admin.header.markAllAsRead", "Marker alle som lest")}
-                  </Button>}
-              </div>
-              <DropdownMenuSeparator />
-              {notifications.length > 0 ? notifications.map(notification => <DropdownMenuItem key={notification.id} className="py-3 cursor-pointer hover:bg-gray-50 focus:bg-gray-100" onClick={() => handleMarkAsRead(notification.id)}>
-                    <div className="flex items-start gap-3 w-full">
-                      <div className="w-2 pt-1">
-                        {!notification.read && <Circle className="h-2 w-2 text-blue-500 fill-current" />}
-                      </div>
-                      <div className="flex flex-col gap-1 flex-1">
-                        <p className="text-sm font-medium text-gray-900">{notification.title}</p>
-                        <p className="text-xs text-gray-600">{notification.description}</p>
-                        <p className="text-xs text-gray-500">{notification.timestamp}</p>
-                      </div>
-                    </div>
-                  </DropdownMenuItem>) : <p className="text-center text-sm text-gray-500 py-4">
-                  {tSync("admin.header.noNewNotifications", "Ingen nye varsler")}
-                </p>}
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="relative h-11 gap-3 px-3 hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:outline-none rounded-lg" aria-label={tSync("admin.header.userProfile", "Brukerprofil og innstillinger")}>
-                <Avatar className="h-8 w-8">
-                  <AvatarImage src={roleAvatars[currentRole].src} alt={roleNames[currentRole]} />
-                  <AvatarFallback className="bg-blue-600 text-white text-xs font-medium">
-                    {roleAvatars[currentRole].fallback}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="hidden md:flex flex-col items-start">
-                  <span className="text-sm font-medium text-gray-900">{roleNames[currentRole]}</span>
-                </div>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="bg-white shadow-lg border border-gray-200">
-              <DropdownMenuLabel className="text-sm font-medium">
-                {tSync("admin.header.myAccount", "Min Konto")}
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-sm py-2 hover:bg-gray-50">
-                {tSync("admin.header.profile", "Profil")}
-              </DropdownMenuItem>
-              <DropdownMenuItem className="text-sm py-2 hover:bg-gray-50">
-                {tSync("admin.header.settings", "Innstillinger")}
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-sm py-2 hover:bg-gray-50 text-red-600">
-                {tSync("admin.header.logout", "Logg ut")}
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <AdminRoleSwitcher />
+          <AdminLanguageToggle />
+          <AdminNotifications />
+          <AdminUserProfile />
         </div>
       </div>
     </header>
