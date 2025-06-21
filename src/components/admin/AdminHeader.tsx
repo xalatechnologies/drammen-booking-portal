@@ -103,8 +103,8 @@ const AdminHeader = () => {
     })));
   };
   return (
-    <header className="border-b bg-white shadow-sm z-50 pb-2 py-[15px]" style={{ height: LAYOUT_CONSTANTS.HEADER_HEIGHT }}>
-      <div className="flex h-16 items-center px-6">
+    <header className="border-b bg-white shadow-sm z-50 pb-2 py-[20px]" style={{ height: LAYOUT_CONSTANTS.HEADER_HEIGHT }}>
+      <div className="flex h-20 items-center px-6">
         <div className="flex items-center gap-4 min-w-0">
           <div className="md:hidden mr-2">
             <SidebarTrigger />
