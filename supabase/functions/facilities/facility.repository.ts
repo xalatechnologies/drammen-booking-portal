@@ -1,3 +1,4 @@
+
 import { SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { Database } from '../_shared/database.types.ts'
 
@@ -29,7 +30,7 @@ export class FacilityRepository {
         *,
         facility_opening_hours(day_of_week, open_time, close_time, is_open),
         zones(id, name, type, capacity, bookable_independently),
-        facility_images!inner(id, image_url, alt_text, is_featured, display_order)
+        facility_images(id, image_url, alt_text, is_featured, display_order)
       `, { count: 'exact' })
       .eq('status', 'active')
       .range(from, to)
@@ -58,13 +59,25 @@ export class FacilityRepository {
     const result = await query
 
     if (result.error) {
+      console.error('FacilityRepository.findAll - Database error:', result.error)
       return result
     }
+
+    console.log('FacilityRepository.findAll - Raw result count:', result.data?.length);
 
     // Transform the data to include featured image and images array
     const transformedData = result.data?.map(facility => {
       const images = facility.facility_images || []
-      const featuredImage = images.find(img => img.is_featured) || images[0] || null
+      const featuredImage = images.find(img => img.is_featured === true) || null
+      
+      console.log(`FacilityRepository.findAll - Processing facility ${facility.id}:`, {
+        name: facility.name,
+        address_street: facility.address_street,
+        address_city: facility.address_city,
+        address_postal_code: facility.address_postal_code,
+        imagesCount: images.length,
+        featuredImage: featuredImage ? { id: featuredImage.id, is_featured: featuredImage.is_featured, image_url: featuredImage.image_url } : null
+      });
       
       return {
         ...facility,
@@ -74,6 +87,8 @@ export class FacilityRepository {
         facility_images: undefined
       }
     })
+
+    console.log('FacilityRepository.findAll - Transformed result count:', transformedData?.length);
 
     return {
       ...result,
@@ -99,13 +114,23 @@ export class FacilityRepository {
       .single()
 
     if (result.error) {
+      console.error('FacilityRepository.findById - Database error:', result.error)
       return result
     }
 
     // Transform the data to include featured image
     const facility = result.data
     const images = facility.facility_images || []
-    const featuredImage = images.find(img => img.is_featured) || images[0] || null
+    const featuredImage = images.find(img => img.is_featured === true) || null
+    
+    console.log(`FacilityRepository.findById - Processing facility ${facility.id}:`, {
+      name: facility.name,
+      address_street: facility.address_street,
+      address_city: facility.address_city,
+      address_postal_code: facility.address_postal_code,
+      imagesCount: images.length,
+      featuredImage: featuredImage ? { id: featuredImage.id, is_featured: featuredImage.is_featured, image_url: featuredImage.image_url } : null
+    });
     
     return {
       ...result,

@@ -2,37 +2,62 @@
 import { CoreFacility } from '@/types/translation';
 
 export const transformDatabaseFacility = (facility: any): CoreFacility => {
-  // Compute the address from individual fields with proper fallbacks
-  const addressParts = [
-    facility.address_street,
-    facility.address_city,
-    facility.address_postal_code
-  ].filter(part => part && part.trim() !== '' && part !== 'undefined' && part !== 'null');
+  console.log('transformDatabaseFacility - Input facility:', facility);
+  
+  // Compute the address from individual fields with better validation
+  const street = facility.address_street;
+  const city = facility.address_city; 
+  const postal = facility.address_postal_code;
+  
+  console.log('transformDatabaseFacility - Address fields:', { street, city, postal });
+  
+  const addressParts = [street, city, postal].filter(part => 
+    part && 
+    typeof part === 'string' && 
+    part.trim() !== '' && 
+    part !== 'null' && 
+    part !== 'undefined' &&
+    part.toLowerCase() !== 'undefined'
+  );
   
   const computedAddress = addressParts.length > 0 
     ? addressParts.join(', ') 
-    : 'Address not available';
+    : '';
 
   // Determine image URL - prioritize featured image, then first image, then fallback
-  let imageUrl = 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&auto=format&fit=crop';
+  let imageUrl = '';
+  
+  console.log('transformDatabaseFacility - Image processing:', {
+    featuredImage: facility.featuredImage,
+    images: facility.images,
+    image_url: facility.image_url
+  });
   
   if (facility.featuredImage?.image_url) {
     imageUrl = facility.featuredImage.image_url;
-  } else if (facility.images && facility.images.length > 0) {
-    imageUrl = facility.images[0].image_url;
+  } else if (facility.images && Array.isArray(facility.images) && facility.images.length > 0) {
+    // Look for featured image first
+    const featuredImg = facility.images.find(img => img.is_featured === true);
+    if (featuredImg?.image_url) {
+      imageUrl = featuredImg.image_url;
+    } else if (facility.images[0]?.image_url) {
+      imageUrl = facility.images[0].image_url;
+    }
   } else if (facility.image_url) {
     imageUrl = facility.image_url;
   }
+  
+  // Only fallback if no image found
+  if (!imageUrl) {
+    imageUrl = 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&auto=format&fit=crop';
+  }
 
-  console.log('transformDatabaseFacility - Transforming facility:', {
+  console.log('transformDatabaseFacility - Final transformation:', {
     id: facility.id,
     name: facility.name,
-    address_street: facility.address_street,
-    address_city: facility.address_city,
-    address_postal_code: facility.address_postal_code,
     computedAddress,
-    featuredImage: facility.featuredImage,
-    imageUrl
+    imageUrl,
+    addressParts
   });
 
   return {

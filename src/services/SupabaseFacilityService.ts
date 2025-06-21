@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { Facility, FacilityFilters } from '@/types/facility';
 import { PaginationParams, ApiResponse, PaginatedResponse } from '@/types/api';
@@ -8,36 +9,53 @@ export class SupabaseFacilityService {
   private static readonly ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN6cGRvaWhveHpsaXZvdGhveXZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA0Mzk5MzksImV4cCI6MjA2NjAxNTkzOX0.4j3PYVkUpQZce-631weYhyICrUKfBk3LV5drs_tYExc';
 
   private static transformCoreFacilityToFacility(coreFacility: any): Facility {
-    // Compute the address from individual fields
+    console.log('SupabaseFacilityService - Raw facility data:', coreFacility);
+    
+    // Compute the address from individual fields with better null checks
     const addressParts = [
       coreFacility.address_street,
       coreFacility.address_city,
       coreFacility.address_postal_code
-    ].filter(part => part && part.trim() !== '');
+    ].filter(part => part && typeof part === 'string' && part.trim() !== '' && part !== 'null' && part !== 'undefined');
     
     const computedAddress = addressParts.length > 0 
       ? addressParts.join(', ') 
-      : 'Address not available';
+      : '';
 
-    console.log('SupabaseFacilityService - Transform facility:', {
-      id: coreFacility.id,
+    console.log('SupabaseFacilityService - Address computation:', {
       address_street: coreFacility.address_street,
       address_city: coreFacility.address_city,
       address_postal_code: coreFacility.address_postal_code,
-      computedAddress,
-      featuredImage: coreFacility.featuredImage,
-      images: coreFacility.images
+      addressParts,
+      computedAddress
     });
 
-    // Get image URL - prioritize featured image
-    let imageUrl = 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&auto=format&fit=crop';
+    // Get image URL - prioritize featured image first
+    let imageUrl = '';
     
+    console.log('SupabaseFacilityService - Image data:', {
+      featuredImage: coreFacility.featuredImage,
+      images: coreFacility.images,
+      image_url: coreFacility.image_url
+    });
+
     if (coreFacility.featuredImage?.image_url) {
       imageUrl = coreFacility.featuredImage.image_url;
-    } else if (coreFacility.images && coreFacility.images.length > 0) {
-      imageUrl = coreFacility.images[0].image_url;
+      console.log('SupabaseFacilityService - Using featured image:', imageUrl);
+    } else if (coreFacility.images && Array.isArray(coreFacility.images) && coreFacility.images.length > 0) {
+      // Find featured image in array or use first image
+      const featured = coreFacility.images.find(img => img.is_featured);
+      imageUrl = featured ? featured.image_url : coreFacility.images[0].image_url;
+      console.log('SupabaseFacilityService - Using image from array:', imageUrl);
     } else if (coreFacility.image_url) {
       imageUrl = coreFacility.image_url;
+      console.log('SupabaseFacilityService - Using direct image_url:', imageUrl);
+    }
+    
+    // Only use fallback if no image found
+    if (!imageUrl) {
+      imageUrl = 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&auto=format&fit=crop';
+      console.log('SupabaseFacilityService - Using fallback image');
     }
 
     return {
