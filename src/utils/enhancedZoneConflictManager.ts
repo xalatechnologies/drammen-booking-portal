@@ -1,4 +1,3 @@
-
 import { ZoneConflictManager } from "./zoneConflictManager";
 import { Zone } from "@/components/booking/types";
 import { BookingService } from "@/services/BookingService";

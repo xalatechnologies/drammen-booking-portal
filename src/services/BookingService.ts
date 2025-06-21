@@ -31,6 +31,12 @@ interface BookingResult {
   conflicts?: any[];
 }
 
+interface ServiceResponse<T> {
+  success: boolean;
+  data?: T;
+  error?: { message: string };
+}
+
 // Helper function to convert between ActorType formats
 const convertActorType = (pricingType: PricingActorType): CartActorType => {
   switch (pricingType) {
@@ -47,9 +53,9 @@ const convertActorType = (pricingType: PricingActorType): CartActorType => {
 const convertActivityToEventType = (activityType: string): EventType => {
   switch (activityType) {
     case 'sport':
-    case 'sports': return 'sport';
+    case 'sports': return 'training'; // Use valid EventType
     case 'kultur':
-    case 'cultural': return 'cultural';
+    case 'cultural': return 'performance'; // Use valid EventType
     case 'møte':
     case 'meeting': return 'meeting';
     case 'trening':
@@ -179,52 +185,142 @@ export class BookingService {
     }
   }
 
-  // Mock implementations for missing methods
-  static async getBookings(pagination: PaginationParams, filters?: BookingFilters) {
-    return { success: true, data: { items: [], total: 0, page: pagination.page, limit: pagination.limit } };
+  // Mock implementations for missing methods with proper error handling
+  static async getBookings(pagination: PaginationParams, filters?: BookingFilters): Promise<ServiceResponse<{ items: any[]; total: number; page: number; limit: number; }>> {
+    try {
+      return { 
+        success: true, 
+        data: { items: [], total: 0, page: pagination.page, limit: pagination.limit } 
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: { message: 'Failed to fetch bookings' }
+      };
+    }
   }
 
-  static async getBookingById(id: string) {
-    return { success: true, data: null };
+  static async getBookingById(id: string): Promise<ServiceResponse<any>> {
+    try {
+      return { success: true, data: null };
+    } catch (error) {
+      return {
+        success: false,
+        error: { message: 'Failed to fetch booking' }
+      };
+    }
   }
 
-  static async getBookingsByFacility(facilityId: string) {
-    return { success: true, data: [] };
+  static async getBookingsByFacility(facilityId: string): Promise<ServiceResponse<any[]>> {
+    try {
+      return { success: true, data: [] };
+    } catch (error) {
+      return {
+        success: false,
+        error: { message: 'Failed to fetch facility bookings' }
+      };
+    }
   }
 
-  static async getBookingsByZone(zoneId: string) {
-    return { success: true, data: [] };
+  static async getBookingsByZone(zoneId: string): Promise<ServiceResponse<any[]>> {
+    try {
+      return { success: true, data: [] };
+    } catch (error) {
+      return {
+        success: false,
+        error: { message: 'Failed to fetch zone bookings' }
+      };
+    }
   }
 
-  static async checkAvailability(zoneId: string, date: Date, timeSlots: string[]) {
-    return { success: true, data: {} };
+  static async checkAvailability(zoneId: string, date: Date, timeSlots: string[]): Promise<ServiceResponse<{}>> {
+    try {
+      return { success: true, data: {} };
+    } catch (error) {
+      return {
+        success: false,
+        error: { message: 'Failed to check availability' }
+      };
+    }
   }
 
-  static async getConflictingBookings(zoneId: string, startDate: Date, endDate: Date) {
-    return { success: true, data: { hasConflict: false, conflictingBookings: [], availableAlternatives: [] } };
+  static async getConflictingBookings(zoneId: string, startDate: Date, endDate: Date): Promise<ServiceResponse<{ hasConflict: boolean; conflictingBookings: any[]; availableAlternatives: any[]; }>> {
+    try {
+      return { 
+        success: true, 
+        data: { hasConflict: false, conflictingBookings: [], availableAlternatives: [] } 
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: { message: 'Failed to check conflicts' }
+      };
+    }
   }
 
-  static async createBooking(request: BookingCreateRequest) {
-    return { success: true, data: null };
+  static async createBooking(request: BookingCreateRequest): Promise<ServiceResponse<any>> {
+    try {
+      return { success: true, data: null };
+    } catch (error) {
+      return {
+        success: false,
+        error: { message: 'Failed to create booking' }
+      };
+    }
   }
 
-  static async updateBooking(id: string, request: BookingUpdateRequest) {
-    return { success: true, data: null };
+  static async updateBooking(id: string, request: BookingUpdateRequest): Promise<ServiceResponse<any>> {
+    try {
+      return { success: true, data: null };
+    } catch (error) {
+      return {
+        success: false,
+        error: { message: 'Failed to update booking' }
+      };
+    }
   }
 
-  static async cancelBooking(id: string, reason?: string) {
-    return { success: true, data: null };
+  static async cancelBooking(id: string, reason?: string): Promise<ServiceResponse<any>> {
+    try {
+      return { success: true, data: null };
+    } catch (error) {
+      return {
+        success: false,
+        error: { message: 'Failed to cancel booking' }
+      };
+    }
   }
 
-  static async approveBooking(id: string, notes?: string) {
-    return { success: true, data: null };
+  static async approveBooking(id: string, notes?: string): Promise<ServiceResponse<any>> {
+    try {
+      return { success: true, data: null };
+    } catch (error) {
+      return {
+        success: false,
+        error: { message: 'Failed to approve booking' }
+      };
+    }
   }
 
-  static async rejectBooking(id: string, reason: string) {
-    return { success: true, data: null };
+  static async rejectBooking(id: string, reason: string): Promise<ServiceResponse<any>> {
+    try {
+      return { success: true, data: null };
+    } catch (error) {
+      return {
+        success: false,
+        error: { message: 'Failed to reject booking' }
+      };
+    }
   }
 
-  static async createRecurringBooking(request: BookingCreateRequest, pattern: any) {
-    return { success: true, data: [] };
+  static async createRecurringBooking(request: BookingCreateRequest, pattern: any): Promise<ServiceResponse<any[]>> {
+    try {
+      return { success: true, data: [] };
+    } catch (error) {
+      return {
+        success: false,
+        error: { message: 'Failed to create recurring booking' }
+      };
+    }
   }
 }
