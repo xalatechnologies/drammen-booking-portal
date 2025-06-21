@@ -178,7 +178,7 @@ const AdminHeader = () => {
                 variant="ghost" 
                 size="sm" 
                 className="relative h-9 gap-2 px-2 hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:outline-none rounded-md"
-                aria-label={tSync("admin.header.profile", "Brukerprofil og innstillinger")}
+                aria-label={tSync("admin.header.userProfile", "Brukerprofil og innstillinger")}
               >
                 <Avatar className="h-7 w-7">
                   <AvatarImage src={roleAvatars[currentRole].src} alt={roleNames[currentRole]} />
