@@ -70,6 +70,9 @@ export function FacilityListItemContent({
     return <IconComponent className="h-4 w-4" />;
   };
 
+  // Safely handle suitableFor array
+  const suitableForArray = Array.isArray(facility.suitableFor) ? facility.suitableFor : [];
+
   return (
     <div className="flex-1 p-6 flex flex-col h-full">
       {/* Title */}
@@ -101,7 +104,7 @@ export function FacilityListItemContent({
         {/* Suitable For - Limited to one line */}
         <div className="flex flex-wrap gap-2 flex-1 overflow-hidden">
           <div className="flex gap-2 items-center min-w-0">
-            {facility.suitableFor.slice(0, 3).map((activity, index) => (
+            {suitableForArray.slice(0, 3).map((activity, index) => (
               <Badge 
                 key={index} 
                 className="bg-blue-50 text-blue-700 border-blue-200 font-medium px-3 py-1.5 text-sm hover:bg-blue-100 transition-colors flex items-center gap-1.5 whitespace-nowrap"
@@ -110,9 +113,9 @@ export function FacilityListItemContent({
                 {activity}
               </Badge>
             ))}
-            {facility.suitableFor.length > 3 && (
+            {suitableForArray.length > 3 && (
               <Badge variant="outline" className="bg-gray-50 text-gray-600 border-gray-300 font-medium px-3 py-1.5 text-sm whitespace-nowrap">
-                +{facility.suitableFor.length - 3}
+                +{suitableForArray.length - 3}
               </Badge>
             )}
           </div>
