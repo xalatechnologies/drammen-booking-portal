@@ -1,8 +1,9 @@
+
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import AdminLayout from "@/components/admin/AdminLayout";
 import OverviewPage from "@/pages/admin/Overview";
-import FacilityManagementPage from "@/pages/admin/FacilityManagement";
+import FacilitiesPage from "@/pages/admin/FacilitiesPage";
 import ApprovalWorkflowsPage from "@/pages/admin/ApprovalWorkflows";
 import UsersRolesPage from "@/pages/admin/UsersRoles"; 
 import ReportsAnalyticsPage from "@/pages/admin/ReportsAnalytics";
@@ -31,7 +32,7 @@ const AdminDashboard = () => {
     <AdminLayout>
       <Routes>
         <Route index element={<OverviewPage />} />
-        <Route path="facilities" element={<FacilityManagementPage />} />
+        <Route path="facilities" element={<FacilitiesPage />} />
         <Route path="bookings-overview" element={<BookingsOverview />} />
         <Route path="approvals" element={<ApprovalWorkflowsPage />} />
         <Route path="users" element={<UsersRolesPage />} />
