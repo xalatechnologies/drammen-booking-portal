@@ -1,15 +1,15 @@
+
 import { BaseRepository } from "@/dal/BaseRepository";
 import { Facility, FacilityFilters } from "@/types/facility";
 import { Zone } from "@/types/zone";
-import { PaginatedResponse, ApiResponse } from "@/types/api";
+import { PaginatedResponse, RepositoryResponse } from "@/types/api";
 import { LocalizedFacility } from "@/types/localization";
-import { mockZones } from "@/data/mockZones";
 
 export class OptimizedLocalizedFacilityRepository extends BaseRepository<LocalizedFacility> {
   private localizedFacilities: LocalizedFacility[];
 
   constructor(initialData: LocalizedFacility[]) {
-    super(initialData);
+    super();
     this.localizedFacilities = initialData;
   }
 
@@ -35,7 +35,7 @@ export class OptimizedLocalizedFacilityRepository extends BaseRepository<Localiz
     filters?: FacilityFilters,
     sortField?: string,
     sortDirection?: 'asc' | 'desc'
-  ): Promise<ApiResponse<PaginatedResponse<LocalizedFacility>>> {
+  ): Promise<RepositoryResponse<PaginatedResponse<LocalizedFacility>>> {
     try {
       let facilities = [...this.localizedFacilities];
 
@@ -134,7 +134,6 @@ export class OptimizedLocalizedFacilityRepository extends BaseRepository<Localiz
       const paginatedFacilities = facilities.slice(start, start + pagination.limit);
 
       return {
-        success: true,
         data: {
           data: paginatedFacilities,
           pagination: {
@@ -149,137 +148,120 @@ export class OptimizedLocalizedFacilityRepository extends BaseRepository<Localiz
       };
     } catch (error) {
       return {
-        success: false,
-        error: {
-          message: "Failed to fetch facilities",
-          details: error,
+        data: {
+          data: [],
+          pagination: {
+            page: pagination.page,
+            limit: pagination.limit,
+            total: 0,
+            totalPages: 0,
+            hasNext: false,
+            hasPrev: false,
+          },
         },
+        error: "Failed to fetch facilities"
       };
     }
   }
 
-  async findByIdRaw(id: string): Promise<ApiResponse<LocalizedFacility>> {
+  async findByIdRaw(id: string): Promise<RepositoryResponse<LocalizedFacility | null>> {
     try {
       const facilityId = parseInt(id, 10);
       const facility = this.localizedFacilities.find(f => f.id === facilityId);
       
       if (!facility) {
         return {
-          success: false,
-          error: {
-            message: `Facility with id ${id} not found`,
-            code: 'NOT_FOUND',
-          },
+          data: null,
+          error: "Facility not found"
         };
       }
 
       return {
-        success: true,
         data: facility,
       };
     } catch (error) {
       return {
-        success: false,
-        error: {
-          message: "Failed to fetch facility",
-          details: error,
-        },
+        data: null,
+        error: "Failed to fetch facility"
       };
     }
   }
 
-  async getRawFacilitiesByType(type: string): Promise<ApiResponse<LocalizedFacility[]>> {
+  async getRawFacilitiesByType(type: string): Promise<RepositoryResponse<LocalizedFacility[]>> {
     try {
       const facilities = this.localizedFacilities.filter(f => f.type === type);
       return {
-        success: true,
         data: facilities,
       };
     } catch (error) {
       return {
-        success: false,
-        error: {
-          message: "Failed to fetch facilities by type",
-          details: error,
-        },
+        data: [],
+        error: "Failed to fetch facilities by type"
       };
     }
   }
 
-  async getRawFacilitiesByArea(area: string): Promise<ApiResponse<LocalizedFacility[]>> {
+  async getRawFacilitiesByArea(area: string): Promise<RepositoryResponse<LocalizedFacility[]>> {
     try {
       const facilities = this.localizedFacilities.filter(f => f.area === area);
       return {
-        success: true,
         data: facilities,
       };
     } catch (error) {
       return {
-        success: false,
-        error: {
-          message: "Failed to fetch facilities by area",
-          details: error,
-        },
+        data: [],
+        error: "Failed to fetch facilities by area"
       };
     }
   }
 
-  async getZonesByFacilityId(facilityId: string): Promise<ApiResponse<Zone[]>> {
+  async getZonesByFacilityId(facilityId: string): Promise<RepositoryResponse<Zone[]>> {
     try {
-      const zones = mockZones.filter(zone => zone.facilityId === facilityId);
+      // For now return empty zones - this should connect to actual zone repository
       return {
-        success: true,
-        data: zones,
+        data: [],
       };
     } catch (error) {
       return {
-        success: false,
-        error: {
-          message: "Failed to fetch zones",
-          details: error,
-        },
+        data: [],
+        error: "Failed to fetch zones"
       };
     }
   }
 
-  async getZoneById(zoneId: string): Promise<ApiResponse<Zone>> {
+  async getZoneById(zoneId: string): Promise<RepositoryResponse<Zone | null>> {
     try {
-      const zone = mockZones.find(z => z.id === zoneId);
-      
-      if (!zone) {
-        return {
-          success: false,
-          error: {
-            message: `Zone with id ${zoneId} not found`,
-            code: 'NOT_FOUND',
-          },
-        };
-      }
-
+      // For now return null - this should connect to actual zone repository
       return {
-        success: true,
-        data: zone,
+        data: null,
+        error: "Zone not found"
       };
     } catch (error) {
       return {
-        success: false,
-        error: {
-          message: "Failed to fetch zone",
-          details: error,
-        },
+        data: null,
+        error: "Failed to fetch zone"
       };
     }
   }
 
-  async create(item: Partial<LocalizedFacility>): Promise<ApiResponse<LocalizedFacility>> {
-    throw new Error("Create operation not implemented for mock data");
+  async create(item: Partial<LocalizedFacility>): Promise<RepositoryResponse<LocalizedFacility>> {
+    return {
+      data: item as LocalizedFacility,
+      error: "Create operation not implemented for mock data"
+    };
   }
 
-  async update(id: string, item: Partial<LocalizedFacility>): Promise<ApiResponse<LocalizedFacility>> {
-    throw new Error("Update operation not implemented for mock data");
+  async update(id: string, item: Partial<LocalizedFacility>): Promise<RepositoryResponse<LocalizedFacility>> {
+    return {
+      data: item as LocalizedFacility,
+      error: "Update operation not implemented for mock data"
+    };
   }
 
-  async delete(id: string): Promise<ApiResponse<boolean>> {
-    throw new Error("Delete operation not implemented for mock data");
+  async delete(id: string): Promise<RepositoryResponse<boolean>> {
+    return {
+      data: false,
+      error: "Delete operation not implemented for mock data"
+    };
   }
 }

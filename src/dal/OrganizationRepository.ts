@@ -1,4 +1,3 @@
-
 import { SupabaseRepository } from './SupabaseRepository';
 import { Organization, OrganizationType, OrganizationStatus, VerificationLevel } from '@/types/organization';
 import { RepositoryResponse } from '@/types/api';
@@ -129,7 +128,6 @@ export class OrganizationRepository extends SupabaseRepository<Organization> {
       status: dbRow.status,
       verificationLevel: dbRow.verification_level,
       parentOrganizationId: dbRow.parent_organization_id,
-      memberCount: dbRow.member_count,
       isActive: dbRow.is_active,
       createdAt: new Date(dbRow.created_at),
       updatedAt: new Date(dbRow.updated_at)

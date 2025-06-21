@@ -78,6 +78,20 @@ export interface FacilityImage {
   created_at: string;
 }
 
+// Add missing blackout period types
+export interface FacilityBlackoutPeriod {
+  id: string;
+  facility_id: number;
+  start_date: Date;
+  end_date: Date;
+  type: BlackoutType;
+  reason: string;
+  created_by: string;
+  created_at: string;
+}
+
+export type BlackoutType = 'maintenance' | 'renovation' | 'event' | 'weather' | 'other';
+
 export interface FacilityFilters {
   searchTerm?: string;
   facilityType?: string;

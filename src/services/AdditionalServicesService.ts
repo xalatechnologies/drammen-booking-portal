@@ -1,168 +1,111 @@
+import { AdditionalService, ServiceFilters } from '@/types/additionalServices';
+import { PaginatedResponse, PaginationParams, RepositoryResponse } from '@/types/api';
+import { LocalizedAdditionalServiceRepository } from '@/dal/repositories/LocalizedAdditionalServiceRepository';
 
-import { additionalServiceRepository } from '@/dal/repositories';
-import { ServiceCategory, ServiceBookingStatus } from '@/types/additionalServices';
-import { ActorType } from '@/types/pricing';
-import { PaginationParams, ApiResponse } from '@/types/api';
+// Create singleton instance
+const localizedAdditionalServiceRepository = new LocalizedAdditionalServiceRepository();
 
-interface ServiceFilters {
-  facilityId?: string;
-  category?: ServiceCategory;
-  isActive?: boolean;
-  searchTerm?: string;
-  priceRange?: {
-    min: number;
-    max: number;
-  };
-}
+// Simulate API delay
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export class AdditionalServicesService {
   static async getServices(
     pagination: PaginationParams,
     filters?: ServiceFilters
-  ) {
-    const result = await additionalServiceRepository.findAllWithFilters(pagination, filters);
-    
-    if (result.error) {
+  ): Promise<RepositoryResponse<PaginatedResponse<AdditionalService>>> {
+    try {
+      await delay(300);
+
+      const result = await localizedAdditionalServiceRepository.findAll(
+        pagination,
+        filters?.searchTerm,
+        filters
+      );
+
+      return result;
+    } catch (error) {
       return {
-        success: false,
-        error: { message: result.error }
+        data: {
+          data: [],
+          pagination: {
+            page: pagination.page,
+            limit: pagination.limit,
+            total: 0,
+            totalPages: 0,
+            hasNext: false,
+            hasPrev: false
+          }
+        },
+        error: "Failed to fetch additional services"
       };
     }
-
-    return {
-      success: true,
-      data: {
-        data: result.data,
-        pagination: {
-          page: pagination.page,
-          limit: pagination.limit,
-          total: result.data.length,
-          totalPages: Math.ceil(result.data.length / pagination.limit),
-          hasNext: pagination.page * pagination.limit < result.data.length,
-          hasPrev: pagination.page > 1
-        }
-      }
-    };
   }
 
-  static async getServiceById(serviceId: string) {
-    const result = await additionalServiceRepository.findById(serviceId);
-    
-    if (result.error) {
+  static async getServiceById(id: string): Promise<RepositoryResponse<AdditionalService | null>> {
+    try {
+      await delay(200);
+
+      const result = await localizedAdditionalServiceRepository.findById(id);
+      return result;
+    } catch (error) {
       return {
-        success: false,
-        error: { message: result.error }
+        data: null,
+        error: "Failed to fetch additional service"
       };
     }
-
-    return {
-      success: true,
-      data: result.data
-    };
   }
 
-  static async getServicesByCategory(
-    category: ServiceCategory,
-    facilityId?: string
-  ) {
-    const result = await additionalServiceRepository.findAllWithFilters(
-      undefined,
-      { category, facilityId, isActive: true }
-    );
-    
-    if (result.error) {
+  static async createService(serviceData: Partial<AdditionalService>): Promise<RepositoryResponse<AdditionalService>> {
+    try {
+      await delay(250);
+
+      const result = await localizedAdditionalServiceRepository.create(serviceData);
+      return result;
+    } catch (error) {
       return {
-        success: false,
-        error: { message: result.error }
+        data: null,
+        error: "Failed to create additional service"
       };
     }
-
-    return {
-      success: true,
-      data: result.data
-    };
   }
 
-  static async getPopularServices(
-    facilityId: string,
-    limit: number = 5
-  ) {
-    const result = await additionalServiceRepository.findAllWithFilters(
-      { page: 1, limit },
-      { facilityId, isActive: true }
-    );
-    
-    if (result.error) {
+  static async updateService(id: string, serviceData: Partial<AdditionalService>): Promise<RepositoryResponse<AdditionalService>> {
+    try {
+      await delay(250);
+
+      const result = await localizedAdditionalServiceRepository.update(id, serviceData);
+      return result;
+    } catch (error) {
       return {
-        success: false,
-        error: { message: result.error }
+        data: null,
+        error: "Failed to update additional service"
       };
     }
-
-    return {
-      success: true,
-      data: result.data
-    };
   }
 
-  static async calculateServicePrice(
-    serviceId: string,
+  static async deleteService(id: string): Promise<RepositoryResponse<boolean>> {
+    try {
+      await delay(200);
+
+      const result = await localizedAdditionalServiceRepository.delete(id);
+      return result;
+    } catch (error) {
+      return {
+        data: false,
+        error: "Failed to delete additional service"
+      };
+    }
+  }
+
+  static calculateServicePrice(
+    service: AdditionalService,
     quantity: number,
-    actorType: ActorType,
-    attendees?: number,
-    timeSlot?: string,
-    date?: Date
-  ) {
-    const serviceResult = await additionalServiceRepository.findById(serviceId);
-    
-    if (serviceResult.error || !serviceResult.data) {
-      return {
-        success: false,
-        error: { message: serviceResult.error || 'Service not found' }
-      };
-    }
-
-    const service = serviceResult.data;
-    
-    // Use base_price from database model
-    const basePrice = service.base_price || 0;
-    const totalPrice = basePrice * quantity;
-
-    return {
-      success: true,
-      data: {
-        serviceId,
-        quantity,
-        basePrice,
-        totalPrice,
-        currency: 'NOK',
-        calculatedAt: new Date()
-      }
-    };
-  }
-
-  static async validateServiceAvailability(
-    serviceId: string,
-    requestedDate: Date,
+    actorType: string,
     timeSlot?: string
-  ) {
-    const serviceResult = await additionalServiceRepository.findById(serviceId);
+  ): number {
+    const basePrice = service.base_price || service.pricing?.basePrice || 0;
+    const multiplier = service.pricing?.actorTypeMultipliers?.[actorType as keyof typeof service.pricing.actorTypeMultipliers] || 1;
     
-    if (serviceResult.error || !serviceResult.data) {
-      return {
-        success: false,
-        error: { message: serviceResult.error || 'Service not found' }
-      };
-    }
-
-    // Basic availability check - this would be more complex in a real implementation
-    return {
-      success: true,
-      data: {
-        isAvailable: true,
-        availableSlots: [],
-        conflicts: []
-      }
-    };
+    return basePrice * quantity * multiplier;
   }
 }

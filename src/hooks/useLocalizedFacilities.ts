@@ -35,21 +35,22 @@ export function useLocalizedFacilities({
     gcTime: 30 * 1000, // Keep in memory for 30 seconds only
   });
 
-  const facilities = response?.success ? response.data.data : [];
-  const paginationInfo = response?.success ? {
+  // Handle response properly - check if it's a direct array or wrapped response
+  const facilities = Array.isArray(response) ? response : (response?.success ? response.data?.data : []);
+  const paginationInfo = Array.isArray(response) ? null : (response?.success ? {
     page: response.data.pagination.page,
     limit: response.data.pagination.limit,
     total: response.data.pagination.total,
     totalPages: response.data.pagination.totalPages,
     hasNext: response.data.pagination.hasNext,
     hasPrev: response.data.pagination.hasPrev
-  } : null;
+  } : null);
 
   return {
-    facilities,
+    facilities: facilities || [],
     pagination: paginationInfo,
     isLoading,
-    error: response?.success === false ? response.error : error,
+    error: Array.isArray(response) ? undefined : (response?.success === false ? response.error : error),
     refetch,
   };
 }

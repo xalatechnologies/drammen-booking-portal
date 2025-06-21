@@ -1,4 +1,3 @@
-
 export interface AdditionalService {
   id: string;
   name: string;
@@ -14,6 +13,11 @@ export interface AdditionalService {
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
+  
+  // Database fields from Supabase
+  base_price?: number; // For compatibility with DB schema
+  unit?: string;
+  is_active?: boolean;
 }
 
 export type ServiceCategory = 
