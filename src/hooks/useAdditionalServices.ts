@@ -4,6 +4,7 @@ import { AdditionalServicesService } from "@/services/AdditionalServicesService"
 import { ServiceFilters } from "@/types/additionalServices";
 import { PaginationParams } from "@/types/api";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { ActorType } from "@/types/pricing";
 
 interface UseAdditionalServicesParams {
   pagination: PaginationParams;
@@ -42,7 +43,7 @@ export function useAdditionalServices({
     services: services || [],
     pagination: paginationInfo,
     isLoading,
-    error: response?.success === false ? response.error?.message || "Failed to fetch services" : error?.message,
+    error: response?.success === false ? (response.error?.message || "Failed to fetch services") : (error?.message || null),
     refetch,
   };
 }
@@ -66,7 +67,32 @@ export function useAdditionalService(id: string) {
   return {
     service: response?.success ? response.data : null,
     isLoading,
-    error: response?.success === false ? response.error?.message || "Failed to fetch service" : error?.message,
+    error: response?.success === false ? (response.error?.message || "Failed to fetch service") : (error?.message || null),
     refetch,
+  };
+}
+
+// Add the missing useServicePricing hook
+export function useServicePricing() {
+  const calculateServicePrice = async (
+    serviceId: string,
+    quantity: number,
+    actorType: ActorType,
+    attendees?: number,
+    timeSlot?: string,
+    date?: Date
+  ) => {
+    return await AdditionalServicesService.calculateServicePrice(
+      serviceId,
+      quantity,
+      actorType,
+      attendees,
+      timeSlot,
+      date
+    );
+  };
+
+  return {
+    calculateServicePrice
   };
 }

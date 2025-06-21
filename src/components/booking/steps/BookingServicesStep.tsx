@@ -40,7 +40,10 @@ export function BookingServicesStep({
   const [totalServicesCost, setTotalServicesCost] = useState(0);
   const [calculationError, setCalculationError] = useState<string | null>(null);
 
-  const { services, isLoading, error } = useAdditionalServices(facilityId, selectedCategory);
+  const { services, isLoading, error } = useAdditionalServices({
+    pagination: { page: 1, limit: 50 },
+    filters: selectedCategory ? { category: selectedCategory } : undefined
+  });
   const { calculateServicePrice } = useServicePricing();
 
   // Update calculated services when selections change
@@ -133,7 +136,7 @@ export function BookingServicesStep({
         <Alert variant="destructive">
           <AlertTriangle className="h-4 w-4" />
           <AlertDescription>
-            {calculationError || (error as any)?.message || t('common.messages.error', {}, 'En feil oppstod')}
+            {calculationError || error || t('common.messages.error', {}, 'En feil oppstod')}
           </AlertDescription>
         </Alert>
       )}
