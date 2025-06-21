@@ -5,7 +5,7 @@ import { BookingsTabs } from '@/components/bookings/BookingsTabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { PaymentForm } from '@/components/booking/PaymentForm';
-import { BookingStatusCard, BookingStatus } from '@/components/booking/BookingStatusCard';
+import { BookingStatusCard } from '@/components/booking/BookingStatusCard';
 
 interface LocalBooking {
   id: string;

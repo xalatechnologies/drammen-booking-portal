@@ -1,11 +1,11 @@
 
 import React from 'react';
 import { Card } from '@/components/ui/card';
-import { BookingStatusCard, BookingStatus } from '@/components/booking/BookingStatusCard';
+import { BookingStatusCard } from '@/components/booking/BookingStatusCard';
 
 interface Booking {
   id: string;
-  status: BookingStatus;
+  status: 'pending' | 'confirmed' | 'cancelled' | 'draft';
   facilityName: string;
   bookingReference: string;
   amount: number;
