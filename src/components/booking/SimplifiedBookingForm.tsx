@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { SelectedTimeSlot } from '@/utils/recurrenceEngine';
@@ -7,7 +8,7 @@ import { SelectedSlotsAccordion } from './SelectedSlotsAccordion';
 import { BookingFormFields } from './BookingFormFields';
 import { EnhancedPriceCalculationCard } from './EnhancedPriceCalculationCard';
 import { BookingActionButtons } from './BookingActionButtons';
-import { useCartStore } from '@/stores/useCartStore';
+import { BookingService, BookingFormData } from '@/services/BookingService';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 
@@ -20,15 +21,6 @@ interface SimplifiedBookingFormProps {
   onCompleteBooking?: (bookingData: any) => void;
   onSlotsCleared?: () => void;
   onRemoveSlot?: (zoneId: string, date: Date, timeSlot: string) => void;
-}
-
-interface BookingFormData {
-  purpose: string;
-  attendees: number;
-  activityType: string;
-  additionalInfo: string;
-  actorType: ActorType | '';
-  termsAccepted: boolean;
 }
 
 export function SimplifiedBookingForm({
@@ -44,7 +36,6 @@ export function SimplifiedBookingForm({
   console.log('SimplifiedBookingForm: Rendering with selectedSlots:', selectedSlots);
   console.log('SimplifiedBookingForm: facilityId:', facilityId, 'facilityName:', facilityName);
   
-  const { addToCart } = useCartStore();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -76,93 +67,30 @@ export function SimplifiedBookingForm({
   };
 
   const isFormValid = () => {
-    const valid = formData.purpose.trim() && 
-           formData.attendees > 0 && 
-           formData.activityType && 
-           formData.actorType &&
-           formData.termsAccepted &&
-           selectedSlots.length > 0;
-    
-    console.log('SimplifiedBookingForm: Form validation:', {
-      purpose: !!formData.purpose.trim(),
-      attendees: formData.attendees > 0,
-      activityType: !!formData.activityType,
-      actorType: !!formData.actorType,
-      termsAccepted: formData.termsAccepted,
-      hasSlots: selectedSlots.length > 0,
-      overall: valid
+    return BookingService.validateBookingData({
+      selectedSlots,
+      facilityId,
+      facilityName,
+      zones,
+      formData
     });
-    
-    return valid;
   };
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     console.log('SimplifiedBookingForm: handleAddToCart called');
-    console.log('SimplifiedBookingForm: Form valid:', isFormValid());
-    console.log('SimplifiedBookingForm: Form data:', formData);
-    console.log('SimplifiedBookingForm: Selected slots:', selectedSlots);
 
-    if (!isFormValid()) {
-      toast({
-        title: "Manglende informasjon",
-        description: "Vennligst fyll ut alle påkrevde felt og aksepter vilkårene",
-        variant: "destructive",
-      });
-      return;
-    }
+    const result = await BookingService.addToCart({
+      selectedSlots,
+      facilityId,
+      facilityName,
+      zones,
+      formData
+    });
 
-    try {
-      // Calculate total pricing for all slots
-      const totalDuration = selectedSlots.reduce((total, slot) => total + (slot.duration || 2), 0);
-      const averagePricePerHour = zones.length > 0 ? 
-        selectedSlots.reduce((total, slot) => {
-          const zone = zones.find(z => z.id === slot.zoneId);
-          return total + (zone?.pricePerHour || 450);
-        }, 0) / selectedSlots.length : 450;
-
-      const baseFacilityPrice = averagePricePerHour * totalDuration;
-
-      console.log('SimplifiedBookingForm: Creating single reservation with multiple slots:', {
-        facilityId,
-        facilityName,
-        selectedSlots,
-        totalDuration,
-        averagePricePerHour,
-        baseFacilityPrice
-      });
-
-      // Create a single cart item with all selected slots
-      addToCart({
-        facilityId,
-        facilityName,
-        zoneId: selectedSlots[0].zoneId, // Primary zone for backward compatibility
-        date: selectedSlots[0].date, // Primary date for backward compatibility
-        timeSlot: selectedSlots[0].timeSlot, // Primary time slot for backward compatibility
-        duration: totalDuration,
-        pricePerHour: averagePricePerHour,
-        purpose: formData.purpose,
-        expectedAttendees: formData.attendees,
-        organizationType: formData.actorType === 'private-person' ? 'private' : 
-                        formData.actorType === 'lag-foreninger' ? 'organization' : 'business',
-        additionalServices: [],
-        timeSlots: selectedSlots, // All selected slots in one reservation
-        customerInfo: {
-          name: '',
-          email: '',
-          phone: ''
-        },
-        pricing: {
-          baseFacilityPrice,
-          servicesPrice: 0,
-          discounts: 0,
-          vatAmount: 0,
-          totalPrice: baseFacilityPrice
-        }
-      });
-
+    if (result.success) {
       toast({
         title: "Lagt til i handlekurv",
-        description: `Reservasjon med ${selectedSlots.length} tidspunkt er lagt til i handlekurven`,
+        description: result.message,
       });
 
       // Clear slots after successful addition
@@ -179,42 +107,49 @@ export function SimplifiedBookingForm({
           formData
         });
       }
-    } catch (error) {
-      console.error('SimplifiedBookingForm: Error adding to cart:', error);
+    } else {
       toast({
         title: "Feil",
-        description: "Kunne ikke legge til i handlekurv. Prøv igjen.",
+        description: result.message,
         variant: "destructive",
       });
     }
   };
 
-  const handleCompleteBooking = () => {
+  const handleCompleteBooking = async () => {
     console.log('SimplifiedBookingForm: handleCompleteBooking called');
-    console.log('SimplifiedBookingForm: Form valid:', isFormValid());
 
-    if (!isFormValid()) {
+    const result = await BookingService.completeBooking({
+      selectedSlots,
+      facilityId,
+      facilityName,
+      zones,
+      formData
+    });
+
+    if (result.success) {
       toast({
-        title: "Manglende informasjon",
-        description: "Vennligst fyll ut alle påkrevde felt og aksepter vilkårene",
-        variant: "destructive",
+        title: "Reservasjon opprettet",
+        description: result.message,
       });
-      return;
-    }
 
-    // For now, add to cart and navigate to checkout
-    handleAddToCart();
-    
-    setTimeout(() => {
-      navigate('/checkout');
-    }, 1000);
+      setTimeout(() => {
+        navigate('/checkout');
+      }, 1000);
 
-    if (onCompleteBooking) {
-      onCompleteBooking({
-        selectedSlots,
-        facilityId,
-        facilityName,
-        formData
+      if (onCompleteBooking) {
+        onCompleteBooking({
+          selectedSlots,
+          facilityId,
+          facilityName,
+          formData
+        });
+      }
+    } else {
+      toast({
+        title: "Feil",
+        description: result.message,
+        variant: "destructive",
       });
     }
   };
