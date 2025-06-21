@@ -1,19 +1,20 @@
+
 import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { format, addDays, startOfWeek, isAfter, startOfDay } from "date-fns";
 import { Calendar } from "lucide-react";
 import { WeekNavigation } from "./WeekNavigation";
 import { CalendarHeader } from "./CalendarHeader";
-import { FacilityCalendarAccordion } from "./FacilityCalendarAccordion";
 import { CalendarViewProps } from "./types";
 import { useFacilities } from "@/hooks/useFacilities";
 import { FacilityFilters } from "@/types/facility";
 import ViewHeader from "../search/ViewHeader";
-import { UnifiedBookingForm } from "../booking/UnifiedBookingForm";
 import { SelectedTimeSlot } from "@/utils/recurrenceEngine";
 import { useCart } from "@/contexts/CartContext";
 import { useNavigate } from "react-router-dom";
 import { BookingForm } from "../booking/BookingForm";
+import { CalendarWithBooking } from "../shared/CalendarWithBooking";
+import { useSlotSelection } from "@/hooks/useSlotSelection";
 
 interface CalendarViewWithToggleProps extends CalendarViewProps {
   viewMode: "grid" | "map" | "calendar" | "list";
@@ -29,16 +30,17 @@ const CalendarView: React.FC<CalendarViewWithToggleProps> = ({
   viewMode,
   setViewMode,
 }) => {
-  const [currentWeekStart, setCurrentWeekStart] = useState(startOfWeek(date || new Date(), { weekStartsOn: 1 }));
   const [selectedFacilityId, setSelectedFacilityId] = useState<string | null>(null);
-  const [selectedSlots, setSelectedSlots] = useState<SelectedTimeSlot[]>([]);
   const { addToCart } = useCart();
   const navigate = useNavigate();
   
-  // Check if we can go to previous week (prevent going to past dates)
-  const today = startOfDay(new Date());
-  const previousWeekStart = new Date(currentWeekStart.getTime() - 7 * 24 * 60 * 60 * 1000);
-  const canGoPrevious = isAfter(addDays(previousWeekStart, 6), today) || format(addDays(previousWeekStart, 6), 'yyyy-MM-dd') === format(today, 'yyyy-MM-dd');
+  // Use the centralized slot selection hook
+  const {
+    selectedSlots,
+    handleSlotClick,
+    handleBulkSlotSelection,
+    clearSelection
+  } = useSlotSelection();
   
   // Create filters from props
   const filters: FacilityFilters = {
@@ -55,7 +57,7 @@ const CalendarView: React.FC<CalendarViewWithToggleProps> = ({
     filters
   });
 
-  // Convert facilities to calendar format with zones - fix the address handling
+  // Convert facilities to calendar format with zones
   const facilitiesWithZones = facilities.map(facility => ({
     id: facility.id,
     name: facility.name,
@@ -70,15 +72,15 @@ const CalendarView: React.FC<CalendarViewWithToggleProps> = ({
       {
         id: `zone-${facility.id}-1`,
         name: "Hovedområde",
-        facilityId: facility.id.toString(), // Add missing facilityId
+        facilityId: facility.id.toString(),
         capacity: Math.floor(facility.capacity * 0.7),
         pricePerHour: 250,
         description: "Hovedområdet i lokalet",
         area: "100 m²",
-        isMainZone: true, // Add missing isMainZone
+        isMainZone: true,
         subZones: [],
         equipment: [],
-        amenities: [], // Add missing amenities property
+        amenities: [],
         bookingRules: {
           minBookingDuration: 1,
           maxBookingDuration: 8,
@@ -101,56 +103,39 @@ const CalendarView: React.FC<CalendarViewWithToggleProps> = ({
         features: [],
         restrictions: [],
         isActive: true
-      },
-      ...(facility.capacity > 50 ? [{
-        id: `zone-${facility.id}-2`, 
-        name: "Seksjon B",
-        facilityId: facility.id.toString(), // Add missing facilityId
-        capacity: Math.floor(facility.capacity * 0.3),
-        pricePerHour: 150,
-        description: "Mindre seksjon av lokalet",
-        area: "50 m²",
-        isMainZone: false, // Add missing isMainZone
-        subZones: [],
-        equipment: [],
-        amenities: [], // Add missing amenities property
-        bookingRules: {
-          minBookingDuration: 1,
-          maxBookingDuration: 8,
-          allowedTimeSlots: [],
-          bookingTypes: ['one-time', 'recurring', 'fixed-lease'],
-          advanceBookingDays: 90,
-          cancellationHours: 24
-        },
-        adminInfo: {
-          contactPersonName: "Facility Manager",
-          contactPersonEmail: "manager@drammen.kommune.no",
-          specialInstructions: "Mindre seksjon av lokalet",
-          maintenanceSchedule: []
-        },
-        layout: {
-          coordinates: { x: 0, y: 0, width: 50, height: 50 },
-          entryPoints: ["Hovedinngang"]
-        },
-        accessibility: [],
-        features: [],
-        isActive: true
-      }] : [])
+      }
     ]
   }));
 
-  // Get selected facility details
-  const selectedFacility = selectedFacilityId 
-    ? facilitiesWithZones.find(f => f.id.toString() === selectedFacilityId)
-    : null;
+  // Get availability status for a slot
+  const getAvailabilityStatus = (zoneId: string, date: Date, timeSlot: string) => {
+    const now = new Date();
+    const timeHour = parseInt(timeSlot.split(':')[0]);
+    const slotDateTime = new Date(date);
+    slotDateTime.setHours(timeHour, 0, 0, 0);
+    
+    if (slotDateTime < now) {
+      return { status: 'unavailable', conflict: null };
+    }
 
-  const handleSlotSelection = (facilityId: string, slots: SelectedTimeSlot[]) => {
-    setSelectedFacilityId(facilityId);
-    setSelectedSlots(slots);
+    // Mock random availability
+    const isBooked = Math.random() > 0.8;
+    return { 
+      status: isBooked ? 'busy' : 'available', 
+      conflict: isBooked ? { type: 'existing-booking', details: 'Allerede booket' } : null 
+    };
+  };
+
+  const isSlotSelected = (zoneId: string, date: Date, timeSlot: string) => {
+    return selectedSlots.some(slot => {
+      const slotDate = slot.date instanceof Date ? slot.date : new Date(slot.date);
+      return slot.zoneId === zoneId &&
+        slotDate.toDateString() === date.toDateString() &&
+        slot.timeSlot === timeSlot;
+    });
   };
 
   const handleAddToCart = (bookingData: any) => {
-    // Add to cart logic here
     addToCart({
       facilityId: bookingData.facilityId,
       facilityName: bookingData.facilityName,
@@ -166,15 +151,13 @@ const CalendarView: React.FC<CalendarViewWithToggleProps> = ({
         vatAmount: 0,
         totalPrice: 250 * bookingData.selectedSlots.length
       },
-      // Legacy fields for compatibility
       date: bookingData.selectedSlots[0]?.date || new Date(),
       timeSlot: bookingData.selectedSlots[0]?.timeSlot || '',
       zoneId: bookingData.selectedSlots[0]?.zoneId || '',
       pricePerHour: 250
     });
     
-    // Clear selections
-    setSelectedSlots([]);
+    clearSelection();
     setSelectedFacilityId(null);
   };
 
@@ -183,8 +166,12 @@ const CalendarView: React.FC<CalendarViewWithToggleProps> = ({
   };
 
   const handleClearSlots = () => {
-    setSelectedSlots([]);
+    clearSelection();
     setSelectedFacilityId(null);
+  };
+
+  const handleRemoveSlot = (zoneId: string, date: Date, timeSlot: string) => {
+    handleSlotClick(zoneId, date, timeSlot, 'available');
   };
 
   if (isLoading) {
@@ -219,6 +206,17 @@ const CalendarView: React.FC<CalendarViewWithToggleProps> = ({
       </div>
     );
   }
+
+  // Get selected facility details
+  const selectedFacility = selectedFacilityId 
+    ? facilitiesWithZones.find(f => f.id.toString() === selectedFacilityId)
+    : null;
+
+  // If no facility is selected, show the first one or create a combined view
+  const displayFacility = selectedFacility || facilitiesWithZones[0];
+  const allZones = selectedFacility 
+    ? selectedFacility.zones 
+    : facilitiesWithZones.flatMap(f => f.zones);
   
   return (
     <div className="max-w-7xl mx-auto px-4 my-[12px]">
@@ -229,81 +227,30 @@ const CalendarView: React.FC<CalendarViewWithToggleProps> = ({
         setViewMode={setViewMode}
       />
 
-      <div className="flex gap-6">
-        {/* Main Calendar Content - 60% */}
-        <div className="w-3/5 space-y-6">
-          <WeekNavigation
-            currentWeekStart={currentWeekStart}
-            setCurrentWeekStart={setCurrentWeekStart}
-            canGoPrevious={canGoPrevious}
-          />
-
-          <Card className="shadow-lg border-0">
-            <CalendarHeader />
-            <CardContent className="p-0">
-              {facilitiesWithZones.length === 0 ? (
-                <div className="p-8 text-center text-gray-500">
-                  <Calendar className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                  <p className="text-lg font-medium">Ingen lokaler funnet</p>
-                  <p className="text-sm">Prøv å justere filtrene dine</p>
-                </div>
-              ) : (
-                <FacilityCalendarAccordion
-                  facilities={facilitiesWithZones}
-                  currentWeekStart={currentWeekStart}
-                  onFacilitySelect={setSelectedFacilityId}
-                  onSlotSelection={handleSlotSelection}
-                />
-              )}
-            </CardContent>
-          </Card>
+      {facilitiesWithZones.length === 0 ? (
+        <div className="text-center py-10">
+          <Calendar className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+          <p className="text-lg font-medium">Ingen lokaler funnet</p>
+          <p className="text-sm text-gray-500">Prøv å justere filtrene dine</p>
         </div>
-
-        {/* Booking Sidebar - 40% */}
-        <div className="w-2/5">
-          <div className="sticky top-4">
-            <BookingForm
-              selectedSlots={selectedSlots}
-              facilityId={selectedFacilityId || ''}
-              facilityName={selectedFacility?.name || ''}
-              zones={selectedFacility?.zones.map(zone => ({
-                ...zone,
-                equipment: [],
-                area: "100 m²",
-                amenities: [], // Add missing amenities property
-                parentZoneId: undefined,
-                isMainZone: true,
-                subZones: [],
-                bookingRules: {
-                  minBookingDuration: 1,
-                  maxBookingDuration: 8,
-                  allowedTimeSlots: [],
-                  bookingTypes: ['one-time', 'recurring', 'fixed-lease'],
-                  advanceBookingDays: 90,
-                  cancellationHours: 24
-                },
-                adminInfo: {
-                  contactPersonName: "Facility Manager",
-                  contactPersonEmail: "manager@drammen.kommune.no",
-                  specialInstructions: zone.description,
-                  maintenanceSchedule: []
-                },
-                layout: {
-                  coordinates: { x: 0, y: 0, width: 100, height: 100 },
-                  entryPoints: ["Hovedinngang"]
-                },
-                accessibility: [],
-                features: [],
-                restrictions: [],
-                isActive: true
-              })) || []}
-              onAddToCart={handleAddToCart}
-              onCompleteBooking={handleCompleteBooking}
-              onSlotsCleared={handleClearSlots}
-            />
-          </div>
-        </div>
-      </div>
+      ) : (
+        <CalendarWithBooking
+          facilityName={displayFacility?.name || 'Alle lokaler'}
+          facilityId={selectedFacilityId || 'all'}
+          zones={allZones}
+          selectedSlots={selectedSlots}
+          onSlotClick={handleSlotClick}
+          onBulkSlotSelection={handleBulkSlotSelection}
+          onRemoveSlot={handleRemoveSlot}
+          onClearSlots={handleClearSlots}
+          onContinueBooking={() => navigate('/checkout')}
+          getAvailabilityStatus={getAvailabilityStatus}
+          isSlotSelected={isSlotSelected}
+          timeSlotDuration={1}
+          layout="horizontal"
+          compact={false}
+        />
+      )}
     </div>
   );
 };

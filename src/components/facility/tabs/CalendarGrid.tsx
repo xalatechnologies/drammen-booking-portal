@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { format, addDays } from 'date-fns';
 import { nb } from 'date-fns/locale';
@@ -54,23 +55,24 @@ export function CalendarGrid({
 
   const handleMouseDown = (day: Date, timeSlot: string, event: React.MouseEvent) => {
     const { status } = getAvailabilityStatus(zone.id, day, timeSlot);
-    if (status === 'available') {
+    if (status === 'available' && onBulkSlotSelection) {
+      event.preventDefault();
       startDrag(zone.id, day, timeSlot, event);
     }
   };
 
   const handleMouseEnter = (day: Date, timeSlot: string) => {
-    if (dragState.isDragging) {
+    if (dragState.isDragging && onBulkSlotSelection) {
       updateDrag(zone.id, day, timeSlot, timeSlots, weekDays, getAvailabilityStatus);
     }
   };
 
   const handleMouseUp = () => {
-    if (dragState.isDragging) {
+    if (dragState.isDragging && onBulkSlotSelection) {
       const previewSlots = endDrag();
       console.log('CalendarGrid: drag ended, preview slots:', previewSlots);
       
-      if (onBulkSlotSelection && previewSlots.length > 0) {
+      if (previewSlots.length > 0) {
         console.log('CalendarGrid: calling onBulkSlotSelection with slots:', previewSlots);
         onBulkSlotSelection(previewSlots);
       }
@@ -78,7 +80,9 @@ export function CalendarGrid({
   };
 
   const handleClick = (day: Date, timeSlot: string, status: string, event: React.MouseEvent) => {
+    // Only handle single clicks if we're not dragging
     if (!dragState.isDragging) {
+      console.log('CalendarGrid: single click on slot:', { zoneId: zone.id, day, timeSlot, status });
       onSlotClick(zone.id, day, timeSlot, status);
     }
   };

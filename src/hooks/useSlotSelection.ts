@@ -19,6 +19,7 @@ export function useSlotSelection() {
     console.log('useSlotSelection: handleSlotClick called with:', { zoneId, date, timeSlot, availability });
     
     if (availability !== 'available') {
+      console.log('useSlotSelection: slot not available, showing notification');
       addNotification({
         type: 'warning',
         title: 'Tidspunkt ikke tilgjengelig',
@@ -27,17 +28,21 @@ export function useSlotSelection() {
       return;
     }
 
-    const isSelected = selectedSlots.some(slot => 
-      slot.zoneId === zoneId &&
-      slot.date.toDateString() === date.toDateString() &&
-      slot.timeSlot === timeSlot
-    );
+    // Ensure date is a Date object
+    const slotDate = date instanceof Date ? date : new Date(date);
+
+    const isSelected = selectedSlots.some(slot => {
+      const selectedDate = slot.date instanceof Date ? slot.date : new Date(slot.date);
+      return slot.zoneId === zoneId &&
+        selectedDate.toDateString() === slotDate.toDateString() &&
+        slot.timeSlot === timeSlot;
+    });
 
     console.log('useSlotSelection: isSelected:', isSelected);
 
     if (isSelected) {
       console.log('useSlotSelection: removing slot');
-      removeSlot(zoneId, date, timeSlot);
+      removeSlot(zoneId, slotDate, timeSlot);
       addNotification({
         type: 'info',
         title: 'Tidspunkt fjernet',
@@ -47,9 +52,9 @@ export function useSlotSelection() {
       console.log('useSlotSelection: adding slot');
       addSlot({
         zoneId,
-        date,
+        date: slotDate,
         timeSlot,
-        duration: 2
+        duration: 1
       });
       addNotification({
         type: 'success',
@@ -61,15 +66,25 @@ export function useSlotSelection() {
 
   const handleBulkSlotSelection = (newSlots: SelectedTimeSlot[]) => {
     console.log('useSlotSelection: handleBulkSlotSelection called with:', newSlots);
-    bulkAddSlots(newSlots);
     
-    if (newSlots.length > 0) {
-      addNotification({
-        type: 'success',
-        title: 'Tidspunkt lagt til',
-        message: `${newSlots.length} tidspunkt ble lagt til utvalget.`
-      });
+    if (newSlots.length === 0) {
+      console.log('useSlotSelection: no slots to add');
+      return;
     }
+
+    // Ensure all dates are Date objects
+    const normalizedSlots = newSlots.map(slot => ({
+      ...slot,
+      date: slot.date instanceof Date ? slot.date : new Date(slot.date)
+    }));
+
+    bulkAddSlots(normalizedSlots);
+    
+    addNotification({
+      type: 'success',
+      title: 'Tidspunkt lagt til',
+      message: `${normalizedSlots.length} tidspunkt ble lagt til utvalget.`
+    });
   };
 
   const clearSelection = () => {
