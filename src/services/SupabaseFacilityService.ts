@@ -8,6 +8,38 @@ export class SupabaseFacilityService {
   private static readonly ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN6cGRvaWhveHpsaXZvdGhveXZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA0Mzk5MzksImV4cCI6MjA2NjAxNTkzOX0.4j3PYVkUpQZce-631weYhyICrUKfBk3LV5drs_tYExc';
 
   private static transformCoreFacilityToFacility(coreFacility: any): Facility {
+    // Compute the address from individual fields
+    const addressParts = [
+      coreFacility.address_street,
+      coreFacility.address_city,
+      coreFacility.address_postal_code
+    ].filter(part => part && part.trim() !== '');
+    
+    const computedAddress = addressParts.length > 0 
+      ? addressParts.join(', ') 
+      : 'Address not available';
+
+    console.log('SupabaseFacilityService - Transform facility:', {
+      id: coreFacility.id,
+      address_street: coreFacility.address_street,
+      address_city: coreFacility.address_city,
+      address_postal_code: coreFacility.address_postal_code,
+      computedAddress,
+      featuredImage: coreFacility.featuredImage,
+      images: coreFacility.images
+    });
+
+    // Get image URL - prioritize featured image
+    let imageUrl = 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&auto=format&fit=crop';
+    
+    if (coreFacility.featuredImage?.image_url) {
+      imageUrl = coreFacility.featuredImage.image_url;
+    } else if (coreFacility.images && coreFacility.images.length > 0) {
+      imageUrl = coreFacility.images[0].image_url;
+    } else if (coreFacility.image_url) {
+      imageUrl = coreFacility.image_url;
+    }
+
     return {
       // Core facility properties
       ...coreFacility,
@@ -20,8 +52,8 @@ export class SupabaseFacilityService {
       amenities: coreFacility.amenities || coreFacility.accessibility_features || [],
       
       // Computed properties for backwards compatibility
-      address: `${coreFacility.address_street}, ${coreFacility.address_postal_code} ${coreFacility.address_city}`,
-      image: coreFacility.image_url || '',
+      address: computedAddress,
+      image: imageUrl,
       pricePerHour: coreFacility.price_per_hour || 450,
       accessibility: coreFacility.accessibility_features || [],
       hasAutoApproval: coreFacility.has_auto_approval || false,
@@ -30,7 +62,11 @@ export class SupabaseFacilityService {
       season: {
         from: coreFacility.season_from || '2024-01-01',
         to: coreFacility.season_to || '2024-12-31'
-      }
+      },
+      
+      // Add image data
+      featuredImage: coreFacility.featuredImage,
+      images: coreFacility.images || []
     };
   }
 

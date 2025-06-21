@@ -1,4 +1,3 @@
-
 import { SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { Database } from '../_shared/database.types.ts'
 
@@ -29,7 +28,8 @@ export class FacilityRepository {
       .select(`
         *,
         facility_opening_hours(day_of_week, open_time, close_time, is_open),
-        zones(id, name, type, capacity, bookable_independently)
+        zones(id, name, type, capacity, bookable_independently),
+        facility_images!inner(id, image_url, alt_text, is_featured, display_order)
       `, { count: 'exact' })
       .eq('status', 'active')
       .range(from, to)
@@ -55,11 +55,34 @@ export class FacilityRepository {
       query = query.contains('accessibility_features', [otherFilters.accessibility])
     }
 
-    return query
+    const result = await query
+
+    if (result.error) {
+      return result
+    }
+
+    // Transform the data to include featured image and images array
+    const transformedData = result.data?.map(facility => {
+      const images = facility.facility_images || []
+      const featuredImage = images.find(img => img.is_featured) || images[0] || null
+      
+      return {
+        ...facility,
+        featuredImage,
+        images: images.sort((a, b) => a.display_order - b.display_order),
+        // Remove the facility_images property to avoid confusion
+        facility_images: undefined
+      }
+    })
+
+    return {
+      ...result,
+      data: transformedData
+    }
   }
 
   async findById(id: number) {
-    return this.supabase
+    const result = await this.supabase
       .from('facilities')
       .select(`
         *,
@@ -68,11 +91,32 @@ export class FacilityRepository {
           id, name, type, capacity, description, 
           bookable_independently, equipment, accessibility_features,
           status, area_sqm
-        )
+        ),
+        facility_images(id, image_url, alt_text, is_featured, display_order, caption)
       `)
       .eq('id', id)
       .eq('status', 'active')
       .single()
+
+    if (result.error) {
+      return result
+    }
+
+    // Transform the data to include featured image
+    const facility = result.data
+    const images = facility.facility_images || []
+    const featuredImage = images.find(img => img.is_featured) || images[0] || null
+    
+    return {
+      ...result,
+      data: {
+        ...facility,
+        featuredImage,
+        images: images.sort((a, b) => a.display_order - b.display_order),
+        // Remove the facility_images property to avoid confusion
+        facility_images: undefined
+      }
+    }
   }
 
   async findByType(type: string) {

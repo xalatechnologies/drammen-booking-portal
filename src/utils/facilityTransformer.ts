@@ -7,16 +7,22 @@ export const transformDatabaseFacility = (facility: any): CoreFacility => {
     facility.address_street,
     facility.address_city,
     facility.address_postal_code
-  ].filter(part => part && part.trim() !== '');
+  ].filter(part => part && part.trim() !== '' && part !== 'undefined' && part !== 'null');
   
   const computedAddress = addressParts.length > 0 
     ? addressParts.join(', ') 
     : 'Address not available';
 
-  // Ensure proper image URL with fallback
-  const imageUrl = facility.image_url || 
-    facility.image || 
-    'https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&auto=format&fit=crop';
+  // Determine image URL - prioritize featured image, then first image, then fallback
+  let imageUrl = 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&auto=format&fit=crop';
+  
+  if (facility.featuredImage?.image_url) {
+    imageUrl = facility.featuredImage.image_url;
+  } else if (facility.images && facility.images.length > 0) {
+    imageUrl = facility.images[0].image_url;
+  } else if (facility.image_url) {
+    imageUrl = facility.image_url;
+  }
 
   console.log('transformDatabaseFacility - Transforming facility:', {
     id: facility.id,
@@ -25,6 +31,7 @@ export const transformDatabaseFacility = (facility: any): CoreFacility => {
     address_city: facility.address_city,
     address_postal_code: facility.address_postal_code,
     computedAddress,
+    featuredImage: facility.featuredImage,
     imageUrl
   });
 
