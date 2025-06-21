@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Calendar } from "lucide-react";
@@ -15,6 +14,18 @@ interface CalendarViewWithToggleProps extends CalendarViewProps {
   viewMode: "grid" | "map" | "calendar" | "list";
   setViewMode: (mode: "grid" | "map" | "calendar" | "list") => void;
 }
+
+// Create a stable hash for consistent availability
+const createStableHash = (zoneId: string, date: Date, timeSlot: string): number => {
+  const str = `${zoneId}-${date.toDateString()}-${timeSlot}`;
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32-bit integer
+  }
+  return Math.abs(hash);
+};
 
 const CalendarView: React.FC<CalendarViewWithToggleProps> = ({
   date,
@@ -102,7 +113,7 @@ const CalendarView: React.FC<CalendarViewWithToggleProps> = ({
     ]
   }));
 
-  // Get availability status for a slot
+  // Stable availability function - no random behavior
   const getAvailabilityStatus = (zoneId: string, date: Date, timeSlot: string) => {
     const now = new Date();
     const timeHour = parseInt(timeSlot.split(':')[0]);
@@ -113,8 +124,10 @@ const CalendarView: React.FC<CalendarViewWithToggleProps> = ({
       return { status: 'unavailable', conflict: null };
     }
 
-    // Mock random availability
-    const isBooked = Math.random() > 0.8;
+    // Use stable hash instead of random to determine if slot is booked
+    const hash = createStableHash(zoneId, date, timeSlot);
+    const isBooked = (hash % 10) < 2; // 20% of slots are "busy"
+    
     return { 
       status: isBooked ? 'busy' : 'available', 
       conflict: isBooked ? { type: 'existing-booking', details: 'Allerede booket' } : null 

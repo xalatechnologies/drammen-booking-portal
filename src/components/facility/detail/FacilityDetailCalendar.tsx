@@ -1,4 +1,3 @@
-
 import React, { useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Zone } from "@/components/booking/types";
@@ -28,6 +27,18 @@ const ensureDate = (date: Date | string): Date => {
   return date instanceof Date ? date : new Date(date);
 };
 
+// Create a stable hash for consistent availability
+const createStableHash = (zoneId: string, date: Date, timeSlot: string): number => {
+  const str = `${zoneId}-${date.toDateString()}-${timeSlot}`;
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32-bit integer
+  }
+  return Math.abs(hash);
+};
+
 export const FacilityDetailCalendar: React.FC<FacilityDetailCalendarProps> = ({
   zones,
   selectedSlots,
@@ -43,7 +54,7 @@ export const FacilityDetailCalendar: React.FC<FacilityDetailCalendarProps> = ({
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // Mock availability function - replace with real implementation
+  // Stable availability function - no random behavior
   const getAvailabilityStatus = useCallback((zoneId: string, date: Date, timeSlot: string) => {
     const now = new Date();
     const timeHour = parseInt(timeSlot.split(':')[0]);
@@ -54,8 +65,10 @@ export const FacilityDetailCalendar: React.FC<FacilityDetailCalendarProps> = ({
       return { status: 'unavailable', conflict: null };
     }
 
-    // Mock random availability
-    const isBooked = Math.random() > 0.8;
+    // Use stable hash instead of random to determine if slot is booked
+    const hash = createStableHash(zoneId, date, timeSlot);
+    const isBooked = (hash % 10) < 2; // 20% of slots are "busy"
+    
     return { 
       status: isBooked ? 'busy' : 'available', 
       conflict: isBooked ? { type: 'existing-booking', details: 'Allerede booket' } : null 
