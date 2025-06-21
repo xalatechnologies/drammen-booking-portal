@@ -166,7 +166,23 @@ const CalendarView: React.FC<CalendarViewWithToggleProps> = ({
                     subZones: [],
                     amenities: [],
                     features: [],
-                    bookingRules: []
+                    bookingRules: [],
+                    adminInfo: {
+                      contactPersonName: "Facility Manager",
+                      contactPersonEmail: "manager@facility.no",
+                      specialInstructions: "",
+                      maintenanceSchedule: []
+                    },
+                    layout: {
+                      coordinates: {
+                        x: 0,
+                        y: 0,
+                        width: 100,
+                        height: 100
+                      },
+                      entryPoints: ["Hovedinngang"]
+                    },
+                    isActive: true
                   }))}
                   selectedSlots={selectedSlots.filter(slot => 
                     facility.zones.some(zone => zone.id === slot.zoneId)
