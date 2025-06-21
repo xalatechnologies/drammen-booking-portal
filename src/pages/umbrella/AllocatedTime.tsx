@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Calendar, Clock, Users, Share2, Edit2, Trash2, Download, Search, Filter, Plus, History, AlertCircle, Info, FileText, FileSpreadsheet } from "lucide-react";
+import { Calendar, Clock, Users, Share2, Edit2, Trash2, Download, Search, Filter, Plus, History, AlertCircle, Info, FileText, FileSpreadsheet, Settings } from "lucide-react";
 import { useTranslation } from "@/i18n/hooks/useTranslation";
 
 const AllocatedTimePage: React.FC = () => {
@@ -21,7 +21,9 @@ const AllocatedTimePage: React.FC = () => {
   const [isReleaseDialogOpen, setIsReleaseDialogOpen] = useState(false);
   const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
   const [isPartialDetailsDialogOpen, setIsPartialDetailsDialogOpen] = useState(false);
+  const [isComprehensiveEditDialogOpen, setIsComprehensiveEditDialogOpen] = useState(false);
   const [selectedPartialBlock, setSelectedPartialBlock] = useState<any>(null);
+  const [activeEditTab, setActiveEditTab] = useState("distribute");
 
   // Mock data for demonstration
   const allocatedTimeBlocks = [
@@ -125,6 +127,11 @@ const AllocatedTimePage: React.FC = () => {
   const handlePartialDetails = (timeBlock: any) => {
     setSelectedPartialBlock(timeBlock);
     setIsPartialDetailsDialogOpen(true);
+  };
+
+  const handleComprehensiveEdit = (timeBlock: any) => {
+    setSelectedTimeBlock(timeBlock);
+    setIsComprehensiveEditDialogOpen(true);
   };
 
   const handleExport = (format: 'excel' | 'pdf') => {
@@ -298,41 +305,13 @@ const AllocatedTimePage: React.FC = () => {
                                 <Button
                                   variant="outline"
                                   size="sm"
-                                  onClick={() => handleDistribute(block)}
+                                  onClick={() => handleComprehensiveEdit(block)}
                                 >
-                                  <Share2 className="w-4 h-4" />
+                                  <Settings className="w-4 h-4" />
                                 </Button>
                               </TooltipTrigger>
                               <TooltipContent>
-                                <p>Fordel tid til underaktør</p>
-                              </TooltipContent>
-                            </Tooltip>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => handleEdit(block)}
-                                >
-                                  <Edit2 className="w-4 h-4" />
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p>Endre tildeling</p>
-                              </TooltipContent>
-                            </Tooltip>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => handleRelease(block)}
-                                >
-                                  <Trash2 className="w-4 h-4" />
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p>Frigi tildelt tid</p>
+                                <p>Rediger handlinger</p>
                               </TooltipContent>
                             </Tooltip>
                           </div>
@@ -438,6 +417,195 @@ const AllocatedTimePage: React.FC = () => {
           </CardContent>
         </Card>
 
+        {/* Comprehensive Edit Dialog with Tabs */}
+        <Dialog open={isComprehensiveEditDialogOpen} onOpenChange={setIsComprehensiveEditDialogOpen}>
+          <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="flex items-center space-x-2">
+                <Settings className="w-5 h-5" />
+                <span>Rediger handlinger - {selectedTimeBlock?.location}</span>
+              </DialogTitle>
+              <DialogDescription>
+                Velg handling og administrer tildelt tid
+              </DialogDescription>
+            </DialogHeader>
+            
+            <Tabs value={activeEditTab} onValueChange={setActiveEditTab} className="w-full">
+              <TabsList className="grid w-full grid-cols-4">
+                <TabsTrigger value="distribute" className="flex items-center space-x-2">
+                  <Share2 className="w-4 h-4" />
+                  <span>Fordel</span>
+                </TabsTrigger>
+                <TabsTrigger value="assign" className="flex items-center space-x-2">
+                  <Plus className="w-4 h-4" />
+                  <span>Tildel</span>
+                </TabsTrigger>
+                <TabsTrigger value="edit" className="flex items-center space-x-2">
+                  <Edit2 className="w-4 h-4" />
+                  <span>Endre</span>
+                </TabsTrigger>
+                <TabsTrigger value="release" className="flex items-center space-x-2">
+                  <Trash2 className="w-4 h-4" />
+                  <span>Frigi</span>
+                </TabsTrigger>
+              </TabsList>
+
+              {/* Distribute Tab */}
+              <TabsContent value="distribute" className="space-y-4">
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-sm font-medium">Velg aktør</label>
+                    <Select>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Velg aktør..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {subActors.map((actor) => (
+                          <SelectItem key={actor.id} value={actor.id.toString()}>
+                            {actor.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">Velg dato(er)</label>
+                    <Input type="date" />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">Velg klokkeslett</label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <Input type="time" placeholder="Starttid" />
+                      <Input type="time" placeholder="Sluttid" />
+                    </div>
+                  </div>
+                  <div className="flex justify-end space-x-2">
+                    <Button variant="outline" onClick={() => setIsComprehensiveEditDialogOpen(false)}>
+                      Avbryt
+                    </Button>
+                    <Button>
+                      Fordel tid
+                    </Button>
+                  </div>
+                </div>
+              </TabsContent>
+
+              {/* Assign Tab */}
+              <TabsContent value="assign" className="space-y-4">
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-sm font-medium">Velg aktør</label>
+                    <Select>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Velg aktør..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {subActors.map((actor) => (
+                          <SelectItem key={actor.id} value={actor.id.toString()}>
+                            {actor.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">Velg dato(er)</label>
+                    <Input type="date" />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">Velg klokkeslett</label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <Input type="time" placeholder="Starttid" />
+                      <Input type="time" placeholder="Sluttid" />
+                    </div>
+                  </div>
+                  <div className="flex justify-end space-x-2">
+                    <Button variant="outline" onClick={() => setIsComprehensiveEditDialogOpen(false)}>
+                      Avbryt
+                    </Button>
+                    <Button>
+                      Tildel tid
+                    </Button>
+                  </div>
+                </div>
+              </TabsContent>
+
+              {/* Edit Tab */}
+              <TabsContent value="edit" className="space-y-4">
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-sm font-medium">Ny aktør</label>
+                    <Select>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Velg ny aktør..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {subActors.map((actor) => (
+                          <SelectItem key={actor.id} value={actor.id.toString()}>
+                            {actor.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">Endre klokkeslett</label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <Input type="time" placeholder="Starttid" />
+                      <Input type="time" placeholder="Sluttid" />
+                    </div>
+                  </div>
+                  <div className="flex justify-end space-x-2">
+                    <Button variant="outline" onClick={() => setIsComprehensiveEditDialogOpen(false)}>
+                      Avbryt
+                    </Button>
+                    <Button variant="destructive">
+                      Trekke tilbake
+                    </Button>
+                    <Button>
+                      Lagre endringer
+                    </Button>
+                  </div>
+                </div>
+              </TabsContent>
+
+              {/* Release Tab */}
+              <TabsContent value="release" className="space-y-4">
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-sm font-medium">Velg periode</label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <Input type="date" placeholder="Startdato" />
+                      <Input type="date" placeholder="Sluttdato" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">Velg klokkeslett</label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <Input type="time" placeholder="Starttid" />
+                      <Input type="time" placeholder="Sluttid" />
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <input type="checkbox" id="convertToSpare" />
+                    <label htmlFor="convertToSpare" className="text-sm">
+                      Konverter til strøtimer
+                    </label>
+                  </div>
+                  <div className="flex justify-end space-x-2">
+                    <Button variant="outline" onClick={() => setIsComprehensiveEditDialogOpen(false)}>
+                      Avbryt
+                    </Button>
+                    <Button variant="destructive">
+                      Frigi tid
+                    </Button>
+                  </div>
+                </div>
+              </TabsContent>
+            </Tabs>
+          </DialogContent>
+        </Dialog>
+
         {/* Distribution Dialog */}
         <Dialog open={isDistributionDialogOpen} onOpenChange={setIsDistributionDialogOpen}>
           <DialogContent className="max-w-md">
@@ -466,6 +634,13 @@ const AllocatedTimePage: React.FC = () => {
               <div>
                 <label className="text-sm font-medium">{t("umbrella.allocatedTime.distribute.selectDates", undefined, "Velg dato(er)")}</label>
                 <Input type="date" />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Velg klokkeslett</label>
+                <div className="grid grid-cols-2 gap-2">
+                  <Input type="time" placeholder="Starttid" />
+                  <Input type="time" placeholder="Sluttid" />
+                </div>
               </div>
               <div className="flex justify-end space-x-2">
                 <Button variant="outline" onClick={() => setIsDistributionDialogOpen(false)}>
@@ -507,6 +682,13 @@ const AllocatedTimePage: React.FC = () => {
               <div>
                 <label className="text-sm font-medium">Velg dato(er)</label>
                 <Input type="date" />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Velg klokkeslett</label>
+                <div className="grid grid-cols-2 gap-2">
+                  <Input type="time" placeholder="Starttid" />
+                  <Input type="time" placeholder="Sluttid" />
+                </div>
               </div>
               <div className="flex justify-end space-x-2">
                 <Button variant="outline" onClick={() => setIsAssignDialogOpen(false)}>
@@ -620,6 +802,13 @@ const AllocatedTimePage: React.FC = () => {
                 <div className="grid grid-cols-2 gap-2">
                   <Input type="date" placeholder={t("umbrella.allocatedTime.release.startDate", undefined, "Startdato")} />
                   <Input type="date" placeholder={t("umbrella.allocatedTime.release.endDate", undefined, "Sluttdato")} />
+                </div>
+              </div>
+              <div>
+                <label className="text-sm font-medium">Velg klokkeslett</label>
+                <div className="grid grid-cols-2 gap-2">
+                  <Input type="time" placeholder="Starttid" />
+                  <Input type="time" placeholder="Sluttid" />
                 </div>
               </div>
               <div className="flex items-center space-x-2">

@@ -57,4 +57,10 @@
   3. **Enhanced calendar view** - Added color-coded calendar view with status indicators
   4. **Assign button for undistributed time** - Added "+" button for undistributed rows to assign time
   5. **Improved export functionality** - Separate Excel and PDF export buttons with metadata support
+- **Fixed time assignment issue** - Added time input fields (start/end time) to all assignment dialogs
+- **Created comprehensive edit dialog** - Single Settings button opens popup with 4 tabs:
+  1. **Fordel** - Distribute time to sub-actors with date and time selection
+  2. **Tildel** - Assign undistributed time with date and time selection  
+  3. **Endre** - Edit existing assignments or recall them
+  4. **Frigi** - Release time with date range and time selection
 - Build completed successfully with no errors 
