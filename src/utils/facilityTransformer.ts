@@ -1,3 +1,4 @@
+
 import { Facility } from '@/types/facility';
 
 export function transformDatabaseFacility(dbFacility: any): Facility {
@@ -41,6 +42,7 @@ export function transformDatabaseFacility(dbFacility: any): Facility {
     is_featured: dbFacility.is_featured || false,
     created_at: dbFacility.created_at,
     updated_at: dbFacility.updated_at,
+    area_sqm: dbFacility.area_sqm,
     
     // Computed/legacy fields for backwards compatibility
     address: `${dbFacility.address_street}, ${dbFacility.address_city}`,
@@ -50,6 +52,7 @@ export function transformDatabaseFacility(dbFacility: any): Facility {
     suitableFor: dbFacility.amenities || [],
     hasAutoApproval: dbFacility.has_auto_approval || false,
     timeSlotDuration: (dbFacility.time_slot_duration || 1) as 1 | 2,
+    nextAvailable: dbFacility.next_available || "Not available",
     
     // Additional computed fields
     season: dbFacility.season_from && dbFacility.season_to ? {
@@ -82,5 +85,6 @@ export function transformFacilityForDisplay(facility: Facility): Facility {
     suitableFor: facility.suitableFor || facility.amenities || [],
     hasAutoApproval: facility.hasAutoApproval ?? facility.has_auto_approval,
     timeSlotDuration: (facility.timeSlotDuration || facility.time_slot_duration || 1) as 1 | 2,
+    nextAvailable: facility.nextAvailable || facility.next_available || "Not available",
   };
 }

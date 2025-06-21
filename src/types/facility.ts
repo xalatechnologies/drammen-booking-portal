@@ -35,6 +35,7 @@ export interface Facility {
   is_featured: boolean;
   created_at: string;
   updated_at: string;
+  area_sqm: number | null;
   
   // Computed/derived fields for backwards compatibility
   address?: string; // Computed from address_street, address_city
@@ -43,6 +44,7 @@ export interface Facility {
   accessibility?: string[]; // Alias for accessibility_features
   suitableFor?: string[];
   hasAutoApproval?: boolean; // Alias for has_auto_approval
+  nextAvailable?: string; // Alias for next_available
   openingHours?: OpeningHours[];
   zones?: Zone[];
   featuredImage?: FacilityImage;
@@ -118,6 +120,7 @@ export interface Zone {
   // Legacy fields for backwards compatibility
   facilityId?: string;
   conflictRules?: ConflictRule[];
+  bookableIndependently?: boolean; // Alias for bookable_independently
   dimensions?: {
     width: number;
     length: number;

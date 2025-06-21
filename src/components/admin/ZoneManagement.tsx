@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -31,10 +32,10 @@ const ZoneManagement: React.FC<ZoneManagementProps> = ({
   const [isAddingZone, setIsAddingZone] = useState(false);
   const [editingZone, setEditingZone] = useState<Zone | null>(null);
   const [newZone, setNewZone] = useState<Partial<Zone>>({
-    facilityId,
+    facility_id: parseInt(facilityId),
     type: 'court',
     status: 'active',
-    bookableIndependently: true,
+    bookable_independently: true,
     conflictRules: []
   });
 
@@ -42,13 +43,13 @@ const ZoneManagement: React.FC<ZoneManagementProps> = ({
     if (newZone.name && newZone.capacity) {
       onZoneCreate({
         ...newZone as Omit<Zone, 'id'>,
-        facilityId
+        facility_id: parseInt(facilityId)
       });
       setNewZone({
-        facilityId,
+        facility_id: parseInt(facilityId),
         type: 'court',
         status: 'active',
-        bookableIndependently: true,
+        bookable_independently: true,
         conflictRules: []
       });
       setIsAddingZone(false);
@@ -135,8 +136,8 @@ const ZoneManagement: React.FC<ZoneManagementProps> = ({
               <div className="flex items-center space-x-2">
                 <Switch
                   id="independent-booking"
-                  checked={newZone.bookableIndependently}
-                  onCheckedChange={(checked) => setNewZone({ ...newZone, bookableIndependently: checked })}
+                  checked={newZone.bookable_independently}
+                  onCheckedChange={(checked) => setNewZone({ ...newZone, bookable_independently: checked })}
                 />
                 <Label htmlFor="independent-booking">Kan bookes separat</Label>
               </div>
@@ -180,7 +181,7 @@ const ZoneManagement: React.FC<ZoneManagementProps> = ({
                 )}
                 <p>
                   <strong>Booking:</strong>
-                  {zone.bookableIndependently ? 'Kan bookes separat' : 'Må bookes med andre soner'}
+                  {(zone.bookable_independently || zone.bookableIndependently) ? 'Kan bookes separat' : 'Må bookes med andre soner'}
                 </p>
               </div>
 
@@ -188,7 +189,7 @@ const ZoneManagement: React.FC<ZoneManagementProps> = ({
               <div className="mt-4">
                 <h4 className="text-sm font-semibold mb-2">Konfliktregler</h4>
                 <div className="space-y-2">
-                  {zone.conflictRules.map((rule) => (
+                  {zone.conflictRules?.map((rule) => (
                     <div key={rule.id} className="flex justify-between items-center text-sm">
                       <span>
                         Konflikt med: {zones.find(z => z.id === rule.conflictingZoneId)?.name}
@@ -211,7 +212,7 @@ const ZoneManagement: React.FC<ZoneManagementProps> = ({
                       </SelectTrigger>
                       <SelectContent>
                         {zones
-                          .filter(z => z.id !== zone.id && !zone.conflictRules.some(r => r.conflictingZoneId === z.id))
+                          .filter(z => z.id !== zone.id && !zone.conflictRules?.some(r => r.conflictingZoneId === z.id))
                           .map(z => (
                             <SelectItem key={z.id} value={z.id}>
                               {z.name}
@@ -280,8 +281,8 @@ const ZoneManagement: React.FC<ZoneManagementProps> = ({
               <div className="flex items-center space-x-2">
                 <Switch
                   id="edit-independent-booking"
-                  checked={editingZone.bookableIndependently}
-                  onCheckedChange={(checked) => setEditingZone({ ...editingZone, bookableIndependently: checked })}
+                  checked={editingZone.bookable_independently || editingZone.bookableIndependently}
+                  onCheckedChange={(checked) => setEditingZone({ ...editingZone, bookable_independently: checked })}
                 />
                 <Label htmlFor="edit-independent-booking">Kan bookes separat</Label>
               </div>
@@ -294,4 +295,4 @@ const ZoneManagement: React.FC<ZoneManagementProps> = ({
   );
 };
 
-export default ZoneManagement; 
+export default ZoneManagement;

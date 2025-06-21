@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { Facility, FacilityFilters } from '@/types/facility';
 import { PaginationParams, ApiResponse, PaginatedResponse } from '@/types/api';
@@ -5,6 +6,7 @@ import { transformDatabaseFacility } from '@/utils/facilityTransformer';
 
 export class SupabaseFacilityService {
   private static readonly BASE_URL = 'https://szpdoihoxzlivothoyva.supabase.co/functions/v1';
+  private static readonly ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN6cGRvaWhveHpsaXZvdGhveXZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA0Mzk5MzksImV4cCI6MjA2NjAxNTkzOX0.4j3PYVkUpQZce-631weYhyICrUKfBk3LV5drs_tYExc';
 
   static async getFacilities(
     pagination?: PaginationParams,
@@ -30,7 +32,7 @@ export class SupabaseFacilityService {
       const response = await fetch(url, {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${supabase.supabaseKey}`,
+          'Authorization': `Bearer ${this.ANON_KEY}`,
           'Content-Type': 'application/json',
         },
       });
@@ -83,7 +85,7 @@ export class SupabaseFacilityService {
       const response = await fetch(url, {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${supabase.supabaseKey}`,
+          'Authorization': `Bearer ${this.ANON_KEY}`,
           'Content-Type': 'application/json',
         },
       });
@@ -133,7 +135,7 @@ export class SupabaseFacilityService {
       const response = await fetch(`${this.BASE_URL}/facilities`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${supabase.supabaseKey}`,
+          'Authorization': `Bearer ${this.ANON_KEY}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(facilityData),
@@ -162,7 +164,7 @@ export class SupabaseFacilityService {
       const response = await fetch(`${this.BASE_URL}/facilities/${id}`, {
         method: 'PUT',
         headers: {
-          'Authorization': `Bearer ${supabase.supabaseKey}`,
+          'Authorization': `Bearer ${this.ANON_KEY}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(facilityData),
@@ -191,7 +193,7 @@ export class SupabaseFacilityService {
       const response = await fetch(`${this.BASE_URL}/facilities/${id}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${supabase.supabaseKey}`,
+          'Authorization': `Bearer ${this.ANON_KEY}`,
           'Content-Type': 'application/json',
         },
       });
@@ -210,7 +212,7 @@ export class SupabaseFacilityService {
       const response = await fetch(`${this.BASE_URL}/facilities/${id}/zones`, {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${supabase.supabaseKey}`,
+          'Authorization': `Bearer ${this.ANON_KEY}`,
           'Content-Type': 'application/json',
         },
       });

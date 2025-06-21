@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card } from './ui/card';
 import { MapContainer } from './map/MapContainer';
@@ -49,7 +48,7 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location, viewMode, set
     image: facility.image,
     type: facility.type,
     capacity: facility.capacity,
-    nextAvailable: facility.nextAvailable
+    nextAvailable: facility.nextAvailable || facility.next_available || "Not available"
   }));
 
   const handleMapLoad = (mapInstance: mapboxgl.Map) => {
