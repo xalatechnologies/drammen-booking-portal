@@ -2,7 +2,6 @@
 import { SelectedTimeSlot } from '@/utils/recurrenceEngine';
 import { ActorType } from '@/types/pricing';
 import { useCartStore } from '@/stores/useCartStore';
-import { useToast } from '@/hooks/use-toast';
 import { Zone } from '@/components/booking/types';
 import { BookingRepository } from '@/dal/repositories/BookingRepository';
 import { ApiResponse } from '@/types/api';
@@ -286,7 +285,7 @@ export class BookingService {
 
   static async getBookingById(id: string): Promise<ApiResponse<Booking>> {
     try {
-      const result = await bookingRepository.getById(id);
+      const result = await bookingRepository.findById(id);
       if (result.error || !result.data) {
         return {
           success: false,
