@@ -24,7 +24,7 @@ export const FacilityCalendarManagement: React.FC<FacilityCalendarManagementProp
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <OpeningHoursManagement facilityId={facilityId} />
+          <OpeningHoursManagement selectedFacilityId={facilityId} />
         </CardContent>
       </Card>
 
@@ -36,7 +36,7 @@ export const FacilityCalendarManagement: React.FC<FacilityCalendarManagementProp
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <BlackoutPeriodsManagement facilityId={facilityId} />
+          <BlackoutPeriodsManagement facilityId={facilityId.toString()} />
         </CardContent>
       </Card>
 
