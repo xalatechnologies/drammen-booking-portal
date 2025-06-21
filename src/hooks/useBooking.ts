@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { BookingService, BookingFormData, BookingServiceParams } from '@/services/BookingService';
+import { BookingService, BookingServiceParams } from '@/services/BookingService';
 import { SelectedTimeSlot } from '@/utils/recurrenceEngine';
 import { Zone } from '@/components/booking/types';
 

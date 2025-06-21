@@ -5,6 +5,8 @@ import { useCartStore } from '@/stores/useCartStore';
 import { ActorType as CartActorType } from '@/types/cart';
 import { ActorType as PricingActorType } from '@/types/pricing';
 import { EventType } from '@/types/booking';
+import { Booking, BookingFilters, BookingCreateRequest, BookingUpdateRequest } from '@/types/booking';
+import { PaginationParams } from '@/types/api';
 
 export interface BookingFormData {
   purpose: string;
@@ -15,12 +17,18 @@ export interface BookingFormData {
   termsAccepted: boolean;
 }
 
-interface BookingRequest {
+export interface BookingServiceParams {
   selectedSlots: SelectedTimeSlot[];
   facilityId: string;
   facilityName: string;
   zones: Zone[];
   formData: BookingFormData;
+}
+
+interface BookingResult {
+  success: boolean;
+  message: string;
+  conflicts?: any[];
 }
 
 // Helper function to convert between ActorType formats
@@ -53,10 +61,39 @@ const convertActivityToEventType = (activityType: string): EventType => {
 };
 
 export class BookingService {
-  static async addToCart({ selectedSlots, facilityId, facilityName, zones, formData }: BookingRequest) {
+  static validateBookingData(params: BookingServiceParams): boolean {
+    const { selectedSlots, formData } = params;
+    
+    if (selectedSlots.length === 0) return false;
+    if (!formData.purpose || formData.purpose.trim().length === 0) return false;
+    if (formData.attendees < 1) return false;
+    if (!formData.actorType) return false;
+    if (!formData.termsAccepted) return false;
+    
+    return true;
+  }
+
+  static calculateTotalPricing(selectedSlots: SelectedTimeSlot[], zones: Zone[] = []): number {
+    return selectedSlots.reduce((total, slot) => {
+      const duration = slot.duration || 2;
+      const pricePerHour = 225; // Default price
+      return total + (pricePerHour * duration);
+    }, 0);
+  }
+
+  static async addToCart(params: BookingServiceParams): Promise<BookingResult> {
     try {
-      console.log('BookingService: Adding to cart with form data:', formData);
+      console.log('BookingService: Adding to cart with form data:', params.formData);
       
+      if (!this.validateBookingData(params)) {
+        return {
+          success: false,
+          message: 'Ugyldig booking data',
+          conflicts: []
+        };
+      }
+
+      const { selectedSlots, facilityId, facilityName, formData } = params;
       const { addToCart } = useCartStore.getState();
       
       // Process each selected slot
@@ -97,36 +134,97 @@ export class BookingService {
 
       return {
         success: true,
-        message: `${selectedSlots.length} tidspunkt lagt til i handlekurv`
+        message: `${selectedSlots.length} tidspunkt lagt til i handlekurv`,
+        conflicts: []
       };
 
     } catch (error) {
       console.error('BookingService: Error adding to cart:', error);
       return {
         success: false,
-        message: 'Kunne ikke legge til i handlekurv'
+        message: 'Kunne ikke legge til i handlekurv',
+        conflicts: []
       };
     }
   }
 
-  static async completeBooking({ selectedSlots, facilityId, facilityName, zones, formData }: BookingRequest) {
+  static async completeBooking(params: BookingServiceParams): Promise<BookingResult> {
     try {
-      console.log('BookingService: Completing booking with form data:', formData);
+      console.log('BookingService: Completing booking with form data:', params.formData);
+      
+      if (!this.validateBookingData(params)) {
+        return {
+          success: false,
+          message: 'Ugyldig booking data',
+          conflicts: []
+        };
+      }
       
       // This would normally submit to a booking API
       // For now, we'll just return success
       
       return {
         success: true,
-        message: `Booking opprettet for ${selectedSlots.length} tidspunkt`
+        message: `Booking opprettet for ${params.selectedSlots.length} tidspunkt`,
+        conflicts: []
       };
 
     } catch (error) {
       console.error('BookingService: Error completing booking:', error);
       return {
         success: false,
-        message: 'Kunne ikke opprette booking'
+        message: 'Kunne ikke opprette booking',
+        conflicts: []
       };
     }
+  }
+
+  // Mock implementations for missing methods
+  static async getBookings(pagination: PaginationParams, filters?: BookingFilters) {
+    return { success: true, data: { items: [], total: 0, page: pagination.page, limit: pagination.limit } };
+  }
+
+  static async getBookingById(id: string) {
+    return { success: true, data: null };
+  }
+
+  static async getBookingsByFacility(facilityId: string) {
+    return { success: true, data: [] };
+  }
+
+  static async getBookingsByZone(zoneId: string) {
+    return { success: true, data: [] };
+  }
+
+  static async checkAvailability(zoneId: string, date: Date, timeSlots: string[]) {
+    return { success: true, data: {} };
+  }
+
+  static async getConflictingBookings(zoneId: string, startDate: Date, endDate: Date) {
+    return { success: true, data: { hasConflict: false, conflictingBookings: [], availableAlternatives: [] } };
+  }
+
+  static async createBooking(request: BookingCreateRequest) {
+    return { success: true, data: null };
+  }
+
+  static async updateBooking(id: string, request: BookingUpdateRequest) {
+    return { success: true, data: null };
+  }
+
+  static async cancelBooking(id: string, reason?: string) {
+    return { success: true, data: null };
+  }
+
+  static async approveBooking(id: string, notes?: string) {
+    return { success: true, data: null };
+  }
+
+  static async rejectBooking(id: string, reason: string) {
+    return { success: true, data: null };
+  }
+
+  static async createRecurringBooking(request: BookingCreateRequest, pattern: any) {
+    return { success: true, data: [] };
   }
 }

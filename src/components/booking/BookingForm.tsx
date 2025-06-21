@@ -46,7 +46,7 @@ export function BookingForm({
     attendees: 1,
     activityType: '',
     additionalInfo: '',
-    actorType: '',
+    actorType: 'private-person' as ActorType,
     termsAccepted: false
   });
 
