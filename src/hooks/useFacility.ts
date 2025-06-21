@@ -21,7 +21,8 @@ export function useFacility(id: number | string) {
       return result;
     },
     enabled: !isNaN(facilityId) && facilityId > 0,
-    staleTime: 10 * 60 * 1000, // 10 minutes
+    staleTime: 0, // No cache - always fetch fresh data
+    gcTime: 30 * 1000, // Keep in memory for 30 seconds only
   });
 
   const facility = response?.success ? response.data : null;

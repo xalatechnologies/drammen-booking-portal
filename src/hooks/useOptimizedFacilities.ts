@@ -28,7 +28,8 @@ export function useOptimizedFacilities({
   } = useQuery({
     queryKey: ['facilities', pagination, filters, sort],
     queryFn: () => LocalizedFacilityService.getRawFacilities(pagination, filters, sort),
-    staleTime: 10 * 60 * 1000, // 10 minutes - longer cache since we handle language client-side
+    staleTime: 0, // No cache - always fetch fresh data
+    gcTime: 30 * 1000, // Keep in memory for 30 seconds only
   });
 
   // Transform the data based on current language (memoized)

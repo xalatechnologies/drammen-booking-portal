@@ -34,7 +34,8 @@ export function useFacilities({ pagination, filters, sort }: UseFacilitiesParams
       console.log('useFacilities - FacilityService response:', result);
       return result;
     },
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 0, // No cache - always fetch fresh data
+    gcTime: 30 * 1000, // Keep in memory for 30 seconds only
   });
 
   const facilities = response?.success ? response.data?.data || [] : [];

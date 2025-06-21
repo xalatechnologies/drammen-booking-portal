@@ -5,8 +5,10 @@ import { QueryClient as TanStackQueryClient, QueryClientProvider } from '@tansta
 const queryClient = new TanStackQueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      gcTime: 10 * 60 * 1000, // 10 minutes
+      staleTime: 0, // No cache - always fetch fresh data
+      gcTime: 30 * 1000, // Keep in memory for 30 seconds only
+      refetchOnWindowFocus: true, // Refetch when window gains focus
+      refetchOnMount: true, // Always refetch on component mount
     },
   },
 });

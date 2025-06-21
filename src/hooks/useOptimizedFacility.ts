@@ -17,7 +17,8 @@ export function useOptimizedFacility(id: number | string) {
     queryKey: ['facility', facilityId],
     queryFn: () => OptimizedLocalizedFacilityService.getRawFacilityById(facilityId),
     enabled: !isNaN(facilityId) && facilityId > 0,
-    staleTime: 10 * 60 * 1000, // 10 minutes
+    staleTime: 0, // No cache - always fetch fresh data
+    gcTime: 30 * 1000, // Keep in memory for 30 seconds only
   });
 
   // Transform the facility based on current language (memoized)

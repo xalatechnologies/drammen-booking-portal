@@ -11,7 +11,7 @@ interface CachedFacilityData {
 
 class FacilityDataService {
   private cache = new Map<string, CachedFacilityData>();
-  private readonly CACHE_DURATION = 2 * 60 * 1000; // 2 minutes
+  private readonly CACHE_DURATION = 10 * 1000; // Reduced to 10 seconds
 
   private getCacheKey(filters: FacilityFilters, page: number, limit: number): string {
     return `${JSON.stringify(filters)}-${page}-${limit}`;

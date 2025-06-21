@@ -28,7 +28,8 @@ export const useZones = (facilityId?: string) => {
       return zones;
     },
     enabled: !!facilityId,
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 0, // No cache - always fetch fresh data
+    gcTime: 30 * 1000, // Keep in memory for 30 seconds only
   });
 };
 
@@ -57,6 +58,7 @@ export const useZone = (zoneId?: string) => {
       return zone;
     },
     enabled: !!zoneId,
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 0, // No cache - always fetch fresh data
+    gcTime: 30 * 1000, // Keep in memory for 30 seconds only
   });
 };
