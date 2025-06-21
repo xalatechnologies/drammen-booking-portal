@@ -2,13 +2,13 @@
 import React from "react";
 import { CalendarViewProps } from "./types";
 import ViewHeader from "../search/ViewHeader";
-import { CalendarWithBooking } from "../shared/CalendarWithBooking";
 import { useCalendarView } from "@/hooks/useCalendarView";
 import { CalendarLoadingState } from "./components/CalendarLoadingState";
 import { CalendarErrorState } from "./components/CalendarErrorState";
 import { CalendarEmptyState } from "./components/CalendarEmptyState";
 import { useSlotSelection } from "@/hooks/useSlotSelection";
 import { useCartStore } from "@/stores/useCartStore";
+import { AvailabilityTab } from "@/components/facility/tabs/AvailabilityTab";
 
 interface CalendarViewWithToggleProps extends CalendarViewProps {
   viewMode: "grid" | "map" | "calendar" | "list";
@@ -71,7 +71,6 @@ const CalendarView: React.FC<CalendarViewWithToggleProps> = ({
       addToCart({
         facilityId: bookingData.facilityId || 'all',
         facilityName: bookingData.facilityName || 'Alle lokaler',
-        zoneName: zone?.name || 'Hovedlokale',
         date: slot.date,
         timeSlot: slot.timeSlot,
         zoneId: slot.zoneId,
@@ -91,8 +90,8 @@ const CalendarView: React.FC<CalendarViewWithToggleProps> = ({
     }
   };
 
-  const handleContinueBooking = () => {
-    console.log('CalendarView: Continue booking');
+  const handleCompleteBooking = (bookingData: any) => {
+    console.log('CalendarView: Complete booking:', bookingData);
     // Navigate to checkout or booking flow
     navigate('/checkout');
   };
@@ -117,28 +116,16 @@ const CalendarView: React.FC<CalendarViewWithToggleProps> = ({
       {facilitiesWithZones.length === 0 ? (
         <CalendarEmptyState />
       ) : (
-        <CalendarWithBooking
-          facilityName={displayFacility?.name || 'Alle lokaler'}
-          facilityId={'all'}
+        <AvailabilityTab
           zones={allZones}
           selectedSlots={selectedSlots}
           onSlotClick={handleSlotClick}
           onBulkSlotSelection={handleBulkSlotSelection}
-          onRemoveSlot={handleRemoveSlot}
           onClearSlots={clearSelection}
-          onAddToCart={handleAddToCart}
-          onContinueBooking={handleContinueBooking}
-          getAvailabilityStatus={getAvailabilityStatus}
-          isSlotSelected={(zoneId: string, date: Date, timeSlot: string) => 
-            selectedSlots.some(slot => 
-              slot.zoneId === zoneId && 
-              slot.date.getTime() === date.getTime() && 
-              slot.timeSlot === timeSlot
-            )
-          }
+          onRemoveSlot={handleRemoveSlot}
+          facilityId={'all'}
+          facilityName={displayFacility?.name || 'Alle lokaler'}
           timeSlotDuration={1}
-          layout="horizontal"
-          compact={false}
         />
       )}
     </div>
