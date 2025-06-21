@@ -5,10 +5,12 @@ export function convertApiZoneToZone(apiZone: any): Zone {
   return {
     id: apiZone.id || apiZone.zone_id,
     name: apiZone.name || apiZone.zone_name || 'Unnamed Zone',
+    facilityId: apiZone.facility_id?.toString() || apiZone.facilityId?.toString() || '1', // Add missing facilityId
     description: apiZone.description || '',
     capacity: apiZone.capacity || 30,
     pricePerHour: apiZone.price_per_hour || apiZone.pricePerHour || 450,
     area: apiZone.area || '100 m²',
+    isMainZone: apiZone.is_main_zone || apiZone.isMainZone || false, // Add missing isMainZone
     equipment: apiZone.equipment || [],
     amenities: apiZone.amenities || [],
     bookingRules: {
@@ -45,10 +47,12 @@ export function convertZoneToApiFormat(zone: Zone): any {
   return {
     id: zone.id,
     name: zone.name,
+    facility_id: zone.facilityId,
     description: zone.description,
     capacity: zone.capacity,
     price_per_hour: zone.pricePerHour,
     area: zone.area,
+    is_main_zone: zone.isMainZone,
     equipment: zone.equipment,
     amenities: zone.amenities,
     min_booking_duration: zone.bookingRules?.minBookingDuration,
@@ -68,10 +72,12 @@ export function convertCalendarZoneToBookingZone(calendarZone: any, facilityId: 
   return {
     id: calendarZone.id,
     name: calendarZone.name,
+    facilityId: facilityId.toString(), // Add missing facilityId
     description: calendarZone.description || '',
     capacity: calendarZone.capacity || 30,
     pricePerHour: calendarZone.pricePerHour || 450,
     area: '100 m²',
+    isMainZone: calendarZone.isMainZone || false, // Add missing isMainZone
     equipment: [],
     amenities: [],
     bookingRules: {

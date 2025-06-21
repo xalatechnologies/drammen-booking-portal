@@ -1,6 +1,7 @@
 import { ZoneConflictManager, ExistingBooking } from "./zoneConflictManager";
 import { Zone } from "@/components/booking/types";
 import { BookingService } from "@/services/BookingService";
+import { ConflictCheckResult, AlternativeSlot } from "./conflict/types";
 
 export interface AlternativeZoneSuggestion {
   zone: Zone;
@@ -22,7 +23,7 @@ export class EnhancedZoneConflictManager extends ZoneConflictManager {
     endDate: Date
   ): Promise<{
     hasConflict: boolean;
-    conflicts: any[];
+    conflictingBookings: any[];
     alternatives: Zone[];
     recommendations: string[];
   }> {
@@ -38,11 +39,11 @@ export class EnhancedZoneConflictManager extends ZoneConflictManager {
         throw new Error(conflictResponse.error?.message || 'Failed to check conflicts');
       }
 
-      const { hasConflict, conflicts, alternatives } = conflictResponse.data!;
+      const { hasConflict, conflictingBookings, alternatives } = conflictResponse.data!;
 
       // Generate intelligent recommendations
       const recommendations = this.generateRecommendations(
-        conflicts,
+        conflictingBookings,
         alternatives,
         startDate,
         endDate
@@ -50,7 +51,7 @@ export class EnhancedZoneConflictManager extends ZoneConflictManager {
 
       return {
         hasConflict,
-        conflicts,
+        conflictingBookings,
         alternatives,
         recommendations
       };
@@ -60,7 +61,7 @@ export class EnhancedZoneConflictManager extends ZoneConflictManager {
       // Fallback to basic conflict checking
       return {
         hasConflict: false,
-        conflicts: [],
+        conflictingBookings: [],
         alternatives: [],
         recommendations: ['Unable to check real-time conflicts. Please try again.']
       };

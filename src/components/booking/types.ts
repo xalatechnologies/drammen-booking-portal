@@ -1,3 +1,4 @@
+
 export interface BookingRules {
   minBookingDuration: number;
   maxBookingDuration: number;
@@ -70,4 +71,21 @@ export interface ZoneConflict {
   severity: 'low' | 'medium' | 'high';
   description: string;
   canOverride: boolean;
+}
+
+// Add missing BookingStatus and BookingConflict exports
+export type BookingStatus = 'draft' | 'pending' | 'confirmed' | 'cancelled' | 'completed';
+
+export interface BookingConflict {
+  id: string;
+  booking_id: string;
+  conflict_type: 'zone-conflict' | 'whole-facility-conflict' | 'sub-zone-conflict' | 'maintenance' | 'blackout';
+  conflict_description?: string;
+  conflicting_booking_id?: string;
+  resolved: boolean;
+  resolved_by?: string;
+  resolved_at?: string;
+  created_at: string;
+  conflict_severity: 'low' | 'medium' | 'high';
+  resolution_notes?: string;
 }

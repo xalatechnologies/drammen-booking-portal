@@ -70,16 +70,71 @@ const CalendarView: React.FC<CalendarViewWithToggleProps> = ({
       {
         id: `zone-${facility.id}-1`,
         name: "Hovedområde",
+        facilityId: facility.id.toString(), // Add missing facilityId
         capacity: Math.floor(facility.capacity * 0.7),
         pricePerHour: 250,
-        description: "Hovedområdet i lokalet"
+        description: "Hovedområdet i lokalet",
+        area: "100 m²",
+        isMainZone: true, // Add missing isMainZone
+        subZones: [],
+        equipment: [],
+        amenities: [], // Add missing amenities property
+        bookingRules: {
+          minBookingDuration: 1,
+          maxBookingDuration: 8,
+          allowedTimeSlots: [],
+          bookingTypes: ['one-time', 'recurring', 'fixed-lease'],
+          advanceBookingDays: 90,
+          cancellationHours: 24
+        },
+        adminInfo: {
+          contactPersonName: "Facility Manager",
+          contactPersonEmail: "manager@drammen.kommune.no",
+          specialInstructions: "Hovedområdet i lokalet",
+          maintenanceSchedule: []
+        },
+        layout: {
+          coordinates: { x: 0, y: 0, width: 100, height: 100 },
+          entryPoints: ["Hovedinngang"]
+        },
+        accessibility: [],
+        features: [],
+        restrictions: [],
+        isActive: true
       },
       ...(facility.capacity > 50 ? [{
         id: `zone-${facility.id}-2`, 
         name: "Seksjon B",
+        facilityId: facility.id.toString(), // Add missing facilityId
         capacity: Math.floor(facility.capacity * 0.3),
         pricePerHour: 150,
-        description: "Mindre seksjon av lokalet"
+        description: "Mindre seksjon av lokalet",
+        area: "50 m²",
+        isMainZone: false, // Add missing isMainZone
+        subZones: [],
+        equipment: [],
+        amenities: [], // Add missing amenities property
+        bookingRules: {
+          minBookingDuration: 1,
+          maxBookingDuration: 8,
+          allowedTimeSlots: [],
+          bookingTypes: ['one-time', 'recurring', 'fixed-lease'],
+          advanceBookingDays: 90,
+          cancellationHours: 24
+        },
+        adminInfo: {
+          contactPersonName: "Facility Manager",
+          contactPersonEmail: "manager@drammen.kommune.no",
+          specialInstructions: "Mindre seksjon av lokalet",
+          maintenanceSchedule: []
+        },
+        layout: {
+          coordinates: { x: 0, y: 0, width: 50, height: 50 },
+          entryPoints: ["Hovedinngang"]
+        },
+        accessibility: [],
+        features: [],
+        isActive: true
       }] : [])
     ]
   }));

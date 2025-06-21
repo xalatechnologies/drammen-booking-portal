@@ -107,7 +107,9 @@ export class UserService {
         },
         bookingPreferences: {
           defaultDuration: 120,
-          autoRebook: false
+          autoRebook: false,
+          preferredTimeSlots: [],
+          frequentFacilities: []
         }
       }
     };
@@ -143,10 +145,16 @@ export class UserService {
       }
     }
 
-    const updateData = {
+    // Only include updatedAt, don't include profile if it's partial
+    const updateData: any = {
       ...request,
       updatedAt: new Date()
     };
+
+    // Remove profile if it's incomplete to avoid type errors
+    if (request.profile && (!request.profile.preferredLanguage)) {
+      delete updateData.profile;
+    }
 
     const result = await userRepository.update(id, updateData);
     
