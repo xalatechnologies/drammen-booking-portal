@@ -63,4 +63,5 @@
   2. **Tildel** - Assign undistributed time with date and time selection  
   3. **Endre** - Edit existing assignments or recall them
   4. **Frigi** - Release time with date range and time selection
+- **Simplified action buttons** - Removed separate Plus button, now only one Settings button for all actions
 - Build completed successfully with no errors 

@@ -284,22 +284,6 @@ const AllocatedTimePage: React.FC = () => {
                         <TableCell>{block.distributedTo || "-"}</TableCell>
                         <TableCell>
                           <div className="flex items-center space-x-2">
-                            {block.status === "Ufordelt" && (
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => handleAssign(block)}
-                                  >
-                                    <Plus className="w-4 h-4" />
-                                  </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  <p>Tildel tid til underaktør</p>
-                                </TooltipContent>
-                              </Tooltip>
-                            )}
                             <Tooltip>
                               <TooltipTrigger asChild>
                                 <Button
