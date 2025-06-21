@@ -19,8 +19,10 @@ export const culturalFacilities: LocalizedFacility[] = [
     image: "/lovable-uploads/b692664c-737a-4a20-8673-25a401789f82.png",
     image_url: "/lovable-uploads/b692664c-737a-4a20-8673-25a401789f82.png",
     next_available: "Torsdag, 19:00",
+    nextAvailable: "Torsdag, 19:00",
     capacity: 150,
     accessibility_features: ["wheelchair", "hearing-loop", "sign-language"],
+    accessibility: ["wheelchair", "hearing-loop", "sign-language"],
     suitableFor: {
       NO: ["Presentasjoner", "Teater", "Konferanser", "Filmvisning"],
       EN: ["Presentations", "Theatre", "Conferences", "Film screenings"]
@@ -44,11 +46,13 @@ export const culturalFacilities: LocalizedFacility[] = [
     rating: 4.6,
     review_count: 31,
     price_per_hour: 800,
+    pricePerHour: 800,
     amenities: {
       NO: ["Projektor", "Lydsystem", "Mikrofoner", "Scene", "Lysrigger"],
       EN: ["Projector", "Sound system", "Microphones", "Stage", "Lighting rig"]
     },
     has_auto_approval: false,
+    hasAutoApproval: false,
     lat: 59.7512,
     lng: 10.1689,
     latitude: 59.7512,
@@ -62,6 +66,7 @@ export const culturalFacilities: LocalizedFacility[] = [
     allowed_booking_types: ['engangs', 'fastlan', 'rammetid', 'strotimer'],
     zones: [],
     time_slot_duration: 1,
+    timeSlotDuration: 1,
     booking_lead_time_hours: 2,
     max_advance_booking_days: 365,
     cancellation_deadline_hours: 24,

@@ -1039,6 +1039,38 @@ export type Database = {
           },
         ]
       }
+      facility_content_keys: {
+        Row: {
+          content_key: string
+          content_type: string
+          created_at: string | null
+          facility_id: number
+          id: string
+        }
+        Insert: {
+          content_key: string
+          content_type: string
+          created_at?: string | null
+          facility_id: number
+          id?: string
+        }
+        Update: {
+          content_key?: string
+          content_type?: string
+          created_at?: string | null
+          facility_id?: number
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "facility_content_keys_facility_id_fkey"
+            columns: ["facility_id"]
+            isOneToOne: false
+            referencedRelation: "facilities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       facility_images: {
         Row: {
           alt_text: string | null
@@ -2356,6 +2388,71 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      translation_keys: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          key_path: string
+          namespace: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          key_path: string
+          namespace: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          key_path?: string
+          namespace?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      translations: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          language_code: Database["public"]["Enums"]["language_code"]
+          translation_key_id: string
+          updated_at: string | null
+          value: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          language_code: Database["public"]["Enums"]["language_code"]
+          translation_key_id: string
+          updated_at?: string | null
+          value: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          language_code?: Database["public"]["Enums"]["language_code"]
+          translation_key_id?: string
+          updated_at?: string | null
+          value?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "translations_translation_key_id_fkey"
+            columns: ["translation_key_id"]
+            isOneToOne: false
+            referencedRelation: "translation_keys"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_booking_preferences: {
         Row: {

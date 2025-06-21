@@ -19,8 +19,10 @@ export const sportsFacilities: LocalizedFacility[] = [
     image: "/lovable-uploads/13aee1f6-e9d9-474b-9ed7-c656d703d19b.png",
     image_url: "/lovable-uploads/13aee1f6-e9d9-474b-9ed7-c656d703d19b.png",
     next_available: "I dag, 18:00",
+    nextAvailable: "I dag, 18:00",
     capacity: 120,
     accessibility_features: ["wheelchair", "hearing-loop"],
+    accessibility: ["wheelchair", "hearing-loop"],
     suitableFor: {
       NO: ["Basketball", "Volleyball", "Håndball", "Badminton"],
       EN: ["Basketball", "Volleyball", "Handball", "Badminton"]
@@ -45,11 +47,13 @@ export const sportsFacilities: LocalizedFacility[] = [
     rating: 4.2,
     review_count: 15,
     price_per_hour: 500,
+    pricePerHour: 500,
     amenities: {
       NO: ["Basketkurver", "Volleyballnett", "Lydsystem", "Projektor"],
       EN: ["Basketball hoops", "Volleyball net", "Sound system", "Projector"]
     },
     has_auto_approval: false,
+    hasAutoApproval: false,
     lat: 59.7464,
     lng: 10.2045,
     latitude: 59.7464,
@@ -63,6 +67,7 @@ export const sportsFacilities: LocalizedFacility[] = [
     allowed_booking_types: ['engangs', 'fastlan', 'rammetid', 'strotimer'],
     zones: [],
     time_slot_duration: 1,
+    timeSlotDuration: 1,
     booking_lead_time_hours: 2,
     max_advance_booking_days: 365,
     cancellation_deadline_hours: 24,

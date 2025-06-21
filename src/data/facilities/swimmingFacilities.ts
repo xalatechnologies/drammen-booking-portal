@@ -19,8 +19,10 @@ export const swimmingFacilities: LocalizedFacility[] = [
     image: "/lovable-uploads/740258a0-d4f7-49b6-a8a6-9c994e75baae.png",
     image_url: "/lovable-uploads/740258a0-d4f7-49b6-a8a6-9c994e75baae.png",
     next_available: "Søndag, 12:00",
+    nextAvailable: "Søndag, 12:00",
     capacity: 250,
     accessibility_features: ["wheelchair", "hearing-loop"],
+    accessibility: ["wheelchair", "hearing-loop"],
     suitableFor: {
       NO: ["Svømming", "Vanngymnastikk", "Svømmeopplæring", "Konkurranser"],
       EN: ["Swimming", "Water aerobics", "Swimming lessons", "Competitions"]
@@ -44,11 +46,13 @@ export const swimmingFacilities: LocalizedFacility[] = [
     rating: 4.7,
     review_count: 89,
     price_per_hour: 700,
+    pricePerHour: 700,
     amenities: {
       NO: ["25m basseng", "Barnebassseng", "Garderober", "Dusjer", "Livredningsutstyr"],
       EN: ["25m pool", "Children's pool", "Changing rooms", "Showers", "Safety equipment"]
     },
     has_auto_approval: false,
+    hasAutoApproval: false,
     lat: 59.7545,
     lng: 10.1798,
     latitude: 59.7545,
@@ -62,6 +66,7 @@ export const swimmingFacilities: LocalizedFacility[] = [
     allowed_booking_types: ['engangs', 'fastlan', 'rammetid', 'strotimer'],
     zones: [],
     time_slot_duration: 1,
+    timeSlotDuration: 1,
     booking_lead_time_hours: 2,
     max_advance_booking_days: 365,
     cancellation_deadline_hours: 24,

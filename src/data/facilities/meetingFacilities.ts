@@ -19,8 +19,10 @@ export const meetingFacilities: LocalizedFacility[] = [
     image: "/lovable-uploads/07eaca70-1e9b-4e73-ab4e-6b9b7f1ca27e.png",
     image_url: "/lovable-uploads/07eaca70-1e9b-4e73-ab4e-6b9b7f1ca27e.png",
     next_available: "Lørdag, 10:00",
+    nextAvailable: "Lørdag, 10:00",
     capacity: 80,
     accessibility_features: ["wheelchair"],
+    accessibility: ["wheelchair"],
     suitableFor: {
       NO: ["Møter", "Kurs", "Workshops", "Seminarer"],
       EN: ["Meetings", "Courses", "Workshops", "Seminars"]
@@ -44,11 +46,13 @@ export const meetingFacilities: LocalizedFacility[] = [
     rating: 4.1,
     review_count: 18,
     price_per_hour: 450,
+    pricePerHour: 450,
     amenities: {
       NO: ["Whiteboard", "Projektor", "WiFi", "Kaffe/te", "Flipchart"],
       EN: ["Whiteboard", "Projector", "WiFi", "Coffee/tea", "Flipchart"]
     },
     has_auto_approval: true,
+    hasAutoApproval: true,
     lat: 59.7389,
     lng: 10.2167,
     latitude: 59.7389,
@@ -62,6 +66,7 @@ export const meetingFacilities: LocalizedFacility[] = [
     allowed_booking_types: ['engangs', 'fastlan', 'rammetid', 'strotimer'],
     zones: [],
     time_slot_duration: 1,
+    timeSlotDuration: 1,
     booking_lead_time_hours: 2,
     max_advance_booking_days: 365,
     cancellation_deadline_hours: 24,
