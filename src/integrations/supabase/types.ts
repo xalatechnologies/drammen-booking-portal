@@ -887,6 +887,7 @@ export type Database = {
           allowed_booking_types: Database["public"]["Enums"]["booking_type"][]
           amenities: string[] | null
           area: string
+          area_sqm: number | null
           booking_lead_time_hours: number
           cancellation_deadline_hours: number
           capacity: number
@@ -924,6 +925,7 @@ export type Database = {
           allowed_booking_types?: Database["public"]["Enums"]["booking_type"][]
           amenities?: string[] | null
           area: string
+          area_sqm?: number | null
           booking_lead_time_hours?: number
           cancellation_deadline_hours?: number
           capacity?: number
@@ -961,6 +963,7 @@ export type Database = {
           allowed_booking_types?: Database["public"]["Enums"]["booking_type"][]
           amenities?: string[] | null
           area?: string
+          area_sqm?: number | null
           booking_lead_time_hours?: number
           cancellation_deadline_hours?: number
           capacity?: number

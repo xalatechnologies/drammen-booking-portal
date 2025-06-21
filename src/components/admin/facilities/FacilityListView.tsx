@@ -29,6 +29,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 interface FacilityListViewProps {
   selectedFacilityId?: number;
@@ -56,16 +65,17 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
     sortBy: "name",
     sortOrder: "asc"
   });
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize] = useState(20);
   const [showForm, setShowForm] = useState(false);
   const [editingFacility, setEditingFacility] = useState<any>(null);
   const [selectedFacilities, setSelectedFacilities] = useState<number[]>([]);
-  const [viewMode, setViewMode] = useState<'table' | 'grid'>('table');
   const queryClient = useQueryClient();
 
   const { data: facilitiesResponse, isLoading, error } = useQuery({
-    queryKey: ['admin-facilities', filters],
+    queryKey: ['admin-facilities', filters, currentPage, pageSize],
     queryFn: () => FacilityService.getFacilities(
-      { page: 1, limit: 100 },
+      { page: currentPage, limit: pageSize },
       { 
         searchTerm: filters.searchTerm,
         facilityType: filters.type !== 'all' ? filters.type : undefined,
@@ -117,6 +127,7 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
   });
 
   const facilities = facilitiesResponse?.success ? facilitiesResponse.data?.data || [] : [];
+  const pagination = facilitiesResponse?.success ? facilitiesResponse.data?.pagination : null;
 
   const filteredFacilities = useMemo(() => {
     let filtered = [...facilities];
@@ -140,13 +151,29 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
     return filtered;
   }, [facilities, filters]);
 
+  // Get unique values for filter options from all facilities (not just current page)
+  const { data: allFacilitiesResponse } = useQuery({
+    queryKey: ['all-facilities-for-filters'],
+    queryFn: () => FacilityService.getFacilities(
+      { page: 1, limit: 1000 }, // Get all facilities for filter options
+      {},
+      {}
+    ),
+  });
+
+  const allFacilities = allFacilitiesResponse?.success ? allFacilitiesResponse.data?.data || [] : [];
+
   const uniqueTypes = useMemo(() => {
-    return [...new Set(facilities.map(f => f.type))];
-  }, [facilities]);
+    return [...new Set(allFacilities.map(f => f.type))];
+  }, [allFacilities]);
 
   const uniqueAreas = useMemo(() => {
-    return [...new Set(facilities.map(f => f.area))];
-  }, [facilities]);
+    return [...new Set(allFacilities.map(f => f.area))];
+  }, [allFacilities]);
+
+  const uniqueStatuses = useMemo(() => {
+    return [...new Set(allFacilities.map(f => f.status))];
+  }, [allFacilities]);
 
   const handleEdit = (facility: any) => {
     setEditingFacility(facility);
@@ -185,7 +212,7 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
     const csvContent = [
       ['ID', 'Name', 'Type', 'Area', 'Status', 'Capacity', 'Price/Hour'].join(','),
       ...filteredFacilities.map(f => 
-        [f.id, f.name, f.type, f.area, f.status, f.capacity, f.pricePerHour || 0].join(',')
+        [f.id, f.name, f.type, f.area, f.status, f.capacity, f.price_per_hour || 0].join(',')
       )
     ].join('\n');
 
@@ -200,6 +227,7 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
 
   const updateFilter = (key: keyof FacilityFilters, value: string) => {
     setFilters(prev => ({ ...prev, [key]: value }));
+    setCurrentPage(1); // Reset to first page when filtering
   };
 
   const clearFilters = () => {
@@ -211,6 +239,11 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
       sortBy: "name",
       sortOrder: "asc"
     });
+    setCurrentPage(1);
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
   };
 
   if (showForm) {
@@ -232,12 +265,12 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
 
   return (
     <div className="w-full space-y-8 p-8">
-      {/* Enhanced Header */}
+      {/* Header */}
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-4xl font-bold text-gray-900 mb-2">Facility Management</h1>
           <p className="text-xl text-muted-foreground">
-            {filteredFacilities.length} of {facilities.length} facilities
+            {pagination ? `${pagination.total} facilities` : `${filteredFacilities.length} facilities`}
           </p>
         </div>
         <div className="flex items-center gap-4">
@@ -252,7 +285,7 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
         </div>
       </div>
 
-      {/* Enhanced Filters Card */}
+      {/* Filters Card */}
       <Card className="shadow-lg border-0 bg-white">
         <CardHeader className="pb-4">
           <div className="flex items-center justify-between">
@@ -285,9 +318,9 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Statuses</SelectItem>
-                <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="maintenance">Maintenance</SelectItem>
-                <SelectItem value="inactive">Inactive</SelectItem>
+                {uniqueStatuses.map(status => (
+                  <SelectItem key={status} value={status}>{status}</SelectItem>
+                ))}
               </SelectContent>
             </Select>
 
@@ -327,15 +360,15 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
                 <SelectItem value="name-desc">Name Z-A</SelectItem>
                 <SelectItem value="capacity-asc">Capacity Low-High</SelectItem>
                 <SelectItem value="capacity-desc">Capacity High-Low</SelectItem>
-                <SelectItem value="pricePerHour-asc">Price Low-High</SelectItem>
-                <SelectItem value="pricePerHour-desc">Price High-Low</SelectItem>
+                <SelectItem value="price_per_hour-asc">Price Low-High</SelectItem>
+                <SelectItem value="price_per_hour-desc">Price High-Low</SelectItem>
               </SelectContent>
             </Select>
           </div>
         </CardContent>
       </Card>
 
-      {/* Enhanced Bulk Actions */}
+      {/* Bulk Actions */}
       {selectedFacilities.length > 0 && (
         <Card className="border-l-4 border-l-blue-500 shadow-md">
           <CardContent className="pt-6">
@@ -378,7 +411,7 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
         </div>
       )}
 
-      {/* Enhanced Facilities Table */}
+      {/* Facilities Table */}
       <Card className="shadow-lg border-0 overflow-hidden">
         <CardContent className="p-0">
           <Table>
@@ -418,7 +451,19 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
                   </TableCell>
                   <TableCell className="py-6">
                     <div className="flex items-start space-x-4">
-                      <div className="w-16 h-16 bg-gray-200 rounded-lg flex-shrink-0"></div>
+                      <div className="w-16 h-16 bg-gray-200 rounded-lg flex-shrink-0 overflow-hidden">
+                        {facility.image_url ? (
+                          <img 
+                            src={facility.image_url} 
+                            alt={facility.name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-400">
+                            No Image
+                          </div>
+                        )}
+                      </div>
                       <div>
                         <div className="text-lg font-semibold text-gray-900 mb-1">{facility.name}</div>
                         <div className="text-base text-gray-600 flex items-center">
@@ -439,7 +484,7 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
                     </Badge>
                   </TableCell>
                   <TableCell className="text-base py-6 font-medium">{facility.capacity}</TableCell>
-                  <TableCell className="text-base py-6 font-medium">{facility.pricePerHour || 0} kr</TableCell>
+                  <TableCell className="text-base py-6 font-medium">{facility.price_per_hour || 0} kr</TableCell>
                   <TableCell onClick={(e) => e.stopPropagation()} className="py-6">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -482,6 +527,48 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
           )}
         </CardContent>
       </Card>
+
+      {/* Pagination */}
+      {pagination && pagination.totalPages > 1 && (
+        <div className="flex justify-center">
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious 
+                  onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                  className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                />
+              </PaginationItem>
+              
+              {/* Page numbers */}
+              {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
+                const pageNum = Math.max(1, Math.min(pagination.totalPages - 4, currentPage - 2)) + i;
+                if (pageNum <= pagination.totalPages) {
+                  return (
+                    <PaginationItem key={pageNum}>
+                      <PaginationLink
+                        onClick={() => handlePageChange(pageNum)}
+                        isActive={pageNum === currentPage}
+                        className="cursor-pointer"
+                      >
+                        {pageNum}
+                      </PaginationLink>
+                    </PaginationItem>
+                  );
+                }
+                return null;
+              })}
+              
+              <PaginationItem>
+                <PaginationNext 
+                  onClick={() => handlePageChange(Math.min(pagination.totalPages, currentPage + 1))}
+                  className={currentPage === pagination.totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </div>
+      )}
     </div>
   );
 };
