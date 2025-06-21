@@ -184,7 +184,7 @@ export const EnhancedFacilityListView: React.FC<EnhancedFacilityListViewProps> =
     const csvContent = [
       ['ID', 'Name', 'Type', 'Area', 'Status', 'Capacity', 'Price/Hour'].join(','),
       ...filteredFacilities.map(f => 
-        [f.id, f.name, f.type, f.area, f.status, f.capacity, f.pricePerHour || f.price_per_hour || 0].join(',')
+        [f.id, f.name, f.type, f.area, f.status, f.capacity, f.pricePerHour || 0].join(',')
       )
     ].join('\n');
 
@@ -427,7 +427,7 @@ export const EnhancedFacilityListView: React.FC<EnhancedFacilityListViewProps> =
                     </Badge>
                   </TableCell>
                   <TableCell>{facility.capacity}</TableCell>
-                  <TableCell>{facility.pricePerHour || facility.price_per_hour || 0} kr</TableCell>
+                  <TableCell>{facility.pricePerHour || 0} kr</TableCell>
                   <TableCell onClick={(e) => e.stopPropagation()}>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
