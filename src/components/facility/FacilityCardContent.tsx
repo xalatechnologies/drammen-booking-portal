@@ -1,6 +1,6 @@
 
 import React from "react";
-import { MapPin, Users } from "lucide-react";
+import { MapPin, Users, Trophy, Target, Zap, Heart, Share2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useTranslation } from "@/i18n";
 
@@ -26,6 +26,33 @@ export function FacilityCardContent({
   onAddressClick
 }: FacilityCardContentProps) {
   const { t } = useTranslation();
+
+  const getSuitableForIcon = (activity: string) => {
+    const activityMap: {
+      [key: string]: React.ElementType;
+    } = {
+      'football': Trophy,
+      'fotball': Trophy,
+      'futsal': Target,
+      'floorball': Zap,
+      'basketball': Trophy,
+      'volleyball': Trophy,
+      'handball': Trophy,
+      'tennis': Trophy,
+      'badminton': Trophy,
+      'yoga': Users,
+      'dans': Users,
+      'møter': Users,
+      'konferanse': Users,
+      'seminar': Users,
+      'kurs': Users,
+      'trening': Trophy,
+      'sport': Trophy
+    };
+
+    const IconComponent = activityMap[activity.toLowerCase()] || Trophy;
+    return <IconComponent className="h-4 w-4" />;
+  };
 
   // Derive suitable activities from facility data if suitableFor is empty
   const getSuitableActivities = () => {
@@ -90,14 +117,15 @@ export function FacilityCardContent({
         {facility.description}
       </p>
 
-      {/* Suitable For Tags - under description */}
+      {/* Suitable For Tags - under description with icons */}
       {suitableActivities.length > 0 && (
         <div className="flex flex-wrap gap-2 mb-5">
           {suitableActivities.slice(0, maxVisibleTags).map((activity, index) => (
             <Badge 
               key={index}
-              className="bg-blue-50 text-blue-700 border-blue-200 font-medium px-3 py-1 text-sm hover:bg-blue-100 transition-colors"
+              className="bg-blue-50 text-blue-700 border-blue-200 font-medium px-3 py-1 text-sm hover:bg-blue-100 transition-colors flex items-center gap-1.5"
             >
+              {getSuitableForIcon(activity)}
               {activity}
             </Badge>
           ))}
