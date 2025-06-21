@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Bell, Search, Globe, Circle, ChevronDown } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -15,6 +16,8 @@ import Logo from "@/components/header/Logo";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 import { useAdminRole, AdminRole } from "@/contexts/AdminRoleContext";
+import { useTranslation } from "@/hooks/useTranslation";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 type Notification = {
   id: string;
@@ -44,15 +47,12 @@ const roleAvatars: Record<AdminRole, { src: string; fallback: string }> = {
 };
 
 const AdminHeader = () => {
-  const [language, setLanguage] = useState("NO");
   const [notifications, setNotifications] = useState<Notification[]>(initialNotifications);
   const { currentRole, setCurrentRole, availableRoles } = useAdminRole();
+  const { tSync } = useTranslation();
+  const { language, toggleLanguage } = useLanguage();
 
   const unreadCount = notifications.filter(n => !n.read).length;
-
-  const toggleLanguage = () => {
-    setLanguage(prev => prev === "NO" ? "EN" : "NO");
-  };
 
   const handleMarkAsRead = (id: string) => {
     setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
@@ -77,9 +77,9 @@ const AdminHeader = () => {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input
-                placeholder="Søk i alt innhold..."
+                placeholder={tSync("admin.header.searchPlaceholder", "Søk i alt innhold...")}
                 className="pl-10 h-10 text-base bg-gray-50 border-gray-200 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none focus:border-blue-500"
-                aria-label="Søk i systemet"
+                aria-label={tSync("admin.header.searchPlaceholder", "Søk i systemet")}
               />
             </div>
           </div>
@@ -94,7 +94,9 @@ const AdminHeader = () => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Bytt visningsrolle</DropdownMenuLabel>
+              <DropdownMenuLabel>
+                {tSync("admin.header.switchRole", "Bytt visningsrolle")}
+              </DropdownMenuLabel>
               <DropdownMenuSeparator />
               {availableRoles.map(role => (
                 <DropdownMenuItem key={role} onSelect={() => setCurrentRole(role)}>
@@ -119,7 +121,7 @@ const AdminHeader = () => {
                 variant="ghost" 
                 size="icon" 
                 className="relative h-9 w-9 hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:outline-none rounded-md"
-                aria-label={`Varsler - ${unreadCount} uleste`}
+                aria-label={`${tSync("admin.header.notifications", "Varsler")} - ${unreadCount} uleste`}
               >
                 <Bell className="h-4 w-4 text-gray-600" />
                 {unreadCount > 0 && (
@@ -131,10 +133,12 @@ const AdminHeader = () => {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-80 bg-white shadow-lg border border-gray-200">
               <div className="flex justify-between items-center px-2 py-2">
-                <DropdownMenuLabel className="text-base font-semibold p-0">Varsler</DropdownMenuLabel>
+                <DropdownMenuLabel className="text-base font-semibold p-0">
+                  {tSync("admin.header.notifications", "Varsler")}
+                </DropdownMenuLabel>
                 {unreadCount > 0 && (
                   <Button variant="link" size="sm" className="h-auto p-0 text-xs" onClick={handleMarkAllAsRead}>
-                    Marker alle som lest
+                    {tSync("admin.header.markAllAsRead", "Marker alle som lest")}
                   </Button>
                 )}
               </div>
@@ -161,7 +165,9 @@ const AdminHeader = () => {
                   </DropdownMenuItem>
                 ))
               ) : (
-                <p className="text-center text-sm text-gray-500 py-4">Ingen nye varsler</p>
+                <p className="text-center text-sm text-gray-500 py-4">
+                  {tSync("admin.header.noNewNotifications", "Ingen nye varsler")}
+                </p>
               )}
             </DropdownMenuContent>
           </DropdownMenu>
@@ -172,7 +178,7 @@ const AdminHeader = () => {
                 variant="ghost" 
                 size="sm" 
                 className="relative h-9 gap-2 px-2 hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:outline-none rounded-md"
-                aria-label="Brukerprofil og innstillinger"
+                aria-label={tSync("admin.header.profile", "Brukerprofil og innstillinger")}
               >
                 <Avatar className="h-7 w-7">
                   <AvatarImage src={roleAvatars[currentRole].src} alt={roleNames[currentRole]} />
@@ -186,12 +192,20 @@ const AdminHeader = () => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="bg-white shadow-lg border border-gray-200">
-              <DropdownMenuLabel className="text-sm font-medium">Min Konto</DropdownMenuLabel>
+              <DropdownMenuLabel className="text-sm font-medium">
+                {tSync("admin.header.myAccount", "Min Konto")}
+              </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-sm py-2 hover:bg-gray-50">Profil</DropdownMenuItem>
-              <DropdownMenuItem className="text-sm py-2 hover:bg-gray-50">Innstillinger</DropdownMenuItem>
+              <DropdownMenuItem className="text-sm py-2 hover:bg-gray-50">
+                {tSync("admin.header.profile", "Profil")}
+              </DropdownMenuItem>
+              <DropdownMenuItem className="text-sm py-2 hover:bg-gray-50">
+                {tSync("admin.header.settings", "Innstillinger")}
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-sm py-2 hover:bg-gray-50 text-red-600">Logg ut</DropdownMenuItem>
+              <DropdownMenuItem className="text-sm py-2 hover:bg-gray-50 text-red-600">
+                {tSync("admin.header.logout", "Logg ut")}
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

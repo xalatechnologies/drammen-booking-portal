@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
@@ -12,6 +13,7 @@ import { FacilityGridView } from "./views/FacilityGridView";
 import { FacilityListViewDisplay } from "./views/FacilityListViewDisplay";
 import { FacilityTableView } from "./views/FacilityTableView";
 import { FacilityMapView } from "./views/FacilityMapView";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface FacilityListViewProps {
   selectedFacilityId?: number;
@@ -31,6 +33,7 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState("all");
   const [filterStatus, setFilterStatus] = useState("all");
+  const { tSync } = useTranslation();
 
   const { data: facilitiesResponse, isLoading, refetch } = useQuery({
     queryKey: ['facilities'],
@@ -88,13 +91,17 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
 
   const renderFacilityContent = () => {
     if (isLoading) {
-      return <div className="text-center py-8">Loading facilities...</div>;
+      return (
+        <div className="text-center py-8">
+          {tSync("common.actions.loading", "Loading facilities...")}
+        </div>
+      );
     }
     
     if (filteredFacilities.length === 0) {
       return (
         <div className="text-center py-8 text-gray-500">
-          No facilities found matching your criteria.
+          {tSync("facility.search.noResults", "No facilities found matching your criteria.")}
         </div>
       );
     }
@@ -155,12 +162,16 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Facilities Management</h1>
-          <p className="text-gray-600">Manage facility information, availability, and settings</p>
+          <h1 className="text-3xl font-bold text-gray-900">
+            {tSync("admin.facilities.management", "Facilities Management")}
+          </h1>
+          <p className="text-gray-600">
+            {tSync("admin.sidebar.descriptions.facilities", "Manage facility information, availability, and settings")}
+          </p>
         </div>
         <Button onClick={handleAddNew} className="flex items-center gap-2">
           <Plus className="h-4 w-4" />
-          Add New Facility
+          {tSync("admin.facilities.addNew", "Add New Facility")}
         </Button>
       </div>
 
