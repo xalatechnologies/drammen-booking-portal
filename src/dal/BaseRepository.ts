@@ -1,8 +1,8 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { PaginationParams, PaginatedResponse, RepositoryResponse } from '@/types/api';
+import { PaginationParams, RepositoryResponse } from '@/types/api';
 
-export abstract class BaseRepository<T> {
+export abstract class BaseRepository<T extends Record<string, any>> {
   protected tableName: string;
 
   constructor(tableName: string) {
@@ -37,7 +37,7 @@ export abstract class BaseRepository<T> {
       }
 
       return {
-        data: data || []
+        data: (data as T[]) || []
       };
     } catch (error: any) {
       return {
@@ -73,11 +73,11 @@ export abstract class BaseRepository<T> {
     }
   }
 
-  async create(data: Partial<T>): Promise<RepositoryResponse<T | null>> {
+  async create(data: Omit<T, 'id' | 'created_at' | 'updated_at'>): Promise<RepositoryResponse<T | null>> {
     try {
       const { data: result, error } = await supabase
         .from(this.tableName)
-        .insert(data)
+        .insert(data as any)
         .select()
         .maybeSingle();
 
@@ -99,11 +99,11 @@ export abstract class BaseRepository<T> {
     }
   }
 
-  async update(id: string, data: Partial<T>): Promise<RepositoryResponse<T | null>> {
+  async update(id: string, data: Partial<Omit<T, 'id' | 'created_at'>>): Promise<RepositoryResponse<T | null>> {
     try {
       const { data: result, error } = await supabase
         .from(this.tableName)
-        .update(data)
+        .update(data as any)
         .eq('id', id)
         .select()
         .maybeSingle();

@@ -21,13 +21,29 @@ export interface PaginatedResponse<T> {
 export interface ApiResponse<T> {
   success: boolean;
   data?: T;
-  error?: string;
+  error?: {
+    message: string;
+    details?: any;
+  };
 }
 
 // Repository response types - simplified for direct data access
 export interface RepositoryResponse<T> {
   data: T;
   error?: string;
+}
+
+// Service price calculation response type
+export interface ServicePriceCalculation {
+  basePrice: number;
+  finalPrice: number;
+  totalPrice: number;
+  breakdown: {
+    baseAmount: number;
+    multiplierAmount: number;
+    discountAmount: number;
+    taxAmount: number;
+  };
 }
 
 // Helper function to extract data from repository responses

@@ -44,10 +44,12 @@ export function StrotimeBookingModal({
         toast.success('Strøtime booked successfully!');
         onBookingSuccess(response.data);
       } else {
-        toast.error(response.error.message);
+        const errorMessage = response.error?.message || 'Failed to book strøtime';
+        toast.error(errorMessage);
       }
     } catch (error) {
-      toast.error('Failed to book strøtime');
+      const errorMessage = error instanceof Error ? error.message : 'Failed to book strøtime';
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }

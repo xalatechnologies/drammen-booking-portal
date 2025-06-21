@@ -1,8 +1,9 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { AdditionalServicesService } from '@/services/AdditionalServicesService';
-import { ServiceCategory, AdditionalService } from '@/types/additionalServices';
+import { ServiceCategory } from '@/types/additionalServices';
 import { ActorType } from '@/types/pricing';
+import { ApiResponse, ServicePriceCalculation } from '@/types/api';
 
 export function useAdditionalServices(facilityId: string, category?: ServiceCategory) {
   const { data, isLoading, error } = useQuery({
@@ -43,15 +44,25 @@ export function useServicePricing() {
     attendees?: number,
     timeSlot?: string,
     date?: Date
-  ) => {
-    return AdditionalServicesService.calculateServicePrice(
-      serviceId,
-      quantity,
-      actorType,
-      attendees,
-      timeSlot,
-      date
-    );
+  ): Promise<ApiResponse<ServicePriceCalculation>> => {
+    try {
+      const result = await AdditionalServicesService.calculateServicePrice(
+        serviceId,
+        quantity,
+        actorType,
+        attendees,
+        timeSlot,
+        date
+      );
+      return result;
+    } catch (error) {
+      return {
+        success: false,
+        error: {
+          message: error instanceof Error ? error.message : 'Failed to calculate service price'
+        }
+      };
+    }
   };
 
   const validateServiceAvailability = async (

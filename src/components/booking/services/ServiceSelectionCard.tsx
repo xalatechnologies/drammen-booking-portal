@@ -49,7 +49,7 @@ export function ServiceSelectionCard({
     };
 
     calculatePrice();
-  }, [service.id, selectedQuantity, actorType, attendees]);
+  }, [service.id, selectedQuantity, actorType, attendees, calculateServicePrice]);
 
   const multiplier = service.pricing.actorTypeMultipliers[actorType] || 1.0;
   const discountPercentage = multiplier < 1.0 ? Math.round((1 - multiplier) * 100) : 0;
