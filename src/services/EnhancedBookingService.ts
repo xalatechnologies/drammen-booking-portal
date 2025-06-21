@@ -307,8 +307,7 @@ export class EnhancedBookingService {
         return {
           success: false,
           error: {
-            message: 'User not authenticated',
-            code: 'UNAUTHENTICATED'
+            message: 'User not authenticated'
           }
         };
       }

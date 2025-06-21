@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { ApiResponse, PaginatedResponse, PaginationParams } from '@/types/api';
 import { Database } from '@/types/database';
@@ -157,8 +158,7 @@ export class OrganizationService {
         return {
           success: false,
           error: {
-            message: 'User not authenticated',
-            code: 'UNAUTHENTICATED'
+            message: 'User not authenticated'
           }
         };
       }

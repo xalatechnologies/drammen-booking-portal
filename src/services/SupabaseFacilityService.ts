@@ -96,7 +96,7 @@ export class SupabaseFacilityService {
         if (response.status === 404) {
           return {
             success: false,
-            error: { message: 'Facility not found', code: 'NOT_FOUND' }
+            error: { message: 'Facility not found' }
           };
         }
         

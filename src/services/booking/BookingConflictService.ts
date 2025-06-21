@@ -18,10 +18,10 @@ export class BookingConflictService {
         excludeBookingId
       );
       
-      if (!result.success) {
+      if (result.error) {
         return {
           success: false,
-          error: result.error
+          error: { message: result.error }
         };
       }
 

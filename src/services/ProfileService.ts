@@ -40,8 +40,7 @@ export class ProfileService {
         return {
           success: false,
           error: {
-            message: 'User not authenticated',
-            code: 'UNAUTHENTICATED'
+            message: 'User not authenticated'
           }
         };
       }
@@ -85,8 +84,7 @@ export class ProfileService {
         return {
           success: false,
           error: {
-            message: 'User not authenticated',
-            code: 'UNAUTHENTICATED'
+            message: 'User not authenticated'
           }
         };
       }
@@ -135,8 +133,7 @@ export class ProfileService {
         return {
           success: false,
           error: {
-            message: 'User ID required',
-            code: 'INVALID_INPUT'
+            message: 'User ID required'
           }
         };
       }
