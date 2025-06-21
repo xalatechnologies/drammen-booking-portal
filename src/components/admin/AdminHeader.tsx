@@ -99,7 +99,7 @@ const AdminHeader = () => {
       read: true
     })));
   };
-  return <header className="border-b bg-white shadow-sm z-50 pb-2 py-[11px]">
+  return <header className="border-b bg-white shadow-sm z-50 pb-2 py-[15px]">
       <div className="flex h-16 items-center px-6">
         <div className="flex items-center gap-4 min-w-0">
           <div className="md:hidden mr-2">
