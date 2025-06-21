@@ -46,6 +46,7 @@ serve(async (req) => {
             .from('zones')
             .select('*')
             .eq('facility_id', facilityId)
+            .eq('status', 'active')
 
           if (zonesError) {
             console.error('Zones fetch error:', zonesError)
@@ -66,9 +67,11 @@ serve(async (req) => {
           .from('facilities')
           .select(`
             *,
-            facility_opening_hours(day_of_week, open_time, close_time, is_open)
+            facility_opening_hours(day_of_week, open_time, close_time, is_open),
+            zones(id, name, type, capacity, description, bookable_independently, equipment, accessibility_features, status, area_sqm)
           `)
           .eq('id', facilityId)
+          .eq('status', 'active')
           .single()
 
         if (facilityError) {
@@ -91,7 +94,7 @@ serve(async (req) => {
           image: facility.image_url || 'https://images.unsplash.com/photo-1525361147853-4bf9f54a0e98?w=600&auto=format&fit=crop',
           nextAvailable: facility.next_available || 'Available now',
           accessibility: facility.accessibility_features || [],
-          suitableFor: [], // This would need to be derived from facility type or stored separately
+          suitableFor: [],
           equipment: facility.equipment || [],
           rating: facility.rating || 4.0,
           reviewCount: facility.review_count || 0,
@@ -109,7 +112,7 @@ serve(async (req) => {
             to: facility.season_to || '2024-12-31'
           },
           allowedBookingTypes: facility.allowed_booking_types || ['engangs'],
-          zones: [] // Zones would be fetched separately if needed
+          zones: facility.zones || []
         }
 
         return new Response(
@@ -130,15 +133,18 @@ serve(async (req) => {
           *,
           facility_opening_hours(day_of_week, open_time, close_time, is_open)
         `, { count: 'exact' })
+        .eq('status', 'active')
 
       // Apply filters
       const searchTerm = url.searchParams.get('search')
       const facilityType = url.searchParams.get('type')
       const location = url.searchParams.get('location')
       const accessibility = url.searchParams.get('accessibility')
+      const sortBy = url.searchParams.get('sortBy') || 'name'
+      const sortDir = url.searchParams.get('sortDir') || 'asc'
 
       if (searchTerm) {
-        query = query.or(`name.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`)
+        query = query.or(`name.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%,area.ilike.%${searchTerm}%`)
       }
 
       if (facilityType) {
@@ -146,12 +152,15 @@ serve(async (req) => {
       }
 
       if (location) {
-        query = query.eq('area', location)
+        query = query.or(`area.ilike.%${location}%,address_city.ilike.%${location}%`)
       }
 
       if (accessibility) {
         query = query.contains('accessibility_features', [accessibility])
       }
+
+      // Apply sorting
+      query = query.order(sortBy, { ascending: sortDir === 'asc' })
 
       // Apply pagination
       query = query.range(offset, offset + limit - 1)
@@ -178,7 +187,7 @@ serve(async (req) => {
         image: facility.image_url || 'https://images.unsplash.com/photo-1525361147853-4bf9f54a0e98?w=600&auto=format&fit=crop',
         nextAvailable: facility.next_available || 'Available now',
         accessibility: facility.accessibility_features || [],
-        suitableFor: [], // This would need to be derived from facility type or stored separately
+        suitableFor: [],
         equipment: facility.equipment || [],
         rating: facility.rating || 4.0,
         reviewCount: facility.review_count || 0,
@@ -227,9 +236,44 @@ serve(async (req) => {
     if (req.method === 'POST') {
       const facilityData = await req.json()
       
+      // Validate required fields
+      if (!facilityData.name || !facilityData.type || !facilityData.area) {
+        return new Response(
+          JSON.stringify({ 
+            success: false, 
+            error: { 
+              message: 'Missing required fields: name, type, area',
+              code: 'VALIDATION_ERROR'
+            }
+          }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+
       const { data: facility, error } = await supabaseClient
         .from('facilities')
-        .insert([facilityData])
+        .insert([{
+          name: facilityData.name,
+          address_street: facilityData.address_street || '',
+          address_city: facilityData.address_city || '',
+          address_postal_code: facilityData.address_postal_code || '',
+          type: facilityData.type,
+          area: facilityData.area,
+          description: facilityData.description,
+          capacity: facilityData.capacity || 1,
+          accessibility_features: facilityData.accessibility_features || [],
+          equipment: facilityData.equipment || [],
+          price_per_hour: facilityData.price_per_hour || 450,
+          amenities: facilityData.amenities || [],
+          has_auto_approval: facilityData.has_auto_approval || false,
+          time_slot_duration: facilityData.time_slot_duration || 1,
+          allowed_booking_types: facilityData.allowed_booking_types || ['engangs'],
+          season_from: facilityData.season_from,
+          season_to: facilityData.season_to,
+          contact_name: facilityData.contact_name,
+          contact_email: facilityData.contact_email,
+          contact_phone: facilityData.contact_phone
+        }])
         .select()
         .single()
 
@@ -237,6 +281,90 @@ serve(async (req) => {
         console.error('Facility creation error:', error)
         return new Response(
           JSON.stringify({ success: false, error: { message: 'Failed to create facility', details: error } }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+
+      return new Response(
+        JSON.stringify({ success: true, data: facility }),
+        { status: 201, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    // Handle PUT requests (update facility)
+    if (req.method === 'PUT') {
+      if (pathSegments.length < 2 || !pathSegments[1]) {
+        return new Response(
+          JSON.stringify({ success: false, error: { message: 'Facility ID is required' } }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+
+      const facilityId = parseInt(pathSegments[1])
+      if (isNaN(facilityId)) {
+        return new Response(
+          JSON.stringify({ success: false, error: { message: 'Invalid facility ID' } }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+
+      const updateData = await req.json()
+      
+      const { data: facility, error } = await supabaseClient
+        .from('facilities')
+        .update({
+          ...updateData,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', facilityId)
+        .select()
+        .single()
+
+      if (error) {
+        console.error('Facility update error:', error)
+        return new Response(
+          JSON.stringify({ success: false, error: { message: 'Failed to update facility', details: error } }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+
+      return new Response(
+        JSON.stringify({ success: true, data: facility }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    // Handle DELETE requests (soft delete facility)
+    if (req.method === 'DELETE') {
+      if (pathSegments.length < 2 || !pathSegments[1]) {
+        return new Response(
+          JSON.stringify({ success: false, error: { message: 'Facility ID is required' } }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+
+      const facilityId = parseInt(pathSegments[1])
+      if (isNaN(facilityId)) {
+        return new Response(
+          JSON.stringify({ success: false, error: { message: 'Invalid facility ID' } }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+
+      const { data: facility, error } = await supabaseClient
+        .from('facilities')
+        .update({ 
+          status: 'inactive',
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', facilityId)
+        .select()
+        .single()
+
+      if (error) {
+        console.error('Facility deletion error:', error)
+        return new Response(
+          JSON.stringify({ success: false, error: { message: 'Failed to delete facility', details: error } }),
           { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         )
       }
