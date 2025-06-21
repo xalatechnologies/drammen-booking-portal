@@ -19,19 +19,19 @@ export const FacilityViewToggle: React.FC<FacilityViewToggleProps> = ({
       type="single" 
       value={displayMode} 
       onValueChange={(value) => value && setDisplayMode(value as DisplayMode)}
-      className="border border-gray-300 rounded-lg"
+      className="border border-gray-300 rounded-lg h-12"
     >
-      <ToggleGroupItem value="table" aria-label="Table view">
-        <Table className="h-4 w-4" />
+      <ToggleGroupItem value="table" aria-label="Table view" className="h-12 px-4 text-base">
+        <Table className="h-5 w-5" />
       </ToggleGroupItem>
-      <ToggleGroupItem value="grid" aria-label="Grid view">
-        <Grid3X3 className="h-4 w-4" />
+      <ToggleGroupItem value="grid" aria-label="Grid view" className="h-12 px-4 text-base">
+        <Grid3X3 className="h-5 w-5" />
       </ToggleGroupItem>
-      <ToggleGroupItem value="list" aria-label="List view">
-        <List className="h-4 w-4" />
+      <ToggleGroupItem value="list" aria-label="List view" className="h-12 px-4 text-base">
+        <List className="h-5 w-5" />
       </ToggleGroupItem>
-      <ToggleGroupItem value="map" aria-label="Map view">
-        <Map className="h-4 w-4" />
+      <ToggleGroupItem value="map" aria-label="Map view" className="h-12 px-4 text-base">
+        <Map className="h-5 w-5" />
       </ToggleGroupItem>
     </ToggleGroup>
   );
