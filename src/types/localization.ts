@@ -33,7 +33,7 @@ export interface LocalizationHelper {
   ): string[];
 }
 
-// Localized facility with translated fields
+// Localized facility with translated fields - make required properties optional to match data files
 export interface LocalizedFacility extends Omit<Facility, 'name' | 'equipment' | 'description' | 'suitableFor' | 'amenities'> {
   // Override with localized versions - allow both string and localized object types
   name: string | { NO: string; EN: string };
@@ -41,7 +41,13 @@ export interface LocalizedFacility extends Omit<Facility, 'name' | 'equipment' |
   equipment?: string[] | { NO: string[]; EN: string[] };
   suitableFor?: string[] | { NO: string[]; EN: string[] };
   amenities?: string[] | { NO: string[]; EN: string[] };
-  pricePerHour: number; // Required field from Facility
+  
+  // Make these properties optional to match existing data
+  pricePerHour?: number;
+  accessibility?: string[];
+  hasAutoApproval?: boolean;
+  nextAvailable?: string;
+  timeSlotDuration?: number;
   
   // Add missing coordinate properties that are used in data files
   lat?: number;

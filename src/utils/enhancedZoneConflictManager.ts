@@ -1,3 +1,4 @@
+
 import { ZoneConflictManager } from "./zoneConflictManager";
 import { Zone } from "@/components/booking/types";
 import { BookingService } from "@/services/BookingService";
@@ -62,12 +63,12 @@ export class EnhancedZoneConflictManager extends ZoneConflictManager {
         throw new Error(conflictResponse.error?.message || 'Failed to check conflicts');
       }
 
-      const { hasConflict, conflictingBookings, alternatives = [] } = conflictResponse.data!;
+      const { hasConflict, conflictingBookings, availableAlternatives = [] } = conflictResponse.data!;
 
       // Generate intelligent recommendations
       const recommendations = this.generateRecommendations(
         conflictingBookings,
-        alternatives,
+        availableAlternatives,
         startDate,
         endDate
       );
@@ -75,7 +76,7 @@ export class EnhancedZoneConflictManager extends ZoneConflictManager {
       return {
         hasConflict,
         conflictingBookings,
-        alternatives,
+        alternatives: availableAlternatives,
         recommendations
       };
     } catch (error) {
@@ -96,7 +97,7 @@ export class EnhancedZoneConflictManager extends ZoneConflictManager {
    */
   private generateRecommendations(
     conflicts: any[],
-    alternatives: Zone[],
+    alternatives: any[],
     startDate: Date,
     endDate: Date
   ): string[] {

@@ -1,4 +1,3 @@
-
 import { zoneRepository } from '@/dal/repositories/ZoneRepository';
 import { Zone as BookingZone } from '@/components/booking/types';
 import { ApiResponse } from '@/types/api';
@@ -123,14 +122,14 @@ export class ZoneService {
   static async createZone(zoneData: Omit<BookingZone, 'id'>): Promise<ApiResponse<BookingZone>> {
     const facilityZoneData = {
       name: zoneData.name,
-      type: 'general', // Add missing type field
+      type: 'room' as const, // Use a valid zone type
       facilityId: zoneData.facilityId,
-      facility_id: parseInt(zoneData.facilityId), // Add missing facility_id field
+      facility_id: parseInt(zoneData.facilityId),
       description: zoneData.description,
       capacity: zoneData.capacity,
       area_sqm: parseInt(zoneData.area.replace(' m²', '')) || 100,
       is_main_zone: zoneData.isMainZone,
-      bookable_independently: true, // Add missing field
+      bookable_independently: true,
       parent_zone_id: zoneData.parentZoneId,
       equipment: zoneData.equipment,
       accessibility_features: zoneData.amenities,
@@ -139,7 +138,7 @@ export class ZoneService {
       coordinates_y: zoneData.layout.coordinates.y,
       coordinates_width: zoneData.layout.coordinates.width,
       coordinates_height: zoneData.layout.coordinates.height,
-      floor: '1', // Add missing floor field
+      floor: '1',
       createdAt: new Date(),
       updatedAt: new Date()
     };

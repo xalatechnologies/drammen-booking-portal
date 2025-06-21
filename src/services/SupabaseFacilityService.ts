@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { Facility, FacilityFilters } from '@/types/facility';
 import { PaginationParams, ApiResponse, PaginatedResponse } from '@/types/api';
@@ -173,7 +172,7 @@ export class SupabaseFacilityService {
       if (result.success && result.data) {
         return {
           success: true,
-          data: transformDatabaseFacility(result.data)
+          data: this.transformCoreFacilityToFacility(result.data)
         };
       }
 
@@ -202,7 +201,7 @@ export class SupabaseFacilityService {
       if (result.success && result.data) {
         return {
           success: true,
-          data: transformDatabaseFacility(result.data)
+          data: this.transformCoreFacilityToFacility(result.data)
         };
       }
 
