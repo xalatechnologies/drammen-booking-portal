@@ -55,15 +55,15 @@ const CalendarView: React.FC<CalendarViewWithToggleProps> = ({
     filters
   });
 
-  // Convert facilities to calendar format with zones
+  // Convert facilities to calendar format with zones - fix the address handling
   const facilitiesWithZones = facilities.map(facility => ({
     id: facility.id,
     name: facility.name,
-    location: facility.address.toLowerCase().includes('sentrum') ? 'drammen-sentrum' : 'konnerud',
+    location: (facility.address && facility.address.toLowerCase().includes('sentrum')) ? 'drammen-sentrum' : 'konnerud',
     type: facility.type,
     capacity: facility.capacity,
     accessibility: facility.accessibility,
-    address: facility.address,
+    address: facility.address || '',
     suitableFor: facility.suitableFor,
     image: facility.image,
     zones: [
