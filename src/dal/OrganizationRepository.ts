@@ -128,7 +128,7 @@ export class OrganizationRepository extends SupabaseRepository<Organization> {
       },
       status: dbRow.status,
       verificationLevel: dbRow.verification_level,
-      vatNumber: dbRow.vat_number,
+      // Remove vatNumber as it doesn't exist in Organization type
       bankAccount: dbRow.bank_account,
       parentOrganizationId: dbRow.parent_organization_id,
       foundedYear: dbRow.founded_year,

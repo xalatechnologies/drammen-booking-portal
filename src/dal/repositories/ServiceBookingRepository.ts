@@ -34,12 +34,12 @@ export class ServiceBookingRepository extends SupabaseRepository<ServiceBooking>
     super();
   }
 
-  async findAll(
+  async findAllWithFilters(
     pagination?: PaginationParams,
     filters?: ServiceBookingFilters
   ): Promise<RepositoryResponse<ServiceBooking[]>> {
     try {
-      let query = supabase.from(this.tableName).select('*');
+      let query = supabase.from(this.tableName as any).select('*');
 
       // Apply filters
       if (filters?.bookingId) {
@@ -75,7 +75,7 @@ export class ServiceBookingRepository extends SupabaseRepository<ServiceBooking>
       }
 
       return {
-        data: (data as ServiceBooking[]) || []
+        data: (data as unknown as ServiceBooking[]) || []
       };
     } catch (error: any) {
       return {
@@ -86,7 +86,7 @@ export class ServiceBookingRepository extends SupabaseRepository<ServiceBooking>
   }
 
   async getServiceBookingsByBooking(bookingId: string): Promise<RepositoryResponse<ServiceBooking[]>> {
-    return this.findAll(undefined, { bookingId });
+    return this.findAllWithFilters(undefined, { bookingId });
   }
 
   async updateServiceBookingStatus(
@@ -95,7 +95,7 @@ export class ServiceBookingRepository extends SupabaseRepository<ServiceBooking>
   ): Promise<RepositoryResponse<ServiceBooking | null>> {
     try {
       const { data, error } = await supabase
-        .from(this.tableName)
+        .from(this.tableName as any)
         .update({
           status,
           updated_at: new Date().toISOString()
@@ -112,7 +112,7 @@ export class ServiceBookingRepository extends SupabaseRepository<ServiceBooking>
       }
 
       return {
-        data: data as ServiceBooking | null
+        data: data as unknown as ServiceBooking | null
       };
     } catch (error: any) {
       return {

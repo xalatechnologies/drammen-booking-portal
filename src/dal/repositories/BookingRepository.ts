@@ -11,12 +11,13 @@ export class BookingRepository extends SupabaseRepository<Booking> {
     super();
   }
 
-  async findAll(
+  // Rename to avoid signature conflict with parent class
+  async findAllWithFilters(
     pagination?: PaginationParams,
     filters?: BookingFilters
   ): Promise<RepositoryResponse<Booking[]>> {
     try {
-      let query = supabase.from(this.tableName).select('*');
+      let query = supabase.from(this.tableName as any).select('*');
 
       // Apply filters
       if (filters?.facilityId) {
@@ -72,7 +73,7 @@ export class BookingRepository extends SupabaseRepository<Booking> {
       }
 
       return {
-        data: (data as Booking[]) || []
+        data: (data as unknown as Booking[]) || []
       };
     } catch (error: any) {
       return {
@@ -84,10 +85,10 @@ export class BookingRepository extends SupabaseRepository<Booking> {
 
   // Simplified query methods
   async getBookingsByFacility(facilityId: string): Promise<RepositoryResponse<Booking[]>> {
-    return this.findAll(undefined, { facilityId });
+    return this.findAllWithFilters(undefined, { facilityId });
   }
 
   async getBookingsByZone(zoneId: string): Promise<RepositoryResponse<Booking[]>> {
-    return this.findAll(undefined, { zoneId });
+    return this.findAllWithFilters(undefined, { zoneId });
   }
 }
