@@ -9,6 +9,7 @@ import { FacilityFormTabs } from "./FacilityFormTabs";
 import { FacilityBasicFields } from "./form/FacilityBasicFields";
 import { FacilityAddressFields } from "./form/FacilityAddressFields";
 import { FacilityContactFields } from "./form/FacilityContactFields";
+import { FacilityFormData } from "./form/types";
 import { ArrowLeft } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
@@ -25,7 +26,7 @@ export const FacilityFormView: React.FC<FacilityFormViewProps> = ({
 }) => {
   const isEditing = !!facility;
   
-  const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm({
+  const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<FacilityFormData>({
     defaultValues: {
       name: facility?.name || "",
       type: facility?.type || "",
@@ -45,7 +46,7 @@ export const FacilityFormView: React.FC<FacilityFormViewProps> = ({
   });
 
   const mutation = useMutation({
-    mutationFn: (data: any) => {
+    mutationFn: (data: FacilityFormData) => {
       if (isEditing) {
         return FacilityService.updateFacility(facility.id.toString(), data);
       } else {
@@ -68,7 +69,7 @@ export const FacilityFormView: React.FC<FacilityFormViewProps> = ({
     },
   });
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: FacilityFormData) => {
     mutation.mutate(data);
   };
 

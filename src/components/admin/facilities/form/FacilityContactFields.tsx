@@ -3,12 +3,7 @@ import React from "react";
 import { UseFormRegister } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-
-interface FacilityFormData {
-  contact_name: string;
-  contact_email: string;
-  contact_phone: string;
-}
+import { FacilityFormData } from "./types";
 
 interface FacilityContactFieldsProps {
   register: UseFormRegister<FacilityFormData>;

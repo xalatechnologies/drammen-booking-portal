@@ -6,17 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-
-interface FacilityFormData {
-  name: string;
-  type: string;
-  area: string;
-  description: string;
-  capacity: number;
-  area_sqm: number;
-  status: string;
-  has_auto_approval: boolean;
-}
+import { FacilityFormData } from "./types";
 
 interface FacilityBasicFieldsProps {
   register: UseFormRegister<FacilityFormData>;

@@ -3,12 +3,7 @@ import React from "react";
 import { UseFormRegister, FieldErrors } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-
-interface FacilityFormData {
-  address_street: string;
-  address_city: string;
-  address_postal_code: string;
-}
+import { FacilityFormData } from "./types";
 
 interface FacilityAddressFieldsProps {
   register: UseFormRegister<FacilityFormData>;
