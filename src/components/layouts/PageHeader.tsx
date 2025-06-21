@@ -12,27 +12,27 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
   className = ""
 }) => {
   return (
-    <div className={cn("mb-4", className)}>
+    <div className={cn("mb-8", className)}>
       {breadcrumb && (
-        <div className="mb-3">
+        <div className="mb-6">
           {breadcrumb}
         </div>
       )}
       
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-gray-900 mb-1">
+          <h1 className={LAYOUT_CONSTANTS.PAGE_TITLE}>
             {title}
           </h1>
           {description && (
-            <p className="text-sm text-gray-600">
+            <p className={LAYOUT_CONSTANTS.PAGE_DESCRIPTION}>
               {description}
             </p>
           )}
         </div>
         
         {actions && (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-4">
             {actions}
           </div>
         )}

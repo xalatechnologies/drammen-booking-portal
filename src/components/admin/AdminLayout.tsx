@@ -16,9 +16,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         header={<AdminHeader />}
         sidebar={<AdminSidebar />}
       >
-        <div className="w-full h-full p-0 m-0">
-          {children}
-        </div>
+        {children}
       </DashboardLayout>
     </AdminRoleProvider>
   );
