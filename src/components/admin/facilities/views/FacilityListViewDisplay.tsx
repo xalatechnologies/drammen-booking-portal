@@ -27,12 +27,12 @@ export const FacilityListViewDisplay: React.FC<FacilityListViewDisplayProps> = (
               <div className="flex-1">
                 <div className="flex items-center gap-4">
                   <div className="flex-1">
-                    <h3 className="text-lg font-semibold">{facility.name}</h3>
-                    <p className="text-sm text-gray-600">
+                    <h3 className="text-xl font-semibold">{facility.name}</h3>
+                    <p className="text-base text-gray-600">
                       {facility.address_street}, {facility.address_city}
                     </p>
                   </div>
-                  <div className="flex items-center gap-6 text-sm">
+                  <div className="flex items-center gap-6 text-base">
                     <div>
                       <span className="text-gray-500">Type:</span>
                       <span className="ml-1 font-medium">{facility.type}</span>
@@ -42,12 +42,13 @@ export const FacilityListViewDisplay: React.FC<FacilityListViewDisplayProps> = (
                       <span className="ml-1 font-medium">{facility.capacity} people</span>
                     </div>
                     <div>
-                      <span className="text-gray-500">Price:</span>
-                      <span className="ml-1 font-medium">{facility.price_per_hour} NOK/hour</span>
+                      <span className="text-gray-500">Area:</span>
+                      <span className="ml-1 font-medium">{facility.area_sqm || 'N/A'} m²</span>
                     </div>
                     <Badge
                       variant={facility.status === 'active' ? 'default' : 
                               facility.status === 'maintenance' ? 'secondary' : 'destructive'}
+                      className="text-base"
                     >
                       {facility.status}
                     </Badge>
@@ -55,7 +56,7 @@ export const FacilityListViewDisplay: React.FC<FacilityListViewDisplayProps> = (
                 </div>
               </div>
               <div className="flex gap-2 ml-4">
-                <Button variant="outline" size="sm" onClick={() => onView(facility)}>
+                <Button variant="outline" size="sm" onClick={() => onView(facility)} className="text-base">
                   <Grid3X3 className="h-4 w-4 mr-1" />
                   View
                 </Button>

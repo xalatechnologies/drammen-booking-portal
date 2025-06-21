@@ -24,35 +24,36 @@ export const FacilityGridView: React.FC<FacilityGridViewProps> = ({
         <Card key={facility.id} className="hover:shadow-lg transition-shadow">
           <CardHeader className="pb-3">
             <div className="flex items-start justify-between">
-              <CardTitle className="text-lg line-clamp-2">{facility.name}</CardTitle>
+              <CardTitle className="text-xl line-clamp-2">{facility.name}</CardTitle>
               <Badge
                 variant={facility.status === 'active' ? 'default' : 
                         facility.status === 'maintenance' ? 'secondary' : 'destructive'}
+                className="text-base"
               >
                 {facility.status}
               </Badge>
             </div>
-            <p className="text-sm text-gray-600 line-clamp-1">
+            <p className="text-base text-gray-600 line-clamp-1">
               {facility.address_street}, {facility.address_city}
             </p>
           </CardHeader>
           <CardContent className="pt-0">
             <div className="space-y-2 mb-4">
-              <div className="flex justify-between text-sm">
+              <div className="flex justify-between text-base">
                 <span className="text-gray-600">Type:</span>
                 <span className="font-medium">{facility.type}</span>
               </div>
-              <div className="flex justify-between text-sm">
+              <div className="flex justify-between text-base">
                 <span className="text-gray-600">Capacity:</span>
                 <span className="font-medium">{facility.capacity} people</span>
               </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Price:</span>
-                <span className="font-medium">{facility.price_per_hour} NOK/hour</span>
+              <div className="flex justify-between text-base">
+                <span className="text-gray-600">Area:</span>
+                <span className="font-medium">{facility.area_sqm || 'N/A'} m²</span>
               </div>
             </div>
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={() => onView(facility)} className="flex-1">
+              <Button variant="outline" size="sm" onClick={() => onView(facility)} className="flex-1 text-base">
                 <Grid3X3 className="h-4 w-4 mr-1" />
                 View
               </Button>
