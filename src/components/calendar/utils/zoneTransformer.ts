@@ -22,7 +22,6 @@ export function transformCalendarZoneToBookingZone(
     area: "120 m²",
     equipment: [],
     accessibility: [],
-    images: [],
     facilityId: facilityId.toString(),
     isMainZone: true,
     subZones: [],
