@@ -8,6 +8,9 @@ import { LocalizationProvider } from "@/contexts/LocalizationContext";
 import { SearchProvider } from "@/contexts/SearchContext";
 import { CartProvider } from "@/contexts/CartContext";
 import { GdprProvider } from "@/contexts/GdprContext";
+import { AuthProvider } from "@/contexts/AuthContext";
+
+// Pages
 import Index from "./pages/Index";
 import FacilityPage from "./pages/facilities/[id]";
 import BookingPage from "./pages/booking/[facilityId]";
@@ -37,7 +40,6 @@ import FacilityDetailsPage from '@/pages/facilities/[id]';
 import BookingConfirmationPage from '@/pages/BookingConfirmationPage';
 import CheckoutPage from '@/pages/checkout';
 import LoginSelectionPage from '@/pages/LoginSelection';
-import { AuthProvider } from "@/contexts/AuthContext";
 
 const queryClient = new QueryClient();
 

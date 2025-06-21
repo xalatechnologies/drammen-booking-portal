@@ -1,9 +1,12 @@
 
 import { useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { FacilityService } from "@/services/facilityService";
+import { useFacilityStore } from "@/stores/useFacilityStore";
 
 export function useFacility(id: number | string) {
   const facilityId = typeof id === 'string' ? parseInt(id, 10) : id;
+  const { setCurrentFacility, currentFacility, setLoading, setError } = useFacilityStore();
 
   console.log('useFacility - Fetching facility with ID:', facilityId);
 
@@ -15,6 +18,7 @@ export function useFacility(id: number | string) {
   } = useQuery({
     queryKey: ['facility', facilityId],
     queryFn: async () => {
+      setLoading(true);
       console.log('useFacility - Calling FacilityService.getFacilityById with ID:', facilityId);
       const result = await FacilityService.getFacilityById(facilityId.toString());
       console.log('useFacility - FacilityService response:', result);
@@ -25,7 +29,22 @@ export function useFacility(id: number | string) {
     gcTime: 30 * 1000, // Keep in memory for 30 seconds only
   });
 
-  const facility = response?.success ? response.data : null;
+  // Update store when data changes
+  useEffect(() => {
+    if (response?.success && response.data) {
+      setCurrentFacility(response.data);
+    } else if (response?.success === false) {
+      setError(response.error?.message || 'Failed to fetch facility');
+      setCurrentFacility(null);
+    }
+  }, [response, setCurrentFacility, setError]);
+
+  // Update loading state
+  useEffect(() => {
+    setLoading(isLoading);
+  }, [isLoading, setLoading]);
+
+  const facility = response?.success ? response.data : currentFacility;
   console.log('useFacility - Final facility data:', facility);
 
   return {
