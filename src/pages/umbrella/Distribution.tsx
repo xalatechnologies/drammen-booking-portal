@@ -9,6 +9,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { 
   Plus, 
   Users, 
@@ -23,7 +26,10 @@ import {
   Eye,
   BarChart3,
   MapPin,
-  CalendarDays
+  CalendarDays,
+  CheckCircle,
+  XCircle,
+  Info
 } from "lucide-react";
 import { useTranslation } from "@/i18n/hooks/useTranslation";
 
@@ -39,6 +45,27 @@ interface SubActor {
   utilization: number;
 }
 
+interface AvailableTimeSlot {
+  id: string;
+  location: string;
+  weekday: string;
+  startTime: string;
+  endTime: string;
+  date: string;
+  isAvailable: boolean;
+}
+
+interface DistributionForm {
+  location: string;
+  weekdays: string[];
+  startTime: string;
+  endTime: string;
+  startDate: string;
+  endDate: string;
+  subActorId: number | null;
+  description: string;
+}
+
 const Distribution = () => {
   const { t } = useTranslation();
 
@@ -51,7 +78,24 @@ const Distribution = () => {
   // State for modals
   const [isManageTimeModalOpen, setIsManageTimeModalOpen] = useState(false);
   const [isCalendarModalOpen, setIsCalendarModalOpen] = useState(false);
+  const [isAddDistributionModalOpen, setIsAddDistributionModalOpen] = useState(false);
   const [selectedSubActor, setSelectedSubActor] = useState<SubActor | null>(null);
+
+  // State for add distribution form
+  const [distributionForm, setDistributionForm] = useState<DistributionForm>({
+    location: "",
+    weekdays: [],
+    startTime: "",
+    endTime: "",
+    startDate: "",
+    endDate: "",
+    subActorId: null,
+    description: ""
+  });
+
+  // State for form validation
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Mock data for demonstration
   const subActors: SubActor[] = [
@@ -112,6 +156,25 @@ const Distribution = () => {
     }
   ];
 
+  // Mock available time slots (only showing available times from umbrella's allocation)
+  const availableTimeSlots: AvailableTimeSlot[] = [
+    { id: "1", location: "Drammenshallen", weekday: "mandag", startTime: "18:00", endTime: "20:00", date: "2024-12-23", isAvailable: true },
+    { id: "2", location: "Drammenshallen", weekday: "tirsdag", startTime: "19:00", endTime: "21:00", date: "2024-12-24", isAvailable: true },
+    { id: "3", location: "Åssidenhallen", weekday: "onsdag", startTime: "17:00", endTime: "19:00", date: "2024-12-25", isAvailable: true },
+    { id: "4", location: "Konnerudhallen", weekday: "torsdag", startTime: "18:30", endTime: "20:30", date: "2024-12-26", isAvailable: true },
+    { id: "5", location: "Drammenshallen", weekday: "fredag", startTime: "16:00", endTime: "18:00", date: "2024-12-27", isAvailable: false },
+  ];
+
+  const weekdays = [
+    { value: "mandag", label: "Mandag" },
+    { value: "tirsdag", label: "Tirsdag" },
+    { value: "onsdag", label: "Onsdag" },
+    { value: "torsdag", label: "Torsdag" },
+    { value: "fredag", label: "Fredag" },
+    { value: "lørdag", label: "Lørdag" },
+    { value: "søndag", label: "Søndag" }
+  ];
+
   // Filtered data
   const filteredSubActors = subActors.filter((actor) => {
     const searchMatch = searchQuery === "" || 
@@ -146,6 +209,22 @@ const Distribution = () => {
     setIsCalendarModalOpen(true);
   };
 
+  const handleAddDistribution = () => {
+    setIsAddDistributionModalOpen(true);
+    // Reset form
+    setDistributionForm({
+      location: "",
+      weekdays: [],
+      startTime: "",
+      endTime: "",
+      startDate: "",
+      endDate: "",
+      subActorId: null,
+      description: ""
+    });
+    setFormErrors({});
+  };
+
   const clearFilters = () => {
     setSearchQuery("");
     setLocationFilter("all");
@@ -172,6 +251,88 @@ const Distribution = () => {
     return "text-red-600";
   };
 
+  // Form validation
+  const validateForm = (): boolean => {
+    const errors: Record<string, string> = {};
+
+    if (!distributionForm.location) {
+      errors.location = "Lokasjon er påkrevd";
+    }
+
+    if (distributionForm.weekdays.length === 0) {
+      errors.weekdays = "Minst én ukedag må velges";
+    }
+
+    if (!distributionForm.startTime) {
+      errors.startTime = "Starttid er påkrevd";
+    }
+
+    if (!distributionForm.endTime) {
+      errors.endTime = "Sluttid er påkrevd";
+    }
+
+    if (distributionForm.startTime && distributionForm.endTime) {
+      if (distributionForm.startTime >= distributionForm.endTime) {
+        errors.timeRange = "Sluttid må være senere enn starttid";
+      }
+    }
+
+    if (!distributionForm.startDate) {
+      errors.startDate = "Startdato er påkrevd";
+    }
+
+    if (!distributionForm.endDate) {
+      errors.endDate = "Sluttdato er påkrevd";
+    }
+
+    if (distributionForm.startDate && distributionForm.endDate) {
+      if (distributionForm.startDate > distributionForm.endDate) {
+        errors.dateRange = "Sluttdato må være senere enn startdato";
+      }
+    }
+
+    if (!distributionForm.subActorId) {
+      errors.subActor = "Underaktør må velges";
+    }
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  // Handle form submission
+  const handleSubmitDistribution = async () => {
+    if (!validateForm()) {
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // Here you would make the actual API call to save the distribution
+      console.log("Distributing time:", distributionForm);
+
+      // Close modal and show success message
+      setIsAddDistributionModalOpen(false);
+      // You could add a toast notification here
+      
+    } catch (error) {
+      console.error("Error distributing time:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Get available time slots for selected location
+  const getAvailableTimeSlots = () => {
+    return availableTimeSlots.filter(slot => 
+      slot.location.toLowerCase() === distributionForm.location.toLowerCase() && 
+      slot.isAvailable
+    );
+  };
+
   return (
     <TooltipProvider>
       <div className="space-y-8">
@@ -179,7 +340,7 @@ const Distribution = () => {
           title={t("umbrella.distribution.title", undefined, "Tidsfordeling")}
           description={t("umbrella.distribution.description", undefined, "Administrer fordeling av tilgjengelig tid mellom organisasjoner")}
           actions={
-            <Button>
+            <Button onClick={handleAddDistribution}>
               <Plus className="w-4 h-4 mr-2" />
               {t("umbrella.distribution.addAllocation", undefined, "Legg til fordeling")}
             </Button>
@@ -447,6 +608,319 @@ const Distribution = () => {
             </div>
           </CardContent>
         </Card>
+
+        {/* Add Distribution Modal */}
+        <Dialog open={isAddDistributionModalOpen} onOpenChange={setIsAddDistributionModalOpen}>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="flex items-center space-x-2">
+                <Plus className="w-5 h-5" />
+                <span>Legg til fordeling</span>
+              </DialogTitle>
+              <DialogDescription>
+                Tildel tilgjengelig tid til en underaktør
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="space-y-6">
+              {/* 1. Velg tildelt tid */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2">
+                    <Calendar className="w-5 h-5" />
+                    <span>1. Velg tildelt tid</span>
+                  </CardTitle>
+                  <CardDescription>
+                    Kun vis tider som paraplyen faktisk har fått tildelt (og som ikke er brukt)
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {/* Lokasjon */}
+                  <div>
+                    <Label htmlFor="location">Lokasjon *</Label>
+                    <Select 
+                      value={distributionForm.location} 
+                      onValueChange={(value) => setDistributionForm({...distributionForm, location: value})}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Velg lokasjon..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Drammenshallen">Drammenshallen</SelectItem>
+                        <SelectItem value="Åssidenhallen">Åssidenhallen</SelectItem>
+                        <SelectItem value="Konnerudhallen">Konnerudhallen</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    {formErrors.location && (
+                      <p className="text-sm text-red-600 mt-1">{formErrors.location}</p>
+                    )}
+                  </div>
+
+                  {/* Ukedager */}
+                  <div>
+                    <Label>Ukedag(er) *</Label>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-2">
+                      {weekdays.map((day) => (
+                        <div key={day.value} className="flex items-center space-x-2">
+                          <div className="flex items-center space-x-2">
+                            <Checkbox
+                              id={day.value}
+                              checked={distributionForm.weekdays.includes(day.value)}
+                              onCheckedChange={(checked) => {
+                                if (checked) {
+                                  setDistributionForm({
+                                    ...distributionForm,
+                                    weekdays: [...distributionForm.weekdays, day.value]
+                                  });
+                                } else {
+                                  setDistributionForm({
+                                    ...distributionForm,
+                                    weekdays: distributionForm.weekdays.filter(d => d !== day.value)
+                                  });
+                                }
+                              }}
+                            />
+                            <Label htmlFor={day.value} className="text-sm">{day.label}</Label>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    {formErrors.weekdays && (
+                      <p className="text-sm text-red-600 mt-1">{formErrors.weekdays}</p>
+                    )}
+                  </div>
+
+                  {/* Klokkeslett */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="startTime">Starttid *</Label>
+                      <Input
+                        id="startTime"
+                        type="time"
+                        value={distributionForm.startTime}
+                        onChange={(e) => setDistributionForm({...distributionForm, startTime: e.target.value})}
+                      />
+                      {formErrors.startTime && (
+                        <p className="text-sm text-red-600 mt-1">{formErrors.startTime}</p>
+                      )}
+                    </div>
+                    <div>
+                      <Label htmlFor="endTime">Sluttid *</Label>
+                      <Input
+                        id="endTime"
+                        type="time"
+                        value={distributionForm.endTime}
+                        onChange={(e) => setDistributionForm({...distributionForm, endTime: e.target.value})}
+                      />
+                      {formErrors.endTime && (
+                        <p className="text-sm text-red-600 mt-1">{formErrors.endTime}</p>
+                      )}
+                    </div>
+                  </div>
+                  {formErrors.timeRange && (
+                    <p className="text-sm text-red-600">{formErrors.timeRange}</p>
+                  )}
+
+                  {/* Periode */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="startDate">Fra dato *</Label>
+                      <Input
+                        id="startDate"
+                        type="date"
+                        value={distributionForm.startDate}
+                        onChange={(e) => setDistributionForm({...distributionForm, startDate: e.target.value})}
+                      />
+                      {formErrors.startDate && (
+                        <p className="text-sm text-red-600 mt-1">{formErrors.startDate}</p>
+                      )}
+                    </div>
+                    <div>
+                      <Label htmlFor="endDate">Til dato *</Label>
+                      <Input
+                        id="endDate"
+                        type="date"
+                        value={distributionForm.endDate}
+                        onChange={(e) => setDistributionForm({...distributionForm, endDate: e.target.value})}
+                      />
+                      {formErrors.endDate && (
+                        <p className="text-sm text-red-600 mt-1">{formErrors.endDate}</p>
+                      )}
+                    </div>
+                  </div>
+                  {formErrors.dateRange && (
+                    <p className="text-sm text-red-600">{formErrors.dateRange}</p>
+                  )}
+
+                  {/* Available time slots preview */}
+                  {distributionForm.location && (
+                    <div className="mt-4 p-4 bg-blue-50 rounded-lg">
+                      <h4 className="font-medium text-blue-900 mb-2">Tilgjengelige tidslotter for {distributionForm.location}:</h4>
+                      <div className="space-y-2">
+                        {getAvailableTimeSlots().map((slot) => (
+                          <div key={slot.id} className="flex items-center justify-between text-sm">
+                            <span className="capitalize">{slot.weekday}</span>
+                            <span>{slot.startTime} - {slot.endTime}</span>
+                            <span className="text-green-600 font-medium">Ledig</span>
+                          </div>
+                        ))}
+                        {getAvailableTimeSlots().length === 0 && (
+                          <p className="text-sm text-gray-600">Ingen ledige tidslotter for valgt lokasjon</p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* 2. Velg underaktør */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2">
+                    <Users className="w-5 h-5" />
+                    <span>2. Velg underaktør</span>
+                  </CardTitle>
+                  <CardDescription>
+                    Aktørliste filtrert på klubber/lag under paraplyorganisasjonen
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="subActorSearch">Søk etter klubb/lag</Label>
+                      <Input
+                        id="subActorSearch"
+                        placeholder="Søk etter navn..."
+                        className="mt-1"
+                      />
+                    </div>
+                    <div className="space-y-2 max-h-48 overflow-y-auto">
+                      {subActors.map((actor) => (
+                        <div
+                          key={actor.id}
+                          className={`p-3 border rounded-lg cursor-pointer transition-colors ${
+                            distributionForm.subActorId === actor.id
+                              ? 'border-blue-500 bg-blue-50'
+                              : 'border-gray-200 hover:border-gray-300'
+                          }`}
+                          onClick={() => setDistributionForm({...distributionForm, subActorId: actor.id})}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <h4 className="font-medium">{actor.name}</h4>
+                              <p className="text-sm text-gray-600">{actor.location} • {actor.users} brukere</p>
+                            </div>
+                            {distributionForm.subActorId === actor.id && (
+                              <CheckCircle className="w-5 h-5 text-blue-600" />
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    {formErrors.subActor && (
+                      <p className="text-sm text-red-600">{formErrors.subActor}</p>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* 3. Beskrivelse */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2">
+                    <Info className="w-5 h-5" />
+                    <span>3. Beskrivelse (valgfritt)</span>
+                  </CardTitle>
+                  <CardDescription>
+                    F.eks. "Fordeles til G15 grunnet seriespill"
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Textarea
+                    placeholder="Beskriv formålet med tildelingen..."
+                    value={distributionForm.description}
+                    onChange={(e) => setDistributionForm({...distributionForm, description: e.target.value})}
+                    rows={3}
+                  />
+                </CardContent>
+              </Card>
+
+              {/* 4. Bekreft og tildel */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2">
+                    <CheckCircle className="w-5 h-5" />
+                    <span>4. Bekreft og tildel</span>
+                  </CardTitle>
+                  <CardDescription>
+                    Validering og bekreftelse av tildeling
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {/* Validation summary */}
+                    <div className="p-4 bg-gray-50 rounded-lg">
+                      <h4 className="font-medium mb-2">Validering:</h4>
+                      <ul className="space-y-1 text-sm">
+                        <li className="flex items-center space-x-2">
+                          {distributionForm.location ? (
+                            <CheckCircle className="w-4 h-4 text-green-600" />
+                          ) : (
+                            <XCircle className="w-4 h-4 text-red-600" />
+                          )}
+                          <span>Tidspunkt må være innenfor paraplyens tildeling</span>
+                        </li>
+                        <li className="flex items-center space-x-2">
+                          {distributionForm.weekdays.length > 0 ? (
+                            <CheckCircle className="w-4 h-4 text-green-600" />
+                          ) : (
+                            <XCircle className="w-4 h-4 text-red-600" />
+                          )}
+                          <span>Ingen overlapp med tidligere fordelinger</span>
+                        </li>
+                        <li className="flex items-center space-x-2">
+                          {distributionForm.subActorId ? (
+                            <CheckCircle className="w-4 h-4 text-green-600" />
+                          ) : (
+                            <XCircle className="w-4 h-4 text-red-600" />
+                          )}
+                          <span>Underaktør valgt</span>
+                        </li>
+                      </ul>
+                    </div>
+
+                    {/* Action buttons */}
+                    <div className="flex justify-end space-x-2">
+                      <Button 
+                        variant="outline" 
+                        onClick={() => setIsAddDistributionModalOpen(false)}
+                        disabled={isSubmitting}
+                      >
+                        Avbryt
+                      </Button>
+                      <Button 
+                        onClick={handleSubmitDistribution}
+                        disabled={isSubmitting}
+                      >
+                        {isSubmitting ? (
+                          <>
+                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                            Tildeler...
+                          </>
+                        ) : (
+                          <>
+                            <CheckCircle className="w-4 h-4 mr-2" />
+                            Tildel tid
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </DialogContent>
+        </Dialog>
 
         {/* Manage Time Modal */}
         <Dialog open={isManageTimeModalOpen} onOpenChange={setIsManageTimeModalOpen}>
