@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { CartItem } from '@/types/cart';
@@ -82,7 +83,7 @@ export function ReservationAccordion({
 
             <Accordion type="single" collapsible className="w-full">
               <AccordionItem value={reservation.id} className="border-none">
-                <AccordionTrigger className="px-6 py-4 hover:no-underline text-left">
+                <AccordionTrigger className="px-6 py-2 hover:no-underline text-left">
                   
                 </AccordionTrigger>
                 
