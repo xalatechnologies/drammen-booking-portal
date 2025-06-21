@@ -8,6 +8,33 @@ export class SupabaseFacilityService {
   private static readonly BASE_URL = 'https://szpdoihoxzlivothoyva.supabase.co/functions/v1';
   private static readonly ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN6cGRvaWhveHpsaXZvdGhveXZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA0Mzk5MzksImV4cCI6MjA2NjAxNTkzOX0.4j3PYVkUpQZce-631weYhyICrUKfBk3LV5drs_tYExc';
 
+  private static transformCoreFacilityToFacility(coreFacility: any): Facility {
+    return {
+      // Core facility properties
+      ...coreFacility,
+      
+      // Add missing Facility properties with defaults
+      name: coreFacility.name || 'Unnamed Facility',
+      description: coreFacility.description || '',
+      suitableFor: coreFacility.suitableFor || [],
+      equipment: coreFacility.equipment || [],
+      amenities: coreFacility.amenities || coreFacility.accessibility_features || [],
+      
+      // Computed properties for backwards compatibility
+      address: `${coreFacility.address_street}, ${coreFacility.address_postal_code} ${coreFacility.address_city}`,
+      image: coreFacility.image_url || '',
+      pricePerHour: coreFacility.price_per_hour || 450,
+      accessibility: coreFacility.accessibility_features || [],
+      hasAutoApproval: coreFacility.has_auto_approval || false,
+      nextAvailable: coreFacility.next_available || '',
+      timeSlotDuration: coreFacility.time_slot_duration as 1 | 2 || 1,
+      season: {
+        from: coreFacility.season_from || '2024-01-01',
+        to: coreFacility.season_to || '2024-12-31'
+      }
+    };
+  }
+
   static async getFacilities(
     pagination?: PaginationParams,
     filters?: FacilityFilters,
@@ -48,7 +75,7 @@ export class SupabaseFacilityService {
       if (result.success && result.data && Array.isArray(result.data.data)) {
         // Transform each facility from database format to frontend format
         const transformedFacilities = result.data.data.map((facility: any) => 
-          transformDatabaseFacility(facility)
+          this.transformCoreFacilityToFacility(facility)
         );
         
         console.log('SupabaseFacilityService.getFacilities - Transformed facilities:', transformedFacilities.slice(0, 2));
@@ -108,7 +135,7 @@ export class SupabaseFacilityService {
 
       if (result.success && result.data) {
         // Transform facility from database format to frontend format
-        const transformedFacility = transformDatabaseFacility(result.data);
+        const transformedFacility = this.transformCoreFacilityToFacility(result.data);
         console.log('SupabaseFacilityService.getFacilityById - Transformed facility:', transformedFacility);
 
         return {

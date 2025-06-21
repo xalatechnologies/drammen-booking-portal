@@ -1,9 +1,30 @@
-
 import { ZoneConflictManager } from "./zoneConflictManager";
 import { Zone } from "@/components/booking/types";
 import { BookingService } from "@/services/BookingService";
-import { ConflictCheckResult, AlternativeSlot, ExistingBooking } from "./conflict/types";
 import { Booking } from "@/types/booking";
+
+// Add missing types
+export interface ConflictCheckResult {
+  hasConflicts: boolean;
+  conflictingBookings: Booking[];
+  availableAlternatives: AlternativeSlot[];
+}
+
+export interface AlternativeSlot {
+  zoneId: string;
+  startDate: Date;
+  endDate: Date;
+  reason: string;
+}
+
+export interface ExistingBooking {
+  id: string;
+  zoneId: string;
+  startDate: Date;
+  endDate: Date;
+  userId: string;
+  purpose: string;
+}
 
 export interface AlternativeZoneSuggestion {
   zone: Zone;
@@ -41,7 +62,7 @@ export class EnhancedZoneConflictManager extends ZoneConflictManager {
         throw new Error(conflictResponse.error?.message || 'Failed to check conflicts');
       }
 
-      const { hasConflict, conflictingBookings, alternatives } = conflictResponse.data!;
+      const { hasConflict, conflictingBookings, alternatives = [] } = conflictResponse.data!;
 
       // Generate intelligent recommendations
       const recommendations = this.generateRecommendations(
@@ -186,35 +207,51 @@ export class EnhancedZoneConflictManager extends ZoneConflictManager {
         booking.endDate >= startDate
       )
       .map(booking => ({
+        // Core booking properties
         id: booking.id,
-        zoneId: booking.zoneId,
-        startDate: booking.startDate,
-        endDate: booking.endDate,
-        userId: booking.userId,
-        purpose: booking.purpose,
-        // Add required Booking properties with defaults
-        eventType: 'other' as const,
-        expectedAttendees: 1,
-        ageGroup: 'mixed' as const,
-        contactName: 'Unknown',
-        contactEmail: 'unknown@example.com',
-        contactPhone: '',
-        facilityId: parseInt(this.zones.find(z => z.id === zoneId)?.facilityId || '1'),
-        status: 'confirmed' as const,
+        user_id: booking.userId,
+        facility_id: parseInt(this.zones.find(z => z.id === zoneId)?.facilityId || '1'),
+        zone_id: booking.zoneId,
+        start_date: booking.startDate,
+        end_date: booking.endDate,
+        duration_minutes: Math.floor((booking.endDate.getTime() - booking.startDate.getTime()) / 60000),
+        
+        // Required Booking properties with defaults
         type: 'engangs' as const,
-        actorType: 'private-person' as const,
-        approvalStatus: 'not-required' as const,
-        requiresApproval: false,
+        status: 'confirmed' as const,
+        approval_status: 'not-required' as const,
+        event_type: 'other' as const,
+        expected_attendees: 1,
+        age_group: 'mixed' as const,
+        actor_type: 'private-person' as const,
+        contact_name: 'Unknown',
+        contact_email: 'unknown@example.com',
+        contact_phone: '',
+        purpose: booking.purpose,
         description: booking.purpose,
-        specialRequirements: '',
-        basePrice: 0,
-        servicesPrice: 0,
-        totalPrice: 0,
-        paymentStatus: 'pending',
-        durationMinutes: Math.floor((booking.endDate.getTime() - booking.startDate.getTime()) / 60000),
-        bookingReference: `REF-${booking.id}`,
-        createdAt: new Date(),
-        updatedAt: new Date()
+        special_requirements: '',
+        requires_approval: false,
+        base_price: 0,
+        services_price: 0,
+        total_price: 0,
+        payment_status: 'pending',
+        booking_reference: `REF-${booking.id}`,
+        created_at: new Date(),
+        updated_at: new Date(),
+        
+        // Additional properties to match Booking type
+        additionalServices: [],
+        pricing: {
+          basePrice: 0,
+          servicesPrice: 0,
+          totalPrice: 0,
+          currency: 'NOK'
+        },
+        notes: [],
+        attachments: [],
+        conflicts: [],
+        recurrence: null,
+        cancellation: null
       }));
 
     const hasConflicts = conflictingBookings.length > 0;

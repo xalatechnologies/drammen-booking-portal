@@ -15,6 +15,24 @@ export interface Translation {
   updated_at: string;
 }
 
+// Add missing exports for localization helper
+export interface LocalizedContent {
+  [key: string]: { [K in LanguageCode]: string };
+}
+
+export interface LocalizationHelper {
+  getCurrentContent<T extends LocalizedContent[keyof LocalizedContent]>(
+    content: T,
+    language: LanguageCode,
+    fallbackLanguage?: LanguageCode
+  ): string;
+  getCurrentArray<T extends { [K in LanguageCode]: string[] }>(
+    content: T,
+    language: LanguageCode,
+    fallbackLanguage?: LanguageCode
+  ): string[];
+}
+
 // Localized facility with translated fields
 export interface LocalizedFacility extends Omit<Facility, 'name' | 'equipment' | 'description' | 'suitableFor' | 'amenities'> {
   // Override with localized versions - allow both string and localized object types
@@ -24,6 +42,10 @@ export interface LocalizedFacility extends Omit<Facility, 'name' | 'equipment' |
   suitableFor?: string[] | { NO: string[]; EN: string[] };
   amenities?: string[] | { NO: string[]; EN: string[] };
   pricePerHour: number; // Required field from Facility
+  
+  // Add missing coordinate properties that are used in data files
+  lat?: number;
+  lng?: number;
   
   // Add translation metadata
   translations?: {
