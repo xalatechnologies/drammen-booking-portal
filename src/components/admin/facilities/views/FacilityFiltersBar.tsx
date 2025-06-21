@@ -31,7 +31,7 @@ export const FacilityFiltersBar: React.FC<FacilityFiltersBarProps> = ({
     <Card>
       <CardContent className="p-4">
         <div className="flex flex-col lg:flex-row gap-2">
-          <div className="flex-1 lg:flex-[2]">
+          <div className="flex-1 lg:flex-[3]">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
               <Input
@@ -44,7 +44,7 @@ export const FacilityFiltersBar: React.FC<FacilityFiltersBarProps> = ({
           </div>
           <div className="flex gap-2 items-center">
             <Select value={filterType} onValueChange={setFilterType}>
-              <SelectTrigger className="w-[180px] h-12 text-base">
+              <SelectTrigger className="w-[140px] h-12 text-base">
                 <SelectValue placeholder={tSync("admin.facilities.search.filterByType", "Filter by type")} />
               </SelectTrigger>
               <SelectContent>
@@ -69,7 +69,7 @@ export const FacilityFiltersBar: React.FC<FacilityFiltersBarProps> = ({
               </SelectContent>
             </Select>
             <Select value={filterStatus} onValueChange={setFilterStatus}>
-              <SelectTrigger className="w-[150px] h-12 text-base">
+              <SelectTrigger className="w-[120px] h-12 text-base">
                 <SelectValue placeholder={tSync("admin.facilities.search.filterByStatus", "Filter by status")} />
               </SelectTrigger>
               <SelectContent>
