@@ -46,7 +46,7 @@ export const useAdditionalServicesStore = create<AdditionalServicesState>((set, 
       
       if (result.error) {
         set({ 
-          error: result.error,
+          error: typeof result.error === 'string' ? result.error : result.error.message,
           loading: false 
         });
         return;
@@ -78,7 +78,7 @@ export const useAdditionalServicesStore = create<AdditionalServicesState>((set, 
       
       if (result.error) {
         set({ 
-          error: result.error,
+          error: typeof result.error === 'string' ? result.error : result.error.message,
           loading: false 
         });
         return;
@@ -110,7 +110,7 @@ export const useAdditionalServicesStore = create<AdditionalServicesState>((set, 
       
       if (result.error) {
         set({ 
-          error: result.error,
+          error: typeof result.error === 'string' ? result.error : result.error.message,
           loading: false 
         });
         return;
@@ -137,7 +137,7 @@ export const useAdditionalServicesStore = create<AdditionalServicesState>((set, 
       
       if (result.error) {
         set({ 
-          error: result.error,
+          error: typeof result.error === 'string' ? result.error : result.error.message,
           loading: false 
         });
         return;
@@ -161,7 +161,7 @@ export const useAdditionalServicesStore = create<AdditionalServicesState>((set, 
       
       if (result.error) {
         set({ 
-          error: result.error,
+          error: typeof result.error === 'string' ? result.error : result.error.message,
           loading: false 
         });
         return;

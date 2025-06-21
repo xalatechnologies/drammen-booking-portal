@@ -1,7 +1,7 @@
 
 import { userRepository } from '@/dal/UserRepository';
 import { User, UserFilters, UserCreateRequest, UserUpdateRequest, UserRole } from '@/types/user';
-import { PaginationParams, ApiResponse, PaginatedResponse, RepositoryResponse } from '@/types/api';
+import { PaginationParams, ApiResponse, PaginatedResponse } from '@/types/api';
 
 export class UserService {
   
@@ -13,7 +13,7 @@ export class UserService {
   ): Promise<ApiResponse<PaginatedResponse<User>>> {
     // Add delay to simulate API call
     await new Promise(resolve => setTimeout(resolve, 200));
-    const result = await userRepository.findAll(pagination, filters?.searchTerm, sortField);
+    const result = await userRepository.findAll(pagination, filters?.searchTerm);
     
     // Convert RepositoryResponse to ApiResponse
     if (result.error) {
@@ -89,12 +89,16 @@ export class UserService {
 
     const userData = {
       ...request,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      is_active: true,
-      last_login_at: null,
-      permissions: [],
-      preferred_language: 'NO' as const
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      isActive: true,
+      lastLoginAt: null,
+      permissions: request.permissions || [],
+      profile: {
+        firstName: request.firstName,
+        lastName: request.lastName,
+        preferredLanguage: 'NO' as const
+      }
     };
 
     const result = await userRepository.create(userData);
@@ -128,7 +132,12 @@ export class UserService {
       }
     }
 
-    const result = await userRepository.update(id, request);
+    const updateData = {
+      ...request,
+      updatedAt: new Date()
+    };
+
+    const result = await userRepository.update(id, updateData);
     
     if (result.error) {
       return {
@@ -207,7 +216,7 @@ export class UserService {
     }
 
     const user = userResult.data!;
-    if (!user.is_active) {
+    if (!user.isActive) {
       return {
         success: false,
         error: {
@@ -233,7 +242,8 @@ export class UserService {
     
     const result = await userRepository.update(userId, {
       role: newRole,
-      permissions: permissions || []
+      permissions: permissions || [],
+      updatedAt: new Date()
     });
 
     if (result.error) {
@@ -253,7 +263,8 @@ export class UserService {
     await new Promise(resolve => setTimeout(resolve, 250));
     
     const result = await userRepository.update(userId, {
-      is_active: false
+      isActive: false,
+      updatedAt: new Date()
     });
 
     if (result.error) {
@@ -273,7 +284,8 @@ export class UserService {
     await new Promise(resolve => setTimeout(resolve, 250));
     
     const result = await userRepository.update(userId, {
-      is_active: true
+      isActive: true,
+      updatedAt: new Date()
     });
 
     if (result.error) {
@@ -327,10 +339,10 @@ export class UserService {
       success: true,
       data: {
         totalUsers: users.length,
-        activeUsers: users.filter(u => u.is_active).length,
+        activeUsers: users.filter(u => u.isActive).length,
         usersByRole,
         recentlyActive: users.filter(u => 
-          u.last_login_at && new Date(u.last_login_at) > weekAgo
+          u.lastLoginAt && new Date(u.lastLoginAt) > weekAgo
         ).length
       }
     };

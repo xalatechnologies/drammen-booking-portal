@@ -58,3 +58,43 @@ export function convertFromLegacyZone(legacyZone: any): Zone {
     updated_at: legacyZone.updatedAt
   };
 }
+
+export function convertZoneToBookingZone(zone: Zone): any {
+  return {
+    id: zone.id,
+    name: zone.name,
+    description: zone.description || '',
+    capacity: zone.capacity || 30,
+    pricePerHour: 450,
+    area: `${zone.area_sqm || 100} m²`,
+    equipment: zone.equipment || [],
+    amenities: [],
+    bookingRules: {
+      minBookingDuration: 1,
+      maxBookingDuration: 8,
+      allowedTimeSlots: ['08:00-10:00', '10:00-12:00', '12:00-14:00', '14:00-16:00', '16:00-18:00', '18:00-20:00'],
+      bookingTypes: ['one-time', 'recurring'],
+      advanceBookingDays: 30,
+      cancellationHours: 24
+    },
+    accessibility: zone.accessibility_features || [],
+    features: [],
+    isActive: zone.status === 'active',
+    subZones: [],
+    layout: {
+      coordinates: {
+        x: zone.coordinates_x || 0,
+        y: zone.coordinates_y || 0,
+        width: zone.coordinates_width || 100,
+        height: zone.coordinates_height || 80
+      },
+      entryPoints: ['Hovedinngang']
+    },
+    adminInfo: {
+      contactPersonName: 'Ansvarlig',
+      contactPersonEmail: 'contact@facility.no',
+      specialInstructions: 'Følg fasilitetets regler',
+      maintenanceSchedule: []
+    }
+  };
+}

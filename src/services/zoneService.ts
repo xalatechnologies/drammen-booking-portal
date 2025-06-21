@@ -92,7 +92,7 @@ export class ZoneService {
   }
 
   static async getZonesByFacility(facilityId: number): Promise<ApiResponse<Zone[]>> {
-    const result = await zoneRepository.findAll();
+    const result = await zoneRepository.getZonesByFacility(facilityId.toString());
     
     if (result.error) {
       return {
@@ -100,12 +100,10 @@ export class ZoneService {
         error: { message: result.error }
       };
     }
-
-    const zones = (result.data || []).filter(zone => zone.facility_id === facilityId);
     
     return {
       success: true,
-      data: zones
+      data: result.data || []
     };
   }
 }
