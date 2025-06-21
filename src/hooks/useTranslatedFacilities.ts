@@ -1,25 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { FacilityView } from '@/types/translation';
-import { facilityTranslationService } from '@/services/FacilityTranslationService';
-import { useTranslationStore } from '@/stores/useTranslationStore';
 import { Facility } from '@/types/facility';
-
-// Convert Facility to FacilityView (they should be compatible now)
-const facilityToFacilityView = (facility: Facility): FacilityView => {
-  return {
-    ...facility,
-    // Ensure all required FacilityView fields are present
-    name: facility.name,
-    description: facility.description || '',
-    suitableFor: facility.suitableFor || [],
-    equipment: facility.equipment || [],
-    amenities: facility.amenities || [],
-    timeSlotDuration: facility.timeSlotDuration,
-    season: facility.season
-  };
-};
+import { useTranslationStore } from '@/stores/useTranslationStore';
 
 export const useTranslatedFacilities = () => {
   const { language } = useLanguage();
@@ -27,7 +10,7 @@ export const useTranslatedFacilities = () => {
 
   return useQuery({
     queryKey: ['translated-facilities', language],
-    queryFn: async (): Promise<FacilityView[]> => {
+    queryFn: async (): Promise<Facility[]> => {
       // Ensure translation service is initialized
       if (!isInitialized) {
         await initializeTranslations();
@@ -49,8 +32,8 @@ export const useTranslatedFacilities = () => {
 
       console.log('useTranslatedFacilities - Raw facilities from DB:', facilities);
 
-      // Convert to FacilityView format with all the database data preserved
-      const facilityViews = (facilities || []).map((facility) => {
+      // Minimal transformation - only compute required fields
+      const processedFacilities = (facilities || []).map((facility) => {
         // Create address from database fields
         const addressParts = [
           facility.address_street,
@@ -71,10 +54,11 @@ export const useTranslatedFacilities = () => {
           }
         }
 
-        const facilityView: FacilityView = {
+        // Return facility with minimal computed fields
+        const processedFacility: Facility = {
           // Keep all database fields exactly as they are
           ...facility,
-          // Add computed fields
+          // Add only essential computed fields
           address,
           image,
           image_url: image,
@@ -90,19 +74,14 @@ export const useTranslatedFacilities = () => {
             from: facility.season_from || '2024-01-01',
             to: facility.season_to || '2024-12-31'
           },
-          availableTimes: [],
-          // Translation fields (will be populated by translation service if needed)
-          name: facility.name,
-          description: facility.description || '',
-          equipment: facility.equipment || [],
-          amenities: facility.amenities || []
+          availableTimes: []
         };
 
-        console.log('useTranslatedFacilities - Converted facility:', facilityView);
-        return facilityView;
+        console.log('useTranslatedFacilities - Processed facility:', processedFacility);
+        return processedFacility;
       });
 
-      return facilityViews;
+      return processedFacilities;
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
@@ -114,7 +93,7 @@ export const useTranslatedFacility = (id: number) => {
 
   return useQuery({
     queryKey: ['translated-facility', id, language],
-    queryFn: async (): Promise<FacilityView | null> => {
+    queryFn: async (): Promise<Facility | null> => {
       if (!id) return null;
 
       // Ensure translation service is initialized
@@ -157,7 +136,7 @@ export const useTranslatedFacility = (id: number) => {
         }
       }
 
-      const facilityView: FacilityView = {
+      const processedFacility: Facility = {
         // Keep all database fields exactly as they are
         ...facility,
         // Add computed fields
@@ -176,15 +155,10 @@ export const useTranslatedFacility = (id: number) => {
           from: facility.season_from || '2024-01-01',
           to: facility.season_to || '2024-12-31'
         },
-        availableTimes: [],
-        // Translation fields
-        name: facility.name,
-        description: facility.description || '',
-        equipment: facility.equipment || [],
-        amenities: facility.amenities || []
+        availableTimes: []
       };
 
-      return facilityView;
+      return processedFacility;
     },
     enabled: !!id,
     staleTime: 5 * 60 * 1000, // 5 minutes

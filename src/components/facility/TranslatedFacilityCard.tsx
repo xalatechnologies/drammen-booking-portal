@@ -2,11 +2,11 @@
 import React from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { FacilityView } from '@/types/translation';
+import { Facility } from '@/types/facility';
 import { MapPin, Users, Clock } from 'lucide-react';
 
 interface TranslatedFacilityCardProps {
-  facility: FacilityView;
+  facility: Facility;
   onClick?: () => void;
 }
 
