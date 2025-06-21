@@ -270,9 +270,14 @@ export class EnhancedZoneConflictManager extends ZoneConflictManager {
           additionalServices: [],
           pricing: {
             basePrice: 0,
-            servicesPrice: 0,
+            servicesCost: 0,
+            discounts: [],
+            surcharges: [],
+            taxes: [],
             totalPrice: 0,
-            currency: 'NOK'
+            currency: 'NOK',
+            calculatedAt: new Date(),
+            breakdown: []
           },
           requiresApproval: false,
           approvalStatus: 'not-required' as const,
