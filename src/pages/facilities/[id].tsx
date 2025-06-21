@@ -1,10 +1,10 @@
+
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import GlobalHeader from "@/components/GlobalHeader";
 import { Zone } from "@/components/booking/types";
 import { useFacility } from "@/hooks/useFacility";
 import { useZones } from "@/hooks/useZones";
-import { useSlotSelection } from "@/hooks/useSlotSelection";
 import { CartProvider } from "@/contexts/CartContext";
 import { MobileBookingPanel } from "@/components/facility/MobileBookingPanel";
 import { convertZoneToBookingZone } from "@/utils/zoneConverter";
@@ -26,15 +26,6 @@ const FacilityDetail = () => {
 
   console.log('FacilityDetail - Facility data:', facility);
   console.log('FacilityDetail - Zones data:', zones);
-  console.log('FacilityDetail - Loading states:', { isLoading, zonesLoading });
-
-  // Use the centralized slot selection hook
-  const {
-    selectedSlots,
-    handleSlotClick,
-    handleBulkSlotSelection,
-    clearSelection
-  } = useSlotSelection();
 
   // State for availability tab patterns
   const [currentPattern, setCurrentPattern] = useState<any>({});
@@ -43,14 +34,14 @@ const FacilityDetail = () => {
   const defaultZone: Zone = {
     id: "whole-facility",
     name: t('facility.booking.wholeVenue'),
-    facilityId: id || "", // Add missing facilityId
+    facilityId: id || "",
     capacity: facility?.capacity || 30,
     equipment: facility?.equipment || ["Projektor", "Lydanlegg", "Whiteboard"],
-    amenities: facility?.accessibility || [], // Add missing amenities property
+    amenities: facility?.accessibility || [],
     pricePerHour: facility?.pricePerHour || 450,
     description: t('facility.booking.wholeVenueDescription'),
     area: facility?.area || "120 m²",
-    isMainZone: true, // Add missing isMainZone
+    isMainZone: true,
     parentZoneId: undefined,
     subZones: ["zone-1", "zone-2"],
     bookingRules: {
@@ -89,19 +80,6 @@ const FacilityDetail = () => {
   const convertedZones = zones.length > 0 ? zones.map(convertZoneToBookingZone) : [defaultZone];
   const displayZones = convertedZones;
 
-  console.log('FacilityDetail - Final display zones:', displayZones);
-
-  const handleRemoveSlot = (zoneId: string, date: Date, timeSlot: string) => {
-    console.log('FacilityDetail: handleRemoveSlot called:', { zoneId, date, timeSlot });
-    // This will be handled by the individual slot click since we're removing
-    handleSlotClick(zoneId, date, timeSlot, 'available');
-  };
-
-  const handleClearSlots = () => {
-    console.log('FacilityDetail: handleClearSlots called');
-    clearSelection();
-  };
-
   const handlePatternApply = (pattern: any) => {
     setCurrentPattern(pattern);
   };
@@ -121,7 +99,6 @@ const FacilityDetail = () => {
   const formatOpeningHours = (openingHours: any) => {
     if (typeof openingHours === 'string') return openingHours;
     if (Array.isArray(openingHours)) {
-      // Convert to a simple string representation
       const weekdays = openingHours.filter(h => h.dayOfWeek >= 1 && h.dayOfWeek <= 5);
       const weekends = openingHours.filter(h => h.dayOfWeek === 0 || h.dayOfWeek === 6);
       
@@ -172,14 +149,9 @@ const FacilityDetail = () => {
             onToggleFavorite={() => setIsFavorited(!isFavorited)}
           />
 
-          {/* Full Width Calendar Section - Updated with Unified Booking Form */}
+          {/* Full Width Calendar Section - Simplified without slot state management */}
           <FacilityDetailCalendar 
             zones={displayZones}
-            selectedSlots={selectedSlots}
-            onSlotClick={handleSlotClick}
-            onBulkSlotSelection={handleBulkSlotSelection}
-            onClearSlots={handleClearSlots}
-            onRemoveSlot={handleRemoveSlot}
             facilityId={id || ""}
             facilityName={facility.name}
             currentPattern={currentPattern}

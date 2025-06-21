@@ -1,152 +1,156 @@
 
-import React, { useCallback } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Zone } from "@/components/booking/types";
-import { SelectedTimeSlot } from "@/utils/recurrenceEngine";
-import { CalendarWithBooking } from "@/components/shared/CalendarWithBooking";
-import { useCart } from "@/contexts/CartContext";
-import { useNavigate } from "react-router-dom";
-import { useToast } from "@/hooks/use-toast";
-import { getStableAvailabilityStatus } from "@/utils/availabilityUtils";
+import React from 'react';
+import { Zone } from '@/components/booking/types';
+import { CalendarWithBooking } from '@/components/shared/CalendarWithBooking';
+import { getStableAvailabilityStatus } from '@/utils/availabilityUtils';
+import { useCart } from '@/contexts/CartContext';
+import { useNavigate } from 'react-router-dom';
 
 interface FacilityDetailCalendarProps {
   zones: Zone[];
-  selectedSlots: SelectedTimeSlot[];
-  onSlotClick: (zoneId: string, date: Date, timeSlot: string, availability: string) => void;
-  onBulkSlotSelection: (slots: SelectedTimeSlot[]) => void;
-  onClearSlots: () => void;
-  onRemoveSlot: (zoneId: string, date: Date, timeSlot: string) => void;
   facilityId: string;
   facilityName: string;
+  timeSlotDuration?: number;
   currentPattern?: any;
   onPatternChange?: (pattern: any) => void;
   onPatternApply?: (pattern: any) => void;
-  timeSlotDuration?: number;
+  // Removed slot management props since we're not managing state
 }
 
-// Helper function to ensure date is a Date object
-const ensureDate = (date: Date | string): Date => {
-  return date instanceof Date ? date : new Date(date);
-};
-
-export const FacilityDetailCalendar: React.FC<FacilityDetailCalendarProps> = ({
+export function FacilityDetailCalendar({
   zones,
-  selectedSlots,
-  onSlotClick,
-  onBulkSlotSelection,
-  onClearSlots,
-  onRemoveSlot,
   facilityId,
   facilityName,
-  timeSlotDuration = 1
-}) => {
+  timeSlotDuration = 1,
+  currentPattern,
+  onPatternChange,
+  onPatternApply
+}: FacilityDetailCalendarProps) {
   const { addToCart } = useCart();
   const navigate = useNavigate();
-  const { toast } = useToast();
 
-  const isSlotSelected = useCallback((zoneId: string, date: Date, timeSlot: string) => {
-    return selectedSlots.some(slot => {
-      // Ensure slot.date is a Date object by converting if it's a string
-      const slotDate = ensureDate(slot.date);
-      return slot.zoneId === zoneId &&
-        slotDate.toDateString() === date.toDateString() &&
-        slot.timeSlot === timeSlot;
+  // Direct slot booking without state management
+  const handleSlotClick = (zoneId: string, date: Date, timeSlot: string, availability: string) => {
+    console.log('FacilityDetailCalendar: Direct slot booking:', { zoneId, date, timeSlot, availability });
+    
+    if (availability !== 'available') {
+      console.log('FacilityDetailCalendar: Slot not available');
+      return;
+    }
+
+    // Directly create booking and add to cart
+    const zone = zones.find(z => z.id === zoneId);
+    const pricePerHour = zone?.pricePerHour || 450;
+    const duration = 2; // Default 2 hours
+
+    addToCart({
+      facilityId,
+      facilityName,
+      zoneId,
+      date,
+      timeSlot,
+      duration,
+      pricePerHour,
+      purpose: 'Direct booking',
+      expectedAttendees: 1,
+      organizationType: 'private',
+      additionalServices: [],
+      timeSlots: [{
+        zoneId,
+        date,
+        timeSlot,
+        duration
+      }],
+      customerInfo: {
+        name: '',
+        email: '',
+        phone: ''
+      },
+      pricing: {
+        baseFacilityPrice: pricePerHour * duration,
+        servicesPrice: 0,
+        discounts: 0,
+        vatAmount: 0,
+        totalPrice: pricePerHour * duration
+      }
     });
-  }, [selectedSlots]);
+  };
 
-  const handleContinueBooking = useCallback(() => {
-    // Navigate to booking form or show booking modal
-    console.log('Continue with booking:', selectedSlots);
-    navigate('/checkout');
-  }, [selectedSlots, navigate]);
-
-  const handleAddToCart = useCallback((bookingData: any) => {
-    // Add each selected slot to cart
-    bookingData.selectedSlots.forEach((slot: SelectedTimeSlot) => {
+  const handleBulkSlotSelection = (slots: any[]) => {
+    console.log('FacilityDetailCalendar: Bulk booking:', slots);
+    
+    // Add each slot directly to cart
+    slots.forEach(slot => {
       const zone = zones.find(z => z.id === slot.zoneId);
-      const duration = slot.duration || 1;
       const pricePerHour = zone?.pricePerHour || 450;
-      
+      const duration = slot.duration || 2;
+
       addToCart({
-        facilityId: bookingData.facilityId,
-        facilityName: bookingData.facilityName,
+        facilityId,
+        facilityName,
+        zoneId: slot.zoneId,
         date: slot.date,
         timeSlot: slot.timeSlot,
-        zoneId: slot.zoneId,
-        pricePerHour,
         duration,
-        organizationType: bookingData.formData.actorType as any,
-        purpose: bookingData.formData.purpose,
-        expectedAttendees: bookingData.formData.attendees,
+        pricePerHour,
+        purpose: 'Bulk booking',
+        expectedAttendees: 1,
+        organizationType: 'private',
         additionalServices: [],
-        timeSlots: [{
-          date: slot.date,
-          timeSlot: slot.timeSlot,
-          zoneId: slot.zoneId,
-          duration
-        }],
+        timeSlots: [slot],
+        customerInfo: {
+          name: '',
+          email: '',
+          phone: ''
+        },
         pricing: {
           baseFacilityPrice: pricePerHour * duration,
           servicesPrice: 0,
           discounts: 0,
           vatAmount: 0,
           totalPrice: pricePerHour * duration
-        },
-        customerInfo: {
-          name: '',
-          email: '',
-          phone: ''
         }
       });
     });
+  };
 
-    toast({
-      title: "Lagt til i handlekurv",
-      description: `${bookingData.selectedSlots.length} tidspunkt lagt til`,
-    });
-
-    // Clear selections after adding to cart
-    onClearSlots();
-  }, [zones, addToCart, toast, onClearSlots]);
-
-  const handleCompleteBooking = useCallback((bookingData: any) => {
-    // Add to cart first, then navigate to checkout
-    handleAddToCart(bookingData);
-    
-    setTimeout(() => {
-      navigate('/checkout');
-    }, 500);
-  }, [handleAddToCart, navigate]);
+  const handleContinueBooking = () => {
+    navigate('/checkout');
+  };
 
   return (
-    <div className="container mx-auto mt-8 px-4 lg:px-0">
-      <Card className="shadow-lg border-0">
-        <CardHeader>
-          <CardTitle className="text-2xl font-semibold tracking-tight">
-            Tilgjengelighet og booking
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <CalendarWithBooking
-            facilityName={facilityName}
-            facilityId={facilityId}
-            zones={zones}
-            selectedSlots={selectedSlots}
-            onSlotClick={onSlotClick}
-            onBulkSlotSelection={onBulkSlotSelection}
-            onRemoveSlot={onRemoveSlot}
-            onClearSlots={onClearSlots}
-            onContinueBooking={handleContinueBooking}
-            onAddToCart={handleAddToCart}
-            onCompleteBooking={handleCompleteBooking}
-            getAvailabilityStatus={getStableAvailabilityStatus}
-            isSlotSelected={isSlotSelected}
-            timeSlotDuration={timeSlotDuration}
-            layout="horizontal"
-            compact={false}
-          />
-        </CardContent>
-      </Card>
+    <div className="bg-gray-50 py-8">
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="bg-white rounded-lg shadow-sm border">
+          <div className="p-6 border-b">
+            <h2 className="text-2xl font-bold text-gray-900">
+              Velg tidspunkt
+            </h2>
+            <p className="text-gray-600 mt-1">
+              Klikk på ledige tidspunkt for å legge dem direkte i handlekurven
+            </p>
+          </div>
+          
+          <div className="p-6">
+            <CalendarWithBooking
+              facilityName={facilityName}
+              facilityId={facilityId}
+              zones={zones}
+              selectedSlots={[]} // No selected slots state
+              onSlotClick={handleSlotClick}
+              onBulkSlotSelection={handleBulkSlotSelection}
+              onRemoveSlot={() => {}} // No removal needed
+              onClearSlots={() => {}} // No clearing needed
+              onContinueBooking={handleContinueBooking}
+              getAvailabilityStatus={getStableAvailabilityStatus}
+              isSlotSelected={() => false} // Never selected in state
+              timeSlotDuration={timeSlotDuration}
+              layout="horizontal"
+              compact={false}
+            />
+          </div>
+        </div>
+      </div>
     </div>
   );
-};
+}

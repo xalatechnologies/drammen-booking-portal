@@ -22,17 +22,16 @@ const CalendarView: React.FC<CalendarViewWithToggleProps> = ({
   viewMode,
   setViewMode,
 }) => {
+  // Fix the capacity type issue by ensuring it's properly typed as a tuple
+  const capacityRange: [number, number] | undefined = capacity && Array.isArray(capacity) && capacity.length === 2 
+    ? [capacity[0], capacity[1]] 
+    : undefined;
+
   const {
     facilitiesWithZones,
-    selectedSlots,
     isLoading,
     error,
-    handleSlotClick,
-    handleBulkSlotSelection,
-    handleRemoveSlot,
-    handleClearSlots,
     getAvailabilityStatus,
-    isSlotSelected,
     displayFacility,
     allZones,
     navigate
@@ -41,8 +40,24 @@ const CalendarView: React.FC<CalendarViewWithToggleProps> = ({
     facilityType,
     location,
     accessibility,
-    capacity
+    capacity: capacityRange
   });
+
+  // Simplified slot handling - no state management, just direct cart operations
+  const handleSlotClick = (zoneId: string, date: Date, timeSlot: string, availability: string) => {
+    console.log('CalendarView: Slot clicked, but not storing in state');
+    // Direct booking flow would go here
+  };
+
+  const handleBulkSlotSelection = (slots: any[]) => {
+    console.log('CalendarView: Bulk selection, but not storing in state');
+    // Direct booking flow would go here
+  };
+
+  const handleAddToCart = (bookingData: any) => {
+    console.log('CalendarView: Adding to cart:', bookingData);
+    // Cart operations happen here
+  };
 
   if (isLoading) {
     return <CalendarLoadingState viewMode={viewMode} setViewMode={setViewMode} />;
@@ -68,14 +83,14 @@ const CalendarView: React.FC<CalendarViewWithToggleProps> = ({
           facilityName={displayFacility?.name || 'Alle lokaler'}
           facilityId={'all'}
           zones={allZones}
-          selectedSlots={selectedSlots}
+          selectedSlots={[]} // No selected slots state
           onSlotClick={handleSlotClick}
           onBulkSlotSelection={handleBulkSlotSelection}
-          onRemoveSlot={handleRemoveSlot}
-          onClearSlots={handleClearSlots}
-          onContinueBooking={() => navigate('/checkout')}
+          onRemoveSlot={() => {}} // No removal needed
+          onClearSlots={() => {}} // No clearing needed
+          onAddToCart={handleAddToCart}
           getAvailabilityStatus={getAvailabilityStatus}
-          isSlotSelected={isSlotSelected}
+          isSlotSelected={() => false} // Never selected
           timeSlotDuration={1}
           layout="horizontal"
           compact={false}

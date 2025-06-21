@@ -1,9 +1,6 @@
 
-import { useState } from "react";
 import { FacilityFilters } from "@/types/facility";
 import { useFacilities } from "@/hooks/useFacilities";
-import { useSlotSelection } from "@/hooks/useSlotSelection";
-import { useCart } from "@/contexts/CartContext";
 import { useNavigate } from "react-router-dom";
 import { transformFacilitiesToCalendarFormat } from "@/components/calendar/utils/facilityTransformer";
 import { getStableAvailabilityStatus } from "@/utils/availabilityUtils";
@@ -23,16 +20,7 @@ export function useCalendarView({
   accessibility,
   capacity
 }: UseCalendarViewProps) {
-  const [selectedFacilityId, setSelectedFacilityId] = useState<string | null>(null);
-  const { addToCart } = useCart();
   const navigate = useNavigate();
-  
-  const {
-    selectedSlots,
-    handleSlotClick,
-    handleBulkSlotSelection,
-    clearSelection
-  } = useSlotSelection();
   
   // Create filters from props
   const filters: FacilityFilters = {
@@ -49,47 +37,14 @@ export function useCalendarView({
   });
 
   const facilitiesWithZones = transformFacilitiesToCalendarFormat(facilities);
-
-  const isSlotSelected = (zoneId: string, date: Date, timeSlot: string) => {
-    return selectedSlots.some(slot => {
-      const slotDate = slot.date instanceof Date ? slot.date : new Date(slot.date);
-      return slot.zoneId === zoneId &&
-        slotDate.toDateString() === date.toDateString() &&
-        slot.timeSlot === timeSlot;
-    });
-  };
-
-  const handleRemoveSlot = (zoneId: string, date: Date, timeSlot: string) => {
-    handleSlotClick(zoneId, date, timeSlot, 'available');
-  };
-
-  const handleClearSlots = () => {
-    clearSelection();
-    setSelectedFacilityId(null);
-  };
-
-  const selectedFacility = selectedFacilityId 
-    ? facilitiesWithZones.find(f => f.id.toString() === selectedFacilityId)
-    : null;
-
-  const displayFacility = selectedFacility || facilitiesWithZones[0];
-  const allZones = selectedFacility 
-    ? selectedFacility.zones 
-    : facilitiesWithZones.flatMap(f => f.zones);
+  const displayFacility = facilitiesWithZones[0];
+  const allZones = facilitiesWithZones.flatMap(f => f.zones);
 
   return {
     facilitiesWithZones,
-    selectedSlots,
-    selectedFacilityId,
-    setSelectedFacilityId,
     isLoading,
     error,
-    handleSlotClick,
-    handleBulkSlotSelection,
-    handleRemoveSlot,
-    handleClearSlots,
     getAvailabilityStatus: getStableAvailabilityStatus,
-    isSlotSelected,
     displayFacility,
     allZones,
     navigate
