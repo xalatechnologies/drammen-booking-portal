@@ -899,7 +899,6 @@ export type Database = {
           equipment: string[] | null
           has_auto_approval: boolean
           id: number
-          image_url: string | null
           is_featured: boolean
           latitude: number | null
           longitude: number | null
@@ -937,7 +936,6 @@ export type Database = {
           equipment?: string[] | null
           has_auto_approval?: boolean
           id?: number
-          image_url?: string | null
           is_featured?: boolean
           latitude?: number | null
           longitude?: number | null
@@ -975,7 +973,6 @@ export type Database = {
           equipment?: string[] | null
           has_auto_approval?: boolean
           id?: number
-          image_url?: string | null
           is_featured?: boolean
           latitude?: number | null
           longitude?: number | null
@@ -1049,9 +1046,12 @@ export type Database = {
           created_at: string
           display_order: number
           facility_id: number
+          file_size: number | null
           id: string
           image_url: string
-          is_primary: boolean
+          is_featured: boolean
+          uploaded_at: string
+          uploaded_by: string | null
         }
         Insert: {
           alt_text?: string | null
@@ -1059,9 +1059,12 @@ export type Database = {
           created_at?: string
           display_order?: number
           facility_id: number
+          file_size?: number | null
           id?: string
           image_url: string
-          is_primary?: boolean
+          is_featured?: boolean
+          uploaded_at?: string
+          uploaded_by?: string | null
         }
         Update: {
           alt_text?: string | null
@@ -1069,9 +1072,12 @@ export type Database = {
           created_at?: string
           display_order?: number
           facility_id?: number
+          file_size?: number | null
           id?: string
           image_url?: string
-          is_primary?: boolean
+          is_featured?: boolean
+          uploaded_at?: string
+          uploaded_by?: string | null
         }
         Relationships: [
           {
@@ -1079,6 +1085,13 @@ export type Database = {
             columns: ["facility_id"]
             isOneToOne: false
             referencedRelation: "facilities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "facility_images_uploaded_by_fkey"
+            columns: ["uploaded_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
