@@ -72,6 +72,7 @@ export function FacilityListItemContent({
 
   // Safely handle suitableFor array
   const suitableForArray = Array.isArray(facility.suitableFor) ? facility.suitableFor : [];
+  const maxVisibleTags = 2;
 
   return (
     <div className="flex-1 p-6 flex flex-col h-full">
@@ -104,18 +105,18 @@ export function FacilityListItemContent({
         {/* Suitable For - Limited to one line */}
         <div className="flex flex-wrap gap-2 flex-1 overflow-hidden">
           <div className="flex gap-2 items-center min-w-0">
-            {suitableForArray.slice(0, 3).map((activity, index) => (
+            {suitableForArray.slice(0, maxVisibleTags).map((activity, index) => (
               <Badge 
                 key={index} 
-                className="bg-blue-50 text-blue-700 border-blue-200 font-medium px-3 py-1.5 text-sm hover:bg-blue-100 transition-colors flex items-center gap-1.5 whitespace-nowrap"
+                className="bg-blue-50 text-blue-700 border-blue-200 font-medium px-3 py-1 text-sm hover:bg-blue-100 transition-colors flex items-center gap-1.5 whitespace-nowrap"
               >
                 {getSuitableForIcon(activity)}
                 {activity}
               </Badge>
             ))}
-            {suitableForArray.length > 3 && (
-              <Badge variant="outline" className="bg-gray-50 text-gray-600 border-gray-300 font-medium px-3 py-1.5 text-sm whitespace-nowrap">
-                +{suitableForArray.length - 3}
+            {suitableForArray.length > maxVisibleTags && (
+              <Badge variant="outline" className="bg-gray-50 text-gray-600 border-gray-300 font-medium px-3 py-1 text-sm whitespace-nowrap">
+                +{suitableForArray.length - maxVisibleTags} more
               </Badge>
             )}
           </div>

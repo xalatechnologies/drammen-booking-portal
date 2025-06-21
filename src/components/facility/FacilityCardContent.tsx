@@ -64,10 +64,11 @@ export function FacilityCardContent({
       }
     }
 
-    return activities.slice(0, 1); // Only one line as requested
+    return activities;
   };
 
   const suitableActivities = getSuitableActivities();
+  const maxVisibleTags = 3;
 
   return (
     <div className="p-6">
@@ -95,15 +96,26 @@ export function FacilityCardContent({
         <span className="text-base font-medium">{t('facility.details.capacity')}: {facility.capacity}</span>
       </div>
 
-      {/* Suitable For Tags - Only one line */}
+      {/* Suitable For Tags - Multiple on one line */}
       {suitableActivities.length > 0 && (
         <div className="mb-6">
           <div className="flex flex-wrap gap-2">
-            <Badge 
-              className="bg-blue-50 text-blue-700 border-blue-200 font-medium px-4 py-2 text-base hover:bg-blue-100 transition-colors"
-            >
-              {suitableActivities[0]}
-            </Badge>
+            {suitableActivities.slice(0, maxVisibleTags).map((activity, index) => (
+              <Badge 
+                key={index}
+                className="bg-blue-50 text-blue-700 border-blue-200 font-medium px-3 py-1 text-sm hover:bg-blue-100 transition-colors"
+              >
+                {activity}
+              </Badge>
+            ))}
+            {suitableActivities.length > maxVisibleTags && (
+              <Badge 
+                variant="outline"
+                className="bg-gray-50 text-gray-600 border-gray-300 font-medium px-3 py-1 text-sm"
+              >
+                +{suitableActivities.length - maxVisibleTags} more
+              </Badge>
+            )}
           </div>
         </div>
       )}
