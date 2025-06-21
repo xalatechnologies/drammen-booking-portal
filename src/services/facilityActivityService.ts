@@ -1,9 +1,8 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { useLanguage } from '@/contexts/LanguageContext';
 
 export class FacilityActivityService {
-  static async getFacilitySuitableActivities(facilityId: number, languageCode: string = 'NO'): Promise<string[]> {
+  static async getFacilitySuitableActivities(facilityId: number, languageCode: 'NO' | 'EN' = 'NO'): Promise<string[]> {
     try {
       const { data, error } = await supabase
         .from('facility_suitable_activities')
