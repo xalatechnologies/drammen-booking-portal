@@ -36,6 +36,14 @@ export const useTranslatedFacilities = () => {
 
       // Transform facilities using utility functions
       const processedFacilities = (facilities || []).map((facility) => {
+        console.log('useTranslatedFacilities - Processing facility:', facility.name);
+        console.log('useTranslatedFacilities - Address fields:', {
+          street: facility.address_street,
+          city: facility.address_city,
+          postal: facility.address_postal_code
+        });
+        console.log('useTranslatedFacilities - Images from DB:', facility.facility_images);
+
         // Use utility functions for consistent transformations
         const address = FacilityDataUtils.computeAddress(facility);
         const image = FacilityDataUtils.getImageUrl(facility.facility_images);
@@ -44,6 +52,9 @@ export const useTranslatedFacilities = () => {
         const season = FacilityDataUtils.formatSeason(facility.season_from, facility.season_to);
         const images = FacilityDataUtils.transformImages(facility.id, facility.facility_images);
         const featuredImage = images.find(img => img.is_featured);
+
+        console.log('useTranslatedFacilities - Computed address:', address);
+        console.log('useTranslatedFacilities - Computed image:', image);
 
         // Return facility with proper type mapping
         const processedFacility: Facility = {
@@ -102,7 +113,12 @@ export const useTranslatedFacilities = () => {
           availableTimes: []
         };
 
-        console.log('useTranslatedFacilities - Processed facility:', processedFacility);
+        console.log('useTranslatedFacilities - Final processed facility:', {
+          id: processedFacility.id,
+          name: processedFacility.name,
+          address: processedFacility.address,
+          image: processedFacility.image
+        });
         return processedFacility;
       });
 

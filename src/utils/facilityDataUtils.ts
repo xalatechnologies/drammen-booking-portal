@@ -7,12 +7,12 @@ export class FacilityDataUtils {
    */
   static computeAddress(facility: Pick<Facility, 'address_street' | 'address_city' | 'address_postal_code'>): string {
     const addressParts = [
-      facility.address_street,
-      facility.address_city,
-      facility.address_postal_code
-    ].filter(part => part && part.trim() !== '');
+      facility.address_street?.trim(),
+      facility.address_city?.trim(),
+      facility.address_postal_code?.trim()
+    ].filter(part => part && part !== '');
     
-    return addressParts.length > 0 ? addressParts.join(', ') : '';
+    return addressParts.length > 0 ? addressParts.join(', ') : 'Address not available';
   }
 
   /**
@@ -22,6 +22,7 @@ export class FacilityDataUtils {
     const fallbackImage = 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&auto=format&fit=crop';
     
     if (!facilityImages || !Array.isArray(facilityImages) || facilityImages.length === 0) {
+      console.log('FacilityDataUtils.getImageUrl - No images available, using fallback');
       return fallbackImage;
     }
     
@@ -29,7 +30,12 @@ export class FacilityDataUtils {
     const featuredImage = facilityImages.find(img => img.is_featured);
     const imageToUse = featuredImage || facilityImages[0];
     
-    return imageToUse?.image_url || fallbackImage;
+    console.log('FacilityDataUtils.getImageUrl - Selected image:', imageToUse);
+    
+    const imageUrl = imageToUse?.image_url || fallbackImage;
+    console.log('FacilityDataUtils.getImageUrl - Final image URL:', imageUrl);
+    
+    return imageUrl;
   }
 
   /**
