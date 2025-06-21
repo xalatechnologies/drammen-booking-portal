@@ -20,12 +20,16 @@ export const useTranslation = () => {
   };
 
   const tSync = (key: string, fallback?: string): string => {
-    // This is a synchronous version that uses cached data
-    // Only use when you're sure the translation service is initialized
+    // This is a synchronous version that tries to get from cache
     if (!isInitialized) return fallback || key;
     
-    // Return from cache or fallback
-    return fallback || key; // Simplified for now
+    // Try to get from cache synchronously
+    const keyCache = translationService['cache'].get(key);
+    if (keyCache) {
+      return keyCache.get(language) || keyCache.get('NO') || fallback || key;
+    }
+    
+    return fallback || key;
   };
 
   return {

@@ -4,7 +4,7 @@ import { Language } from '@/i18n/types';
 import { Translation, TranslationKey } from '@/types/translation';
 
 class TranslationService {
-  private cache = new Map<string, Map<Language, string>>();
+  public cache = new Map<string, Map<Language, string>>();
   private isInitialized = false;
 
   async initialize(): Promise<void> {
@@ -34,6 +34,7 @@ class TranslationService {
       });
 
       this.isInitialized = true;
+      console.log('Translation service initialized with', translations?.length, 'translations');
     } catch (error) {
       console.error('Failed to initialize TranslationService:', error);
     }
