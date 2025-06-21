@@ -22,52 +22,52 @@ export const FacilityTableView: React.FC<FacilityTableViewProps> = ({
     <Card>
       <CardContent className="p-0">
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="w-full text-lg">
             <thead className="border-b bg-gray-50">
               <tr>
-                <th className="text-left p-4 font-medium">Name</th>
-                <th className="text-left p-4 font-medium">Type</th>
-                <th className="text-left p-4 font-medium">Location</th>
-                <th className="text-left p-4 font-medium">Capacity</th>
-                <th className="text-left p-4 font-medium">Price/Hour</th>
-                <th className="text-left p-4 font-medium">Status</th>
-                <th className="text-left p-4 font-medium">Actions</th>
+                <th className="text-left p-5 font-medium text-lg">Name</th>
+                <th className="text-left p-5 font-medium text-lg">Type</th>
+                <th className="text-left p-5 font-medium text-lg">Location</th>
+                <th className="text-left p-5 font-medium text-lg">Capacity</th>
+                <th className="text-left p-5 font-medium text-lg">Area (m²)</th>
+                <th className="text-left p-5 font-medium text-lg">Status</th>
+                <th className="text-left p-5 font-medium text-lg">Actions</th>
               </tr>
             </thead>
             <tbody>
               {facilities.map((facility) => (
                 <tr key={facility.id} className="border-b hover:bg-gray-50">
-                  <td className="p-4">
+                  <td className="p-5">
                     <div>
-                      <div className="font-medium">{facility.name}</div>
-                      <div className="text-sm text-gray-500">{facility.area}</div>
+                      <div className="font-medium text-lg">{facility.name}</div>
+                      <div className="text-base text-gray-500">{facility.area}</div>
                     </div>
                   </td>
-                  <td className="p-4 text-sm">{facility.type}</td>
-                  <td className="p-4 text-sm">
+                  <td className="p-5 text-base">{facility.type}</td>
+                  <td className="p-5 text-base">
                     {facility.address_street}, {facility.address_city}
                   </td>
-                  <td className="p-4 text-sm">{facility.capacity} people</td>
-                  <td className="p-4 text-sm">{facility.price_per_hour} NOK</td>
-                  <td className="p-4">
+                  <td className="p-5 text-base">{facility.capacity} people</td>
+                  <td className="p-5 text-base">{facility.area_sqm || 'N/A'} m²</td>
+                  <td className="p-5">
                     <Badge
                       variant={facility.status === 'active' ? 'default' : 
                               facility.status === 'maintenance' ? 'secondary' : 'destructive'}
-                      className="text-xs"
+                      className="text-sm"
                     >
                       {facility.status}
                     </Badge>
                   </td>
-                  <td className="p-4">
-                    <div className="flex gap-1">
+                  <td className="p-5">
+                    <div className="flex gap-2">
                       <Button variant="outline" size="sm" onClick={() => onView(facility)}>
-                        <Grid3X3 className="h-3 w-3" />
+                        <Grid3X3 className="h-4 w-4" />
                       </Button>
                       <Button variant="outline" size="sm" onClick={() => onCalendar(facility)}>
-                        <Calendar className="h-3 w-3" />
+                        <Calendar className="h-4 w-4" />
                       </Button>
                       <Button variant="outline" size="sm" onClick={() => onEdit(facility)}>
-                        <Settings className="h-3 w-3" />
+                        <Settings className="h-4 w-4" />
                       </Button>
                     </div>
                   </td>

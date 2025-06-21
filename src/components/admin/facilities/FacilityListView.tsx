@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
@@ -20,14 +19,14 @@ interface FacilityListViewProps {
 }
 
 type ViewMode = 'list' | 'form' | 'calendar' | 'detail';
-type DisplayMode = 'grid' | 'list' | 'table' | 'map';
+type DisplayMode = 'table' | 'grid' | 'list' | 'map';
 
 export const FacilityListView: React.FC<FacilityListViewProps> = ({
   selectedFacilityId,
   onFacilitySelect
 }) => {
   const [viewMode, setViewMode] = useState<ViewMode>('list');
-  const [displayMode, setDisplayMode] = useState<DisplayMode>('grid');
+  const [displayMode, setDisplayMode] = useState<DisplayMode>('table');
   const [selectedFacility, setSelectedFacility] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState("all");
@@ -108,16 +107,16 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
     };
 
     switch (displayMode) {
+      case 'table':
+        return <FacilityTableView {...commonProps} />;
       case 'grid':
         return <FacilityGridView {...commonProps} />;
       case 'list':
         return <FacilityListViewDisplay {...commonProps} />;
-      case 'table':
-        return <FacilityTableView {...commonProps} />;
       case 'map':
         return <FacilityMapView facilities={filteredFacilities} isLoading={isLoading} />;
       default:
-        return <FacilityGridView {...commonProps} />;
+        return <FacilityTableView {...commonProps} />;
     }
   };
 
