@@ -8,6 +8,7 @@ export interface Facility {
   image: string;
   nextAvailable: string;
   capacity: number;
+  area_sqm?: number | null; // Added area in square meters
   accessibility: string[];
   area: string;
   suitableFor: string[];
