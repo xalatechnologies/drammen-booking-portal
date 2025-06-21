@@ -210,9 +210,9 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
 
   const handleExport = () => {
     const csvContent = [
-      ['ID', 'Name', 'Type', 'Area', 'Status', 'Capacity', 'Price/Hour'].join(','),
+      ['ID', 'Name', 'Type', 'Area', 'Status', 'Capacity', 'Area SQM'].join(','),
       ...filteredFacilities.map(f => 
-        [f.id, f.name, f.type, f.area, f.status, f.capacity, f.price_per_hour || 0].join(',')
+        [f.id, f.name, f.type, f.area, f.status, f.capacity, f.area_sqm || 0].join(',')
       )
     ].join('\n');
 
@@ -360,8 +360,8 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
                 <SelectItem value="name-desc">Name Z-A</SelectItem>
                 <SelectItem value="capacity-asc">Capacity Low-High</SelectItem>
                 <SelectItem value="capacity-desc">Capacity High-Low</SelectItem>
-                <SelectItem value="price_per_hour-asc">Price Low-High</SelectItem>
-                <SelectItem value="price_per_hour-desc">Price High-Low</SelectItem>
+                <SelectItem value="area_sqm-asc">Area SQM Low-High</SelectItem>
+                <SelectItem value="area_sqm-desc">Area SQM High-Low</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -429,7 +429,7 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
                 <TableHead className="text-base font-semibold text-gray-900 py-6">Area</TableHead>
                 <TableHead className="text-base font-semibold text-gray-900 py-6">Status</TableHead>
                 <TableHead className="text-base font-semibold text-gray-900 py-6">Capacity</TableHead>
-                <TableHead className="text-base font-semibold text-gray-900 py-6">Price/Hour</TableHead>
+                <TableHead className="text-base font-semibold text-gray-900 py-6">Area SQM</TableHead>
                 <TableHead className="w-24 text-base font-semibold text-gray-900 py-6">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -459,7 +459,7 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
                             className="w-full h-full object-cover"
                           />
                         ) : (
-                          <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-400">
+                          <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-400 text-xs">
                             No Image
                           </div>
                         )}
@@ -484,7 +484,7 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
                     </Badge>
                   </TableCell>
                   <TableCell className="text-base py-6 font-medium">{facility.capacity}</TableCell>
-                  <TableCell className="text-base py-6 font-medium">{facility.price_per_hour || 0} kr</TableCell>
+                  <TableCell className="text-base py-6 font-medium">{facility.area_sqm || 0} m²</TableCell>
                   <TableCell onClick={(e) => e.stopPropagation()} className="py-6">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>

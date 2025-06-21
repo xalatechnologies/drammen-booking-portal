@@ -38,7 +38,7 @@ export const FacilityFormView: React.FC<FacilityFormViewProps> = ({
       area: facility?.area || "",
       description: facility?.description || "",
       capacity: facility?.capacity || 1,
-      price_per_hour: facility?.price_per_hour || 450,
+      area_sqm: facility?.area_sqm || 0,
       status: facility?.status || "active",
       has_auto_approval: facility?.has_auto_approval || false,
       contact_email: facility?.contact_email || "",
@@ -246,20 +246,19 @@ export const FacilityFormView: React.FC<FacilityFormViewProps> = ({
               </div>
 
               <div className="space-y-3">
-                <Label htmlFor="price_per_hour" className="text-base font-medium">Price per Hour (NOK) *</Label>
+                <Label htmlFor="area_sqm" className="text-base font-medium">Area (m²)</Label>
                 <Input
-                  id="price_per_hour"
+                  id="area_sqm"
                   type="number"
                   min="0"
                   step="0.01"
                   className="h-12 text-base"
-                  {...register("price_per_hour", { 
-                    required: "Price is required",
-                    min: { value: 0, message: "Price cannot be negative" }
+                  {...register("area_sqm", { 
+                    min: { value: 0, message: "Area cannot be negative" }
                   })}
                 />
-                {errors.price_per_hour && (
-                  <p className="text-sm text-red-500">{errors.price_per_hour.message as string}</p>
+                {errors.area_sqm && (
+                  <p className="text-sm text-red-500">{errors.area_sqm.message as string}</p>
                 )}
               </div>
             </div>
