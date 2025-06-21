@@ -71,6 +71,11 @@ export function FacilityCardContent({
 
   return (
     <div className="p-6">
+      {/* Facility Name */}
+      <h3 className="text-2xl font-bold text-gray-900 mb-4 line-clamp-2">
+        {facility.name}
+      </h3>
+
       {/* Location */}
       <div className="flex items-center gap-3 mb-5 text-gray-600 hover:text-blue-600 transition-colors group/location">
         <MapPin className="h-5 w-5 text-gray-400 group-hover/location:text-blue-500" />
