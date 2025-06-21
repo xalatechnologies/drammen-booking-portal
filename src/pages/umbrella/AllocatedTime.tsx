@@ -122,14 +122,6 @@ const AllocatedTimePage: React.FC = () => {
                 {t("umbrella.allocatedTime.overview.description", undefined, "Visning i tabell- og kalenderformat")}
               </CardDescription>
             </div>
-            <div className="flex items-center space-x-2">
-              <Tabs value={selectedView} onValueChange={setSelectedView}>
-                <TabsList>
-                  <TabsTrigger value="table">{t("umbrella.allocatedTime.overview.tableView", undefined, "Tabell")}</TabsTrigger>
-                  <TabsTrigger value="calendar">{t("umbrella.allocatedTime.overview.calendarView", undefined, "Kalender")}</TabsTrigger>
-                </TabsList>
-              </Tabs>
-            </div>
           </div>
         </CardHeader>
         <CardContent>
@@ -167,74 +159,81 @@ const AllocatedTimePage: React.FC = () => {
             </Button>
           </div>
 
-          {/* Table View */}
-          <TabsContent value="table" className="space-y-4">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>{t("umbrella.allocatedTime.overview.location", undefined, "Lokasjon")}</TableHead>
-                  <TableHead>{t("umbrella.allocatedTime.overview.weekdays", undefined, "Ukedag(er)")}</TableHead>
-                  <TableHead>{t("umbrella.allocatedTime.overview.timeSlot", undefined, "Klokkeslett")}</TableHead>
-                  <TableHead>{t("umbrella.allocatedTime.overview.period", undefined, "Periode")}</TableHead>
-                  <TableHead>{t("umbrella.allocatedTime.overview.status", undefined, "Status")}</TableHead>
-                  <TableHead>{t("umbrella.allocatedTime.overview.distributedTo", undefined, "Fordelt til")}</TableHead>
-                  <TableHead>{t("umbrella.allocatedTime.overview.actions", undefined, "Handlinger")}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {allocatedTimeBlocks.map((block) => (
-                  <TableRow key={block.id}>
-                    <TableCell className="font-medium">{block.location}</TableCell>
-                    <TableCell>{block.weekdays.join(", ")}</TableCell>
-                    <TableCell>{block.timeSlot}</TableCell>
-                    <TableCell>{block.period}</TableCell>
-                    <TableCell>
-                      <Badge variant={
-                        block.status === "Fordelt" ? "default" : 
-                        block.status === "Ufordelt" ? "secondary" : "outline"
-                      }>
-                        {block.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>{block.distributedTo || "-"}</TableCell>
-                    <TableCell>
-                      <div className="flex items-center space-x-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleDistribute(block)}
-                        >
-                          <Share2 className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleEdit(block)}
-                        >
-                          <Edit2 className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleRelease(block)}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TabsContent>
+          <Tabs value={selectedView} onValueChange={setSelectedView}>
+            <TabsList className="mb-4">
+              <TabsTrigger value="table">{t("umbrella.allocatedTime.overview.tableView", undefined, "Tabell")}</TabsTrigger>
+              <TabsTrigger value="calendar">{t("umbrella.allocatedTime.overview.calendarView", undefined, "Kalender")}</TabsTrigger>
+            </TabsList>
 
-          {/* Calendar View */}
-          <TabsContent value="calendar" className="space-y-4">
-            <div className="text-center py-8 text-gray-500">
-              <Calendar className="w-12 h-12 mx-auto mb-4 opacity-50" />
-              <p>{t("umbrella.allocatedTime.overview.calendarComingSoon", undefined, "Kalendervisning kommer snart")}</p>
-            </div>
-          </TabsContent>
+            {/* Table View */}
+            <TabsContent value="table" className="space-y-4">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>{t("umbrella.allocatedTime.overview.location", undefined, "Lokasjon")}</TableHead>
+                    <TableHead>{t("umbrella.allocatedTime.overview.weekdays", undefined, "Ukedag(er)")}</TableHead>
+                    <TableHead>{t("umbrella.allocatedTime.overview.timeSlot", undefined, "Klokkeslett")}</TableHead>
+                    <TableHead>{t("umbrella.allocatedTime.overview.period", undefined, "Periode")}</TableHead>
+                    <TableHead>{t("umbrella.allocatedTime.overview.status", undefined, "Status")}</TableHead>
+                    <TableHead>{t("umbrella.allocatedTime.overview.distributedTo", undefined, "Fordelt til")}</TableHead>
+                    <TableHead>{t("umbrella.allocatedTime.overview.actions", undefined, "Handlinger")}</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {allocatedTimeBlocks.map((block) => (
+                    <TableRow key={block.id}>
+                      <TableCell className="font-medium">{block.location}</TableCell>
+                      <TableCell>{block.weekdays.join(", ")}</TableCell>
+                      <TableCell>{block.timeSlot}</TableCell>
+                      <TableCell>{block.period}</TableCell>
+                      <TableCell>
+                        <Badge variant={
+                          block.status === "Fordelt" ? "default" : 
+                          block.status === "Ufordelt" ? "secondary" : "outline"
+                        }>
+                          {block.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>{block.distributedTo || "-"}</TableCell>
+                      <TableCell>
+                        <div className="flex items-center space-x-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleDistribute(block)}
+                          >
+                            <Share2 className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleEdit(block)}
+                          >
+                            <Edit2 className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleRelease(block)}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TabsContent>
+
+            {/* Calendar View */}
+            <TabsContent value="calendar" className="space-y-4">
+              <div className="text-center py-8 text-gray-500">
+                <Calendar className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                <p>{t("umbrella.allocatedTime.overview.calendarComingSoon", undefined, "Kalendervisning kommer snart")}</p>
+              </div>
+            </TabsContent>
+          </Tabs>
         </CardContent>
       </Card>
 
