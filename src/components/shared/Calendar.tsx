@@ -9,7 +9,7 @@ import { Zone } from "@/components/booking/types";
 import { SelectedTimeSlot } from "@/utils/recurrenceEngine";
 import { CalendarGrid } from "@/components/facility/tabs/CalendarGrid";
 
-interface ReusableCalendarProps {
+interface CalendarProps {
   zones: Zone[];
   selectedSlots: SelectedTimeSlot[];
   onSlotClick: (zoneId: string, date: Date, timeSlot: string, availability: string) => void;
@@ -21,7 +21,7 @@ interface ReusableCalendarProps {
   compact?: boolean;
 }
 
-export const ReusableCalendar: React.FC<ReusableCalendarProps> = ({
+export const Calendar: React.FC<CalendarProps> = ({
   zones,
   selectedSlots,
   onSlotClick,
@@ -145,3 +145,5 @@ export const ReusableCalendar: React.FC<ReusableCalendarProps> = ({
     </div>
   );
 };
+
+export default Calendar;

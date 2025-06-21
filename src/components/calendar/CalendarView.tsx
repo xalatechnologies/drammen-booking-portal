@@ -1,18 +1,13 @@
 
 import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { format, addDays, startOfWeek, isAfter, startOfDay } from "date-fns";
 import { Calendar } from "lucide-react";
-import { WeekNavigation } from "./WeekNavigation";
-import { CalendarHeader } from "./CalendarHeader";
 import { CalendarViewProps } from "./types";
 import { useFacilities } from "@/hooks/useFacilities";
 import { FacilityFilters } from "@/types/facility";
 import ViewHeader from "../search/ViewHeader";
-import { SelectedTimeSlot } from "@/utils/recurrenceEngine";
 import { useCart } from "@/contexts/CartContext";
 import { useNavigate } from "react-router-dom";
-import { BookingForm } from "../booking/BookingForm";
 import { CalendarWithBooking } from "../shared/CalendarWithBooking";
 import { useSlotSelection } from "@/hooks/useSlotSelection";
 
@@ -135,43 +130,13 @@ const CalendarView: React.FC<CalendarViewWithToggleProps> = ({
     });
   };
 
-  const handleAddToCart = (bookingData: any) => {
-    addToCart({
-      facilityId: bookingData.facilityId,
-      facilityName: bookingData.facilityName,
-      purpose: bookingData.formData.purpose,
-      timeSlots: bookingData.selectedSlots,
-      organizationType: bookingData.formData.actorType,
-      expectedAttendees: bookingData.formData.attendees,
-      additionalServices: [],
-      pricing: {
-        baseFacilityPrice: 250 * bookingData.selectedSlots.length,
-        servicesPrice: 0,
-        discounts: 0,
-        vatAmount: 0,
-        totalPrice: 250 * bookingData.selectedSlots.length
-      },
-      date: bookingData.selectedSlots[0]?.date || new Date(),
-      timeSlot: bookingData.selectedSlots[0]?.timeSlot || '',
-      zoneId: bookingData.selectedSlots[0]?.zoneId || '',
-      pricePerHour: 250
-    });
-    
-    clearSelection();
-    setSelectedFacilityId(null);
-  };
-
-  const handleCompleteBooking = (bookingData: any) => {
-    navigate('/checkout', { state: { bookingData } });
+  const handleRemoveSlot = (zoneId: string, date: Date, timeSlot: string) => {
+    handleSlotClick(zoneId, date, timeSlot, 'available');
   };
 
   const handleClearSlots = () => {
     clearSelection();
     setSelectedFacilityId(null);
-  };
-
-  const handleRemoveSlot = (zoneId: string, date: Date, timeSlot: string) => {
-    handleSlotClick(zoneId, date, timeSlot, 'available');
   };
 
   if (isLoading) {

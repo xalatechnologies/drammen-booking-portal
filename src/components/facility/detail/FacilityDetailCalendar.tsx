@@ -1,5 +1,5 @@
 
-import React, { useState, useCallback } from "react";
+import React, { useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Zone } from "@/components/booking/types";
 import { SelectedTimeSlot } from "@/utils/recurrenceEngine";
@@ -19,6 +19,11 @@ interface FacilityDetailCalendarProps {
   onPatternApply?: (pattern: any) => void;
   timeSlotDuration?: number;
 }
+
+// Helper function to ensure date is a Date object
+const ensureDate = (date: Date | string): Date => {
+  return date instanceof Date ? date : new Date(date);
+};
 
 export const FacilityDetailCalendar: React.FC<FacilityDetailCalendarProps> = ({
   zones,
@@ -53,7 +58,7 @@ export const FacilityDetailCalendar: React.FC<FacilityDetailCalendarProps> = ({
   const isSlotSelected = useCallback((zoneId: string, date: Date, timeSlot: string) => {
     return selectedSlots.some(slot => {
       // Ensure slot.date is a Date object by converting if it's a string
-      const slotDate = slot.date instanceof Date ? slot.date : new Date(slot.date);
+      const slotDate = ensureDate(slot.date);
       return slot.zoneId === zoneId &&
         slotDate.toDateString() === date.toDateString() &&
         slot.timeSlot === timeSlot;

@@ -2,7 +2,7 @@
 import React from "react";
 import { Zone } from "@/components/booking/types";
 import { SelectedTimeSlot } from "@/utils/recurrenceEngine";
-import { ReusableCalendar } from "./ReusableCalendar";
+import { Calendar } from "./Calendar";
 import { ReusableBookingSidebar } from "./ReusableBookingSidebar";
 
 interface CalendarWithBookingProps {
@@ -44,7 +44,7 @@ export const CalendarWithBooking: React.FC<CalendarWithBookingProps> = ({
     <div className={`${isHorizontal ? 'grid grid-cols-1 lg:grid-cols-3 gap-6' : 'space-y-6'} ${compact ? 'max-w-6xl mx-auto' : 'w-full'}`}>
       {/* Calendar Section */}
       <div className={isHorizontal ? 'lg:col-span-2' : 'w-full'}>
-        <ReusableCalendar
+        <Calendar
           zones={zones}
           selectedSlots={selectedSlots}
           onSlotClick={onSlotClick}
