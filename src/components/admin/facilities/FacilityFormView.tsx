@@ -90,8 +90,22 @@ export const FacilityFormView: React.FC<FacilityFormViewProps> = ({
           <CardTitle className="text-2xl font-bold text-gray-900">Facility Management</CardTitle>
         </CardHeader>
         <CardContent>
-          <FacilityFormTabs facilityId={facility?.id}>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+          <FacilityFormTabs 
+            facilityId={facility?.id}
+            title="Facility Details"
+            actions={
+              <div className="flex justify-end space-x-4 pt-6">
+                <Button variant="outline" type="button" size="lg" onClick={onCancel} className="text-base px-8 py-3">
+                  Cancel
+                </Button>
+                <Button type="submit" size="lg" disabled={mutation.isPending} className="text-base px-8 py-3">
+                  {mutation.isPending ? "Saving..." : (isEditing ? "Update Facility" : "Create Facility")}
+                </Button>
+              </div>
+            }
+            onSubmit={handleSubmit(onSubmit)}
+          >
+            <form className="space-y-8">
               <FacilityBasicFields 
                 register={register}
                 setValue={setValue}
@@ -107,15 +121,6 @@ export const FacilityFormView: React.FC<FacilityFormViewProps> = ({
               <FacilityContactFields 
                 register={register}
               />
-
-              <div className="flex justify-end space-x-4 pt-6">
-                <Button variant="outline" type="button" size="lg" onClick={onCancel} className="text-base px-8 py-3">
-                  Cancel
-                </Button>
-                <Button type="submit" size="lg" disabled={mutation.isPending} className="text-base px-8 py-3">
-                  {mutation.isPending ? "Saving..." : (isEditing ? "Update Facility" : "Create Facility")}
-                </Button>
-              </div>
             </form>
           </FacilityFormTabs>
         </CardContent>

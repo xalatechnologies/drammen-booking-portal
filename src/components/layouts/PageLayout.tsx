@@ -7,7 +7,7 @@ import { LAYOUT_CONSTANTS } from "./constants";
 export const PageLayout: React.FC<PageLayoutProps> = ({
   children,
   maxWidth = "max-w-7xl",
-  padding = LAYOUT_CONSTANTS.PAGE_PADDING,
+  padding = "py-8",
   className = ""
 }) => {
   return (

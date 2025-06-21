@@ -1,7 +1,6 @@
-
 export const LAYOUT_CONSTANTS = {
-  // Spacing
-  PAGE_PADDING: "p-6 py-[27px] my-[23px]",
+  // Spacing - keeping original values
+  PAGE_PADDING: "py-8",
   SECTION_SPACING: "space-y-8",
   CARD_SPACING: "space-y-6",
   
@@ -9,11 +8,11 @@ export const LAYOUT_CONSTANTS = {
   PAGE_BACKGROUND: "bg-gray-50",
   CARD_BACKGROUND: "bg-white",
   
-  // Layout dimensions
+  // Layout dimensions - keeping original values
   SIDEBAR_WIDTH: "20rem", // 320px
   HEADER_HEIGHT: "4rem", // 64px
   
-  // Typography
+  // Typography - keeping original values
   PAGE_TITLE: "text-3xl font-bold text-gray-900",
   PAGE_DESCRIPTION: "text-gray-600 mt-2",
   SECTION_TITLE: "text-xl font-semibold text-gray-900",

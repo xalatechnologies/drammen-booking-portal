@@ -1,7 +1,7 @@
-import React from 'react';
-import PageHeader from '@/components/admin/PageHeader';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import React, { useState } from "react";
+import { PageHeader } from "@/components/layouts";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 const mockMessages = [
   { id: 1, from: 'Drammen Kommune Kultur', title: 'Viktig informasjon om sesongstart 2024/2025', date: '2024-08-15', read: false },
@@ -35,4 +35,4 @@ const MessagesPage = () => {
     );
 }
 
-export default MessagesPage; 
+export default MessagesPage;

@@ -1,7 +1,7 @@
-import React from 'react';
-import PageHeader from '@/components/admin/PageHeader';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import React, { useState } from "react";
+import { PageHeader } from "@/components/layouts";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';
@@ -68,4 +68,4 @@ const InvoicesPage = () => {
     );
 }
 
-export default InvoicesPage; 
+export default InvoicesPage;

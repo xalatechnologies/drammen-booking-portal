@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import PageHeader from '@/components/admin/PageHeader';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
+import React, { useState } from "react";
+import { PageHeader } from "@/components/layouts";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 
 const UserProfilePage = () => {
     const [name, setName] = useState('Ola Nordmann');
@@ -58,4 +58,4 @@ const UserProfilePage = () => {
     );
 }
 
-export default UserProfilePage; 
+export default UserProfilePage;

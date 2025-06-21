@@ -1,149 +1,129 @@
-import React, { useState, useMemo } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { PlusCircle, MoreHorizontal, Trash2, Edit } from 'lucide-react';
-import PageHeader from '@/components/admin/PageHeader';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator,
-} from '@/components/ui/dropdown-menu';
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-  } from "@/components/ui/alert-dialog"
-import { useSearch } from '@/contexts/SearchContext';
+import React, { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { PageHeader } from "@/components/layouts";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Calendar, Filter, Plus, Eye, Edit2, Trash2, Clock, MapPin } from "lucide-react";
+import { BookingService } from "@/services/BookingService";
+import { useTranslation } from "@/hooks/useTranslation";
 
-const initialUserBookings = [
-  { id: 1, facility: 'Fjell Skole - Aktivitetshall', date: '2024-09-10', time: '17:00 - 18:00', status: 'Godkjent' },
-  { id: 2, facility: 'Drammenshallen - Bane B', date: '2024-09-12', time: '19:00 - 20:30', status: 'Venter på behandling' },
-  { id: 3, facility: 'Åssiden Fotballhall', date: '2024-08-20', time: '16:00 - 17:00', status: 'Avvist' },
-];
+const BookingsPage = () => {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterType, setFilterType] = useState("all");
+  const [filterStatus, setFilterStatus] = useState("all");
+  const { tSync } = useTranslation();
 
-const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "Godkjent":
-        return <Badge variant="outline" className="text-green-600 border-green-200 bg-green-50">{status}</Badge>;
-      case "Venter på behandling":
-        return <Badge variant="outline" className="text-yellow-600 border-yellow-200 bg-yellow-50">{status}</Badge>;
-      case "Avvist":
-        return <Badge variant="outline" className="text-red-600 border-red-200 bg-red-50">{status}</Badge>;
-      default:
-        return <Badge variant="outline">{status}</Badge>;
-    }
-  };
+  const { data: bookingsResponse, isLoading, refetch } = useQuery({
+    queryKey: ['bookings'],
+    queryFn: () => BookingService.getBookings({
+      page: 1,
+      limit: 50
+    }, {}, {})
+  });
 
-const UserBookingsPage = () => {
-    const [bookings, setBookings] = useState(initialUserBookings);
-    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-    const [selectedBookingId, setSelectedBookingId] = useState<number | null>(null);
-    const { searchTerm } = useSearch();
+  const bookings = bookingsResponse?.success ? bookingsResponse.data?.data || [] : [];
 
-    const filteredBookings = useMemo(() => {
-        if (!searchTerm) return bookings;
-        return bookings.filter(booking => 
-            booking.facility.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-    }, [searchTerm, bookings]);
-
-    const handleDeleteClick = (id: number) => {
-        setSelectedBookingId(id);
-        setIsDeleteDialogOpen(true);
-    };
-
-    const confirmDelete = () => {
-        if (selectedBookingId) {
-            setBookings(bookings.filter(b => b.id !== selectedBookingId));
-        }
-        setIsDeleteDialogOpen(false);
-        setSelectedBookingId(null);
-    }
+  const filteredBookings = bookings.filter(booking => {
+    const matchesSearch = booking.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      booking.facility?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesType = filterType === "all" || booking.type === filterType;
+    const matchesStatus = filterStatus === "all" || booking.status === filterStatus;
+    return matchesSearch && matchesType && matchesStatus;
+  });
 
   return (
-    <div className="space-y-8">
-        <PageHeader 
-            title="Mine Søknader"
-            description="Her er en oversikt over dine tidligere og kommende søknader om tid."
-            actions={<Button><PlusCircle className="mr-2 h-4 w-4" /> Ny søknad</Button>}
-        />
+    <div className="w-full">
+      <PageHeader
+        title={tSync("user.bookings.title", "My Bookings")}
+        description={tSync("user.bookings.description", "View and manage your bookings")}
+        actions={
+          <Button className="flex items-center gap-2">
+            <Plus className="h-4 w-4" />
+            {tSync("user.bookings.newBooking", "New Booking")}
+          </Button>
+        }
+      />
 
-        <Card>
-            <CardHeader>
-                <CardTitle>Søknadshistorikk</CardTitle>
-            </CardHeader>
-            <CardContent>
-            <Table>
-                <TableHeader>
-                <TableRow>
-                    <TableHead>Lokale</TableHead>
-                    <TableHead>Dato</TableHead>
-                    <TableHead>Tid</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Handlinger</TableHead>
-                </TableRow>
-                </TableHeader>
-                <TableBody>
-                {filteredBookings.map((booking) => (
-                    <TableRow key={booking.id}>
-                    <TableCell className="font-medium">{booking.facility}</TableCell>
-                    <TableCell>{booking.date}</TableCell>
-                    <TableCell>{booking.time}</TableCell>
-                    <TableCell>{getStatusBadge(booking.status)}</TableCell>
-                    <TableCell className="text-right">
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" className="h-8 w-8 p-0">
-                                    <span className="sr-only">Åpne meny</span>
-                                    <MoreHorizontal className="h-4 w-4" />
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                                <DropdownMenuItem>
-                                    <Edit className="mr-2 h-4 w-4" />
-                                    <span>Endre</span>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => handleDeleteClick(booking.id)} className="text-red-600">
-                                    <Trash2 className="mr-2 h-4 w-4" />
-                                    <span>Slett</span>
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </TableCell>
-                    </TableRow>
-                ))}
-                </TableBody>
-            </Table>
-            </CardContent>
-        </Card>
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle>{tSync("user.bookings.upcomingBookings", "Upcoming Bookings")}</CardTitle>
+          <CardDescription>{tSync("user.bookings.manageBookings", "Manage your upcoming bookings")}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4">
+            <div className="flex items-center space-x-4">
+              <Input
+                placeholder={tSync("user.bookings.searchPlaceholder", "Search bookings...")}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              <Select onValueChange={setFilterType}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder={tSync("user.bookings.filterType", "Filter by type")} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{tSync("user.bookings.allTypes", "All Types")}</SelectItem>
+                  <SelectItem value="sports">{tSync("user.bookings.sports", "Sports")}</SelectItem>
+                  <SelectItem value="meeting">{tSync("user.bookings.meeting", "Meeting")}</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select onValueChange={setFilterStatus}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder={tSync("user.bookings.filterStatus", "Filter by status")} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{tSync("user.bookings.allStatuses", "All Statuses")}</SelectItem>
+                  <SelectItem value="active">{tSync("user.bookings.active", "Active")}</SelectItem>
+                  <SelectItem value="inactive">{tSync("user.bookings.inactive", "Inactive")}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-        <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-            <AlertDialogContent>
-                <AlertDialogHeader>
-                <AlertDialogTitle>Er du helt sikker?</AlertDialogTitle>
-                <AlertDialogDescription>
-                    Denne handlingen kan ikke angres. Dette vil permanent slette din bookingforespørsel.
-                </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                <AlertDialogCancel>Avbryt</AlertDialogCancel>
-                <AlertDialogAction onClick={confirmDelete} className="bg-red-600 hover:bg-red-700">
-                    Ja, slett booking
-                </AlertDialogAction>
-                </AlertDialogFooter>
-            </AlertDialogContent>
-        </AlertDialog>
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{tSync("user.bookings.tableHeader.name", "Name")}</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{tSync("user.bookings.tableHeader.facility", "Facility")}</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{tSync("user.bookings.tableHeader.date", "Date")}</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{tSync("user.bookings.tableHeader.time", "Time")}</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{tSync("user.bookings.tableHeader.status", "Status")}</th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{tSync("user.bookings.tableHeader.actions", "Actions")}</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {filteredBookings.map(booking => (
+                    <tr key={booking.id}>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{booking.name}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{booking.facility}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{booking.date}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{booking.time}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <Badge variant="secondary">{booking.status}</Badge>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <Button variant="ghost" size="icon">
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon">
+                          <Edit2 className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon">
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
 
-export default UserBookingsPage; 
+export default BookingsPage;

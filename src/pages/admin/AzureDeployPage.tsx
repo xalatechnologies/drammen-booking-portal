@@ -1,11 +1,12 @@
-
 import React, { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PageHeader } from "@/components/layouts";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RefreshCw, Server, Cloud, CheckCircle } from "lucide-react";
-import PageHeader from "@/components/admin/PageHeader";
 
 const MOCK_ENVIRONMENTS = [
   { id: "dev", name: "Utvikling", status: "OK", lastDeploy: "2024-06-18 10:00" },

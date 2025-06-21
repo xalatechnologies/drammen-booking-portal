@@ -1,102 +1,159 @@
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { ArrowRight, Clock, Users, Share2 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import PageHeader from '@/components/admin/PageHeader';
+import React, { useState } from "react";
+import { PageHeader } from "@/components/layouts";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { Calendar, Users, Clock, AlertCircle, CheckCircle, TrendingUp } from "lucide-react";
 
-export const mockRammetid = [
-  { id: 1, facility: 'Drammenshallen - Bane A', day: 'Mandager', time: '18:00 - 20:00', totalHours: 104, remainingHours: 40 },
-  { id: 2, facility: 'Brandengen Skole - Gymsal', day: 'Onsdager', time: '19:00 - 21:00', totalHours: 104, remainingHours: 60 },
-];
-
-export const mockSubOrganizations = [
-  { id: 'sub1', name: 'Drammen Håndballklubb', allocatedHours: 30 },
-  { id: 'sub2', name: 'Glassverket IF Turn', allocatedHours: 20 },
-  { id: 'sub3', name: 'Drammen Basketball', allocatedHours: 10 },
-];
-
-export const mockOrgUsers = [
-    { id: 'user1', name: 'Geir Gulliksen', role: 'Trener, A-lag' },
-    { id: 'user2', name: 'Heidi Løke', role: 'Oppmann, Junior' },
-];
-
-
-const UmbrellaOverview = () => {
-    const navigate = useNavigate();
-
-    const totalAllocatedHours = mockRammetid.reduce((acc, curr) => acc + curr.totalHours, 0);
-    const totalRemainingHours = mockRammetid.reduce((acc, curr) => acc + curr.remainingHours, 0);
+const OverviewPage = () => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
+  const [progress, setProgress] = useState(50);
 
   return (
-    <div className="p-8 space-y-8">
-       <PageHeader 
-        title="Velkommen, Paraplyadministrator"
-        description="Her kan du administrere tildelt tid og brukere for din organisasjon."
+    <div>
+      <PageHeader
+        title="Overview"
+        description="Dashboard overview and summary of key metrics"
       />
-      
-      <div className="grid gap-6 md:grid-cols-4">
-        <Card>
-          <CardContent className="p-6">
-            <Clock className="h-6 w-6 text-gray-400 mb-4" />
-            <p className="text-2xl font-bold">{totalAllocatedHours}t</p>
-            <p className="text-sm text-gray-600">Totalt tildelt tid</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-6">
-            <Clock className="h-6 w-6 text-green-500 mb-4" />
-            <p className="text-2xl font-bold">{totalRemainingHours}t</p>
-            <p className="text-sm text-gray-600">Gjenværende tid</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-6">
-            <Share2 className="h-6 w-6 text-gray-400 mb-4" />
-            <p className="text-2xl font-bold">{mockSubOrganizations.length}</p>
-            <p className="text-sm text-gray-600">Tilknyttede aktører</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-6">
-            <Users className="h-6 w-6 text-gray-400 mb-4" />
-            <p className="text-2xl font-bold">{mockOrgUsers.length}</p>
-            <p className="text-sm text-gray-600">Organisasjonsbrukere</p>
-          </CardContent>
-        </Card>
-      </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle>Snarveier</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-                <Button variant="outline" className="w-full justify-start text-lg py-6" onClick={() => navigate('/minside/paraply/rammetid')}>
-                    <Clock className="mr-4 h-5 w-5" />
-                    Administrer tildelt tid
-                </Button>
-                <Button variant="outline" className="w-full justify-start text-lg py-6" onClick={() => navigate('/minside/paraply/fordeling')}>
-                    <Share2 className="mr-4 h-5 w-5" />
-                    Fordel tid til underaktører
-                </Button>
-                <Button variant="outline" className="w-full justify-start text-lg py-6" onClick={() => navigate('/minside/paraply/brukere')}>
-                    <Users className="mr-4 h-5 w-5" />
-                    Administrer brukere
-                </Button>
-            </CardContent>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <Calendar className="w-4 h-4" />
+              <span>Bookings</span>
+            </CardTitle>
+            <CardDescription>Total number of bookings this month</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold">325</div>
+            <div className="text-sm text-gray-500">
+              <span className="flex items-center space-x-1">
+                <TrendingUp className="w-4 h-4 text-green-500" />
+                <span>+12% from last month</span>
+              </span>
+            </div>
+          </CardContent>
         </Card>
+
         <Card>
-            <CardHeader>
-                <CardTitle>Nylig aktivitet</CardTitle>
-            </CardHeader>
-            <CardContent>
-                <p className="text-gray-500">Ingen nylig aktivitet å vise.</p>
-            </CardContent>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <Users className="w-4 h-4" />
+              <span>Users</span>
+            </CardTitle>
+            <CardDescription>Total number of active users</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold">1,450</div>
+            <div className="text-sm text-gray-500">
+              <span className="flex items-center space-x-1">
+                <TrendingUp className="w-4 h-4 text-green-500" />
+                <span>+5% from last month</span>
+              </span>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <Clock className="w-4 h-4" />
+              <span>Avg. Booking Duration</span>
+            </CardTitle>
+            <CardDescription>Average duration of bookings</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold">2.5 hrs</div>
+            <div className="text-sm text-gray-500">
+              <span className="flex items-center space-x-1">
+                <TrendingUp className="w-4 h-4 text-green-500" />
+                <span>+3% from last month</span>
+              </span>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <AlertCircle className="w-4 h-4" />
+              <span>Alerts</span>
+            </CardTitle>
+            <CardDescription>System alerts and notifications</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span>Low server resources</span>
+                <Badge variant="destructive">High</Badge>
+              </div>
+              <div className="flex items-center justify-between">
+                <span>Pending user approvals</span>
+                <Badge variant="secondary">Medium</Badge>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <CheckCircle className="w-4 h-4" />
+              <span>Tasks</span>
+            </CardTitle>
+            <CardDescription>Ongoing tasks and progress</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span>Database optimization</span>
+                <span>
+                  <Progress value={progress} />
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span>User interface improvements</span>
+                <span>
+                  <Progress value={70} />
+                </span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Loading State</CardTitle>
+            <CardDescription>Demonstrates a loading state</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {loading ? (
+              <div className="animate-pulse">Loading...</div>
+            ) : (
+              <Button onClick={() => setLoading(true)}>Load Data</Button>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Error State</CardTitle>
+            <CardDescription>Demonstrates an error state</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {error ? (
+              <div className="text-red-500">Error: Could not fetch data.</div>
+            ) : (
+              <Button onClick={() => setError(true)}>Trigger Error</Button>
+            )}
+          </CardContent>
         </Card>
       </div>
     </div>
   );
 };
 
-export default UmbrellaOverview; 
+export default OverviewPage;

@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
@@ -84,6 +85,10 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
   const handleBack = () => {
     setViewMode('list');
     setSelectedFacility(null);
+  };
+
+  const handleViewModeChange = (viewId: string) => {
+    setDisplayMode(viewId as DisplayMode);
   };
 
   const viewOptions = [
@@ -208,7 +213,7 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
         <ViewToggle
           views={viewOptions}
           activeView={displayMode}
-          onViewChange={setDisplayMode}
+          onViewChange={handleViewModeChange}
         />
       </FiltersBar>
 

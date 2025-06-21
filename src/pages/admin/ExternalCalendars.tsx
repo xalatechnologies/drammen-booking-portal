@@ -1,204 +1,117 @@
-
 import React, { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { PageHeader } from "@/components/layouts";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { UploadCloud, RefreshCw } from "lucide-react";
-import PageHeader from "@/components/admin/PageHeader";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Plus, Settings, Calendar, Sync, AlertCircle } from "lucide-react";
+import { PageLayout } from "@/components/layouts";
+import { useTranslation } from "@/hooks/useTranslation";
 
-// Eksempel på ICS-hendelser (mocket)
-const MOCK_ICS_EVENTS = [
-  {
-    uid: "1234567890@example.com",
-    start: "2025-06-26T16:00:00",
-    end: "2025-06-26T18:00:00",
-    summary: "Ekstern booking - Hovedhall",
-    description: "Ekstern booking fra idrettslag",
-    location: "Brandengen Skole - Gymsal",
-  },
-  {
-    uid: "0987654321@example.com",
-    start: "2025-06-27T10:00:00",
-    end: "2025-06-27T12:00:00",
-    summary: "Ekstern booking - Møte",
-    description: "Ekstern booking fra kommune",
-    location: "Fjell Skole - Aktivitetshall",
-  },
-];
+const ExternalCalendarsPage = () => {
+  const { tSync } = useTranslation();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterType, setFilterType] = useState("all");
+  const [isSyncEnabled, setIsSyncEnabled] = useState(true);
 
-// Eksempel på Exchange-hendelser (mocket)
-const MOCK_EXCHANGE_EVENTS = [
-  {
-    id: "ex-1",
-    start: "2025-06-29T14:00:00",
-    end: "2025-06-29T16:00:00",
-    subject: "Outlook booking - Fotballhall",
-    body: "Booking fra Outlook-kalender",
-    location: "Åssiden Fotballhall",
-  },
-  {
-    id: "ex-2",
-    start: "2025-06-29T15:00:00",
-    end: "2025-06-29T17:00:00",
-    subject: "Outlook booking - Møte",
-    body: "Booking fra Exchange-kalender",
-    location: "Brandengen Skole - Gymsal",
-  },
-];
+  const handleSyncToggle = () => {
+    setIsSyncEnabled(!isSyncEnabled);
+  };
 
-const ExternalCalendars: React.FC = () => {
-  const [tab, setTab] = useState("ics");
-  const [icsEvents, setIcsEvents] = useState(MOCK_ICS_EVENTS);
-  const [exchangeEvents] = useState(MOCK_EXCHANGE_EVENTS);
-  const [icsFileName, setIcsFileName] = useState<string | null>(null);
-
-  // Simulert filopplasting
-  function handleIcsUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    if (e.target.files && e.target.files.length > 0) {
-      setIcsFileName(e.target.files[0].name);
-      setIcsEvents(MOCK_ICS_EVENTS);
-    }
-  }
-
+  const externalCalendars = [{
+    id: "1",
+    name: "Google Calendar",
+    type: "Google",
+    status: "Active",
+    lastSync: "2024-03-15 10:00",
+    syncFrequency: "Daily"
+  }, {
+    id: "2",
+    name: "Outlook Calendar",
+    type: "Outlook",
+    status: "Inactive",
+    lastSync: "Never",
+    syncFrequency: "Weekly"
+  }, {
+    id: "3",
+    name: "iCalendar",
+    type: "iCal",
+    status: "Active",
+    lastSync: "2024-03-14 14:30",
+    syncFrequency: "Daily"
+  }];
+  const filteredCalendars = externalCalendars.filter(calendar => calendar.name.toLowerCase().includes(searchTerm.toLowerCase()) && (filterType === "all" || calendar.type === filterType));
   return (
-    <div className="w-full space-y-8 p-8">
-      <PageHeader
-        title="Eksterne kalendere"
-        description="Importer og synkroniser eksterne kalenderhendelser (iCal/ICS, Exchange/Outlook) og blokker tidene i systemet."
-      />
-      
-      <Tabs value={tab} onValueChange={setTab}>
-        <TabsList className="mb-8 h-14 bg-white border border-gray-200 rounded-lg p-1">
-          <TabsTrigger 
-            value="ics" 
-            className="text-base py-3 px-6 data-[state=active]:bg-blue-600 data-[state=active]:text-white"
-          >
-            iCal/ICS
-          </TabsTrigger>
-          <TabsTrigger 
-            value="exchange" 
-            className="text-base py-3 px-6 data-[state=active]:bg-blue-600 data-[state=active]:text-white"
-          >
-            Exchange/Outlook
-          </TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="ics">
-          <Card className="shadow-lg border-0">
-            <CardHeader className="pb-6">
-              <CardTitle className="text-2xl font-bold text-gray-900">Importer ICS-fil</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-col gap-6">
-                <label className="flex items-center gap-4 cursor-pointer p-6 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 transition-colors">
-                  <UploadCloud className="h-8 w-8 text-blue-600" />
-                  <div>
-                    <span className="font-medium text-lg text-gray-900">Last opp ICS-fil</span>
-                    {icsFileName && <span className="ml-3 text-gray-500 text-base">{icsFileName}</span>}
-                  </div>
-                  <Input type="file" accept=".ics" className="hidden" onChange={handleIcsUpload} />
-                </label>
-                
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow className="bg-gray-50 border-b-2">
-                        <TableHead className="text-base font-semibold text-gray-900 py-6">Start</TableHead>
-                        <TableHead className="text-base font-semibold text-gray-900 py-6">Slutt</TableHead>
-                        <TableHead className="text-base font-semibold text-gray-900 py-6">Tittel</TableHead>
-                        <TableHead className="text-base font-semibold text-gray-900 py-6">Sted</TableHead>
-                        <TableHead className="text-base font-semibold text-gray-900 py-6">Beskrivelse</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {icsEvents.length === 0 ? (
-                        <TableRow>
-                          <TableCell colSpan={5} className="text-center text-gray-500 py-16 text-lg">
-                            Ingen hendelser funnet i ICS-fil.
-                          </TableCell>
-                        </TableRow>
-                      ) : (
-                        icsEvents.map(ev => (
-                          <TableRow key={ev.uid} className="hover:bg-blue-50 transition-colors duration-200">
-                            <TableCell className="text-base py-6">{ev.start.replace("T", " ").replace(":00", "")}</TableCell>
-                            <TableCell className="text-base py-6">{ev.end.replace("T", " ").replace(":00", "")}</TableCell>
-                            <TableCell className="text-base py-6 font-medium">{ev.summary}</TableCell>
-                            <TableCell className="text-base py-6">{ev.location}</TableCell>
-                            <TableCell className="text-base py-6">{ev.description}</TableCell>
-                          </TableRow>
-                        ))
-                      )}
-                    </TableBody>
-                  </Table>
-                </div>
-                
-                <Button 
-                  className="mt-6 w-fit text-base px-8 py-4"
-                  disabled={icsEvents.length === 0}
-                  size="lg"
-                >
-                  Blokker tidene i systemet
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="exchange">
-          <Card className="shadow-lg border-0">
-            <CardHeader className="pb-6">
-              <CardTitle className="text-2xl font-bold text-gray-900">Exchange/Outlook-synkronisering</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-col gap-6">
-                <div className="flex items-center gap-3 mb-2">
-                  <RefreshCw className="h-5 w-5 text-blue-600 animate-spin-slow" />
-                  <span className="font-medium text-base">Synkroniserer med Exchange (mock)...</span>
-                </div>
-                <div className="overflow-x-auto mt-2">
-                  <Table>
-                    <TableHeader>
-                      <TableRow className="bg-gray-50 border-b-2">
-                        <TableHead className="text-base font-semibold text-gray-900 py-6">Start</TableHead>
-                        <TableHead className="text-base font-semibold text-gray-900 py-6">Slutt</TableHead>
-                        <TableHead className="text-base font-semibold text-gray-900 py-6">Emne</TableHead>
-                        <TableHead className="text-base font-semibold text-gray-900 py-6">Sted</TableHead>
-                        <TableHead className="text-base font-semibold text-gray-900 py-6">Beskrivelse</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {exchangeEvents.length === 0 ? (
-                        <TableRow>
-                          <TableCell colSpan={5} className="text-center text-gray-500 py-16 text-lg">
-                            Ingen hendelser funnet fra Exchange.
-                          </TableCell>
-                        </TableRow>
-                      ) : (
-                        exchangeEvents.map(ev => (
-                          <TableRow key={ev.id} className="hover:bg-blue-50 transition-colors duration-200">
-                            <TableCell className="text-base py-6">{ev.start.replace("T", " ").replace(":00", "")}</TableCell>
-                            <TableCell className="text-base py-6">{ev.end.replace("T", " ").replace(":00", "")}</TableCell>
-                            <TableCell className="text-base py-6 font-medium">{ev.subject}</TableCell>
-                            <TableCell className="text-base py-6">{ev.location}</TableCell>
-                            <TableCell className="text-base py-6">{ev.body}</TableCell>
-                          </TableRow>
-                        ))
-                      )}
-                    </TableBody>
-                  </Table>
-                </div>
-                <Button className="mt-6 w-fit text-base px-8 py-4" disabled={exchangeEvents.length === 0} size="lg">
-                  Blokker tidene i systemet
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-    </div>
+    <PageLayout>
+      <PageHeader title={tSync("admin.externalCalendars.title", "External Calendars")} description={tSync("admin.externalCalendars.description", "Manage external calendar integrations")} actions={<Button><Plus className="h-4 w-4 mr-2" />
+          {tSync("admin.externalCalendars.addCalendar", "Add Calendar")}
+        </Button>} />
+      <Card>
+        <CardHeader>
+          <CardTitle>{tSync("admin.externalCalendars.calendarList", "Calendar List")}</CardTitle>
+          <CardDescription>{tSync("admin.externalCalendars.configureSync", "Configure synchronization settings for external calendars")}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4 grid-cols-1 md:grid-cols-3">
+            <Input type="search" placeholder={tSync("admin.externalCalendars.searchCalendar", "Search calendar...")} value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
+            <Select value={filterType} onValueChange={setType => setFilterType(setType)}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder={tSync("admin.externalCalendars.selectType", "Select Type")} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{tSync("admin.externalCalendars.allTypes", "All Types")}</SelectItem>
+                <SelectItem value="Google">Google</SelectItem>
+                <SelectItem value="Outlook">Outlook</SelectItem>
+                <SelectItem value="iCal">iCalendar</SelectItem>
+              </SelectContent>
+            </Select>
+            <div className="flex items-center justify-end">
+              <Label htmlFor="syncToggle" className="text-sm font-medium mr-3">{tSync("admin.externalCalendars.enableSync", "Enable Sync")}</Label>
+              <Switch id="syncToggle" checked={isSyncEnabled} onCheckedChange={handleSyncToggle} />
+            </div>
+          </div>
+          <div className="mt-6 overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{tSync("admin.externalCalendars.name", "Name")}</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{tSync("admin.externalCalendars.type", "Type")}</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{tSync("admin.externalCalendars.status", "Status")}</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{tSync("admin.externalCalendars.lastSync", "Last Sync")}</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{tSync("admin.externalCalendars.syncFrequency", "Sync Frequency")}</th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{tSync("admin.externalCalendars.actions", "Actions")}</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {filteredCalendars.map(calendar => <tr key={calendar.id}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{calendar.name}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{calendar.type}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><Badge variant={calendar.status === "Active" ? "success" : "default"}>{calendar.status}</Badge></td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{calendar.lastSync}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{calendar.syncFrequency}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <Button variant="ghost" size="sm"><Settings className="h-4 w-4 mr-2" />
+                        {tSync("admin.externalCalendars.settings", "Settings")}
+                      </Button>
+                      <Button variant="ghost" size="sm"><Sync className="h-4 w-4 mr-2" />
+                        {tSync("admin.externalCalendars.syncNow", "Sync Now")}
+                      </Button>
+                    </td>
+                  </tr>)}
+              </tbody>
+            </table>
+            {filteredCalendars.length === 0 && <div className="text-center py-4">
+                <AlertCircle className="h-6 w-6 mx-auto text-gray-400 mb-2" />
+                <p className="text-sm text-gray-500">{tSync("admin.externalCalendars.noCalendars", "No external calendars found")}</p>
+              </div>}
+          </div>
+        </CardContent>
+      </Card>
+    </PageLayout>
   );
 };
 
-export default ExternalCalendars;
+export default ExternalCalendarsPage;

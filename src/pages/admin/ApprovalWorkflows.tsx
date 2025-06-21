@@ -1,38 +1,10 @@
 import React, { useState } from "react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { PageHeader } from "@/components/layouts";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import {
-  Search,
-  Filter,
-  Clock,
-  CheckCircle,
-  XCircle,
-  Eye,
-  Calendar,
-  User,
-  ThumbsUp,
-  ThumbsDown
-} from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import PageHeader from "@/components/admin/PageHeader";
+import { Plus, Play, Pause, Edit2, Users, Clock, CheckCircle, XCircle } from "lucide-react";
+import { useTranslation } from "@/hooks/useTranslation";
 
 const initialRequests = [
   {

@@ -1,101 +1,86 @@
-
 import React, { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PageHeader } from "@/components/layouts";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Shield, Info } from "lucide-react";
-import PageHeader from "@/components/admin/PageHeader";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useTranslation } from "@/hooks/useTranslation";
 
-const MOCK_RULES = [
-  { id: "users", label: "Brukere", months: 24, enabled: true },
-  { id: "logs", label: "Logger", months: 12, enabled: true },
-  { id: "bookings", label: "Bookinger", months: 36, enabled: false },
-  { id: "messages", label: "Meldinger", months: 6, enabled: false },
-];
+const DataRetentionPage = () => {
+  const [retentionPeriod, setRetentionPeriod] = useState("3 months");
+  const [anonymizationMethod, setAnonymizationMethod] = useState("pseudonymization");
+  const { tSync } = useTranslation();
 
-const currentUser = { name: "Admin Bruker", role: "systemadmin" };
+  return (
+    <div>
+      <PageHeader
+        title={tSync("admin.dataRetention.title", "Data Retention & Anonymization")}
+        description={tSync("admin.dataRetention.description", "Configure data retention policies and anonymization methods")}
+      />
 
-const DataRetentionPage: React.FC = () => {
-  const [rules, setRules] = useState(MOCK_RULES);
-
-  function handleToggle(id: string) {
-    setRules(rules => rules.map(r => r.id === id ? { ...r, enabled: !r.enabled } : r));
-  }
-
-  function handleMonthsChange(id: string, value: string) {
-    const months = parseInt(value, 10) || 0;
-    setRules(rules => rules.map(r => r.id === id ? { ...r, months } : r));
-  }
-
-  function handleManualDelete(id: string) {
-    alert(`Sletting/anonymisering av data for ${id} (mock)`);
-  }
-
-  if (!["systemadmin", "superadmin"].includes(currentUser.role)) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Card className="max-w-md w-full">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Card>
           <CardHeader>
-            <CardTitle className="text-2xl">Ingen tilgang</CardTitle>
+            <CardTitle>{tSync("admin.dataRetention.retentionPolicy", "Retention Policy")}</CardTitle>
+            <CardDescription>{tSync("admin.dataRetention.retentionPolicyDescription", "Define how long data is stored before being anonymized or deleted.")}</CardDescription>
           </CardHeader>
-          <CardContent>
-            <p className="text-lg">Du må være systemadministrator for å se og endre datalagringsregler.</p>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="retention-period">{tSync("admin.dataRetention.retentionPeriodLabel", "Retention Period")}</Label>
+              <Select value={retentionPeriod} onValueChange={setRetentionPeriod}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder={tSync("admin.dataRetention.selectPeriod", "Select a period")} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1 month">{tSync("admin.dataRetention.oneMonth", "1 Month")}</SelectItem>
+                  <SelectItem value="3 months">{tSync("admin.dataRetention.threeMonths", "3 Months")}</SelectItem>
+                  <SelectItem value="6 months">{tSync("admin.dataRetention.sixMonths", "6 Months")}</SelectItem>
+                  <SelectItem value="1 year">{tSync("admin.dataRetention.oneYear", "1 Year")}</SelectItem>
+                  <SelectItem value="2 years">{tSync("admin.dataRetention.twoYears", "2 Years")}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Button>{tSync("admin.dataRetention.applySettings", "Apply Settings")}</Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>{tSync("admin.dataRetention.anonymizationMethod", "Anonymization Method")}</CardTitle>
+            <CardDescription>{tSync("admin.dataRetention.anonymizationMethodDescription", "Choose the method used to anonymize data after the retention period.")}</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="anonymization-method">{tSync("admin.dataRetention.anonymizationMethodLabel", "Method")}</Label>
+              <Select value={anonymizationMethod} onValueChange={setAnonymizationMethod}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder={tSync("admin.dataRetention.selectMethod", "Select a method")} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="pseudonymization">{tSync("admin.dataRetention.pseudonymization", "Pseudonymization")}</SelectItem>
+                  <SelectItem value="deletion">{tSync("admin.dataRetention.deletion", "Deletion")}</SelectItem>
+                  <SelectItem value="aggregation">{tSync("admin.dataRetention.aggregation", "Aggregation")}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Button>{tSync("admin.dataRetention.applySettings", "Apply Settings")}</Button>
+            </div>
           </CardContent>
         </Card>
       </div>
-    );
-  }
 
-  return (
-    <div className="w-full space-y-8 p-8">
-      <PageHeader
-        title="Datalagring & anonymisering"
-        description="Sett regler for hvor lenge persondata lagres og når de anonymiseres/slettes. GDPR: Persondata skal ikke lagres lenger enn nødvendig."
-      />
-      
-      <Card className="shadow-lg border-0">
-        <CardHeader className="pb-6">
-          <CardTitle className="text-2xl font-bold text-gray-900">Regler for datalagring</CardTitle>
+      <Card className="mt-6">
+        <CardHeader>
+          <CardTitle>{tSync("admin.dataRetention.complianceStatus", "Compliance Status")}</CardTitle>
+          <CardDescription>{tSync("admin.dataRetention.complianceStatusDescription", "Overview of your compliance with data retention policies.")}</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-6">
-            {rules.map(rule => (
-              <div key={rule.id} className="flex flex-col md:flex-row md:items-center gap-4 border-b pb-6 last:border-b-0 last:pb-0">
-                <div className="flex items-center gap-3 min-w-[150px]">
-                  <Checkbox 
-                    checked={rule.enabled} 
-                    onCheckedChange={() => handleToggle(rule.id)} 
-                    id={`chk-${rule.id}`}
-                    className="w-5 h-5"
-                  />
-                  <label htmlFor={`chk-${rule.id}`} className="font-medium text-lg">{rule.label}</label>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="text-base text-gray-700">Slett/anonymiser etter</span>
-                  <Input
-                    type="number"
-                    min={1}
-                    max={120}
-                    value={rule.months}
-                    onChange={e => handleMonthsChange(rule.id, e.target.value)}
-                    className="w-24 h-12 text-base"
-                    disabled={!rule.enabled}
-                  />
-                  <span className="text-base text-gray-700">måneder</span>
-                </div>
-                <Button 
-                  size="lg" 
-                  variant="outline" 
-                  onClick={() => handleManualDelete(rule.id)} 
-                  disabled={!rule.enabled}
-                  className="text-base px-6 py-3"
-                >
-                  Slett/anonymiser nå
-                </Button>
-              </div>
-            ))}
-          </div>
+          <Badge variant="outline">{tSync("admin.dataRetention.statusCompliant", "Compliant")}</Badge>
         </CardContent>
       </Card>
     </div>

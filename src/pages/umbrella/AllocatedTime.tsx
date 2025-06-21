@@ -1,45 +1,32 @@
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import PageHeader from '@/components/admin/PageHeader';
-import { mockRammetid } from './Overview';
+import React, { useState } from "react";
+import { PageHeader } from "@/components/layouts";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
-const AllocatedTime = () => {
+const AllocatedTimePage: React.FC = () => {
+  const [allocatedTime, setAllocatedTime] = useState("8 hours");
+
   return (
-    <div className="p-8">
-        <PageHeader 
-            title="Tildelt Tid (Rammetid)"
-            description="Oversikt over den totale tiden tildelt til din paraplyorganisasjon for sesongen."
-        />
-        <Card>
-            <CardHeader>
-                <CardTitle>Rammetid</CardTitle>
-            </CardHeader>
-            <CardContent>
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                        <TableHead>Lokale</TableHead>
-                        <TableHead>Dag og Tid</TableHead>
-                        <TableHead>Totalt antall timer</TableHead>
-                        <TableHead>Gjenværende timer</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {mockRammetid.map((item) => (
-                        <TableRow key={item.id}>
-                            <TableCell className="font-medium">{item.facility}</TableCell>
-                            <TableCell>{item.day}, {item.time}</TableCell>
-                            <TableCell>{item.totalHours}t</TableCell>
-                            <TableCell className="font-semibold">{item.remainingHours}t</TableCell>
-                        </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </CardContent>
-        </Card>
+    <div>
+      <PageHeader
+        title="Allocated Time"
+        description="View and manage your allocated time."
+      />
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Your Allocated Time</CardTitle>
+          <CardDescription>
+            Here you can see how much time has been allocated to you.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <p>Allocated Time: {allocatedTime}</p>
+          <Button>Adjust Time</Button>
+        </CardContent>
+      </Card>
     </div>
   );
 };
 
-export default AllocatedTime; 
+export default AllocatedTimePage;

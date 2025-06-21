@@ -1,8 +1,8 @@
-import React from 'react';
-import PageHeader from '@/components/admin/PageHeader';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import React, { useState } from "react";
+import { PageHeader } from "@/components/layouts";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const mockHistory = [
   { id: 1, user: 'Admin Bruker', userAvatar: 'https://i.pravatar.cc/150?u=admin', action: 'Endret fordeling for Drammen Turn', date: '2024-10-25 14:30' },
@@ -54,4 +54,4 @@ const HistoryLogPage = () => {
     );
 }
 
-export default HistoryLogPage; 
+export default HistoryLogPage;
