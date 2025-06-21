@@ -20,7 +20,7 @@ export class AdditionalServicesService {
     pagination: PaginationParams,
     filters?: ServiceFilters
   ) {
-    const result = await additionalServiceRepository.findAll(pagination, filters);
+    const result = await additionalServiceRepository.findAllWithFilters(pagination, filters);
     
     if (result.error) {
       return {
@@ -65,7 +65,7 @@ export class AdditionalServicesService {
     category: ServiceCategory,
     facilityId?: string
   ) {
-    const result = await additionalServiceRepository.findAll(
+    const result = await additionalServiceRepository.findAllWithFilters(
       undefined,
       { category, facilityId, isActive: true }
     );
@@ -87,7 +87,7 @@ export class AdditionalServicesService {
     facilityId: string,
     limit: number = 5
   ) {
-    const result = await additionalServiceRepository.findAll(
+    const result = await additionalServiceRepository.findAllWithFilters(
       { page: 1, limit },
       { facilityId, isActive: true }
     );

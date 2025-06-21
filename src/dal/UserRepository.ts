@@ -15,7 +15,7 @@ export class UserRepository extends SupabaseRepository<User> {
   async findByEmail(email: string): Promise<RepositoryResponse<User | null>> {
     try {
       const { data, error } = await supabase
-        .from(this.tableName)
+        .from(this.tableName as any)
         .select('*')
         .eq('email', email.toLowerCase())
         .maybeSingle();
@@ -28,7 +28,7 @@ export class UserRepository extends SupabaseRepository<User> {
       }
 
       return {
-        data: data as User | null
+        data: data as unknown as User | null
       };
     } catch (error: any) {
       return {
@@ -46,7 +46,7 @@ export class UserRepository extends SupabaseRepository<User> {
           *,
           profiles (*)
         `)
-        .eq('role', role)
+        .eq('role', role as any)
         .eq('is_active', true);
 
       if (error) {
@@ -57,7 +57,7 @@ export class UserRepository extends SupabaseRepository<User> {
       }
 
       return {
-        data: (data?.map(item => item.profiles).filter(Boolean) as User[]) || []
+        data: (data?.map((item: any) => item.profiles).filter(Boolean) as User[]) || []
       };
     } catch (error: any) {
       return {
@@ -70,7 +70,7 @@ export class UserRepository extends SupabaseRepository<User> {
   async updateLastLogin(id: string): Promise<RepositoryResponse<User | null>> {
     try {
       const { data, error } = await supabase
-        .from(this.tableName)
+        .from(this.tableName as any)
         .update({
           last_login_at: new Date().toISOString()
         })
@@ -86,7 +86,7 @@ export class UserRepository extends SupabaseRepository<User> {
       }
 
       return {
-        data: data as User | null
+        data: data as unknown as User | null
       };
     } catch (error: any) {
       return {

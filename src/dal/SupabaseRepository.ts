@@ -33,7 +33,7 @@ export abstract class SupabaseRepository<T extends Record<string, any>> {
       }
 
       return {
-        data: (data as T[]) || []
+        data: (data as unknown as T[]) || []
       };
     } catch (error: any) {
       return {
@@ -59,7 +59,7 @@ export abstract class SupabaseRepository<T extends Record<string, any>> {
       }
 
       return {
-        data: data as T | null
+        data: data as unknown as T | null
       };
     } catch (error: any) {
       return {
@@ -85,7 +85,7 @@ export abstract class SupabaseRepository<T extends Record<string, any>> {
       }
 
       return {
-        data: result as T | null
+        data: result as unknown as T | null
       };
     } catch (error: any) {
       return {
@@ -112,7 +112,7 @@ export abstract class SupabaseRepository<T extends Record<string, any>> {
       }
 
       return {
-        data: result as T | null
+        data: result as unknown as T | null
       };
     } catch (error: any) {
       return {

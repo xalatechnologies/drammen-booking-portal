@@ -14,12 +14,13 @@ export class AdditionalServiceRepository extends SupabaseRepository<AdditionalSe
     super();
   }
 
-  async findAll(
+  // Override findAll to add filtering support
+  async findAllWithFilters(
     pagination?: PaginationParams,
     filters?: ServiceFilters
   ): Promise<RepositoryResponse<AdditionalService[]>> {
     try {
-      let query = supabase.from(this.tableName).select('*');
+      let query = supabase.from(this.tableName as any).select('*');
 
       // Apply filters
       if (filters?.category) {
@@ -52,7 +53,7 @@ export class AdditionalServiceRepository extends SupabaseRepository<AdditionalSe
       }
 
       return {
-        data: (data as AdditionalService[]) || []
+        data: (data as unknown as AdditionalService[]) || []
       };
     } catch (error: any) {
       return {
@@ -62,3 +63,6 @@ export class AdditionalServiceRepository extends SupabaseRepository<AdditionalSe
     }
   }
 }
+
+// Export singleton instance
+export const additionalServiceRepository = new AdditionalServiceRepository();

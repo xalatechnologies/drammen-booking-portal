@@ -120,7 +120,6 @@ export class OrganizationRepository extends SupabaseRepository<Organization> {
       orgNumber: dbRow.org_number,
       contactEmail: dbRow.contact_email,
       contactPhone: dbRow.contact_phone,
-      description: dbRow.description,
       address: {
         street: dbRow.address_street,
         city: dbRow.address_city,
