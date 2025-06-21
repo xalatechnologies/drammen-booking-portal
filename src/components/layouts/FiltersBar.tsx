@@ -28,14 +28,14 @@ export const FiltersBar: React.FC<FiltersBarProps> = ({
               placeholder={defaultSearchPlaceholder}
               value={searchTerm}
               onChange={(e) => onSearchChange(e.target.value)}
-              className="pl-10 h-12"
+              className="pl-10 h-9"
             />
           </div>
         )}
         
         {selectFilters.map((filter) => (
           <Select key={filter.id} value={filter.value} onValueChange={filter.onChange}>
-            <SelectTrigger className="w-[200px] h-12">
+            <SelectTrigger className="w-[180px] h-9">
               <SelectValue placeholder={filter.label} />
             </SelectTrigger>
             <SelectContent>

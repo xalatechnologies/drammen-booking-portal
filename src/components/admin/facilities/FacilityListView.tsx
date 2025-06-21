@@ -192,16 +192,17 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3">
       <PageHeader
         title={tSync("admin.facilities.management", "Facilities Management")}
         description={tSync("admin.facilities.pageDescription", "Manage facility information, availability and settings")}
         actions={
-          <Button onClick={handleAddNew} className="flex items-center gap-2">
+          <Button onClick={handleAddNew} className="flex items-center gap-2 h-8 px-3 text-sm">
             <Plus className="h-4 w-4" />
             {tSync("admin.facilities.addNew", "Add New Facility")}
           </Button>
         }
+        className="mb-3"
       />
 
       <FiltersBar
@@ -209,6 +210,7 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
         onSearchChange={setSearchTerm}
         searchPlaceholder={tSync("admin.facilities.search.placeholder", "Search facilities...")}
         selectFilters={filterOptions}
+        className="mb-3"
       >
         <ViewToggle
           views={viewOptions}

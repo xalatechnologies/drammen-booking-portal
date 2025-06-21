@@ -6,7 +6,7 @@ const FacilitiesPage = () => {
   const [selectedFacilityId, setSelectedFacilityId] = useState<number | undefined>();
 
   return (
-    <div className="w-full h-full">
+    <div className="w-full h-full p-3">
       <FacilityListView 
         selectedFacilityId={selectedFacilityId}
         onFacilitySelect={setSelectedFacilityId}
