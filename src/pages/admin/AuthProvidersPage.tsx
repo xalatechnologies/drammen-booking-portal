@@ -136,21 +136,21 @@ const AuthProvidersPage: React.FC = () => {
             <div className="space-y-3">
               <label className="block text-base font-medium text-gray-900 flex items-center">
                 Client ID 
-                <Info className="h-4 w-4 text-gray-400 ml-1" title="OIDC Client ID" />
+                <Info className="h-4 w-4 text-gray-400 ml-1" />
               </label>
               <Input placeholder="client-id-123" defaultValue="" className="h-12 text-base" />
             </div>
             <div className="space-y-3">
               <label className="block text-base font-medium text-gray-900 flex items-center">
                 Client Secret 
-                <Info className="h-4 w-4 text-gray-400 ml-1" title="OIDC Client Secret" />
+                <Info className="h-4 w-4 text-gray-400 ml-1" />
               </label>
               <Input placeholder="••••••••" type="password" defaultValue="" className="h-12 text-base" />
             </div>
             <div className="space-y-3">
               <label className="block text-base font-medium text-gray-900 flex items-center">
                 Discovery URL 
-                <Info className="h-4 w-4 text-gray-400 ml-1" title="OIDC Discovery URL" />
+                <Info className="h-4 w-4 text-gray-400 ml-1" />
               </label>
               <Input placeholder="https://login.example.com/.well-known/openid-configuration" defaultValue="" className="h-12 text-base" />
             </div>
@@ -158,7 +158,7 @@ const AuthProvidersPage: React.FC = () => {
               <div className="space-y-3">
                 <label className="block text-base font-medium text-gray-900 flex items-center">
                   SCIM-endepunkt 
-                  <Info className="h-4 w-4 text-gray-400 ml-1" title="SCIM API-endepunkt" />
+                  <Info className="h-4 w-4 text-gray-400 ml-1" />
                 </label>
                 <Input placeholder="https://scim.example.com/v2/" defaultValue="" className="h-12 text-base" />
               </div>
