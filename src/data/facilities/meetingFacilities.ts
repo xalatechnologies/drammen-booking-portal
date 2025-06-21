@@ -1,5 +1,4 @@
 
-
 import { LocalizedFacility } from '@/types/localization';
 
 export const meetingFacilities: LocalizedFacility[] = [
@@ -10,10 +9,15 @@ export const meetingFacilities: LocalizedFacility[] = [
       EN: "Marienlyst Stadium - Meeting Room"
     },
     address: "Schwartz gate 2, 3043 Drammen",
+    address_street: "Schwartz gate 2",
+    address_city: "Drammen",
+    address_postal_code: "3043",
+    address_country: "Norway",
     type: "Møtesal",
     area: "Strømsø",
     status: 'active',
     image: "/lovable-uploads/07eaca70-1e9b-4e73-ab4e-6b9b7f1ca27e.png",
+    image_url: "/lovable-uploads/07eaca70-1e9b-4e73-ab4e-6b9b7f1ca27e.png",
     next_available: "Lørdag, 10:00",
     capacity: 80,
     accessibility_features: ["wheelchair"],
@@ -47,12 +51,27 @@ export const meetingFacilities: LocalizedFacility[] = [
     has_auto_approval: true,
     lat: 59.7389,
     lng: 10.2167,
+    latitude: 59.7389,
+    longitude: 10.2167,
     season: {
       from: "2024-01-01",
       to: "2024-12-31"
     },
+    season_from: "2024-01-01",
+    season_to: "2024-12-31",
     allowed_booking_types: ['engangs', 'fastlan', 'rammetid', 'strotimer'],
     zones: [],
+    time_slot_duration: 1,
+    booking_lead_time_hours: 2,
+    max_advance_booking_days: 365,
+    cancellation_deadline_hours: 24,
+    is_featured: false,
+    created_at: "2024-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z",
+    area_sqm: null,
+    contact_name: null,
+    contact_email: null,
+    contact_phone: null,
     availableTimes: [
       {
         date: new Date(2025, 4, 30),
@@ -70,10 +89,15 @@ export const meetingFacilities: LocalizedFacility[] = [
       EN: "Drammen Library - Meeting Room"
     },
     address: "Grønland 32, 3045 Drammen",
+    address_street: "Grønland 32",
+    address_city: "Drammen",
+    address_postal_code: "3045",
+    address_country: "Norway",
     type: "Møterom",
     area: "Bragernes",
     status: 'active',
     image: "/lovable-uploads/08e8f8d5-4126-4805-a56e-e4337f97dbd0.png",
+    image_url: "/lovable-uploads/08e8f8d5-4126-4805-a56e-e4337f97dbd0.png",
     next_available: "Mandag, 09:00",
     capacity: 25,
     accessibility_features: ["wheelchair", "hearing-loop", "sign-language"],
@@ -107,12 +131,27 @@ export const meetingFacilities: LocalizedFacility[] = [
     has_auto_approval: true,
     lat: 59.7423,
     lng: 10.2056,
+    latitude: 59.7423,
+    longitude: 10.2056,
     season: {
       from: "2024-01-01",
       to: "2024-12-31"
     },
+    season_from: "2024-01-01",
+    season_to: "2024-12-31",
     allowed_booking_types: ['engangs', 'fastlan', 'rammetid', 'strotimer'],
     zones: [],
+    time_slot_duration: 1,
+    booking_lead_time_hours: 2,
+    max_advance_booking_days: 365,
+    cancellation_deadline_hours: 24,
+    is_featured: false,
+    created_at: "2024-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z",
+    area_sqm: null,
+    contact_name: null,
+    contact_email: null,
+    contact_phone: null,
     availableTimes: [
       {
         date: new Date(2025, 5, 2),
@@ -132,10 +171,15 @@ export const meetingFacilities: LocalizedFacility[] = [
       EN: "Tangen School - Classroom"
     },
     address: "Tangenvegen 45, 3047 Drammen",
+    address_street: "Tangenvegen 45",
+    address_city: "Drammen",
+    address_postal_code: "3047",
+    address_country: "Norway",
     type: "Klasserom",
     area: "Tangen",
     status: 'active',
     image: "/lovable-uploads/13aee1f6-e9d9-474b-9ed7-c656d703d19b.png",
+    image_url: "/lovable-uploads/13aee1f6-e9d9-474b-9ed7-c656d703d19b.png",
     next_available: "Onsdag, 17:00",
     capacity: 30,
     accessibility_features: ["wheelchair"],
@@ -169,12 +213,27 @@ export const meetingFacilities: LocalizedFacility[] = [
     has_auto_approval: true,
     lat: 59.7512,
     lng: 10.2234,
+    latitude: 59.7512,
+    longitude: 10.2234,
     season: {
       from: "2024-01-01",
       to: "2024-12-31"
     },
+    season_from: "2024-01-01",
+    season_to: "2024-12-31",
     allowed_booking_types: ['engangs', 'fastlan', 'rammetid', 'strotimer'],
     zones: [],
+    time_slot_duration: 1,
+    booking_lead_time_hours: 2,
+    max_advance_booking_days: 365,
+    cancellation_deadline_hours: 24,
+    is_featured: false,
+    created_at: "2024-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z",
+    area_sqm: null,
+    contact_name: null,
+    contact_email: null,
+    contact_phone: null,
     availableTimes: [
       {
         date: new Date(2025, 5, 4),
@@ -192,10 +251,15 @@ export const meetingFacilities: LocalizedFacility[] = [
       EN: "Buskerud City Hall - Assembly Hall"
     },
     address: "Gamle Kirkeplass 3, 3012 Drammen",
+    address_street: "Gamle Kirkeplass 3",
+    address_city: "Drammen",
+    address_postal_code: "3012",
+    address_country: "Norway",
     type: "Forsamlingssal",
     area: "Bragernes",
     status: 'active',
     image: "/lovable-uploads/b692664c-737a-4a20-8673-25a401789f82.png",
+    image_url: "/lovable-uploads/b692664c-737a-4a20-8673-25a401789f82.png",
     next_available: "Fredag, 14:00",
     capacity: 100,
     accessibility_features: ["wheelchair", "hearing-loop", "sign-language"],
@@ -229,12 +293,27 @@ export const meetingFacilities: LocalizedFacility[] = [
     has_auto_approval: false,
     lat: 59.7445,
     lng: 10.2089,
+    latitude: 59.7445,
+    longitude: 10.2089,
     season: {
       from: "2024-01-01",
       to: "2024-12-31"
     },
+    season_from: "2024-01-01",
+    season_to: "2024-12-31",
     allowed_booking_types: ['engangs', 'fastlan', 'rammetid', 'strotimer'],
     zones: [],
+    time_slot_duration: 1,
+    booking_lead_time_hours: 2,
+    max_advance_booking_days: 365,
+    cancellation_deadline_hours: 24,
+    is_featured: false,
+    created_at: "2024-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z",
+    area_sqm: null,
+    contact_name: null,
+    contact_email: null,
+    contact_phone: null,
     availableTimes: [
       {
         date: new Date(2025, 5, 6),
@@ -245,4 +324,3 @@ export const meetingFacilities: LocalizedFacility[] = [
     ]
   }
 ];
-
