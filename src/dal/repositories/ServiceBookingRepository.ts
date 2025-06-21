@@ -1,7 +1,6 @@
 
-import { BaseRepository } from '../BaseRepository';
+import { SupabaseRepository } from '../SupabaseRepository';
 import { ServiceBooking, ServiceBookingStatus } from '@/types/additionalServices';
-import { ApiResponse } from '@/types/api';
 
 interface ServiceBookingFilters {
   bookingId?: string;
@@ -12,120 +11,111 @@ interface ServiceBookingFilters {
 }
 
 interface ServiceBookingCreateRequest {
-  bookingId: string;
-  serviceId: string;
+  booking_id: string;
+  service_id: string;
   quantity: number;
-  startTime?: Date;
-  endTime?: Date;
-  specialInstructions?: string;
-  deliveryLocation?: string;
-  pricing: {
-    unitPrice: number;
-    totalPrice: number;
-    discounts: number;
-    surcharges: number;
-  };
+  start_time?: Date;
+  end_time?: Date;
+  special_instructions?: string;
+  unit_price: number;
+  total_price: number;
 }
 
 interface ServiceBookingUpdateRequest extends Partial<ServiceBookingCreateRequest> {
   status?: ServiceBookingStatus;
-  assignedStaff?: string[];
 }
 
-export class ServiceBookingRepository extends BaseRepository<
-  ServiceBooking,
-  ServiceBookingFilters,
-  ServiceBookingCreateRequest,
-  ServiceBookingUpdateRequest
-> {
+export class ServiceBookingRepository extends SupabaseRepository<ServiceBooking> {
+  protected tableName = 'service_bookings';
+
   constructor() {
-    super([]);
+    super();
   }
 
-  protected getId(serviceBooking: ServiceBooking): string {
-    return serviceBooking.id;
-  }
-
-  protected applyFilters(serviceBookings: ServiceBooking[], filters: ServiceBookingFilters): ServiceBooking[] {
-    return serviceBookings.filter(serviceBooking => {
-      if (filters.bookingId && serviceBooking.bookingId !== filters.bookingId) return false;
-      if (filters.serviceId && serviceBooking.serviceId !== filters.serviceId) return false;
-      if (filters.status && serviceBooking.status !== filters.status) return false;
-      if (filters.startDate && serviceBooking.startTime && serviceBooking.startTime < filters.startDate) return false;
-      if (filters.endDate && serviceBooking.startTime && serviceBooking.startTime > filters.endDate) return false;
-      return true;
-    });
-  }
-
-  protected createEntity(request: ServiceBookingCreateRequest): ServiceBooking {
-    const newId = `service-booking-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    
-    return {
-      id: newId,
-      bookingId: request.bookingId,
-      serviceId: request.serviceId,
-      quantity: request.quantity,
-      startTime: request.startTime,
-      endTime: request.endTime,
-      specialInstructions: request.specialInstructions,
-      status: 'pending',
-      assignedStaff: [],
-      deliveryLocation: request.deliveryLocation,
-      pricing: request.pricing,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
-  }
-
-  protected updateEntity(existing: ServiceBooking, request: ServiceBookingUpdateRequest): ServiceBooking {
-    return {
-      ...existing,
-      ...request,
-      updatedAt: new Date()
-    };
-  }
-
-  async getServiceBookingsByBooking(bookingId: string): Promise<ApiResponse<ServiceBooking[]>> {
+  async findAll(
+    pagination?: PaginationParams,
+    filters?: ServiceBookingFilters
+  ): Promise<RepositoryResponse<ServiceBooking[]>> {
     try {
-      const serviceBookings = this.data.filter(sb => sb.bookingId === bookingId);
-      return { success: true, data: serviceBookings };
-    } catch (error) {
+      let query = supabase.from(this.tableName).select('*');
+
+      // Apply filters
+      if (filters?.bookingId) {
+        query = query.eq('booking_id', filters.bookingId);
+      }
+      if (filters?.serviceId) {
+        query = query.eq('service_id', filters.serviceId);
+      }
+      if (filters?.status) {
+        query = query.eq('status', filters.status);
+      }
+      if (filters?.startDate) {
+        query = query.gte('start_time', filters.startDate.toISOString());
+      }
+      if (filters?.endDate) {
+        query = query.lte('start_time', filters.endDate.toISOString());
+      }
+
+      // Apply pagination
+      if (pagination) {
+        const from = (pagination.page - 1) * pagination.limit;
+        const to = from + pagination.limit - 1;
+        query = query.range(from, to);
+      }
+
+      const { data, error } = await query;
+
+      if (error) {
+        return {
+          data: [],
+          error: error.message
+        };
+      }
+
       return {
-        success: false,
-        error: { message: 'Failed to fetch service bookings', details: error }
+        data: (data as ServiceBooking[]) || []
+      };
+    } catch (error: any) {
+      return {
+        data: [],
+        error: error.message
       };
     }
   }
 
+  async getServiceBookingsByBooking(bookingId: string): Promise<RepositoryResponse<ServiceBooking[]>> {
+    return this.findAll(undefined, { bookingId });
+  }
+
   async updateServiceBookingStatus(
     serviceBookingId: string,
-    status: ServiceBookingStatus,
-    assignedStaff?: string[]
-  ): Promise<ApiResponse<ServiceBooking>> {
+    status: ServiceBookingStatus
+  ): Promise<RepositoryResponse<ServiceBooking | null>> {
     try {
-      const existing = this.data.find(sb => sb.id === serviceBookingId);
-      if (!existing) {
+      const { data, error } = await supabase
+        .from(this.tableName)
+        .update({
+          status,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', serviceBookingId)
+        .select()
+        .maybeSingle();
+
+      if (error) {
         return {
-          success: false,
-          error: { message: 'Service booking not found' }
+          data: null,
+          error: error.message
         };
       }
 
-      const updated = {
-        ...existing,
-        status,
-        assignedStaff: assignedStaff || existing.assignedStaff,
-        updatedAt: new Date()
-      };
-
-      const index = this.data.findIndex(sb => sb.id === serviceBookingId);
-      this.data[index] = updated;
-
-      return { success: true, data: updated };
-    } catch (error) {
       return {
-        success: false,
-        error: { message: 'Failed to update service booking status', details: error }
+        data: data as ServiceBooking | null
+      };
+    } catch (error: any) {
+      return {
+        data: null,
+        error: error.message
       };
     }
   }

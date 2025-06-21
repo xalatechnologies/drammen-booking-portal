@@ -1,94 +1,86 @@
 
+import { SupabaseRepository } from '../SupabaseRepository';
 import { LocalizedFacility } from '@/types/localization';
 import { Zone } from '@/types/zone';
-import { FacilityFilters } from '@/types/facility';
+import { FacilityFilters, FacilitySortOptions } from '@/types/facility';
 import { PaginationParams, PaginatedResponse, RepositoryResponse } from '@/types/api';
 
-export class LocalizedFacilityRepository {
-  private facilities: LocalizedFacility[];
+export class LocalizedFacilityRepository extends SupabaseRepository<LocalizedFacility> {
+  protected tableName = 'facilities';
 
-  constructor(facilities: LocalizedFacility[]) {
-    this.facilities = facilities;
+  constructor() {
+    super();
   }
 
   async findAllRaw(
     pagination: PaginationParams,
     filters?: FacilityFilters,
-    sortField?: string,
-    sortDirection: 'asc' | 'desc' = 'asc'
+    orderBy?: string,
+    orderDirection: 'asc' | 'desc' = 'asc'
   ): Promise<RepositoryResponse<PaginatedResponse<LocalizedFacility>>> {
     try {
-      let filteredFacilities = [...this.facilities];
+      let query = supabase
+        .from(this.tableName)
+        .select(`
+          *,
+          facility_translations(*),
+          facility_images(*)
+        `, { count: 'exact' });
 
       // Apply filters
-      if (filters?.facilityType && filters.facilityType !== 'all') {
-        filteredFacilities = filteredFacilities.filter(f => f.type === filters.facilityType);
+      if (filters?.type && filters.type.length > 0) {
+        query = query.in('type', filters.type);
       }
-
-      if (filters?.location && filters.location !== 'all') {
-        filteredFacilities = filteredFacilities.filter(f => f.area === filters.location);
+      if (filters?.area && filters.area.length > 0) {
+        query = query.in('area', filters.area);
       }
-
-      if (filters?.searchTerm) {
-        const searchTerm = filters.searchTerm.toLowerCase();
-        filteredFacilities = filteredFacilities.filter(f => 
-          f.name.NO.toLowerCase().includes(searchTerm) ||
-          f.name.EN.toLowerCase().includes(searchTerm) ||
-          f.description.NO.toLowerCase().includes(searchTerm) ||
-          f.description.EN.toLowerCase().includes(searchTerm)
-        );
+      if (filters?.search) {
+        query = query.or(`name.ilike.%${filters.search}%,description.ilike.%${filters.search}%`);
       }
 
       // Apply sorting
-      if (sortField) {
-        filteredFacilities.sort((a, b) => {
-          let aValue: any;
-          let bValue: any;
-
-          switch (sortField) {
-            case 'name':
-              aValue = a.name.NO;
-              bValue = b.name.NO;
-              break;
-            case 'capacity':
-              aValue = a.capacity;
-              bValue = b.capacity;
-              break;
-            case 'price_per_hour':
-              aValue = a.pricePerHour || a.price_per_hour;
-              bValue = b.pricePerHour || b.price_per_hour;
-              break;
-            default:
-              return 0;
-          }
-
-          if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
-          if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
-          return 0;
-        });
+      if (orderBy) {
+        query = query.order(orderBy, { ascending: orderDirection === 'asc' });
       }
 
       // Apply pagination
-      const total = filteredFacilities.length;
-      const totalPages = Math.ceil(total / pagination.limit);
-      const startIndex = (pagination.page - 1) * pagination.limit;
-      const endIndex = startIndex + pagination.limit;
-      const paginatedData = filteredFacilities.slice(startIndex, endIndex);
+      const from = (pagination.page - 1) * pagination.limit;
+      const to = from + pagination.limit - 1;
+      query = query.range(from, to);
 
-      const result: PaginatedResponse<LocalizedFacility> = {
-        data: paginatedData,
-        pagination: {
-          page: pagination.page,
-          limit: pagination.limit,
-          total,
-          totalPages,
-          hasNext: pagination.page < totalPages,
-          hasPrev: pagination.page > 1
-        }
-      };
+      const { data, error, count } = await query;
+
+      if (error) {
+        return {
+          data: {
+            data: [],
+            pagination: {
+              page: pagination.page,
+              limit: pagination.limit,
+              total: 0,
+              totalPages: 0,
+              hasNext: false,
+              hasPrev: false
+            }
+          },
+          error: error.message
+        };
+      }
+
+      const totalPages = Math.ceil((count || 0) / pagination.limit);
 
       return {
-        data: result
+        data: {
+          data: (data as LocalizedFacility[]) || [],
+          pagination: {
+            page: pagination.page,
+            limit: pagination.limit,
+            total: count || 0,
+            totalPages,
+            hasNext: pagination.page < totalPages,
+            hasPrev: pagination.page > 1
+          }
+        }
       };
     } catch (error: any) {
       return {
@@ -110,9 +102,25 @@ export class LocalizedFacilityRepository {
 
   async findByIdRaw(id: string): Promise<RepositoryResponse<LocalizedFacility | null>> {
     try {
-      const facility = this.facilities.find(f => f.id.toString() === id);
+      const { data, error } = await supabase
+        .from(this.tableName)
+        .select(`
+          *,
+          facility_translations(*),
+          facility_images(*)
+        `)
+        .eq('id', parseInt(id))
+        .maybeSingle();
+
+      if (error) {
+        return {
+          data: null,
+          error: error.message
+        };
+      }
+
       return {
-        data: facility || null
+        data: data as LocalizedFacility | null
       };
     } catch (error: any) {
       return {
@@ -124,9 +132,20 @@ export class LocalizedFacilityRepository {
 
   async getZonesByFacilityId(facilityId: string): Promise<RepositoryResponse<Zone[]>> {
     try {
-      const facility = this.facilities.find(f => f.id.toString() === facilityId);
+      const { data, error } = await supabase
+        .from('zones')
+        .select('*')
+        .eq('facility_id', parseInt(facilityId));
+
+      if (error) {
+        return {
+          data: [],
+          error: error.message
+        };
+      }
+
       return {
-        data: facility?.zones || []
+        data: (data as Zone[]) || []
       };
     } catch (error: any) {
       return {
@@ -138,16 +157,21 @@ export class LocalizedFacilityRepository {
 
   async getZoneById(zoneId: string): Promise<RepositoryResponse<Zone | null>> {
     try {
-      for (const facility of this.facilities) {
-        const zone = facility.zones?.find(z => z.id === zoneId);
-        if (zone) {
-          return {
-            data: zone
-          };
-        }
+      const { data, error } = await supabase
+        .from('zones')
+        .select('*')
+        .eq('id', zoneId)
+        .maybeSingle();
+
+      if (error) {
+        return {
+          data: null,
+          error: error.message
+        };
       }
+
       return {
-        data: null
+        data: data as Zone | null
       };
     } catch (error: any) {
       return {
@@ -159,9 +183,24 @@ export class LocalizedFacilityRepository {
 
   async getRawFacilitiesByType(type: string): Promise<RepositoryResponse<LocalizedFacility[]>> {
     try {
-      const facilities = this.facilities.filter(f => f.type === type);
+      const { data, error } = await supabase
+        .from(this.tableName)
+        .select(`
+          *,
+          facility_translations(*),
+          facility_images(*)
+        `)
+        .eq('type', type);
+
+      if (error) {
+        return {
+          data: [],
+          error: error.message
+        };
+      }
+
       return {
-        data: facilities
+        data: (data as LocalizedFacility[]) || []
       };
     } catch (error: any) {
       return {
@@ -173,9 +212,24 @@ export class LocalizedFacilityRepository {
 
   async getRawFacilitiesByArea(area: string): Promise<RepositoryResponse<LocalizedFacility[]>> {
     try {
-      const facilities = this.facilities.filter(f => f.area === area);
+      const { data, error } = await supabase
+        .from(this.tableName)
+        .select(`
+          *,
+          facility_translations(*),
+          facility_images(*)
+        `)
+        .eq('area', area);
+
+      if (error) {
+        return {
+          data: [],
+          error: error.message
+        };
+      }
+
       return {
-        data: facilities
+        data: (data as LocalizedFacility[]) || []
       };
     } catch (error: any) {
       return {
