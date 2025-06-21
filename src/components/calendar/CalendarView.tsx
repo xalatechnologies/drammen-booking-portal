@@ -166,7 +166,14 @@ const CalendarView: React.FC<CalendarViewWithToggleProps> = ({
                     subZones: [],
                     amenities: [],
                     features: [],
-                    bookingRules: [],
+                    bookingRules: {
+                      minBookingDuration: 1,
+                      maxBookingDuration: 8,
+                      allowedTimeSlots: [],
+                      bookingTypes: ['one-time', 'recurring', 'fixed-lease'],
+                      advanceBookingDays: 90,
+                      cancellationHours: 24
+                    },
                     adminInfo: {
                       contactPersonName: "Facility Manager",
                       contactPersonEmail: "manager@facility.no",
