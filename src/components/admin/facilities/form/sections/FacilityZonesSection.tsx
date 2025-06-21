@@ -2,15 +2,12 @@
 import React, { useState } from "react";
 import { UseFormReturn } from "react-hook-form";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
 import { FacilityFormData } from "../FacilityFormSchema";
 import { useTranslation } from "@/hooks/useTranslation";
-import { Plus, Trash2, Grid3X3, Move } from "lucide-react";
+import { Plus, Grid3X3, Move, Edit, Trash2 } from "lucide-react";
+import { ZoneEditor } from "./zones/ZoneEditor";
 
 interface FacilityZonesSectionProps {
   form: UseFormReturn<FacilityFormData>;
@@ -29,65 +26,35 @@ interface Zone {
   floor: string;
   equipment: string[];
   status: 'active' | 'maintenance' | 'inactive';
+  priceMultiplier: number;
+  minBookingDuration: number;
+  maxBookingDuration: number;
 }
 
 export const FacilityZonesSection: React.FC<FacilityZonesSectionProps> = ({ form, facilityId }) => {
   const { tSync } = useTranslation();
   const [zones, setZones] = useState<Zone[]>([]);
   const [isAddingZone, setIsAddingZone] = useState(false);
-  const [newZone, setNewZone] = useState<Partial<Zone>>({
-    name: '',
-    type: 'room',
-    capacity: 1,
-    description: '',
-    isMainZone: false,
-    bookableIndependently: true,
-    areaSqm: 0,
-    floor: '',
-    equipment: [],
-    status: 'active'
-  });
+  const [editingZone, setEditingZone] = useState<Zone | null>(null);
 
-  const addZone = () => {
-    if (newZone.name && newZone.capacity) {
-      const zone: Zone = {
-        id: Date.now().toString(),
-        name: newZone.name,
-        type: newZone.type as Zone['type'],
-        capacity: newZone.capacity,
-        description: newZone.description || '',
-        isMainZone: newZone.isMainZone || false,
-        bookableIndependently: newZone.bookableIndependently || true,
-        areaSqm: newZone.areaSqm || 0,
-        floor: newZone.floor || '',
-        equipment: newZone.equipment || [],
-        status: newZone.status as Zone['status'] || 'active'
-      };
+  const handleSaveZone = (zone: Zone) => {
+    if (editingZone) {
+      setZones(zones.map(z => z.id === zone.id ? zone : z));
+      setEditingZone(null);
+    } else {
       setZones([...zones, zone]);
-      setNewZone({
-        name: '',
-        type: 'room',
-        capacity: 1,
-        description: '',
-        isMainZone: false,
-        bookableIndependently: true,
-        areaSqm: 0,
-        floor: '',
-        equipment: [],
-        status: 'active'
-      });
       setIsAddingZone(false);
     }
   };
 
-  const removeZone = (id: string) => {
+  const handleDeleteZone = (id: string) => {
     setZones(zones.filter(zone => zone.id !== id));
   };
 
   const getZoneTypeLabel = (type: string) => {
     const labels = {
       'court': 'Court',
-      'room': 'Room',
+      'room': 'Room', 
       'area': 'Area',
       'section': 'Section',
       'field': 'Field'
@@ -103,6 +70,31 @@ export const FacilityZonesSection: React.FC<FacilityZonesSectionProps> = ({ form
       default: return 'bg-gray-100 text-gray-800';
     }
   };
+
+  const getZoneTypeIcon = (type: string) => {
+    const icons = {
+      court: '🏐',
+      room: '🏢',
+      area: '📐',
+      section: '📋',
+      field: '⚽'
+    };
+    return icons[type as keyof typeof icons] || '📋';
+  };
+
+  if (isAddingZone || editingZone) {
+    return (
+      <ZoneEditor
+        zone={editingZone || undefined}
+        onSave={handleSaveZone}
+        onCancel={() => {
+          setIsAddingZone(false);
+          setEditingZone(null);
+        }}
+        existingZones={zones}
+      />
+    );
+  }
 
   return (
     <Card>
@@ -124,6 +116,7 @@ export const FacilityZonesSection: React.FC<FacilityZonesSectionProps> = ({ form
           <div className="space-y-3">
             {zones.map((zone) => (
               <div key={zone.id} className="flex items-center gap-4 p-4 border rounded-lg bg-card">
+                <div className="text-2xl">{getZoneTypeIcon(zone.type)}</div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
                     <h4 className="font-medium">{zone.name}</h4>
@@ -140,7 +133,7 @@ export const FacilityZonesSection: React.FC<FacilityZonesSectionProps> = ({ form
                       <span className="font-medium">Area:</span> {zone.areaSqm} m²
                     </div>
                     <div>
-                      <span className="font-medium">Floor:</span> {zone.floor || 'Ground'}
+                      <span className="font-medium">Price:</span> ×{zone.priceMultiplier}
                     </div>
                     <div>
                       <span className="font-medium">Equipment:</span> {zone.equipment.length} items
@@ -151,13 +144,20 @@ export const FacilityZonesSection: React.FC<FacilityZonesSectionProps> = ({ form
                   )}
                 </div>
                 <div className="flex gap-2">
+                  <Button 
+                    size="sm" 
+                    variant="ghost"
+                    onClick={() => setEditingZone(zone)}
+                  >
+                    <Edit className="w-4 h-4" />
+                  </Button>
                   <Button size="sm" variant="ghost">
                     <Move className="w-4 h-4" />
                   </Button>
                   <Button 
                     size="sm" 
                     variant="ghost" 
-                    onClick={() => removeZone(zone.id)}
+                    onClick={() => handleDeleteZone(zone.id)}
                     className="text-red-500 hover:text-red-700"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -168,124 +168,11 @@ export const FacilityZonesSection: React.FC<FacilityZonesSectionProps> = ({ form
           </div>
         )}
 
-        {/* Add Zone Section */}
-        {isAddingZone ? (
-          <div className="space-y-4 p-4 border-2 border-dashed rounded-lg">
-            <h3 className="font-medium">{tSync("admin.facilities.form.zones.addNew", "Add New Zone")}</h3>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-medium">{tSync("admin.facilities.form.zones.name", "Zone Name")} *</label>
-                <Input
-                  value={newZone.name}
-                  onChange={(e) => setNewZone({...newZone, name: e.target.value})}
-                  placeholder="e.g., Court A, Meeting Room 1"
-                />
-              </div>
-              
-              <div>
-                <label className="text-sm font-medium">{tSync("admin.facilities.form.zones.type", "Zone Type")}</label>
-                <Select onValueChange={(value) => setNewZone({...newZone, type: value as Zone['type']})}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="court">Court</SelectItem>
-                    <SelectItem value="room">Room</SelectItem>
-                    <SelectItem value="area">Area</SelectItem>
-                    <SelectItem value="section">Section</SelectItem>
-                    <SelectItem value="field">Field</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <label className="text-sm font-medium">{tSync("admin.facilities.form.zones.capacity", "Capacity")} *</label>
-                <Input
-                  type="number"
-                  value={newZone.capacity}
-                  onChange={(e) => setNewZone({...newZone, capacity: parseInt(e.target.value) || 1})}
-                  placeholder="Number of people"
-                />
-              </div>
-
-              <div>
-                <label className="text-sm font-medium">{tSync("admin.facilities.form.zones.area", "Area (m²)")}</label>
-                <Input
-                  type="number"
-                  value={newZone.areaSqm}
-                  onChange={(e) => setNewZone({...newZone, areaSqm: parseFloat(e.target.value) || 0})}
-                  placeholder="Square meters"
-                />
-              </div>
-
-              <div>
-                <label className="text-sm font-medium">{tSync("admin.facilities.form.zones.floor", "Floor/Level")}</label>
-                <Input
-                  value={newZone.floor}
-                  onChange={(e) => setNewZone({...newZone, floor: e.target.value})}
-                  placeholder="e.g., Ground, 1st Floor, Basement"
-                />
-              </div>
-
-              <div>
-                <label className="text-sm font-medium">{tSync("admin.facilities.form.zones.status", "Status")}</label>
-                <Select onValueChange={(value) => setNewZone({...newZone, status: value as Zone['status']})}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="active">Active</SelectItem>
-                    <SelectItem value="maintenance">Maintenance</SelectItem>
-                    <SelectItem value="inactive">Inactive</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            <div>
-              <label className="text-sm font-medium">{tSync("admin.facilities.form.zones.description", "Description")}</label>
-              <Textarea
-                value={newZone.description}
-                onChange={(e) => setNewZone({...newZone, description: e.target.value})}
-                placeholder="Describe this zone's features and purpose"
-                rows={2}
-              />
-            </div>
-
-            <div className="flex items-center gap-6">
-              <div className="flex items-center space-x-2">
-                <Switch
-                  checked={newZone.isMainZone}
-                  onCheckedChange={(checked) => setNewZone({...newZone, isMainZone: checked})}
-                />
-                <label className="text-sm">{tSync("admin.facilities.form.zones.isMain", "Main Zone")}</label>
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                <Switch
-                  checked={newZone.bookableIndependently}
-                  onCheckedChange={(checked) => setNewZone({...newZone, bookableIndependently: checked})}
-                />
-                <label className="text-sm">{tSync("admin.facilities.form.zones.independent", "Bookable Independently")}</label>
-              </div>
-            </div>
-
-            <div className="flex gap-2">
-              <Button onClick={addZone} size="sm">
-                {tSync("admin.facilities.form.zones.save", "Save Zone")}
-              </Button>
-              <Button onClick={() => setIsAddingZone(false)} size="sm" variant="outline">
-                {tSync("admin.common.cancel", "Cancel")}
-              </Button>
-            </div>
-          </div>
-        ) : (
-          <Button onClick={() => setIsAddingZone(true)} variant="outline" className="w-full">
-            <Plus className="w-4 h-4 mr-2" />
-            {tSync("admin.facilities.form.zones.addZone", "Add Zone")}
-          </Button>
-        )}
+        {/* Add Zone Button */}
+        <Button onClick={() => setIsAddingZone(true)} variant="outline" className="w-full">
+          <Plus className="w-4 h-4 mr-2" />
+          {tSync("admin.facilities.form.zones.addZone", "Add Zone")}
+        </Button>
 
         {/* Summary */}
         {zones.length > 0 && (

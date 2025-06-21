@@ -4,51 +4,18 @@ import { UseFormReturn } from "react-hook-form";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage, FormDescription } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { FacilityFormData } from "../FacilityFormSchema";
 import { useTranslation } from "@/hooks/useTranslation";
-import { Plus, Trash2, DollarSign } from "lucide-react";
+import { DollarSign } from "lucide-react";
+import { PricingRulesManager } from "./pricing/PricingRulesManager";
 
 interface FacilityPricingSectionProps {
   form: UseFormReturn<FacilityFormData>;
 }
 
-interface PricingRule {
-  id: string;
-  actorType: string;
-  bookingType: string;
-  timeSlot: string;
-  dayType: string;
-  basePrice: number;
-  multiplier: number;
-  validFrom: string;
-  validTo: string;
-}
-
 export const FacilityPricingSection: React.FC<FacilityPricingSectionProps> = ({ form }) => {
   const { tSync } = useTranslation();
-  const [pricingRules, setPricingRules] = useState<PricingRule[]>([]);
-
-  const addPricingRule = () => {
-    const newRule: PricingRule = {
-      id: Date.now().toString(),
-      actorType: 'individual',
-      bookingType: 'engangs',
-      timeSlot: 'all',
-      dayType: 'all',
-      basePrice: form.watch('price_per_hour') || 450,
-      multiplier: 1,
-      validFrom: new Date().toISOString().split('T')[0],
-      validTo: ''
-    };
-    setPricingRules([...pricingRules, newRule]);
-  };
-
-  const removePricingRule = (id: string) => {
-    setPricingRules(pricingRules.filter(rule => rule.id !== id));
-  };
 
   return (
     <Card>
@@ -122,57 +89,13 @@ export const FacilityPricingSection: React.FC<FacilityPricingSectionProps> = ({ 
         </div>
 
         {/* Advanced Pricing Rules */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-md font-semibold">{tSync("admin.facilities.form.pricing.advancedRules", "Advanced Pricing Rules")}</h3>
-            <Button type="button" onClick={addPricingRule} size="sm" variant="outline">
-              <Plus className="w-4 h-4 mr-1" />
-              {tSync("admin.facilities.form.pricing.addRule", "Add Rule")}
-            </Button>
-          </div>
-
-          {pricingRules.length === 0 ? (
-            <div className="text-center py-6 text-muted-foreground border-2 border-dashed rounded-lg">
-              <DollarSign className="w-8 h-8 mx-auto mb-2 opacity-50" />
-              <p className="text-sm">{tSync("admin.facilities.form.pricing.noRules", "No advanced pricing rules configured")}</p>
-              <p className="text-xs">{tSync("admin.facilities.form.pricing.noRulesHint", "Add rules for actor-specific, time-based, or seasonal pricing")}</p>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {pricingRules.map((rule) => (
-                <div key={rule.id} className="flex items-center gap-3 p-3 border rounded-lg bg-muted/50">
-                  <div className="flex-1 grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
-                    <div>
-                      <span className="font-medium">Actor:</span>
-                      <Badge variant="secondary" className="ml-1">{rule.actorType}</Badge>
-                    </div>
-                    <div>
-                      <span className="font-medium">Type:</span>
-                      <Badge variant="secondary" className="ml-1">{rule.bookingType}</Badge>
-                    </div>
-                    <div>
-                      <span className="font-medium">Price:</span>
-                      <span className="ml-1 font-mono">{rule.basePrice} × {rule.multiplier}</span>
-                    </div>
-                    <div>
-                      <span className="font-medium">Period:</span>
-                      <span className="ml-1 text-xs">{rule.validFrom} - {rule.validTo || 'ongoing'}</span>
-                    </div>
-                  </div>
-                  <Button
-                    type="button"
-                    onClick={() => removePricingRule(rule.id)}
-                    size="sm"
-                    variant="ghost"
-                    className="text-red-500 hover:text-red-700"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        <PricingRulesManager 
+          basePrice={form.watch('price_per_hour') || 450}
+          onRulesChange={(rules) => {
+            console.log('Pricing rules updated:', rules);
+            // Here you would typically save the rules to the form or send to API
+          }}
+        />
 
         {/* Payment & Billing */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t">
