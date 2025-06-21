@@ -99,7 +99,7 @@ export const FacilityFormView: React.FC<FacilityFormViewProps> = ({
                   {...register("name", { required: "Name is required" })}
                 />
                 {errors.name && (
-                  <p className="text-sm text-red-500">{errors.name.message}</p>
+                  <p className="text-sm text-red-500">{errors.name.message as string}</p>
                 )}
               </div>
 
@@ -163,7 +163,7 @@ export const FacilityFormView: React.FC<FacilityFormViewProps> = ({
                   })}
                 />
                 {errors.capacity && (
-                  <p className="text-sm text-red-500">{errors.capacity.message}</p>
+                  <p className="text-sm text-red-500">{errors.capacity.message as string}</p>
                 )}
               </div>
 
@@ -180,7 +180,7 @@ export const FacilityFormView: React.FC<FacilityFormViewProps> = ({
                   })}
                 />
                 {errors.price_per_hour && (
-                  <p className="text-sm text-red-500">{errors.price_per_hour.message}</p>
+                  <p className="text-sm text-red-500">{errors.price_per_hour.message as string}</p>
                 )}
               </div>
             </div>
@@ -195,7 +195,7 @@ export const FacilityFormView: React.FC<FacilityFormViewProps> = ({
                     {...register("address_street", { required: "Street address is required" })}
                   />
                   {errors.address_street && (
-                    <p className="text-sm text-red-500">{errors.address_street.message}</p>
+                    <p className="text-sm text-red-500">{errors.address_street.message as string}</p>
                   )}
                 </div>
 
@@ -206,7 +206,7 @@ export const FacilityFormView: React.FC<FacilityFormViewProps> = ({
                     {...register("address_postal_code", { required: "Postal code is required" })}
                   />
                   {errors.address_postal_code && (
-                    <p className="text-sm text-red-500">{errors.address_postal_code.message}</p>
+                    <p className="text-sm text-red-500">{errors.address_postal_code.message as string}</p>
                   )}
                 </div>
 
@@ -217,7 +217,7 @@ export const FacilityFormView: React.FC<FacilityFormViewProps> = ({
                     {...register("address_city", { required: "City is required" })}
                   />
                   {errors.address_city && (
-                    <p className="text-sm text-red-500">{errors.address_city.message}</p>
+                    <p className="text-sm text-red-500">{errors.address_city.message as string}</p>
                   )}
                 </div>
               </div>
