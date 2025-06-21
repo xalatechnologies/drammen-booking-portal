@@ -4,8 +4,24 @@ import { supabase } from '@/integrations/supabase/client';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { CoreFacility, FacilityView } from '@/types/translation';
 import { facilityTranslationService } from '@/services/FacilityTranslationService';
-import { transformDatabaseFacility } from '@/utils/facilityTransformer';
 import { useTranslationStore } from '@/stores/useTranslationStore';
+
+// Simple transformer function to replace the deleted file
+const transformDatabaseFacility = (facility: any): CoreFacility => {
+  return {
+    ...facility,
+    address: `${facility.address_street || ''}, ${facility.address_city || ''}`.replace(/^,\s*/, '').replace(/,\s*$/, ''),
+    image: facility.image_url || "/lovable-uploads/13aee1f6-e9d9-474b-9ed7-c656d703d19b.png",
+    pricePerHour: facility.price_per_hour || 450,
+    accessibility: facility.accessibility_features || [],
+    suitableFor: [],
+    hasAutoApproval: facility.has_auto_approval || false,
+    nextAvailable: facility.next_available || "Not available",
+    openingHours: [],
+    zones: [],
+    availableTimes: []
+  };
+};
 
 export const useTranslatedFacilities = () => {
   const { language } = useLanguage();

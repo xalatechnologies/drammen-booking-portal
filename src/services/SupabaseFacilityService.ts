@@ -9,7 +9,7 @@ export class SupabaseFacilityService {
   private static adaptDatabaseToFacility(dbFacility: any): Facility {
     console.log('SupabaseFacilityService - Raw facility from DB:', dbFacility);
     
-    // Create address from database fields
+    // Create address from database fields - ensure all fields are preserved
     const addressParts = [
       dbFacility.address_street,
       dbFacility.address_city,
@@ -35,7 +35,7 @@ export class SupabaseFacilityService {
 
     // Adapt database structure to frontend Facility interface
     return {
-      // Direct database fields
+      // Direct database fields - ensure all address fields are included
       id: dbFacility.id,
       name: dbFacility.name || 'Unnamed Facility',
       address_street: dbFacility.address_street || '',
@@ -232,7 +232,7 @@ export class SupabaseFacilityService {
       if (result.success && result.data) {
         return {
           success: true,
-          data: this.transformCoreFacilityToFacility(result.data)
+          data: this.adaptDatabaseToFacility(result.data)
         };
       }
 
@@ -261,7 +261,7 @@ export class SupabaseFacilityService {
       if (result.success && result.data) {
         return {
           success: true,
-          data: this.transformCoreFacilityToFacility(result.data)
+          data: this.adaptDatabaseToFacility(result.data)
         };
       }
 

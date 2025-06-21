@@ -1,3 +1,4 @@
+
 import { SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { Database } from '../_shared/database.types.ts'
 
@@ -31,7 +32,8 @@ export class FacilityRepository {
         *,
         facility_opening_hours(day_of_week, open_time, close_time, is_open),
         zones(id, name, type, capacity, bookable_independently),
-        facility_images(id, image_url, alt_text, is_featured, display_order)
+        facility_images(id, image_url, alt_text, is_featured, display_order),
+        facility_translations(language_code, name, description, short_description, rules, directions)
       `, { count: 'exact' })
       .eq('status', 'active')
       .range(from, to)
@@ -83,7 +85,8 @@ export class FacilityRepository {
           bookable_independently, equipment, accessibility_features,
           status, area_sqm
         ),
-        facility_images(id, image_url, alt_text, is_featured, display_order, caption)
+        facility_images(id, image_url, alt_text, is_featured, display_order, caption),
+        facility_translations(language_code, name, description, short_description, rules, directions)
       `)
       .eq('id', id)
       .eq('status', 'active')
