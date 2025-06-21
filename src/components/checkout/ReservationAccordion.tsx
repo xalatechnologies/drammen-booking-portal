@@ -70,6 +70,18 @@ export function ReservationAccordion({
     }
   };
 
+  const calculateSlotDuration = (timeSlot: string) => {
+    // Parse time slot like "08:00-09:00" to calculate actual duration
+    const match = timeSlot.match(/(\d{2}):(\d{2})-(\d{2}):(\d{2})/);
+    if (match) {
+      const [, startHour, startMin, endHour, endMin] = match.map(Number);
+      const startMinutes = startHour * 60 + startMin;
+      const endMinutes = endHour * 60 + endMin;
+      return (endMinutes - startMinutes) / 60; // Return duration in hours
+    }
+    return 2; // Default fallback
+  };
+
   return (
     <div className="space-y-4">
       {uniqueReservations.map((reservation) => {
@@ -80,7 +92,12 @@ export function ReservationAccordion({
           duration: reservation.duration
         }];
         
-        const totalDuration = timeSlots.reduce((sum, slot) => sum + (slot.duration || 2), 0);
+        // Calculate total duration by parsing actual time slots
+        const totalDuration = timeSlots.reduce((sum, slot) => {
+          const slotDuration = calculateSlotDuration(slot.timeSlot);
+          return sum + slotDuration;
+        }, 0);
+        
         const bookingType = getBookingType(reservation);
 
         return (
@@ -224,7 +241,7 @@ export function ReservationAccordion({
                         </div>
                       </div>
 
-                      {/* Contact Information */}
+                      {/* Contact Information - Only show if available */}
                       {reservation.customerInfo && (
                         <div className="space-y-4">
                           <h4 className="font-medium text-gray-900 flex items-center gap-2">
@@ -266,20 +283,23 @@ export function ReservationAccordion({
                         Valgte tidspunkt
                       </h4>
                       <div className="grid gap-2">
-                        {timeSlots.map((slot, index) => (
-                          <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded text-sm">
-                            <div className="flex items-center gap-3">
-                              <span className="font-medium">
-                                {format(new Date(slot.date), 'EEEE dd.MM.yyyy', { locale: nb })}
+                        {timeSlots.map((slot, index) => {
+                          const slotDuration = calculateSlotDuration(slot.timeSlot);
+                          return (
+                            <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded text-sm">
+                              <div className="flex items-center gap-3">
+                                <span className="font-medium">
+                                  {format(new Date(slot.date), 'EEEE dd.MM.yyyy', { locale: nb })}
+                                </span>
+                                <span className="text-gray-600">{slot.timeSlot}</span>
+                                <span className="text-gray-500">({slotDuration}t)</span>
+                              </div>
+                              <span className="text-gray-600 text-xs">
+                                {slot.zoneId === 'whole-facility' ? 'Hele lokalet' : slot.zoneId}
                               </span>
-                              <span className="text-gray-600">{slot.timeSlot}</span>
-                              <span className="text-gray-500">({slot.duration || 2}t)</span>
                             </div>
-                            <span className="text-gray-600 text-xs">
-                              {slot.zoneId === 'whole-facility' ? 'Hele lokalet' : slot.zoneId}
-                            </span>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     </div>
 
