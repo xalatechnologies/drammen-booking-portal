@@ -200,8 +200,7 @@ export const FacilityFormView: React.FC<FacilityFormViewProps> = ({
 
               <TabsContent value="hours" className="mt-0">
                 <OpeningHoursManagement
-                  openingHours={facility.openingHours || []}
-                  onOpeningHoursChange={(hours) => setFacility(prev => ({ ...prev, openingHours: hours }))}
+                  selectedFacilityId={facilityId}
                 />
               </TabsContent>
             </div>
