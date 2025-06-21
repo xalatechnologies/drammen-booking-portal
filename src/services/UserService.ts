@@ -88,8 +88,8 @@ export class UserService {
 
     const userData = {
       ...request,
-      createdAt: new Date(), // Use Date object instead of string
-      updatedAt: new Date(), // Use Date object instead of string
+      createdAt: new Date(),
+      updatedAt: new Date(),
       isActive: true,
       lastLoginAt: null,
       permissions: request.permissions || [],
@@ -100,7 +100,10 @@ export class UserService {
         notifications: {
           email: true,
           sms: false,
-          push: true
+          push: true,
+          bookingReminders: true,
+          approvalUpdates: true,
+          marketingEmails: false
         },
         bookingPreferences: {
           defaultDuration: 120,
@@ -142,7 +145,7 @@ export class UserService {
 
     const updateData = {
       ...request,
-      updatedAt: new Date() // Use Date object instead of string
+      updatedAt: new Date()
     };
 
     const result = await userRepository.update(id, updateData);
@@ -251,7 +254,7 @@ export class UserService {
     const result = await userRepository.update(userId, {
       role: newRole,
       permissions: permissions || [],
-      updatedAt: new Date() // Use Date object instead of string
+      updatedAt: new Date()
     });
 
     if (result.error) {
@@ -272,7 +275,7 @@ export class UserService {
     
     const result = await userRepository.update(userId, {
       isActive: false,
-      updatedAt: new Date() // Use Date object instead of string
+      updatedAt: new Date()
     });
 
     if (result.error) {
@@ -293,7 +296,7 @@ export class UserService {
     
     const result = await userRepository.update(userId, {
       isActive: true,
-      updatedAt: new Date() // Use Date object instead of string
+      updatedAt: new Date()
     });
 
     if (result.error) {

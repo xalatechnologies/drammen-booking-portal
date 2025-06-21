@@ -15,7 +15,7 @@ export function convertZoneToBookingZone(facilityZone: FacilityZone): BookingZon
     parentZoneId: facilityZone.parent_zone_id || undefined,
     subZones: [],
     equipment: facilityZone.equipment || [],
-    amenities: [], // Add missing amenities property
+    amenities: facilityZone.accessibility_features || [], // Map accessibility_features to amenities
     bookingRules: {
       minBookingDuration: 1,
       maxBookingDuration: 8,

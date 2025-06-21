@@ -36,8 +36,8 @@ export function ZoneAvailabilityTable({
       return { 
         available: false, 
         reason: 'conflict', 
-        conflictType: conflict.conflict_type, // Use conflict_type from BookingConflict
-        conflictDetails: 'Booked by another user' // Default value since bookedBy doesn't exist
+        conflictType: conflict.conflict_type,
+        conflictDetails: 'Booked by another user'
       };
     }
     
@@ -85,9 +85,9 @@ export function ZoneAvailabilityTable({
     return <Badge variant="default" className="text-xs bg-green-100 text-green-800">Ledig</Badge>;
   };
 
-  // Group zones by hierarchy - check for isMainZone property or assume main zone by checking subzones
-  const mainZones = zones.filter(zone => zone.isMainZone === true || zone.subZones?.length > 0);
-  const subZones = zones.filter(zone => zone.isMainZone === false || (!zone.subZones || zone.subZones.length === 0));
+  // Group zones by hierarchy - use isMainZone property correctly
+  const mainZones = zones.filter(zone => zone.isMainZone === true);
+  const subZones = zones.filter(zone => zone.isMainZone === false);
 
   return (
     <Card className="p-6">

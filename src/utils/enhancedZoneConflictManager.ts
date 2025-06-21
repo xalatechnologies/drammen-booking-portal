@@ -1,4 +1,3 @@
-
 import { ZoneConflictManager, ExistingBooking } from "./zoneConflictManager";
 import { Zone } from "@/components/booking/types";
 import { BookingService } from "@/services/BookingService";
@@ -169,5 +168,42 @@ export class EnhancedZoneConflictManager extends ZoneConflictManager {
     }
 
     return heatmap;
+  }
+
+  getDetailedConflictInfo(
+    zoneId: string,
+    startDate: Date,
+    endDate: Date
+  ): ConflictCheckResult {
+    // Simplified implementation - check for basic conflicts
+    const hasConflicts = this.existingBookings.some(booking => {
+      return booking.zoneId === zoneId &&
+             booking.startDate <= endDate &&
+             booking.endDate >= startDate;
+    });
+
+    const conflictingBookings = hasConflicts 
+      ? this.existingBookings.filter(booking => 
+          booking.zoneId === zoneId &&
+          booking.startDate <= endDate &&
+          booking.endDate >= startDate
+        ).map(booking => ({
+          id: booking.id,
+          zoneId: booking.zoneId,
+          startDate: booking.startDate,
+          endDate: booking.endDate,
+          userId: booking.userId,
+          purpose: booking.purpose
+        }))
+      : [];
+
+    const availableAlternatives: AlternativeSlot[] = [];
+    // Could implement alternative finding logic here
+
+    return {
+      hasConflicts,
+      conflictingBookings,
+      availableAlternatives
+    };
   }
 }

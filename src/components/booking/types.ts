@@ -1,80 +1,73 @@
-
-export interface ZoneAvailabilityStatus {
-  zoneId: string;
-  isAvailable: boolean;
-  conflicts: string[];
-  restrictions: string[];
+export interface BookingRules {
+  minBookingDuration: number;
+  maxBookingDuration: number;
+  allowedTimeSlots: string[];
+  bookingTypes: string[];
+  advanceBookingDays: number;
+  cancellationHours: number;
 }
 
-export interface BookingFormData {
-  facilityId: string;
-  zoneId: string;
-  startDate: Date;
-  endDate: Date;
-  purpose: string;
-  contactName: string;
-  contactEmail: string;
-  contactPhone: string;
-  specialRequirements?: string;
-  expectedAttendees: number;
-  actorType: string;
-  eventType: string;
-  ageGroup: string;
+export interface AdminInfo {
+  contactPersonName: string;
+  contactPersonEmail: string;
+  specialInstructions: string;
+  maintenanceSchedule: MaintenanceSchedule[];
 }
 
-export type BookingStep = 'selection' | 'details' | 'confirmation';
+export interface MaintenanceSchedule {
+  day: string;
+  startTime: string;
+  endTime: string;
+}
 
-// Zone interface for booking components
+export interface ZoneLayout {
+  coordinates: Coordinates;
+  entryPoints: string[];
+}
+
+export interface Coordinates {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
 export interface Zone {
   id: string;
   name: string;
-  description: string;
+  facilityId: string;
   capacity: number;
   pricePerHour: number;
+  description: string;
   area: string;
+  isMainZone: boolean; // Add missing property
+  parentZoneId?: string;
+  subZones: string[];
   equipment: string[];
-  amenities: string[];
-  bookingRules: {
-    minBookingDuration: number;
-    maxBookingDuration: number;
-    allowedTimeSlots: string[];
-    bookingTypes: string[];
-    advanceBookingDays: number;
-    cancellationHours: number;
-  };
+  amenities: string[]; // Required property
+  bookingRules: BookingRules;
+  adminInfo: AdminInfo;
+  layout: ZoneLayout;
   accessibility: string[];
   features: string[];
   isActive: boolean;
-  subZones: string[];
-  layout: {
-    coordinates: {
-      x: number;
-      y: number;
-      width: number;
-      height: number;
-    };
-    entryPoints: string[];
-  };
-  adminInfo: {
-    contactPersonName: string;
-    contactPersonEmail: string;
-    specialInstructions: string;
-    maintenanceSchedule: any[];
-  };
 }
 
-export type BookingStatus = 'draft' | 'pending' | 'confirmed' | 'cancelled' | 'completed';
+export interface ZoneAvailabilityStatus {
+  zoneId: string;
+  date: Date;
+  timeSlot: string;
+  isAvailable: boolean;
+  conflictReason?: string;
+  conflictDetails?: ZoneConflict;
+}
 
-export interface BookingConflict {
-  id: string;
-  booking_id: string;
-  conflict_type: string;
-  conflict_description: string;
-  conflict_severity: string;
-  resolved: boolean;
-  created_at: string;
-  conflicting_booking_id?: string;
-  resolved_by?: string;
-  resolved_at?: string;
-  resolution_notes?: string;
+export interface ZoneConflict {
+  zoneId: string;
+  conflictType: 'booking' | 'maintenance' | 'blackout' | 'zone-conflict';
+  startTime: Date;
+  endTime: Date;
+  severity: 'low' | 'medium' | 'high';
+  description: string;
+  canOverride: boolean;
 }

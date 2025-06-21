@@ -1,47 +1,47 @@
 
-import { Zone } from "@/components/booking/types";
-import { AvailabilityUtils } from "./availabilityUtils";
-import { ExistingBooking } from "./types";
+import { Zone } from '@/components/booking/types';
+import { ConflictCheckResult, AlternativeSlot } from './types';
+import { AvailabilityUtils } from './availabilityUtils';
+import { ExistingBooking } from './types';
 
-export class RecommendationEngine extends AvailabilityUtils {
-  constructor(zones: Zone[], existingBookings: ExistingBooking[]) {
-    super(zones, existingBookings);
+export class RecommendationEngine {
+  private zones: Zone[];
+  private existingBookings: ExistingBooking[];
+
+  constructor(zones: Zone[], existingBookings: ExistingBooking[] = []) {
+    this.zones = zones;
+    this.existingBookings = existingBookings;
   }
 
-  /**
-   * Get booking recommendations based on requirements
-   */
-  getBookingRecommendations(
-    requiredCapacity: number,
-    preferredEquipment: string[],
-    date: Date,
-    timeSlot: string
-  ): Zone[] {
-    const availabilityStatuses = this.getZoneAvailabilityStatus(date, timeSlot);
+  getZoneAvailabilityStatus(zoneId: string, date: Date, timeSlot: string): boolean {
+    const zone = this.zones.find(z => z.id === zoneId);
+    if (!zone) return false;
     
-    return this.zones
-      .filter(zone => {
-        const status = availabilityStatuses.find(s => s.zoneId === zone.id);
-        return (
-          status?.isAvailable &&
-          zone.capacity >= requiredCapacity &&
-          zone.isActive
-        );
-      })
-      .sort((a, b) => {
-        // Score zones based on equipment match and efficiency
-        const aEquipmentScore = preferredEquipment.filter(eq => a.equipment.includes(eq)).length;
-        const bEquipmentScore = preferredEquipment.filter(eq => b.equipment.includes(eq)).length;
-        
-        if (aEquipmentScore !== bEquipmentScore) {
-          return bEquipmentScore - aEquipmentScore;
+    return AvailabilityUtils.checkTimeSlotAvailability(zone, date, timeSlot);
+  }
+
+  generateAlternatives(
+    preferredZoneId: string,
+    preferredDate: Date,
+    preferredTimeSlot: string
+  ): AlternativeSlot[] {
+    const alternatives: AlternativeSlot[] = [];
+    
+    // Find alternative zones
+    this.zones.forEach(zone => {
+      if (zone.id !== preferredZoneId && zone.isActive) {
+        if (this.getZoneAvailabilityStatus(zone.id, preferredDate, preferredTimeSlot)) {
+          alternatives.push({
+            startTime: new Date(`${preferredDate.toDateString()} ${preferredTimeSlot.split('-')[0]}`),
+            endTime: new Date(`${preferredDate.toDateString()} ${preferredTimeSlot.split('-')[1]}`),
+            zoneId: zone.id,
+            zoneName: zone.name,
+            reason: `Alternative zone available`
+          });
         }
-        
-        // Prefer zones that are closer to required capacity (more efficient)
-        const aEfficiency = Math.abs(a.capacity - requiredCapacity);
-        const bEfficiency = Math.abs(b.capacity - requiredCapacity);
-        
-        return aEfficiency - bEfficiency;
-      });
+      }
+    });
+
+    return alternatives;
   }
 }

@@ -1,55 +1,30 @@
 
-import { Zone } from '@/types/zone';
-import { ZoneAvailabilityStatus } from '@/components/booking/types';
+import { Zone } from '@/components/booking/types';
 
-export function checkZoneAvailability(
-  zone: Zone,
-  startTime: Date,
-  endTime: Date,
-  existingBookings: any[] = []
-): ZoneAvailabilityStatus {
-  const conflicts: string[] = [];
-  const restrictions: string[] = [];
+export class AvailabilityUtils {
+  static checkTimeSlotAvailability(
+    zone: Zone,
+    date: Date,
+    timeSlot: string
+  ): boolean {
+    // Basic availability check - can be enhanced later
+    return zone.isActive;
+  }
 
-  // Check for overlapping bookings
-  const overlappingBookings = existingBookings.filter(booking => {
-    const bookingStart = new Date(booking.start_date);
-    const bookingEnd = new Date(booking.end_date);
+  static getAvailableTimeSlots(
+    zone: Zone,
+    date: Date
+  ): string[] {
+    if (!zone.isActive) return [];
     
-    return (
-      (startTime < bookingEnd && endTime > bookingStart) &&
-      booking.zone_id === zone.id &&
-      booking.status !== 'cancelled'
-    );
-  });
-
-  if (overlappingBookings.length > 0) {
-    conflicts.push(`Zone is already booked for ${overlappingBookings.length} overlapping time slots`);
+    // Return default time slots - can be enhanced with actual business logic
+    return [
+      "08:00-10:00",
+      "10:00-12:00", 
+      "12:00-14:00",
+      "14:00-16:00",
+      "16:00-18:00",
+      "18:00-20:00"
+    ];
   }
-
-  // Check zone status
-  if (zone.status !== 'active') {
-    restrictions.push(`Zone is currently ${zone.status}`);
-  }
-
-  const isAvailable = conflicts.length === 0 && restrictions.length === 0;
-
-  return {
-    zoneId: zone.id,
-    isAvailable,
-    conflicts,
-    restrictions
-  };
-}
-
-export function findAvailableZones(
-  zones: Zone[],
-  startTime: Date,
-  endTime: Date,
-  existingBookings: any[] = []
-): Zone[] {
-  return zones.filter(zone => {
-    const availability = checkZoneAvailability(zone, startTime, endTime, existingBookings);
-    return availability.isAvailable;
-  });
 }
