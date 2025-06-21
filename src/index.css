@@ -72,46 +72,68 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground text-base;
-    font-size: 16px;
+    @apply bg-background text-foreground;
+    font-size: 15px;
     line-height: 1.6;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
   
-  /* Enhanced global font sizes */
-  h1 { @apply text-4xl font-bold; }
-  h2 { @apply text-3xl font-semibold; }
-  h3 { @apply text-2xl font-medium; }
-  h4 { @apply text-xl font-medium; }
-  h5 { @apply text-lg font-medium; }
-  h6 { @apply text-base font-medium; }
+  /* Enhanced typography */
+  h1 { @apply text-3xl font-bold tracking-tight; }
+  h2 { @apply text-2xl font-semibold tracking-tight; }
+  h3 { @apply text-xl font-semibold; }
+  h4 { @apply text-lg font-medium; }
+  h5 { @apply text-base font-medium; }
+  h6 { @apply text-sm font-medium; }
   
-  p { @apply text-base; }
+  p { @apply text-sm leading-relaxed; }
   
-  /* Enhanced form elements */
-  input, textarea, select {
-    @apply text-base;
-    font-size: 16px !important;
+  /* Consistent form elements height */
+  input, textarea, select, .select-trigger {
+    @apply h-10 text-sm;
+    font-size: 14px !important;
   }
   
   /* Enhanced button text */
   button {
-    @apply text-base;
+    @apply text-sm font-medium;
   }
   
   /* Enhanced navigation and menu items */
   nav a, .nav-item {
-    @apply text-base;
+    @apply text-sm;
   }
   
   /* Enhanced table text */
   table td, table th {
-    @apply text-base;
+    @apply text-sm;
   }
   
   /* Enhanced placeholder text */
   ::placeholder {
-    @apply text-base;
-    font-size: 16px !important;
+    @apply text-sm;
+    font-size: 14px !important;
+  }
+
+  /* Enhanced tab styling */
+  .enhanced-tabs {
+    @apply border-b-0 bg-gray-50/50 rounded-lg p-1;
+  }
+
+  .enhanced-tab-trigger {
+    @apply relative px-4 py-2 text-sm font-medium rounded-md transition-all duration-200;
+    @apply text-gray-600 hover:text-gray-900 hover:bg-white/60;
+    @apply data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm;
+  }
+
+  .enhanced-tab-trigger::after {
+    content: '';
+    @apply absolute bottom-0 left-1/2 w-0 h-0.5 bg-primary transition-all duration-300;
+    transform: translateX(-50%);
+  }
+
+  .enhanced-tab-trigger[data-state="active"]::after {
+    @apply w-6;
   }
 }
 
