@@ -231,57 +231,57 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
+    <div className="w-full space-y-8 p-8">
+      {/* Enhanced Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold">Facility Management</h2>
-          <p className="text-muted-foreground">
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">Facility Management</h1>
+          <p className="text-xl text-muted-foreground">
             {filteredFacilities.length} of {facilities.length} facilities
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={handleExport}>
-            <Download className="w-4 h-4 mr-2" />
-            Export
+        <div className="flex items-center gap-4">
+          <Button variant="outline" size="lg" onClick={handleExport} className="text-base px-6 py-3">
+            <Download className="w-5 h-5 mr-2" />
+            Export Data
           </Button>
-          <Button onClick={() => setShowForm(true)}>
-            <Plus className="w-4 h-4 mr-2" />
-            Add Facility
+          <Button size="lg" onClick={() => setShowForm(true)} className="text-base px-6 py-3">
+            <Plus className="w-5 h-5 mr-2" />
+            Add New Facility
           </Button>
         </div>
       </div>
 
-      {/* Filters */}
-      <Card>
-        <CardHeader>
+      {/* Enhanced Filters Card */}
+      <Card className="shadow-lg border-0 bg-white">
+        <CardHeader className="pb-4">
           <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center">
-              <Filter className="w-4 h-4 mr-2" />
-              Filters & Search
+            <CardTitle className="flex items-center text-2xl font-semibold">
+              <Filter className="w-6 h-6 mr-3 text-blue-600" />
+              Search & Filters
             </CardTitle>
-            <Button variant="ghost" size="sm" onClick={clearFilters}>
-              Clear All
+            <Button variant="ghost" size="lg" onClick={clearFilters} className="text-base">
+              Clear All Filters
             </Button>
           </div>
         </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
+        <CardContent className="pt-0">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6">
             <div className="lg:col-span-2">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
                 <Input
-                  placeholder="Search facilities..."
+                  placeholder="Search facilities by name, location..."
                   value={filters.searchTerm}
                   onChange={(e) => updateFilter('searchTerm', e.target.value)}
-                  className="pl-10"
+                  className="pl-12 h-12 text-base border-2 focus:border-blue-500"
                 />
               </div>
             </div>
             
             <Select value={filters.status} onValueChange={(value) => updateFilter('status', value)}>
-              <SelectTrigger>
-                <SelectValue placeholder="Status" />
+              <SelectTrigger className="h-12 text-base border-2">
+                <SelectValue placeholder="Filter by Status" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Statuses</SelectItem>
@@ -292,8 +292,8 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
             </Select>
 
             <Select value={filters.type} onValueChange={(value) => updateFilter('type', value)}>
-              <SelectTrigger>
-                <SelectValue placeholder="Type" />
+              <SelectTrigger className="h-12 text-base border-2">
+                <SelectValue placeholder="Filter by Type" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Types</SelectItem>
@@ -304,8 +304,8 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
             </Select>
 
             <Select value={filters.area} onValueChange={(value) => updateFilter('area', value)}>
-              <SelectTrigger>
-                <SelectValue placeholder="Area" />
+              <SelectTrigger className="h-12 text-base border-2">
+                <SelectValue placeholder="Filter by Area" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Areas</SelectItem>
@@ -319,8 +319,8 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
               const [sortBy, sortOrder] = value.split('-');
               setFilters(prev => ({ ...prev, sortBy, sortOrder: sortOrder as 'asc' | 'desc' }));
             }}>
-              <SelectTrigger>
-                <SelectValue placeholder="Sort" />
+              <SelectTrigger className="h-12 text-base border-2">
+                <SelectValue placeholder="Sort Options" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="name-asc">Name A-Z</SelectItem>
@@ -335,25 +335,26 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
         </CardContent>
       </Card>
 
-      {/* Bulk Actions */}
+      {/* Enhanced Bulk Actions */}
       {selectedFacilities.length > 0 && (
-        <Card>
+        <Card className="border-l-4 border-l-blue-500 shadow-md">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">
+              <span className="text-lg font-medium text-gray-900">
                 {selectedFacilities.length} facilities selected
               </span>
-              <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" onClick={() => setSelectedFacilities([])}>
+              <div className="flex items-center gap-3">
+                <Button variant="outline" size="lg" onClick={() => setSelectedFacilities([])} className="text-base">
                   Clear Selection
                 </Button>
                 <Button 
                   variant="destructive" 
-                  size="sm" 
+                  size="lg" 
                   onClick={handleBulkDelete}
                   disabled={bulkDeleteMutation.isPending}
+                  className="text-base px-6"
                 >
-                  <Trash2 className="w-4 h-4 mr-2" />
+                  <Trash2 className="w-5 h-5 mr-2" />
                   Delete Selected
                 </Button>
               </div>
@@ -364,93 +365,103 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
 
       {/* Loading/Error States */}
       {isLoading && (
-        <div className="text-center py-8">Loading facilities...</div>
-      )}
-
-      {error && (
-        <div className="text-center py-8 text-red-500">
-          Error loading facilities: {error.message}
+        <div className="text-center py-16">
+          <div className="text-2xl text-gray-600">Loading facilities...</div>
         </div>
       )}
 
-      {/* Facilities Table */}
-      <Card>
+      {error && (
+        <div className="text-center py-16">
+          <div className="text-2xl text-red-600">
+            Error loading facilities: {error.message}
+          </div>
+        </div>
+      )}
+
+      {/* Enhanced Facilities Table */}
+      <Card className="shadow-lg border-0 overflow-hidden">
         <CardContent className="p-0">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead className="w-12">
+              <TableRow className="bg-gray-50 border-b-2">
+                <TableHead className="w-16 py-6">
                   <Checkbox
                     checked={selectedFacilities.length === filteredFacilities.length && filteredFacilities.length > 0}
                     onCheckedChange={handleSelectAll}
+                    className="w-5 h-5"
                   />
                 </TableHead>
-                <TableHead>Name</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Area</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Capacity</TableHead>
-                <TableHead>Price/Hour</TableHead>
-                <TableHead className="w-20">Actions</TableHead>
+                <TableHead className="text-base font-semibold text-gray-900 py-6">Facility Details</TableHead>
+                <TableHead className="text-base font-semibold text-gray-900 py-6">Type</TableHead>
+                <TableHead className="text-base font-semibold text-gray-900 py-6">Area</TableHead>
+                <TableHead className="text-base font-semibold text-gray-900 py-6">Status</TableHead>
+                <TableHead className="text-base font-semibold text-gray-900 py-6">Capacity</TableHead>
+                <TableHead className="text-base font-semibold text-gray-900 py-6">Price/Hour</TableHead>
+                <TableHead className="w-24 text-base font-semibold text-gray-900 py-6">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredFacilities.map((facility: any) => (
                 <TableRow 
                   key={facility.id}
-                  className={`cursor-pointer ${
-                    selectedFacilityId === facility.id ? 'bg-muted/50' : ''
+                  className={`cursor-pointer hover:bg-blue-50 transition-colors duration-200 ${
+                    selectedFacilityId === facility.id ? 'bg-blue-100 border-l-4 border-l-blue-500' : ''
                   }`}
                   onClick={() => onFacilitySelect?.(facility.id)}
                 >
-                  <TableCell onClick={(e) => e.stopPropagation()}>
+                  <TableCell onClick={(e) => e.stopPropagation()} className="py-6">
                     <Checkbox
                       checked={selectedFacilities.includes(facility.id)}
                       onCheckedChange={(checked) => handleSelectFacility(facility.id, checked as boolean)}
+                      className="w-5 h-5"
                     />
                   </TableCell>
-                  <TableCell className="font-medium">
-                    <div className="flex items-center space-x-2">
+                  <TableCell className="py-6">
+                    <div className="flex items-start space-x-4">
+                      <div className="w-16 h-16 bg-gray-200 rounded-lg flex-shrink-0"></div>
                       <div>
-                        <div className="font-medium">{facility.name}</div>
-                        <div className="text-sm text-muted-foreground flex items-center">
-                          <MapPin className="w-3 h-3 mr-1" />
+                        <div className="text-lg font-semibold text-gray-900 mb-1">{facility.name}</div>
+                        <div className="text-base text-gray-600 flex items-center">
+                          <MapPin className="w-4 h-4 mr-2" />
                           {facility.address_street || facility.address}, {facility.address_city || facility.city}
                         </div>
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell>{facility.type}</TableCell>
-                  <TableCell>{facility.area}</TableCell>
-                  <TableCell>
-                    <Badge variant={facility.status === 'active' ? 'default' : 'secondary'}>
+                  <TableCell className="text-base py-6">{facility.type}</TableCell>
+                  <TableCell className="text-base py-6">{facility.area}</TableCell>
+                  <TableCell className="py-6">
+                    <Badge 
+                      variant={facility.status === 'active' ? 'default' : 'secondary'}
+                      className="text-sm px-3 py-1"
+                    >
                       {facility.status}
                     </Badge>
                   </TableCell>
-                  <TableCell>{facility.capacity}</TableCell>
-                  <TableCell>{facility.pricePerHour || 0} kr</TableCell>
-                  <TableCell onClick={(e) => e.stopPropagation()}>
+                  <TableCell className="text-base py-6 font-medium">{facility.capacity}</TableCell>
+                  <TableCell className="text-base py-6 font-medium">{facility.pricePerHour || 0} kr</TableCell>
+                  <TableCell onClick={(e) => e.stopPropagation()} className="py-6">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm">
-                          <MoreHorizontal className="w-4 h-4" />
+                        <Button variant="ghost" size="sm" className="h-10 w-10">
+                          <MoreHorizontal className="w-5 h-5" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => onFacilitySelect?.(facility.id)}>
-                          <Eye className="w-4 h-4 mr-2" />
+                      <DropdownMenuContent align="end" className="w-48">
+                        <DropdownMenuItem onClick={() => onFacilitySelect?.(facility.id)} className="text-base py-3">
+                          <Eye className="w-4 h-4 mr-3" />
                           View Details
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleEdit(facility)}>
-                          <Edit className="w-4 h-4 mr-2" />
-                          Edit
+                        <DropdownMenuItem onClick={() => handleEdit(facility)} className="text-base py-3">
+                          <Edit className="w-4 h-4 mr-3" />
+                          Edit Facility
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem 
                           onClick={() => handleDelete(facility.id)}
-                          className="text-destructive"
+                          className="text-destructive text-base py-3"
                         >
-                          <Trash2 className="w-4 h-4 mr-2" />
+                          <Trash2 className="w-4 h-4 mr-3" />
                           Delete
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -462,8 +473,11 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
           </Table>
 
           {filteredFacilities.length === 0 && !isLoading && (
-            <div className="text-center py-8 text-muted-foreground">
-              No facilities found. {filters.searchTerm && "Try adjusting your search terms."}
+            <div className="text-center py-16">
+              <div className="text-2xl text-muted-foreground mb-2">No facilities found</div>
+              {filters.searchTerm && (
+                <div className="text-lg text-gray-500">Try adjusting your search terms or filters</div>
+              )}
             </div>
           )}
         </CardContent>
