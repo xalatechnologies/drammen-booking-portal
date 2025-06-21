@@ -64,38 +64,10 @@ export class FacilityRepository {
       return result
     }
 
-    console.log('FacilityRepository.findAll - Raw database result:', result.data?.[0]);
+    console.log('FacilityRepository.findAll - Raw database result sample:', result.data?.[0]);
 
-    // Transform the data to include featured image and images array
-    const transformedData = result.data?.map(facility => {
-      const images = facility.facility_images || []
-      const featuredImage = images.find(img => img.is_featured === true) || null
-      
-      console.log(`FacilityRepository.findAll - Processing facility ${facility.id}:`, {
-        name: facility.name,
-        address_street: facility.address_street,
-        address_city: facility.address_city,
-        address_postal_code: facility.address_postal_code,
-        imagesCount: images.length,
-        featuredImage: featuredImage ? { id: featuredImage.id, is_featured: featuredImage.is_featured, image_url: featuredImage.image_url } : null,
-        rawFacility: facility
-      });
-      
-      return {
-        ...facility,
-        featuredImage,
-        images: images.sort((a, b) => a.display_order - b.display_order),
-        // Remove the facility_images property to avoid confusion
-        facility_images: undefined
-      }
-    })
-
-    console.log('FacilityRepository.findAll - Transformed result sample:', transformedData?.[0]);
-
-    return {
-      ...result,
-      data: transformedData
-    }
+    // Return raw data without transformation
+    return result
   }
 
   async findById(id: number) {
@@ -124,31 +96,8 @@ export class FacilityRepository {
 
     console.log('FacilityRepository.findById - Raw database result:', result.data);
 
-    // Transform the data to include featured image
-    const facility = result.data
-    const images = facility.facility_images || []
-    const featuredImage = images.find(img => img.is_featured === true) || null
-    
-    console.log(`FacilityRepository.findById - Processing facility ${facility.id}:`, {
-      name: facility.name,
-      address_street: facility.address_street,
-      address_city: facility.address_city,
-      address_postal_code: facility.address_postal_code,
-      imagesCount: images.length,
-      featuredImage: featuredImage ? { id: featuredImage.id, is_featured: featuredImage.is_featured, image_url: featuredImage.image_url } : null,
-      rawFacility: facility
-    });
-    
-    return {
-      ...result,
-      data: {
-        ...facility,
-        featuredImage,
-        images: images.sort((a, b) => a.display_order - b.display_order),
-        // Remove the facility_images property to avoid confusion
-        facility_images: undefined
-      }
-    }
+    // Return raw data without transformation
+    return result
   }
 
   async findByType(type: string) {

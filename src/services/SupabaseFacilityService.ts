@@ -1,116 +1,97 @@
 import { supabase } from '@/integrations/supabase/client';
 import { Facility, FacilityFilters } from '@/types/facility';
 import { PaginationParams, ApiResponse, PaginatedResponse } from '@/types/api';
-import { transformDatabaseFacility } from '@/utils/facilityTransformer';
 
 export class SupabaseFacilityService {
   private static readonly BASE_URL = 'https://szpdoihoxzlivothoyva.supabase.co/functions/v1';
   private static readonly ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN6cGRvaWhveHpsaXZvdGhveXZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA0Mzk5MzksImV4cCI6MjA2NjAxNTkzOX0.4j3PYVkUpQZce-631weYhyICrUKfBk3LV5drs_tYExc';
 
-  private static transformCoreFacilityToFacility(coreFacility: any): Facility {
-    console.log('SupabaseFacilityService - Raw facility data from API:', coreFacility);
+  private static adaptDatabaseToFacility(dbFacility: any): Facility {
+    console.log('SupabaseFacilityService - Raw facility from DB:', dbFacility);
     
-    // Ensure we have valid data before processing
-    if (!coreFacility || typeof coreFacility !== 'object') {
-      console.error('SupabaseFacilityService - Invalid facility data:', coreFacility);
-      throw new Error('Invalid facility data received from API');
+    // Create address from database fields
+    const addressParts = [
+      dbFacility.address_street,
+      dbFacility.address_city,
+      dbFacility.address_postal_code
+    ].filter(part => part && part.trim() !== '');
+    
+    const address = addressParts.length > 0 ? addressParts.join(', ') : '';
+
+    // Get image from facility_images or fallback
+    let image = 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&auto=format&fit=crop';
+    
+    if (dbFacility.facility_images && Array.isArray(dbFacility.facility_images) && dbFacility.facility_images.length > 0) {
+      // Find featured image or use first one
+      const featuredImage = dbFacility.facility_images.find(img => img.is_featured);
+      const imageToUse = featuredImage || dbFacility.facility_images[0];
+      if (imageToUse?.image_url) {
+        image = imageToUse.image_url;
+      }
     }
 
-    // Extract address fields directly - they should be simple strings
-    const addressStreet = coreFacility.address_street;
-    const addressCity = coreFacility.address_city;
-    const addressPostal = coreFacility.address_postal_code;
-    
-    console.log('SupabaseFacilityService - Raw address fields:', {
-      address_street: typeof addressStreet + ': ' + JSON.stringify(addressStreet),
-      address_city: typeof addressCity + ': ' + JSON.stringify(addressCity),
-      address_postal_code: typeof addressPostal + ': ' + JSON.stringify(addressPostal)
-    });
+    console.log('SupabaseFacilityService - Computed address:', address);
+    console.log('SupabaseFacilityService - Using image:', image);
 
-    // Compute the address from individual fields with better null checks
-    const addressParts = [addressStreet, addressCity, addressPostal].filter(part => 
-      part && 
-      typeof part === 'string' && 
-      part.trim() !== '' && 
-      part !== 'null' && 
-      part !== 'undefined' &&
-      part.toLowerCase() !== 'undefined'
-    );
-    
-    const computedAddress = addressParts.length > 0 
-      ? addressParts.join(', ') 
-      : '';
+    // Adapt database structure to frontend Facility interface
+    return {
+      // Direct database fields
+      id: dbFacility.id,
+      name: dbFacility.name || 'Unnamed Facility',
+      address_street: dbFacility.address_street || '',
+      address_city: dbFacility.address_city || '',
+      address_postal_code: dbFacility.address_postal_code || '',
+      address_country: dbFacility.address_country || 'Norway',
+      type: dbFacility.type || '',
+      area: dbFacility.area || '',
+      status: dbFacility.status || 'active',
+      capacity: dbFacility.capacity || 0,
+      description: dbFacility.description || '',
+      next_available: dbFacility.next_available,
+      rating: dbFacility.rating,
+      review_count: dbFacility.review_count || 0,
+      price_per_hour: dbFacility.price_per_hour || 450,
+      has_auto_approval: dbFacility.has_auto_approval || false,
+      amenities: dbFacility.amenities || [],
+      equipment: dbFacility.equipment || [],
+      time_slot_duration: dbFacility.time_slot_duration || 1,
+      latitude: dbFacility.latitude,
+      longitude: dbFacility.longitude,
+      accessibility_features: dbFacility.accessibility_features || [],
+      allowed_booking_types: dbFacility.allowed_booking_types || ['engangs'],
+      season_from: dbFacility.season_from,
+      season_to: dbFacility.season_to,
+      contact_name: dbFacility.contact_name,
+      contact_email: dbFacility.contact_email,
+      contact_phone: dbFacility.contact_phone,
+      booking_lead_time_hours: dbFacility.booking_lead_time_hours || 2,
+      max_advance_booking_days: dbFacility.max_advance_booking_days || 365,
+      cancellation_deadline_hours: dbFacility.cancellation_deadline_hours || 24,
+      is_featured: dbFacility.is_featured || false,
+      created_at: dbFacility.created_at,
+      updated_at: dbFacility.updated_at,
+      area_sqm: dbFacility.area_sqm,
+      image_url: image,
 
-    console.log('SupabaseFacilityService - Address computation result:', {
-      addressParts,
-      computedAddress
-    });
-
-    // Get image URL - prioritize featured image first
-    let imageUrl = '';
-    
-    console.log('SupabaseFacilityService - Image data processing:', {
-      featuredImage: coreFacility.featuredImage,
-      images: coreFacility.images,
-      image_url: coreFacility.image_url
-    });
-
-    if (coreFacility.featuredImage?.image_url) {
-      imageUrl = coreFacility.featuredImage.image_url;
-      console.log('SupabaseFacilityService - Using featured image:', imageUrl);
-    } else if (coreFacility.images && Array.isArray(coreFacility.images) && coreFacility.images.length > 0) {
-      // Find featured image in array or use first image
-      const featured = coreFacility.images.find(img => img.is_featured);
-      imageUrl = featured ? featured.image_url : coreFacility.images[0].image_url;
-      console.log('SupabaseFacilityService - Using image from array:', imageUrl);
-    } else if (coreFacility.image_url) {
-      imageUrl = coreFacility.image_url;
-      console.log('SupabaseFacilityService - Using direct image_url:', imageUrl);
-    }
-    
-    // Only use fallback if no image found
-    if (!imageUrl) {
-      imageUrl = 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&auto=format&fit=crop';
-      console.log('SupabaseFacilityService - Using fallback image');
-    }
-
-    const transformedFacility = {
-      // Core facility properties
-      ...coreFacility,
-      
-      // Add missing Facility properties with defaults
-      name: coreFacility.name || 'Unnamed Facility',
-      description: coreFacility.description || '',
-      suitableFor: coreFacility.suitableFor || [],
-      equipment: coreFacility.equipment || [],
-      amenities: coreFacility.amenities || coreFacility.accessibility_features || [],
-      
-      // Computed properties for backwards compatibility
-      address: computedAddress,
-      image: imageUrl,
-      pricePerHour: coreFacility.price_per_hour || 450,
-      accessibility: coreFacility.accessibility_features || [],
-      hasAutoApproval: coreFacility.has_auto_approval || false,
-      nextAvailable: coreFacility.next_available || '',
-      timeSlotDuration: coreFacility.time_slot_duration as 1 | 2 || 1,
+      // Computed/legacy fields for backward compatibility
+      address,
+      image,
+      pricePerHour: dbFacility.price_per_hour || 450,
+      accessibility: dbFacility.accessibility_features || [],
+      suitableFor: [],
+      hasAutoApproval: dbFacility.has_auto_approval || false,
+      nextAvailable: dbFacility.next_available || 'Available now',
+      openingHours: [], // TODO: Transform facility_opening_hours if needed
+      zones: dbFacility.zones || [],
+      featuredImage: dbFacility.facility_images?.find(img => img.is_featured),
+      images: dbFacility.facility_images || [],
+      timeSlotDuration: (dbFacility.time_slot_duration || 1) as 1 | 2,
       season: {
-        from: coreFacility.season_from || '2024-01-01',
-        to: coreFacility.season_to || '2024-12-31'
+        from: dbFacility.season_from || '2024-01-01',
+        to: dbFacility.season_to || '2024-12-31'
       },
-      
-      // Add image data
-      featuredImage: coreFacility.featuredImage,
-      images: coreFacility.images || []
+      availableTimes: []
     };
-
-    console.log('SupabaseFacilityService - Final transformed facility:', {
-      id: transformedFacility.id,
-      name: transformedFacility.name,
-      address: transformedFacility.address,
-      image: transformedFacility.image
-    });
-
-    return transformedFacility;
   }
 
   static async getFacilities(
@@ -151,17 +132,17 @@ export class SupabaseFacilityService {
       console.log('SupabaseFacilityService.getFacilities - Raw response:', result);
 
       if (result.success && result.data && Array.isArray(result.data.data)) {
-        // Transform each facility from database format to frontend format
-        const transformedFacilities = result.data.data.map((facility: any) => 
-          this.transformCoreFacilityToFacility(facility)
+        // Adapt database facilities to frontend format
+        const adaptedFacilities = result.data.data.map((facility: any) => 
+          this.adaptDatabaseToFacility(facility)
         );
         
-        console.log('SupabaseFacilityService.getFacilities - Transformed facilities:', transformedFacilities.slice(0, 2));
+        console.log('SupabaseFacilityService.getFacilities - Adapted facilities:', adaptedFacilities.slice(0, 2));
 
         return {
           success: true,
           data: {
-            data: transformedFacilities,
+            data: adaptedFacilities,
             pagination: result.data.pagination
           }
         };
@@ -212,13 +193,13 @@ export class SupabaseFacilityService {
       console.log('SupabaseFacilityService.getFacilityById - Raw response:', result);
 
       if (result.success && result.data) {
-        // Transform facility from database format to frontend format
-        const transformedFacility = this.transformCoreFacilityToFacility(result.data);
-        console.log('SupabaseFacilityService.getFacilityById - Transformed facility:', transformedFacility);
+        // Adapt database facility to frontend format
+        const adaptedFacility = this.adaptDatabaseToFacility(result.data);
+        console.log('SupabaseFacilityService.getFacilityById - Adapted facility:', adaptedFacility);
 
         return {
           success: true,
-          data: transformedFacility
+          data: adaptedFacility
         };
       }
 
