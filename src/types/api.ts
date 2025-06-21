@@ -9,6 +9,12 @@ export interface ApiResponse<T> {
   };
 }
 
+// Add missing RepositoryResponse type
+export interface RepositoryResponse<T> {
+  data?: T;
+  error?: string;
+}
+
 export interface PaginationParams {
   page: number;
   limit: number;
