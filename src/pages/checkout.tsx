@@ -1,10 +1,10 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import GlobalHeader from '@/components/GlobalHeader';
 import GlobalFooter from '@/components/GlobalFooter';
 import { useCart } from '@/contexts/CartContext';
 import { useAuthStore } from '@/stores/useAuthStore';
+import { CheckoutHeader } from '@/components/checkout/CheckoutHeader';
 import { ProgressIndicator } from '@/components/checkout/ProgressIndicator';
 import { EmptyCart } from '@/components/checkout/EmptyCart';
 import { ReviewStep } from '@/components/checkout/ReviewStep';
@@ -43,6 +43,7 @@ const CheckoutPage = () => {
     await new Promise(resolve => setTimeout(resolve, 1000));
     
     clearCart();
+    // Navigate to bookings page instead of confirmation page
     navigate('/bookings');
   };
 
@@ -51,6 +52,7 @@ const CheckoutPage = () => {
   };
 
   const handleContinueFromReview = () => {
+    // Skip login step if user is already authenticated
     if (isAuthenticated) {
       setStep('confirm');
     } else {
@@ -64,7 +66,7 @@ const CheckoutPage = () => {
 
   if (items.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex flex-col">
+      <div className="min-h-screen bg-gray-50 flex flex-col">
         <GlobalHeader />
         <div className="flex-grow flex items-center justify-center">
           <EmptyCart onNavigateHome={() => navigate('/')} />
@@ -75,22 +77,15 @@ const CheckoutPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex flex-col">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       <GlobalHeader />
       <div className="flex-grow py-8">
         <div className="container mx-auto px-4 max-w-6xl">
-          {/* Compact Header */}
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Fullfør reservasjon</h1>
-            <p className="text-gray-600">
-              Gjennomgå og bekreft dine reservasjoner
-            </p>
-          </div>
-
+          <CheckoutHeader onBack={() => navigate(-1)} />
           <ProgressIndicator currentStep={step} isAuthenticated={isAuthenticated} />
 
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-            <div className="xl:col-span-2">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2">
               {step === 'review' && (
                 <ReviewStep
                   items={items}
@@ -116,7 +111,7 @@ const CheckoutPage = () => {
               )}
             </div>
 
-            <div className="xl:col-span-1">
+            <div className="lg:col-span-1">
               <OrderSummary items={items} customerType={formData.customerType} />
             </div>
           </div>

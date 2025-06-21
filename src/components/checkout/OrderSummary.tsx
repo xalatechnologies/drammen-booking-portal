@@ -3,7 +3,6 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { CartItem } from '@/types/cart';
-import { CreditCard } from 'lucide-react';
 
 interface OrderSummaryProps {
   items: CartItem[];
@@ -26,60 +25,59 @@ export function OrderSummary({ items, customerType }: OrderSummaryProps) {
   const totalWithVat = discountedTotal + vat;
 
   return (
-    <div className="sticky top-6 space-y-4">
-      {/* Compact Pricing Card */}
-      <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <CreditCard className="h-5 w-5 text-blue-600" />
-            Prissammendrag
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="space-y-2 text-sm">
-            <div className="flex justify-between">
-              <span>Subtotal ({items.length} reservasjon{items.length !== 1 ? 'er' : ''})</span>
-              <span className="font-medium">{subtotal} kr</span>
-            </div>
-            
-            {discount > 0 && (
-              <div className="flex justify-between text-green-600">
-                <span>
-                  {customerType === 'business' ? 'Bedriftsrabatt (10%)' : 'Organisasjonsrabatt (20%)'}
-                </span>
-                <span className="font-medium">-{Math.round(discount)} kr</span>
-              </div>
-            )}
-            
-            <div className="flex justify-between">
-              <span>MVA (25%)</span>
-              <span className="font-medium">{vat} kr</span>
-            </div>
-            
-            <Separator />
-            
-            <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-3 border border-green-200">
-              <div className="flex justify-between items-center">
-                <span className="font-bold text-green-900">Total</span>
-                <span className="text-xl font-bold text-green-700">{totalWithVat} kr</span>
-              </div>
-            </div>
+    <Card className="sticky top-6">
+      <CardHeader>
+        <CardTitle>Prissammendrag</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="space-y-3">
+          <div className="flex justify-between text-sm">
+            <span>Subtotal ({items.length} reservasjon{items.length !== 1 ? 'er' : ''})</span>
+            <span>{subtotal} kr</span>
           </div>
-        </CardContent>
-      </Card>
+          
+          {discount > 0 && (
+            <div className="flex justify-between text-sm text-green-600">
+              <span>
+                {customerType === 'business' ? 'Bedriftsrabatt (10%)' : 'Organisasjonsrabatt (20%)'}
+              </span>
+              <span>-{Math.round(discount)} kr</span>
+            </div>
+          )}
+          
+          <div className="flex justify-between text-sm">
+            <span>MVA (25%)</span>
+            <span>{vat} kr</span>
+          </div>
+          
+          <Separator />
+          
+          <div className="flex justify-between font-bold text-lg">
+            <span>Total</span>
+            <span className="text-green-600">{totalWithVat} kr</span>
+          </div>
+        </div>
 
-      {/* Quick Info */}
-      <Card className="bg-blue-50 border-blue-200 shadow-md">
-        <CardContent className="p-4">
-          <div className="text-center">
-            <div className="text-sm font-medium text-blue-900 mb-1">Betalingsinfo</div>
-            <div className="text-xs text-blue-700 space-y-1">
-              <div>Faktura sendes etter arrangementet</div>
-              <div>30 dagers betalingsfrist</div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+        <div className="text-xs text-gray-500 space-y-2 pt-4 border-t">
+          <h4 className="font-medium text-gray-700">Inkludert i prisen:</h4>
+          <ul className="space-y-1">
+            <li>• Tilgang til fasiliteten i valgte tidsrom</li>
+            <li>• Grunnleggende utstyr og inventar</li>
+            <li>• Rengjøring etter bruk</li>
+            <li>• Teknisk support ved behov</li>
+          </ul>
+        </div>
+
+        <div className="text-xs text-gray-500 space-y-1 pt-3 border-t">
+          <h4 className="font-medium text-gray-700">Viktige vilkår:</h4>
+          <ul className="space-y-1">
+            <li>• Gratis avbestilling frem til 48 timer før</li>
+            <li>• Bekreftelse sendes på e-post</li>
+            <li>• Faktura sendes etter arrangementet</li>
+            <li>• Møt opp 15 minutter før avtalt tid</li>
+          </ul>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
