@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FacilityListView } from "./FacilityListView";
+import { EnhancedFacilityListView } from "./EnhancedFacilityListView";
 import { FacilityFormView } from "./FacilityFormView";
 import { OpeningHoursManagement } from "./OpeningHoursManagement";
 import { BlackoutPeriodsManagement } from "./BlackoutPeriodsManagement";
@@ -32,7 +32,7 @@ export const FacilityManagementTabs: React.FC<FacilityManagementTabsProps> = ({
         </TabsList>
 
         <TabsContent value="facilities" className="space-y-4">
-          <FacilityListView 
+          <EnhancedFacilityListView 
             selectedFacilityId={selectedFacilityId}
             onFacilitySelect={onFacilitySelect}
           />
