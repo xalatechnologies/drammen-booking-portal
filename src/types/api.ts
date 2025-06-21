@@ -1,10 +1,20 @@
 
+export interface ApiResponse<T> {
+  success: boolean;
+  data?: T;
+  error?: {
+    message: string;
+    code?: string;
+    details?: any;
+  };
+}
+
 export interface PaginationParams {
   page: number;
   limit: number;
 }
 
-export interface PaginationInfo {
+export interface PaginationMeta {
   page: number;
   limit: number;
   total: number;
@@ -15,48 +25,63 @@ export interface PaginationInfo {
 
 export interface PaginatedResponse<T> {
   data: T[];
-  pagination: PaginationInfo;
+  pagination: PaginationMeta;
 }
 
-export interface ApiResponse<T> {
+export interface SortParams {
+  field: string;
+  direction: 'asc' | 'desc';
+}
+
+export interface ErrorDetails {
+  field?: string;
+  message: string;
+  code?: string;
+}
+
+export interface ValidationError {
+  message: string;
+  errors: ErrorDetails[];
+}
+
+// Generic list response
+export interface ListResponse<T> {
   success: boolean;
-  data?: T;
+  data: T[]; // Fixed: Changed from T[][] to T[]
+  pagination?: PaginationMeta;
   error?: {
     message: string;
-    details?: any;
+    code?: string;
   };
 }
 
-// Repository response types - simplified for direct data access
-export interface RepositoryResponse<T> {
-  data: T;
-  error?: string;
-}
-
-// Service price calculation response type
-export interface ServicePriceCalculation {
-  basePrice: number;
-  finalPrice: number;
-  totalPrice: number;
-  breakdown: {
-    baseAmount: number;
-    multiplierAmount: number;
-    discountAmount: number;
-    taxAmount: number;
+// Status responses
+export interface StatusResponse {
+  success: boolean;
+  message?: string;
+  error?: {
+    message: string;
+    code?: string;
   };
 }
 
-// Helper function to extract data from repository responses
-export function extractData<T>(response: ApiResponse<PaginatedResponse<T[]>>): T[] {
-  if (response.success && response.data) {
-    return response.data.data;
-  }
-  return [];
+// Search and filter interfaces
+export interface SearchParams {
+  query?: string;
+  filters?: Record<string, any>;
+  sort?: SortParams;
+  pagination?: PaginationParams;
 }
 
-export function extractPaginatedData<T>(response: ApiResponse<PaginatedResponse<T[]>>): PaginatedResponse<T[]> | null {
-  if (response.success && response.data) {
-    return response.data;
-  }
-  return null;
+export interface FilterOption {
+  label: string;
+  value: string | number;
+  count?: number;
+}
+
+export interface FilterGroup {
+  name: string;
+  label: string;
+  options: FilterOption[];
+  type: 'select' | 'checkbox' | 'range' | 'date';
 }

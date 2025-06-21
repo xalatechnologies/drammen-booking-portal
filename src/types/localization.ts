@@ -1,69 +1,82 @@
 
-import { Language } from '@/i18n/types';
 import { Facility } from './facility';
-import { AdditionalService } from './additionalServices';
 
-export interface LocalizedContent {
-  [key: string]: {
-    [K in Language]: string;
-  };
+// Language codes supported by the system
+export type LanguageCode = 'NO' | 'EN';
+
+// Base interface for translated content
+export interface Translation {
+  id: string;
+  language_code: LanguageCode;
+  key: string;
+  value: string;
+  namespace?: string;
+  created_at: string;
+  updated_at: string;
 }
 
-export interface LocalizedFacility extends Omit<Facility, 'name' | 'description' | 'suitableFor' | 'equipment' | 'amenities'> {
-  name: {
-    [K in Language]: string;
-  };
-  description: {
-    [K in Language]: string;
-  };
-  suitableFor: {
-    [K in Language]: string[];
-  };
-  equipment: {
-    [K in Language]: string[];
-  };
-  amenities?: {
-    [K in Language]: string[];
-  };
-  // Ensure lat/lng are always present for localized facilities
-  lat: number;
-  lng: number;
+// Localized facility with translated fields
+export interface LocalizedFacility extends Omit<Facility, 'name' | 'equipment' | 'description' | 'suitableFor' | 'amenities'> {
+  // Override with localized versions
+  name: string;
+  description?: string;
+  equipment?: string[];
+  suitableFor?: string[];
+  amenities?: string[];
+  pricePerHour: number; // Required field from Facility
   
-  // Make these optional to fix compatibility with old data
-  pricePerHour?: number;
-  accessibility?: string[];
-  hasAutoApproval?: boolean;
-  nextAvailable?: string;
-  timeSlotDuration?: 1 | 2;
-}
-
-export interface LocalizedAdditionalService extends Omit<AdditionalService, 'name' | 'description' | 'shortDescription' | 'metadata'> {
-  name: {
-    [K in Language]: string;
-  };
-  description: {
-    [K in Language]: string;
-  };
-  shortDescription?: {
-    [K in Language]: string;
-  };
-  metadata: Omit<AdditionalService['metadata'], 'instructions'> & {
-    instructions?: {
-      [K in Language]: string;
-    };
+  // Add translation metadata
+  translations?: {
+    name?: Record<LanguageCode, string>;
+    description?: Record<LanguageCode, string>;
+    equipment?: Record<LanguageCode, string[]>;
+    suitableFor?: Record<LanguageCode, string[]>;
+    amenities?: Record<LanguageCode, string[]>;
   };
 }
 
-export interface LocalizationHelper {
-  getCurrentContent<T extends LocalizedContent[keyof LocalizedContent]>(
-    content: T,
-    language: Language,
-    fallbackLanguage?: Language
-  ): string;
-  
-  getCurrentArray<T extends { [K in Language]: string[] }>(
-    content: T,
-    language: Language,
-    fallbackLanguage?: Language
-  ): string[];
+// Translation key structure
+export interface TranslationKey {
+  id: string;
+  key_path: string;
+  namespace: string;
+  description?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+// Localization context
+export interface LocalizationContext {
+  currentLanguage: LanguageCode;
+  availableLanguages: LanguageCode[];
+  fallbackLanguage: LanguageCode;
+  translations: Record<string, string>;
+}
+
+// Translation request/response types
+export interface TranslationRequest {
+  key: string;
+  namespace?: string;
+  language?: LanguageCode;
+  fallback?: string;
+}
+
+export interface TranslationResponse {
+  key: string;
+  value: string;
+  language: LanguageCode;
+  namespace?: string;
+}
+
+// Batch translation operations
+export interface BatchTranslationRequest {
+  keys: string[];
+  namespace?: string;
+  language?: LanguageCode;
+}
+
+export interface BatchTranslationResponse {
+  translations: Record<string, string>;
+  language: LanguageCode;
+  missing_keys?: string[];
 }

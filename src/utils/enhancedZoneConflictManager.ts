@@ -1,7 +1,9 @@
-import { ZoneConflictManager, ExistingBooking } from "./zoneConflictManager";
+
+import { ZoneConflictManager } from "./zoneConflictManager";
 import { Zone } from "@/components/booking/types";
 import { BookingService } from "@/services/BookingService";
-import { ConflictCheckResult, AlternativeSlot } from "./conflict/types";
+import { ConflictCheckResult, AlternativeSlot, ExistingBooking } from "./conflict/types";
+import { Booking } from "@/types/booking";
 
 export interface AlternativeZoneSuggestion {
   zone: Zone;
@@ -176,27 +178,46 @@ export class EnhancedZoneConflictManager extends ZoneConflictManager {
     startDate: Date,
     endDate: Date
   ): ConflictCheckResult {
-    // Simplified implementation - check for basic conflicts
-    const hasConflicts = this.existingBookings.some(booking => {
-      return booking.zoneId === zoneId &&
-             booking.startDate <= endDate &&
-             booking.endDate >= startDate;
-    });
+    // Get existing bookings for this zone and time range
+    const conflictingBookings = this.existingBookings
+      .filter(booking => 
+        booking.zoneId === zoneId &&
+        booking.startDate <= endDate &&
+        booking.endDate >= startDate
+      )
+      .map(booking => ({
+        id: booking.id,
+        zoneId: booking.zoneId,
+        startDate: booking.startDate,
+        endDate: booking.endDate,
+        userId: booking.userId,
+        purpose: booking.purpose,
+        // Add required Booking properties with defaults
+        eventType: 'other' as const,
+        expectedAttendees: 1,
+        ageGroup: 'mixed' as const,
+        contactName: 'Unknown',
+        contactEmail: 'unknown@example.com',
+        contactPhone: '',
+        facilityId: parseInt(this.zones.find(z => z.id === zoneId)?.facilityId || '1'),
+        status: 'confirmed' as const,
+        type: 'engangs' as const,
+        actorType: 'private-person' as const,
+        approvalStatus: 'not-required' as const,
+        requiresApproval: false,
+        description: booking.purpose,
+        specialRequirements: '',
+        basePrice: 0,
+        servicesPrice: 0,
+        totalPrice: 0,
+        paymentStatus: 'pending',
+        durationMinutes: Math.floor((booking.endDate.getTime() - booking.startDate.getTime()) / 60000),
+        bookingReference: `REF-${booking.id}`,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }));
 
-    const conflictingBookings = hasConflicts 
-      ? this.existingBookings.filter(booking => 
-          booking.zoneId === zoneId &&
-          booking.startDate <= endDate &&
-          booking.endDate >= startDate
-        ).map(booking => ({
-          id: booking.id,
-          zoneId: booking.zoneId,
-          startDate: booking.startDate,
-          endDate: booking.endDate,
-          userId: booking.userId,
-          purpose: booking.purpose
-        }))
-      : [];
+    const hasConflicts = conflictingBookings.length > 0;
 
     const availableAlternatives: AlternativeSlot[] = [];
     // Could implement alternative finding logic here
