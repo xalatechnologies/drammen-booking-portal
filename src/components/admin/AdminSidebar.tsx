@@ -3,11 +3,12 @@ import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { LayoutDashboard, Calendar, Building, Settings, Users, UserCheck, BarChart3, Bell, User, Shield, FileText, HelpCircle, Wrench, Activity, Cloud, Lock, Clock, Database, FileSearch, Globe, MessageSquare, Zap } from "lucide-react";
 import { useTranslation } from "@/hooks/useTranslation";
+import { LAYOUT_CONSTANTS } from "@/components/layouts/constants";
+
 const AdminSidebar: React.FC = () => {
   const location = useLocation();
-  const {
-    tSync
-  } = useTranslation();
+  const { tSync } = useTranslation();
+
   const menuItems = [{
     title: tSync("admin.sidebar.overview", "Overview"),
     href: "/admin",
@@ -119,19 +120,27 @@ const AdminSidebar: React.FC = () => {
     icon: Cloud,
     description: tSync("admin.sidebar.descriptions.azureDeploy", "Azure og deployment")
   }];
-  return <div className="fixed inset-y-0 left-0 z-50 w-80 bg-white border-r border-gray-200 overflow-y-auto">
+  
+  return (
+    <div className="fixed inset-y-0 left-0 z-50 bg-white border-r border-gray-200 overflow-y-auto" style={{ width: LAYOUT_CONSTANTS.SIDEBAR_WIDTH }}>
       <div className="flex flex-col h-full">
-        {/* Header */}
-        
-
-        {/* Navigation */}
         <nav className="flex-1 p-6 py-[100px] px-[18px] mx-0">
           <ul className="space-y-3">
-            {menuItems.map(item => {
-            const isActive = location.pathname === item.href;
-            const Icon = item.icon;
-            return <li key={item.href}>
-                  <Link to={item.href} className={cn("flex items-center p-4 rounded-lg transition-colors duration-200 group", isActive ? "bg-blue-50 text-blue-700 border-l-4 border-l-blue-600" : "text-gray-700 hover:bg-gray-50 hover:text-gray-900")}>
+            {menuItems.map((item) => {
+              const isActive = location.pathname === item.href;
+              const Icon = item.icon;
+              
+              return (
+                <li key={item.href}>
+                  <Link
+                    to={item.href}
+                    className={cn(
+                      "flex items-center p-4 rounded-lg transition-colors duration-200 group",
+                      isActive
+                        ? "bg-blue-50 text-blue-700 border-l-4 border-l-blue-600"
+                        : "text-gray-700 hover:bg-gray-50 hover:text-gray-900"
+                    )}
+                  >
                     <Icon className="w-6 h-6 mr-4 flex-shrink-0" />
                     <div className="flex-1 min-w-0">
                       <div className="text-base font-medium truncate">
@@ -142,11 +151,14 @@ const AdminSidebar: React.FC = () => {
                       </div>
                     </div>
                   </Link>
-                </li>;
-          })}
+                </li>
+              );
+            })}
           </ul>
         </nav>
       </div>
-    </div>;
+    </div>
+  );
 };
+
 export default AdminSidebar;

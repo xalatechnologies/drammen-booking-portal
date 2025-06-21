@@ -10,6 +10,8 @@ import { cn } from "@/lib/utils";
 import { useAdminRole, AdminRole } from "@/contexts/AdminRoleContext";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { LAYOUT_CONSTANTS } from "@/components/layouts/constants";
+
 type Notification = {
   id: string;
   title: string;
@@ -17,6 +19,7 @@ type Notification = {
   timestamp: string;
   read: boolean;
 };
+
 const AdminHeader = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const {
@@ -99,7 +102,8 @@ const AdminHeader = () => {
       read: true
     })));
   };
-  return <header className="border-b bg-white shadow-sm z-50 pb-2 py-[15px]">
+  return (
+    <header className="border-b bg-white shadow-sm z-50 pb-2 py-[15px]" style={{ height: LAYOUT_CONSTANTS.HEADER_HEIGHT }}>
       <div className="flex h-16 items-center px-6">
         <div className="flex items-center gap-4 min-w-0">
           <div className="md:hidden mr-2">
@@ -112,7 +116,11 @@ const AdminHeader = () => {
           <div className="flex items-center gap-4 w-full max-w-lg">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input placeholder={tSync("admin.header.searchPlaceholder", "Søk i alt innhold...")} className="pl-10 h-10 text-base bg-gray-50 border-gray-200 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none focus:border-blue-500" aria-label={tSync("admin.header.searchPlaceholder", "Søk i systemet")} />
+              <Input 
+                placeholder={tSync("admin.header.searchPlaceholder", "Search all content...")} 
+                className="pl-10 h-10 text-base bg-gray-50 border-gray-200 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none focus:border-blue-500" 
+                aria-label={tSync("admin.header.searchPlaceholder", "Search the system")} 
+              />
             </div>
           </div>
         </div>
@@ -209,6 +217,8 @@ const AdminHeader = () => {
           </DropdownMenu>
         </div>
       </div>
-    </header>;
+    </header>
+  );
 };
+
 export default AdminHeader;
