@@ -17,6 +17,7 @@ export interface Facility {
   rating?: number;
   reviewCount?: number;
   pricePerHour?: number;
+  area_sqm?: number; // Added this property
   amenities?: string[];
   hasAutoApproval?: boolean;
   timeSlotDuration?: 1 | 2; // New option: 1 for 1-hour slots, 2 for 2-hour slots
