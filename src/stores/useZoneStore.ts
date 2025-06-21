@@ -1,14 +1,14 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Zone } from '@/types/zone';
+import { Zone as BookingZone } from '@/components/booking/types';
 import { PaginationParams } from '@/types/api';
 import { ZoneService } from '@/services/zoneService';
 
 interface ZoneState {
-  // Zones data
-  zones: Zone[];
-  currentZone: Zone | null;
+  // Zones data - use BookingZone type consistently
+  zones: BookingZone[];
+  currentZone: BookingZone | null;
   totalCount: number;
   pagination: PaginationParams;
   
@@ -17,10 +17,10 @@ interface ZoneState {
   error: string | null;
   
   // Actions
-  setZones: (zones: Zone[], total: number) => void;
-  setCurrentZone: (zone: Zone | null) => void;
-  addZone: (zone: Zone) => void;
-  updateZone: (zoneId: string, updates: Partial<Zone>) => void;
+  setZones: (zones: BookingZone[], total: number) => void;
+  setCurrentZone: (zone: BookingZone | null) => void;
+  addZone: (zone: BookingZone) => void;
+  updateZone: (zoneId: string, updates: Partial<BookingZone>) => void;
   removeZone: (zoneId: string) => void;
   setPagination: (pagination: Partial<PaginationParams>) => void;
   setLoading: (loading: boolean) => void;
@@ -29,8 +29,8 @@ interface ZoneState {
   // Async actions
   fetchZones: (facilityId?: string) => Promise<void>;
   fetchZoneById: (id: string) => Promise<void>;
-  createZone: (zoneData: Partial<Zone>) => Promise<void>;
-  updateZoneAsync: (id: string, zoneData: Partial<Zone>) => Promise<void>;
+  createZone: (zoneData: Partial<BookingZone>) => Promise<void>;
+  updateZoneAsync: (id: string, zoneData: Partial<BookingZone>) => Promise<void>;
   deleteZone: (id: string) => Promise<void>;
   
   reset: () => void;
@@ -147,51 +147,44 @@ export const useZoneStore = create<ZoneState>()(
         setError(null);
 
         try {
-          const completeZoneData = {
+          const completeZoneData: Omit<BookingZone, 'id'> = {
             name: zoneData.name || '',
             facilityId: zoneData.facilityId || '',
             isMainZone: zoneData.isMainZone || false,
             capacity: zoneData.capacity || 1,
-            area: zoneData.area || 0,
-            features: zoneData.features || [],
+            pricePerHour: zoneData.pricePerHour || 250,
+            description: zoneData.description || '',
+            area: zoneData.area || '100 m²',
+            parentZoneId: zoneData.parentZoneId,
+            subZones: zoneData.subZones || [],
+            equipment: zoneData.equipment || [],
+            amenities: zoneData.amenities || [],
+            bookingRules: zoneData.bookingRules || {
+              minBookingDuration: 1,
+              maxBookingDuration: 8,
+              allowedTimeSlots: [],
+              bookingTypes: ['one-time', 'recurring'],
+              advanceBookingDays: 30,
+              cancellationHours: 24
+            },
+            adminInfo: zoneData.adminInfo || {
+              contactPersonName: 'Zone Manager',
+              contactPersonEmail: 'zone@drammen.kommune.no',
+              specialInstructions: '',
+              maintenanceSchedule: []
+            },
+            layout: zoneData.layout || {
+              coordinates: {
+                x: 0,
+                y: 0,
+                width: 100,
+                height: 100
+              },
+              entryPoints: ['Hovedinngang']
+            },
             accessibility: zoneData.accessibility || [],
-            equipment: zoneData.equipment || [], // Add missing equipment property
-            pricing: zoneData.pricing || {
-              basePrice: 0,
-              currency: 'NOK',
-              priceRules: [],
-              minimumBookingDuration: 60,
-              maximumBookingDuration: 480,
-              cancellationPolicy: {
-                freeUntilHours: 24,
-                partialRefundUntilHours: 12,
-                partialRefundPercentage: 50,
-                noRefundAfterHours: 2
-              }
-            },
-            availability: zoneData.availability || {
-              openingHours: [],
-              blackoutPeriods: [],
-              maintenanceSchedule: [],
-              recurringUnavailability: []
-            },
-            restrictions: zoneData.restrictions || {
-              requiresSupervision: false,
-              allowedActivities: [],
-              prohibitedActivities: [],
-              requiresTraining: false,
-              alcoholPermitted: false,
-              smokingPermitted: false,
-              petsAllowed: false,
-              cateringAllowed: true,
-              decorationsAllowed: true,
-              amplifiedSoundAllowed: false,
-              commercialUseAllowed: false
-            },
-            isActive: zoneData.isActive !== undefined ? zoneData.isActive : true,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            ...zoneData
+            features: zoneData.features || [],
+            isActive: zoneData.isActive !== undefined ? zoneData.isActive : true
           };
 
           const result = await ZoneService.createZone(completeZoneData);

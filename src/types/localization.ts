@@ -33,21 +33,17 @@ export interface LocalizationHelper {
   ): string[];
 }
 
-// Localized facility with translated fields - make required properties optional to match data files
-export interface LocalizedFacility extends Omit<Facility, 'name' | 'equipment' | 'description' | 'suitableFor' | 'amenities'> {
+// Localized facility with translated fields - make properties optional by extending Partial
+export interface LocalizedFacility extends Partial<Omit<Facility, 'name' | 'equipment' | 'description' | 'suitableFor' | 'amenities'>> {
+  // Core required properties
+  id: number;
+  
   // Override with localized versions - allow both string and localized object types
   name: string | { NO: string; EN: string };
   description?: string | { NO: string; EN: string };
   equipment?: string[] | { NO: string[]; EN: string[] };
   suitableFor?: string[] | { NO: string[]; EN: string[] };
   amenities?: string[] | { NO: string[]; EN: string[] };
-  
-  // Make these properties optional to match existing data
-  pricePerHour?: number;
-  accessibility?: string[];
-  hasAutoApproval?: boolean;
-  nextAvailable?: string;
-  timeSlotDuration?: number;
   
   // Add missing coordinate properties that are used in data files
   lat?: number;

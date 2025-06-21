@@ -1,4 +1,3 @@
-
 import { ZoneConflictManager } from "./zoneConflictManager";
 import { Zone } from "@/components/booking/types";
 import { BookingService } from "@/services/BookingService";
@@ -208,7 +207,7 @@ export class EnhancedZoneConflictManager extends ZoneConflictManager {
         booking.endDate >= startDate
       )
       .map(booking => ({
-        // Core booking properties
+        // Core booking properties that match Booking interface
         id: booking.id,
         user_id: booking.userId,
         facility_id: parseInt(this.zones.find(z => z.id === zoneId)?.facilityId || '1'),
@@ -240,7 +239,13 @@ export class EnhancedZoneConflictManager extends ZoneConflictManager {
         created_at: new Date(),
         updated_at: new Date(),
         
-        // Additional properties to match Booking type
+        // Additional Booking interface properties
+        eventType: 'other' as const,
+        expectedAttendees: 1,
+        ageGroup: 'mixed' as const,
+        contactName: 'Unknown',
+        contactEmail: 'unknown@example.com',
+        contactPhone: '',
         additionalServices: [],
         pricing: {
           basePrice: 0,
@@ -248,6 +253,10 @@ export class EnhancedZoneConflictManager extends ZoneConflictManager {
           totalPrice: 0,
           currency: 'NOK'
         },
+        requiresApproval: false,
+        approvalStatus: 'not-required' as const,
+        createdAt: new Date(),
+        updatedAt: new Date(),
         notes: [],
         attachments: [],
         conflicts: [],
