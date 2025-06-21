@@ -1,18 +1,17 @@
 
 import React, { useState } from "react";
-import { PageLayout } from "@/components/layouts";
 import { FacilityListView } from "@/components/admin/facilities/FacilityListView";
 
 const FacilitiesPage = () => {
   const [selectedFacilityId, setSelectedFacilityId] = useState<number | undefined>();
 
   return (
-    <PageLayout>
+    <div className="w-full h-full">
       <FacilityListView 
         selectedFacilityId={selectedFacilityId}
         onFacilitySelect={setSelectedFacilityId}
       />
-    </PageLayout>
+    </div>
   );
 };
 
