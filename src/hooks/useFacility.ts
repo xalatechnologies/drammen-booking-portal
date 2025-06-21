@@ -51,7 +51,7 @@ export function useFacility(id: number | string) {
     facility,
     isLoading,
     error: response?.success === false ? response.error : error,
-    notFound: response?.success === false && response.error?.code === 'NOT_FOUND',
+    notFound: response?.success === false && response.error?.message?.includes('NOT_FOUND'),
     refetch,
   };
 }

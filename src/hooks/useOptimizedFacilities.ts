@@ -19,7 +19,7 @@ export function useOptimizedFacilities({
 }: UseFacilitiesParams) {
   const { getLocalizedFacility, language } = useLocalization();
 
-  // Fetch the raw localized data (language-agnostic query key)
+  // Use getFacilities instead of getRawFacilities
   const {
     data: response,
     isLoading,
@@ -27,7 +27,7 @@ export function useOptimizedFacilities({
     refetch
   } = useQuery({
     queryKey: ['facilities', pagination, filters, sort],
-    queryFn: () => LocalizedFacilityService.getRawFacilities(pagination, filters, sort),
+    queryFn: () => LocalizedFacilityService.getFacilities(pagination, filters, sort),
     staleTime: 0, // No cache - always fetch fresh data
     gcTime: 30 * 1000, // Keep in memory for 30 seconds only
   });

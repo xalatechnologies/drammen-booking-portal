@@ -124,8 +124,8 @@ export class AdditionalServicesService {
 
     const service = serviceResult.data;
     
-    // Basic price calculation - this would be more complex in a real implementation
-    const basePrice = service.base_price || 0;
+    // Use basePrice instead of base_price
+    const basePrice = service.basePrice || 0;
     const totalPrice = basePrice * quantity;
 
     return {

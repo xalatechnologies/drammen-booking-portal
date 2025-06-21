@@ -23,15 +23,15 @@ export function useOptimizedFacility(id: number | string) {
 
   // Transform the facility based on current language (memoized)
   const facility = useMemo(() => {
-    if (!response?.success || !response.data) return null;
+    if (!response?.data) return null;
     return getLocalizedFacility(response.data);
   }, [response, getLocalizedFacility]);
 
   return {
     facility,
     isLoading,
-    error: response?.success === false ? response.error : error,
-    notFound: response?.success === false && response.error?.code === 'NOT_FOUND',
+    error: response?.error || error,
+    notFound: response?.error && response.error.message.includes('NOT_FOUND'),
     refetch,
   };
 }
