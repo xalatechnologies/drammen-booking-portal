@@ -1,3 +1,4 @@
+
 import { Booking } from '@/types/booking';
 import { BookingConflict } from '@/types/booking';
 import { Zone } from '@/components/booking/types';
@@ -13,14 +14,14 @@ export class ConflictChecker {
     
     for (const existing of existingBookings) {
       // Check time overlap using correct property names
-      const newStart = new Date(newBooking.start_date || newBooking.startDate || '');
-      const newEnd = new Date(newBooking.end_date || newBooking.endDate || '');
-      const existingStart = new Date(existing.start_date || existing.startDate || '');
-      const existingEnd = new Date(existing.end_date || existing.endDate || '');
+      const newStart = new Date(newBooking.startDate || '');
+      const newEnd = new Date(newBooking.endDate || '');
+      const existingStart = new Date(existing.startDate || '');
+      const existingEnd = new Date(existing.endDate || '');
       
       if (this.hasTimeOverlap(newStart, newEnd, existingStart, existingEnd)) {
         // Same zone conflict
-        if (newBooking.zone_id === existing.zone_id) {
+        if (newBooking.zoneId === existing.zoneId) {
           conflicts.push({
             id: `conflict-${existing.id}`,
             booking_id: newBooking.id || '',
@@ -34,7 +35,7 @@ export class ConflictChecker {
         }
         
         // Facility-wide conflict (if booking whole facility)
-        if (newBooking.facility_id === existing.facility_id && 
+        if (newBooking.facilityId === existing.facilityId && 
             this.isWholeFacilityBooking(newBooking, zones)) {
           conflicts.push({
             id: `facility-conflict-${existing.id}`,
@@ -49,8 +50,8 @@ export class ConflictChecker {
         }
         
         // Check zone conflict rules
-        const conflictingZones = this.getConflictingZones(newBooking.zone_id, zones);
-        if (conflictingZones.includes(existing.zone_id)) {
+        const conflictingZones = this.getConflictingZones(newBooking.zoneId, zones);
+        if (conflictingZones.includes(existing.zoneId)) {
           conflicts.push({
             id: `zone-rule-conflict-${existing.id}`,
             booking_id: newBooking.id || '',

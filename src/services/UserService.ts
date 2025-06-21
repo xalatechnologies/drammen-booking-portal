@@ -88,8 +88,8 @@ export class UserService {
 
     const userData = {
       ...request,
-      createdAt: new Date().toISOString(), // Use createdAt instead of created_at
-      updatedAt: new Date().toISOString(), // Use updatedAt instead of updated_at
+      createdAt: new Date(), // Use Date object instead of string
+      updatedAt: new Date(), // Use Date object instead of string
       isActive: true,
       lastLoginAt: null,
       permissions: request.permissions || [],
@@ -142,7 +142,7 @@ export class UserService {
 
     const updateData = {
       ...request,
-      updatedAt: new Date().toISOString() // Use updatedAt instead of updated_at
+      updatedAt: new Date() // Use Date object instead of string
     };
 
     const result = await userRepository.update(id, updateData);
@@ -251,7 +251,7 @@ export class UserService {
     const result = await userRepository.update(userId, {
       role: newRole,
       permissions: permissions || [],
-      updatedAt: new Date().toISOString() // Use updatedAt instead of updated_at
+      updatedAt: new Date() // Use Date object instead of string
     });
 
     if (result.error) {
@@ -272,7 +272,7 @@ export class UserService {
     
     const result = await userRepository.update(userId, {
       isActive: false,
-      updatedAt: new Date().toISOString() // Use updatedAt instead of updated_at
+      updatedAt: new Date() // Use Date object instead of string
     });
 
     if (result.error) {
@@ -293,7 +293,7 @@ export class UserService {
     
     const result = await userRepository.update(userId, {
       isActive: true,
-      updatedAt: new Date().toISOString() // Use updatedAt instead of updated_at
+      updatedAt: new Date() // Use Date object instead of string
     });
 
     if (result.error) {

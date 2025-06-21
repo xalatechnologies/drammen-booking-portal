@@ -1,4 +1,3 @@
-
 import React from "react";
 import { format } from "date-fns";
 import { nb } from "date-fns/locale";
@@ -37,8 +36,8 @@ export function ZoneAvailabilityTable({
       return { 
         available: false, 
         reason: 'conflict', 
-        conflictType: conflict.conflictType,
-        conflictDetails: conflict.bookedBy
+        conflictType: conflict.conflict_type, // Use conflict_type from BookingConflict
+        conflictDetails: 'Booked by another user' // Default value since bookedBy doesn't exist
       };
     }
     
@@ -86,9 +85,9 @@ export function ZoneAvailabilityTable({
     return <Badge variant="default" className="text-xs bg-green-100 text-green-800">Ledig</Badge>;
   };
 
-  // Group zones by hierarchy
-  const mainZones = zones.filter(zone => zone.isMainZone);
-  const subZones = zones.filter(zone => !zone.isMainZone);
+  // Group zones by hierarchy - check for isMainZone property or assume main zone by checking subzones
+  const mainZones = zones.filter(zone => zone.isMainZone === true || zone.subZones?.length > 0);
+  const subZones = zones.filter(zone => zone.isMainZone === false || (!zone.subZones || zone.subZones.length === 0));
 
   return (
     <Card className="p-6">

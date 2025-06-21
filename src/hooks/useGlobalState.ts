@@ -1,13 +1,10 @@
-import { useUserStore } from '@/stores/useUserStore';
+
 import { useFacilityStore } from '@/stores/useFacilityStore';
 import { useZoneStore } from '@/stores/useZoneStore';
 import { useAdditionalServicesStore } from '@/stores/useAdditionalServicesStore';
 
 export const useGlobalState = () => {
-  const user = useUserStore(state => state.user);
-  const setUser = useUserStore(state => state.setUser);
-  const logout = useUserStore(state => state.logout);
-  
+  // Remove user store references since it doesn't exist
   const facilities = useFacilityStore(state => state.facilities);
   const currentFacility = useFacilityStore(state => state.currentFacility);
   const setCurrentFacility = useFacilityStore(state => state.setCurrentFacility);
@@ -19,24 +16,18 @@ export const useGlobalState = () => {
   const services = useAdditionalServicesStore(state => state.services);
   const selectedService = useAdditionalServicesStore(state => state.selectedService);
   const setSelectedService = useAdditionalServicesStore(state => state.setSelectedService);
-  const clearError = useAdditionalServicesStore(state => state.clearError); // Use clearError instead of reset
+  const clearError = useAdditionalServicesStore(state => state.clearError);
   
   const resetAll = () => {
-    logout();
     setCurrentFacility(null);
     setCurrentZone(null);
     setSelectedService(null);
-    clearError(); // Use clearError method
+    clearError();
   };
   
-  const isLoading = useAdditionalServicesStore(state => state.loading); // Use loading instead of isLoading
+  const isLoading = useAdditionalServicesStore(state => state.loading);
   
   return {
-    // User state
-    user,
-    setUser,
-    logout,
-    
     // Facility state
     facilities,
     currentFacility,

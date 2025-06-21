@@ -155,6 +155,7 @@ export const useZoneStore = create<ZoneState>()(
             area: zoneData.area || 0,
             features: zoneData.features || [],
             accessibility: zoneData.accessibility || [],
+            equipment: zoneData.equipment || [], // Add missing equipment property
             pricing: zoneData.pricing || {
               basePrice: 0,
               currency: 'NOK',

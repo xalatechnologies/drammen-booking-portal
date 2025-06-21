@@ -1,14 +1,23 @@
 
 import { Zone } from "@/components/booking/types";
-import { RecommendationEngine } from "./conflict/recommendationEngine";
-import type { ExistingBooking } from "./conflict/types";
-import { BookingConflict } from "@/components/booking/types";
+import { BookingConflict } from "@/types/booking";
 
-export type { ExistingBooking } from "./conflict/types";
+export interface ExistingBooking {
+  id: string;
+  zoneId: string;
+  startDate: Date;
+  endDate: Date;
+  userId: string;
+  purpose: string;
+}
 
-export class ZoneConflictManager extends RecommendationEngine {
+export class ZoneConflictManager {
+  protected zones: Zone[];
+  protected existingBookings: ExistingBooking[];
+
   constructor(zones: Zone[], existingBookings: ExistingBooking[] = []) {
-    super(zones, existingBookings);
+    this.zones = zones;
+    this.existingBookings = existingBookings;
   }
 
   // Add the missing checkZoneConflict method

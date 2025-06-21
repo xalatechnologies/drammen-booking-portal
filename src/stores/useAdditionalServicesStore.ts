@@ -135,7 +135,7 @@ export const useAdditionalServicesStore = create<AdditionalServicesState>((set, 
     try {
       const result = await additionalServiceRepository.update(id, {
         ...serviceData,
-        updated_at: new Date().toISOString(), // Keep this as updated_at for the repository
+        updatedAt: new Date().toISOString(), // Use updatedAt instead of updated_at
       });
       
       if (result.error) {

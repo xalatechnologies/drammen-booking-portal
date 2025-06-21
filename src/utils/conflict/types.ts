@@ -24,4 +24,13 @@ export interface ConflictRule {
   description: string;
 }
 
-export { ZoneAvailabilityStatus };
+export interface ExistingBooking {
+  id: string;
+  zoneId: string;
+  startDate: Date;
+  endDate: Date;
+  userId: string;
+  purpose: string;
+}
+
+export type { ZoneAvailabilityStatus };
