@@ -3,7 +3,7 @@ import React from 'react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Edit3, Trash2, Calendar, Clock, Users, CheckCircle } from 'lucide-react';
+import { Edit3, Trash2, Calendar, Clock, Users, CheckCircle, User, FileText, Info } from 'lucide-react';
 import { CartItem } from '@/types/cart';
 import { format } from 'date-fns';
 import { nb } from 'date-fns/locale';
@@ -45,6 +45,29 @@ export function ReservationAccordion({
       }
     }
     return 'Flere tidspunkt';
+  };
+
+  const getActorTypeLabel = (actorType: string) => {
+    switch (actorType) {
+      case 'private': return 'Privatperson';
+      case 'business': return 'Bedrift';
+      case 'organization': return 'Organisasjon';
+      case 'lag-foreninger': return 'Lag/Foreninger';
+      case 'paraply': return 'Paraplyorganisasjon';
+      default: return 'Ukjent';
+    }
+  };
+
+  const getEventTypeLabel = (eventType?: string) => {
+    switch (eventType) {
+      case 'sport': return 'Sport';
+      case 'cultural': return 'Kultur';
+      case 'meeting': return 'Møte';
+      case 'training': return 'Trening';
+      case 'competition': return 'Konkurranse';
+      case 'other': return 'Annet';
+      default: return 'Ikke spesifisert';
+    }
   };
 
   return (
@@ -138,21 +161,113 @@ export function ReservationAccordion({
                         {reservation.pricing?.totalPrice || (reservation.pricePerHour * totalDuration)} kr
                       </div>
                       <Badge variant="outline" className="text-xs">
-                        {reservation.organizationType === 'business' ? 'Bedrift' : 
-                         reservation.organizationType === 'organization' ? 'Organisasjon' : 'Privat'}
+                        {getActorTypeLabel(reservation.organizationType)}
                       </Badge>
                     </div>
                   </div>
                 </AccordionTrigger>
                 
                 <AccordionContent className="px-6 pb-6">
-                  <div className="space-y-4 pt-4 border-t border-gray-100">
+                  <div className="space-y-6 pt-4 border-t border-gray-100">
+                    {/* Booking Details */}
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <div className="space-y-4">
+                        <h4 className="font-medium text-gray-900 flex items-center gap-2">
+                          <Info className="h-4 w-4 text-blue-600" />
+                          Booking detaljer
+                        </h4>
+                        
+                        <div className="space-y-3 text-sm">
+                          <div className="flex items-start gap-3">
+                            <FileText className="h-4 w-4 text-gray-500 mt-0.5 flex-shrink-0" />
+                            <div>
+                              <span className="font-medium text-gray-700">Formål:</span>
+                              <p className="text-gray-600 mt-1">{reservation.purpose}</p>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center gap-3">
+                            <User className="h-4 w-4 text-gray-500 flex-shrink-0" />
+                            <div>
+                              <span className="font-medium text-gray-700">Aktør type:</span>
+                              <span className="text-gray-600 ml-2">{getActorTypeLabel(reservation.organizationType)}</span>
+                            </div>
+                          </div>
+                          
+                          {reservation.eventType && (
+                            <div className="flex items-center gap-3">
+                              <Calendar className="h-4 w-4 text-gray-500 flex-shrink-0" />
+                              <div>
+                                <span className="font-medium text-gray-700">Arrangementstype:</span>
+                                <span className="text-gray-600 ml-2">{getEventTypeLabel(reservation.eventType)}</span>
+                              </div>
+                            </div>
+                          )}
+                          
+                          <div className="flex items-center gap-3">
+                            <Users className="h-4 w-4 text-gray-500 flex-shrink-0" />
+                            <div>
+                              <span className="font-medium text-gray-700">Forventet antall deltakere:</span>
+                              <span className="text-gray-600 ml-2">{reservation.expectedAttendees}</span>
+                            </div>
+                          </div>
+
+                          {reservation.specialRequirements && (
+                            <div className="flex items-start gap-3">
+                              <Info className="h-4 w-4 text-gray-500 mt-0.5 flex-shrink-0" />
+                              <div>
+                                <span className="font-medium text-gray-700">Spesielle krav:</span>
+                                <p className="text-gray-600 mt-1">{reservation.specialRequirements}</p>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Contact Information */}
+                      {reservation.customerInfo && (
+                        <div className="space-y-4">
+                          <h4 className="font-medium text-gray-900 flex items-center gap-2">
+                            <User className="h-4 w-4 text-blue-600" />
+                            Kontaktinformasjon
+                          </h4>
+                          
+                          <div className="space-y-2 text-sm">
+                            <div>
+                              <span className="font-medium text-gray-700">Navn:</span>
+                              <span className="text-gray-600 ml-2">{reservation.customerInfo.name}</span>
+                            </div>
+                            
+                            <div>
+                              <span className="font-medium text-gray-700">E-post:</span>
+                              <span className="text-gray-600 ml-2">{reservation.customerInfo.email}</span>
+                            </div>
+                            
+                            <div>
+                              <span className="font-medium text-gray-700">Telefon:</span>
+                              <span className="text-gray-600 ml-2">{reservation.customerInfo.phone}</span>
+                            </div>
+                            
+                            {reservation.customerInfo.organization && (
+                              <div>
+                                <span className="font-medium text-gray-700">Organisasjon:</span>
+                                <span className="text-gray-600 ml-2">{reservation.customerInfo.organization}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
                     {/* Detailed Time Slots */}
                     <div>
-                      <h4 className="font-medium text-gray-900 mb-2">Valgte tidspunkt:</h4>
+                      <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
+                        <Clock className="h-4 w-4 text-blue-600" />
+                        Valgte tidspunkt
+                      </h4>
                       <div className="grid gap-2">
                         {timeSlots.map((slot, index) => (
-                          <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded text-sm">
+                          <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded text-sm">
                             <div className="flex items-center gap-3">
                               <span className="font-medium">
                                 {format(new Date(slot.date), 'EEEE dd.MM.yyyy', { locale: nb })}
@@ -169,13 +284,13 @@ export function ReservationAccordion({
                     </div>
 
                     {/* Terms and Included Services */}
-                    <div className="grid md:grid-cols-2 gap-4 pt-3 border-t border-gray-100">
+                    <div className="grid md:grid-cols-2 gap-6 pt-4 border-t border-gray-100">
                       <div>
-                        <h4 className="font-medium text-gray-900 mb-2 flex items-center gap-2">
+                        <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
                           <CheckCircle className="h-4 w-4 text-green-600" />
                           Inkludert i prisen
                         </h4>
-                        <ul className="text-xs text-gray-600 space-y-1">
+                        <ul className="text-sm text-gray-600 space-y-1">
                           <li>• Tilgang til fasiliteten</li>
                           <li>• Grunnleggende utstyr</li>
                           <li>• Rengjøring etter bruk</li>
@@ -184,8 +299,8 @@ export function ReservationAccordion({
                       </div>
                       
                       <div>
-                        <h4 className="font-medium text-gray-900 mb-2">Vilkår</h4>
-                        <ul className="text-xs text-gray-600 space-y-1">
+                        <h4 className="font-medium text-gray-900 mb-3">Vilkår</h4>
+                        <ul className="text-sm text-gray-600 space-y-1">
                           <li>• Gratis avbestilling (48t)</li>
                           <li>• Møt opp 15 min før</li>
                           <li>• Faktura etter arrangementet</li>
