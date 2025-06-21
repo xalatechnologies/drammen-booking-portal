@@ -110,17 +110,19 @@ export const EnhancedFacilityForm: React.FC<EnhancedFacilityFormProps> = ({
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-4">
-        {/* Breadcrumb */}
-        <FacilityFormBreadcrumb 
-          isEditing={isEditing} 
-          facilityName={facility?.name}
-          onCancel={onCancel}
-        />
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-3">
+        {/* Breadcrumb - Reduced margin */}
+        <div className="mb-3">
+          <FacilityFormBreadcrumb 
+            isEditing={isEditing} 
+            facilityName={facility?.name}
+            onCancel={onCancel}
+          />
+        </div>
 
         {/* Compact Page Header */}
         <div className="mb-4">
-          <h1 className="text-2xl font-bold text-gray-900">
+          <h1 className="text-xl font-semibold text-gray-900">
             {isEditing ? `${tSync("admin.facilities.form.edit", "Edit")}: ${facility.name}` : tSync("admin.facilities.form.addNew", "Add New Facility")}
           </h1>
           <p className="text-sm text-gray-600 mt-1">
@@ -132,24 +134,24 @@ export const EnhancedFacilityForm: React.FC<EnhancedFacilityFormProps> = ({
         </div>
 
         {/* Main Content - Reduced Padding */}
-        <Card className="shadow-lg border-0">
+        <Card className="shadow-sm border">
           <CardContent className="p-0">
             <Tabs defaultValue="details" className="w-full">
-              <div className="border-b border-gray-200 px-4 pt-4">
-                <TabsList className="grid w-full grid-cols-5 h-9">
-                  <TabsTrigger value="details" className="text-sm py-1">
+              <div className="border-b border-gray-200 px-4 pt-3">
+                <TabsList className="grid w-full grid-cols-5 h-8">
+                  <TabsTrigger value="details" className="text-xs py-1 px-2">
                     {tSync("admin.facilities.form.tabs.details", "Details")}
                   </TabsTrigger>
-                  <TabsTrigger value="contact" className="text-sm py-1">
+                  <TabsTrigger value="contact" className="text-xs py-1 px-2">
                     {tSync("admin.facilities.form.tabs.contact", "Contact")}
                   </TabsTrigger>
-                  <TabsTrigger value="config" className="text-sm py-1">
+                  <TabsTrigger value="config" className="text-xs py-1 px-2">
                     {tSync("admin.facilities.form.tabs.config", "Configuration")}
                   </TabsTrigger>
-                  <TabsTrigger value="images" disabled={!isEditing} className="text-sm py-1">
+                  <TabsTrigger value="images" disabled={!isEditing} className="text-xs py-1 px-2">
                     {tSync("admin.facilities.form.tabs.images", "Images")}
                   </TabsTrigger>
-                  <TabsTrigger value="calendar" disabled={!isEditing} className="text-sm py-1">
+                  <TabsTrigger value="calendar" disabled={!isEditing} className="text-xs py-1 px-2">
                     {tSync("admin.facilities.form.tabs.calendar", "Calendar")}
                   </TabsTrigger>
                 </TabsList>
@@ -157,18 +159,18 @@ export const EnhancedFacilityForm: React.FC<EnhancedFacilityFormProps> = ({
 
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)}>
-                  <div className="p-4 space-y-4">
-                    <TabsContent value="details" className="mt-0 space-y-4">
+                  <div className="p-4 space-y-3">
+                    <TabsContent value="details" className="mt-0 space-y-3">
                       <FacilityBasicSection form={form} />
                       <FacilityAddressSection form={form} />
                       <FacilityFeaturesSection form={form} />
                     </TabsContent>
 
-                    <TabsContent value="contact" className="mt-0 space-y-4">
+                    <TabsContent value="contact" className="mt-0 space-y-3">
                       <FacilityContactSection form={form} />
                     </TabsContent>
 
-                    <TabsContent value="config" className="mt-0 space-y-4">
+                    <TabsContent value="config" className="mt-0 space-y-3">
                       <FacilityConfigSection form={form} />
                     </TabsContent>
 
@@ -176,7 +178,7 @@ export const EnhancedFacilityForm: React.FC<EnhancedFacilityFormProps> = ({
                       {isEditing ? (
                         <FacilityImageManagement facilityId={facility.id} />
                       ) : (
-                        <div className="text-center py-8 text-gray-500">
+                        <div className="text-center py-6 text-gray-500">
                           <p className="text-sm">{tSync("admin.facilities.form.saveFirstForImages", "Please save the facility first before managing images.")}</p>
                         </div>
                       )}
@@ -186,7 +188,7 @@ export const EnhancedFacilityForm: React.FC<EnhancedFacilityFormProps> = ({
                       {isEditing ? (
                         <FacilityCalendarManagement facilityId={facility.id} />
                       ) : (
-                        <div className="text-center py-8 text-gray-500">
+                        <div className="text-center py-6 text-gray-500">
                           <p className="text-sm">{tSync("admin.facilities.form.saveFirstForCalendar", "Please save the facility first before managing calendar settings.")}</p>
                         </div>
                       )}
@@ -194,13 +196,13 @@ export const EnhancedFacilityForm: React.FC<EnhancedFacilityFormProps> = ({
                   </div>
 
                   {/* Form Actions - Compact Footer */}
-                  <div className="border-t border-gray-200 bg-gray-50 px-4 py-3">
-                    <div className="flex justify-end space-x-3">
-                      <Button type="button" variant="outline" onClick={onCancel} className="px-4 h-9 text-sm">
+                  <div className="border-t border-gray-200 bg-gray-50 px-4 py-2">
+                    <div className="flex justify-end space-x-2">
+                      <Button type="button" variant="outline" onClick={onCancel} className="px-3 h-8 text-sm">
                         <X className="w-3 h-3 mr-1" />
                         {tSync("admin.common.cancel", "Cancel")}
                       </Button>
-                      <Button type="submit" disabled={mutation.isPending} className="px-4 h-9 text-sm">
+                      <Button type="submit" disabled={mutation.isPending} className="px-3 h-8 text-sm">
                         <Save className="w-3 h-3 mr-1" />
                         {mutation.isPending 
                           ? tSync("admin.common.saving", "Saving...") 
