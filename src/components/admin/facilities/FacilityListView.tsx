@@ -117,7 +117,7 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
   if (viewMode === 'detail' && selectedFacility) {
     return <FacilityDetailView facility={selectedFacility} onBack={handleBack} onEdit={() => handleEdit(selectedFacility)} onCalendar={() => handleCalendar(selectedFacility)} />;
   }
-  return <div className="w-full space-y-6 p-6 py-[27px]">
+  return <div className="w-full space-y-6 p-6 py-[27px] my-[23px]">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
