@@ -4,6 +4,7 @@ import { Zone } from '@/components/booking/types';
 import { useCartStore } from '@/stores/useCartStore';
 import { ActorType as CartActorType } from '@/types/cart';
 import { ActorType as PricingActorType } from '@/types/pricing';
+import { EventType } from '@/types/booking';
 
 export interface BookingFormData {
   purpose: string;
@@ -35,7 +36,7 @@ const convertActorType = (pricingType: PricingActorType): CartActorType => {
 };
 
 // Helper function to convert activity type to event type
-const convertActivityToEventType = (activityType: string) => {
+const convertActivityToEventType = (activityType: string): EventType => {
   switch (activityType) {
     case 'sport':
     case 'sports': return 'sport';
