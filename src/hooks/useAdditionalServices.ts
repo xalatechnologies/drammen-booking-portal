@@ -53,11 +53,7 @@ export function useServicePricing() {
       date
     );
     
-    if (!result.success) {
-      throw new Error(result.error?.message || 'Failed to calculate price');
-    }
-    
-    return result.data;
+    return result; // Return the full API response with success/data structure
   };
 
   const validateServiceAvailability = async (
@@ -71,11 +67,7 @@ export function useServicePricing() {
       timeSlot
     );
     
-    if (!result.success) {
-      throw new Error(result.error?.message || 'Failed to validate availability');
-    }
-    
-    return result.data;
+    return result; // Return the full API response with success/data structure
   };
 
   return {
