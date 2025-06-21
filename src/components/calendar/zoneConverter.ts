@@ -23,7 +23,6 @@ export function convertApiZoneToZone(apiZone: any): Zone {
     features: apiZone.features || [],
     isActive: apiZone.is_active !== false,
     subZones: apiZone.sub_zones || [],
-    parentZoneId: apiZone.parent_zone_id,
     layout: {
       coordinates: {
         x: 0,
@@ -61,7 +60,46 @@ export function convertZoneToApiFormat(zone: Zone): any {
     accessibility: zone.accessibility,
     features: zone.features,
     is_active: zone.isActive,
-    sub_zones: zone.subZones,
-    parent_zone_id: zone.parentZoneId
+    sub_zones: zone.subZones
+  };
+}
+
+export function convertCalendarZoneToBookingZone(calendarZone: any, facilityId: number): Zone {
+  return {
+    id: calendarZone.id,
+    name: calendarZone.name,
+    description: calendarZone.description || '',
+    capacity: calendarZone.capacity || 30,
+    pricePerHour: calendarZone.pricePerHour || 450,
+    area: '100 m²',
+    equipment: [],
+    amenities: [],
+    bookingRules: {
+      minBookingDuration: 1,
+      maxBookingDuration: 8,
+      allowedTimeSlots: ['08:00-10:00', '10:00-12:00', '12:00-14:00', '14:00-16:00', '16:00-18:00', '18:00-20:00'],
+      bookingTypes: ['one-time', 'recurring'],
+      advanceBookingDays: 30,
+      cancellationHours: 24
+    },
+    accessibility: [],
+    features: [],
+    isActive: true,
+    subZones: [],
+    layout: {
+      coordinates: {
+        x: 0,
+        y: 0,
+        width: 100,
+        height: 80
+      },
+      entryPoints: ['Hovedinngang']
+    },
+    adminInfo: {
+      contactPersonName: 'Ansvarlig',
+      contactPersonEmail: 'contact@facility.no',
+      specialInstructions: 'Følg fasilitetets regler',
+      maintenanceSchedule: []
+    }
   };
 }

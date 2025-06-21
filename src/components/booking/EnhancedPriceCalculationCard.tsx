@@ -54,8 +54,8 @@ export function EnhancedPriceCalculationCard({
     );
   }
 
-  // Get available pricing modes for this zone - filter to only hourly and package
-  const availableModes: PricingMode[] = ['hourly', 'package'];
+  // Get available pricing modes for this zone - only hourly for now
+  const availableModes: PricingMode[] = ['hourly'];
   
   // Calculate pricing for all selected slots
   let totalCalculation = null;
@@ -69,7 +69,7 @@ export function EnhancedPriceCalculationCard({
       endDate,
       actorType as ActorType,
       firstSlot.timeSlot,
-      pricingMode === 'hourly' ? 'hourly' : 'package',
+      'hourly',
       selectedSlots.length > 1 ? 'fastlan' : 'engangs',
       activityType
     );

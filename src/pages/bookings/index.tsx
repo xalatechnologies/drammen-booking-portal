@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { PaymentForm } from '@/components/booking/PaymentForm';
 import { BookingStatusCard, BookingStatus } from '@/components/booking/BookingStatusCard';
 
-interface Booking {
+interface LocalBooking {
   id: string;
   status: 'pending' | 'confirmed' | 'cancelled' | 'draft';
   facilityName: string;
@@ -36,7 +36,7 @@ export default function BookingsPage() {
   };
 
   // Mock bookings data
-  const mockBookings: Booking[] = [
+  const mockBookings: LocalBooking[] = [
     {
       id: '1',
       status: 'pending',

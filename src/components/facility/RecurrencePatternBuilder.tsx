@@ -22,6 +22,8 @@ export function RecurrencePatternBuilder({
   facilityId
 }: RecurrencePatternBuilderProps) {
   const [currentPattern, setCurrentPattern] = useState<RecurrencePattern>(pattern);
+  const [frequency, setFrequency] = useState<string>('weekly');
+  const [count, setCount] = useState<number>(1);
 
   const handlePatternUpdate = (updates: Partial<RecurrencePattern>) => {
     const newPattern = { ...currentPattern, ...updates };
@@ -48,8 +50,8 @@ export function RecurrencePatternBuilder({
           <div>
             <label className="block text-sm font-medium mb-2">Frekvens</label>
             <select 
-              value={currentPattern.frequency || 'weekly'}
-              onChange={(e) => handlePatternUpdate({ frequency: e.target.value as any })}
+              value={frequency}
+              onChange={(e) => setFrequency(e.target.value)}
               className="w-full p-2 border rounded-md"
             >
               <option value="daily">Daglig</option>
@@ -62,8 +64,8 @@ export function RecurrencePatternBuilder({
             <label className="block text-sm font-medium mb-2">Antall gjentakelser</label>
             <input
               type="number"
-              value={currentPattern.count || 1}
-              onChange={(e) => handlePatternUpdate({ count: parseInt(e.target.value) })}
+              value={count}
+              onChange={(e) => setCount(parseInt(e.target.value))}
               className="w-full p-2 border rounded-md"
               min="1"
               max="52"
