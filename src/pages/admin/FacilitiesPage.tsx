@@ -1,13 +1,13 @@
 
 import React, { useState } from "react";
-import { FacilityManagementTabs } from "@/components/admin/facilities/FacilityManagementTabs";
+import { FacilityListView } from "@/components/admin/facilities/FacilityListView";
 
 const FacilitiesPage = () => {
   const [selectedFacilityId, setSelectedFacilityId] = useState<number | undefined>();
 
   return (
     <div className="w-full min-h-screen bg-gray-50">
-      <FacilityManagementTabs 
+      <FacilityListView 
         selectedFacilityId={selectedFacilityId}
         onFacilitySelect={setSelectedFacilityId}
       />
