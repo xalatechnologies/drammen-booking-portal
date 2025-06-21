@@ -86,39 +86,36 @@ export function FacilityCardContent({
       </div>
 
       {/* Description */}
-      <p className="text-gray-700 text-base leading-relaxed mb-5 line-clamp-2">
+      <p className="text-gray-700 text-base leading-relaxed mb-4 line-clamp-2">
         {facility.description}
       </p>
 
-      {/* Capacity and Suitable For on the same line */}
-      <div className="flex items-center justify-between mb-6">
-        {/* Capacity */}
-        <div className="flex items-center gap-3 text-gray-600">
-          <Users className="h-5 w-5" />
-          <span className="text-base font-medium">{t('facility.details.capacity')}: {facility.capacity}</span>
+      {/* Suitable For Tags - under description */}
+      {suitableActivities.length > 0 && (
+        <div className="flex flex-wrap gap-2 mb-5">
+          {suitableActivities.slice(0, maxVisibleTags).map((activity, index) => (
+            <Badge 
+              key={index}
+              className="bg-blue-50 text-blue-700 border-blue-200 font-medium px-3 py-1 text-sm hover:bg-blue-100 transition-colors"
+            >
+              {activity}
+            </Badge>
+          ))}
+          {suitableActivities.length > maxVisibleTags && (
+            <Badge 
+              variant="outline"
+              className="bg-gray-50 text-gray-600 border-gray-300 font-medium px-3 py-1 text-sm"
+            >
+              +{suitableActivities.length - maxVisibleTags} more
+            </Badge>
+          )}
         </div>
+      )}
 
-        {/* Suitable For Tags */}
-        {suitableActivities.length > 0 && (
-          <div className="flex flex-wrap gap-2 justify-end">
-            {suitableActivities.slice(0, maxVisibleTags).map((activity, index) => (
-              <Badge 
-                key={index}
-                className="bg-blue-50 text-blue-700 border-blue-200 font-medium px-3 py-1 text-sm hover:bg-blue-100 transition-colors"
-              >
-                {activity}
-              </Badge>
-            ))}
-            {suitableActivities.length > maxVisibleTags && (
-              <Badge 
-                variant="outline"
-                className="bg-gray-50 text-gray-600 border-gray-300 font-medium px-3 py-1 text-sm"
-              >
-                +{suitableActivities.length - maxVisibleTags} more
-              </Badge>
-            )}
-          </div>
-        )}
+      {/* Capacity */}
+      <div className="flex items-center gap-3 text-gray-600">
+        <Users className="h-5 w-5" />
+        <span className="text-base font-medium">{t('facility.details.capacity')}: {facility.capacity}</span>
       </div>
     </div>
   );

@@ -134,39 +134,38 @@ export function FacilityListItemContent({
       </div>
 
       {/* Description */}
-      <div className="mb-4 flex-grow">
+      <div className="mb-4">
         <p className="text-gray-700 leading-relaxed text-base line-clamp-2">
           {facility.description}
         </p>
       </div>
 
-      {/* Bottom section with Capacity, Suitable For and Action Buttons */}
-      <div className="flex items-center justify-between">
-        {/* Capacity and Suitable For */}
-        <div className="flex items-center gap-6 flex-1 min-w-0">
-          {/* Capacity */}
-          <div className="flex items-center gap-2 text-gray-600">
-            <Users className="h-5 w-5" />
-            <span className="font-medium text-base">{facility.capacity} personer</span>
-          </div>
+      {/* Suitable For - under description */}
+      {suitableActivities.length > 0 && (
+        <div className="flex gap-2 items-center mb-4 flex-wrap">
+          {suitableActivities.slice(0, maxVisibleTags).map((activity, index) => (
+            <Badge 
+              key={index} 
+              className="bg-blue-50 text-blue-700 border-blue-200 font-medium px-3 py-1 text-sm hover:bg-blue-100 transition-colors flex items-center gap-1.5 whitespace-nowrap"
+            >
+              {getSuitableForIcon(activity)}
+              {activity}
+            </Badge>
+          ))}
+          {suitableActivities.length > maxVisibleTags && (
+            <Badge variant="outline" className="bg-gray-50 text-gray-600 border-gray-300 font-medium px-3 py-1 text-sm whitespace-nowrap">
+              +{suitableActivities.length - maxVisibleTags} more
+            </Badge>
+          )}
+        </div>
+      )}
 
-          {/* Suitable For - on the same line */}
-          <div className="flex gap-2 items-center min-w-0 flex-1">
-            {suitableActivities.slice(0, maxVisibleTags).map((activity, index) => (
-              <Badge 
-                key={index} 
-                className="bg-blue-50 text-blue-700 border-blue-200 font-medium px-3 py-1 text-sm hover:bg-blue-100 transition-colors flex items-center gap-1.5 whitespace-nowrap"
-              >
-                {getSuitableForIcon(activity)}
-                {activity}
-              </Badge>
-            ))}
-            {suitableActivities.length > maxVisibleTags && (
-              <Badge variant="outline" className="bg-gray-50 text-gray-600 border-gray-300 font-medium px-3 py-1 text-sm whitespace-nowrap">
-                +{suitableActivities.length - maxVisibleTags} more
-              </Badge>
-            )}
-          </div>
+      {/* Bottom section with Capacity and Action Buttons */}
+      <div className="flex items-center justify-between mt-auto">
+        {/* Capacity */}
+        <div className="flex items-center gap-2 text-gray-600">
+          <Users className="h-5 w-5" />
+          <span className="font-medium text-base">{facility.capacity} personer</span>
         </div>
 
         {/* Action Buttons - aligned to the right */}
