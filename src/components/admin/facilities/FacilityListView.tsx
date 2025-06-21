@@ -28,7 +28,8 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
     queryKey: ['admin-facilities', { searchTerm }],
     queryFn: () => FacilityService.getFacilities(
       { page: 1, limit: 50 },
-      { searchTerm }
+      { searchTerm },
+      {}
     ),
   });
 

@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -26,7 +25,7 @@ export const OpeningHoursManagement: React.FC<OpeningHoursManagementProps> = ({
 
   const { data: facilitiesResponse } = useQuery({
     queryKey: ['admin-facilities-list'],
-    queryFn: () => FacilityService.getFacilities({ page: 1, limit: 100 }),
+    queryFn: () => FacilityService.getFacilities({ page: 1, limit: 100 }, {}, {}),
   });
 
   const { data: openingHoursResponse, isLoading } = useQuery({
