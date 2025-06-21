@@ -149,7 +149,7 @@ const FacilityDetail = () => {
             onToggleFavorite={() => setIsFavorited(!isFavorited)}
           />
 
-          {/* Full Width Calendar Section - Simplified without slot state management */}
+          {/* Full Width Calendar Section with Zone Tabs */}
           <FacilityDetailCalendar 
             zones={displayZones}
             facilityId={id || ""}
