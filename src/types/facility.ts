@@ -1,24 +1,52 @@
+
 export interface Facility {
   id: number;
   name: string;
-  address: string;
+  address_street: string;
+  address_city: string;
+  address_postal_code: string;
+  address_country: string;
   type: string;
   status: 'active' | 'maintenance' | 'inactive';
-  image: string;
-  nextAvailable: string;
+  image_url: string | null;
   capacity: number;
-  accessibility: string[];
   area: string;
-  suitableFor: string[];
-  equipment: string[];
-  openingHours: OpeningHours[];
-  description: string;
-  rating?: number;
-  reviewCount?: number;
-  pricePerHour?: number;
-  area_sqm?: number;
-  amenities?: string[];
-  hasAutoApproval?: boolean;
+  description: string | null;
+  next_available: string | null;
+  rating: number | null;
+  review_count: number | null;
+  price_per_hour: number;
+  has_auto_approval: boolean;
+  amenities: string[] | null;
+  time_slot_duration: number;
+  latitude: number | null;
+  longitude: number | null;
+  accessibility_features: string[] | null;
+  equipment: string[] | null;
+  allowed_booking_types: ('engangs' | 'fastlan' | 'rammetid' | 'strotimer')[];
+  season_from: string | null;
+  season_to: string | null;
+  contact_name: string | null;
+  contact_email: string | null;
+  contact_phone: string | null;
+  booking_lead_time_hours: number;
+  max_advance_booking_days: number;
+  cancellation_deadline_hours: number;
+  is_featured: boolean;
+  created_at: string;
+  updated_at: string;
+  
+  // Computed/derived fields for backwards compatibility
+  address?: string; // Computed from address_street, address_city
+  image?: string; // Alias for image_url
+  pricePerHour?: number; // Alias for price_per_hour
+  accessibility?: string[]; // Alias for accessibility_features
+  suitableFor?: string[];
+  hasAutoApproval?: boolean; // Alias for has_auto_approval
+  openingHours?: OpeningHours[];
+  zones?: Zone[];
+  featuredImage?: FacilityImage;
+  images?: FacilityImage[];
   timeSlotDuration?: 1 | 2;
   availableTimes?: {
     date: Date;
@@ -28,14 +56,10 @@ export interface Facility {
       available: boolean;
     }[];
   }[];
-  season: {
+  season?: {
     from: string;
     to: string;
   };
-  allowedBookingTypes: ('engangslån' | 'fastlån' | 'rammetid' | 'strøtimer')[];
-  zones: Zone[];
-  featuredImage?: FacilityImage;
-  images?: FacilityImage[];
 }
 
 export interface FacilityImage {
@@ -65,26 +89,40 @@ export interface FacilityFilters {
 }
 
 export interface FacilitySortOptions {
-  field: 'name' | 'capacity' | 'pricePerHour' | 'rating';
+  field: 'name' | 'capacity' | 'price_per_hour' | 'rating';
   direction: 'asc' | 'desc';
 }
 
 export interface Zone {
   id: string;
   name: string;
-  facilityId: string;
-  type: 'court' | 'room' | 'area' | 'section';
+  facility_id: number;
+  type: 'court' | 'room' | 'area' | 'section' | 'field';
   capacity: number;
-  description?: string;
-  bookableIndependently: boolean;
-  conflictRules: ConflictRule[];
-  equipment?: string[];
+  description: string | null;
+  is_main_zone: boolean;
+  parent_zone_id: string | null;
+  bookable_independently: boolean;
+  area_sqm: number | null;
+  floor: string | null;
+  coordinates_x: number | null;
+  coordinates_y: number | null;
+  coordinates_width: number | null;
+  coordinates_height: number | null;
+  equipment: string[] | null;
+  accessibility_features: string[] | null;
+  status: 'active' | 'maintenance' | 'inactive';
+  created_at: string;
+  updated_at: string;
+  
+  // Legacy fields for backwards compatibility
+  facilityId?: string;
+  conflictRules?: ConflictRule[];
   dimensions?: {
     width: number;
     length: number;
     height?: number;
   };
-  status: 'active' | 'maintenance' | 'inactive';
 }
 
 export interface ConflictRule {

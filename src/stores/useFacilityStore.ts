@@ -37,12 +37,15 @@ interface FacilityState {
 }
 
 const initialFilters: FacilityFilters = {
-  area: undefined,
-  type: undefined,
+  searchTerm: undefined,
+  facilityType: undefined,
+  location: undefined,
+  accessibility: undefined,
   capacity: undefined,
+  date: undefined,
   priceRange: undefined,
+  availableNow: undefined,
   amenities: [],
-  availability: undefined,
 };
 
 const initialSortOptions: FacilitySortOptions = {
