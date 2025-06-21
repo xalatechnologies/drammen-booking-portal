@@ -11,16 +11,16 @@ interface FacilityAddressSectionProps {
 
 export const FacilityAddressSection: React.FC<FacilityAddressSectionProps> = ({ form }) => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div className="md:col-span-2">
         <FormField
           control={form.control}
           name="address_street"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Street Address *</FormLabel>
+              <FormLabel className="text-sm font-medium">Street Address *</FormLabel>
               <FormControl>
-                <Input placeholder="Street name and number" {...field} />
+                <Input placeholder="Street name and number" className="h-9 text-sm" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -33,9 +33,9 @@ export const FacilityAddressSection: React.FC<FacilityAddressSectionProps> = ({ 
         name="address_city"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>City *</FormLabel>
+            <FormLabel className="text-sm font-medium">City *</FormLabel>
             <FormControl>
-              <Input placeholder="City name" {...field} />
+              <Input placeholder="City name" className="h-9 text-sm" {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -47,9 +47,9 @@ export const FacilityAddressSection: React.FC<FacilityAddressSectionProps> = ({ 
         name="address_postal_code"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Postal Code *</FormLabel>
+            <FormLabel className="text-sm font-medium">Postal Code *</FormLabel>
             <FormControl>
-              <Input placeholder="e.g., 3019" {...field} />
+              <Input placeholder="e.g., 3019" className="h-9 text-sm" {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -61,27 +61,28 @@ export const FacilityAddressSection: React.FC<FacilityAddressSectionProps> = ({ 
         name="address_country"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Country</FormLabel>
+            <FormLabel className="text-sm font-medium">Country</FormLabel>
             <FormControl>
-              <Input {...field} />
+              <Input className="h-9 text-sm" {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
         )}
       />
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-3">
         <FormField
           control={form.control}
           name="latitude"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Latitude</FormLabel>
+              <FormLabel className="text-sm font-medium">Latitude</FormLabel>
               <FormControl>
                 <Input 
                   type="number" 
                   step="any"
                   placeholder="59.7428"
+                  className="h-9 text-sm"
                   {...field}
                   onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
                 />
@@ -96,12 +97,13 @@ export const FacilityAddressSection: React.FC<FacilityAddressSectionProps> = ({ 
           name="longitude"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Longitude</FormLabel>
+              <FormLabel className="text-sm font-medium">Longitude</FormLabel>
               <FormControl>
                 <Input 
                   type="number" 
                   step="any"
                   placeholder="10.2045"
+                  className="h-9 text-sm"
                   {...field}
                   onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
                 />
