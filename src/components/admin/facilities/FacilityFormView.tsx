@@ -9,8 +9,8 @@ import { Facility } from "@/types/facility";
 import PageHeader from "@/components/admin/PageHeader";
 import FacilityBasicInfoForm from "./FacilityBasicInfoForm";
 import FacilityImageUpload from "./FacilityImageUpload";
-import OpeningHoursManagement from "./OpeningHoursManagement";
-import ZoneManagementView from "./ZoneManagementView";
+import { OpeningHoursManagement } from "./OpeningHoursManagement";
+import { ZoneManagementView } from "./ZoneManagementView";
 
 interface FacilityFormViewProps {
   facilityId?: number;
@@ -170,7 +170,7 @@ export const FacilityFormView: React.FC<FacilityFormViewProps> = ({
       <Card className="shadow-lg border-0">
         <CardContent className="p-0">
           <Tabs defaultValue="basic" className="w-full">
-            <TabsList className="grid w-full grid-cols-4 h-14 bg-gray-50 rounded-none">
+            <TabsList className="grid w-full grid-cols-3 h-14 bg-gray-50 rounded-none">
               <TabsTrigger value="basic" className="text-base py-3">
                 Grunninfo
               </TabsTrigger>
@@ -179,9 +179,6 @@ export const FacilityFormView: React.FC<FacilityFormViewProps> = ({
               </TabsTrigger>
               <TabsTrigger value="hours" className="text-base py-3">
                 Åpningstider
-              </TabsTrigger>
-              <TabsTrigger value="zones" className="text-base py-3">
-                Soner
               </TabsTrigger>
             </TabsList>
 
@@ -208,16 +205,6 @@ export const FacilityFormView: React.FC<FacilityFormViewProps> = ({
                   openingHours={facility.openingHours || []}
                   onOpeningHoursChange={(hours) => setFacility(prev => ({ ...prev, openingHours: hours }))}
                 />
-              </TabsContent>
-
-              <TabsContent value="zones" className="mt-0">
-                {facilityId ? (
-                  <ZoneManagementView facilityId={facilityId} />
-                ) : (
-                  <div className="text-center py-8 text-gray-500">
-                    <p className="text-base">Lagre fasiliteten først for å administrere soner</p>
-                  </div>
-                )}
               </TabsContent>
             </div>
           </Tabs>
