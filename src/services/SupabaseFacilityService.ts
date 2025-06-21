@@ -11,21 +11,29 @@ export class SupabaseFacilityService {
   private static transformCoreFacilityToFacility(coreFacility: any): Facility {
     console.log('SupabaseFacilityService - Raw facility data:', coreFacility);
     
+    // Extract address fields directly
+    const addressStreet = coreFacility.address_street;
+    const addressCity = coreFacility.address_city;
+    const addressPostal = coreFacility.address_postal_code;
+    
     // Compute the address from individual fields with better null checks
-    const addressParts = [
-      coreFacility.address_street,
-      coreFacility.address_city,
-      coreFacility.address_postal_code
-    ].filter(part => part && typeof part === 'string' && part.trim() !== '' && part !== 'null' && part !== 'undefined');
+    const addressParts = [addressStreet, addressCity, addressPostal].filter(part => 
+      part && 
+      typeof part === 'string' && 
+      part.trim() !== '' && 
+      part !== 'null' && 
+      part !== 'undefined' &&
+      part.toLowerCase() !== 'undefined'
+    );
     
     const computedAddress = addressParts.length > 0 
       ? addressParts.join(', ') 
       : '';
 
     console.log('SupabaseFacilityService - Address computation:', {
-      address_street: coreFacility.address_street,
-      address_city: coreFacility.address_city,
-      address_postal_code: coreFacility.address_postal_code,
+      address_street: addressStreet,
+      address_city: addressCity,
+      address_postal_code: addressPostal,
       addressParts,
       computedAddress
     });

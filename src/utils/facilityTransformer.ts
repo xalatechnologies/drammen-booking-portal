@@ -4,13 +4,14 @@ import { CoreFacility } from '@/types/translation';
 export const transformDatabaseFacility = (facility: any): CoreFacility => {
   console.log('transformDatabaseFacility - Input facility:', facility);
   
-  // Compute the address from individual fields with better validation
+  // Extract address fields directly - no more _type/value wrapper
   const street = facility.address_street;
   const city = facility.address_city; 
   const postal = facility.address_postal_code;
   
   console.log('transformDatabaseFacility - Address fields:', { street, city, postal });
   
+  // Filter out null, undefined, empty strings, and string "null"/"undefined"
   const addressParts = [street, city, postal].filter(part => 
     part && 
     typeof part === 'string' && 
@@ -24,7 +25,7 @@ export const transformDatabaseFacility = (facility: any): CoreFacility => {
     ? addressParts.join(', ') 
     : '';
 
-  // Determine image URL - prioritize featured image, then first image, then fallback
+  // Handle image URL - prioritize featured image, then first image
   let imageUrl = '';
   
   console.log('transformDatabaseFacility - Image processing:', {
@@ -35,21 +36,26 @@ export const transformDatabaseFacility = (facility: any): CoreFacility => {
   
   if (facility.featuredImage?.image_url) {
     imageUrl = facility.featuredImage.image_url;
+    console.log('transformDatabaseFacility - Using featured image:', imageUrl);
   } else if (facility.images && Array.isArray(facility.images) && facility.images.length > 0) {
-    // Look for featured image first
+    // Look for featured image first, then use first image
     const featuredImg = facility.images.find(img => img.is_featured === true);
     if (featuredImg?.image_url) {
       imageUrl = featuredImg.image_url;
+      console.log('transformDatabaseFacility - Using featured from images array:', imageUrl);
     } else if (facility.images[0]?.image_url) {
       imageUrl = facility.images[0].image_url;
+      console.log('transformDatabaseFacility - Using first image from array:', imageUrl);
     }
   } else if (facility.image_url) {
     imageUrl = facility.image_url;
+    console.log('transformDatabaseFacility - Using direct image_url:', imageUrl);
   }
   
   // Only fallback if no image found
   if (!imageUrl) {
     imageUrl = 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&auto=format&fit=crop';
+    console.log('transformDatabaseFacility - Using fallback image');
   }
 
   console.log('transformDatabaseFacility - Final transformation:', {
