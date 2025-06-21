@@ -6,15 +6,20 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FacilityService } from "@/services/facilityService";
-import { facilityFormSchema, FacilityFormData, FACILITY_TYPES, BOOKING_TYPES } from "./FacilityFormSchema";
+import { facilityFormSchema, FacilityFormData } from "./FacilityFormSchema";
 import { FacilityBasicSection } from "./sections/FacilityBasicSection";
 import { FacilityAddressSection } from "./sections/FacilityAddressSection";
 import { FacilityContactSection } from "./sections/FacilityContactSection";
 import { FacilityConfigSection } from "./sections/FacilityConfigSection";
 import { FacilityFeaturesSection } from "./sections/FacilityFeaturesSection";
+import { FacilityImageManagement } from "../FacilityImageManagement";
+import { FacilityCalendarManagement } from "./sections/FacilityCalendarManagement";
+import { FacilityFormBreadcrumb } from "./FacilityFormBreadcrumb";
 import { toast } from "@/hooks/use-toast";
-import { ArrowLeft, Save, X } from "lucide-react";
+import { Save, X } from "lucide-react";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface EnhancedFacilityFormProps {
   facility?: any;
@@ -29,6 +34,7 @@ export const EnhancedFacilityForm: React.FC<EnhancedFacilityFormProps> = ({
 }) => {
   const queryClient = useQueryClient();
   const isEditing = !!facility;
+  const { tSync } = useTranslation();
 
   const form = useForm<FacilityFormData>({
     resolver: zodResolver(facilityFormSchema),
@@ -76,23 +82,23 @@ export const EnhancedFacilityForm: React.FC<EnhancedFacilityFormProps> = ({
     onSuccess: (response) => {
       if (response.success) {
         toast({
-          title: "Success",
-          description: `Facility ${isEditing ? 'updated' : 'created'} successfully`,
+          title: tSync("admin.common.success", "Success"),
+          description: `${tSync("admin.facilities.form.facility", "Facility")} ${isEditing ? tSync("admin.common.updated", "updated") : tSync("admin.common.created", "created")} ${tSync("admin.common.successfully", "successfully")}`,
         });
         queryClient.invalidateQueries({ queryKey: ['facilities'] });
         onSuccess();
       } else {
         toast({
-          title: "Error",
-          description: response.error?.message || `Failed to ${isEditing ? 'update' : 'create'} facility`,
+          title: tSync("admin.common.error", "Error"),
+          description: response.error?.message || `${tSync("admin.common.failedTo", "Failed to")} ${isEditing ? tSync("admin.common.update", "update") : tSync("admin.common.create", "create")} ${tSync("admin.facilities.form.facility", "facility")}`,
           variant: "destructive",
         });
       }
     },
     onError: (error: any) => {
       toast({
-        title: "Error",
-        description: error.message || `Failed to ${isEditing ? 'update' : 'create'} facility`,
+        title: tSync("admin.common.error", "Error"),
+        description: error.message || `${tSync("admin.common.failedTo", "Failed to")} ${isEditing ? tSync("admin.common.update", "update") : tSync("admin.common.create", "create")} ${tSync("admin.facilities.form.facility", "facility")}`,
         variant: "destructive",
       });
     },
@@ -104,85 +110,112 @@ export const EnhancedFacilityForm: React.FC<EnhancedFacilityFormProps> = ({
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-6 p-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <Button variant="outline" onClick={onCancel}>
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Facilities
-          </Button>
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Breadcrumb */}
+        <FacilityFormBreadcrumb 
+          isEditing={isEditing} 
+          facilityName={facility?.name}
+          onCancel={onCancel}
+        />
+
+        {/* Page Header */}
+        <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">
-            {isEditing ? `Edit: ${facility.name}` : 'Add New Facility'}
+            {isEditing ? `${tSync("admin.facilities.form.edit", "Edit")}: ${facility.name}` : tSync("admin.facilities.form.addNew", "Add New Facility")}
           </h1>
+          <p className="text-gray-600 mt-2">
+            {isEditing 
+              ? tSync("admin.facilities.form.editDescription", "Update facility information and settings")
+              : tSync("admin.facilities.form.createDescription", "Create a new facility with all necessary details")
+            }
+          </p>
         </div>
+
+        {/* Main Content */}
+        <Card className="shadow-lg border-0">
+          <CardContent className="p-0">
+            <Tabs defaultValue="details" className="w-full">
+              <div className="border-b border-gray-200 px-6 pt-6">
+                <TabsList className="grid w-full grid-cols-5 h-12">
+                  <TabsTrigger value="details" className="text-sm">
+                    {tSync("admin.facilities.form.tabs.details", "Details")}
+                  </TabsTrigger>
+                  <TabsTrigger value="contact" className="text-sm">
+                    {tSync("admin.facilities.form.tabs.contact", "Contact")}
+                  </TabsTrigger>
+                  <TabsTrigger value="config" className="text-sm">
+                    {tSync("admin.facilities.form.tabs.config", "Configuration")}
+                  </TabsTrigger>
+                  <TabsTrigger value="images" disabled={!isEditing} className="text-sm">
+                    {tSync("admin.facilities.form.tabs.images", "Images")}
+                  </TabsTrigger>
+                  <TabsTrigger value="calendar" disabled={!isEditing} className="text-sm">
+                    {tSync("admin.facilities.form.tabs.calendar", "Calendar")}
+                  </TabsTrigger>
+                </TabsList>
+              </div>
+
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)}>
+                  <div className="p-6">
+                    <TabsContent value="details" className="mt-0 space-y-8">
+                      <FacilityBasicSection form={form} />
+                      <FacilityAddressSection form={form} />
+                      <FacilityFeaturesSection form={form} />
+                    </TabsContent>
+
+                    <TabsContent value="contact" className="mt-0 space-y-8">
+                      <FacilityContactSection form={form} />
+                    </TabsContent>
+
+                    <TabsContent value="config" className="mt-0 space-y-8">
+                      <FacilityConfigSection form={form} />
+                    </TabsContent>
+
+                    <TabsContent value="images" className="mt-0">
+                      {isEditing ? (
+                        <FacilityImageManagement facilityId={facility.id} />
+                      ) : (
+                        <div className="text-center py-12 text-gray-500">
+                          <p>{tSync("admin.facilities.form.saveFirstForImages", "Please save the facility first before managing images.")}</p>
+                        </div>
+                      )}
+                    </TabsContent>
+
+                    <TabsContent value="calendar" className="mt-0">
+                      {isEditing ? (
+                        <FacilityCalendarManagement facilityId={facility.id} />
+                      ) : (
+                        <div className="text-center py-12 text-gray-500">
+                          <p>{tSync("admin.facilities.form.saveFirstForCalendar", "Please save the facility first before managing calendar settings.")}</p>
+                        </div>
+                      )}
+                    </TabsContent>
+                  </div>
+
+                  {/* Form Actions - Fixed at bottom */}
+                  <div className="border-t border-gray-200 bg-gray-50 px-6 py-4">
+                    <div className="flex justify-end space-x-4">
+                      <Button type="button" variant="outline" onClick={onCancel} className="px-6">
+                        <X className="w-4 h-4 mr-2" />
+                        {tSync("admin.common.cancel", "Cancel")}
+                      </Button>
+                      <Button type="submit" disabled={mutation.isPending} className="px-6">
+                        <Save className="w-4 h-4 mr-2" />
+                        {mutation.isPending 
+                          ? tSync("admin.common.saving", "Saving...") 
+                          : (isEditing ? tSync("admin.facilities.form.updateFacility", "Update Facility") : tSync("admin.facilities.form.createFacility", "Create Facility"))
+                        }
+                      </Button>
+                    </div>
+                  </div>
+                </form>
+              </Form>
+            </Tabs>
+          </CardContent>
+        </Card>
       </div>
-
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          {/* Basic Information */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Basic Information</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <FacilityBasicSection form={form} />
-            </CardContent>
-          </Card>
-
-          {/* Address Information */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Address Information</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <FacilityAddressSection form={form} />
-            </CardContent>
-          </Card>
-
-          {/* Contact Information */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Contact Information</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <FacilityContactSection form={form} />
-            </CardContent>
-          </Card>
-
-          {/* Configuration */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Booking Configuration</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <FacilityConfigSection form={form} />
-            </CardContent>
-          </Card>
-
-          {/* Features & Amenities */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Features & Amenities</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <FacilityFeaturesSection form={form} />
-            </CardContent>
-          </Card>
-
-          {/* Form Actions */}
-          <div className="flex justify-end space-x-4 pt-6">
-            <Button type="button" variant="outline" onClick={onCancel}>
-              <X className="w-4 h-4 mr-2" />
-              Cancel
-            </Button>
-            <Button type="submit" disabled={mutation.isPending}>
-              <Save className="w-4 h-4 mr-2" />
-              {mutation.isPending ? "Saving..." : (isEditing ? "Update Facility" : "Create Facility")}
-            </Button>
-          </div>
-        </form>
-      </Form>
     </div>
   );
 };
