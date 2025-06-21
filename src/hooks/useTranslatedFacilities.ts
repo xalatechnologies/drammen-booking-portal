@@ -1,8 +1,10 @@
+
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Facility } from '@/types/facility';
 import { useTranslationStore } from '@/stores/useTranslationStore';
+import { FacilityDataUtils } from '@/utils/facilityDataUtils';
 
 export const useTranslatedFacilities = () => {
   const { language } = useLanguage();
@@ -32,48 +34,69 @@ export const useTranslatedFacilities = () => {
 
       console.log('useTranslatedFacilities - Raw facilities from DB:', facilities);
 
-      // Minimal transformation - only compute required fields
+      // Transform facilities using utility functions
       const processedFacilities = (facilities || []).map((facility) => {
-        // Create address from database fields
-        const addressParts = [
-          facility.address_street,
-          facility.address_city,
-          facility.address_postal_code
-        ].filter(part => part && part.trim() !== '');
-        
-        const address = addressParts.length > 0 ? addressParts.join(', ') : '';
+        // Use utility functions for consistent transformations
+        const address = FacilityDataUtils.computeAddress(facility);
+        const image = FacilityDataUtils.getImageUrl(facility.facility_images);
+        const openingHours = FacilityDataUtils.transformOpeningHours(facility.facility_opening_hours);
+        const zones = FacilityDataUtils.transformZones(facility.zones);
+        const season = FacilityDataUtils.formatSeason(facility.season_from, facility.season_to);
 
-        // Get image from facility_images or fallback
-        let image = 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&auto=format&fit=crop';
-        
-        if (facility.facility_images && Array.isArray(facility.facility_images) && facility.facility_images.length > 0) {
-          const featuredImage = facility.facility_images.find(img => img.is_featured);
-          const imageToUse = featuredImage || facility.facility_images[0];
-          if (imageToUse?.image_url) {
-            image = imageToUse.image_url;
-          }
-        }
-
-        // Return facility with minimal computed fields
+        // Return facility with proper type mapping
         const processedFacility: Facility = {
-          // Keep all database fields exactly as they are
-          ...facility,
-          // Add only essential computed fields
+          // Direct database field mapping
+          id: facility.id,
+          name: facility.name || 'Unnamed Facility',
+          address_street: facility.address_street || '',
+          address_city: facility.address_city || '',
+          address_postal_code: facility.address_postal_code || '',
+          address_country: facility.address_country || 'Norway',
+          type: facility.type || '',
+          area: facility.area || '',
+          status: facility.status || 'active',
+          capacity: facility.capacity || 0,
+          description: facility.description || '',
+          next_available: facility.next_available,
+          rating: facility.rating,
+          review_count: facility.review_count || 0,
+          price_per_hour: facility.price_per_hour || 450,
+          has_auto_approval: facility.has_auto_approval || false,
+          amenities: facility.amenities || [],
+          equipment: facility.equipment || [],
+          time_slot_duration: facility.time_slot_duration || 1,
+          latitude: facility.latitude,
+          longitude: facility.longitude,
+          accessibility_features: facility.accessibility_features || [],
+          allowed_booking_types: facility.allowed_booking_types || ['engangs'],
+          season_from: facility.season_from,
+          season_to: facility.season_to,
+          contact_name: facility.contact_name,
+          contact_email: facility.contact_email,
+          contact_phone: facility.contact_phone,
+          booking_lead_time_hours: facility.booking_lead_time_hours || 2,
+          max_advance_booking_days: facility.max_advance_booking_days || 365,
+          cancellation_deadline_hours: facility.cancellation_deadline_hours || 24,
+          is_featured: facility.is_featured || false,
+          created_at: facility.created_at,
+          updated_at: facility.updated_at,
+          area_sqm: facility.area_sqm,
+          image_url: image,
+
+          // Computed fields using utilities
           address,
           image,
-          image_url: image,
           pricePerHour: facility.price_per_hour || 450,
           accessibility: facility.accessibility_features || [],
           suitableFor: [],
           hasAutoApproval: facility.has_auto_approval || false,
           nextAvailable: facility.next_available || 'Available now',
-          openingHours: facility.facility_opening_hours || [],
-          zones: facility.zones || [],
+          openingHours,
+          zones,
+          featuredImage: facility.facility_images?.find(img => img.is_featured),
+          images: facility.facility_images || [],
           timeSlotDuration: (facility.time_slot_duration || 1) as 1 | 2,
-          season: {
-            from: facility.season_from || '2024-01-01',
-            to: facility.season_to || '2024-12-31'
-          },
+          season,
           availableTimes: []
         };
 
@@ -116,45 +139,66 @@ export const useTranslatedFacility = (id: number) => {
 
       if (error || !facility) return null;
 
-      // Create address from database fields
-      const addressParts = [
-        facility.address_street,
-        facility.address_city,
-        facility.address_postal_code
-      ].filter(part => part && part.trim() !== '');
-      
-      const address = addressParts.length > 0 ? addressParts.join(', ') : '';
-
-      // Get image from facility_images or fallback
-      let image = 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&auto=format&fit=crop';
-      
-      if (facility.facility_images && Array.isArray(facility.facility_images) && facility.facility_images.length > 0) {
-        const featuredImage = facility.facility_images.find(img => img.is_featured);
-        const imageToUse = featuredImage || facility.facility_images[0];
-        if (imageToUse?.image_url) {
-          image = imageToUse.image_url;
-        }
-      }
+      // Use utility functions for transformations
+      const address = FacilityDataUtils.computeAddress(facility);
+      const image = FacilityDataUtils.getImageUrl(facility.facility_images);
+      const openingHours = FacilityDataUtils.transformOpeningHours(facility.facility_opening_hours);
+      const zones = FacilityDataUtils.transformZones(facility.zones);
+      const season = FacilityDataUtils.formatSeason(facility.season_from, facility.season_to);
 
       const processedFacility: Facility = {
-        // Keep all database fields exactly as they are
-        ...facility,
-        // Add computed fields
+        // Direct database field mapping
+        id: facility.id,
+        name: facility.name || 'Unnamed Facility',
+        address_street: facility.address_street || '',
+        address_city: facility.address_city || '',
+        address_postal_code: facility.address_postal_code || '',
+        address_country: facility.address_country || 'Norway',
+        type: facility.type || '',
+        area: facility.area || '',
+        status: facility.status || 'active',
+        capacity: facility.capacity || 0,
+        description: facility.description || '',
+        next_available: facility.next_available,
+        rating: facility.rating,
+        review_count: facility.review_count || 0,
+        price_per_hour: facility.price_per_hour || 450,
+        has_auto_approval: facility.has_auto_approval || false,
+        amenities: facility.amenities || [],
+        equipment: facility.equipment || [],
+        time_slot_duration: facility.time_slot_duration || 1,
+        latitude: facility.latitude,
+        longitude: facility.longitude,
+        accessibility_features: facility.accessibility_features || [],
+        allowed_booking_types: facility.allowed_booking_types || ['engangs'],
+        season_from: facility.season_from,
+        season_to: facility.season_to,
+        contact_name: facility.contact_name,
+        contact_email: facility.contact_email,
+        contact_phone: facility.contact_phone,
+        booking_lead_time_hours: facility.booking_lead_time_hours || 2,
+        max_advance_booking_days: facility.max_advance_booking_days || 365,
+        cancellation_deadline_hours: facility.cancellation_deadline_hours || 24,
+        is_featured: facility.is_featured || false,
+        created_at: facility.created_at,
+        updated_at: facility.updated_at,
+        area_sqm: facility.area_sqm,
+        image_url: image,
+
+        // Computed fields using utilities
         address,
         image,
-        image_url: image,
         pricePerHour: facility.price_per_hour || 450,
         accessibility: facility.accessibility_features || [],
         suitableFor: [],
         hasAutoApproval: facility.has_auto_approval || false,
         nextAvailable: facility.next_available || 'Available now',
-        openingHours: facility.facility_opening_hours || [],
-        zones: facility.zones || [],
+        openingHours,
+        zones,
+        featuredImage: facility.facility_images?.find(img => img.is_featured),
+        images: facility.facility_images || [],
         timeSlotDuration: (facility.time_slot_duration || 1) as 1 | 2,
-        season: {
-          from: facility.season_from || '2024-01-01',
-          to: facility.season_to || '2024-12-31'
-        },
+        season,
         availableTimes: []
       };
 
