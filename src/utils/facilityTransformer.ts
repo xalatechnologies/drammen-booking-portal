@@ -2,14 +2,24 @@
 import { CoreFacility } from '@/types/translation';
 
 export const transformDatabaseFacility = (facility: any): CoreFacility => {
-  console.log('transformDatabaseFacility - Input facility:', facility);
+  console.log('transformDatabaseFacility - Input facility (raw):', facility);
   
-  // Extract address fields directly - no more _type/value wrapper
+  // Check if facility data is properly structured
+  if (!facility || typeof facility !== 'object') {
+    console.error('transformDatabaseFacility - Invalid facility data:', facility);
+    throw new Error('Invalid facility data provided');
+  }
+
+  // Extract address fields directly - these should be simple strings from the database
   const street = facility.address_street;
   const city = facility.address_city; 
   const postal = facility.address_postal_code;
   
-  console.log('transformDatabaseFacility - Address fields:', { street, city, postal });
+  console.log('transformDatabaseFacility - Address fields (raw from DB):', { 
+    street: typeof street + ': ' + street, 
+    city: typeof city + ': ' + city, 
+    postal: typeof postal + ': ' + postal 
+  });
   
   // Filter out null, undefined, empty strings, and string "null"/"undefined"
   const addressParts = [street, city, postal].filter(part => 
@@ -24,6 +34,8 @@ export const transformDatabaseFacility = (facility: any): CoreFacility => {
   const computedAddress = addressParts.length > 0 
     ? addressParts.join(', ') 
     : '';
+
+  console.log('transformDatabaseFacility - Computed address:', computedAddress);
 
   // Handle image URL - prioritize featured image, then first image
   let imageUrl = '';
@@ -58,15 +70,7 @@ export const transformDatabaseFacility = (facility: any): CoreFacility => {
     console.log('transformDatabaseFacility - Using fallback image');
   }
 
-  console.log('transformDatabaseFacility - Final transformation:', {
-    id: facility.id,
-    name: facility.name,
-    computedAddress,
-    imageUrl,
-    addressParts
-  });
-
-  return {
+  const transformedFacility = {
     id: facility.id,
     address_street: facility.address_street || '',
     address_city: facility.address_city || '',
@@ -112,4 +116,18 @@ export const transformDatabaseFacility = (facility: any): CoreFacility => {
     zones: [],
     availableTimes: []
   };
+
+  console.log('transformDatabaseFacility - Final transformation result:', {
+    id: transformedFacility.id,
+    name: facility.name,
+    computedAddress: transformedFacility.address,
+    imageUrl: transformedFacility.image,
+    addressFields: {
+      street: transformedFacility.address_street,
+      city: transformedFacility.address_city,
+      postal: transformedFacility.address_postal_code
+    }
+  });
+
+  return transformedFacility;
 };

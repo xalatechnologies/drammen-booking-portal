@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { Facility, FacilityFilters } from '@/types/facility';
 import { PaginationParams, ApiResponse, PaginatedResponse } from '@/types/api';
@@ -9,13 +8,25 @@ export class SupabaseFacilityService {
   private static readonly ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN6cGRvaWhveHpsaXZvdGhveXZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA0Mzk5MzksImV4cCI6MjA2NjAxNTkzOX0.4j3PYVkUpQZce-631weYhyICrUKfBk3LV5drs_tYExc';
 
   private static transformCoreFacilityToFacility(coreFacility: any): Facility {
-    console.log('SupabaseFacilityService - Raw facility data:', coreFacility);
+    console.log('SupabaseFacilityService - Raw facility data from API:', coreFacility);
     
-    // Extract address fields directly
+    // Ensure we have valid data before processing
+    if (!coreFacility || typeof coreFacility !== 'object') {
+      console.error('SupabaseFacilityService - Invalid facility data:', coreFacility);
+      throw new Error('Invalid facility data received from API');
+    }
+
+    // Extract address fields directly - they should be simple strings
     const addressStreet = coreFacility.address_street;
     const addressCity = coreFacility.address_city;
     const addressPostal = coreFacility.address_postal_code;
     
+    console.log('SupabaseFacilityService - Raw address fields:', {
+      address_street: typeof addressStreet + ': ' + JSON.stringify(addressStreet),
+      address_city: typeof addressCity + ': ' + JSON.stringify(addressCity),
+      address_postal_code: typeof addressPostal + ': ' + JSON.stringify(addressPostal)
+    });
+
     // Compute the address from individual fields with better null checks
     const addressParts = [addressStreet, addressCity, addressPostal].filter(part => 
       part && 
@@ -30,10 +41,7 @@ export class SupabaseFacilityService {
       ? addressParts.join(', ') 
       : '';
 
-    console.log('SupabaseFacilityService - Address computation:', {
-      address_street: addressStreet,
-      address_city: addressCity,
-      address_postal_code: addressPostal,
+    console.log('SupabaseFacilityService - Address computation result:', {
       addressParts,
       computedAddress
     });
@@ -41,7 +49,7 @@ export class SupabaseFacilityService {
     // Get image URL - prioritize featured image first
     let imageUrl = '';
     
-    console.log('SupabaseFacilityService - Image data:', {
+    console.log('SupabaseFacilityService - Image data processing:', {
       featuredImage: coreFacility.featuredImage,
       images: coreFacility.images,
       image_url: coreFacility.image_url
@@ -66,7 +74,7 @@ export class SupabaseFacilityService {
       console.log('SupabaseFacilityService - Using fallback image');
     }
 
-    return {
+    const transformedFacility = {
       // Core facility properties
       ...coreFacility,
       
@@ -94,6 +102,15 @@ export class SupabaseFacilityService {
       featuredImage: coreFacility.featuredImage,
       images: coreFacility.images || []
     };
+
+    console.log('SupabaseFacilityService - Final transformed facility:', {
+      id: transformedFacility.id,
+      name: transformedFacility.name,
+      address: transformedFacility.address,
+      image: transformedFacility.image
+    });
+
+    return transformedFacility;
   }
 
   static async getFacilities(

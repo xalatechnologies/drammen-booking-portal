@@ -1,4 +1,3 @@
-
 import { SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { Database } from '../_shared/database.types.ts'
 
@@ -24,44 +23,12 @@ export class FacilityRepository {
     const from = (page - 1) * limit
     const to = from + limit - 1
 
+    console.log('FacilityRepository.findAll - Starting query with filters:', otherFilters);
+
     let query = this.supabase
       .from('facilities')
       .select(`
-        id,
-        name,
-        address_street,
-        address_city,
-        address_postal_code,
-        address_country,
-        type,
-        area,
-        description,
-        status,
-        capacity,
-        next_available,
-        rating,
-        review_count,
-        price_per_hour,
-        has_auto_approval,
-        time_slot_duration,
-        latitude,
-        longitude,
-        accessibility_features,
-        allowed_booking_types,
-        season_from,
-        season_to,
-        contact_name,
-        contact_email,
-        contact_phone,
-        booking_lead_time_hours,
-        max_advance_booking_days,
-        cancellation_deadline_hours,
-        is_featured,
-        created_at,
-        updated_at,
-        area_sqm,
-        equipment,
-        amenities,
+        *,
         facility_opening_hours(day_of_week, open_time, close_time, is_open),
         zones(id, name, type, capacity, bookable_independently),
         facility_images(id, image_url, alt_text, is_featured, display_order)
@@ -97,7 +64,7 @@ export class FacilityRepository {
       return result
     }
 
-    console.log('FacilityRepository.findAll - Raw result count:', result.data?.length);
+    console.log('FacilityRepository.findAll - Raw database result:', result.data?.[0]);
 
     // Transform the data to include featured image and images array
     const transformedData = result.data?.map(facility => {
@@ -110,7 +77,8 @@ export class FacilityRepository {
         address_city: facility.address_city,
         address_postal_code: facility.address_postal_code,
         imagesCount: images.length,
-        featuredImage: featuredImage ? { id: featuredImage.id, is_featured: featuredImage.is_featured, image_url: featuredImage.image_url } : null
+        featuredImage: featuredImage ? { id: featuredImage.id, is_featured: featuredImage.is_featured, image_url: featuredImage.image_url } : null,
+        rawFacility: facility
       });
       
       return {
@@ -122,7 +90,7 @@ export class FacilityRepository {
       }
     })
 
-    console.log('FacilityRepository.findAll - Transformed result count:', transformedData?.length);
+    console.log('FacilityRepository.findAll - Transformed result sample:', transformedData?.[0]);
 
     return {
       ...result,
@@ -131,44 +99,12 @@ export class FacilityRepository {
   }
 
   async findById(id: number) {
+    console.log('FacilityRepository.findById - Starting query for ID:', id);
+
     const result = await this.supabase
       .from('facilities')
       .select(`
-        id,
-        name,
-        address_street,
-        address_city,
-        address_postal_code,
-        address_country,
-        type,
-        area,
-        description,
-        status,
-        capacity,
-        next_available,
-        rating,
-        review_count,
-        price_per_hour,
-        has_auto_approval,
-        time_slot_duration,
-        latitude,
-        longitude,
-        accessibility_features,
-        allowed_booking_types,
-        season_from,
-        season_to,
-        contact_name,
-        contact_email,
-        contact_phone,
-        booking_lead_time_hours,
-        max_advance_booking_days,
-        cancellation_deadline_hours,
-        is_featured,
-        created_at,
-        updated_at,
-        area_sqm,
-        equipment,
-        amenities,
+        *,
         facility_opening_hours(day_of_week, open_time, close_time, is_open),
         zones(
           id, name, type, capacity, description, 
@@ -186,6 +122,8 @@ export class FacilityRepository {
       return result
     }
 
+    console.log('FacilityRepository.findById - Raw database result:', result.data);
+
     // Transform the data to include featured image
     const facility = result.data
     const images = facility.facility_images || []
@@ -197,7 +135,8 @@ export class FacilityRepository {
       address_city: facility.address_city,
       address_postal_code: facility.address_postal_code,
       imagesCount: images.length,
-      featuredImage: featuredImage ? { id: featuredImage.id, is_featured: featuredImage.is_featured, image_url: featuredImage.image_url } : null
+      featuredImage: featuredImage ? { id: featuredImage.id, is_featured: featuredImage.is_featured, image_url: featuredImage.image_url } : null,
+      rawFacility: facility
     });
     
     return {
