@@ -33,9 +33,9 @@ export class SupabaseFacilityService {
     console.log('SupabaseFacilityService - Computed address:', address);
     console.log('SupabaseFacilityService - Using image:', image);
 
-    // Adapt database structure to frontend Facility interface
-    return {
-      // Direct database fields - ensure all address fields are included
+    // Direct mapping - keep all database fields as they are
+    const facility: Facility = {
+      // Database fields - keep exactly as they come from DB
       id: dbFacility.id,
       name: dbFacility.name || 'Unnamed Facility',
       address_street: dbFacility.address_street || '',
@@ -81,7 +81,7 @@ export class SupabaseFacilityService {
       suitableFor: [],
       hasAutoApproval: dbFacility.has_auto_approval || false,
       nextAvailable: dbFacility.next_available || 'Available now',
-      openingHours: [], // TODO: Transform facility_opening_hours if needed
+      openingHours: dbFacility.facility_opening_hours || [],
       zones: dbFacility.zones || [],
       featuredImage: dbFacility.facility_images?.find(img => img.is_featured),
       images: dbFacility.facility_images || [],
@@ -92,6 +92,9 @@ export class SupabaseFacilityService {
       },
       availableTimes: []
     };
+
+    console.log('SupabaseFacilityService - Final adapted facility:', facility);
+    return facility;
   }
 
   static async getFacilities(
