@@ -1,4 +1,5 @@
 
+
 import { LocalizedFacility } from '@/types/localization';
 
 export const sportsFacilities: LocalizedFacility[] = [
@@ -15,7 +16,7 @@ export const sportsFacilities: LocalizedFacility[] = [
     image: "/lovable-uploads/13aee1f6-e9d9-474b-9ed7-c656d703d19b.png",
     next_available: "I dag, 18:00",
     capacity: 120,
-    accessibility: ["wheelchair", "hearing-loop"],
+    accessibility_features: ["wheelchair", "hearing-loop"],
     suitableFor: {
       NO: ["Basketball", "Volleyball", "Håndball", "Badminton"],
       EN: ["Basketball", "Volleyball", "Handball", "Badminton"]
@@ -39,19 +40,19 @@ export const sportsFacilities: LocalizedFacility[] = [
     },
     rating: 4.2,
     review_count: 15,
-    pricePerHour: 500,
+    price_per_hour: 500,
     amenities: {
       NO: ["Basketkurver", "Volleyballnett", "Lydsystem", "Projektor"],
       EN: ["Basketball hoops", "Volleyball net", "Sound system", "Projector"]
     },
-    hasAutoApproval: false,
+    has_auto_approval: false,
     lat: 59.7464,
     lng: 10.2045,
     season: {
       from: "2024-01-01",
       to: "2024-12-31"
     },
-    allowedBookingTypes: ['engangslån', 'fastlån', 'rammetid', 'strøtimer'],
+    allowed_booking_types: ['engangs', 'fastlan', 'rammetid', 'strotimer'],
     zones: [],
     availableTimes: [
       {
@@ -77,7 +78,7 @@ export const sportsFacilities: LocalizedFacility[] = [
     image: "/lovable-uploads/b12bcda3-d611-4e9e-bbcc-d53d2db38af9.png",
     next_available: "Fredag, 17:00",
     capacity: 200,
-    accessibility: ["wheelchair"],
+    accessibility_features: ["wheelchair"],
     suitableFor: {
       NO: ["Fotball", "Innebandy", "Dans", "Konsert"],
       EN: ["Football", "Floorball", "Dance", "Concert"]
@@ -101,19 +102,19 @@ export const sportsFacilities: LocalizedFacility[] = [
     },
     rating: 4.5,
     review_count: 23,
-    pricePerHour: 650,
+    price_per_hour: 650,
     amenities: {
       NO: ["Fotballmål", "Lydanlegg", "Scene", "Garderober"],
       EN: ["Football goals", "Sound system", "Stage", "Changing rooms"]
     },
-    hasAutoApproval: false,
+    has_auto_approval: false,
     lat: 59.7298,
     lng: 10.1845,
     season: {
       from: "2024-01-01",
       to: "2024-12-31"
     },
-    allowedBookingTypes: ['engangslån', 'fastlån', 'rammetid', 'strøtimer'],
+    allowed_booking_types: ['engangs', 'fastlan', 'rammetid', 'strotimer'],
     zones: [],
     availableTimes: [
       {
@@ -138,7 +139,7 @@ export const sportsFacilities: LocalizedFacility[] = [
     image: "/lovable-uploads/a72ba2e2-f0a3-4561-bff6-17fa721a0c02.png",
     next_available: "Lørdag, 18:30",
     capacity: 300,
-    accessibility: ["wheelchair"],
+    accessibility_features: ["wheelchair"],
     suitableFor: {
       NO: ["Fotball", "Futsal", "Innebandy", "Håndball"],
       EN: ["Football", "Futsal", "Floorball", "Handball"]
@@ -161,19 +162,19 @@ export const sportsFacilities: LocalizedFacility[] = [
     },
     rating: 4.4,
     review_count: 52,
-    pricePerHour: 900,
+    price_per_hour: 900,
     amenities: {
       NO: ["Kunstgress", "Fotballmål", "Tilskuerplasser", "Garderober", "Kafeteria"],
       EN: ["Artificial turf", "Football goals", "Spectator seats", "Changing rooms", "Cafeteria"]
     },
-    hasAutoApproval: true,
+    has_auto_approval: true,
     lat: 59.7634,
     lng: 10.1456,
     season: {
       from: "2024-01-01",
       to: "2024-12-31"
     },
-    allowedBookingTypes: ['engangslån', 'fastlån', 'rammetid', 'strøtimer'],
+    allowed_booking_types: ['engangs', 'fastlan', 'rammetid', 'strotimer'],
     zones: [],
     availableTimes: [
       {
@@ -197,7 +198,7 @@ export const sportsFacilities: LocalizedFacility[] = [
     image: "/lovable-uploads/a72ba2e2-f0a3-4561-bff6-17fa721a0c02.png",
     next_available: "Torsdag, 15:00",
     capacity: 350,
-    accessibility: ["wheelchair", "hearing-loop"],
+    accessibility_features: ["wheelchair", "hearing-loop"],
     suitableFor: {
       NO: ["Fotball", "Håndball", "Basketball", "Turnering"],
       EN: ["Football", "Handball", "Basketball", "Tournaments"]
@@ -220,19 +221,19 @@ export const sportsFacilities: LocalizedFacility[] = [
     },
     rating: 4.8,
     review_count: 76,
-    pricePerHour: 850,
+    price_per_hour: 850,
     amenities: {
       NO: ["Kunstgress", "Tribuner", "Lydanlegg", "Garderober", "Kantine"],
       EN: ["Artificial turf", "Stands", "Sound system", "Changing rooms", "Canteen"]
     },
-    hasAutoApproval: false,
+    has_auto_approval: false,
     lat: 59.7234,
     lng: 10.1678,
     season: {
       from: "2024-01-01",
       to: "2024-12-31"
     },
-    allowedBookingTypes: ['engangslån', 'fastlån', 'rammetid', 'strøtimer'],
+    allowed_booking_types: ['engangs', 'fastlan', 'rammetid', 'strotimer'],
     zones: [],
     availableTimes: [
       {
@@ -257,7 +258,7 @@ export const sportsFacilities: LocalizedFacility[] = [
     image: "/lovable-uploads/13aee1f6-e9d9-474b-9ed7-c656d703d19b.png",
     next_available: "I morgen, 09:00",
     capacity: 150,
-    accessibility: ["wheelchair"],
+    accessibility_features: ["wheelchair"],
     suitableFor: {
       NO: ["Håndball", "Basketball", "Volleyball", "Badminton"],
       EN: ["Handball", "Basketball", "Volleyball", "Badminton"]
@@ -281,20 +282,21 @@ export const sportsFacilities: LocalizedFacility[] = [
     },
     rating: 4.6,
     review_count: 32,
-    pricePerHour: 600,
+    price_per_hour: 600,
     amenities: {
       NO: ["Moderne utstyr", "God ventilasjon", "Garderober"],
       EN: ["Modern Equipment", "Good Ventilation", "Changing Rooms"]
     },
-    hasAutoApproval: true,
-    timeSlotDuration: 2,
+    has_auto_approval: true,
+    time_slot_duration: 2,
     lat: 59.7234,
     lng: 10.1934,
     season: {
       from: "2024-01-01",
       to: "2024-12-31"
     },
-    allowedBookingTypes: ['engangslån', 'fastlån', 'rammetid', 'strøtimer'],
+    allowed_booking_types: ['engangs', 'fastlan', 'rammetid', 'strotimer'],
     zones: []
   }
 ];
+

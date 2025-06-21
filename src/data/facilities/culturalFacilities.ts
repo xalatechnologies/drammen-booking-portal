@@ -1,4 +1,5 @@
 
+
 import { LocalizedFacility } from '@/types/localization';
 
 export const culturalFacilities: LocalizedFacility[] = [
@@ -50,7 +51,7 @@ export const culturalFacilities: LocalizedFacility[] = [
       from: "2024-01-01",
       to: "2024-12-31"
     },
-    allowed_booking_types: ['engangslån', 'fastlån', 'rammetid', 'strøtimer'],
+    allowed_booking_types: ['engangs', 'fastlan', 'rammetid', 'strotimer'],
     zones: [],
     availableTimes: [
       {
@@ -109,7 +110,7 @@ export const culturalFacilities: LocalizedFacility[] = [
       from: "2024-01-01",
       to: "2024-12-31"
     },
-    allowed_booking_types: ['engangslån', 'fastlån', 'rammetid', 'strøtimer'],
+    allowed_booking_types: ['engangs', 'fastlan', 'rammetid', 'strotimer'],
     zones: [],
     availableTimes: [
       {
@@ -168,7 +169,7 @@ export const culturalFacilities: LocalizedFacility[] = [
       from: "2024-01-01",
       to: "2024-12-31"
     },
-    allowed_booking_types: ['engangslån', 'fastlån', 'rammetid', 'strøtimer'],
+    allowed_booking_types: ['engangs', 'fastlan', 'rammetid', 'strotimer'],
     zones: [],
     availableTimes: [
       {
@@ -228,7 +229,7 @@ export const culturalFacilities: LocalizedFacility[] = [
       from: "2024-01-01",
       to: "2024-12-31"
     },
-    allowed_booking_types: ['engangslån', 'fastlån', 'rammetid', 'strøtimer'],
+    allowed_booking_types: ['engangs', 'fastlan', 'rammetid', 'strotimer'],
     zones: [],
     availableTimes: [
       {
@@ -287,7 +288,7 @@ export const culturalFacilities: LocalizedFacility[] = [
       from: "2024-01-01",
       to: "2024-12-31"
     },
-    allowed_booking_types: ['engangslån', 'fastlån', 'rammetid', 'strøtimer'],
+    allowed_booking_types: ['engangs', 'fastlan', 'rammetid', 'strotimer'],
     zones: [],
     availableTimes: [
       {
@@ -347,7 +348,7 @@ export const culturalFacilities: LocalizedFacility[] = [
       from: "2024-01-01",
       to: "2024-12-31"
     },
-    allowed_booking_types: ['engangslån', 'fastlån', 'rammetid', 'strøtimer'],
+    allowed_booking_types: ['engangs', 'fastlan', 'rammetid', 'strotimer'],
     zones: [],
     availableTimes: [
       {
@@ -408,7 +409,8 @@ export const culturalFacilities: LocalizedFacility[] = [
       from: "2024-01-01",
       to: "2024-12-31"
     },
-    allowed_booking_types: ['engangslån', 'fastlån', 'rammetid', 'strøtimer'],
+    allowed_booking_types: ['engangs', 'fastlan', 'rammetid', 'strotimer'],
     zones: []
   }
 ];
+

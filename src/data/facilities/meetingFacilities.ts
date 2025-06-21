@@ -1,4 +1,5 @@
 
+
 import { LocalizedFacility } from '@/types/localization';
 
 export const meetingFacilities: LocalizedFacility[] = [
@@ -15,7 +16,7 @@ export const meetingFacilities: LocalizedFacility[] = [
     image: "/lovable-uploads/07eaca70-1e9b-4e73-ab4e-6b9b7f1ca27e.png",
     next_available: "Lørdag, 10:00",
     capacity: 80,
-    accessibility: ["wheelchair"],
+    accessibility_features: ["wheelchair"],
     suitableFor: {
       NO: ["Møter", "Kurs", "Workshops", "Seminarer"],
       EN: ["Meetings", "Courses", "Workshops", "Seminars"]
@@ -38,19 +39,19 @@ export const meetingFacilities: LocalizedFacility[] = [
     },
     rating: 4.1,
     review_count: 18,
-    pricePerHour: 450,
+    price_per_hour: 450,
     amenities: {
       NO: ["Whiteboard", "Projektor", "WiFi", "Kaffe/te", "Flipchart"],
       EN: ["Whiteboard", "Projector", "WiFi", "Coffee/tea", "Flipchart"]
     },
-    hasAutoApproval: true,
+    has_auto_approval: true,
     lat: 59.7389,
     lng: 10.2167,
     season: {
       from: "2024-01-01",
       to: "2024-12-31"
     },
-    allowedBookingTypes: ['engangslån', 'fastlån', 'rammetid', 'strøtimer'],
+    allowed_booking_types: ['engangs', 'fastlan', 'rammetid', 'strotimer'],
     zones: [],
     availableTimes: [
       {
@@ -75,7 +76,7 @@ export const meetingFacilities: LocalizedFacility[] = [
     image: "/lovable-uploads/08e8f8d5-4126-4805-a56e-e4337f97dbd0.png",
     next_available: "Mandag, 09:00",
     capacity: 25,
-    accessibility: ["wheelchair", "hearing-loop", "sign-language"],
+    accessibility_features: ["wheelchair", "hearing-loop", "sign-language"],
     suitableFor: {
       NO: ["Møter", "Studiegrupper", "Workshops", "Lesninger"],
       EN: ["Meetings", "Study groups", "Workshops", "Readings"]
@@ -98,19 +99,19 @@ export const meetingFacilities: LocalizedFacility[] = [
     },
     rating: 4.3,
     review_count: 27,
-    pricePerHour: 200,
+    price_per_hour: 200,
     amenities: {
       NO: ["Whiteboard", "Projektor", "WiFi", "Bøker", "Stilleområde"],
       EN: ["Whiteboard", "Projector", "WiFi", "Books", "Quiet area"]
     },
-    hasAutoApproval: true,
+    has_auto_approval: true,
     lat: 59.7423,
     lng: 10.2056,
     season: {
       from: "2024-01-01",
       to: "2024-12-31"
     },
-    allowedBookingTypes: ['engangslån', 'fastlån', 'rammetid', 'strøtimer'],
+    allowed_booking_types: ['engangs', 'fastlan', 'rammetid', 'strotimer'],
     zones: [],
     availableTimes: [
       {
@@ -137,7 +138,7 @@ export const meetingFacilities: LocalizedFacility[] = [
     image: "/lovable-uploads/13aee1f6-e9d9-474b-9ed7-c656d703d19b.png",
     next_available: "Onsdag, 17:00",
     capacity: 30,
-    accessibility: ["wheelchair"],
+    accessibility_features: ["wheelchair"],
     suitableFor: {
       NO: ["Undervisning", "Kurs", "Studiegrupper", "Seminarer"],
       EN: ["Teaching", "Courses", "Study groups", "Seminars"]
@@ -160,19 +161,19 @@ export const meetingFacilities: LocalizedFacility[] = [
     },
     rating: 4.0,
     review_count: 12,
-    pricePerHour: 250,
+    price_per_hour: 250,
     amenities: {
       NO: ["Tavle", "Projektor", "WiFi", "Stoler", "Bord"],
       EN: ["Blackboard", "Projector", "WiFi", "Chairs", "Tables"]
     },
-    hasAutoApproval: true,
+    has_auto_approval: true,
     lat: 59.7512,
     lng: 10.2234,
     season: {
       from: "2024-01-01",
       to: "2024-12-31"
     },
-    allowedBookingTypes: ['engangslån', 'fastlån', 'rammetid', 'strøtimer'],
+    allowed_booking_types: ['engangs', 'fastlan', 'rammetid', 'strotimer'],
     zones: [],
     availableTimes: [
       {
@@ -197,7 +198,7 @@ export const meetingFacilities: LocalizedFacility[] = [
     image: "/lovable-uploads/b692664c-737a-4a20-8673-25a401789f82.png",
     next_available: "Fredag, 14:00",
     capacity: 100,
-    accessibility: ["wheelchair", "hearing-loop", "sign-language"],
+    accessibility_features: ["wheelchair", "hearing-loop", "sign-language"],
     suitableFor: {
       NO: ["Offentlige møter", "Konferanser", "Presentasjoner", "Debatter"],
       EN: ["Public meetings", "Conferences", "Presentations", "Debates"]
@@ -220,19 +221,19 @@ export const meetingFacilities: LocalizedFacility[] = [
     },
     rating: 4.4,
     review_count: 22,
-    pricePerHour: 600,
+    price_per_hour: 600,
     amenities: {
       NO: ["Mikrofoner", "Projektor", "Lyd-/videoutstyr", "Wifi", "Tolketjenester"],
       EN: ["Microphones", "Projector", "Audio/video equipment", "WiFi", "Interpretation services"]
     },
-    hasAutoApproval: false,
+    has_auto_approval: false,
     lat: 59.7445,
     lng: 10.2089,
     season: {
       from: "2024-01-01",
       to: "2024-12-31"
     },
-    allowedBookingTypes: ['engangslån', 'fastlån', 'rammetid', 'strøtimer'],
+    allowed_booking_types: ['engangs', 'fastlan', 'rammetid', 'strotimer'],
     zones: [],
     availableTimes: [
       {
@@ -244,3 +245,4 @@ export const meetingFacilities: LocalizedFacility[] = [
     ]
   }
 ];
+

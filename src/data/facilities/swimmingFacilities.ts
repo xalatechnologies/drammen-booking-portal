@@ -1,4 +1,5 @@
 
+
 import { LocalizedFacility } from '@/types/localization';
 
 export const swimmingFacilities: LocalizedFacility[] = [
@@ -15,7 +16,7 @@ export const swimmingFacilities: LocalizedFacility[] = [
     image: "/lovable-uploads/740258a0-d4f7-49b6-a8a6-9c994e75baae.png",
     next_available: "Søndag, 12:00",
     capacity: 250,
-    accessibility: ["wheelchair", "hearing-loop"],
+    accessibility_features: ["wheelchair", "hearing-loop"],
     suitableFor: {
       NO: ["Svømming", "Vanngymnastikk", "Svømmeopplæring", "Konkurranser"],
       EN: ["Swimming", "Water aerobics", "Swimming lessons", "Competitions"]
@@ -38,19 +39,19 @@ export const swimmingFacilities: LocalizedFacility[] = [
     },
     rating: 4.7,
     review_count: 89,
-    pricePerHour: 700,
+    price_per_hour: 700,
     amenities: {
       NO: ["25m basseng", "Barnebassseng", "Garderober", "Dusjer", "Livredningsutstyr"],
       EN: ["25m pool", "Children's pool", "Changing rooms", "Showers", "Safety equipment"]
     },
-    hasAutoApproval: false,
+    has_auto_approval: false,
     lat: 59.7545,
     lng: 10.1798,
     season: {
       from: "2024-01-01",
       to: "2024-12-31"
     },
-    allowedBookingTypes: ['engangslån', 'fastlån', 'rammetid', 'strøtimer'],
+    allowed_booking_types: ['engangs', 'fastlan', 'rammetid', 'strotimer'],
     zones: [],
     availableTimes: [
       {
@@ -75,7 +76,7 @@ export const swimmingFacilities: LocalizedFacility[] = [
     image: "/lovable-uploads/740258a0-d4f7-49b6-a8a6-9c994e75baae.png",
     next_available: "Tirsdag, 07:00",
     capacity: 180,
-    accessibility: ["wheelchair", "hearing-loop"],
+    accessibility_features: ["wheelchair", "hearing-loop"],
     suitableFor: {
       NO: ["Svømming", "Vanngymnastikk", "Barneskole", "Kurs"],
       EN: ["Swimming", "Water aerobics", "Primary school", "Courses"]
@@ -98,19 +99,19 @@ export const swimmingFacilities: LocalizedFacility[] = [
     },
     rating: 4.2,
     review_count: 41,
-    pricePerHour: 550,
+    price_per_hour: 550,
     amenities: {
       NO: ["25m basseng", "Varmbasseng", "Badstue", "Garderober", "Kafeteria"],
       EN: ["25m pool", "Warm pool", "Sauna", "Changing rooms", "Cafeteria"]
     },
-    hasAutoApproval: true,
+    has_auto_approval: true,
     lat: 59.4894,
     lng: 10.3123,
     season: {
       from: "2024-01-01",
       to: "2024-12-31"
     },
-    allowedBookingTypes: ['engangslån', 'fastlån', 'rammetid', 'strøtimer'],
+    allowed_booking_types: ['engangs', 'fastlan', 'rammetid', 'strotimer'],
     zones: [],
     availableTimes: [
       {
@@ -123,3 +124,4 @@ export const swimmingFacilities: LocalizedFacility[] = [
     ]
   }
 ];
+
