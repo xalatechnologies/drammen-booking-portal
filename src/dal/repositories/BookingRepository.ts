@@ -91,4 +91,50 @@ export class BookingRepository extends SupabaseRepository<Booking> {
   async getBookingsByZone(zoneId: string): Promise<RepositoryResponse<Booking[]>> {
     return this.findAllWithFilters(undefined, { zoneId });
   }
+
+  // Add the missing checkBookingConflicts method
+  async checkBookingConflicts(
+    zoneId: string,
+    startDate: Date,
+    endDate: Date,
+    excludeBookingId?: string
+  ): Promise<RepositoryResponse<{ hasConflict: boolean; conflictingBookings: Booking[]; availableAlternatives: any[] }>> {
+    try {
+      let query = supabase
+        .from(this.tableName as any)
+        .select('*')
+        .eq('zone_id', zoneId)
+        .neq('status', 'cancelled')
+        .or(`start_date.lte.${endDate.toISOString()},end_date.gte.${startDate.toISOString()}`);
+
+      if (excludeBookingId) {
+        query = query.neq('id', excludeBookingId);
+      }
+
+      const { data, error } = await query;
+
+      if (error) {
+        return {
+          data: { hasConflict: false, conflictingBookings: [], availableAlternatives: [] },
+          error: error.message
+        };
+      }
+
+      const conflictingBookings = (data as unknown as Booking[]) || [];
+      const hasConflict = conflictingBookings.length > 0;
+
+      return {
+        data: {
+          hasConflict,
+          conflictingBookings,
+          availableAlternatives: [] // Would implement alternative time slot suggestions here
+        }
+      };
+    } catch (error: any) {
+      return {
+        data: { hasConflict: false, conflictingBookings: [], availableAlternatives: [] },
+        error: error.message
+      };
+    }
+  }
 }

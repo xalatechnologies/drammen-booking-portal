@@ -111,11 +111,11 @@ export class BookingService {
         };
       }
 
-      // Transform BookingCreateRequest to match repository expectations
+      // Transform BookingCreateRequest to match database structure
       const bookingData = {
         facility_id: parseInt(request.facilityId),
         zone_id: request.zoneId,
-        user_id: 'temp-user-id', // This should come from auth context
+        user_id: 'temp-user-id',
         start_date: request.startDate,
         end_date: request.endDate,
         purpose: request.purpose,
@@ -131,11 +131,41 @@ export class BookingService {
         booking_reference: `BK-${Date.now()}`,
         base_price: 0,
         total_price: 0,
-        services_price: 0
+        services_price: 0,
+        type: 'engangs' as any,
+        status: 'draft' as any,
+        approval_status: 'not-required' as any,
+        requires_approval: false,
+        description: '',
+        // Core Booking interface fields
+        eventType: request.eventType,
+        expectedAttendees: request.expectedAttendees,
+        ageGroup: request.ageGroup,
+        contactName: request.contactName,
+        contactEmail: request.contactEmail,
+        contactPhone: request.contactPhone,
+        startDate: request.startDate,
+        endDate: request.endDate,
+        facilityId: parseInt(request.facilityId),
+        zoneId: request.zoneId,
+        additionalServices: [],
+        pricing: {
+          basePrice: 0,
+          servicesPrice: 0,
+          discounts: [],
+          surcharges: [],
+          taxes: [],
+          totalPrice: 0,
+          breakdown: []
+        },
+        requiresApproval: false,
+        approvalStatus: 'not-required' as any,
+        notes: [],
+        attachments: []
       };
 
       // Create the booking
-      const result = await bookingRepository.create(bookingData);
+      const result = await bookingRepository.create(bookingData as any);
       
       if (result.error) {
         return {
@@ -198,7 +228,22 @@ export class BookingService {
         }
       }
 
-      const result = await bookingRepository.update(id, request);
+      // Transform update request to match database structure
+      const updateData: any = {};
+      
+      if (request.startDate) updateData.start_date = request.startDate;
+      if (request.endDate) updateData.end_date = request.endDate;
+      if (request.purpose) updateData.purpose = request.purpose;
+      if (request.eventType) updateData.event_type = request.eventType;
+      if (request.expectedAttendees) updateData.expected_attendees = request.expectedAttendees;
+      if (request.ageGroup) updateData.age_group = request.ageGroup;
+      if (request.contactName) updateData.contact_name = request.contactName;
+      if (request.contactEmail) updateData.contact_email = request.contactEmail;
+      if (request.contactPhone) updateData.contact_phone = request.contactPhone;
+      if (request.specialRequirements) updateData.special_requirements = request.specialRequirements;
+      if (request.organizationId) updateData.organization_id = request.organizationId;
+
+      const result = await bookingRepository.update(id, updateData);
       
       if (result.error) {
         return {
