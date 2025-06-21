@@ -51,11 +51,13 @@ export const FacilityDetailCalendar: React.FC<FacilityDetailCalendarProps> = ({
   }, []);
 
   const isSlotSelected = useCallback((zoneId: string, date: Date, timeSlot: string) => {
-    return selectedSlots.some(slot => 
-      slot.zoneId === zoneId &&
-      slot.date.toDateString() === date.toDateString() &&
-      slot.timeSlot === timeSlot
-    );
+    return selectedSlots.some(slot => {
+      // Ensure slot.date is a Date object by converting if it's a string
+      const slotDate = slot.date instanceof Date ? slot.date : new Date(slot.date);
+      return slot.zoneId === zoneId &&
+        slotDate.toDateString() === date.toDateString() &&
+        slot.timeSlot === timeSlot;
+    });
   }, [selectedSlots]);
 
   const handleContinueBooking = useCallback(() => {

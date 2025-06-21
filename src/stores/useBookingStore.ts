@@ -59,6 +59,11 @@ const initialFormData: BookingFormData = {
   organization: ''
 };
 
+// Helper function to ensure date is a Date object
+const ensureDate = (date: Date | string): Date => {
+  return date instanceof Date ? date : new Date(date);
+};
+
 export const useBookingStore = create<BookingState>()(
   persist(
     (set, get) => ({
@@ -73,29 +78,43 @@ export const useBookingStore = create<BookingState>()(
 
       // Slot management actions
       setSelectedSlots: (slots) => {
-        set({ selectedSlots: slots });
+        // Ensure all dates are Date objects
+        const normalizedSlots = slots.map(slot => ({
+          ...slot,
+          date: ensureDate(slot.date)
+        }));
+        set({ selectedSlots: normalizedSlots });
       },
 
       addSlot: (slot) => {
         const { selectedSlots } = get();
-        const exists = selectedSlots.some(s => 
-          s.zoneId === slot.zoneId &&
-          s.date.toDateString() === slot.date.toDateString() &&
-          s.timeSlot === slot.timeSlot
-        );
+        const normalizedSlot = {
+          ...slot,
+          date: ensureDate(slot.date)
+        };
+        
+        const exists = selectedSlots.some(s => {
+          const sDate = ensureDate(s.date);
+          return s.zoneId === normalizedSlot.zoneId &&
+            sDate.toDateString() === normalizedSlot.date.toDateString() &&
+            s.timeSlot === normalizedSlot.timeSlot;
+        });
         
         if (!exists) {
-          set({ selectedSlots: [...selectedSlots, slot] });
+          set({ selectedSlots: [...selectedSlots, normalizedSlot] });
         }
       },
 
       removeSlot: (zoneId, date, timeSlot) => {
         const { selectedSlots } = get();
-        const filtered = selectedSlots.filter(slot => 
-          !(slot.zoneId === zoneId &&
-            slot.date.toDateString() === date.toDateString() &&
-            slot.timeSlot === timeSlot)
-        );
+        const targetDate = ensureDate(date);
+        
+        const filtered = selectedSlots.filter(slot => {
+          const slotDate = ensureDate(slot.date);
+          return !(slot.zoneId === zoneId &&
+            slotDate.toDateString() === targetDate.toDateString() &&
+            slot.timeSlot === timeSlot);
+        });
         set({ selectedSlots: filtered });
       },
 
@@ -105,12 +124,18 @@ export const useBookingStore = create<BookingState>()(
 
       bulkAddSlots: (slots) => {
         const { selectedSlots } = get();
-        const newSlots = slots.filter(newSlot => 
-          !selectedSlots.some(existingSlot =>
-            existingSlot.zoneId === newSlot.zoneId &&
-            existingSlot.date.toDateString() === newSlot.date.toDateString() &&
-            existingSlot.timeSlot === newSlot.timeSlot
-          )
+        const normalizedNewSlots = slots.map(slot => ({
+          ...slot,
+          date: ensureDate(slot.date)
+        }));
+        
+        const newSlots = normalizedNewSlots.filter(newSlot => 
+          !selectedSlots.some(existingSlot => {
+            const existingDate = ensureDate(existingSlot.date);
+            return existingSlot.zoneId === newSlot.zoneId &&
+              existingDate.toDateString() === newSlot.date.toDateString() &&
+              existingSlot.timeSlot === newSlot.timeSlot;
+          })
         );
         
         if (newSlots.length > 0) {

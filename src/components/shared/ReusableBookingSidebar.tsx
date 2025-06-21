@@ -40,13 +40,17 @@ export const ReusableBookingSidebar: React.FC<ReusableBookingSidebarProps> = ({
     return total + (zone?.pricePerHour || 450) * (slot.duration || 1);
   }, 0);
 
-  // Group slots by date
+  // Group slots by date - ensure dates are Date objects
   const slotsByDate = selectedSlots.reduce((acc, slot) => {
-    const dateKey = format(slot.date, 'yyyy-MM-dd');
+    const slotDate = slot.date instanceof Date ? slot.date : new Date(slot.date);
+    const dateKey = format(slotDate, 'yyyy-MM-dd');
     if (!acc[dateKey]) {
       acc[dateKey] = [];
     }
-    acc[dateKey].push(slot);
+    acc[dateKey].push({
+      ...slot,
+      date: slotDate
+    });
     return acc;
   }, {} as Record<string, SelectedTimeSlot[]>);
 
