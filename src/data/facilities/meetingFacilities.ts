@@ -13,7 +13,7 @@ export const meetingFacilities: LocalizedFacility[] = [
     area: "Strømsø",
     status: 'active',
     image: "/lovable-uploads/07eaca70-1e9b-4e73-ab4e-6b9b7f1ca27e.png",
-    nextAvailable: "Lørdag, 10:00",
+    next_available: "Lørdag, 10:00",
     capacity: 80,
     accessibility: ["wheelchair"],
     suitableFor: {
@@ -37,7 +37,7 @@ export const meetingFacilities: LocalizedFacility[] = [
       EN: "Spacious meeting room with natural light and modern conference equipment. Ideal for business meetings and training activities."
     },
     rating: 4.1,
-    reviewCount: 18,
+    review_count: 18,
     pricePerHour: 450,
     amenities: {
       NO: ["Whiteboard", "Projektor", "WiFi", "Kaffe/te", "Flipchart"],
@@ -73,7 +73,7 @@ export const meetingFacilities: LocalizedFacility[] = [
     area: "Bragernes",
     status: 'active',
     image: "/lovable-uploads/08e8f8d5-4126-4805-a56e-e4337f97dbd0.png",
-    nextAvailable: "Mandag, 09:00",
+    next_available: "Mandag, 09:00",
     capacity: 25,
     accessibility: ["wheelchair", "hearing-loop", "sign-language"],
     suitableFor: {
@@ -97,7 +97,7 @@ export const meetingFacilities: LocalizedFacility[] = [
       EN: "Quiet meeting room in the library with access to research resources and peaceful working environment."
     },
     rating: 4.3,
-    reviewCount: 27,
+    review_count: 27,
     pricePerHour: 200,
     amenities: {
       NO: ["Whiteboard", "Projektor", "WiFi", "Bøker", "Stilleområde"],
@@ -135,7 +135,7 @@ export const meetingFacilities: LocalizedFacility[] = [
     area: "Tangen",
     status: 'active',
     image: "/lovable-uploads/13aee1f6-e9d9-474b-9ed7-c656d703d19b.png",
-    nextAvailable: "Onsdag, 17:00",
+    next_available: "Onsdag, 17:00",
     capacity: 30,
     accessibility: ["wheelchair"],
     suitableFor: {
@@ -159,7 +159,7 @@ export const meetingFacilities: LocalizedFacility[] = [
       EN: "Practical classroom with good lighting and modern teaching equipment."
     },
     rating: 4.0,
-    reviewCount: 12,
+    review_count: 12,
     pricePerHour: 250,
     amenities: {
       NO: ["Tavle", "Projektor", "WiFi", "Stoler", "Bord"],
@@ -195,7 +195,7 @@ export const meetingFacilities: LocalizedFacility[] = [
     area: "Bragernes",
     status: 'active',
     image: "/lovable-uploads/b692664c-737a-4a20-8673-25a401789f82.png",
-    nextAvailable: "Fredag, 14:00",
+    next_available: "Fredag, 14:00",
     capacity: 100,
     accessibility: ["wheelchair", "hearing-loop", "sign-language"],
     suitableFor: {
@@ -219,7 +219,7 @@ export const meetingFacilities: LocalizedFacility[] = [
       EN: "Representative assembly hall in the city hall with full technical equipment for public events."
     },
     rating: 4.4,
-    reviewCount: 22,
+    review_count: 22,
     pricePerHour: 600,
     amenities: {
       NO: ["Mikrofoner", "Projektor", "Lyd-/videoutstyr", "Wifi", "Tolketjenester"],

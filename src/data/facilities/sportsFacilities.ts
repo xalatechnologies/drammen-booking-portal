@@ -13,7 +13,7 @@ export const sportsFacilities: LocalizedFacility[] = [
     area: "Bragernes",
     status: 'active',
     image: "/lovable-uploads/13aee1f6-e9d9-474b-9ed7-c656d703d19b.png",
-    nextAvailable: "I dag, 18:00",
+    next_available: "I dag, 18:00",
     capacity: 120,
     accessibility: ["wheelchair", "hearing-loop"],
     suitableFor: {
@@ -38,7 +38,7 @@ export const sportsFacilities: LocalizedFacility[] = [
       EN: "A modern gymnasium with high standards and good ventilation. Ideal for ball sports and larger events."
     },
     rating: 4.2,
-    reviewCount: 15,
+    review_count: 15,
     pricePerHour: 500,
     amenities: {
       NO: ["Basketkurver", "Volleyballnett", "Lydsystem", "Projektor"],
@@ -75,7 +75,7 @@ export const sportsFacilities: LocalizedFacility[] = [
     area: "Konnerud",
     status: 'active',
     image: "/lovable-uploads/b12bcda3-d611-4e9e-bbcc-d53d2db38af9.png",
-    nextAvailable: "Fredag, 17:00",
+    next_available: "Fredag, 17:00",
     capacity: 200,
     accessibility: ["wheelchair"],
     suitableFor: {
@@ -100,7 +100,7 @@ export const sportsFacilities: LocalizedFacility[] = [
       EN: "Large activity hall suitable for both sports and cultural events. Good acoustics and modern facilities."
     },
     rating: 4.5,
-    reviewCount: 23,
+    review_count: 23,
     pricePerHour: 650,
     amenities: {
       NO: ["Fotballmål", "Lydanlegg", "Scene", "Garderober"],
@@ -136,7 +136,7 @@ export const sportsFacilities: LocalizedFacility[] = [
     area: "Åssiden",
     status: 'active',
     image: "/lovable-uploads/a72ba2e2-f0a3-4561-bff6-17fa721a0c02.png",
-    nextAvailable: "Lørdag, 18:30",
+    next_available: "Lørdag, 18:30",
     capacity: 300,
     accessibility: ["wheelchair"],
     suitableFor: {
@@ -160,7 +160,7 @@ export const sportsFacilities: LocalizedFacility[] = [
       EN: "Large football hall with high-quality artificial turf. Suitable for training, matches and tournaments."
     },
     rating: 4.4,
-    reviewCount: 52,
+    review_count: 52,
     pricePerHour: 900,
     amenities: {
       NO: ["Kunstgress", "Fotballmål", "Tilskuerplasser", "Garderober", "Kafeteria"],
@@ -195,7 +195,7 @@ export const sportsFacilities: LocalizedFacility[] = [
     area: "Konnerud",
     status: 'active',
     image: "/lovable-uploads/a72ba2e2-f0a3-4561-bff6-17fa721a0c02.png",
-    nextAvailable: "Torsdag, 15:00",
+    next_available: "Torsdag, 15:00",
     capacity: 350,
     accessibility: ["wheelchair", "hearing-loop"],
     suitableFor: {
@@ -219,7 +219,7 @@ export const sportsFacilities: LocalizedFacility[] = [
       EN: "Large sports hall with stands and modern facilities. Ideal for major sports events."
     },
     rating: 4.8,
-    reviewCount: 76,
+    review_count: 76,
     pricePerHour: 850,
     amenities: {
       NO: ["Kunstgress", "Tribuner", "Lydanlegg", "Garderober", "Kantine"],
@@ -255,7 +255,7 @@ export const sportsFacilities: LocalizedFacility[] = [
     area: "Mjøndalen",
     status: 'active',
     image: "/lovable-uploads/13aee1f6-e9d9-474b-9ed7-c656d703d19b.png",
-    nextAvailable: "I morgen, 09:00",
+    next_available: "I morgen, 09:00",
     capacity: 150,
     accessibility: ["wheelchair"],
     suitableFor: {
@@ -280,7 +280,7 @@ export const sportsFacilities: LocalizedFacility[] = [
       EN: "Modern sports hall with three separate zones that can be combined. Ideal for handball, basketball, volleyball and badminton with the possibility of simultaneous use of multiple areas."
     },
     rating: 4.6,
-    reviewCount: 32,
+    review_count: 32,
     pricePerHour: 600,
     amenities: {
       NO: ["Moderne utstyr", "God ventilasjon", "Garderober"],

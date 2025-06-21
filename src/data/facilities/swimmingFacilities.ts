@@ -13,7 +13,7 @@ export const swimmingFacilities: LocalizedFacility[] = [
     area: "Åssiden",
     status: 'active',
     image: "/lovable-uploads/740258a0-d4f7-49b6-a8a6-9c994e75baae.png",
-    nextAvailable: "Søndag, 12:00",
+    next_available: "Søndag, 12:00",
     capacity: 250,
     accessibility: ["wheelchair", "hearing-loop"],
     suitableFor: {
@@ -37,7 +37,7 @@ export const swimmingFacilities: LocalizedFacility[] = [
       EN: "Modern swimming facility with both competition pool and children's area. High standard facilities and safety measures."
     },
     rating: 4.7,
-    reviewCount: 89,
+    review_count: 89,
     pricePerHour: 700,
     amenities: {
       NO: ["25m basseng", "Barnebassseng", "Garderober", "Dusjer", "Livredningsutstyr"],
@@ -73,7 +73,7 @@ export const swimmingFacilities: LocalizedFacility[] = [
     area: "Holmestrand",
     status: 'active',
     image: "/lovable-uploads/740258a0-d4f7-49b6-a8a6-9c994e75baae.png",
-    nextAvailable: "Tirsdag, 07:00",
+    next_available: "Tirsdag, 07:00",
     capacity: 180,
     accessibility: ["wheelchair", "hearing-loop"],
     suitableFor: {
@@ -97,7 +97,7 @@ export const swimmingFacilities: LocalizedFacility[] = [
       EN: "Modern swimming facility with warm pool and sauna. Family-friendly with excellent facilities."
     },
     rating: 4.2,
-    reviewCount: 41,
+    review_count: 41,
     pricePerHour: 550,
     amenities: {
       NO: ["25m basseng", "Varmbasseng", "Badstue", "Garderober", "Kafeteria"],

@@ -37,19 +37,19 @@ export interface Facility {
   updated_at: string;
   area_sqm: number | null;
   
-  // Computed/derived fields for backwards compatibility
-  address?: string; // Computed from address_street, address_city
-  image?: string; // Alias for image_url
-  pricePerHour?: number; // Alias for price_per_hour
-  accessibility?: string[]; // Alias for accessibility_features
-  suitableFor?: string[];
-  hasAutoApproval?: boolean; // Alias for has_auto_approval
-  nextAvailable?: string; // Alias for next_available
-  openingHours?: OpeningHours[];
-  zones?: Zone[];
+  // Computed/derived fields for backwards compatibility - all required to avoid conflicts
+  address: string; // Computed from address_street, address_city - REQUIRED
+  image: string; // Alias for image_url - REQUIRED
+  pricePerHour: number; // Alias for price_per_hour
+  accessibility: string[]; // Alias for accessibility_features
+  suitableFor: string[];
+  hasAutoApproval: boolean; // Alias for has_auto_approval
+  nextAvailable: string; // Alias for next_available - REQUIRED
+  openingHours: OpeningHours[];
+  zones: Zone[];
   featuredImage?: FacilityImage;
   images?: FacilityImage[];
-  timeSlotDuration?: 1 | 2;
+  timeSlotDuration: 1 | 2;
   availableTimes?: {
     date: Date;
     slots: {
@@ -58,7 +58,7 @@ export interface Facility {
       available: boolean;
     }[];
   }[];
-  season?: {
+  season: {
     from: string;
     to: string;
   };

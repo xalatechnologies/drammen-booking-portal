@@ -44,7 +44,7 @@ export function transformDatabaseFacility(dbFacility: any): Facility {
     updated_at: dbFacility.updated_at,
     area_sqm: dbFacility.area_sqm,
     
-    // Computed/legacy fields for backwards compatibility
+    // Computed/legacy fields for backwards compatibility - all REQUIRED
     address: `${dbFacility.address_street}, ${dbFacility.address_city}`,
     image: dbFacility.image_url || "/lovable-uploads/13aee1f6-e9d9-474b-9ed7-c656d703d19b.png",
     pricePerHour: dbFacility.price_per_hour || 450,
