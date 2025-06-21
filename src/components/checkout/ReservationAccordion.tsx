@@ -37,9 +37,15 @@ export function ReservationAccordion({
       return 'Enkelt booking';
     }
     
-    const dateKeys = [...new Set(timeSlots.map(slot => format(new Date(slot.date), 'yyyy-MM-dd')))];
+    const dateKeys = [...new Set(timeSlots.map(slot => {
+      const dateValue = slot.date instanceof Date ? slot.date : new Date(slot.date);
+      return format(dateValue, 'yyyy-MM-dd');
+    }))];
     if (dateKeys.length > 1) {
-      const uniqueDays = new Set(timeSlots.map(slot => format(new Date(slot.date), 'EEEE', { locale: nb })));
+      const uniqueDays = new Set(timeSlots.map(slot => {
+        const dateValue = slot.date instanceof Date ? slot.date : new Date(slot.date);
+        return format(dateValue, 'EEEE', { locale: nb });
+      }));
       if (uniqueDays.size === 1) {
         return 'Fastlån';
       }
@@ -96,10 +102,11 @@ export function ReservationAccordion({
         const nextHour = currentHour + 1;
         const hourSlot = `${currentHour.toString().padStart(2, '0')}:00-${nextHour.toString().padStart(2, '0')}:00`;
         
-        const displayText = `${format(new Date(slot.date), 'EEEE dd.MM.yyyy', { locale: nb })} ${hourSlot}`;
+        const dateValue = slot.date instanceof Date ? slot.date : new Date(slot.date);
+        const displayText = `${format(dateValue, 'EEEE dd.MM.yyyy', { locale: nb })} ${hourSlot}`;
         
         individualSlots.push({
-          date: slot.date,
+          date: typeof slot.date === 'string' ? slot.date : slot.date.toISOString(),
           timeSlot: hourSlot,
           zoneId: slot.zoneId,
           displayText
@@ -178,8 +185,15 @@ export function ReservationAccordion({
                           <Calendar className="h-4 w-4" />
                           <span>
                             {timeSlots.length === 1 
-                              ? format(new Date(timeSlots[0].date), 'dd.MM.yyyy', { locale: nb })
-                              : `${format(new Date(timeSlots[0].date), 'dd.MM', { locale: nb })} - ${format(new Date(timeSlots[timeSlots.length - 1].date), 'dd.MM.yyyy', { locale: nb })}`
+                              ? (() => {
+                                  const dateValue = timeSlots[0].date instanceof Date ? timeSlots[0].date : new Date(timeSlots[0].date);
+                                  return format(dateValue, 'dd.MM.yyyy', { locale: nb });
+                                })()
+                              : (() => {
+                                  const firstDate = timeSlots[0].date instanceof Date ? timeSlots[0].date : new Date(timeSlots[0].date);
+                                  const lastDate = timeSlots[timeSlots.length - 1].date instanceof Date ? timeSlots[timeSlots.length - 1].date : new Date(timeSlots[timeSlots.length - 1].date);
+                                  return `${format(firstDate, 'dd.MM', { locale: nb })} - ${format(lastDate, 'dd.MM.yyyy', { locale: nb })}`;
+                                })()
                             }
                           </span>
                         </div>
