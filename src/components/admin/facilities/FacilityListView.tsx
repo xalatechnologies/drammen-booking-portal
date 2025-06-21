@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Plus, Search, Filter, Grid3X3, List, Calendar, Settings } from "lucide-react";
@@ -31,7 +30,11 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
 
   const { data: facilitiesResponse, isLoading, refetch } = useQuery({
     queryKey: ['facilities'],
-    queryFn: () => FacilityService.getFacilities({ page: 1, limit: 50 }),
+    queryFn: () => FacilityService.getFacilities(
+      { page: 1, limit: 50 },
+      {},
+      {}
+    ),
   });
 
   const facilities = facilitiesResponse?.success ? facilitiesResponse.data?.data || [] : [];
