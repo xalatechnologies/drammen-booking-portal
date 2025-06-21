@@ -1,7 +1,6 @@
-
 import { userRepository } from '@/dal/UserRepository';
 import { User, UserFilters, UserCreateRequest, UserUpdateRequest, UserRole } from '@/types/user';
-import { PaginationParams, ApiResponse, PaginatedResponse } from '@/types/api';
+import { PaginationParams, ApiResponse, PaginatedResponse, RepositoryResponse } from '@/types/api';
 
 export class UserService {
   
@@ -13,17 +12,64 @@ export class UserService {
   ): Promise<ApiResponse<PaginatedResponse<User>>> {
     // Add delay to simulate API call
     await new Promise(resolve => setTimeout(resolve, 200));
-    return userRepository.findAll(pagination, filters, sortField, sortDirection);
+    const result = await userRepository.findAll(pagination, filters, sortField);
+    
+    // Convert RepositoryResponse to ApiResponse
+    if (result.error) {
+      return {
+        success: false,
+        error: { message: result.error }
+      };
+    }
+    
+    return {
+      success: true,
+      data: {
+        data: result.data || [],
+        pagination: {
+          page: pagination?.page || 1,
+          limit: pagination?.limit || 10,
+          total: result.data?.length || 0,
+          totalPages: 1,
+          hasNext: false,
+          hasPrev: false
+        }
+      }
+    };
   }
 
   async getUserById(id: string): Promise<ApiResponse<User>> {
     await new Promise(resolve => setTimeout(resolve, 150));
-    return userRepository.findById(id);
+    const result = await userRepository.findById(id);
+    
+    if (result.error) {
+      return {
+        success: false,
+        error: { message: result.error }
+      };
+    }
+    
+    return {
+      success: true,
+      data: result.data!
+    };
   }
 
   async getUserByEmail(email: string): Promise<ApiResponse<User>> {
     await new Promise(resolve => setTimeout(resolve, 150));
-    return userRepository.findByEmail(email);
+    const result = await userRepository.findByEmail(email);
+    
+    if (result.error) {
+      return {
+        success: false,
+        error: { message: result.error }
+      };
+    }
+    
+    return {
+      success: true,
+      data: result.data!
+    };
   }
 
   async createUser(request: UserCreateRequest): Promise<ApiResponse<User>> {
@@ -31,17 +77,40 @@ export class UserService {
     
     // Validate email uniqueness
     const existingUser = await userRepository.findByEmail(request.email);
-    if (existingUser.success) {
+    if (existingUser.data) {
       return {
         success: false,
         error: {
-          message: 'User with this email already exists',
-          code: 'EMAIL_EXISTS'
+          message: 'User with this email already exists'
         }
       };
     }
 
-    return userRepository.create(request);
+    const userData = {
+      ...request,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      isActive: true,
+      profile: {
+        firstName: request.profile?.firstName || '',
+        lastName: request.profile?.lastName || '',
+        preferredLanguage: request.profile?.preferredLanguage || 'NO'
+      }
+    };
+
+    const result = await userRepository.create(userData);
+    
+    if (result.error) {
+      return {
+        success: false,
+        error: { message: result.error }
+      };
+    }
+    
+    return {
+      success: true,
+      data: result.data!
+    };
   }
 
   async updateUser(id: string, request: UserUpdateRequest): Promise<ApiResponse<User>> {
@@ -50,28 +119,63 @@ export class UserService {
     // If email is being updated, check uniqueness
     if (request.email) {
       const existingUser = await userRepository.findByEmail(request.email);
-      if (existingUser.success && existingUser.data?.id !== id) {
+      if (existingUser.data && existingUser.data.id !== id) {
         return {
           success: false,
           error: {
-            message: 'User with this email already exists',
-            code: 'EMAIL_EXISTS'
+            message: 'User with this email already exists'
           }
         };
       }
     }
 
-    return userRepository.update(id, request);
+    const result = await userRepository.update(id, request);
+    
+    if (result.error) {
+      return {
+        success: false,
+        error: { message: result.error }
+      };
+    }
+    
+    return {
+      success: true,
+      data: result.data!
+    };
   }
 
   async deleteUser(id: string): Promise<ApiResponse<boolean>> {
     await new Promise(resolve => setTimeout(resolve, 200));
-    return userRepository.delete(id);
+    const result = await userRepository.delete(id);
+    
+    if (result.error) {
+      return {
+        success: false,
+        error: { message: result.error }
+      };
+    }
+    
+    return {
+      success: true,
+      data: result.data!
+    };
   }
 
   async getUsersByRole(role: UserRole): Promise<ApiResponse<User[]>> {
     await new Promise(resolve => setTimeout(resolve, 150));
-    return userRepository.findByRole(role);
+    const result = await userRepository.findByRole(role);
+    
+    if (result.error) {
+      return {
+        success: false,
+        error: { message: result.error }
+      };
+    }
+    
+    return {
+      success: true,
+      data: result.data!
+    };
   }
 
   async updateLastLogin(id: string): Promise<ApiResponse<User>> {

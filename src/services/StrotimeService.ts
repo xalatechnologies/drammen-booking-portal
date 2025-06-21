@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { ApiResponse, PaginatedResponse, PaginationParams } from '@/types/api';
 
