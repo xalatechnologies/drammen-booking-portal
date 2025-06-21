@@ -32,4 +32,22 @@
 - Updated translation file with new Norwegian terms for the redesigned sections
 - Improved UI with better visual hierarchy and actionable elements
 - Added mock data to demonstrate the functionality
+- Build completed successfully with no errors
+
+## 2024-12-19 - Redesign AllocatedTime Page with Functional Modules
+
+- Completely redesigned the AllocatedTime page to include all functional modules for umbrella representatives
+- Added five main functional modules as requested:
+  1. **Oversikt over tildelt tid** - Table and calendar view with filtering and export
+  2. **Viderefordeling til underaktører** - Dialog for selecting actors and assigning time
+  3. **Endring av eksisterende fordeling** - Dialog for editing or recalling assignments
+  4. **Frigi tid** - Dialog for releasing time with option to convert to spare hours
+  5. **Historikk og logg** - Full activity log with export to Excel/PDF
+- Implemented comprehensive table view with all required fields:
+  - Lokasjon, Ukedag(er), Klokkeslett, Periode, Status, Fordelt til, Handlinger
+- Added filtering capabilities by location, status, and search functionality
+- Created interactive dialogs for all major actions with proper form controls
+- Added mock data demonstrating real-world scenarios
+- Updated translation file with comprehensive Norwegian and English terms
+- Improved UI with professional design and intuitive user experience
 - Build completed successfully with no errors 

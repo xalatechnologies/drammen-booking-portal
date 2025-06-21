@@ -207,13 +207,63 @@ export const umbrellaTranslations = {
     // Allocated Time page
     allocatedTime: {
       title: "Tildelt Rammetid",
-      description: "Oversikt over tildelt rammetid for organisasjonen",
+      description: "Full oversikt over tildelt tid og verktøy for viderefordeling",
       allocatedTime: "Tildelt tid",
       allocatedTimeDescription: "Se og administrer tildelt rammetid",
       totalAllocated: "Totalt tildelt",
       used: "Brukt",
       remaining: "Gjenværende",
-      utilization: "Utnyttelse"
+      utilization: "Utnyttelse",
+      overview: {
+        title: "Oversikt over tildelt tid",
+        description: "Visning i tabell- og kalenderformat",
+        tableView: "Tabell",
+        calendarView: "Kalender",
+        searchPlaceholder: "Søk etter lokasjon eller aktør...",
+        filterLocation: "Filtrer lokasjon",
+        filterStatus: "Filtrer status",
+        statusDistributed: "Fordelt",
+        statusUndistributed: "Ufordelt",
+        statusPartially: "Delvis fordelt",
+        export: "Eksporter",
+        location: "Lokasjon",
+        weekdays: "Ukedag(er)",
+        timeSlot: "Klokkeslett",
+        period: "Periode",
+        status: "Status",
+        distributedTo: "Fordelt til",
+        actions: "Handlinger",
+        calendarComingSoon: "Kalendervisning kommer snart"
+      },
+      distribute: {
+        title: "Viderefordel rammetid",
+        description: "Velg aktør og tildel tid",
+        selectActor: "Velg aktør",
+        selectActorPlaceholder: "Velg aktør...",
+        selectDates: "Velg dato(er)",
+        assign: "Tildel"
+      },
+      edit: {
+        title: "Endre fordeling",
+        description: "Endre eller trekke tilbake tildeling",
+        newActor: "Ny aktør",
+        selectNewActor: "Velg ny aktør...",
+        recall: "Trekke tilbake"
+      },
+      release: {
+        title: "Frigi tid",
+        description: "Velg dato(er) eller periode og frigi tid",
+        selectPeriod: "Velg periode",
+        startDate: "Startdato",
+        endDate: "Sluttdato",
+        convertToSpare: "Konverter til strøtimer",
+        confirm: "Frigi tid"
+      },
+      history: {
+        title: "Historikk og logg",
+        description: "Full loggvisning av alle endringer",
+        exportLog: "Eksporter logg til Excel/PDF"
+      }
     },
 
     // Common
@@ -460,13 +510,63 @@ export const umbrellaTranslations = {
     // Allocated Time page
     allocatedTime: {
       title: "Allocated Time",
-      description: "Overview of allocated time for the organization",
+      description: "Full overview of allocated time and tools for redistribution",
       allocatedTime: "Allocated Time",
       allocatedTimeDescription: "View and manage allocated time",
       totalAllocated: "Total Allocated",
       used: "Used",
       remaining: "Remaining",
-      utilization: "Utilization"
+      utilization: "Utilization",
+      overview: {
+        title: "Overview of Allocated Time",
+        description: "View in table and calendar format",
+        tableView: "Table",
+        calendarView: "Calendar",
+        searchPlaceholder: "Search by location or actor...",
+        filterLocation: "Filter location",
+        filterStatus: "Filter status",
+        statusDistributed: "Distributed",
+        statusUndistributed: "Undistributed",
+        statusPartially: "Partially distributed",
+        export: "Export",
+        location: "Location",
+        weekdays: "Weekday(s)",
+        timeSlot: "Time",
+        period: "Period",
+        status: "Status",
+        distributedTo: "Distributed to",
+        actions: "Actions",
+        calendarComingSoon: "Calendar view coming soon"
+      },
+      distribute: {
+        title: "Redistribute Allocated Time",
+        description: "Select actor and assign time",
+        selectActor: "Select Actor",
+        selectActorPlaceholder: "Select actor...",
+        selectDates: "Select date(s)",
+        assign: "Assign"
+      },
+      edit: {
+        title: "Edit Distribution",
+        description: "Change or recall assignment",
+        newActor: "New Actor",
+        selectNewActor: "Select new actor...",
+        recall: "Recall"
+      },
+      release: {
+        title: "Release Time",
+        description: "Select date(s) or period and release time",
+        selectPeriod: "Select Period",
+        startDate: "Start Date",
+        endDate: "End Date",
+        convertToSpare: "Convert to spare hours",
+        confirm: "Release Time"
+      },
+      history: {
+        title: "History and Log",
+        description: "Full log view of all changes",
+        exportLog: "Export log to Excel/PDF"
+      }
     },
 
     // Common
