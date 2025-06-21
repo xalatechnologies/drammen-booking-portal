@@ -10,14 +10,16 @@ interface ReviewStepProps {
   items: CartItem[];
   onEditReservation: (reservationId: string) => void;
   onRemoveReservation: (reservationId: string) => void;
-  onContinue: () => void;
+  onSendToApproval: (reservationId?: string) => void;
+  onEmptyCart: () => void;
 }
 
 export function ReviewStep({ 
   items, 
   onEditReservation, 
   onRemoveReservation, 
-  onContinue 
+  onSendToApproval,
+  onEmptyCart
 }: ReviewStepProps) {
   const totalSlots = items.reduce((total, item) => total + (item.timeSlots?.length || 1), 0);
   const totalPrice = items.reduce((total, item) => total + (item.pricing?.totalPrice || (item.pricePerHour * 2)), 0);
@@ -28,6 +30,7 @@ export function ReviewStep({
         reservations={items}
         onEditReservation={onEditReservation}
         onRemoveReservation={onRemoveReservation}
+        onSendToApproval={onSendToApproval}
       />
       
       {/* Total Price Summary */}
@@ -58,16 +61,13 @@ export function ReviewStep({
         <Button 
           variant="outline" 
           className="flex-1"
-          onClick={() => {
-            // Handle individual approval submissions
-            console.log('Send individual reservations to approval');
-          }}
+          onClick={onEmptyCart}
         >
-          Send hver for seg til godkjenning
+          Tøm handlekurv
         </Button>
         
         <Button 
-          onClick={onContinue} 
+          onClick={() => onSendToApproval()} 
           className="flex-1 bg-blue-600 hover:bg-blue-700"
         >
           Send alle sammen til godkjenning

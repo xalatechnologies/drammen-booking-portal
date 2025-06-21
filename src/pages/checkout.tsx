@@ -6,26 +6,18 @@ import GlobalFooter from '@/components/GlobalFooter';
 import { useCart } from '@/contexts/CartContext';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { CheckoutHeader } from '@/components/checkout/CheckoutHeader';
-import { ProgressIndicator } from '@/components/checkout/ProgressIndicator';
 import { EmptyCart } from '@/components/checkout/EmptyCart';
 import { ReviewStep } from '@/components/checkout/ReviewStep';
-import { LoginStep } from '@/components/checkout/LoginStep';
-import { ConfirmationStep } from '@/components/checkout/ConfirmationStep';
+import { LoginSelectionModal } from '@/components/auth/LoginSelectionModal';
+import { useToast } from '@/hooks/use-toast';
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
   const { items, removeFromCart, clearCart } = useCart();
   const { isAuthenticated } = useAuthStore();
-  const [step, setStep] = useState<'review' | 'login' | 'confirm'>('review');
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    organization: '',
-    purpose: '',
-    notes: '',
-    customerType: 'private' as 'private' | 'business' | 'organization'
-  });
+  const { toast } = useToast();
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [pendingAction, setPendingAction] = useState<'individual' | 'all' | null>(null);
 
   const handleEditReservation = (reservationId: string) => {
     const reservation = items.find(item => item.id === reservationId);
@@ -39,27 +31,41 @@ const CheckoutPage = () => {
     removeFromCart(reservationId);
   };
 
-  const handleSubmit = async () => {
-    await new Promise(resolve => setTimeout(resolve, 1000));
+  const handleSendToApproval = (reservationId?: string) => {
+    if (!isAuthenticated) {
+      setPendingAction(reservationId ? 'individual' : 'all');
+      setShowLoginModal(true);
+      return;
+    }
+
+    // Simulate sending to approval
+    const message = reservationId 
+      ? 'Reservasjon sendt til godkjenning'
+      : 'Alle reservasjoner sendt til godkjenning';
     
-    clearCart();
-    navigate('/bookings');
+    toast({
+      title: 'Sendt til godkjenning',
+      description: message,
+    });
+
+    setTimeout(() => {
+      navigate('/bookings');
+    }, 1500);
   };
 
-  const updateFormData = (data: Partial<typeof formData>) => {
-    setFormData(prev => ({ ...prev, ...data }));
-  };
-
-  const handleContinueFromReview = () => {
-    if (isAuthenticated) {
-      setStep('confirm');
-    } else {
-      setStep('login');
+  const handleLoginMethodSelect = (method: 'id-porten' | 'feide' | 'municipal') => {
+    console.log('Selected login method:', method);
+    setShowLoginModal(false);
+    // Here you would normally handle the actual login
+    // For now, we'll just proceed with the approval action
+    if (pendingAction) {
+      handleSendToApproval(pendingAction === 'individual' ? items[0]?.id : undefined);
+      setPendingAction(null);
     }
   };
 
-  const handleContinueFromLogin = () => {
-    setStep('confirm');
+  const handleEmptyCart = () => {
+    clearCart();
   };
 
   if (items.length === 0) {
@@ -80,36 +86,25 @@ const CheckoutPage = () => {
       <div className="flex-grow py-8">
         <div className="container mx-auto px-4 max-w-4xl">
           <CheckoutHeader onBack={() => navigate(-1)} />
-          <ProgressIndicator currentStep={step} isAuthenticated={isAuthenticated} />
 
           <div className="w-full">
-            {step === 'review' && (
-              <ReviewStep
-                items={items}
-                onEditReservation={handleEditReservation}
-                onRemoveReservation={handleRemoveReservation}
-                onContinue={handleContinueFromReview}
-              />
-            )}
-
-            {step === 'login' && !isAuthenticated && (
-              <LoginStep
-                onBack={() => setStep('review')}
-                onContinue={handleContinueFromLogin}
-              />
-            )}
-
-            {step === 'confirm' && (
-              <ConfirmationStep
-                formData={formData}
-                onBack={() => isAuthenticated ? setStep('review') : setStep('login')}
-                onSubmit={handleSubmit}
-              />
-            )}
+            <ReviewStep
+              items={items}
+              onEditReservation={handleEditReservation}
+              onRemoveReservation={handleRemoveReservation}
+              onSendToApproval={handleSendToApproval}
+              onEmptyCart={handleEmptyCart}
+            />
           </div>
         </div>
       </div>
       <GlobalFooter />
+
+      <LoginSelectionModal
+        isOpen={showLoginModal}
+        onClose={() => setShowLoginModal(false)}
+        onLoginMethodSelect={handleLoginMethodSelect}
+      />
     </div>
   );
 };
