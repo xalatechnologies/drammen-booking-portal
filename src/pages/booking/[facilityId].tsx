@@ -2,19 +2,27 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { BookingForm } from '@/components/booking/BookingForm';
-import { useFacilityData } from '@/hooks/useFacilityData';
+import { useFacility } from '@/hooks/useFacility';
+import { useZones } from '@/hooks/useZones';
+import { convertZoneToBookingZone } from '@/utils/zoneConverter';
 
 export default function BookingPage() {
   const { facilityId } = useParams();
-  const { facility, zones, isLoading } = useFacilityData(facilityId);
+  const { facility, isLoading, error } = useFacility(Number(facilityId));
+  const { data: zones = [], isLoading: zonesLoading } = useZones(facilityId);
 
-  if (isLoading) {
+  const isLoadingAny = isLoading || zonesLoading;
+
+  if (isLoadingAny) {
     return <div>Laster...</div>;
   }
 
-  if (!facility) {
+  if (error || !facility) {
     return <div>Fant ikke fasiliteten</div>;
   }
+
+  // Convert zones to booking zones format
+  const bookingZones = zones.map(convertZoneToBookingZone);
 
   return (
     <div className="container mx-auto py-8">
@@ -23,7 +31,7 @@ export default function BookingPage() {
         selectedSlots={[]}
         facilityId={facilityId!}
         facilityName={facility.name}
-        zones={zones}
+        zones={bookingZones}
       />
     </div>
   );
