@@ -3,6 +3,7 @@ import React from "react";
 import { MapPin, Users, Trophy, Target, Zap, Heart, Share2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { useFacilityActivities } from "@/hooks/useFacilityActivities";
 
 interface Facility {
   id: number;
@@ -43,6 +44,8 @@ export function FacilityListItemContent({
   onFavorite,
   onShare
 }: FacilityListItemContentProps) {
+  const { data: databaseActivities, isLoading } = useFacilityActivities(facility.id);
+
   const getSuitableForIcon = (activity: string) => {
     const activityMap: {
       [key: string]: React.ElementType;
@@ -70,13 +73,17 @@ export function FacilityListItemContent({
     return <IconComponent className="h-4 w-4" />;
   };
 
-  // Derive suitable activities from facility data if suitableFor is empty
+  // Use database activities if available, otherwise fall back to derived activities
   const getSuitableActivities = () => {
+    if (databaseActivities && databaseActivities.length > 0) {
+      return databaseActivities;
+    }
+
     if (facility.suitableFor && facility.suitableFor.length > 0) {
       return facility.suitableFor;
     }
 
-    // Derive from facility type and area - using actual values that match the image
+    // Fallback derived from facility type and area - using actual values that match the image
     const activities = [];
     
     if (facility.type) {
@@ -118,7 +125,7 @@ export function FacilityListItemContent({
   const suitableActivities = getSuitableActivities();
   const maxVisibleTags = 3;
 
-  console.log('FacilityListItemContent - Facility:', facility.name, 'SuitableFor:', facility.suitableFor, 'Type:', facility.type, 'Area:', facility.area, 'Derived activities:', suitableActivities);
+  console.log('FacilityListItemContent - Facility:', facility.name, 'Database activities:', databaseActivities, 'Final activities:', suitableActivities);
 
   return (
     <div className="flex-1 p-6 flex flex-col h-full">

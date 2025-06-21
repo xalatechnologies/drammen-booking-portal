@@ -1172,6 +1172,38 @@ export type Database = {
           },
         ]
       }
+      facility_suitable_activities: {
+        Row: {
+          activity_name: string
+          created_at: string | null
+          facility_id: number
+          id: string
+          language_code: Database["public"]["Enums"]["language_code"]
+        }
+        Insert: {
+          activity_name: string
+          created_at?: string | null
+          facility_id: number
+          id?: string
+          language_code?: Database["public"]["Enums"]["language_code"]
+        }
+        Update: {
+          activity_name?: string
+          created_at?: string | null
+          facility_id?: number
+          id?: string
+          language_code?: Database["public"]["Enums"]["language_code"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "facility_suitable_activities_facility_id_fkey"
+            columns: ["facility_id"]
+            isOneToOne: false
+            referencedRelation: "facilities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       facility_translations: {
         Row: {
           created_at: string

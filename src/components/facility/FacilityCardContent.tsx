@@ -3,6 +3,7 @@ import React from "react";
 import { MapPin, Users, Trophy, Target, Zap, Heart, Share2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useTranslation } from "@/i18n";
+import { useFacilityActivities } from "@/hooks/useFacilityActivities";
 
 interface Facility {
   id: number;
@@ -26,6 +27,7 @@ export function FacilityCardContent({
   onAddressClick
 }: FacilityCardContentProps) {
   const { t } = useTranslation();
+  const { data: databaseActivities, isLoading } = useFacilityActivities(facility.id);
 
   const getSuitableForIcon = (activity: string) => {
     const activityMap: {
@@ -54,8 +56,12 @@ export function FacilityCardContent({
     return <IconComponent className="h-4 w-4" />;
   };
 
-  // Derive suitable activities from facility data if suitableFor is empty
+  // Use database activities if available, otherwise fall back to derived activities
   const getSuitableActivities = () => {
+    if (databaseActivities && databaseActivities.length > 0) {
+      return databaseActivities;
+    }
+
     if (facility.suitableFor && facility.suitableFor.length > 0) {
       return facility.suitableFor;
     }
