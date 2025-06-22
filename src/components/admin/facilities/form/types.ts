@@ -1,5 +1,11 @@
 
-export interface FacilityFormData {
+import { FacilityFormData } from "./FacilityFormSchema";
+
+// Export the main form data type from the schema
+export type { FacilityFormData };
+
+// Additional interface for backward compatibility if needed
+export interface LegacyFacilityFormData {
   name: string;
   type: string;
   area: string;

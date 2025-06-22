@@ -1,15 +1,16 @@
 
 import React from "react";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FacilityService } from "@/services/facilityService";
-import { FacilityFormTabs } from "./FacilityFormTabs";
+import { FacilityFormTabs } from "./form/FacilityFormTabs";
 import { FacilityBasicFields } from "./form/FacilityBasicFields";
 import { FacilityAddressFields } from "./form/FacilityAddressFields";
 import { FacilityContactFields } from "./form/FacilityContactFields";
-import { FacilityFormData } from "./form/FacilityFormSchema";
+import { facilityFormSchema, FacilityFormData } from "./form/FacilityFormSchema";
 import { useFacilityStore } from "@/stores/useFacilityStore";
 import { ArrowLeft } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
@@ -29,13 +30,14 @@ export const FacilityFormView: React.FC<FacilityFormViewProps> = ({
   const { updateFacility, setCurrentFacility } = useFacilityStore();
   
   const form = useForm<FacilityFormData>({
+    resolver: zodResolver(facilityFormSchema),
     defaultValues: {
-      id: facility?.id,
       name: facility?.name || "",
       type: facility?.type || "",
       address_street: facility?.address_street || "",
       address_city: facility?.address_city || "",
       address_postal_code: facility?.address_postal_code || "",
+      address_country: facility?.address_country || "Norway",
       area: facility?.area || "",
       description: facility?.description || "",
       capacity: facility?.capacity || 1,
@@ -50,6 +52,15 @@ export const FacilityFormView: React.FC<FacilityFormViewProps> = ({
       accessibility_features: facility?.accessibility_features || [],
       price_per_hour: facility?.price_per_hour || 450,
       time_slot_duration: facility?.time_slot_duration || 1,
+      booking_lead_time_hours: facility?.booking_lead_time_hours || 2,
+      max_advance_booking_days: facility?.max_advance_booking_days || 365,
+      cancellation_deadline_hours: facility?.cancellation_deadline_hours || 24,
+      allowed_booking_types: facility?.allowed_booking_types || ["engangs"],
+      latitude: facility?.latitude || undefined,
+      longitude: facility?.longitude || undefined,
+      season_from: facility?.season_from || "",
+      season_to: facility?.season_to || "",
+      is_featured: facility?.is_featured || false,
     }
   });
 

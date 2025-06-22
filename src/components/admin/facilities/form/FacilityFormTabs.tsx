@@ -16,7 +16,7 @@ interface FacilityFormTabsProps {
   actions: React.ReactNode;
   children: React.ReactNode;
   onSubmit: (e: React.FormEvent) => void;
-  form?: UseFormReturn<FacilityFormData>;
+  form: UseFormReturn<FacilityFormData>;
 }
 
 export const FacilityFormTabs: React.FC<FacilityFormTabsProps> = ({
@@ -106,24 +106,20 @@ export const FacilityFormTabs: React.FC<FacilityFormTabsProps> = ({
         </TabsContent>
 
         <TabsContent value="features" className="space-y-6">
-          {form && (
-            <FacilityFeaturesSection 
-              ref={featuresRef}
-              form={form}
-              equipment={form.watch('equipment')}
-              amenities={form.watch('amenities')}
-              capacity={form.watch('capacity')}
-            />
-          )}
+          <FacilityFeaturesSection 
+            ref={featuresRef}
+            form={form}
+            equipment={form.watch('equipment')}
+            amenities={form.watch('amenities')}
+            capacity={form.watch('capacity')}
+          />
         </TabsContent>
 
         <TabsContent value="pricing" className="space-y-6">
-          {form && (
-            <FacilityPricingSection 
-              ref={pricingRef}
-              form={form}
-            />
-          )}
+          <FacilityPricingSection 
+            ref={pricingRef}
+            form={form}
+          />
         </TabsContent>
 
         <TabsContent value="schedule" className="space-y-6">
