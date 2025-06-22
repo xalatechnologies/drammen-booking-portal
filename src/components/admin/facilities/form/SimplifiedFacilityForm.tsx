@@ -69,6 +69,9 @@ export const SimplifiedFacilityForm: React.FC<SimplifiedFacilityFormProps> = ({
     }
   });
 
+  // Watch the name field to pass to management section
+  const facilityName = form.watch("name");
+
   const mutation = useMutation({
     mutationFn: async (data: FacilityFormData) => {
       console.log('Saving facility data...');
@@ -199,6 +202,7 @@ export const SimplifiedFacilityForm: React.FC<SimplifiedFacilityFormProps> = ({
                       {isEditing ? (
                         <SimplifiedManagementSection 
                           facilityId={facility.id}
+                          facilityName={facilityName || facility.name}
                           ref={managementRef}
                         />
                       ) : (

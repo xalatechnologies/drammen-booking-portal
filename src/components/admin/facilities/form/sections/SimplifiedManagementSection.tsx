@@ -3,25 +3,26 @@ import React, { forwardRef, useImperativeHandle, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FacilityImageManagement } from "../../FacilityImageManagement";
-import { ZoneManagementView } from "../../ZoneManagementView";
 import { FacilityBlackoutSection } from "./FacilityBlackoutSection";
 import { Images, Map, Calendar } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { SimplifiedZoneManagement } from "./SimplifiedZoneManagement";
 
 interface SimplifiedManagementSectionProps {
   facilityId: number;
+  facilityName?: string;
 }
 
 export const SimplifiedManagementSection = forwardRef<
   { saveData: () => Promise<boolean> },
   SimplifiedManagementSectionProps
->(({ facilityId }, ref) => {
+>(({ facilityId, facilityName }, ref) => {
   const [activeTab, setActiveTab] = useState("images");
 
   useImperativeHandle(ref, () => ({
     saveData: async () => {
       try {
-        // Management sections don't need explicit saving as they handle their own state
+        // Management sections handle their own state automatically
         toast({
           title: "Success",
           description: "Management settings are automatically saved",
@@ -37,7 +38,9 @@ export const SimplifiedManagementSection = forwardRef<
   return (
     <div className="space-y-6">
       <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Facility Management</h2>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+          {facilityName ? `Managing: ${facilityName}` : 'Facility Management'}
+        </h2>
         <p className="text-gray-600 text-lg">Manage images, zones, and availability for this facility</p>
       </div>
 
@@ -74,7 +77,7 @@ export const SimplifiedManagementSection = forwardRef<
               <CardTitle className="text-xl">Zone Management</CardTitle>
             </CardHeader>
             <CardContent>
-              <ZoneManagementView selectedFacilityId={facilityId} />
+              <SimplifiedZoneManagement facilityId={facilityId} />
             </CardContent>
           </Card>
         </TabsContent>
