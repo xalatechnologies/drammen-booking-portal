@@ -18,6 +18,7 @@ interface BlackoutState {
   
   // Async actions
   fetchBlackoutPeriods: (facilityId: number) => Promise<void>;
+  saveBlackoutPeriods: (facilityId: number) => Promise<boolean>;
   createBlackoutPeriod: (periodData: Partial<FacilityBlackoutPeriod>) => Promise<FacilityBlackoutPeriod | null>;
   updateBlackoutPeriodAsync: (id: string, periodData: Partial<FacilityBlackoutPeriod>) => Promise<FacilityBlackoutPeriod | null>;
   deleteBlackoutPeriod: (id: string) => Promise<boolean>;
@@ -58,7 +59,7 @@ export const useBlackoutStore = create<BlackoutState>((set, get) => ({
           start_date: typeof period.start_date === 'string' ? new Date(period.start_date) : period.start_date,
           end_date: typeof period.end_date === 'string' ? new Date(period.end_date) : period.end_date,
           created_by: period.created_by,
-          created_at: typeof period.created_at === 'string' ? period.created_at : (period.created_at instanceof Date ? period.created_at.toISOString() : String(period.created_at))
+          created_at: typeof period.created_at === 'string' ? period.created_at : (period.created_at && typeof period.created_at === 'object' && 'toISOString' in period.created_at ? period.created_at.toISOString() : String(period.created_at))
         }));
         set({ blackoutPeriods: periods, isLoading: false });
       } else {
@@ -67,6 +68,13 @@ export const useBlackoutStore = create<BlackoutState>((set, get) => ({
     } catch (error: any) {
       set({ error: error.message, isLoading: false });
     }
+  },
+
+  saveBlackoutPeriods: async (facilityId) => {
+    console.log('Saving blackout periods for facility:', facilityId);
+    // For now, just return true since the periods are already saved individually
+    // This could be enhanced to batch save all periods
+    return true;
   },
 
   createBlackoutPeriod: async (periodData) => {
@@ -90,7 +98,7 @@ export const useBlackoutStore = create<BlackoutState>((set, get) => ({
           start_date: typeof response.data.start_date === 'string' ? new Date(response.data.start_date) : response.data.start_date,
           end_date: typeof response.data.end_date === 'string' ? new Date(response.data.end_date) : response.data.end_date,
           created_by: response.data.created_by,
-          created_at: typeof response.data.created_at === 'string' ? response.data.created_at : (response.data.created_at instanceof Date ? response.data.created_at.toISOString() : String(response.data.created_at))
+          created_at: typeof response.data.created_at === 'string' ? response.data.created_at : (response.data.created_at && typeof response.data.created_at === 'object' && 'toISOString' in response.data.created_at ? response.data.created_at.toISOString() : String(response.data.created_at))
         };
         
         get().addBlackoutPeriod(period);
@@ -119,7 +127,7 @@ export const useBlackoutStore = create<BlackoutState>((set, get) => ({
           start_date: typeof response.data.start_date === 'string' ? new Date(response.data.start_date) : response.data.start_date,
           end_date: typeof response.data.end_date === 'string' ? new Date(response.data.end_date) : response.data.end_date,
           created_by: response.data.created_by,
-          created_at: typeof response.data.created_at === 'string' ? response.data.created_at : (response.data.created_at instanceof Date ? response.data.created_at.toISOString() : String(response.data.created_at))
+          created_at: typeof response.data.created_at === 'string' ? response.data.created_at : (response.data.created_at && typeof response.data.created_at === 'object' && 'toISOString' in response.data.created_at ? response.data.created_at.toISOString() : String(response.data.created_at))
         };
         
         const periods = get().blackoutPeriods;
