@@ -1,0 +1,23 @@
+{
+  "errors.general": "An error occurred",
+  "errors.network": "Network error",
+  "errors.server": "Server error",
+  "errors.notFound": "Resource not found",
+  "errors.unauthorized": "Unauthorized access",
+  "errors.forbidden": "Access forbidden",
+  
+  "errors.validation": "Validation error",
+  "errors.validation.required": "{{field}} is required",
+  "errors.validation.minLength": "{{field}} must be at least {{min}} characters",
+  "errors.validation.maxLength": "{{field}} must not exceed {{max}} characters",
+  "errors.validation.pattern": "{{field}} has an invalid format",
+  "errors.validation.email": "{{field}} must be a valid email address",
+  
+  "errors.booking.conflict": "Booking conflicts with an existing reservation",
+  "errors.booking.pastDate": "Cannot book dates in the past",
+  "errors.booking.full": "This facility is fully booked for the selected time",
+  
+  "errors.facility.notAvailable": "Facility is not available",
+  "errors.facility.maintenance": "Facility is under maintenance",
+  "errors.facility.closed": "Facility is closed"
+}

@@ -1,87 +1,102 @@
-
 import { create } from 'zustand';
-import { OpeningHour, OpeningHoursService } from '@/services/OpeningHoursService';
+import { Day, DAYS_OF_WEEK } from '@/types/schedule';
 
-interface OpeningHoursState {
-  openingHours: OpeningHour[];
-  isLoading: boolean;
-  error: string | null;
-  
-  // Actions
-  setOpeningHours: (hours: OpeningHour[]) => void;
-  updateOpeningHour: (dayOfWeek: number, updates: Partial<OpeningHour>) => void;
-  setLoading: (loading: boolean) => void;
-  setError: (error: string | null) => void;
-  
-  // Async actions
-  fetchOpeningHours: (facilityId: number) => Promise<void>;
-  saveOpeningHours: (facilityId: number) => Promise<boolean>;
-  reset: () => void;
+export interface TimeSlot {
+  id: string; // Use a temporary client-side ID like UUID
+  from: string; // e.g., "09:00"
+  to: string;   // e.g., "17:00"
 }
 
-export const useOpeningHoursStore = create<OpeningHoursState>((set, get) => ({
-  openingHours: [],
-  isLoading: false,
-  error: null,
+export interface DaySchedule {
+  isOpen: boolean;
+  slots: TimeSlot[];
+}
 
-  setOpeningHours: (hours) => set({ openingHours: hours }),
-  updateOpeningHour: (dayOfWeek, updates) => set(state => ({
-    openingHours: state.openingHours.map(hour => 
-      hour.day_of_week === dayOfWeek ? { ...hour, ...updates } : hour
-    )
-  })),
-  setLoading: (loading) => set({ isLoading: loading }),
-  setError: (error) => set({ error }),
+export type OpeningHoursState = {
+  schedule: Record<Day, DaySchedule>;
+  isDirty: boolean; // To track if changes have been made
+  actions: {
+    initialize: (initialSchedule: Record<Day, DaySchedule>) => void;
+    toggleDay: (day: Day, isOpen: boolean) => void;
+    addSlot: (day: Day) => void;
+    updateSlot: (day: Day, slotId: string, newFrom: string, newTo: string) => void;
+    removeSlot: (day: Day, slotId: string) => void;
+    copyToAll: (fromDay: Day) => void;
+    reset: () => void;
+  };
+};
 
-  fetchOpeningHours: async (facilityId) => {
-    set({ isLoading: true, error: null });
-    try {
-      const response = await OpeningHoursService.getOpeningHours(facilityId);
-      if (response.success && response.data) {
-        // If no opening hours exist, create default ones
-        if (response.data.length === 0) {
-          const defaultHours: OpeningHour[] = [
-            { facility_id: facilityId, day_of_week: 1, open_time: "07:00", close_time: "23:00", is_open: true },
-            { facility_id: facilityId, day_of_week: 2, open_time: "07:00", close_time: "23:00", is_open: true },
-            { facility_id: facilityId, day_of_week: 3, open_time: "07:00", close_time: "23:00", is_open: true },
-            { facility_id: facilityId, day_of_week: 4, open_time: "07:00", close_time: "23:00", is_open: true },
-            { facility_id: facilityId, day_of_week: 5, open_time: "07:00", close_time: "23:00", is_open: true },
-            { facility_id: facilityId, day_of_week: 6, open_time: "07:00", close_time: "23:00", is_open: true },
-            { facility_id: facilityId, day_of_week: 0, open_time: "07:00", close_time: "23:00", is_open: false },
-          ];
-          set({ openingHours: defaultHours, isLoading: false });
-        } else {
-          set({ openingHours: response.data, isLoading: false });
-        }
-      } else {
-        set({ error: response.error?.message || 'Failed to fetch opening hours', isLoading: false });
-      }
-    } catch (error: any) {
-      set({ error: error.message, isLoading: false });
-    }
+const initialDayState = { isOpen: true, slots: [{ id: crypto.randomUUID(), from: '09:00', to: '17:00' }] };
+const closedDayState = { isOpen: false, slots: [] };
+
+const initialState = {
+  schedule: {
+    Monday: initialDayState,
+    Tuesday: initialDayState,
+    Wednesday: initialDayState,
+    Thursday: initialDayState,
+    Friday: initialDayState,
+    Saturday: closedDayState,
+    Sunday: closedDayState,
   },
+  isDirty: false,
+};
 
-  saveOpeningHours: async (facilityId) => {
-    const { openingHours } = get();
-    set({ isLoading: true, error: null });
-    try {
-      const response = await OpeningHoursService.saveOpeningHours(facilityId, openingHours);
-      if (response.success) {
-        set({ isLoading: false });
-        return true;
-      } else {
-        set({ error: response.error?.message || 'Failed to save opening hours', isLoading: false });
-        return false;
-      }
-    } catch (error: any) {
-      set({ error: error.message, isLoading: false });
-      return false;
-    }
-  },
-
-  reset: () => set({
-    openingHours: [],
-    isLoading: false,
-    error: null
-  })
+export const useOpeningHoursStore = create<OpeningHoursState>((set) => ({
+  ...initialState,
+  actions: {
+    initialize: (initialSchedule) => set({ schedule: initialSchedule, isDirty: false }),
+    toggleDay: (day, isOpen) =>
+      set((state) => ({
+        schedule: {
+          ...state.schedule,
+          [day]: { ...state.schedule[day], isOpen },
+        },
+        isDirty: true,
+      })),
+    addSlot: (day) =>
+      set((state) => {
+        const newSlot: TimeSlot = { id: crypto.randomUUID(), from: '09:00', to: '17:00' };
+        return {
+          schedule: {
+            ...state.schedule,
+            [day]: { ...state.schedule[day], slots: [...state.schedule[day].slots, newSlot] },
+          },
+          isDirty: true,
+        };
+      }),
+    updateSlot: (day, slotId, newFrom, newTo) =>
+      set((state) => {
+        const updatedSlots = state.schedule[day].slots.map((slot) =>
+          slot.id === slotId ? { ...slot, from: newFrom, to: newTo } : slot
+        );
+        return {
+          schedule: { ...state.schedule, [day]: { ...state.schedule[day], slots: updatedSlots } },
+          isDirty: true,
+        };
+      }),
+    removeSlot: (day, slotId) =>
+      set((state) => {
+        const filteredSlots = state.schedule[day].slots.filter((slot) => slot.id !== slotId);
+        return {
+          schedule: { ...state.schedule, [day]: { ...state.schedule[day], slots: filteredSlots } },
+          isDirty: true,
+        };
+      }),
+    copyToAll: (fromDay) =>
+      set((state) => {
+        const slotsToCopy = state.schedule[fromDay].slots;
+        const newSchedule = { ...state.schedule };
+        DAYS_OF_WEEK.forEach((day) => {
+          if (day !== fromDay) {
+            newSchedule[day] = {
+              ...newSchedule[day],
+              slots: slotsToCopy.map(slot => ({ ...slot, id: crypto.randomUUID() })),
+            };
+          }
+        });
+        return { schedule: newSchedule, isDirty: true };
+      }),
+    reset: () => set(initialState),
+  }
 }));

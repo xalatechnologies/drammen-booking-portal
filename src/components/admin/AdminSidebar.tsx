@@ -18,7 +18,7 @@ const AdminSidebar: React.FC = () => {
     title: tSync("admin.sidebar.facilities", "Facilities"),
     href: "/admin/facilities",
     icon: Building,
-    description: tSync("admin.sidebar.descriptions.facilities", "Administrer fasiliteter")
+    description: tSync("admin.sidebar.descriptions.facilities", "Administrer Lokaler")
   }, {
     title: tSync("admin.sidebar.bookings", "Bookings"),
     href: "/admin/bookings",

@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PageHeader, FiltersBar, ViewToggle } from "@/components/layouts";
-import { FacilityService } from "@/services/facilityService";
+import { FacilityService } from "@/services/FacilityService";
 import { FacilityCalendarView } from "./calendar/FacilityCalendarView";
 import { FacilityDetailView } from "./detail/FacilityDetailView";
 import { FacilityGridView } from "./views/FacilityGridView";

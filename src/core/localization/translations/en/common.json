@@ -1,0 +1,24 @@
+{
+  "app.title": "Drammen Booking Portal",
+  "app.description": "Book facilities in Drammen municipality",
+  
+  "navigation.home": "Home",
+  "navigation.facilities": "Facilities",
+  "navigation.bookings": "Bookings",
+  "navigation.admin": "Admin",
+  "navigation.profile": "Profile",
+  
+  "actions.save": "Save",
+  "actions.cancel": "Cancel",
+  "actions.edit": "Edit",
+  "actions.delete": "Delete",
+  "actions.search": "Search",
+  "actions.filter": "Filter",
+  "actions.book": "Book",
+  "actions.confirm": "Confirm",
+  
+  "status.loading": "Loading",
+  "status.success": "Success",
+  "status.error": "Error",
+  "status.notFound": "Not Found"
+}

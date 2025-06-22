@@ -1,0 +1,19 @@
+{
+  "validation.required": "{{field}} is required",
+  "validation.email": "Please enter a valid email address",
+  "validation.min": "{{field}} must be at least {{min}} characters",
+  "validation.max": "{{field}} cannot exceed {{max}} characters",
+  "validation.minValue": "{{field}} must be at least {{min}}",
+  "validation.maxValue": "{{field}} cannot exceed {{max}}",
+  "validation.pattern": "{{field}} format is invalid",
+  "validation.match": "{{field}} does not match {{otherField}}",
+  "validation.unique": "This {{field}} already exists",
+  "validation.date.future": "Date must be in the future",
+  "validation.date.past": "Date must be in the past",
+  "validation.date.valid": "Please enter a valid date",
+  "validation.number": "Please enter a valid number",
+  "validation.boolean": "This field must be true or false",
+  "validation.array.minItems": "Please select at least {{min}} items",
+  "validation.array.maxItems": "Please select no more than {{max}} items",
+  "validation.object.required": "{{field}} object is required"
+}

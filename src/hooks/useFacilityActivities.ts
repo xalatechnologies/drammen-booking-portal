@@ -1,6 +1,6 @@
 
 import { useQuery } from '@tanstack/react-query';
-import { FacilityActivityService } from '@/services/facilityActivityService';
+import { FacilityActivityService } from '@/services/FacilityActivityService';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 export function useFacilityActivities(facilityId: number) {

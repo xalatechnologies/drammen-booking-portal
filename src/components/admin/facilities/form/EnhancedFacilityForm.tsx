@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FacilityService } from "@/services/facilityService";
+import { FacilityService } from "@/services/FacilityService";
 import { facilityFormSchema, FacilityFormData } from "./FacilityFormSchema";
 import { EnhancedFacilityBasicSection } from "./sections/EnhancedFacilityBasicSection";
 import { EnhancedFacilityAddressSection } from "./sections/EnhancedFacilityAddressSection";
@@ -196,7 +196,7 @@ export const EnhancedFacilityForm: React.FC<EnhancedFacilityFormProps> = ({
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Breadcrumb */}
         <div className="mb-4">
           <FacilityFormBreadcrumb 

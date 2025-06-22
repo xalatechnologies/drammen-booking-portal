@@ -1,0 +1,23 @@
+{
+  "errors.general": "Det oppstod en feil",
+  "errors.network": "Nettverksfeil",
+  "errors.server": "Serverfeil",
+  "errors.notFound": "Ressurs ikke funnet",
+  "errors.unauthorized": "Uautorisert tilgang",
+  "errors.forbidden": "Tilgang forbudt",
+  
+  "errors.validation": "Valideringsfeil",
+  "errors.validation.required": "{{field}} er påkrevd",
+  "errors.validation.minLength": "{{field}} må være minst {{min}} tegn",
+  "errors.validation.maxLength": "{{field}} kan ikke overstige {{max}} tegn",
+  "errors.validation.pattern": "{{field}} har et ugyldig format",
+  "errors.validation.email": "{{field}} må være en gyldig e-postadresse",
+  
+  "errors.booking.conflict": "Bestilling er i konflikt med en eksisterende reservasjon",
+  "errors.booking.pastDate": "Kan ikke bestille datoer i fortiden",
+  "errors.booking.full": "Dette anlegget er fullbooket for valgt tid",
+  
+  "errors.facility.notAvailable": "Anlegget er ikke tilgjengelig",
+  "errors.facility.maintenance": "Anlegget er under vedlikehold",
+  "errors.facility.closed": "Anlegget er stengt"
+}

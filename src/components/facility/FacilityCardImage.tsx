@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/i18n";
 import { useQuery } from "@tanstack/react-query";
-import { FacilityImageService } from "@/services/facilityImageService";
+import { FacilityImageService } from "@/services/FacilityImageService";
 
 interface FacilityCardImageProps {
   facility: {

@@ -66,7 +66,7 @@ export const coreFacilities = [
     cancellation_deadline_hours: 24,
     is_featured: false,
     description: {
-      NO: "Stor aktivitetshall med mulighet for både sport og kulturarrangementer. God akustikk og moderne fasiliteter.",
+      NO: "Stor aktivitetshall med mulighet for både sport og kulturarrangementer. God akustikk og moderne Lokaler.",
       EN: "Large activity hall suitable for both sports and cultural events. Good acoustics and modern facilities."
     },
     suitableFor: {

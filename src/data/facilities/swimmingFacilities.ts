@@ -40,7 +40,7 @@ export const swimmingFacilities: LocalizedFacility[] = [
       { dayOfWeek: 6, opens: "08:00", closes: "20:00" }
     ],
     description: {
-      NO: "Moderne svømmeanlegg med både konkurransebasseng og barneområde. Høy standard på fasiliteter og sikkerhet.",
+      NO: "Moderne svømmeanlegg med både konkurransebasseng og barneområde. Høy standard på Lokaler og sikkerhet.",
       EN: "Modern swimming facility with both competition pool and children's area. High standard facilities and safety measures."
     },
     rating: 4.7,
@@ -123,7 +123,7 @@ export const swimmingFacilities: LocalizedFacility[] = [
       { dayOfWeek: 6, opens: "09:00", closes: "18:00" }
     ],
     description: {
-      NO: "Moderne svømmeanlegg med varmebasseng og badstue. Familievennlig med gode fasiliteter.",
+      NO: "Moderne svømmeanlegg med varmebasseng og badstue. Familievennlig med gode Lokaler.",
       EN: "Modern swimming facility with warm pool and sauna. Family-friendly with excellent facilities."
     },
     rating: 4.2,

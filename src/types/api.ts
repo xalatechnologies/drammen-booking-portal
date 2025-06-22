@@ -9,15 +9,27 @@ export interface ApiResponse<T> {
   };
 }
 
-// Add missing RepositoryResponse type
+// Import error type from our error handling utilities
+import { AppError } from '@/core/utils/localized-error-handling';
+
+// Repository response type for data access layer
 export interface RepositoryResponse<T> {
+  success: boolean;
   data?: T;
-  error?: string;
+  error?: AppError;
+}
+
+// Service response type for service layer
+export interface ServiceResponse<T> {
+  success: boolean;
+  data?: T;
+  error?: AppError;
 }
 
 export interface PaginationParams {
   page: number;
   limit: number;
+  pageSize: number; // Adding pageSize property to fix lint errors
 }
 
 export interface PaginationMeta {
@@ -37,6 +49,7 @@ export interface PaginatedResponse<T> {
 export interface SortParams {
   field: string;
   direction: 'asc' | 'desc';
+  order: 'asc' | 'desc'; // Adding order property as an alias to maintain compatibility
 }
 
 export interface ErrorDetails {

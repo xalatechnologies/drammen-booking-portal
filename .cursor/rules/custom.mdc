@@ -1,0 +1,11 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+all interactions with DB/supabase should happen via BaseRepository, DAL and Zustand.
+
+When creating new components / code, Always keep localization in mind.
+
+Make sure to start plan with a thoroguh review of current status, current codebase and implementation, the database structure and models, the supabase edge functions and all related code in the codebase, also add a step for looking into the requirements of the application and the context of the project. At the end of the plan add a clean up process to remove all redundant and unused code that the AI might have generated, and clean build and lint.
+Always use aliases for imports and exports and relative paths. Add aliases to the tsconfig.json file.

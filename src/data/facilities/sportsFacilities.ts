@@ -126,7 +126,7 @@ export const sportsFacilities: LocalizedFacility[] = [
       { dayOfWeek: 0, opens: "09:00", closes: "22:00" }
     ],
     description: {
-      NO: "Stor aktivitetshall med mulighet for både sport og kulturarrangementer. God akustikk og moderne fasiliteter.",
+      NO: "Stor aktivitetshall med mulighet for både sport og kulturarrangementer. God akustikk og moderne Lokaler.",
       EN: "Large activity hall suitable for both sports and cultural events. Good acoustics and modern facilities."
     },
     rating: 4.5,
@@ -285,7 +285,7 @@ export const sportsFacilities: LocalizedFacility[] = [
       { dayOfWeek: 6, opens: "06:00", closes: "23:30" }
     ],
     description: {
-      NO: "Stor idrettshall med tribuner og moderne fasiliteter. Ideell for store idrettsarrangementer.",
+      NO: "Stor idrettshall med tribuner og moderne Lokaler. Ideell for store idrettsarrangementer.",
       EN: "Large sports hall with stands and modern facilities. Ideal for major sports events."
     },
     rating: 4.8,

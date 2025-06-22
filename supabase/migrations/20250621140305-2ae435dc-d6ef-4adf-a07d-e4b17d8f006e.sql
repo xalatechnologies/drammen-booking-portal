@@ -3,12 +3,12 @@
 INSERT INTO facility_translations (facility_id, language_code, name, description, created_at, updated_at) VALUES
 -- Norwegian translations
 (1, 'NO', 'Brandengen Skole - Gymsal', 'En moderne gymsal med høy standard og god ventilasjon. Ideell for ballsport og større arrangementer.', now(), now()),
-(2, 'NO', 'Fjell Skole - Aktivitetshall', 'Stor aktivitetshall med mulighet for både sport og kulturarrangementer. God akustikk og moderne fasiliteter.', now(), now()),
+(2, 'NO', 'Fjell Skole - Aktivitetshall', 'Stor aktivitetshall med mulighet for både sport og kulturarrangementer. God akustikk og moderne Lokaler.', now(), now()),
 (6, 'NO', 'Åssiden Fotballhall', 'Stor fotballhall med kunstgress av høy kvalitet. Egnet for både trening, kamper og turneringer.', now(), now()),
-(11, 'NO', 'Ytterkollen Idrettshall', 'Stor idrettshall med tribuner og moderne fasiliteter. Ideell for store idrettsarrangementer.', now(), now()),
+(11, 'NO', 'Ytterkollen Idrettshall', 'Stor idrettshall med tribuner og moderne Lokaler. Ideell for store idrettsarrangementer.', now(), now()),
 (998, 'NO', 'Idrettshall Mjøndalen - Fleksibel', 'Moderne idrettshall med tre separate soner som kan kombineres. Ideell for håndball, basketball, volleyball og badminton.', now(), now()),
-(5, 'NO', 'Drammensbadet - Svømmehall', 'Moderne svømmeanlegg med både konkurransebasseng og barneområde. Høy standard på fasiliteter og sikkerhet.', now(), now()),
-(16, 'NO', 'Holmestrand Svømmehall', 'Moderne svømmeanlegg med varmebasseng og badstue. Familievennlig med gode fasiliteter.', now(), now()),
+(5, 'NO', 'Drammensbadet - Svømmehall', 'Moderne svømmeanlegg med både konkurransebasseng og barneområde. Høy standard på Lokaler og sikkerhet.', now(), now()),
+(16, 'NO', 'Holmestrand Svømmehall', 'Moderne svømmeanlegg med varmebasseng og badstue. Familievennlig med gode Lokaler.', now(), now()),
 (4, 'NO', 'Marienlyst Stadion - Møtesal', 'Romslig møtesal med naturlig lys og moderne konferanseutstyr. Ideell for bedriftsmøter og kursvirksomhet.', now(), now()),
 (7, 'NO', 'Drammen Bibliotek - Møterom', 'Rolig møterom i biblioteket med tilgang til forskningsressurser og stille arbeidsmiljø.', now(), now()),
 (10, 'NO', 'Tangen Skole - Klasserom', 'Praktisk klasserom med god belysning og moderne undervisningsutstyr.', now(), now()),

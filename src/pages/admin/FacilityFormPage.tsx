@@ -1,8 +1,7 @@
-
 import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { FacilityService } from "@/services/facilityService";
+import { FacilityService } from "@/services/FacilityService";
 import { SimplifiedFacilityForm } from "@/components/admin/facilities/form/SimplifiedFacilityForm";
 import { LoadingState } from "@/components/layouts";
 

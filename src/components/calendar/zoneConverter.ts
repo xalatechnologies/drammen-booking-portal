@@ -37,7 +37,7 @@ export function convertApiZoneToZone(apiZone: any): Zone {
     adminInfo: {
       contactPersonName: 'Ansvarlig',
       contactPersonEmail: 'contact@facility.no',
-      specialInstructions: 'Følg fasilitetets regler',
+      specialInstructions: 'Følg Lokalets regler',
       maintenanceSchedule: []
     }
   };
@@ -104,7 +104,7 @@ export function convertCalendarZoneToBookingZone(calendarZone: any, facilityId: 
     adminInfo: {
       contactPersonName: 'Ansvarlig',
       contactPersonEmail: 'contact@facility.no',
-      specialInstructions: 'Følg fasilitetets regler',
+      specialInstructions: 'Følg Lokalets regler',
       maintenanceSchedule: []
     }
   };

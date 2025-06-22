@@ -1,6 +1,6 @@
 
 import { useQuery } from "@tanstack/react-query";
-import { FacilityService } from "@/services/facilityService";
+import { FacilityService } from "@/services/FacilityService";
 import { FacilityFilters, FacilitySortOptions } from "@/types/facility";
 import { PaginationParams } from "@/types/api";
 import { useLanguage } from "@/contexts/LanguageContext";

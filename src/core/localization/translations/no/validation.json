@@ -1,0 +1,19 @@
+{
+  "validation.required": "{{field}} er påkrevd",
+  "validation.email": "Vennligst skriv inn en gyldig e-postadresse",
+  "validation.min": "{{field}} må være minst {{min}} tegn",
+  "validation.max": "{{field}} kan ikke overstige {{max}} tegn",
+  "validation.minValue": "{{field}} må være minst {{min}}",
+  "validation.maxValue": "{{field}} kan ikke overstige {{max}}",
+  "validation.pattern": "{{field}} format er ugyldig",
+  "validation.match": "{{field}} samsvarer ikke med {{otherField}}",
+  "validation.unique": "Denne {{field}} finnes allerede",
+  "validation.date.future": "Dato må være i fremtiden",
+  "validation.date.past": "Dato må være i fortiden",
+  "validation.date.valid": "Vennligst oppgi en gyldig dato",
+  "validation.number": "Vennligst oppgi et gyldig tall",
+  "validation.boolean": "Dette feltet må være sant eller usant",
+  "validation.array.minItems": "Vennligst velg minst {{min}} elementer",
+  "validation.array.maxItems": "Vennligst velg ikke mer enn {{max}} elementer",
+  "validation.object.required": "{{field}} objekt er påkrevd"
+}

@@ -1,246 +1,164 @@
-
-import React, { useRef, useState } from "react";
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form } from "@/components/ui/form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FacilityService } from "@/services/facilityService";
-import { facilityFormSchema, FacilityFormData } from "./FacilityFormSchema";
-import { SimplifiedBasicSection } from "./sections/SimplifiedBasicSection";
-import { SimplifiedConfigurationSection } from "./sections/SimplifiedConfigurationSection";
-import { SimplifiedManagementSection } from "./sections/SimplifiedManagementSection";
-import { ArrowLeft, Save, X } from "lucide-react";
-import { toast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/use-toast";
+import { Facility, facilitySchema } from "@/types/facility";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useTranslation } from "@/i18n/hooks/useTranslation";
+import { useFacilityZoneStore } from '@/stores/useFacilityZoneStore';
+import React from 'react';
+
+import { OverviewSection } from "./sections/OverviewSection";
+import { ManagementSection } from "./sections/ManagementSection";
+import { ConfigurationSection } from "./sections/ConfigurationSection";
+import { BookingAvailabilitySection } from "./sections/BookingAvailabilitySection";
+import { BlackoutPeriodsManager } from './sections/BlackoutPeriodsManager';
+import { OpeningHoursEditor } from './sections/OpeningHoursEditor';
+import { ZoneEditor } from './sections/zones/ZoneEditor';
+
 
 interface SimplifiedFacilityFormProps {
-  facility?: any;
-  onSuccess: () => void;
-  onCancel: () => void;
+    facility?: Facility;
 }
 
-export const SimplifiedFacilityForm: React.FC<SimplifiedFacilityFormProps> = ({
-  facility,
-  onSuccess,
-  onCancel
-}) => {
-  const queryClient = useQueryClient();
-  const isEditing = !!facility;
-  const [activeTab, setActiveTab] = useState("basic");
-  
-  // Refs for sections that need to save their own data
-  const configRef = useRef<{ saveData: () => Promise<boolean> }>(null);
-  const managementRef = useRef<{ saveData: () => Promise<boolean> }>(null);
+export const SimplifiedFacilityForm: React.FC<SimplifiedFacilityFormProps> = ({ facility }) => {
+    const { t } = useTranslation();
+    const isEditing = !!facility;
+    const facilityId = facility?.id || 'new';
 
-  const form = useForm<FacilityFormData>({
-    resolver: zodResolver(facilityFormSchema),
-    defaultValues: {
-      name: facility?.name || "",
-      type: facility?.type || "",
-      area: facility?.area || "",
-      description: facility?.description || "",
-      capacity: facility?.capacity || 1,
-      area_sqm: facility?.area_sqm || 0,
-      address_street: facility?.address_street || "",
-      address_city: facility?.address_city || "",
-      address_postal_code: facility?.address_postal_code || "",
-      address_country: facility?.address_country || "Norway",
-      contact_name: facility?.contact_name || "",
-      contact_email: facility?.contact_email || "",
-      contact_phone: facility?.contact_phone || "",
-      status: facility?.status || "active",
-      has_auto_approval: facility?.has_auto_approval || false,
-      price_per_hour: facility?.price_per_hour || 450,
-      time_slot_duration: facility?.time_slot_duration || 1,
-      booking_lead_time_hours: facility?.booking_lead_time_hours || 2,
-      max_advance_booking_days: facility?.max_advance_booking_days || 365,
-      cancellation_deadline_hours: facility?.cancellation_deadline_hours || 24,
-      allowed_booking_types: facility?.allowed_booking_types || ["engangs"],
-      equipment: facility?.equipment || [],
-      amenities: facility?.amenities || [],
-      accessibility_features: facility?.accessibility_features || [],
-      latitude: facility?.latitude || undefined,
-      longitude: facility?.longitude || undefined,
-      season_from: facility?.season_from || "",
-      season_to: facility?.season_to || "",
-      is_featured: facility?.is_featured || false,
-    }
-  });
+    const queryClient = useQueryClient();
+    const { toast } = useToast();
 
-  // Watch the name field to pass to management section
-  const facilityName = form.watch("name");
+    const form = useForm<z.infer<typeof facilitySchema>>({
+        resolver: zodResolver(facilitySchema),
+        defaultValues: facility || {
+            name: "",
+            description: "",
+            category: "sports",
+            type: "football_field",
+            status: "active",
+            booking_confirmation_required: false,
+            zones: [],
+        },
+    });
 
-  const mutation = useMutation({
-    mutationFn: async (data: FacilityFormData) => {
-      console.log('Saving facility data...');
-      
-      // First save the main facility data
-      let facilityResult;
-      if (isEditing) {
-        facilityResult = await FacilityService.updateFacility(facility.id.toString(), data);
-      } else {
-        facilityResult = await FacilityService.createFacility(data);
-      }
+    // Connect the zone store to the form state
+    const zones = useFacilityZoneStore((state) => state.zones);
+    const initializeZones = useFacilityZoneStore((state) => state.actions.initialize);
+    
+    React.useEffect(() => {
+        form.setValue('zones', zones);
+    }, [zones, form]);
 
-      if (!facilityResult.success) {
-        throw new Error(facilityResult.error?.message || 'Failed to save facility');
-      }
-
-      console.log('Facility saved successfully');
-
-      // Save data from other sections if facility is saved
-      const savePromises = [];
-
-      if (configRef.current) {
-        console.log('Saving configuration data...');
-        savePromises.push(configRef.current.saveData());
-      }
-
-      if (managementRef.current && isEditing) {
-        console.log('Saving management data...');
-        savePromises.push(managementRef.current.saveData());
-      }
-
-      // Wait for all section saves to complete
-      if (savePromises.length > 0) {
-        const results = await Promise.all(savePromises);
-        const failed = results.some(result => !result);
-        if (failed) {
-          console.warn('Some sections failed to save, but facility was saved successfully');
+    React.useEffect(() => {
+        if(facility?.zones) {
+            initializeZones(facility.zones);
         }
-      }
+    }, [facility, initializeZones])
 
-      return facilityResult;
-    },
-    onSuccess: (response) => {
-      if (response.success) {
-        toast({
-          title: "Success",
-          description: `Facility ${isEditing ? 'updated' : 'created'} successfully`,
-        });
-        queryClient.invalidateQueries({ queryKey: ['facilities'] });
-        onSuccess();
-      }
-    },
-    onError: (error: any) => {
-      console.error('Facility save error:', error);
-      toast({
-        title: "Error",
-        description: error.message || `Failed to ${isEditing ? 'update' : 'create'} facility`,
-        variant: "destructive",
-      });
-    },
-  });
-
-  const onSubmit = (data: FacilityFormData) => {
-    console.log('Submitting facility form data:', data);
-    mutation.mutate(data);
-  };
-
-  return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {/* Header */}
-        <div className="mb-6">
-          <div className="flex items-center gap-4 mb-4">
-            <Button variant="outline" onClick={onCancel} className="text-base">
-              <ArrowLeft className="w-5 h-5 mr-2" />
-              Back to Facilities
-            </Button>
-          </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            {isEditing ? `Edit: ${facility.name}` : 'Add New Facility'}
-          </h1>
-          <p className="text-gray-600 text-lg">
-            {isEditing 
-              ? 'Update facility information and settings'
-              : 'Create a new facility with all necessary details'
+    const mutation = useMutation({
+        mutationFn: async (data: z.infer<typeof facilitySchema>) => {
+            console.log("Submitting data:", data);
+            if (isEditing) {
+                console.log("Facility updated");
+            } else {
+                console.log("Facility created");
             }
-          </p>
-        </div>
+        },
+        onSuccess: () => {
+            toast({
+                title: isEditing ? t('admin:facility.toast.updateSuccess.title') : t('admin:facility.toast.createSuccess.title'),
+                description: isEditing ? t('admin:facility.toast.updateSuccess.description') : t('admin:facility.toast.createSuccess.description'),
+            });
+            queryClient.invalidateQueries({ queryKey: ["facilities"] });
+        },
+        onError: (error) => {
+            toast({
+                title: t('common:error.title'),
+                description: error.message,
+                variant: "destructive",
+            });
+        },
+    });
 
-        {/* Main Form */}
-        <Card className="shadow-sm border-0 ring-1 ring-gray-200">
-          <CardContent className="p-0">
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <div className="border-b border-gray-100 px-8 pt-8 pb-4">
-                <TabsList className="grid w-full grid-cols-3 h-12 text-base">
-                  <TabsTrigger value="basic" className="text-base font-medium">
-                    Basic Information
-                  </TabsTrigger>
-                  <TabsTrigger value="configuration" className="text-base font-medium">
-                    Configuration
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="management" 
-                    disabled={!isEditing} 
-                    className="text-base font-medium"
-                  >
-                    Management
-                  </TabsTrigger>
-                </TabsList>
-              </div>
+    const onSubmit = (data: z.infer<typeof facilitySchema>) => {
+        console.log("Form data submitted", data);
+        mutation.mutate(data);
+    };
 
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)}>
-                  <div className="p-8">
-                    <TabsContent value="basic" className="mt-0">
-                      <SimplifiedBasicSection form={form} />
-                    </TabsContent>
 
-                    <TabsContent value="configuration" className="mt-0">
-                      <SimplifiedConfigurationSection 
-                        form={form} 
-                        facilityId={facility?.id}
-                        ref={configRef}
-                      />
-                    </TabsContent>
-
-                    <TabsContent value="management" className="mt-0">
-                      {isEditing ? (
-                        <SimplifiedManagementSection 
-                          facilityId={facility.id}
-                          facilityName={facilityName || facility.name}
-                          ref={managementRef}
-                        />
-                      ) : (
-                        <div className="text-center py-12 text-gray-500">
-                          <p className="text-lg">Save the facility first to access management features.</p>
-                        </div>
-                      )}
-                    </TabsContent>
-                  </div>
-
-                  {/* Form Actions */}
-                  <div className="border-t border-gray-100 px-8 py-6 bg-gray-50">
-                    <div className="flex justify-end space-x-4">
-                      <Button 
-                        variant="outline" 
-                        type="button" 
-                        onClick={onCancel}
-                        className="text-base px-6 py-3"
-                      >
-                        <X className="w-4 h-4 mr-2" />
-                        Cancel
-                      </Button>
-                      <Button 
-                        type="submit" 
-                        disabled={mutation.isPending}
-                        className="text-base px-6 py-3"
-                      >
-                        <Save className="w-4 h-4 mr-2" />
-                        {mutation.isPending ? "Saving..." : (isEditing ? "Update Facility" : "Create Facility")}
-                      </Button>
+    return (
+        <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                <div className="flex justify-between items-center mb-6">
+                    <h1 className="text-2xl font-bold">
+                        {isEditing ? t('admin:facility.editTitle') : t('admin:facility.addTitle')}
+                    </h1>
+                    <div className="flex gap-2">
+                        <Button type="button" variant="outline" onClick={() => form.reset()}>
+                            {t('common:cancel')}
+                        </Button>
+                        <Button type="submit" disabled={mutation.isPending}>
+                            {mutation.isPending ? t('common:saving') : t('common:saveChanges')}
+                        </Button>
                     </div>
-                  </div>
-                </form>
-              </Form>
-            </Tabs>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
-  );
+                </div>
+
+                <div className="flex flex-col md:flex-row gap-8">
+                    <div className="flex-1">
+                        <Tabs defaultValue="overview" className="w-full">
+                            <TabsList className="grid w-full grid-cols-4">
+                                <TabsTrigger value="overview">{t('admin:facility.tabs.overview')}</TabsTrigger>
+                                <TabsTrigger value="booking">{t('admin:facility.tabs.booking')}</TabsTrigger>
+                                <TabsTrigger value="zones">{t('admin:facility.tabs.zones')}</TabsTrigger>
+                                <TabsTrigger value="media">{t('admin:facility.tabs.media')}</TabsTrigger>
+                            </TabsList>
+                            <TabsContent value="overview" className="mt-6">
+                                <OverviewSection control={form.control} />
+                            </TabsContent>
+                            <TabsContent value="booking" className="mt-6">
+                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                                    <div className="lg:col-span-2">
+                                        <BookingAvailabilitySection />
+                                    </div>
+                                    <div className="space-y-6">
+                                        <OpeningHoursEditor facilityId={facilityId} />
+                                        <BlackoutPeriodsManager />
+                                    </div>
+                                </div>
+                            </TabsContent>
+                            <TabsContent value="zones" className="mt-6">
+                                <ZoneEditor facilityId={facilityId} />
+                            </TabsContent>
+                            <TabsContent value="media" className="mt-6">
+                                <p>Media and features management will be here.</p>
+                            </TabsContent>
+                        </Tabs>
+                    </div>
+                    <div className="w-full md:w-1/3 space-y-6">
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>{t('admin:facility.sections.management.title')}</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <ManagementSection control={form.control} />
+                            </CardContent>
+                        </Card>
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>{t('admin:facility.sections.configuration.title')}</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <ConfigurationSection control={form.control} />
+                            </CardContent>
+                        </Card>
+                    </div>
+                </div>
+            </form>
+        </Form>
+    );
 };

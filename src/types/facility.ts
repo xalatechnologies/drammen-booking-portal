@@ -1,4 +1,3 @@
-
 export interface Facility {
   id: number;
   name: string;
@@ -37,14 +36,13 @@ export interface Facility {
   updated_at: string;
   area_sqm: number | null;
   
-  // Computed/derived fields for backwards compatibility - all required to avoid conflicts
-  address: string; // Computed from address_street, address_city - REQUIRED
-  image: string; // Alias for image_url - REQUIRED
-  pricePerHour: number; // Alias for price_per_hour
-  accessibility: string[]; // Alias for accessibility_features
+  address: string;
+  image: string;
+  pricePerHour: number;
+  accessibility: string[];
   suitableFor: string[];
-  hasAutoApproval: boolean; // Alias for has_auto_approval
-  nextAvailable: string; // Alias for next_available - REQUIRED
+  hasAutoApproval: boolean;
+  nextAvailable: string;
   openingHours: OpeningHours[];
   zones: Zone[];
   featuredImage?: FacilityImage;
@@ -78,7 +76,6 @@ export interface FacilityImage {
   created_at: string;
 }
 
-// Add missing blackout period types
 export interface FacilityBlackoutPeriod {
   id: string;
   facility_id: number;
@@ -92,7 +89,12 @@ export interface FacilityBlackoutPeriod {
 
 export type BlackoutType = 'maintenance' | 'renovation' | 'event' | 'weather' | 'other';
 
+/**
+ * Interface for filtering facilities
+ * Following Interface Segregation Principle by providing focused filter options
+ */
 export interface FacilityFilters {
+  // Original properties
   searchTerm?: string;
   facilityType?: string;
   location?: string;
@@ -101,6 +103,11 @@ export interface FacilityFilters {
   date?: Date;
   priceRange?: { min: number; max: number };
   availableNow?: boolean;
+  
+  // Additional properties used by our repository implementation
+  search?: string; // For search term
+  type?: string;   // For facility type filter
+  area?: string;   // For location/area filter
   amenities?: string[];
 }
 
@@ -112,34 +119,19 @@ export interface FacilitySortOptions {
 export interface Zone {
   id: string;
   name: string;
-  facility_id: number;
   type: 'court' | 'room' | 'area' | 'section' | 'field';
   capacity: number;
-  description: string | null;
-  is_main_zone: boolean;
-  parent_zone_id: string | null;
-  bookable_independently: boolean;
-  area_sqm: number | null;
-  floor: string | null;
-  coordinates_x: number | null;
-  coordinates_y: number | null;
-  coordinates_width: number | null;
-  coordinates_height: number | null;
-  equipment: string[] | null;
-  accessibility_features: string[] | null;
+  description: string;
+  isMainZone: boolean;
+  bookableIndependently: boolean;
+  areaSqm: number;
+  floor: string;
+  equipment: string[];
   status: 'active' | 'maintenance' | 'inactive';
-  created_at: string;
-  updated_at: string;
-  
-  // Legacy fields for backwards compatibility
-  facilityId?: string;
-  conflictRules?: ConflictRule[];
-  bookableIndependently?: boolean; // Alias for bookable_independently
-  dimensions?: {
-    width: number;
-    length: number;
-    height?: number;
-  };
+  priceMultiplier: number;
+  minBookingDuration: number;
+  maxBookingDuration: number;
+  facility_id?: number;
 }
 
 export interface ConflictRule {
@@ -151,7 +143,61 @@ export interface ConflictRule {
 }
 
 export interface OpeningHours {
-  dayOfWeek: 0 | 1 | 2 | 3 | 4 | 5 | 6; // 0 = Sunday, 1 = Monday, etc.
-  opens: string; // HH:mm format
-  closes: string; // HH:mm format
+  dayOfWeek: 0 | 1 | 2 | 3 | 4 | 5 | 6;
+  opens: string;
+  closes: string;
+}
+
+/**
+ * Represents a media item (image, video, etc.) related to a facility
+ */
+export interface MediaItem {
+  id: string;
+  facilityId: string;
+  url: string;
+  type: 'image' | 'video' | 'virtual_tour' | 'document';
+  title: string;
+  description: string;
+  featured: boolean;
+  order: number;
+  mimeType: string;
+  fileName: string;
+  fileSize: number;
+  width?: number;
+  height?: number;
+}
+
+/**
+ * Alias for FacilityMedia for backward compatibility
+ */
+export type FacilityMedia = MediaItem;
+
+/**
+ * Represents a feature of a zone within a facility
+ */
+export interface ZoneFeature {
+  id: string;
+  zoneId: string;
+  name: string;
+  description: string;
+  icon?: string;
+  category?: 'amenity' | 'equipment' | 'accessibility' | 'safety';
+}
+
+/**
+ * Represents capacity information for a zone
+ */
+export interface ZoneCapacity {
+  zoneId: string;
+  standard: number;
+  maximum: number;
+  recommended: number;
+  minimumBooking: number;
+  standingCapacity?: number;
+  seatedCapacity?: number;
+  layoutOptions?: Array<{
+    name: string;
+    capacity: number;
+    description?: string;
+  }>;
 }

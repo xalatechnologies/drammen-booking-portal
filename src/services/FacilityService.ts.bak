@@ -1,0 +1,243 @@
+import { IFacilityService } from './interfaces/IFacilityService';
+import { IFacilityRepository } from '@/dal/interfaces/IFacilityRepository';
+import { Facility } from '@/types/facility';
+import { PaginationParams, PaginatedResponse, SortParams } from '@/types/api';
+
+/**
+ * Implementation of the Facility Service
+ * Follows the Single Responsibility Principle by focusing only on facility operations
+ * Follows Dependency Inversion by depending on abstractions (interfaces) rather than concrete implementations
+ */
+export class FacilityService implements IFacilityService {
+  /**
+   * Repository instance injected via constructor (Dependency Injection)
+   */
+  private repository: IFacilityRepository;
+
+  /**
+   * Constructor for FacilityService
+   * @param facilityRepository The repository implementation to use
+   */
+  constructor(facilityRepository: IFacilityRepository) {
+    this.repository = facilityRepository;
+  }
+
+  /**
+   * Get all facilities
+   */
+  async getAll(): Promise<Facility[]> {
+    const response = await this.repository.findAll();
+    return response.data || [];
+  }
+
+  /**
+   * Get a facility by ID
+   * @param id The ID of the facility to retrieve
+   */
+  async getById(id: string | number): Promise<Facility | null> {
+    const response = await this.repository.findById(id);
+    return response.data || null;
+  }
+
+  /**
+   * Create a new facility
+   * @param facility The facility data to create
+   */
+  async create(facility: Omit<Facility, 'id'>): Promise<Facility> {
+    const response = await this.repository.create(facility);
+    
+    if (response.error) {
+      throw new Error(response.error || 'Failed to create facility');
+    }
+    
+    if (!response.data) {
+      throw new Error('Failed to create facility: No data returned');
+    }
+    
+    return response.data;
+  }
+
+  /**
+   * Update an existing facility
+   * @param id The ID of the facility to update
+   * @param facility The partial facility data to update
+   */
+  async update(id: string | number, facility: Partial<Facility>): Promise<Facility> {
+    const response = await this.repository.update(id, facility);
+    
+    if (response.error) {
+      throw new Error(response.error || 'Failed to update facility');
+    }
+    
+    if (!response.data) {
+      throw new Error('Failed to update facility: No data returned');
+    }
+    
+    return response.data;
+  }
+
+  /**
+   * Delete a facility by its ID
+   * @param id The ID of the facility to delete
+   */
+  async delete(id: string | number): Promise<boolean> {
+    const response = await this.repository.delete(id);
+    
+    if (response.error) {
+      throw new Error(response.error || 'Failed to delete facility');
+    }
+    
+    return response.data || false;
+  }
+
+  /**
+   * Get facilities with pagination support
+   * @param pagination Pagination parameters
+   * @param sorting Optional sorting parameters
+   * @param filters Optional filtering parameters
+   */
+  async getPaginated(
+    pagination: PaginationParams,
+    sorting?: SortParams,
+    filters?: Record<string, any>
+  ): Promise<PaginatedResponse<Facility>> {
+    const response = await this.repository.getPaginated(pagination, filters, sorting);
+    
+    if (response.error || !response.data) {
+      return {
+        data: [],
+        pagination: {
+          page: pagination.page || 1,
+          limit: pagination.limit || 10,
+          total: 0,
+          totalPages: 0,
+          hasNext: false,
+          hasPrev: false
+        }
+      };
+    }
+    
+    return response.data;
+  }
+
+  /**
+   * Get facilities by type
+   * @param type The facility type to filter by
+   * @param pagination Optional pagination parameters
+   */
+  async getFacilitiesByType(
+    type: string,
+    pagination?: PaginationParams
+  ): Promise<Facility[]> {
+    const response = await this.repository.getFacilitiesByType(type);
+    return response.data || [];
+  }
+
+  /**
+   * Get facilities by area/district
+   * @param areaId The area ID to filter by
+   * @param pagination Optional pagination parameters
+   */
+  async getFacilitiesByArea(
+    areaId: string | number,
+    pagination?: PaginationParams
+  ): Promise<Facility[]> {
+    const response = await this.repository.getFacilitiesByArea(String(areaId));
+    return response.data || [];
+  }
+
+  /**
+   * Get featured facilities
+   * @param limit Optional number of featured facilities to retrieve
+   */
+  async getFeaturedFacilities(limit?: number): Promise<Facility[]> {
+    const response = await this.repository.getFeaturedFacilities();
+    return response.data || [];
+  }
+
+  /**
+   * Toggle the active status of a facility
+   * @param id Facility ID
+   * @param isActive New active status
+   */
+  async toggleStatus(id: string | number, isActive: boolean): Promise<Facility> {
+    const response = await this.repository.toggleStatus(id, isActive);
+    
+    if (response.error) {
+      throw new Error(response.error || 'Failed to toggle facility status');
+    }
+    
+    if (!response.data) {
+      throw new Error('Failed to toggle facility status: No data returned');
+    }
+    
+    return response.data;
+  }
+
+  /**
+   * Update facility images
+   * @param id Facility ID
+   * @param imageUrls Array of image URLs
+   */
+  async updateImages(id: string | number, imageUrls: string[]): Promise<Facility> {
+    const response = await this.repository.updateImages(id, imageUrls);
+    
+    if (response.error) {
+      throw new Error(response.error || 'Failed to update facility images');
+    }
+    
+    if (!response.data) {
+      throw new Error('Failed to update facility images: No data returned');
+    }
+    
+    return response.data;
+  }
+
+  /**
+   * Search facilities by name, description, or other attributes
+   * @param searchTerm The search term
+   * @param pagination Optional pagination parameters
+   */
+  async searchFacilities(
+    searchTerm: string,
+    pagination?: PaginationParams
+  ): Promise<PaginatedResponse<Facility>> {
+    // Construct search filter using the proper FacilityFilters type
+    const filters: import('@/types/facility').FacilityFilters = {
+      searchTerm: searchTerm
+    };
+    
+    // Use the paginated method with search filters
+    const response = await this.repository.getPaginated(
+      pagination || { page: 1, limit: 10 },
+      filters,
+      undefined
+    );
+    
+    if (response.error || !response.data) {
+      return {
+        data: [],
+        pagination: {
+          page: pagination?.page || 1,
+          limit: pagination?.limit || 10,
+          total: 0,
+          totalPages: 0,
+          hasNext: false,
+          hasPrev: false
+        }
+      };
+    }
+    
+    return response.data;
+  }
+
+  /**
+   * Get all facility types
+   * @returns Array of facility types
+   */
+  async getAllFacilityTypes(): Promise<string[]> {
+    // This would typically be fetched from a lookup service or repository
+    // For now returning some common facility types as strings
+    return ['sports', 'culture', 'education', 'community', 'recreation'];
+  }
+}

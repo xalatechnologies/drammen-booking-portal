@@ -1,0 +1,24 @@
+{
+  "app.title": "Drammen Bookingportal",
+  "app.description": "Reserver Lokaler i Drammen kommune",
+  
+  "navigation.home": "Hjem",
+  "navigation.facilities": "Lokaler",
+  "navigation.bookings": "Reservasjoner",
+  "navigation.admin": "Admin",
+  "navigation.profile": "Profil",
+  
+  "actions.save": "Lagre",
+  "actions.cancel": "Avbryt",
+  "actions.edit": "Rediger",
+  "actions.delete": "Slett",
+  "actions.search": "Søk",
+  "actions.filter": "Filtrer",
+  "actions.book": "Reserver",
+  "actions.confirm": "Bekreft",
+  
+  "status.loading": "Laster",
+  "status.success": "Vellykket",
+  "status.error": "Feil",
+  "status.notFound": "Ikke funnet"
+}

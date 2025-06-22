@@ -1,7 +1,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
-import { FacilityService } from "@/services/facilityService";
+import { FacilityService } from "@/services/FacilityService";
 import { useFacilityStore } from "@/stores/useFacilityStore";
 
 export function useFacility(id: number | string) {

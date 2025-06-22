@@ -1,7 +1,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { Zone } from '@/types/zone';
-import { FacilityService } from '@/services/facilityService';
+import { FacilityService } from '@/services/FacilityService';
 
 export const useZones = (facilityId?: string) => {
   console.log('useZones - Fetching zones for facility ID:', facilityId);

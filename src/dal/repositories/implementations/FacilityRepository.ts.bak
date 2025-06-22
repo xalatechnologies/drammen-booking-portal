@@ -1,0 +1,164 @@
+import { Facility, FacilityStatus, FacilityDTO } from '@/types/facility';
+import { IFacilityRepository } from '../interfaces/IFacilityRepository';
+
+/**
+ * FacilityRepository Implementation
+ * 
+ * Responsible for facility data access operations
+ * Following Single Responsibility Principle by focusing only on data access
+ * Following Open/Closed Principle by implementing an interface
+ */
+export class FacilityRepository implements IFacilityRepository {
+  // Mock data for development purposes
+  // In production, this would be replaced with actual API calls
+  private mockFacilities: Facility[] = [
+    {
+      id: '1',
+      name: {
+        EN: 'Drammen Main Hall',
+        NO: 'Drammen Hovedhall'
+      },
+      description: {
+        EN: 'Large multipurpose hall for events and sports',
+        NO: 'Stor flerbrukshall for arrangementer og sport'
+      },
+      type: {
+        EN: 'Sports Hall',
+        NO: 'Sportshall'
+      },
+      capacity: 500,
+      area: '350',
+      pricePerHour: 1500,
+      amenities: ['Parking', 'Changing Rooms', 'Sound System', 'Lighting'],
+      images: [
+        {
+          image_url: '/images/facilities/hall1.jpg',
+          alt_text: 'Drammen Main Hall'
+        }
+      ],
+      address: {
+        street: 'Konnerudgata 5',
+        city: 'Drammen',
+        postalCode: '3045',
+        country: 'Norway'
+      },
+      status: FacilityStatus.ACTIVE,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    },
+    {
+      id: '2',
+      name: {
+        EN: 'Marienlyst Stadium',
+        NO: 'Marienlyst Stadion'
+      },
+      description: {
+        EN: 'Football stadium with modern facilities',
+        NO: 'Fotballstadion med moderne fasiliteter'
+      },
+      type: {
+        EN: 'Stadium',
+        NO: 'Stadion'
+      },
+      capacity: 8000,
+      area: '10500',
+      pricePerHour: 5000,
+      amenities: ['Seating', 'Locker Rooms', 'Food Vendors', 'VIP Boxes'],
+      images: [
+        {
+          image_url: '/images/facilities/stadium1.jpg',
+          alt_text: 'Marienlyst Stadium'
+        }
+      ],
+      address: {
+        street: 'Marienlyst 2',
+        city: 'Drammen',
+        postalCode: '3046',
+        country: 'Norway'
+      },
+      status: FacilityStatus.ACTIVE,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    }
+  ];
+
+  /**
+   * Get all facilities
+   */
+  async getAllFacilities(): Promise<Facility[]> {
+    // In a real implementation, this would fetch from API
+    return Promise.resolve([...this.mockFacilities]);
+  }
+
+  /**
+   * Get a facility by ID
+   */
+  async getFacilityById(id: string): Promise<Facility | null> {
+    const facility = this.mockFacilities.find(f => f.id === id);
+    return Promise.resolve(facility || null);
+  }
+
+  /**
+   * Create a new facility
+   */
+  async createFacility(facilityData: FacilityDTO): Promise<Facility> {
+    const newFacility: Facility = {
+      id: String(this.mockFacilities.length + 1),
+      ...facilityData,
+      status: facilityData.status || FacilityStatus.PENDING,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    
+    this.mockFacilities.push(newFacility);
+    return Promise.resolve({...newFacility});
+  }
+
+  /**
+   * Update a facility
+   */
+  async updateFacility(id: string, facilityData: Partial<FacilityDTO>): Promise<Facility> {
+    const index = this.mockFacilities.findIndex(f => f.id === id);
+    if (index === -1) {
+      throw new Error('Facility not found');
+    }
+    
+    // Update facility
+    const updatedFacility = {
+      ...this.mockFacilities[index],
+      ...facilityData,
+      updatedAt: new Date()
+    };
+    
+    this.mockFacilities[index] = updatedFacility;
+    return Promise.resolve({...updatedFacility});
+  }
+
+  /**
+   * Delete a facility
+   */
+  async deleteFacility(id: string): Promise<boolean> {
+    const index = this.mockFacilities.findIndex(f => f.id === id);
+    if (index === -1) {
+      throw new Error('Facility not found');
+    }
+    
+    this.mockFacilities.splice(index, 1);
+    return Promise.resolve(true);
+  }
+
+  /**
+   * Get facilities by area
+   */
+  async getFacilitiesByArea(areaId: string): Promise<Facility[]> {
+    // Mock implementation - in a real app, we'd filter by area
+    return Promise.resolve([...this.mockFacilities]);
+  }
+  
+  /**
+   * Update facility status
+   */
+  async updateFacilityStatus(id: string, status: string | FacilityStatus): Promise<Facility> {
+    return this.updateFacility(id, { status });
+  }
+}

@@ -1,6 +1,50 @@
 
 // Database types for the new Norwegian municipal booking system
+// Updated for Prisma compatibility while maintaining SOLID principles
 
+/**
+ * Filter operator enum for building database queries
+ * Used in generic filter builders following SOLID principles
+ */
+export enum FilterOperator {
+  EQ = 'eq',      // Equal
+  NEQ = 'neq',    // Not equal
+  GT = 'gt',      // Greater than
+  GTE = 'gte',    // Greater than or equal
+  LT = 'lt',      // Less than
+  LTE = 'lte',    // Less than or equal
+  IN = 'in',      // In array
+  CONTAINS = 'contains',  // Contains substring/value
+  SEARCH = 'search',      // Full text search
+  MULTILINGUAL = 'multilingual' // Multilingual search across fields
+}
+
+/**
+ * Query options for database operations
+ * Used for filtering, sorting, and pagination
+ */
+export interface QueryOptions {
+  sortBy: any;
+  sortDirection: string;
+  filters?: Record<string, any>;
+  orderBy?: string;
+  orderDirection?: 'asc' | 'desc';
+  limit?: number;
+  offset?: number;
+  select?: string[];
+  includes?: Record<string, boolean | QueryOptions>;
+}
+
+/**
+ * Join options for queries
+ */
+export interface JoinOptions {
+  table: string;
+  on: Record<string, string>;
+  type?: 'inner' | 'left' | 'right' | 'full';
+}
+
+// Legacy database structure (maintaining for compatibility)
 export interface Database {
   public: {
     Tables: {

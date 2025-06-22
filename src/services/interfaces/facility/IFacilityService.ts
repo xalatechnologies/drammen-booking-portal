@@ -1,0 +1,77 @@
+import { IBaseService } from '../base/IBaseService';
+import { Facility } from '@/types/facility';
+import { PaginationParams, PaginatedResponse, SortParams } from '@/types/api';
+
+/**
+ * Service interface for facility management operations
+ * Extends the base service with facility-specific functionality
+ * Follows Interface Segregation Principle by providing focused methods
+ */
+export interface IFacilityService extends IBaseService<Facility> {
+  /**
+   * Get facilities with pagination support
+   * @param pagination Pagination parameters (page, limit)
+   * @param sorting Optional sorting parameters
+   * @param filters Optional filtering parameters
+   */
+  getPaginated(
+    pagination: PaginationParams,
+    sorting?: SortParams,
+    filters?: Record<string, any>
+  ): Promise<PaginatedResponse<Facility>>;
+  
+  /**
+   * Get facilities by type
+   * @param type The facility type to filter by
+   * @param pagination Optional pagination parameters
+   */
+  getFacilitiesByType(
+    type: string,
+    pagination?: PaginationParams
+  ): Promise<Facility[]>;
+  
+  /**
+   * Get facilities by area/district
+   * @param areaId The area ID to filter by
+   * @param pagination Optional pagination parameters
+   */
+  getFacilitiesByArea(
+    areaId: string | number,
+    pagination?: PaginationParams
+  ): Promise<Facility[]>;
+  
+  /**
+   * Get featured facilities
+   * @param limit Optional number of featured facilities to retrieve
+   */
+  getFeaturedFacilities(limit?: number): Promise<Facility[]>;
+  
+  /**
+   * Toggle the active status of a facility
+   * @param id Facility ID
+   * @param isActive New active status
+   */
+  toggleStatus(id: string | number, isActive: boolean): Promise<Facility>;
+  
+  /**
+   * Update facility images
+   * @param id Facility ID
+   * @param imageUrls Array of image URLs
+   */
+  updateImages(id: string | number, imageUrls: string[]): Promise<Facility>;
+  
+  /**
+   * Search facilities by name, description, or other attributes
+   * @param searchTerm The search term
+   * @param pagination Optional pagination parameters
+   */
+  searchFacilities(
+    searchTerm: string,
+    pagination?: PaginationParams
+  ): Promise<PaginatedResponse<Facility>>;
+  
+  /**
+   * Get all facility types
+   */
+  getAllFacilityTypes(): Promise<string[]>;
+}

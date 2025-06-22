@@ -1,0 +1,67 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Facility model with support for multilingual fields and complex relations
+model Facility {
+  id                    String    @id @default(uuid())
+  nameEn                String    // We'll handle the multilingual structure in the repository layer
+  nameNo                String
+  type                  String
+  area                  String?
+  status                String    @default("active")
+  capacity              Int?
+  pricePerHour          Float?    @map("price_per_hour")
+  accessibilityFeatures String[]  @map("accessibility_features")
+  allowedBookingTypes   String[]  @map("allowed_booking_types")
+  amenities             String[]
+  description           Json?     // Multilingual description stored as JSON
+  location              Json?     // Latitude/longitude as JSON
+  openingHours          Json?     // Opening hours as JSON structure
+  timeSlotDuration      Float?    @default(1) @map("time_slot_duration")
+  createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt             DateTime  @updatedAt @map("updated_at")
+  
+  // Relations
+  bookings              Booking[]
+  
+  @@map("facilities") // Maps to the actual table name
+}
+
+// Booking model 
+model Booking {
+  id          String   @id @default(uuid())
+  facilityId  String   @map("facility_id")
+  facility    Facility @relation(fields: [facilityId], references: [id])
+  startTime   DateTime @map("start_time")
+  endTime     DateTime @map("end_time")
+  userId      String   @map("user_id")
+  status      String   @default("pending")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  
+  @@map("bookings")
+}
+
+// User profile model
+model UserProfile {
+  id          String   @id @default(uuid())
+  userId      String   @unique @map("user_id")
+  firstName   String   @map("first_name")
+  lastName    String   @map("last_name")
+  email       String   @unique
+  phoneNumber String?  @map("phone_number")
+  preferences Json?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  
+  @@map("user_profiles")
+}
