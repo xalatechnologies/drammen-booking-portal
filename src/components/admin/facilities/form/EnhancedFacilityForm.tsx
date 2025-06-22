@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -77,6 +78,11 @@ export const EnhancedFacilityForm: React.FC<EnhancedFacilityFormProps> = ({
       is_featured: facility?.is_featured || false,
     }
   });
+
+  // Watch form values to pass to components
+  const watchedEquipment = form.watch("equipment");
+  const watchedAmenities = form.watch("amenities");
+  const watchedCapacity = form.watch("capacity");
 
   const mutation = useMutation({
     mutationFn: async (data: FacilityFormData) => {
