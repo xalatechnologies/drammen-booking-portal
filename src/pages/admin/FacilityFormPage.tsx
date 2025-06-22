@@ -13,7 +13,7 @@ const FacilityFormPage = () => {
 
   const { data: facilityResponse, isLoading } = useQuery({
     queryKey: ['facility', id],
-    queryFn: () => FacilityService.getFacility(id!),
+    queryFn: () => FacilityService.getFacilityById(id!),
     enabled: !!isEditing
   });
 
