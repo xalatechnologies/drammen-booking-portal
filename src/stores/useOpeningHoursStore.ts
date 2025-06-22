@@ -38,7 +38,21 @@ export const useOpeningHoursStore = create<OpeningHoursState>((set, get) => ({
     try {
       const response = await OpeningHoursService.getOpeningHours(facilityId);
       if (response.success && response.data) {
-        set({ openingHours: response.data, isLoading: false });
+        // If no opening hours exist, create default ones
+        if (response.data.length === 0) {
+          const defaultHours: OpeningHour[] = [
+            { facility_id: facilityId, day_of_week: 1, open_time: "07:00", close_time: "23:00", is_open: true },
+            { facility_id: facilityId, day_of_week: 2, open_time: "07:00", close_time: "23:00", is_open: true },
+            { facility_id: facilityId, day_of_week: 3, open_time: "07:00", close_time: "23:00", is_open: true },
+            { facility_id: facilityId, day_of_week: 4, open_time: "07:00", close_time: "23:00", is_open: true },
+            { facility_id: facilityId, day_of_week: 5, open_time: "07:00", close_time: "23:00", is_open: true },
+            { facility_id: facilityId, day_of_week: 6, open_time: "07:00", close_time: "23:00", is_open: true },
+            { facility_id: facilityId, day_of_week: 0, open_time: "07:00", close_time: "23:00", is_open: false },
+          ];
+          set({ openingHours: defaultHours, isLoading: false });
+        } else {
+          set({ openingHours: response.data, isLoading: false });
+        }
       } else {
         set({ error: response.error?.message || 'Failed to fetch opening hours', isLoading: false });
       }
