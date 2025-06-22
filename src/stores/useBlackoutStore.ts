@@ -25,6 +25,17 @@ interface BlackoutState {
   reset: () => void;
 }
 
+// Helper function to safely convert dates to ISO strings
+const safeToISOString = (value: any): string => {
+  if (value instanceof Date) {
+    return value.toISOString();
+  }
+  if (typeof value === 'string') {
+    return value;
+  }
+  return String(value || '');
+};
+
 export const useBlackoutStore = create<BlackoutState>((set, get) => ({
   blackoutPeriods: [],
   isLoading: false,
@@ -59,7 +70,7 @@ export const useBlackoutStore = create<BlackoutState>((set, get) => ({
           start_date: typeof period.start_date === 'string' ? new Date(period.start_date) : period.start_date,
           end_date: typeof period.end_date === 'string' ? new Date(period.end_date) : period.end_date,
           created_by: period.created_by,
-          created_at: typeof period.created_at === 'string' ? period.created_at : (period.created_at && typeof period.created_at === 'object' && 'toISOString' in period.created_at ? period.created_at.toISOString() : String(period.created_at))
+          created_at: safeToISOString(period.created_at)
         }));
         set({ blackoutPeriods: periods, isLoading: false });
       } else {
@@ -98,7 +109,7 @@ export const useBlackoutStore = create<BlackoutState>((set, get) => ({
           start_date: typeof response.data.start_date === 'string' ? new Date(response.data.start_date) : response.data.start_date,
           end_date: typeof response.data.end_date === 'string' ? new Date(response.data.end_date) : response.data.end_date,
           created_by: response.data.created_by,
-          created_at: typeof response.data.created_at === 'string' ? response.data.created_at : (response.data.created_at && typeof response.data.created_at === 'object' && 'toISOString' in response.data.created_at ? response.data.created_at.toISOString() : String(response.data.created_at))
+          created_at: safeToISOString(response.data.created_at)
         };
         
         get().addBlackoutPeriod(period);
@@ -127,7 +138,7 @@ export const useBlackoutStore = create<BlackoutState>((set, get) => ({
           start_date: typeof response.data.start_date === 'string' ? new Date(response.data.start_date) : response.data.start_date,
           end_date: typeof response.data.end_date === 'string' ? new Date(response.data.end_date) : response.data.end_date,
           created_by: response.data.created_by,
-          created_at: typeof response.data.created_at === 'string' ? response.data.created_at : (response.data.created_at && typeof response.data.created_at === 'object' && 'toISOString' in response.data.created_at ? response.data.created_at.toISOString() : String(response.data.created_at))
+          created_at: safeToISOString(response.data.created_at)
         };
         
         const periods = get().blackoutPeriods;
