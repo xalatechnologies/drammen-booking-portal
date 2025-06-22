@@ -29,7 +29,7 @@ export const ZoneManagementView: React.FC<ZoneManagementViewProps> = ({
 
   const { data: zonesResponse, isLoading } = useQuery({
     queryKey: ['facility-zones', editingFacilityId],
-    queryFn: () => editingFacilityId ? FacilityService.getZonesByFacilityId(editingFacilityId) : null,
+    queryFn: () => editingFacilityId ? ZoneService.getZonesByFacilityId(editingFacilityId) : null,
     enabled: !!editingFacilityId,
   });
 

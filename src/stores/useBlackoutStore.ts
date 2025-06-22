@@ -18,7 +18,6 @@ interface BlackoutState {
   
   // Async actions
   fetchBlackoutPeriods: (facilityId: number) => Promise<void>;
-  saveBlackoutPeriods: (facilityId: number) => Promise<boolean>;
   createBlackoutPeriod: (periodData: Partial<FacilityBlackoutPeriod>) => Promise<FacilityBlackoutPeriod | null>;
   updateBlackoutPeriodAsync: (id: string, periodData: Partial<FacilityBlackoutPeriod>) => Promise<FacilityBlackoutPeriod | null>;
   deleteBlackoutPeriod: (id: string) => Promise<boolean>;
@@ -59,7 +58,7 @@ export const useBlackoutStore = create<BlackoutState>((set, get) => ({
           start_date: typeof period.start_date === 'string' ? new Date(period.start_date) : period.start_date,
           end_date: typeof period.end_date === 'string' ? new Date(period.end_date) : period.end_date,
           created_by: period.created_by,
-          created_at: typeof period.created_at === 'string' ? period.created_at : period.created_at.toISOString()
+          created_at: typeof period.created_at === 'string' ? period.created_at : (period.created_at instanceof Date ? period.created_at.toISOString() : String(period.created_at))
         }));
         set({ blackoutPeriods: periods, isLoading: false });
       } else {
@@ -67,46 +66,6 @@ export const useBlackoutStore = create<BlackoutState>((set, get) => ({
       }
     } catch (error: any) {
       set({ error: error.message, isLoading: false });
-    }
-  },
-
-  saveBlackoutPeriods: async (facilityId) => {
-    set({ isLoading: true, error: null });
-    try {
-      const periods = get().blackoutPeriods;
-      
-      // Save each period individually
-      const savePromises = periods.map(async (period) => {
-        if (period.id) {
-          // Update existing period
-          return await FacilityBlackoutService.updateBlackout(period.id, {
-            facility_id: facilityId,
-            type: period.type,
-            reason: period.reason,
-            start_date: period.start_date,
-            end_date: period.end_date
-          });
-        } else {
-          // Create new period
-          return await FacilityBlackoutService.createBlackout({
-            facility_id: facilityId,
-            type: period.type,
-            reason: period.reason,
-            start_date: period.start_date,
-            end_date: period.end_date,
-            created_by: 'system' // TODO: Get from auth context
-          });
-        }
-      });
-
-      const results = await Promise.all(savePromises);
-      const allSuccessful = results.every(result => result.data !== null);
-      
-      set({ isLoading: false });
-      return allSuccessful;
-    } catch (error: any) {
-      set({ error: error.message, isLoading: false });
-      return false;
     }
   },
 
@@ -131,7 +90,7 @@ export const useBlackoutStore = create<BlackoutState>((set, get) => ({
           start_date: typeof response.data.start_date === 'string' ? new Date(response.data.start_date) : response.data.start_date,
           end_date: typeof response.data.end_date === 'string' ? new Date(response.data.end_date) : response.data.end_date,
           created_by: response.data.created_by,
-          created_at: typeof response.data.created_at === 'string' ? response.data.created_at : response.data.created_at.toISOString()
+          created_at: typeof response.data.created_at === 'string' ? response.data.created_at : (response.data.created_at instanceof Date ? response.data.created_at.toISOString() : String(response.data.created_at))
         };
         
         get().addBlackoutPeriod(period);
@@ -160,7 +119,7 @@ export const useBlackoutStore = create<BlackoutState>((set, get) => ({
           start_date: typeof response.data.start_date === 'string' ? new Date(response.data.start_date) : response.data.start_date,
           end_date: typeof response.data.end_date === 'string' ? new Date(response.data.end_date) : response.data.end_date,
           created_by: response.data.created_by,
-          created_at: typeof response.data.created_at === 'string' ? response.data.created_at : response.data.created_at.toISOString()
+          created_at: typeof response.data.created_at === 'string' ? response.data.created_at : (response.data.created_at instanceof Date ? response.data.created_at.toISOString() : String(response.data.created_at))
         };
         
         const periods = get().blackoutPeriods;
