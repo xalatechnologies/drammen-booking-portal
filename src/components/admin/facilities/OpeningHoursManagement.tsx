@@ -30,12 +30,12 @@ export const OpeningHoursManagement: React.FC<OpeningHoursManagementProps> = ({
 
   const { data: openingHoursResponse, isLoading } = useQuery({
     queryKey: ['facility-opening-hours', editingFacilityId],
-    queryFn: () => editingFacilityId ? OpeningHoursService.getFacilityOpeningHours(editingFacilityId) : null,
+    queryFn: () => editingFacilityId ? OpeningHoursService.getOpeningHours(editingFacilityId) : null,
     enabled: !!editingFacilityId,
   });
 
   const updateMutation = useMutation({
-    mutationFn: (data: any) => OpeningHoursService.updateOpeningHours(data),
+    mutationFn: (data: any) => OpeningHoursService.saveOpeningHours(data.facility_id, data.opening_hours),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['facility-opening-hours'] });
       toast({

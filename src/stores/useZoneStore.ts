@@ -1,7 +1,6 @@
-
 import { create } from 'zustand';
 import { Zone } from '@/types/facility';
-import { ZoneService } from '@/services/ZoneService';
+import { ZoneService } from '@/services/zoneService';
 
 interface ZoneState {
   zones: Zone[];

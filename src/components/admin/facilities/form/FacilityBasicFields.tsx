@@ -1,4 +1,3 @@
-
 import React from "react";
 import { UseFormRegister, UseFormSetValue, UseFormWatch, FieldErrors } from "react-hook-form";
 import { Input } from "@/components/ui/input";
@@ -6,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { FacilityFormData } from "./types";
+import { FacilityFormData } from "./FacilityFormSchema";
 
 interface FacilityBasicFieldsProps {
   register: UseFormRegister<FacilityFormData>;
@@ -71,7 +70,7 @@ export const FacilityBasicFields: React.FC<FacilityBasicFieldsProps> = ({
 
       <div className="space-y-3">
         <Label htmlFor="status" className="text-base font-medium">Status</Label>
-        <Select onValueChange={(value) => setValue("status", value)} defaultValue={watch("status")}>
+        <Select onValueChange={(value) => setValue("status", value as "active" | "maintenance" | "inactive")} defaultValue={watch("status")}>
           <SelectTrigger className="h-12 text-base">
             <SelectValue />
           </SelectTrigger>
