@@ -1,4 +1,3 @@
-
 import React, { useState, forwardRef, useImperativeHandle } from "react";
 import { UseFormReturn } from "react-hook-form";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
@@ -24,9 +23,9 @@ import {
   Goal,
   Volleyball,
   Speaker,
-  Wheelchair,
+  UserCheck,
   Eye,
-  Elevator,
+  ArrowUp,
   Bath,
   Shield,
   Lock,
@@ -69,8 +68,8 @@ const AMENITY_OPTIONS = [
 ];
 
 const ACCESSIBILITY_OPTIONS = [
-  { value: 'wheelchair', label: 'Wheelchair Access', icon: <Wheelchair className="w-4 h-4" /> },
-  { value: 'elevator', label: 'Elevator Access', icon: <Elevator className="w-4 h-4" /> },
+  { value: 'wheelchair', label: 'Wheelchair Access', icon: <UserCheck className="w-4 h-4" /> },
+  { value: 'elevator', label: 'Elevator Access', icon: <ArrowUp className="w-4 h-4" /> },
   { value: 'visual_aids', label: 'Visual Aids', icon: <Eye className="w-4 h-4" /> },
   { value: 'accessible_parking', label: 'Accessible Parking', icon: <Car className="w-4 h-4" /> },
   { value: 'accessible_restrooms', label: 'Accessible Restrooms', icon: <Bath className="w-4 h-4" /> }
@@ -329,7 +328,7 @@ export const FacilityFeaturesSection = forwardRef<FacilityFeaturesSectionRef, Fa
           <AccordionItem value="accessibility" className="border rounded-lg">
             <AccordionTrigger className="px-4 hover:no-underline">
               <div className="flex items-center gap-2">
-                <Wheelchair className="w-4 h-4" />
+                <UserCheck className="w-4 h-4" />
                 <span className="font-medium">Accessibility Features</span>
                 <Badge variant="outline" className="ml-auto mr-8">
                   {selectedAccessibility.length} selected
