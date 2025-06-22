@@ -133,6 +133,7 @@ export const FacilityFormTabs: React.FC<FacilityFormTabsProps> = ({
           <FacilityBlackoutSection 
             ref={blackoutRef}
             facilityId={facilityId}
+            form={form}
           />
         </TabsContent>
       </Tabs>
