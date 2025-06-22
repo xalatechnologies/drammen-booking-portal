@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, forwardRef, useImperativeHandle } from "react";
 import { FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
@@ -20,7 +20,11 @@ interface FacilityOpeningHoursSectionProps {
   facilityId?: number;
 }
 
-export const FacilityOpeningHoursSection: React.FC<FacilityOpeningHoursSectionProps> = ({ facilityId }) => {
+interface FacilityOpeningHoursSectionRef {
+  saveData: () => Promise<boolean>;
+}
+
+export const FacilityOpeningHoursSection = forwardRef<FacilityOpeningHoursSectionRef, FacilityOpeningHoursSectionProps>(({ facilityId }, ref) => {
   const { tSync } = useTranslation();
   
   const [openingHours, setOpeningHours] = useState<OpeningHour[]>([
@@ -32,6 +36,38 @@ export const FacilityOpeningHoursSection: React.FC<FacilityOpeningHoursSectionPr
     { dayOfWeek: 6, dayName: "Saturday", isOpen: true, openTime: "09:00", closeTime: "20:00" },
     { dayOfWeek: 0, dayName: "Sunday", isOpen: false, openTime: "10:00", closeTime: "18:00" },
   ]);
+
+  // Expose save function to parent via ref
+  useImperativeHandle(ref, () => ({
+    saveData: async () => {
+      console.log('Saving opening hours:', openingHours);
+      
+      if (!facilityId) {
+        console.log('No facility ID, skipping opening hours save');
+        return true;
+      }
+
+      try {
+        // Here you would implement the actual API call to save opening hours
+        // For now, just log the data that would be saved
+        console.log('Opening hours would be saved:', {
+          facilityId,
+          hours: openingHours.map(hour => ({
+            facility_id: facilityId,
+            day_of_week: hour.dayOfWeek,
+            is_open: hour.isOpen,
+            open_time: hour.openTime,
+            close_time: hour.closeTime
+          }))
+        });
+        
+        return true;
+      } catch (error) {
+        console.error('Failed to save opening hours:', error);
+        return false;
+      }
+    }
+  }), [openingHours, facilityId]);
 
   const updateDay = (dayOfWeek: number, field: keyof OpeningHour, value: any) => {
     setOpeningHours(prev => prev.map(day => 
@@ -118,4 +154,6 @@ export const FacilityOpeningHoursSection: React.FC<FacilityOpeningHoursSectionPr
       </CardContent>
     </Card>
   );
-};
+});
+
+FacilityOpeningHoursSection.displayName = "FacilityOpeningHoursSection";

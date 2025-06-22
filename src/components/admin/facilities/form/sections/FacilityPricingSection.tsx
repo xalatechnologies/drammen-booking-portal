@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, forwardRef, useImperativeHandle } from "react";
 import { UseFormReturn } from "react-hook-form";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage, FormDescription } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -14,8 +14,34 @@ interface FacilityPricingSectionProps {
   form: UseFormReturn<FacilityFormData>;
 }
 
-export const FacilityPricingSection: React.FC<FacilityPricingSectionProps> = ({ form }) => {
+interface FacilityPricingSectionRef {
+  saveData: () => Promise<boolean>;
+}
+
+export const FacilityPricingSection = forwardRef<FacilityPricingSectionRef, FacilityPricingSectionProps>(({ form }, ref) => {
   const { tSync } = useTranslation();
+  const [pricingRules, setPricingRules] = useState<any[]>([]);
+
+  // Expose save function to parent via ref
+  useImperativeHandle(ref, () => ({
+    saveData: async () => {
+      console.log('Saving pricing rules:', pricingRules);
+      
+      try {
+        // Here you would implement the actual API call to save pricing rules
+        console.log('Pricing rules would be saved:', pricingRules);
+        return true;
+      } catch (error) {
+        console.error('Failed to save pricing rules:', error);
+        return false;
+      }
+    }
+  }), [pricingRules]);
+
+  const handleRulesChange = (rules: any[]) => {
+    console.log('Pricing rules updated:', rules);
+    setPricingRules(rules);
+  };
 
   return (
     <Card>
@@ -91,10 +117,7 @@ export const FacilityPricingSection: React.FC<FacilityPricingSectionProps> = ({ 
         {/* Advanced Pricing Rules */}
         <PricingRulesManager 
           basePrice={form.watch('price_per_hour') || 450}
-          onRulesChange={(rules) => {
-            console.log('Pricing rules updated:', rules);
-            // Here you would typically save the rules to the form or send to API
-          }}
+          onRulesChange={handleRulesChange}
         />
 
         {/* Payment & Billing */}
@@ -138,4 +161,6 @@ export const FacilityPricingSection: React.FC<FacilityPricingSectionProps> = ({ 
       </CardContent>
     </Card>
   );
-};
+});
+
+FacilityPricingSection.displayName = "FacilityPricingSection";

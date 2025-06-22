@@ -1,5 +1,4 @@
-
-import React from "react";
+import React, { useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -34,6 +33,11 @@ interface EnhancedFacilityFormProps {
   onCancel: () => void;
 }
 
+// Define ref interfaces for each section that needs to save data
+interface SectionSaveRef {
+  saveData: () => Promise<boolean>;
+}
+
 export const EnhancedFacilityForm: React.FC<EnhancedFacilityFormProps> = ({
   facility,
   onSuccess,
@@ -43,6 +47,12 @@ export const EnhancedFacilityForm: React.FC<EnhancedFacilityFormProps> = ({
   const isEditing = !!facility;
   const { tSync } = useTranslation();
   const { currentRole, hasPermission, canAccessTab, getAvailableTabs } = useRoleBasedAccess();
+
+  // Create refs for sections that need to save their own data
+  const openingHoursRef = useRef<SectionSaveRef>(null);
+  const zonesRef = useRef<SectionSaveRef>(null);
+  const blackoutsRef = useRef<SectionSaveRef>(null);
+  const pricingRulesRef = useRef<SectionSaveRef>(null);
 
   const form = useForm<FacilityFormData>({
     resolver: zodResolver(facilityFormSchema),
@@ -79,18 +89,63 @@ export const EnhancedFacilityForm: React.FC<EnhancedFacilityFormProps> = ({
     }
   });
 
-  // Watch form values to pass to components - these are needed for real-time updates
+  // Watch form values to pass to components
   const watchedEquipment = form.watch("equipment");
   const watchedAmenities = form.watch("amenities");
   const watchedCapacity = form.watch("capacity");
 
   const mutation = useMutation({
     mutationFn: async (data: FacilityFormData) => {
+      console.log('Starting facility save process...');
+      
+      // First save the main facility data
+      let facilityResult;
       if (isEditing) {
-        return FacilityService.updateFacility(facility.id.toString(), data);
+        facilityResult = await FacilityService.updateFacility(facility.id.toString(), data);
       } else {
-        return FacilityService.createFacility(data);
+        facilityResult = await FacilityService.createFacility(data);
       }
+
+      if (!facilityResult.success) {
+        throw new Error(facilityResult.error?.message || 'Failed to save facility');
+      }
+
+      const facilityId = facilityResult.data.id;
+      console.log('Facility saved successfully:', facilityId);
+
+      // Now save data from other sections if they exist and facility is saved
+      const savePromises = [];
+
+      if (openingHoursRef.current) {
+        console.log('Saving opening hours...');
+        savePromises.push(openingHoursRef.current.saveData());
+      }
+
+      if (zonesRef.current) {
+        console.log('Saving zones...');
+        savePromises.push(zonesRef.current.saveData());
+      }
+
+      if (blackoutsRef.current) {
+        console.log('Saving blackouts...');
+        savePromises.push(blackoutsRef.current.saveData());
+      }
+
+      if (pricingRulesRef.current) {
+        console.log('Saving pricing rules...');
+        savePromises.push(pricingRulesRef.current.saveData());
+      }
+
+      // Wait for all section saves to complete
+      if (savePromises.length > 0) {
+        const results = await Promise.all(savePromises);
+        const failed = results.some(result => !result);
+        if (failed) {
+          console.warn('Some sections failed to save, but facility was saved successfully');
+        }
+      }
+
+      return facilityResult;
     },
     onSuccess: (response) => {
       if (response.success) {
@@ -109,6 +164,7 @@ export const EnhancedFacilityForm: React.FC<EnhancedFacilityFormProps> = ({
       }
     },
     onError: (error: any) => {
+      console.error('Facility save error:', error);
       toast({
         title: tSync("admin.common.error", "Error"),
         description: error.message || `${tSync("admin.common.failedTo", "Failed to")} ${isEditing ? tSync("admin.common.update", "update") : tSync("admin.common.create", "create")} ${tSync("admin.facilities.form.facility", "facility")}`,
@@ -185,6 +241,7 @@ export const EnhancedFacilityForm: React.FC<EnhancedFacilityFormProps> = ({
             <Tabs defaultValue={availableTabs[0]} className="w-full">
               <div className="border-b border-gray-100 px-6 pt-6 pb-2">
                 <TabsList className="grid w-full" style={{ gridTemplateColumns: `repeat(${availableTabs.length}, 1fr)` }}>
+                  {/* ... keep existing code (tabs list) */}
                   {availableTabs.includes('basic') && (
                     <TabsTrigger value="basic" className="text-sm">
                       {tSync("admin.facilities.form.tabs.basic", "Basic")}
@@ -262,19 +319,19 @@ export const EnhancedFacilityForm: React.FC<EnhancedFacilityFormProps> = ({
                     </TabsContent>
 
                     <TabsContent value="pricing" className="mt-0 space-y-6">
-                      <FacilityPricingSection form={form} />
+                      <FacilityPricingSection form={form} ref={pricingRulesRef} />
                     </TabsContent>
 
                     <TabsContent value="zones" className="mt-0 space-y-6">
-                      <FacilityZonesSection form={form} facilityId={facility?.id} />
+                      <FacilityZonesSection form={form} facilityId={facility?.id} ref={zonesRef} />
                     </TabsContent>
 
                     <TabsContent value="schedule" className="mt-0 space-y-6">
-                      <FacilityOpeningHoursSection facilityId={facility?.id} />
+                      <FacilityOpeningHoursSection facilityId={facility?.id} ref={openingHoursRef} />
                     </TabsContent>
 
                     <TabsContent value="blackouts" className="mt-0 space-y-6">
-                      <FacilityBlackoutSection form={form} facilityId={facility?.id} />
+                      <FacilityBlackoutSection form={form} facilityId={facility?.id} ref={blackoutsRef} />
                     </TabsContent>
 
                     <TabsContent value="images" className="mt-0">
@@ -288,6 +345,7 @@ export const EnhancedFacilityForm: React.FC<EnhancedFacilityFormProps> = ({
                     </TabsContent>
 
                     <TabsContent value="analytics" className="mt-0">
+                      {/* ... keep existing code (analytics tab content) */}
                       {isEditing ? (
                         <Card>
                           <CardContent className="p-6">

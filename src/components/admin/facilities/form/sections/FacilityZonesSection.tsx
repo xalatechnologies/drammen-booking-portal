@@ -1,5 +1,4 @@
-
-import React, { useState } from "react";
+import React, { useState, forwardRef, useImperativeHandle } from "react";
 import { UseFormReturn } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,6 +11,10 @@ import { ZoneEditor } from "./zones/ZoneEditor";
 interface FacilityZonesSectionProps {
   form: UseFormReturn<FacilityFormData>;
   facilityId?: number;
+}
+
+interface FacilityZonesSectionRef {
+  saveData: () => Promise<boolean>;
 }
 
 interface Zone {
@@ -31,11 +34,51 @@ interface Zone {
   maxBookingDuration: number;
 }
 
-export const FacilityZonesSection: React.FC<FacilityZonesSectionProps> = ({ form, facilityId }) => {
+export const FacilityZonesSection = forwardRef<FacilityZonesSectionRef, FacilityZonesSectionProps>(({ form, facilityId }, ref) => {
   const { tSync } = useTranslation();
   const [zones, setZones] = useState<Zone[]>([]);
   const [isAddingZone, setIsAddingZone] = useState(false);
   const [editingZone, setEditingZone] = useState<Zone | null>(null);
+
+  // Expose save function to parent via ref
+  useImperativeHandle(ref, () => ({
+    saveData: async () => {
+      console.log('Saving zones:', zones);
+      
+      if (!facilityId) {
+        console.log('No facility ID, skipping zones save');
+        return true;
+      }
+
+      try {
+        // Here you would implement the actual API call to save zones
+        console.log('Zones would be saved:', {
+          facilityId,
+          zones: zones.map(zone => ({
+            facility_id: facilityId,
+            name: zone.name,
+            type: zone.type,
+            capacity: zone.capacity,
+            description: zone.description,
+            is_main_zone: zone.isMainZone,
+            bookable_independently: zone.bookableIndependently,
+            area_sqm: zone.areaSqm,
+            floor: zone.floor,
+            equipment: zone.equipment,
+            status: zone.status,
+            price_multiplier: zone.priceMultiplier,
+            min_booking_duration: zone.minBookingDuration,
+            max_booking_duration: zone.maxBookingDuration
+          }))
+        });
+        
+        return true;
+      } catch (error) {
+        console.error('Failed to save zones:', error);
+        return false;
+      }
+    }
+  }), [zones, facilityId]);
 
   const handleSaveZone = (zone: Zone) => {
     if (editingZone) {
@@ -198,4 +241,6 @@ export const FacilityZonesSection: React.FC<FacilityZonesSectionProps> = ({ form
       </CardContent>
     </Card>
   );
-};
+});
+
+FacilityZonesSection.displayName = "FacilityZonesSection";

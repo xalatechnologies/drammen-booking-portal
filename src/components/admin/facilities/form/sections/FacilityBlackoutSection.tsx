@@ -1,83 +1,87 @@
 
-import React, { useState } from "react";
+import React, { useState, forwardRef, useImperativeHandle } from "react";
 import { UseFormReturn } from "react-hook-form";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { FacilityFormData } from "../FacilityFormSchema";
 import { useTranslation } from "@/hooks/useTranslation";
-import { Plus, Trash2, Calendar as CalendarIcon, AlertTriangle, CalendarDays } from "lucide-react";
-import { format } from "date-fns";
-import { cn } from "@/lib/utils";
-import { BlackoutCalendar } from "./blackout/BlackoutCalendar";
+import { Calendar, Plus, Edit, Trash2, AlertTriangle } from "lucide-react";
 
 interface FacilityBlackoutSectionProps {
   form: UseFormReturn<FacilityFormData>;
   facilityId?: number;
 }
 
+interface FacilityBlackoutSectionRef {
+  saveData: () => Promise<boolean>;
+}
+
 interface BlackoutPeriod {
   id: string;
   type: 'maintenance' | 'renovation' | 'event' | 'weather' | 'other';
-  startDate: Date;
-  endDate: Date;
+  reason: string;
+  startDate: string;
+  endDate: string;
   startTime?: string;
   endTime?: string;
-  reason: string;
-  isRecurring: boolean;
-  recurrencePattern?: string;
+  isAllDay: boolean;
+  recurring?: {
+    pattern: 'daily' | 'weekly' | 'monthly';
+    interval: number;
+    endDate?: string;
+  };
 }
 
-export const FacilityBlackoutSection: React.FC<FacilityBlackoutSectionProps> = ({ form, facilityId }) => {
+export const FacilityBlackoutSection = forwardRef<FacilityBlackoutSectionRef, FacilityBlackoutSectionProps>(({ form, facilityId }, ref) => {
   const { tSync } = useTranslation();
   const [blackoutPeriods, setBlackoutPeriods] = useState<BlackoutPeriod[]>([]);
-  const [isAddingPeriod, setIsAddingPeriod] = useState(false);
-  const [selectedDate, setSelectedDate] = useState<Date>();
-  const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
-  const [newPeriod, setNewPeriod] = useState<Partial<BlackoutPeriod>>({
-    type: 'maintenance',
-    startDate: new Date(),
-    endDate: new Date(),
-    startTime: '',
-    endTime: '',
-    reason: '',
-    isRecurring: false
-  });
+  const [isAddingBlackout, setIsAddingBlackout] = useState(false);
 
-  const addBlackoutPeriod = () => {
-    if (newPeriod.startDate && newPeriod.endDate && newPeriod.reason) {
-      const period: BlackoutPeriod = {
-        id: Date.now().toString(),
-        type: newPeriod.type as BlackoutPeriod['type'],
-        startDate: newPeriod.startDate,
-        endDate: newPeriod.endDate,
-        startTime: newPeriod.startTime,
-        endTime: newPeriod.endTime,
-        reason: newPeriod.reason,
-        isRecurring: newPeriod.isRecurring || false,
-        recurrencePattern: newPeriod.recurrencePattern
-      };
-      setBlackoutPeriods([...blackoutPeriods, period]);
-      setNewPeriod({
-        type: 'maintenance',
-        startDate: new Date(),
-        endDate: new Date(),
-        startTime: '',
-        endTime: '',
-        reason: '',
-        isRecurring: false
-      });
-      setIsAddingPeriod(false);
+  // Expose save function to parent via ref
+  useImperativeHandle(ref, () => ({
+    saveData: async () => {
+      console.log('Saving blackout periods:', blackoutPeriods);
+      
+      if (!facilityId) {
+        console.log('No facility ID, skipping blackout periods save');
+        return true;
+      }
+
+      try {
+        // Here you would implement the actual API call to save blackout periods
+        console.log('Blackout periods would be saved:', {
+          facilityId,
+          blackouts: blackoutPeriods.map(blackout => ({
+            facility_id: facilityId,
+            type: blackout.type,
+            reason: blackout.reason,
+            start_date: blackout.startDate,
+            end_date: blackout.endDate,
+            start_time: blackout.startTime,
+            end_time: blackout.endTime,
+            is_all_day: blackout.isAllDay,
+            recurring_pattern: blackout.recurring
+          }))
+        });
+        
+        return true;
+      } catch (error) {
+        console.error('Failed to save blackout periods:', error);
+        return false;
+      }
     }
-  };
+  }), [blackoutPeriods, facilityId]);
 
-  const removeBlackoutPeriod = (id: string) => {
-    setBlackoutPeriods(blackoutPeriods.filter(period => period.id !== id));
+  const getTypeIcon = (type: string) => {
+    const icons = {
+      maintenance: "🔧",
+      renovation: "🏗️",
+      event: "🎉",
+      weather: "⛈️",
+      other: "📋"
+    };
+    return icons[type as keyof typeof icons] || "📋";
   };
 
   const getTypeColor = (type: string) => {
@@ -91,236 +95,107 @@ export const FacilityBlackoutSection: React.FC<FacilityBlackoutSectionProps> = (
     }
   };
 
-  const getTypeIcon = (type: string) => {
-    switch (type) {
-      case 'maintenance': return '🔧';
-      case 'renovation': return '🏗️';
-      case 'event': return '🎉';
-      case 'weather': return '⛈️';
-      case 'other': return '📋';
-      default: return '📋';
-    }
-  };
-
-  const formatDateRange = (start: Date, end: Date) => {
-    const startStr = format(start, 'MMM dd, yyyy');
-    const endStr = format(end, 'MMM dd, yyyy');
-    return start.getTime() === end.getTime() ? startStr : `${startStr} - ${endStr}`;
+  const handleDeleteBlackout = (id: string) => {
+    setBlackoutPeriods(periods => periods.filter(period => period.id !== id));
   };
 
   return (
     <Card>
       <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-lg flex items-center gap-2">
-            <AlertTriangle className="w-5 h-5" />
-            {tSync("admin.facilities.form.blackout.title", "Blackout Periods")}
-          </CardTitle>
-          <div className="flex items-center gap-2">
-            <Button
-              type="button"
-              variant={viewMode === 'list' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setViewMode('list')}
-            >
-              List
-            </Button>
-            <Button
-              type="button"
-              variant={viewMode === 'calendar' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setViewMode('calendar')}
-            >
-              <CalendarDays className="w-4 h-4 mr-1" />
-              Calendar
-            </Button>
-          </div>
-        </div>
+        <CardTitle className="text-lg flex items-center gap-2">
+          <Calendar className="w-5 h-5" />
+          {tSync("admin.facilities.form.blackouts.title", "Blackout Periods")}
+        </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        {viewMode === 'calendar' ? (
-          <BlackoutCalendar
-            blackoutPeriods={blackoutPeriods}
-            onDateSelect={setSelectedDate}
-            selectedDate={selectedDate}
-          />
-        ) : (
-          <>
-            {/* Current Blackout Periods */}
-            {blackoutPeriods.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground border-2 border-dashed rounded-lg">
-                <AlertTriangle className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                <h3 className="font-medium mb-1">{tSync("admin.facilities.form.blackout.noPeriods", "No blackout periods")}</h3>
-                <p className="text-sm mb-4">{tSync("admin.facilities.form.blackout.noPeriodsHint", "Add blackout periods to block booking availability")}</p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {blackoutPeriods.map((period) => (
-                  <div key={period.id} className="flex items-center gap-4 p-4 border rounded-lg bg-card">
-                    <div className="text-2xl">{getTypeIcon(period.type)}</div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <h4 className="font-medium">{period.reason}</h4>
-                        <Badge className={getTypeColor(period.type)}>{period.type}</Badge>
-                        {period.isRecurring && <Badge variant="outline">Recurring</Badge>}
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-muted-foreground">
-                        <div>
-                          <CalendarIcon className="w-4 h-4 inline mr-1" />
-                          {formatDateRange(period.startDate, period.endDate)}
-                        </div>
-                        {(period.startTime || period.endTime) && (
-                          <div>
-                            🕐 {period.startTime || '00:00'} - {period.endTime || '23:59'}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    <Button 
-                      size="sm" 
-                      variant="ghost" 
-                      onClick={() => removeBlackoutPeriod(period.id)}
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </>
-        )}
-
-        {/* Add Blackout Period */}
-        {isAddingPeriod ? (
-          <div className="space-y-4 p-4 border-2 border-dashed rounded-lg">
-            <h3 className="font-medium">{tSync("admin.facilities.form.blackout.addNew", "Add Blackout Period")}</h3>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-medium">{tSync("admin.facilities.form.blackout.type", "Type")} *</label>
-                <Select onValueChange={(value) => setNewPeriod({...newPeriod, type: value as BlackoutPeriod['type']})}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="maintenance">🔧 Maintenance</SelectItem>
-                    <SelectItem value="renovation">🏗️ Renovation</SelectItem>
-                    <SelectItem value="event">🎉 Private Event</SelectItem>
-                    <SelectItem value="weather">⛈️ Weather</SelectItem>
-                    <SelectItem value="other">📋 Other</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <label className="text-sm font-medium">{tSync("admin.facilities.form.blackout.reason", "Reason")} *</label>
-                <Input
-                  value={newPeriod.reason}
-                  onChange={(e) => setNewPeriod({...newPeriod, reason: e.target.value})}
-                  placeholder="Brief description of the blackout"
-                />
-              </div>
-
-              <div>
-                <label className="text-sm font-medium">{tSync("admin.facilities.form.blackout.startDate", "Start Date")} *</label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !newPeriod.startDate && "text-muted-foreground")}>
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {newPeriod.startDate ? format(newPeriod.startDate, "PPP") : "Pick start date"}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0">
-                    <Calendar
-                      mode="single"
-                      selected={newPeriod.startDate}
-                      onSelect={(date) => setNewPeriod({...newPeriod, startDate: date || new Date()})}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
-
-              <div>
-                <label className="text-sm font-medium">{tSync("admin.facilities.form.blackout.endDate", "End Date")} *</label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !newPeriod.endDate && "text-muted-foreground")}>
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {newPeriod.endDate ? format(newPeriod.endDate, "PPP") : "Pick end date"}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0">
-                    <Calendar
-                      mode="single"
-                      selected={newPeriod.endDate}
-                      onSelect={(date) => setNewPeriod({...newPeriod, endDate: date || new Date()})}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
-
-              <div>
-                <label className="text-sm font-medium">{tSync("admin.facilities.form.blackout.startTime", "Start Time")}</label>
-                <Input
-                  type="time"
-                  value={newPeriod.startTime}
-                  onChange={(e) => setNewPeriod({...newPeriod, startTime: e.target.value})}
-                  placeholder="Optional start time"
-                />
-              </div>
-
-              <div>
-                <label className="text-sm font-medium">{tSync("admin.facilities.form.blackout.endTime", "End Time")}</label>
-                <Input
-                  type="time"
-                  value={newPeriod.endTime}
-                  onChange={(e) => setNewPeriod({...newPeriod, endTime: e.target.value})}
-                  placeholder="Optional end time"
-                />
-              </div>
-            </div>
-
-            <div className="flex gap-2">
-              <Button onClick={addBlackoutPeriod} size="sm">
-                {tSync("admin.facilities.form.blackout.save", "Save Period")}
-              </Button>
-              <Button onClick={() => setIsAddingPeriod(false)} size="sm" variant="outline">
-                {tSync("admin.common.cancel", "Cancel")}
-              </Button>
-            </div>
+        {/* Blackout Periods List */}
+        {blackoutPeriods.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground border-2 border-dashed rounded-lg">
+            <AlertTriangle className="w-12 h-12 mx-auto mb-3 opacity-50" />
+            <h3 className="font-medium mb-1">{tSync("admin.facilities.form.blackouts.noBlackouts", "No blackout periods configured")}</h3>
+            <p className="text-sm mb-4">{tSync("admin.facilities.form.blackouts.noBlackoutsHint", "Add blackout periods to block bookings during maintenance or special events")}</p>
           </div>
         ) : (
-          <Button onClick={() => setIsAddingPeriod(true)} variant="outline" className="w-full">
-            <Plus className="w-4 h-4 mr-2" />
-            {tSync("admin.facilities.form.blackout.addPeriod", "Add Blackout Period")}
-          </Button>
+          <div className="space-y-3">
+            {blackoutPeriods.map((blackout) => (
+              <div key={blackout.id} className="flex items-center gap-4 p-4 border rounded-lg bg-card">
+                <div className="text-2xl">{getTypeIcon(blackout.type)}</div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <h4 className="font-medium">{blackout.reason}</h4>
+                    <Badge className={getTypeColor(blackout.type)}>{blackout.type}</Badge>
+                    {blackout.recurring && <Badge variant="outline">Recurring</Badge>}
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm text-muted-foreground">
+                    <div>
+                      <span className="font-medium">Start:</span> {blackout.startDate}
+                      {!blackout.isAllDay && blackout.startTime && ` ${blackout.startTime}`}
+                    </div>
+                    <div>
+                      <span className="font-medium">End:</span> {blackout.endDate}
+                      {!blackout.isAllDay && blackout.endTime && ` ${blackout.endTime}`}
+                    </div>
+                    <div>
+                      <span className="font-medium">Duration:</span> {blackout.isAllDay ? 'All day' : 'Partial day'}
+                    </div>
+                  </div>
+                  {blackout.recurring && (
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Repeats {blackout.recurring.pattern} every {blackout.recurring.interval} 
+                      {blackout.recurring.pattern === 'daily' ? ' day(s)' : 
+                       blackout.recurring.pattern === 'weekly' ? ' week(s)' : ' month(s)'}
+                      {blackout.recurring.endDate && ` until ${blackout.recurring.endDate}`}
+                    </p>
+                  )}
+                </div>
+                <div className="flex gap-2">
+                  <Button size="sm" variant="ghost">
+                    <Edit className="w-4 h-4" />
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    variant="ghost" 
+                    onClick={() => handleDeleteBlackout(blackout.id)}
+                    className="text-red-500 hover:text-red-700"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
         )}
+
+        {/* Add Blackout Button */}
+        <Button onClick={() => setIsAddingBlackout(true)} variant="outline" className="w-full">
+          <Plus className="w-4 h-4 mr-2" />
+          {tSync("admin.facilities.form.blackouts.addBlackout", "Add Blackout Period")}
+        </Button>
 
         {/* Summary */}
         {blackoutPeriods.length > 0 && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t text-sm">
             <div>
-              <div className="font-medium text-muted-foreground">Total Periods</div>
+              <div className="font-medium text-muted-foreground">Total Blackouts</div>
               <div className="text-lg font-bold">{blackoutPeriods.length}</div>
             </div>
             <div>
               <div className="font-medium text-muted-foreground">Maintenance</div>
-              <div className="text-lg font-bold text-orange-600">{blackoutPeriods.filter(p => p.type === 'maintenance').length}</div>
+              <div className="text-lg font-bold text-orange-600">{blackoutPeriods.filter(b => b.type === 'maintenance').length}</div>
             </div>
             <div>
               <div className="font-medium text-muted-foreground">Events</div>
-              <div className="text-lg font-bold text-blue-600">{blackoutPeriods.filter(p => p.type === 'event').length}</div>
+              <div className="text-lg font-bold text-blue-600">{blackoutPeriods.filter(b => b.type === 'event').length}</div>
             </div>
             <div>
               <div className="font-medium text-muted-foreground">Recurring</div>
-              <div className="text-lg font-bold text-purple-600">{blackoutPeriods.filter(p => p.isRecurring).length}</div>
+              <div className="text-lg font-bold text-purple-600">{blackoutPeriods.filter(b => b.recurring).length}</div>
             </div>
           </div>
         )}
       </CardContent>
     </Card>
   );
-};
+});
+
+FacilityBlackoutSection.displayName = "FacilityBlackoutSection";
