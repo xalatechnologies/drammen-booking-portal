@@ -1,3 +1,4 @@
+
 import { create } from 'zustand';
 import { FacilityBlackoutService } from '@/services/FacilityBlackoutService';
 import { FacilityBlackoutPeriod } from '@/types/facility';
@@ -58,7 +59,7 @@ export const useBlackoutStore = create<BlackoutState>((set, get) => ({
           start_date: typeof period.start_date === 'string' ? new Date(period.start_date) : period.start_date,
           end_date: typeof period.end_date === 'string' ? new Date(period.end_date) : period.end_date,
           created_by: period.created_by,
-          created_at: typeof period.created_at === 'string' ? new Date(period.created_at) : period.created_at
+          created_at: typeof period.created_at === 'string' ? period.created_at : period.created_at.toISOString()
         }));
         set({ blackoutPeriods: periods, isLoading: false });
       } else {
@@ -130,7 +131,7 @@ export const useBlackoutStore = create<BlackoutState>((set, get) => ({
           start_date: typeof response.data.start_date === 'string' ? new Date(response.data.start_date) : response.data.start_date,
           end_date: typeof response.data.end_date === 'string' ? new Date(response.data.end_date) : response.data.end_date,
           created_by: response.data.created_by,
-          created_at: typeof response.data.created_at === 'string' ? new Date(response.data.created_at) : response.data.created_at
+          created_at: typeof response.data.created_at === 'string' ? response.data.created_at : response.data.created_at.toISOString()
         };
         
         get().addBlackoutPeriod(period);
@@ -159,7 +160,7 @@ export const useBlackoutStore = create<BlackoutState>((set, get) => ({
           start_date: typeof response.data.start_date === 'string' ? new Date(response.data.start_date) : response.data.start_date,
           end_date: typeof response.data.end_date === 'string' ? new Date(response.data.end_date) : response.data.end_date,
           created_by: response.data.created_by,
-          created_at: typeof response.data.created_at === 'string' ? new Date(response.data.created_at) : response.data.created_at
+          created_at: typeof response.data.created_at === 'string' ? response.data.created_at : response.data.created_at.toISOString()
         };
         
         const periods = get().blackoutPeriods;

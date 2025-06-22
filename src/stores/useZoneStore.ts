@@ -1,6 +1,7 @@
+
 import { create } from 'zustand';
 import { Zone } from '@/types/facility';
-import { ZoneService } from '@/services/zoneService';
+import { ZoneService } from '@/services/ZoneService';
 
 interface ZoneState {
   zones: Zone[];
@@ -74,8 +75,8 @@ export const useZoneStore = create<ZoneState>((set, get) => ({
           coordinates_width: bookingZone.layout.coordinates.width,
           coordinates_height: bookingZone.layout.coordinates.height,
           floor: '1',
-          created_at: new Date(),
-          updated_at: new Date()
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
         }));
         set({ zones: facilityZones, isLoading: false });
       } else {
@@ -116,7 +117,7 @@ export const useZoneStore = create<ZoneState>((set, get) => ({
           minBookingDuration: 1,
           maxBookingDuration: 8,
           allowedTimeSlots: [],
-          bookingTypes: ['one-time', 'recurring'] as const,
+          bookingTypes: ['one-time', 'recurring'] as string[],
           advanceBookingDays: 30,
           cancellationHours: 24
         },
@@ -152,8 +153,8 @@ export const useZoneStore = create<ZoneState>((set, get) => ({
           coordinates_width: response.data.layout.coordinates.width,
           coordinates_height: response.data.layout.coordinates.height,
           floor: '1',
-          created_at: new Date(),
-          updated_at: new Date()
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
         };
         
         get().addZone(facilityZone);
@@ -214,7 +215,7 @@ export const useZoneStore = create<ZoneState>((set, get) => ({
           coordinates_y: response.data.layout.coordinates.y,
           coordinates_width: response.data.layout.coordinates.width,
           coordinates_height: response.data.layout.coordinates.height,
-          updated_at: new Date()
+          updated_at: new Date().toISOString()
         };
         
         get().updateZone(id, facilityZoneUpdates);
