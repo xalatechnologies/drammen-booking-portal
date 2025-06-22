@@ -7,9 +7,17 @@ import { FacilityFormData, EQUIPMENT_OPTIONS, AMENITIES_OPTIONS, ACCESSIBILITY_O
 
 interface FacilityFeaturesSectionProps {
   form: UseFormReturn<FacilityFormData>;
+  equipment?: string[];
+  amenities?: string[];
+  capacity?: number;
 }
 
-export const FacilityFeaturesSection: React.FC<FacilityFeaturesSectionProps> = ({ form }) => {
+export const FacilityFeaturesSection: React.FC<FacilityFeaturesSectionProps> = ({ 
+  form,
+  equipment,
+  amenities,
+  capacity
+}) => {
   return (
     <div className="space-y-6">
       <FormField
