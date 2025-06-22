@@ -9,7 +9,8 @@ import { FacilityFormTabs } from "./FacilityFormTabs";
 import { FacilityBasicFields } from "./form/FacilityBasicFields";
 import { FacilityAddressFields } from "./form/FacilityAddressFields";
 import { FacilityContactFields } from "./form/FacilityContactFields";
-import { FacilityFormData } from "./form/types";
+import { FacilityFormData } from "./form/FacilityFormSchema";
+import { useFacilityStore } from "@/stores/useFacilityStore";
 import { ArrowLeft } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
@@ -25,9 +26,11 @@ export const FacilityFormView: React.FC<FacilityFormViewProps> = ({
   onCancel
 }) => {
   const isEditing = !!facility;
+  const { updateFacility, setCurrentFacility } = useFacilityStore();
   
-  const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<FacilityFormData>({
+  const form = useForm<FacilityFormData>({
     defaultValues: {
+      id: facility?.id,
       name: facility?.name || "",
       type: facility?.type || "",
       address_street: facility?.address_street || "",
@@ -42,25 +45,51 @@ export const FacilityFormView: React.FC<FacilityFormViewProps> = ({
       contact_email: facility?.contact_email || "",
       contact_phone: facility?.contact_phone || "",
       contact_name: facility?.contact_name || "",
+      equipment: facility?.equipment || [],
+      amenities: facility?.amenities || [],
+      accessibility_features: facility?.accessibility_features || [],
+      price_per_hour: facility?.price_per_hour || 450,
+      time_slot_duration: facility?.time_slot_duration || 1,
     }
   });
 
   const mutation = useMutation({
-    mutationFn: (data: FacilityFormData) => {
+    mutationFn: async (data: FacilityFormData) => {
+      console.log('Submitting facility data:', data);
+      
       if (isEditing) {
-        return FacilityService.updateFacility(facility.id.toString(), data);
+        const response = await FacilityService.updateFacility(facility.id.toString(), data);
+        console.log('Update response:', response);
+        return response;
       } else {
-        return FacilityService.createFacility(data);
+        const response = await FacilityService.createFacility(data);
+        console.log('Create response:', response);
+        return response;
       }
     },
-    onSuccess: () => {
-      toast({
-        title: "Success",
-        description: `Facility ${isEditing ? 'updated' : 'created'} successfully`,
-      });
-      onSuccess();
+    onSuccess: (response) => {
+      console.log('Mutation success:', response);
+      
+      if (response?.success && response.data) {
+        // Update store
+        if (isEditing) {
+          updateFacility(facility.id.toString(), response.data);
+        } else {
+          setCurrentFacility(response.data);
+        }
+
+        toast({
+          title: "Success",
+          description: `Facility ${isEditing ? 'updated' : 'created'} successfully`,
+        });
+        
+        onSuccess();
+      } else {
+        throw new Error(response?.error?.message || 'Unknown error occurred');
+      }
     },
     onError: (error: any) => {
+      console.error('Mutation error:', error);
       toast({
         title: "Error",
         description: error.message || `Failed to ${isEditing ? 'update' : 'create'} facility`,
@@ -70,6 +99,7 @@ export const FacilityFormView: React.FC<FacilityFormViewProps> = ({
   });
 
   const onSubmit = async (data: FacilityFormData) => {
+    console.log('Form submitted with data:', data);
     mutation.mutate(data);
   };
 
@@ -93,6 +123,7 @@ export const FacilityFormView: React.FC<FacilityFormViewProps> = ({
           <FacilityFormTabs 
             facilityId={facility?.id}
             title="Facility Details"
+            form={form}
             actions={
               <div className="flex justify-end space-x-4 pt-6">
                 <Button variant="outline" type="button" size="lg" onClick={onCancel} className="text-base px-8 py-3">
@@ -103,25 +134,28 @@ export const FacilityFormView: React.FC<FacilityFormViewProps> = ({
                 </Button>
               </div>
             }
-            onSubmit={handleSubmit(onSubmit)}
+            onSubmit={(e) => {
+              e.preventDefault();
+              form.handleSubmit(onSubmit)(e);
+            }}
           >
-            <form className="space-y-8">
+            <div className="space-y-8">
               <FacilityBasicFields 
-                register={register}
-                setValue={setValue}
-                watch={watch}
-                errors={errors}
+                register={form.register}
+                setValue={form.setValue}
+                watch={form.watch}
+                errors={form.formState.errors}
               />
 
               <FacilityAddressFields 
-                register={register}
-                errors={errors}
+                register={form.register}
+                errors={form.formState.errors}
               />
 
               <FacilityContactFields 
-                register={register}
+                register={form.register}
               />
-            </form>
+            </div>
           </FacilityFormTabs>
         </CardContent>
       </Card>

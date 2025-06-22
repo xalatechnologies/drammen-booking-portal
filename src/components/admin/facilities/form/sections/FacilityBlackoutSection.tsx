@@ -1,15 +1,14 @@
 
-import React, { useState, forwardRef, useImperativeHandle } from "react";
-import { UseFormReturn } from "react-hook-form";
+import React, { useEffect, forwardRef, useImperativeHandle } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { FacilityFormData } from "../FacilityFormSchema";
 import { useTranslation } from "@/hooks/useTranslation";
+import { useBlackoutStore } from "@/stores/useBlackoutStore";
 import { Calendar, Plus, Edit, Trash2, AlertTriangle } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
 
 interface FacilityBlackoutSectionProps {
-  form: UseFormReturn<FacilityFormData>;
   facilityId?: number;
 }
 
@@ -17,61 +16,34 @@ interface FacilityBlackoutSectionRef {
   saveData: () => Promise<boolean>;
 }
 
-interface BlackoutPeriod {
-  id: string;
-  type: 'maintenance' | 'renovation' | 'event' | 'weather' | 'other';
-  reason: string;
-  startDate: string;
-  endDate: string;
-  startTime?: string;
-  endTime?: string;
-  isAllDay: boolean;
-  recurring?: {
-    pattern: 'daily' | 'weekly' | 'monthly';
-    interval: number;
-    endDate?: string;
-  };
-}
-
-export const FacilityBlackoutSection = forwardRef<FacilityBlackoutSectionRef, FacilityBlackoutSectionProps>(({ form, facilityId }, ref) => {
+export const FacilityBlackoutSection = forwardRef<FacilityBlackoutSectionRef, FacilityBlackoutSectionProps>(({ facilityId }, ref) => {
   const { tSync } = useTranslation();
-  const [blackoutPeriods, setBlackoutPeriods] = useState<BlackoutPeriod[]>([]);
-  const [isAddingBlackout, setIsAddingBlackout] = useState(false);
+  const {
+    blackoutPeriods,
+    isLoading,
+    error,
+    fetchBlackoutPeriods,
+    deleteBlackoutPeriod,
+    reset
+  } = useBlackoutStore();
+
+  useEffect(() => {
+    if (facilityId) {
+      fetchBlackoutPeriods(facilityId);
+    }
+
+    return () => {
+      reset();
+    };
+  }, [facilityId, fetchBlackoutPeriods, reset]);
 
   // Expose save function to parent via ref
   useImperativeHandle(ref, () => ({
     saveData: async () => {
-      console.log('Saving blackout periods:', blackoutPeriods);
-      
-      if (!facilityId) {
-        console.log('No facility ID, skipping blackout periods save');
-        return true;
-      }
-
-      try {
-        // Here you would implement the actual API call to save blackout periods
-        console.log('Blackout periods would be saved:', {
-          facilityId,
-          blackouts: blackoutPeriods.map(blackout => ({
-            facility_id: facilityId,
-            type: blackout.type,
-            reason: blackout.reason,
-            start_date: blackout.startDate,
-            end_date: blackout.endDate,
-            start_time: blackout.startTime,
-            end_time: blackout.endTime,
-            is_all_day: blackout.isAllDay,
-            recurring_pattern: blackout.recurring
-          }))
-        });
-        
-        return true;
-      } catch (error) {
-        console.error('Failed to save blackout periods:', error);
-        return false;
-      }
+      console.log('Blackout periods are automatically synced through store');
+      return true;
     }
-  }), [blackoutPeriods, facilityId]);
+  }), []);
 
   const getTypeIcon = (type: string) => {
     const icons = {
@@ -95,9 +67,41 @@ export const FacilityBlackoutSection = forwardRef<FacilityBlackoutSectionRef, Fa
     }
   };
 
-  const handleDeleteBlackout = (id: string) => {
-    setBlackoutPeriods(periods => periods.filter(period => period.id !== id));
+  const handleDeleteBlackout = async (id: string) => {
+    if (!id) return;
+    
+    try {
+      const success = await deleteBlackoutPeriod(id);
+      if (success) {
+        toast({
+          title: "Success",
+          description: "Blackout period deleted successfully",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to delete blackout period",
+          variant: "destructive",
+        });
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete blackout period",
+        variant: "destructive",
+      });
+    }
   };
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Loading blackout periods...</CardTitle>
+        </CardHeader>
+      </Card>
+    );
+  }
 
   return (
     <Card>
@@ -108,6 +112,12 @@ export const FacilityBlackoutSection = forwardRef<FacilityBlackoutSectionRef, Fa
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
+        {error && (
+          <div className="text-red-600 text-sm p-3 bg-red-50 rounded">
+            {error}
+          </div>
+        )}
+
         {/* Blackout Periods List */}
         {blackoutPeriods.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground border-2 border-dashed rounded-lg">
@@ -124,29 +134,18 @@ export const FacilityBlackoutSection = forwardRef<FacilityBlackoutSectionRef, Fa
                   <div className="flex items-center gap-2 mb-2">
                     <h4 className="font-medium">{blackout.reason}</h4>
                     <Badge className={getTypeColor(blackout.type)}>{blackout.type}</Badge>
-                    {blackout.recurring && <Badge variant="outline">Recurring</Badge>}
                   </div>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm text-muted-foreground">
                     <div>
-                      <span className="font-medium">Start:</span> {blackout.startDate}
-                      {!blackout.isAllDay && blackout.startTime && ` ${blackout.startTime}`}
+                      <span className="font-medium">Start:</span> {blackout.start_date}
                     </div>
                     <div>
-                      <span className="font-medium">End:</span> {blackout.endDate}
-                      {!blackout.isAllDay && blackout.endTime && ` ${blackout.endTime}`}
+                      <span className="font-medium">End:</span> {blackout.end_date}
                     </div>
                     <div>
-                      <span className="font-medium">Duration:</span> {blackout.isAllDay ? 'All day' : 'Partial day'}
+                      <span className="font-medium">Type:</span> {blackout.type}
                     </div>
                   </div>
-                  {blackout.recurring && (
-                    <p className="text-sm text-muted-foreground mt-1">
-                      Repeats {blackout.recurring.pattern} every {blackout.recurring.interval} 
-                      {blackout.recurring.pattern === 'daily' ? ' day(s)' : 
-                       blackout.recurring.pattern === 'weekly' ? ' week(s)' : ' month(s)'}
-                      {blackout.recurring.endDate && ` until ${blackout.recurring.endDate}`}
-                    </p>
-                  )}
                 </div>
                 <div className="flex gap-2">
                   <Button size="sm" variant="ghost">
@@ -155,7 +154,7 @@ export const FacilityBlackoutSection = forwardRef<FacilityBlackoutSectionRef, Fa
                   <Button 
                     size="sm" 
                     variant="ghost" 
-                    onClick={() => handleDeleteBlackout(blackout.id)}
+                    onClick={() => blackout.id && handleDeleteBlackout(blackout.id)}
                     className="text-red-500 hover:text-red-700"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -167,7 +166,7 @@ export const FacilityBlackoutSection = forwardRef<FacilityBlackoutSectionRef, Fa
         )}
 
         {/* Add Blackout Button */}
-        <Button onClick={() => setIsAddingBlackout(true)} variant="outline" className="w-full">
+        <Button variant="outline" className="w-full">
           <Plus className="w-4 h-4 mr-2" />
           {tSync("admin.facilities.form.blackouts.addBlackout", "Add Blackout Period")}
         </Button>
@@ -188,8 +187,8 @@ export const FacilityBlackoutSection = forwardRef<FacilityBlackoutSectionRef, Fa
               <div className="text-lg font-bold text-blue-600">{blackoutPeriods.filter(b => b.type === 'event').length}</div>
             </div>
             <div>
-              <div className="font-medium text-muted-foreground">Recurring</div>
-              <div className="text-lg font-bold text-purple-600">{blackoutPeriods.filter(b => b.recurring).length}</div>
+              <div className="font-medium text-muted-foreground">Other</div>
+              <div className="text-lg font-bold text-purple-600">{blackoutPeriods.filter(b => b.type === 'other').length}</div>
             </div>
           </div>
         )}

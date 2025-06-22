@@ -1,14 +1,16 @@
-import React, { useState, forwardRef, useImperativeHandle } from "react";
+
+import React, { useState, forwardRef, useImperativeHandle, useEffect } from "react";
 import { UseFormReturn } from "react-hook-form";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { FacilityFormData } from "../FacilityFormSchema";
 import { useTranslation } from "@/hooks/useTranslation";
+import { useFacilityStore } from "@/stores/useFacilityStore";
+import { toast } from "@/hooks/use-toast";
 import { 
   Star, 
   Users, 
@@ -82,9 +84,21 @@ export const FacilityFeaturesSection = forwardRef<FacilityFeaturesSectionRef, Fa
   capacity = 1 
 }, ref) => {
   const { tSync } = useTranslation();
+  const { updateFacility } = useFacilityStore();
   const [selectedEquipment, setSelectedEquipment] = useState<string[]>(equipment);
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>(amenities);
   const [selectedAccessibility, setSelectedAccessibility] = useState<string[]>([]);
+
+  // Initialize from form data
+  useEffect(() => {
+    const formEquipment = form.watch('equipment');
+    const formAmenities = form.watch('amenities');
+    const formAccessibility = form.watch('accessibility_features');
+
+    if (formEquipment) setSelectedEquipment(formEquipment);
+    if (formAmenities) setSelectedAmenities(formAmenities);
+    if (formAccessibility) setSelectedAccessibility(formAccessibility);
+  }, [form]);
 
   // Expose save function to parent via ref
   useImperativeHandle(ref, () => ({
@@ -102,13 +116,35 @@ export const FacilityFeaturesSection = forwardRef<FacilityFeaturesSectionRef, Fa
         form.setValue('amenities', selectedAmenities);
         form.setValue('accessibility_features', selectedAccessibility);
         
+        // Update store if we have current facility
+        const facilityId = form.watch('id');
+        if (facilityId) {
+          updateFacility(facilityId.toString(), {
+            equipment: selectedEquipment,
+            amenities: selectedAmenities,
+            accessibility_features: selectedAccessibility,
+            capacity: form.watch('capacity'),
+            area_sqm: form.watch('area_sqm')
+          });
+        }
+
+        toast({
+          title: "Success",
+          description: "Facility features updated successfully",
+        });
+        
         return true;
       } catch (error) {
         console.error('Failed to save facility features:', error);
+        toast({
+          title: "Error",
+          description: "Failed to save facility features",
+          variant: "destructive",
+        });
         return false;
       }
     }
-  }), [selectedEquipment, selectedAmenities, selectedAccessibility, form]);
+  }), [selectedEquipment, selectedAmenities, selectedAccessibility, form, updateFacility]);
 
   const toggleSelection = (item: string, currentList: string[], setList: (list: string[]) => void) => {
     if (currentList.includes(item)) {

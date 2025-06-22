@@ -2,10 +2,9 @@
 import { supabase } from '@/integrations/supabase/client';
 import { ApiResponse } from '@/types/api';
 
-interface OpeningHours {
+export interface OpeningHour {
   id?: string;
-  facility_id?: number;
-  zone_id?: string;
+  facility_id: number;
   day_of_week: number;
   open_time: string;
   close_time: string;
@@ -15,108 +14,64 @@ interface OpeningHours {
 }
 
 export class OpeningHoursService {
-  private static readonly EDGE_FUNCTION_URL = 'https://szpdoihoxzlivothoyva.supabase.co/functions/v1/opening-hours';
-
-  static async getFacilityOpeningHours(facilityId: number): Promise<ApiResponse<OpeningHours[]>> {
+  static async getOpeningHours(facilityId: number): Promise<ApiResponse<OpeningHour[]>> {
     try {
-      console.log('OpeningHoursService.getFacilityOpeningHours - Called with facility ID:', facilityId);
-
-      const { data: { session } } = await supabase.auth.getSession();
+      console.log('OpeningHoursService.getOpeningHours - Called with facility ID:', facilityId);
       
-      const response = await fetch(`${this.EDGE_FUNCTION_URL}?facilityId=${facilityId}`, {
+      const { data, error } = await supabase.functions.invoke('opening-hours', {
         method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': session ? `Bearer ${session.access_token}` : `Bearer ${process.env.SUPABASE_ANON_KEY}`,
-        },
+        body: { facilityId }
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      if (error) {
+        console.error('OpeningHoursService.getOpeningHours - Error:', error);
+        return {
+          success: false,
+          error: { message: error.message || 'Failed to fetch opening hours' }
+        };
       }
 
-      const result = await response.json();
-      console.log('OpeningHoursService.getFacilityOpeningHours - Response:', result);
-      return result;
-    } catch (error) {
-      console.error('OpeningHoursService.getFacilityOpeningHours - Error:', error);
+      console.log('OpeningHoursService.getOpeningHours - Success:', data);
+      return {
+        success: true,
+        data: data || []
+      };
+    } catch (error: any) {
+      console.error('OpeningHoursService.getOpeningHours - Exception:', error);
       return {
         success: false,
-        error: {
-          message: 'Failed to fetch facility opening hours',
-          details: error
-        }
+        error: { message: error.message || 'Failed to fetch opening hours' }
       };
     }
   }
 
-  static async getZoneOpeningHours(zoneId: string): Promise<ApiResponse<OpeningHours[]>> {
+  static async saveOpeningHours(facilityId: number, hours: OpeningHour[]): Promise<ApiResponse<OpeningHour[]>> {
     try {
-      console.log('OpeningHoursService.getZoneOpeningHours - Called with zone ID:', zoneId);
-
-      const { data: { session } } = await supabase.auth.getSession();
+      console.log('OpeningHoursService.saveOpeningHours - Called with facility ID and hours:', facilityId, hours);
       
-      const response = await fetch(`${this.EDGE_FUNCTION_URL}?zoneId=${zoneId}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': session ? `Bearer ${session.access_token}` : `Bearer ${process.env.SUPABASE_ANON_KEY}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const result = await response.json();
-      console.log('OpeningHoursService.getZoneOpeningHours - Response:', result);
-      return result;
-    } catch (error) {
-      console.error('OpeningHoursService.getZoneOpeningHours - Error:', error);
-      return {
-        success: false,
-        error: {
-          message: 'Failed to fetch zone opening hours',
-          details: error
-        }
-      };
-    }
-  }
-
-  static async updateOpeningHours(hoursData: {
-    facility_id?: number;
-    zone_id?: string;
-    opening_hours: OpeningHours[];
-  }): Promise<ApiResponse<OpeningHours[]>> {
-    try {
-      console.log('OpeningHoursService.updateOpeningHours - Called with:', hoursData);
-
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      const response = await fetch(this.EDGE_FUNCTION_URL, {
+      const { data, error } = await supabase.functions.invoke('opening-hours', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': session ? `Bearer ${session.access_token}` : `Bearer ${process.env.SUPABASE_ANON_KEY}`,
-        },
-        body: JSON.stringify(hoursData),
+        body: { facilityId, hours }
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      if (error) {
+        console.error('OpeningHoursService.saveOpeningHours - Error:', error);
+        return {
+          success: false,
+          error: { message: error.message || 'Failed to save opening hours' }
+        };
       }
 
-      const result = await response.json();
-      console.log('OpeningHoursService.updateOpeningHours - Response:', result);
-      return result;
-    } catch (error) {
-      console.error('OpeningHoursService.updateOpeningHours - Error:', error);
+      console.log('OpeningHoursService.saveOpeningHours - Success:', data);
+      return {
+        success: true,
+        data: data || []
+      };
+    } catch (error: any) {
+      console.error('OpeningHoursService.saveOpeningHours - Exception:', error);
       return {
         success: false,
-        error: {
-          message: 'Failed to update opening hours',
-          details: error
-        }
+        error: { message: error.message || 'Failed to save opening hours' }
       };
     }
   }
