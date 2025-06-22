@@ -1,11 +1,11 @@
 
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PageHeader, FiltersBar, ViewToggle } from "@/components/layouts";
 import { FacilityService } from "@/services/facilityService";
-import { EnhancedFacilityForm } from "./form/EnhancedFacilityForm";
 import { FacilityCalendarView } from "./calendar/FacilityCalendarView";
 import { FacilityDetailView } from "./detail/FacilityDetailView";
 import { FacilityGridView } from "./views/FacilityGridView";
@@ -19,13 +19,14 @@ interface FacilityListViewProps {
   onFacilitySelect?: (id: number) => void;
 }
 
-type ViewMode = 'list' | 'form' | 'calendar' | 'detail';
+type ViewMode = 'list' | 'calendar' | 'detail';
 type DisplayMode = 'table' | 'grid' | 'list' | 'map';
 
 export const FacilityListView: React.FC<FacilityListViewProps> = ({
   selectedFacilityId,
   onFacilitySelect
 }) => {
+  const navigate = useNavigate();
   const [viewMode, setViewMode] = useState<ViewMode>('list');
   const [displayMode, setDisplayMode] = useState<DisplayMode>('table');
   const [selectedFacility, setSelectedFacility] = useState<any>(null);
@@ -54,13 +55,11 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
   });
 
   const handleAddNew = () => {
-    setSelectedFacility(null);
-    setViewMode('form');
+    navigate('/admin/facilities/new');
   };
 
   const handleEdit = (facility: any) => {
-    setSelectedFacility(facility);
-    setViewMode('form');
+    navigate(`/admin/facilities/${facility.id}`);
   };
 
   const handleView = (facility: any) => {
@@ -74,12 +73,6 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
   const handleCalendar = (facility: any) => {
     setSelectedFacility(facility);
     setViewMode('calendar');
-  };
-
-  const handleFormSuccess = () => {
-    setViewMode('list');
-    setSelectedFacility(null);
-    refetch();
   };
 
   const handleBack = () => {
@@ -160,16 +153,6 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
         return <FacilityTableView {...commonProps} />;
     }
   };
-
-  if (viewMode === 'form') {
-    return (
-      <EnhancedFacilityForm 
-        facility={selectedFacility} 
-        onSuccess={handleFormSuccess} 
-        onCancel={handleBack} 
-      />
-    );
-  }
 
   if (viewMode === 'calendar' && selectedFacility) {
     return (

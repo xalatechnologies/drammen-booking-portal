@@ -4,6 +4,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import AdminLayout from "@/components/admin/AdminLayout";
 import OverviewPage from "@/pages/admin/Overview";
 import FacilitiesPage from "@/pages/admin/FacilitiesPage";
+import FacilityFormPage from "@/pages/admin/FacilityFormPage";
 import ApprovalWorkflowsPage from "@/pages/admin/ApprovalWorkflows";
 import UsersRolesPage from "@/pages/admin/UsersRoles"; 
 import ReportsAnalyticsPage from "@/pages/admin/ReportsAnalytics";
@@ -33,6 +34,8 @@ const AdminDashboard = () => {
       <Routes>
         <Route index element={<OverviewPage />} />
         <Route path="facilities" element={<FacilitiesPage />} />
+        <Route path="facilities/new" element={<FacilityFormPage />} />
+        <Route path="facilities/:id" element={<FacilityFormPage />} />
         <Route path="bookings-overview" element={<BookingsOverview />} />
         <Route path="approvals" element={<ApprovalWorkflowsPage />} />
         <Route path="users" element={<UsersRolesPage />} />
