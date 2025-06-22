@@ -1,7 +1,6 @@
-
 import { create } from 'zustand';
 import { Zone } from '@/types/facility';
-import { zoneService } from '@/services/zoneService';
+import { ZoneService } from '@/services/zoneService';
 
 interface ZoneState {
   zones: Zone[];
@@ -53,7 +52,7 @@ export const useZoneStore = create<ZoneState>((set, get) => ({
   fetchZonesByFacility: async (facilityId) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await zoneService.getZonesByFacility(facilityId);
+      const response = await ZoneService.getZonesByFacility(facilityId);
       if (response.success && response.data) {
         // Convert booking zones to facility zones
         const facilityZones: Zone[] = response.data.map(bookingZone => ({
@@ -75,8 +74,8 @@ export const useZoneStore = create<ZoneState>((set, get) => ({
           coordinates_width: bookingZone.layout.coordinates.width,
           coordinates_height: bookingZone.layout.coordinates.height,
           floor: '1',
-          createdAt: new Date(),
-          updatedAt: new Date()
+          created_at: new Date(),
+          updated_at: new Date()
         }));
         set({ zones: facilityZones, isLoading: false });
       } else {
@@ -131,7 +130,7 @@ export const useZoneStore = create<ZoneState>((set, get) => ({
         features: zoneData.equipment || []
       };
 
-      const response = await zoneService.createZone(bookingZoneData);
+      const response = await ZoneService.createZone(bookingZoneData);
       if (response.success && response.data) {
         // Convert back to facility zone
         const facilityZone: Zone = {
@@ -153,8 +152,8 @@ export const useZoneStore = create<ZoneState>((set, get) => ({
           coordinates_width: response.data.layout.coordinates.width,
           coordinates_height: response.data.layout.coordinates.height,
           floor: '1',
-          createdAt: new Date(),
-          updatedAt: new Date()
+          created_at: new Date(),
+          updated_at: new Date()
         };
         
         get().addZone(facilityZone);
@@ -198,7 +197,7 @@ export const useZoneStore = create<ZoneState>((set, get) => ({
         };
       }
 
-      const response = await zoneService.updateZone(id, bookingZoneData);
+      const response = await ZoneService.updateZone(id, bookingZoneData);
       if (response.success && response.data) {
         // Convert back to facility zone format
         const facilityZoneUpdates: Partial<Zone> = {
@@ -215,7 +214,7 @@ export const useZoneStore = create<ZoneState>((set, get) => ({
           coordinates_y: response.data.layout.coordinates.y,
           coordinates_width: response.data.layout.coordinates.width,
           coordinates_height: response.data.layout.coordinates.height,
-          updatedAt: new Date()
+          updated_at: new Date()
         };
         
         get().updateZone(id, facilityZoneUpdates);
@@ -234,7 +233,7 @@ export const useZoneStore = create<ZoneState>((set, get) => ({
   deleteZone: async (id) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await zoneService.deleteZone(id);
+      const response = await ZoneService.deleteZone(id);
       if (response.success) {
         get().removeZone(id);
         set({ isLoading: false });

@@ -83,17 +83,31 @@ export const FacilityBlackoutSection = forwardRef<FacilityBlackoutSectionRef, Fa
       facility_id: facilityId,
       type: 'maintenance',
       reason: '',
-      start_date: '',
-      end_date: ''
+      start_date: new Date(),
+      end_date: new Date()
     });
   };
 
   const handleUpdateBlackoutPeriod = (index: number, field: string, value: string) => {
-    updateBlackoutPeriod(index, { [field]: value });
+    const updates: any = {};
+    
+    if (field === 'start_date' || field === 'end_date') {
+      updates[field] = new Date(value);
+    } else {
+      updates[field] = value;
+    }
+    
+    updateBlackoutPeriod(index, updates);
   };
 
   const handleRemoveBlackoutPeriod = (index: number) => {
     removeBlackoutPeriod(index);
+  };
+
+  const formatDateForInput = (date: Date): string => {
+    if (!date) return '';
+    const d = new Date(date);
+    return d.toISOString().slice(0, 16);
   };
 
   if (error) {
@@ -169,7 +183,7 @@ export const FacilityBlackoutSection = forwardRef<FacilityBlackoutSectionRef, Fa
                       <Label>Start Date</Label>
                       <Input
                         type="datetime-local"
-                        value={period.start_date}
+                        value={formatDateForInput(period.start_date)}
                         onChange={(e) => handleUpdateBlackoutPeriod(index, 'start_date', e.target.value)}
                       />
                     </div>
@@ -178,7 +192,7 @@ export const FacilityBlackoutSection = forwardRef<FacilityBlackoutSectionRef, Fa
                       <Label>End Date</Label>
                       <Input
                         type="datetime-local"
-                        value={period.end_date}
+                        value={formatDateForInput(period.end_date)}
                         onChange={(e) => handleUpdateBlackoutPeriod(index, 'end_date', e.target.value)}
                       />
                     </div>

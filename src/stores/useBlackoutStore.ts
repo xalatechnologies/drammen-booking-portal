@@ -1,6 +1,5 @@
-
 import { create } from 'zustand';
-import { BlackoutService } from '@/services/BlackoutService';
+import { FacilityBlackoutService } from '@/services/FacilityBlackoutService';
 import { FacilityBlackoutPeriod } from '@/types/facility';
 
 interface BlackoutState {
@@ -48,11 +47,22 @@ export const useBlackoutStore = create<BlackoutState>((set, get) => ({
   fetchBlackoutPeriods: async (facilityId) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await BlackoutService.getBlackoutPeriods(facilityId.toString());
-      if (response.success && response.data) {
-        set({ blackoutPeriods: response.data, isLoading: false });
+      const response = await FacilityBlackoutService.getBlackoutsByFacility(facilityId);
+      if (response.data) {
+        // Convert repository data to FacilityBlackoutPeriod format
+        const periods: FacilityBlackoutPeriod[] = response.data.map(period => ({
+          id: period.id || '',
+          facility_id: typeof period.facility_id === 'string' ? parseInt(period.facility_id) : period.facility_id,
+          type: period.type,
+          reason: period.reason,
+          start_date: typeof period.start_date === 'string' ? new Date(period.start_date) : period.start_date,
+          end_date: typeof period.end_date === 'string' ? new Date(period.end_date) : period.end_date,
+          created_by: period.created_by,
+          created_at: typeof period.created_at === 'string' ? new Date(period.created_at) : period.created_at
+        }));
+        set({ blackoutPeriods: periods, isLoading: false });
       } else {
-        set({ error: response.error?.message || 'Failed to fetch blackout periods', isLoading: false });
+        set({ error: response.error || 'Failed to fetch blackout periods', isLoading: false });
       }
     } catch (error: any) {
       set({ error: error.message, isLoading: false });
@@ -63,9 +73,36 @@ export const useBlackoutStore = create<BlackoutState>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       const periods = get().blackoutPeriods;
-      const response = await BlackoutService.saveBlackoutPeriods(facilityId.toString(), periods);
+      
+      // Save each period individually
+      const savePromises = periods.map(async (period) => {
+        if (period.id) {
+          // Update existing period
+          return await FacilityBlackoutService.updateBlackout(period.id, {
+            facility_id: facilityId,
+            type: period.type,
+            reason: period.reason,
+            start_date: period.start_date,
+            end_date: period.end_date
+          });
+        } else {
+          // Create new period
+          return await FacilityBlackoutService.createBlackout({
+            facility_id: facilityId,
+            type: period.type,
+            reason: period.reason,
+            start_date: period.start_date,
+            end_date: period.end_date,
+            created_by: 'system' // TODO: Get from auth context
+          });
+        }
+      });
+
+      const results = await Promise.all(savePromises);
+      const allSuccessful = results.every(result => result.data !== null);
+      
       set({ isLoading: false });
-      return response.success;
+      return allSuccessful;
     } catch (error: any) {
       set({ error: error.message, isLoading: false });
       return false;
@@ -75,13 +112,32 @@ export const useBlackoutStore = create<BlackoutState>((set, get) => ({
   createBlackoutPeriod: async (periodData) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await BlackoutService.createBlackoutPeriod(periodData);
-      if (response.success && response.data) {
-        get().addBlackoutPeriod(response.data);
+      const response = await FacilityBlackoutService.createBlackout({
+        facility_id: periodData.facility_id!,
+        type: periodData.type!,
+        reason: periodData.reason!,
+        start_date: periodData.start_date!,
+        end_date: periodData.end_date!,
+        created_by: 'system' // TODO: Get from auth context
+      });
+      
+      if (response.data) {
+        const period: FacilityBlackoutPeriod = {
+          id: response.data.id || '',
+          facility_id: typeof response.data.facility_id === 'string' ? parseInt(response.data.facility_id) : response.data.facility_id,
+          type: response.data.type,
+          reason: response.data.reason,
+          start_date: typeof response.data.start_date === 'string' ? new Date(response.data.start_date) : response.data.start_date,
+          end_date: typeof response.data.end_date === 'string' ? new Date(response.data.end_date) : response.data.end_date,
+          created_by: response.data.created_by,
+          created_at: typeof response.data.created_at === 'string' ? new Date(response.data.created_at) : response.data.created_at
+        };
+        
+        get().addBlackoutPeriod(period);
         set({ isLoading: false });
-        return response.data;
+        return period;
       } else {
-        set({ error: response.error?.message || 'Failed to create blackout period', isLoading: false });
+        set({ error: response.error || 'Failed to create blackout period', isLoading: false });
         return null;
       }
     } catch (error: any) {
@@ -93,17 +149,28 @@ export const useBlackoutStore = create<BlackoutState>((set, get) => ({
   updateBlackoutPeriodAsync: async (id, periodData) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await BlackoutService.updateBlackoutPeriod(id, periodData);
-      if (response.success && response.data) {
+      const response = await FacilityBlackoutService.updateBlackout(id, periodData);
+      if (response.data) {
+        const period: FacilityBlackoutPeriod = {
+          id: response.data.id || '',
+          facility_id: typeof response.data.facility_id === 'string' ? parseInt(response.data.facility_id) : response.data.facility_id,
+          type: response.data.type,
+          reason: response.data.reason,
+          start_date: typeof response.data.start_date === 'string' ? new Date(response.data.start_date) : response.data.start_date,
+          end_date: typeof response.data.end_date === 'string' ? new Date(response.data.end_date) : response.data.end_date,
+          created_by: response.data.created_by,
+          created_at: typeof response.data.created_at === 'string' ? new Date(response.data.created_at) : response.data.created_at
+        };
+        
         const periods = get().blackoutPeriods;
         const index = periods.findIndex(p => p.id === id);
         if (index !== -1) {
-          get().updateBlackoutPeriod(index, response.data);
+          get().updateBlackoutPeriod(index, period);
         }
         set({ isLoading: false });
-        return response.data;
+        return period;
       } else {
-        set({ error: response.error?.message || 'Failed to update blackout period', isLoading: false });
+        set({ error: response.error || 'Failed to update blackout period', isLoading: false });
         return null;
       }
     } catch (error: any) {
@@ -115,8 +182,8 @@ export const useBlackoutStore = create<BlackoutState>((set, get) => ({
   deleteBlackoutPeriod: async (id) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await BlackoutService.deleteBlackoutPeriod(id);
-      if (response.success) {
+      const response = await FacilityBlackoutService.deleteBlackout(id);
+      if (response.data) {
         const periods = get().blackoutPeriods;
         const index = periods.findIndex(p => p.id === id);
         if (index !== -1) {
@@ -125,7 +192,7 @@ export const useBlackoutStore = create<BlackoutState>((set, get) => ({
         set({ isLoading: false });
         return true;
       } else {
-        set({ error: response.error?.message || 'Failed to delete blackout period', isLoading: false });
+        set({ error: response.error || 'Failed to delete blackout period', isLoading: false });
         return false;
       }
     } catch (error: any) {
