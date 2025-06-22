@@ -79,7 +79,7 @@ export const EnhancedFacilityForm: React.FC<EnhancedFacilityFormProps> = ({
     }
   });
 
-  // Watch form values to pass to components
+  // Watch form values to pass to components - these are needed for real-time updates
   const watchedEquipment = form.watch("equipment");
   const watchedAmenities = form.watch("amenities");
   const watchedCapacity = form.watch("capacity");
@@ -252,7 +252,12 @@ export const EnhancedFacilityForm: React.FC<EnhancedFacilityFormProps> = ({
                     </TabsContent>
 
                     <TabsContent value="features" className="mt-0 space-y-6">
-                      <FacilityFeaturesSection form={form} />
+                      <FacilityFeaturesSection 
+                        form={form} 
+                        equipment={watchedEquipment}
+                        amenities={watchedAmenities}
+                        capacity={watchedCapacity}
+                      />
                       <FacilityConfigSection form={form} />
                     </TabsContent>
 
