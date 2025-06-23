@@ -1,33 +1,18 @@
-
 import { SupabaseRepository } from '../SupabaseRepository';
-import { Zone } from '@/types/facility';
-import { PaginationParams, RepositoryResponse } from '@/types/api';
+import { Zone } from '@/types/zone';
+import { RepositoryResponse } from '@/types/api';
 import { supabase } from '@/integrations/supabase/client';
 
-interface ZoneFilters {
-  facilityId?: string;
-  type?: string;
-  isActive?: boolean;
-  capacity?: number;
-}
-
 interface ZoneCreateRequest {
-  facility_id: number;
   name: string;
-  type: string;
-  capacity: number;
+  facility_id: number;
   description?: string;
-  is_main_zone?: boolean;
-  parent_zone_id?: string;
-  bookable_independently?: boolean;
-  area_sqm?: number;
-  floor?: string;
-  equipment?: string[];
-  accessibility_features?: string[];
+  capacity?: number;
+  is_active?: boolean;
 }
 
 interface ZoneUpdateRequest extends Partial<ZoneCreateRequest> {
-  status?: 'active' | 'maintenance' | 'inactive';
+  status?: string;
 }
 
 export class ZoneRepository extends SupabaseRepository<Zone> {
@@ -37,65 +22,10 @@ export class ZoneRepository extends SupabaseRepository<Zone> {
     super();
   }
 
-  async findAllWithFilters(
-    pagination?: PaginationParams,
-    filters?: ZoneFilters
-  ): Promise<RepositoryResponse<Zone[]>> {
+  async getAllZones(facilityId?: number): Promise<RepositoryResponse<Zone[]>> {
     try {
-      let query = supabase.from(this.tableName as any).select('*');
-
-      // Apply filters
-      if (filters?.facilityId) {
-        query = query.eq('facility_id', filters.facilityId);
-      }
-      if (filters?.type) {
-        query = query.eq('type', filters.type);
-      }
-      if (filters?.isActive !== undefined) {
-        query = query.eq('status', filters.isActive ? 'active' : 'inactive');
-      }
-      if (filters?.capacity) {
-        query = query.gte('capacity', filters.capacity);
-      }
-
-      // Apply pagination
-      if (pagination) {
-        const from = (pagination.page - 1) * pagination.limit;
-        const to = from + pagination.limit - 1;
-        query = query.range(from, to);
-      }
-
-      const { data, error } = await query;
-
-      if (error) {
-        return {
-          data: [],
-          error: error.message
-        };
-      }
-
-      return {
-        data: (data as unknown as Zone[]) || []
-      };
-    } catch (error: any) {
-      return {
-        data: [],
-        error: error.message
-      };
-    }
-  }
-
-  async getZonesByFacility(facilityId: string): Promise<RepositoryResponse<Zone[]>> {
-    return this.findAllWithFilters(undefined, { facilityId });
-  }
-
-  async getMainZones(facilityId?: string): Promise<RepositoryResponse<Zone[]>> {
-    try {
-      let query = supabase
-        .from(this.tableName as any)
-        .select('*')
-        .eq('is_main_zone', true);
-
+      let query = supabase.from('zones').select('*');
+      
       if (facilityId) {
         query = query.eq('facility_id', facilityId);
       }
@@ -110,7 +40,34 @@ export class ZoneRepository extends SupabaseRepository<Zone> {
       }
 
       return {
-        data: (data as unknown as Zone[]) || []
+        data: data || [],
+        error: null
+      };
+    } catch (error: any) {
+      return {
+        data: [],
+        error: error.message
+      };
+    }
+  }
+
+  async getZonesByFacility(facilityId: number): Promise<RepositoryResponse<Zone[]>> {
+    try {
+      const { data, error } = await supabase
+        .from('zones')
+        .select('*')
+        .eq('facility_id', facilityId);
+
+      if (error) {
+        return {
+          data: [],
+          error: error.message
+        };
+      }
+
+      return {
+        data: data || [],
+        error: null
       };
     } catch (error: any) {
       return {

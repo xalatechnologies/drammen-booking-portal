@@ -1,3 +1,4 @@
+
 import { BaseRepository } from '@/dal/BaseRepository';
 import { RepositoryResponse, PaginationParams } from '@/types/api';
 import { supabase } from '@/integrations/supabase/client';

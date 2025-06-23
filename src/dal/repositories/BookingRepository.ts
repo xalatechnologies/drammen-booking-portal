@@ -1,8 +1,23 @@
-
 import { SupabaseRepository } from '../SupabaseRepository';
-import { Booking, BookingFilters, BookingCreateRequest, BookingUpdateRequest } from '@/types/booking';
-import { PaginationParams, RepositoryResponse } from '@/types/api';
+import { Booking } from '@/types/booking';
+import { RepositoryResponse } from '@/types/api';
 import { supabase } from '@/integrations/supabase/client';
+
+interface BookingCreateRequest {
+  facility_id: number;
+  zone_id: number;
+  start_time: string;
+  end_time: string;
+  user_id: string;
+  status: string;
+  total_price: number;
+  additional_notes?: string;
+}
+
+interface BookingUpdateRequest extends Partial<BookingCreateRequest> {
+  status?: string;
+  total_price?: number;
+}
 
 export class BookingRepository extends SupabaseRepository<Booking> {
   protected tableName = 'bookings';
@@ -11,56 +26,16 @@ export class BookingRepository extends SupabaseRepository<Booking> {
     super();
   }
 
-  // Rename to avoid signature conflict with parent class
-  async findAllWithFilters(
-    pagination?: PaginationParams,
-    filters?: BookingFilters
-  ): Promise<RepositoryResponse<Booking[]>> {
+  async getAllBookings(filters?: any): Promise<RepositoryResponse<Booking[]>> {
     try {
-      let query = supabase.from(this.tableName as any).select('*');
-
-      // Apply filters
-      if (filters?.facilityId) {
-        query = query.eq('facility_id', filters.facilityId);
-      }
-      if (filters?.zoneId) {
-        query = query.eq('zone_id', filters.zoneId);
-      }
-      if (filters?.userId) {
-        query = query.eq('user_id', filters.userId);
-      }
-      if (filters?.organizationId) {
-        query = query.eq('organization_id', filters.organizationId);
-      }
-      if (filters?.status) {
-        query = query.eq('status', filters.status);
-      }
-      if (filters?.eventType) {
-        query = query.eq('event_type', filters.eventType);
-      }
-      if (filters?.startDate) {
-        query = query.gte('start_date', filters.startDate.toISOString());
-      }
-      if (filters?.endDate) {
-        query = query.lte('start_date', filters.endDate.toISOString());
-      }
-      if (filters?.requiresApproval !== undefined) {
-        query = query.eq('requires_approval', filters.requiresApproval);
-      }
-      if (filters?.approvalStatus) {
-        query = query.eq('approval_status', filters.approvalStatus);
-      }
-
-      // Apply search
-      if (filters?.searchTerm && filters.searchTerm.trim() !== "") {
-        query = query.or(`purpose.ilike.%${filters.searchTerm}%,contact_name.ilike.%${filters.searchTerm}%,description.ilike.%${filters.searchTerm}%`);
-      }
-
-      // Apply pagination
-      if (pagination) {
-        const from = (pagination.page - 1) * pagination.limit;
-        const to = from + pagination.limit - 1;
-        query = query.range(from, to);
+      let query = supabase.from('bookings').select('*');
+      
+      if (filters) {
+        Object.keys(filters).forEach(key => {
+          if (filters[key] !== undefined) {
+            query = query.eq(key, filters[key]);
+          }
+        });
       }
 
       const { data, error } = await query;
@@ -73,7 +48,8 @@ export class BookingRepository extends SupabaseRepository<Booking> {
       }
 
       return {
-        data: (data as unknown as Booking[]) || []
+        data: data || [],
+        error: null
       };
     } catch (error: any) {
       return {
@@ -83,56 +59,161 @@ export class BookingRepository extends SupabaseRepository<Booking> {
     }
   }
 
-  // Simplified query methods
-  async getBookingsByFacility(facilityId: string): Promise<RepositoryResponse<Booking[]>> {
-    return this.findAllWithFilters(undefined, { facilityId });
-  }
-
-  async getBookingsByZone(zoneId: string): Promise<RepositoryResponse<Booking[]>> {
-    return this.findAllWithFilters(undefined, { zoneId });
-  }
-
-  // Add the missing checkBookingConflicts method
-  async checkBookingConflicts(
-    zoneId: string,
-    startDate: Date,
-    endDate: Date,
-    excludeBookingId?: string
-  ): Promise<RepositoryResponse<{ hasConflict: boolean; conflictingBookings: Booking[]; availableAlternatives: any[] }>> {
+  async getBookingById(id: string): Promise<RepositoryResponse<Booking | null>> {
     try {
-      let query = supabase
-        .from(this.tableName as any)
+      const { data, error } = await supabase
+        .from('bookings')
         .select('*')
-        .eq('zone_id', zoneId)
-        .neq('status', 'cancelled')
-        .or(`start_date.lte.${endDate.toISOString()},end_date.gte.${startDate.toISOString()}`);
-
-      if (excludeBookingId) {
-        query = query.neq('id', excludeBookingId);
-      }
-
-      const { data, error } = await query;
+        .eq('id', id)
+        .maybeSingle();
 
       if (error) {
         return {
-          data: { hasConflict: false, conflictingBookings: [], availableAlternatives: [] },
+          data: null,
           error: error.message
         };
       }
 
-      const conflictingBookings = (data as unknown as Booking[]) || [];
-      const hasConflict = conflictingBookings.length > 0;
-
       return {
-        data: {
-          hasConflict,
-          conflictingBookings,
-          availableAlternatives: [] // Would implement alternative time slot suggestions here
-        }
+        data: data as Booking | null,
+        error: null
       };
     } catch (error: any) {
       return {
-        data: { hasConflict: false, conflictingBookings: [], availableAlternatives: [] },
+        data: null,
+        error: error.message
+      };
+    }
+  }
+
+  async createBooking(bookingData: BookingCreateRequest): Promise<RepositoryResponse<Booking | null>> {
+    try {
+      const { data, error } = await supabase
+        .from('bookings')
+        .insert(bookingData)
+        .select()
+        .maybeSingle();
+
+      if (error) {
+        return {
+          data: null,
+          error: error.message
+        };
+      }
+
+      return {
+        data: data as Booking | null,
+        error: null
+      };
+    } catch (error: any) {
+      return {
+        data: null,
+        error: error.message
+      };
+    }
+  }
+
+  async updateBooking(id: string, bookingData: BookingUpdateRequest): Promise<RepositoryResponse<Booking | null>> {
+    try {
+      const { data, error } = await supabase
+        .from('bookings')
+        .update(bookingData)
+        .eq('id', id)
+        .select()
+        .maybeSingle();
+
+      if (error) {
+        return {
+          data: null,
+          error: error.message
+        };
+      }
+
+      return {
+        data: data as Booking | null,
+        error: null
+      };
+    } catch (error: any) {
+      return {
+        data: null,
+        error: error.message
+      };
+    }
+  }
+
+  async deleteBooking(id: string): Promise<RepositoryResponse<boolean>> {
+    try {
+      const { error } = await supabase
+        .from('bookings')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        return {
+          data: false,
+          error: error.message
+        };
+      }
+
+      return {
+        data: true,
+        error: null
+      };
+    } catch (error: any) {
+      return {
+        data: false,
+        error: error.message
+      };
+    }
+  }
+
+  async checkBookingConflicts(bookingData: any): Promise<RepositoryResponse<{
+    hasConflict: boolean;
+    conflictingBookings: Booking[];
+    availableAlternatives: any[];
+  }>> {
+    try {
+      // Extract relevant data from bookingData
+      const { facility_id, zone_id, start_time, end_time } = bookingData;
+  
+      // Construct the conflict query
+      const { data, error } = await supabase
+        .from('bookings')
+        .select('*')
+        .eq('facility_id', facility_id)
+        .eq('zone_id', zone_id)
+        .lte('start_time', end_time)
+        .gte('end_time', start_time);
+  
+      if (error) {
+        return {
+          data: {
+            hasConflict: true,
+            conflictingBookings: [],
+            availableAlternatives: []
+          },
+          error: error.message
+        };
+      }
+  
+      const conflictingBookings = data as Booking[];
+      const hasConflict = conflictingBookings.length > 0;
+  
+      return {
+        data: {
+          hasConflict: false,
+          conflictingBookings: [],
+          availableAlternatives: []
+        },
+        error: null
+      };
+    } catch (error: any) {
+      return {
+        data: {
+          hasConflict: false,
+          conflictingBookings: [],
+          availableAlternatives: []
+        },
         error: error.message
       };
     }

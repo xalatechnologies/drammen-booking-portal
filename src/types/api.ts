@@ -2,6 +2,7 @@
 export interface RepositoryResponse<T> {
   data: T;
   error: string | null;
+  pagination?: PaginationResponse;
 }
 
 export interface PaginationParams {

@@ -63,6 +63,59 @@ export class PricingRuleRepository extends SupabaseRepository<PricingRuleRow> {
   async deletePricingRule(id: string): Promise<RepositoryResponse<boolean>> {
     return this.delete(id);
   }
+
+  async getAllPricingRules(): Promise<RepositoryResponse<any[]>> {
+    try {
+      const { data, error } = await supabase
+        .from('pricing_rules')
+        .select('*')
+        .eq('is_active', true);
+
+      if (error) {
+        return {
+          data: [],
+          error: error.message
+        };
+      }
+
+      return {
+        data: data || [],
+        error: null
+      };
+    } catch (error: any) {
+      return {
+        data: [],
+        error: error.message
+      };
+    }
+  }
+
+  async getPricingRulesByFacility(facilityId: number): Promise<RepositoryResponse<any[]>> {
+    try {
+      const { data, error } = await supabase
+        .from('pricing_rules')
+        .select('*')
+        .eq('facility_id', facilityId)
+        .eq('is_active', true);
+
+      if (error) {
+        return {
+          data: [],
+          error: error.message
+        };
+      }
+
+      return {
+        data: data || [],
+        error: null
+      };
+    } catch (error: any) {
+      return {
+        data: [],
+        error: error.message
+      };
+    }
+  }
 }
 
-export const pricingRuleRepository = new PricingRuleRepository(); 
+export const pricingRuleRepository = new PricingRuleRepository();

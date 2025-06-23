@@ -1,4 +1,3 @@
-
 import { SupabaseRepository } from '../SupabaseRepository';
 import { AdditionalService, ServiceFilters } from '@/types/additionalServices';
 import { PaginationParams, RepositoryResponse } from '@/types/api';
@@ -54,6 +53,33 @@ export class AdditionalServiceRepository extends SupabaseRepository<AdditionalSe
 
       return {
         data: (data as unknown as AdditionalService[]) || []
+      };
+    } catch (error: any) {
+      return {
+        data: [],
+        error: error.message
+      };
+    }
+  }
+
+  async getAllByCategory(category: string): Promise<RepositoryResponse<AdditionalService[]>> {
+    try {
+      const { data, error } = await supabase
+        .from('additional_services')
+        .select('*')
+        .eq('category', category)
+        .eq('is_active', true);
+
+      if (error) {
+        return {
+          data: [],
+          error: error.message
+        };
+      }
+
+      return {
+        data: data || [],
+        error: null
       };
     } catch (error: any) {
       return {
