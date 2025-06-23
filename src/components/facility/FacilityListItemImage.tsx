@@ -20,13 +20,13 @@ export function FacilityListItemImage({
   area
 }: FacilityListItemImageProps) {
   // Get featured image from database
-  const { data: featuredImage, error: featuredError } = useQuery({
+  const { data: featuredImage } = useQuery({
     queryKey: ['facility-featured-image', facilityId],
     queryFn: () => FacilityImageService.getFeaturedImage(facilityId),
   });
 
   // Fallback to first image if no featured image
-  const { data: firstImage, error: firstError } = useQuery({
+  const { data: firstImage } = useQuery({
     queryKey: ['facility-first-image', facilityId],
     queryFn: () => FacilityImageService.getFirstImage(facilityId),
     enabled: !featuredImage,
@@ -42,16 +42,6 @@ export function FacilityListItemImage({
                   firstImage?.alt_text || 
                   `Bilde av ${facilityName}`;
 
-  console.log('=== FacilityListItemImage Debug ===');
-  console.log('Facility ID:', facilityId);
-  console.log('Featured image data:', featuredImage);
-  console.log('Featured image error:', featuredError);
-  console.log('First image data:', firstImage);
-  console.log('First image error:', firstError);
-  console.log('Final image URL:', imageUrl);
-  console.log('Fallback image prop:', image);
-  console.log('===============================');
-
   return (
     <div className="h-full w-full relative overflow-hidden">
       <img 
@@ -60,8 +50,6 @@ export function FacilityListItemImage({
         className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110" 
         onError={(e) => {
           const target = e.target as HTMLImageElement;
-          console.log('Image failed to load:', imageUrl);
-          console.log('Switching to fallback image');
           target.src = "https://images.unsplash.com/photo-1525361147853-4bf9f54a0e98?w=600&auto=format&fit=crop";
           target.onerror = null;
         }} 

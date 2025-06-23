@@ -51,8 +51,6 @@ export function FacilityCardImage({
                   firstImage?.alt_text || 
                   t('facility.image.alt', { name: facility.name });
 
-  console.log('FacilityCardImage - Final image URL:', imageUrl, 'for facility:', facility.id);
-
   return (
     <div className="relative h-48 overflow-hidden">
       <img 
