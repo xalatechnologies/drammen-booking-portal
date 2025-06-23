@@ -26,7 +26,7 @@ import { toast } from "@/hooks/use-toast";
 import { Save, X, Shield, AlertCircle, Loader2 } from "lucide-react";
 import { useTranslation } from "@/hooks/useTranslation";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useFacilityAdminStore } from '@/stores/useFacilityAdminStore';
+import { useFacilityStore } from '@/stores/useGenericFacilityStore';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -53,15 +53,15 @@ export const EnhancedFacilityForm: React.FC<EnhancedFacilityFormProps> = ({ onSu
   const { tSync, isInitialized } = useTranslation();
   const { currentRole, hasPermission, canAccessTab, getAvailableTabs } = useRoleBasedAccess();
   const {
-    currentFacility,
-    createFacility,
-    updateFacility,
-    deleteFacility,
+    selectedItem: currentFacility,
+    create: createFacility,
+    update: updateFacility,
+    delete: deleteFacility,
     isLoading,
     error,
     formMode,
     closeForm
-  } = useFacilityAdminStore();
+  } = useFacilityStore();
   const [saveError, setSaveError] = React.useState<string | null>(null);
   const [saveSuccess, setSaveSuccess] = React.useState<boolean>(false);
   const [sectionErrors, setSectionErrors] = React.useState<string[]>([]);
@@ -142,18 +142,22 @@ export const EnhancedFacilityForm: React.FC<EnhancedFacilityFormProps> = ({ onSu
     clearSectionErrors(); // Clear previous section errors
     setSaveSuccess(false);
     console.log('EnhancedFacilityForm onSubmit: data', data);
-
+    
+    // Set loading state to prevent multiple submissions
+    setSectionLoading(true);
+    
     try {
       // Save main facility data
+      // The generic store returns the entity directly or null if there was an error
       const facilityResult = isEdit && currentFacility
-        ? await updateFacility(currentFacility.id.toString(), data)
+        ? await updateFacility(currentFacility.id, data)
         : await createFacility(data);
 
-      if (facilityResult.error || !facilityResult.data) {
-        throw new Error(facilityResult.error || 'Failed to save facility');
+      if (!facilityResult) {
+        throw new Error('Failed to save facility');
       }
 
-      const facilityId = facilityResult.data.id;
+      const facilityId = facilityResult.id;
       console.log('Facility saved successfully:', facilityId);
       
       // Save data from other sections
@@ -191,6 +195,8 @@ export const EnhancedFacilityForm: React.FC<EnhancedFacilityFormProps> = ({ onSu
       const error = err as Error;
       setSaveError(error.message || 'An unknown error occurred.');
       console.error('EnhancedFacilityForm onSubmit: error', err);
+    } finally {
+      setSectionLoading(false);
     }
   };
 
@@ -258,9 +264,9 @@ export const EnhancedFacilityForm: React.FC<EnhancedFacilityFormProps> = ({ onSu
         </div>
 
         {/* Page Header */}
-        <div className="mb-6">
+        <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
-            <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
+            <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
               {isEdit ? `${tSync("admin.facilities.form.edit", "Edit")}: ${currentFacility?.name}` : tSync("admin.facilities.form.addNew", "Add New Facility")}
             </h1>
             <div className="flex items-center gap-1.5 text-xs bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full border border-blue-200">
@@ -268,7 +274,7 @@ export const EnhancedFacilityForm: React.FC<EnhancedFacilityFormProps> = ({ onSu
               {currentRole}
             </div>
           </div>
-          <p className="text-gray-600 leading-relaxed">
+          <p className="text-gray-600 leading-relaxed text-lg">
             {isEdit 
               ? tSync("admin.facilities.form.editDescription", "Update facility information and settings")
               : tSync("admin.facilities.form.createDescription", "Create a new facility with all necessary details")
@@ -276,153 +282,411 @@ export const EnhancedFacilityForm: React.FC<EnhancedFacilityFormProps> = ({ onSu
           </p>
         </div>
 
-        {/* Role-based Info */}
-        {currentRole === 'saksbehandler' && (
-          <Alert className="mb-6 border-amber-200 bg-amber-50">
-            <AlertCircle className="h-4 w-4 text-amber-600" />
-            <AlertDescription className="text-amber-800">
-              {tSync("admin.facilities.form.limitedAccess", "As a case handler, you have limited access to facility settings. Contact an admin for advanced configuration.")}
-            </AlertDescription>
-          </Alert>
-        )}
-
         {/* Global Error Summary */}
         {(saveError || sectionErrors.length > 0) && (
-          <div className="bg-red-100 text-red-800 p-4 rounded mb-4 text-lg font-semibold border border-red-300">
-            {saveError && <div>{saveError}</div>}
+          <div className="bg-red-100 text-red-800 p-4 rounded mb-4 border border-red-300" id="validation-error-summary">
+            <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
+              <AlertCircle className="h-5 w-5" />
+              {tSync('admin.facilities.form.validationErrors', 'Please correct the following errors:')}
+            </h3>
+            {saveError && (
+              <div className="mt-2">
+                {saveError.split('\n').map((line, idx) => {
+                  // Check if this is a field: error format
+                  const fieldMatch = line.match(/^([^:]+):\s*(.+)$/);
+                  if (fieldMatch) {
+                    const [, fieldName, errorMessage] = fieldMatch;
+                    return (
+                      <div key={idx} className="py-1 border-b border-red-200 last:border-0">
+                        <span className="font-medium">{fieldName}:</span> {errorMessage}
+                      </div>
+                    );
+                  }
+                  return <div key={idx}>{line}</div>;
+                })}
+              </div>
+            )}
             {sectionErrors.length > 0 && (
               <ul className="list-disc ml-6 mt-2">
-                {sectionErrors.map((err, idx) => <li key={idx}>{err}</li>)}
+                {sectionErrors.map((err, idx) => <li key={idx} className="py-1">{err}</li>)}
               </ul>
             )}
           </div>
         )}
 
         {/* Main Content */}
-        <Card className="shadow-sm border-0 ring-1 ring-gray-200">
-          <CardContent className="p-0">
-            <Tabs defaultValue={availableTabs[0]} className="w-full">
-              <div className="border-b border-gray-100 px-6 pt-6 pb-2">
-                <TabsList className="grid w-full gap-2" style={{ gridTemplateColumns: `repeat(${availableTabs.length}, 1fr)` }}>
-                  {availableTabs.includes('basic') && (
-                    <TabsTrigger value="basic" className="text-xl h-14 px-6 font-bold">
-                      {tSync("admin.facilities.form.tabs.basic", "Basic")}
-                    </TabsTrigger>
-                  )}
-                  {availableTabs.includes('location') && (
-                    <TabsTrigger value="location" className="text-xl h-14 px-6 font-bold">
-                      {tSync("admin.facilities.form.tabs.location", "Location")}
-                    </TabsTrigger>
-                  )}
-                  {availableTabs.includes('features') && (
-                    <TabsTrigger value="features" className="text-xl h-14 px-6 font-bold">
-                      {tSync("admin.facilities.form.tabs.features", "Features")}
-                    </TabsTrigger>
-                  )}
-                  {availableTabs.includes('pricing') && (
-                    <TabsTrigger value="pricing" className="text-xl h-14 px-6 font-bold">
-                      {tSync("admin.facilities.form.tabs.pricing", "Pricing")}
-                    </TabsTrigger>
-                  )}
-                  {availableTabs.includes('zones') && (
-                    <TabsTrigger value="zones" className="text-xl h-14 px-6 font-bold">
-                      {tSync("admin.facilities.form.tabs.zones", "Zones")}
-                    </TabsTrigger>
-                  )}
-                  {availableTabs.includes('schedule') && (
-                    <TabsTrigger value="schedule" className="text-xl h-14 px-6 font-bold">
-                      {tSync("admin.facilities.form.tabs.schedule", "Schedule")}
-                    </TabsTrigger>
-                  )}
-                  {availableTabs.includes('blackouts') && (
-                    <TabsTrigger value="blackouts" className="text-xl h-14 px-6 font-bold">
-                      {tSync("admin.facilities.form.tabs.blackouts", "Blackouts")}
-                    </TabsTrigger>
-                  )}
-                  {availableTabs.includes('images') && (
-                    <TabsTrigger value="images" disabled={!isEdit} className="text-xl h-14 px-6 font-bold">
-                      {tSync("admin.facilities.form.tabs.images", "Images")}
-                    </TabsTrigger>
-                  )}
-                </TabsList>
-              </div>
-
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="w-full px-4 sm:px-6 lg:px-8 space-y-4 p-6 bg-white rounded shadow">
-                  {saveSuccess && (
-                    <div className="bg-green-100 text-green-800 p-4 rounded mb-4 text-lg font-semibold border border-green-300">
-                      {tSync('admin.facilities.form.saveSuccess', 'Facility saved successfully!')}
-                    </div>
-                  )}
-                  <TabsContent value="basic" className="space-y-6">
-                    <EnhancedFacilityBasicSection form={form} />
-                  </TabsContent>
-                  <TabsContent value="location" className="space-y-6">
-                    <EnhancedFacilityAddressSection form={form} />
-                  </TabsContent>
-                  <TabsContent value="contact" className="space-y-6">
-                    <FacilityContactSection form={form} />
-                  </TabsContent>
-                  <TabsContent value="config" className="space-y-6">
-                    <FacilityConfigSection form={form} />
-                  </TabsContent>
-                  <TabsContent value="features" className="space-y-6">
-                    <FacilityFeaturesSection form={form} equipment={watchedEquipment} amenities={watchedAmenities} capacity={watchedCapacity} />
-                  </TabsContent>
-                  <TabsContent value="pricing" className="space-y-6">
-                    <FacilityPricingSection ref={pricingRulesRef} form={form} facilityId={currentFacility?.id} />
-                  </TabsContent>
-                  <TabsContent value="zones" className="space-y-6">
-                    <FacilityZonesSection ref={zonesRef} facilityId={currentFacility?.id} />
-                  </TabsContent>
-                  <TabsContent value="schedule" className="space-y-6">
-                    <FacilityOpeningHoursSection ref={openingHoursRef} facilityId={currentFacility?.id} />
-                  </TabsContent>
-                  <TabsContent value="blackouts" className="space-y-6">
-                    <FacilityBlackoutSection ref={blackoutsRef} facilityId={currentFacility?.id} form={form} />
-                  </TabsContent>
-                  <TabsContent value="images" className="space-y-6">
-                    <FacilityImageManagement facilityId={currentFacility?.id} />
-                  </TabsContent>
-                  {/* Add more sections as needed */}
-                  {error && <div className="text-red-500 text-sm">{error}</div>}
-                  <div className="flex justify-end gap-4 mt-8">
-                    {isEdit && (
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button variant="destructive" className="h-12 px-6 text-lg font-bold" disabled={isDeleting}>
-                            {isDeleting ? "Deleting..." : "Delete"}
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              This action cannot be undone. This will permanently delete the
-                              facility and all its related data.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={handleDelete}>Continue</AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    )}
-                    <Button type="submit" className="h-12 px-6 text-lg font-bold" disabled={isLoading}>
-                      {isLoading ? "Saving..." : (isEdit ? tSync('admin.facilities.form.save', 'Save Changes') : tSync('admin.facilities.form.create', 'Create Facility'))}
-                    </Button>
-                    {closeForm && (
-                      <Button type="button" variant="secondary" onClick={closeForm} className="h-12 px-6 text-lg">
-                        {tSync('admin.facilities.form.cancel', 'Cancel')}
-                      </Button>
-                    )}
+        <Form {...form}>
+          <form onSubmit={(e) => { 
+              e.preventDefault();
+              console.log('Form submitted');
+              form.handleSubmit(onSubmit)(e);
+            }} 
+            className="space-y-4">
+            <Card className="shadow-sm border-0 ring-1 ring-gray-200 overflow-hidden">
+              <CardContent className="p-0">
+                <Tabs defaultValue={availableTabs[0]} className="w-full">
+                  <div className="bg-gradient-to-r from-blue-50 to-gray-50 border-b border-gray-200 px-6 pt-6 pb-4 mb-4">
+                    <TabsList 
+                      className="grid w-full gap-2 h-18 bg-white/80 backdrop-blur-sm shadow-sm rounded-lg p-1 border border-gray-100" 
+                      style={{ gridTemplateColumns: `repeat(${availableTabs.length}, 1fr)` }}
+                    >
+                      {availableTabs.includes('basic') && (
+                        <TabsTrigger 
+                          value="basic" 
+                          className="text-lg h-14 px-4 font-medium tracking-tight transition-all data-[state=active]:bg-blue-50 data-[state=active]:text-blue-800 data-[state=active]:font-semibold data-[state=active]:shadow-sm rounded-md"
+                        >
+                          {tSync("admin.facilities.form.tabs.basic", "Basic")}
+                        </TabsTrigger>
+                      )}
+                      {availableTabs.includes('location') && (
+                        <TabsTrigger 
+                          value="location" 
+                          className="text-lg h-14 px-4 font-medium tracking-tight transition-all data-[state=active]:bg-blue-50 data-[state=active]:text-blue-800 data-[state=active]:font-semibold data-[state=active]:shadow-sm rounded-md"
+                        >
+                          {tSync("admin.facilities.form.tabs.location", "Location")}
+                        </TabsTrigger>
+                      )}
+                      {availableTabs.includes('features') && (
+                        <TabsTrigger 
+                          value="features" 
+                          className="text-lg h-14 px-4 font-medium tracking-tight transition-all data-[state=active]:bg-blue-50 data-[state=active]:text-blue-800 data-[state=active]:font-semibold data-[state=active]:shadow-sm rounded-md"
+                        >
+                          {tSync("admin.facilities.form.tabs.features", "Features")}
+                        </TabsTrigger>
+                      )}
+                      {availableTabs.includes('pricing') && (
+                        <TabsTrigger 
+                          value="pricing" 
+                          className="text-lg h-14 px-4 font-medium tracking-tight transition-all data-[state=active]:bg-blue-50 data-[state=active]:text-blue-800 data-[state=active]:font-semibold data-[state=active]:shadow-sm rounded-md"
+                        >
+                          {tSync("admin.facilities.form.tabs.pricing", "Pricing")}
+                        </TabsTrigger>
+                      )}
+                      {/* {availableTabs.includes('zones') && (
+                        <TabsTrigger 
+                          value="zones" 
+                          className="text-lg h-14 px-4 font-medium tracking-tight transition-all data-[state=active]:bg-blue-50 data-[state=active]:text-blue-800 data-[state=active]:font-semibold data-[state=active]:shadow-sm rounded-md"
+                        >
+                          {tSync("admin.facilities.form.tabs.zones", "Zones")}
+                        </TabsTrigger>
+                      )} */}
+                      {/* Schedule tab removed - content moved to basic tab */}
+                      {availableTabs.includes('blackouts') && (
+                        <TabsTrigger 
+                          value="blackouts" 
+                          className="text-lg h-14 px-4 font-medium tracking-tight transition-all data-[state=active]:bg-blue-50 data-[state=active]:text-blue-800 data-[state=active]:font-semibold data-[state=active]:shadow-sm rounded-md"
+                        >
+                          {tSync("admin.facilities.form.tabs.blackouts", "Blackouts")}
+                        </TabsTrigger>
+                      )}
+                      {availableTabs.includes('images') && (
+                        <TabsTrigger 
+                          value="images" 
+                          disabled={!isEdit} 
+                          className="text-lg h-12 px-4 font-medium tracking-tight transition-all data-[state=active]:bg-blue-50 data-[state=active]:text-blue-800 data-[state=active]:font-semibold data-[state=active]:shadow-sm data-[state=inactive]:opacity-70 rounded-md"
+                        >
+                          {tSync("admin.facilities.form.tabs.images", "Images")}
+                        </TabsTrigger>
+                      )}
+                    </TabsList>
                   </div>
-                </form>
-              </Form>
-            </Tabs>
-          </CardContent>
-        </Card>
+                  
+                  <div className="w-full px-4 sm:px-6 lg:px-8 p-6 bg-white rounded">
+                    {saveSuccess && (
+                      <div className="bg-green-100 text-green-800 p-4 rounded mb-4 text-lg font-semibold border border-green-300">
+                        {tSync('admin.facilities.form.saveSuccess', 'Facility saved successfully!')}
+                      </div>
+                    )}
+                    <TabsContent value="basic" className="space-y-8 pt-2">
+                      <EnhancedFacilityBasicSection form={form} />
+                      <FacilityZonesSection ref={zonesRef} facilityId={currentFacility?.id?.toString()} />
+                      <FacilityOpeningHoursSection ref={openingHoursRef} facilityId={currentFacility?.id} />
+                    </TabsContent>
+                    <TabsContent value="location" className="space-y-8 pt-2">
+                      <EnhancedFacilityAddressSection form={form} />
+                    </TabsContent>
+                    <TabsContent value="contact" className="space-y-8 pt-2">
+                      <FacilityContactSection form={form} />
+                    </TabsContent>
+                    <TabsContent value="config" className="space-y-8 pt-2">
+                      <FacilityConfigSection form={form} />
+                    </TabsContent>
+                    <TabsContent value="features" className="space-y-8 pt-2">
+                      <FacilityFeaturesSection form={form} equipment={watchedEquipment} amenities={watchedAmenities} capacity={watchedCapacity} />
+                    </TabsContent>
+                    <TabsContent value="pricing" className="space-y-8 pt-2">
+                      <FacilityPricingSection ref={pricingRulesRef} form={form} facilityId={currentFacility?.id} />
+                    </TabsContent>
+                    {/* <TabsContent value="zones" className="space-y-8 pt-2">
+                      <FacilityZonesSection ref={zonesRef} facilityId={currentFacility?.id} />
+                    </TabsContent> */}
+                    {/* Schedule tab removed - content moved to basic tab */}
+                    <TabsContent value="blackouts" className="space-y-8 pt-2">
+                      <FacilityBlackoutSection ref={blackoutsRef} facilityId={currentFacility?.id} form={form} />
+                    </TabsContent>
+                    <TabsContent value="images" className="space-y-8 pt-2">
+                      <FacilityImageManagement facilityId={currentFacility?.id} />
+                    </TabsContent>
+                  </div>
+                </Tabs>
+              </CardContent>
+            </Card>
+
+            {/* Action Buttons */}
+            {error && <div className="text-red-500 text-sm">{error}</div>}
+            <div className="flex justify-end gap-4 mt-8 pt-4 border-t">
+              {isEdit && (
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="destructive" className="h-12 px-6 text-lg font-bold" disabled={isDeleting}>
+                      {isDeleting ? "Deleting..." : "Delete"}
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This action cannot be undone. This will permanently delete the
+                        facility and all its related data.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction onClick={handleDelete}>Continue</AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              )}
+              <Button 
+                type="button" 
+                className="h-12 px-6 text-lg font-bold" 
+                disabled={globalLoading}
+                onClick={async () => {
+                  console.log('Save button clicked directly submitting');
+                  setSectionLoading(true);
+                  setSaveError(null);
+                  clearSectionErrors();
+                  setSaveSuccess(false);
+                  
+                  try {
+                    // Get values directly from form
+                    const formValues = form.getValues();
+                    console.log('Form values to submit:', formValues);
+                    
+                    // Validate before submitting
+                    const isValid = await form.trigger();
+                    if (!isValid) {
+                      console.error('Form validation failed');
+                      const formErrors = form.formState.errors;
+                      console.log('Validation errors:', formErrors);
+                      
+                      // Create a more user-friendly summary of validation errors
+                      const errorFields = Object.entries(formErrors).map(([field, error]) => {
+                        // Convert camelCase field names to user-friendly format
+                        const fieldName = field
+                          .replace(/([A-Z])/g, ' $1') // Add space before capital letters
+                          .replace(/_/g, ' ') // Replace underscores with spaces
+                          .trim() // Remove extra spaces
+                          .replace(/^./, (str) => str.toUpperCase()); // Capitalize first letter
+                        
+                        return `${fieldName}: ${error.message}`;
+                      });
+                      
+                      // Set descriptive error message
+                      setSaveError(
+                        `${errorFields.join('\n')}`
+                      );
+                      
+                      // Show toast notification for validation errors
+                      toast({
+                        title: tSync('admin.facilities.form.validationFailed', 'Validation Failed'),
+                        description: tSync('admin.facilities.form.validationErrorsPresent', 'Please correct the highlighted fields'),
+                        variant: "destructive"
+                      });
+                      
+                      // Find which tab contains the first error and switch to it
+                      const firstErrorField = Object.keys(formErrors)[0];
+                      
+                      if (firstErrorField) {
+                        try {
+                          // Determine which tab contains the error
+                          let tabToActivate = 'basic';
+                          
+                          // Map fields to tabs (add more mappings as needed)
+                          const fieldToTabMap: Record<string, string> = {
+                            // Basic tab fields
+                            'name': 'basic',
+                            'type': 'basic',
+                            'description': 'basic',
+                            'capacity': 'basic',
+                            'area_sqm': 'basic',
+                            'status': 'basic',
+                            // Location tab fields
+                            'address_street': 'location',
+                            'address_city': 'location',
+                            'address_postal_code': 'location',
+                            'latitude': 'location',
+                            'longitude': 'location',
+                            // Features tab
+                            'equipment': 'features',
+                            'amenities': 'features',
+                            'accessibility_features': 'features',
+                            // And so on for other tabs
+                          };
+                          
+                          if (fieldToTabMap[firstErrorField]) {
+                            tabToActivate = fieldToTabMap[firstErrorField];
+                          }
+                          
+                          // Activate the tab containing the error
+                          const tabTrigger = document.querySelector(`[data-state="inactive"][value="${tabToActivate}"]`) as HTMLButtonElement;
+                          if (tabTrigger) {
+                            console.log(`Switching to tab: ${tabToActivate}`);
+                            tabTrigger.click();
+                          }
+                          
+                          // Scroll to error element after a short delay to allow tab switch
+                          setTimeout(() => {
+                            const errorElement = document.querySelector(`[name="${firstErrorField}"]`);
+                            if (errorElement) {
+                              errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                              // Add a pulsing outline to highlight the field
+                              errorElement.classList.add('ring-2', 'ring-red-500', 'animate-pulse');
+                              setTimeout(() => {
+                                errorElement.classList.remove('animate-pulse');
+                              }, 2000);
+                            } else {
+                              // If we couldn't find the element, scroll to the error summary
+                              const errorSummary = document.getElementById('validation-error-summary');
+                              if (errorSummary) {
+                                errorSummary.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                              }
+                            }
+                          }, 100);
+                        } catch (e) {
+                          console.error('Error handling validation display:', e);
+                          // Fallback: scroll to error summary
+                          const errorSummary = document.getElementById('validation-error-summary');
+                          if (errorSummary) {
+                            errorSummary.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                          }
+                        }
+                      }
+                      return;
+                    }
+                    
+                    // Save main facility data directly
+                    const facilityResult = isEdit && currentFacility
+                      ? await updateFacility(currentFacility.id.toString(), formValues)
+                      : await createFacility(formValues);
+
+                    if (!facilityResult) {
+                      throw new Error('Failed to save facility');
+                    }
+                    
+                    const facilityId = facilityResult.id;
+                    console.log('Facility saved successfully:', facilityId);
+                    
+                    // Save data from other sections
+                    console.log('EnhancedFacilityForm - Starting to save sections for facility ID:', facilityId);
+                    
+                    // Create array of section refs with names for better debugging
+                    const sectionRefs = [
+                      { name: 'Opening Hours', ref: openingHoursRef.current },
+                      { name: 'Zones', ref: zonesRef.current },
+                      { name: 'Blackouts', ref: blackoutsRef.current },
+                      { name: 'Pricing Rules', ref: pricingRulesRef.current },
+                    ];
+                    
+                    // Log which sections are available to save
+                    sectionRefs.forEach(section => {
+                      console.log(`EnhancedFacilityForm - Section ${section.name} ref exists:`, !!section.ref);
+                    });
+                    
+                    // Filter out sections that don't have refs or don't have saveData method
+                    const validSectionRefs = sectionRefs.filter(section => {
+                      const hasRef = !!section.ref;
+                      const hasSaveMethod = hasRef && typeof section.ref.saveData === 'function';
+                      
+                      if (hasRef && !hasSaveMethod) {
+                        console.warn(`EnhancedFacilityForm - Section ${section.name} has ref but no saveData method`);
+                      }
+                      
+                      return hasRef && hasSaveMethod;
+                    });
+                    
+                    const savePromises = validSectionRefs.map(section => ({
+                      name: section.name,
+                      promise: section.ref!.saveData()
+                    }));
+                    
+                    console.log(`EnhancedFacilityForm - Executing ${savePromises.length} section save promises`);
+                    
+                    // Execute each save promise individually to better track which one fails
+                    const results = [];
+                    const sectionSaveErrors = [];
+                    
+                    for (const { name, promise } of savePromises) {
+                      try {
+                        console.log(`EnhancedFacilityForm - Saving section: ${name}`);
+                        
+                        // Handle potential promise rejection
+                        let result;
+                        try {
+                          result = await promise;
+                        } catch (promiseError) {
+                          console.error(`EnhancedFacilityForm - Promise rejected for section ${name}:`, promiseError);
+                          throw promiseError;
+                        }
+                        
+                        console.log(`EnhancedFacilityForm - Section ${name} save result:`, result);
+                        results.push(result);
+                        
+                        if (!result) {
+                          console.error(`EnhancedFacilityForm - Failed to save section: ${name}`);
+                          sectionSaveErrors.push(`Failed to save ${name}.`);
+                        }
+                      } catch (error) {
+                        console.error(`EnhancedFacilityForm - Error saving section ${name}:`, error);
+                        results.push(false);
+                        sectionSaveErrors.push(`Error saving ${name}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+                      }
+                    }
+                    
+                    console.log('EnhancedFacilityForm - All section save results:', results);
+                    console.log('EnhancedFacilityForm - Section save errors:', sectionSaveErrors);
+
+                    if (sectionSaveErrors.length > 0) {
+                      setSectionErrors(sectionSaveErrors);
+                      throw new Error('Some sections failed to save.');
+                    }
+
+                    setSaveSuccess(true);
+                    toast({
+                      title: "Success",
+                      description: `Facility ${isEdit ? 'updated' : 'created'} successfully.`,
+                    });
+                    if (onSuccess) onSuccess();
+                    closeForm();
+                  } catch (err: unknown) {
+                    const error = err as Error;
+                    setSaveError(error.message || 'An unknown error occurred.');
+                    console.error('Save error:', err);
+                  } finally {
+                    setSectionLoading(false);
+                  }
+                }}
+              >
+                {globalLoading ? "Saving..." : (isEdit ? tSync('admin.facilities.form.save', 'Save Changes') : tSync('admin.facilities.form.create', 'Create Facility'))}
+              </Button>
+              {closeForm && (
+                <Button type="button" variant="secondary" onClick={closeForm} className="h-12 px-6 text-lg">
+                  {tSync('admin.facilities.form.cancel', 'Cancel')}
+                </Button>
+              )}
+            </div>
+          </form>
+        </Form>
       </div>
     </div>
   );

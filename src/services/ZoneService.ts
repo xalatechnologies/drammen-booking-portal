@@ -1,130 +1,98 @@
-
-import { supabase } from '@/integrations/supabase/client';
 import { ApiResponse } from '@/types/api';
 import { Zone } from '@/types/facility';
+import { zoneEdgeFunctionRepository } from '@/dal/repositories/ZoneEdgeFunctionRepository';
 
-export class ZoneService {
-  static async getZonesByFacilityId(facilityId: number): Promise<ApiResponse<Zone[]>> {
-    try {
-      console.log('ZoneService.getZonesByFacilityId - Called with facility ID:', facilityId);
-      
-      const { data, error } = await supabase.functions.invoke('zones', {
-        method: 'GET',
-        body: { facilityId }
-      });
-
-      if (error) {
-        console.error('ZoneService.getZonesByFacilityId - Error:', error);
-        return {
-          success: false,
-          error: { message: error.message || 'Failed to fetch zones' }
-        };
-      }
-
-      console.log('ZoneService.getZonesByFacilityId - Success:', data);
-      return {
-        success: true,
-        data: data || []
-      };
-    } catch (error: any) {
-      console.error('ZoneService.getZonesByFacilityId - Exception:', error);
+/**
+ * Service for managing facility zones
+ * Uses ZoneEdgeFunctionRepository for data access
+ */
+class ZoneServiceClass {
+  /**
+   * Get zones for a specific facility
+   * @param facilityId Facility ID
+   * @returns ApiResponse with array of zones
+   */
+  async getZonesByFacilityId(facilityId: number): Promise<ApiResponse<Zone[]>> {
+    console.log('ZoneService.getZonesByFacilityId - Called with facility ID:', facilityId);
+    
+    const response = await zoneEdgeFunctionRepository.getZonesByFacilityId(facilityId);
+    
+    if (response.error) {
       return {
         success: false,
-        error: { message: error.message || 'Failed to fetch zones' }
+        error: { message: response.error }
       };
     }
+    
+    console.log('ZoneService.getZonesByFacilityId - Success, zones:', response.data?.length || 0);
+    return { success: true, data: response.data || [] };
   }
-
-  static async createZone(zoneData: Partial<Zone>): Promise<ApiResponse<Zone>> {
-    try {
-      console.log('ZoneService.createZone - Called with data:', zoneData);
-      
-      const { data, error } = await supabase.functions.invoke('zones', {
-        method: 'POST',
-        body: zoneData
-      });
-
-      if (error) {
-        console.error('ZoneService.createZone - Error:', error);
-        return {
-          success: false,
-          error: { message: error.message || 'Failed to create zone' }
-        };
-      }
-
-      console.log('ZoneService.createZone - Success:', data);
-      return {
-        success: true,
-        data: data
-      };
-    } catch (error: any) {
-      console.error('ZoneService.createZone - Exception:', error);
+  
+  /**
+   * Create a new zone
+   * @param zoneData Zone data
+   * @returns ApiResponse with created zone
+   */
+  async createZone(zoneData: Partial<Zone>): Promise<ApiResponse<Zone>> {
+    console.log('ZoneService.createZone - Called with data:', zoneData);
+    
+    // Use the custom call method to avoid type constraints of the create method
+    const response = await zoneEdgeFunctionRepository.customCall<Zone>('POST', zoneData);
+    
+    if (response.error) {
       return {
         success: false,
-        error: { message: error.message || 'Failed to create zone' }
+        error: { message: response.error }
       };
     }
+    
+    console.log('ZoneService.createZone - Success:', response.data);
+    return { success: true, data: response.data as Zone };
   }
-
-  static async updateZone(id: string, zoneData: Partial<Zone>): Promise<ApiResponse<Zone>> {
-    try {
-      console.log('ZoneService.updateZone - Called with ID and data:', id, zoneData);
-      
-      const { data, error } = await supabase.functions.invoke('zones', {
-        method: 'PUT',
-        body: { id, ...zoneData }
-      });
-
-      if (error) {
-        console.error('ZoneService.updateZone - Error:', error);
-        return {
-          success: false,
-          error: { message: error.message || 'Failed to update zone' }
-        };
-      }
-
-      console.log('ZoneService.updateZone - Success:', data);
-      return {
-        success: true,
-        data: data
-      };
-    } catch (error: any) {
-      console.error('ZoneService.updateZone - Exception:', error);
+  
+  /**
+   * Update an existing zone
+   * @param zoneId Zone ID
+   * @param zoneData Updated zone data
+   * @returns ApiResponse with updated zone
+   */
+  async updateZone(zoneId: string, zoneData: Partial<Zone>): Promise<ApiResponse<Zone>> {
+    console.log('ZoneService.updateZone - Called with ID:', zoneId, 'and data:', zoneData);
+    
+    const response = await zoneEdgeFunctionRepository.update(zoneId, zoneData);
+    
+    if (response.error) {
       return {
         success: false,
-        error: { message: error.message || 'Failed to update zone' }
+        error: { message: response.error }
       };
     }
+    
+    console.log('ZoneService.updateZone - Success:', response.data);
+    return { success: true, data: response.data as Zone };
   }
-
-  static async deleteZone(id: string): Promise<ApiResponse<boolean>> {
-    try {
-      console.log('ZoneService.deleteZone - Called with ID:', id);
-      
-      const { error } = await supabase.functions.invoke('zones', {
-        method: 'DELETE',
-        body: { id }
-      });
-
-      if (error) {
-        console.error('ZoneService.deleteZone - Error:', error);
-        return {
-          success: false,
-          error: { message: error.message || 'Failed to delete zone' }
-        };
-      }
-
-      console.log('ZoneService.deleteZone - Success');
-      return {
-        success: true,
-        data: true
-      };
-    } catch (error: any) {
-      console.error('ZoneService.deleteZone - Exception:', error);
+  
+  /**
+   * Delete a zone
+   * @param zoneId Zone ID
+   * @returns ApiResponse with success status
+   */
+  async deleteZone(zoneId: string): Promise<ApiResponse<void>> {
+    console.log('ZoneService.deleteZone - Called with ID:', zoneId);
+    
+    const response = await zoneEdgeFunctionRepository.delete(zoneId);
+    
+    if (response.error) {
       return {
         success: false,
-        error: { message: error.message || 'Failed to delete zone' }
+        error: { message: response.error }
       };
     }
+    
+    console.log('ZoneService.deleteZone - Success');
+    return { success: true };
   }
 }
+
+// Export singleton instance for use throughout the application
+export const ZoneService = new ZoneServiceClass();

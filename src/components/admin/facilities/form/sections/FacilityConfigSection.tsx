@@ -7,12 +7,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { FacilityFormData, BOOKING_TYPES } from "../FacilityFormSchema";
+import { Star } from "lucide-react";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface FacilityConfigSectionProps {
   form: UseFormReturn<FacilityFormData>;
 }
 
 export const FacilityConfigSection: React.FC<FacilityConfigSectionProps> = ({ form }) => {
+  const { tSync } = useTranslation();
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -180,45 +183,49 @@ export const FacilityConfigSection: React.FC<FacilityConfigSectionProps> = ({ fo
           )}
         />
 
-        <div className="flex items-center space-x-8">
+        <h3 className="font-medium text-gray-800 mt-8 mb-4 border-t pt-6">Special Settings</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <FormField
             control={form.control}
-            name="has_auto_approval"
+            name="is_featured"
             render={({ field }) => (
-              <FormItem className="flex flex-row items-center space-x-3 space-y-0">
+              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
+                <div className="space-y-0.5">
+                  <FormLabel className="flex items-center gap-2">
+                    <Star className="w-4 h-4" />
+                    {tSync("admin.facilities.form.basic.featured", "Featured Facility")}
+                  </FormLabel>
+                  <FormDescription>
+                    {tSync("admin.facilities.form.basic.featuredHint", "Show this facility prominently on the homepage")}
+                  </FormDescription>
+                </div>
                 <FormControl>
                   <Switch
                     checked={field.value}
                     onCheckedChange={field.onChange}
                   />
                 </FormControl>
-                <div className="space-y-1 leading-none">
-                  <FormLabel>Auto Approval</FormLabel>
-                  <FormDescription>
-                    Automatically approve eligible bookings
-                  </FormDescription>
-                </div>
               </FormItem>
             )}
           />
 
           <FormField
             control={form.control}
-            name="is_featured"
+            name="has_auto_approval"
             render={({ field }) => (
-              <FormItem className="flex flex-row items-center space-x-3 space-y-0">
+              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
+                <div className="space-y-0.5">
+                  <FormLabel>{tSync("admin.facilities.form.basic.autoApproval", "Auto-approve Bookings")}</FormLabel>
+                  <FormDescription>
+                    {tSync("admin.facilities.form.basic.autoApprovalHint", "Automatically approve booking requests")}
+                  </FormDescription>
+                </div>
                 <FormControl>
                   <Switch
                     checked={field.value}
                     onCheckedChange={field.onChange}
                   />
                 </FormControl>
-                <div className="space-y-1 leading-none">
-                  <FormLabel>Featured Facility</FormLabel>
-                  <FormDescription>
-                    Show in featured listings
-                  </FormDescription>
-                </div>
               </FormItem>
             )}
           />

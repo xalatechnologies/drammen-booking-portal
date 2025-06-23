@@ -23,23 +23,26 @@ export const EnhancedFacilityBasicSection: React.FC<EnhancedFacilityBasicSection
 
   return (
     <Card>
-      <CardHeader className="pb-3">
-        <CardTitle className="text-lg flex items-center gap-2">
-          <Info className="w-5 h-5" />
+      <CardHeader className="pb-5 pt-5 bg-gray-50 border-b border-gray-200">
+        <CardTitle className="text-xl flex items-center gap-1.5">
+          <Info className="w-4 h-4" />
           {tSync("admin.facilities.form.basic.title", "Basic Information")}
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-3 py-6">
         {/* Name and Type Row */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <FormField
             control={form.control}
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{tSync("admin.facilities.form.basic.name", "Facility Name")} *</FormLabel>
                 <FormControl>
-                  <Input placeholder={tSync("admin.facilities.form.basic.namePlaceholder", "Enter facility name")} {...field} />
+                  <Input 
+                    placeholder={tSync("admin.facilities.form.basic.namePlaceholder", "Facility Name*")}
+                    className="h-9" 
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -51,11 +54,10 @@ export const EnhancedFacilityBasicSection: React.FC<EnhancedFacilityBasicSection
             name="type"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{tSync("admin.facilities.form.basic.type", "Facility Type")} *</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <Select onValueChange={field.onChange} value={field.value || ""}>
                   <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder={tSync("admin.facilities.form.basic.typePlaceholder", "Select type")} />
+                    <SelectTrigger className="h-9">
+                      <SelectValue placeholder={tSync("admin.facilities.form.basic.typePlaceholder", "Facility Type*")} />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
@@ -73,25 +75,24 @@ export const EnhancedFacilityBasicSection: React.FC<EnhancedFacilityBasicSection
         </div>
 
         {/* Area and Status Row */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <FormField
             control={form.control}
             name="area"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{tSync("admin.facilities.form.basic.area", "Area/District")} *</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <Select onValueChange={field.onChange} value={field.value || ""}>
                   <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder={tSync("admin.facilities.form.basic.areaPlaceholder", "Select area")} />
+                    <SelectTrigger className="h-9">
+                      <SelectValue placeholder={tSync("admin.facilities.form.basic.areaPlaceholder", "Area/District*")} />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="drammen-sentrum">Drammen Sentrum</SelectItem>
-                    <SelectItem value="stromso">Strømsø</SelectItem>
-                    <SelectItem value="bragernes">Bragernes</SelectItem>
-                    <SelectItem value="tanganvik">Tangen/Åsvik</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
+                    <SelectItem value="drammen-sentrum">{tSync("admin.facilities.areas.drammenSentrum", "Drammen Sentrum")}</SelectItem>
+                    <SelectItem value="stromso">{tSync("admin.facilities.areas.stromso", "Strømsø")}</SelectItem>
+                    <SelectItem value="bragernes">{tSync("admin.facilities.areas.bragernes", "Bragernes")}</SelectItem>
+                    <SelectItem value="tanganvik">{tSync("admin.facilities.areas.tanganvik", "Tangen/Åsvik")}</SelectItem>
+                    <SelectItem value="other">{tSync("admin.facilities.areas.other", "Other")}</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />
@@ -104,27 +105,32 @@ export const EnhancedFacilityBasicSection: React.FC<EnhancedFacilityBasicSection
             name="status"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{tSync("admin.facilities.form.basic.status", "Status")}</FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
-                    <SelectTrigger>
-                      <SelectValue />
+                    <SelectTrigger className="h-9">
+                      <SelectValue placeholder={tSync("admin.facilities.form.basic.statusPlaceholder", "Status")} />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
                     <SelectItem value="active">
                       <div className="flex items-center gap-2">
-                        <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">Active</Badge>
+                        <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                          {tSync("admin.facilities.statuses.active", "Active")}
+                        </Badge>
                       </div>
                     </SelectItem>
                     <SelectItem value="maintenance">
                       <div className="flex items-center gap-2">
-                        <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">Maintenance</Badge>
+                        <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">
+                          {tSync("admin.facilities.statuses.maintenance", "Maintenance")}
+                        </Badge>
                       </div>
                     </SelectItem>
                     <SelectItem value="inactive">
                       <div className="flex items-center gap-2">
-                        <Badge variant="outline" className="bg-gray-50 text-gray-700 border-gray-200">Inactive</Badge>
+                        <Badge variant="outline" className="bg-gray-50 text-gray-700 border-gray-200">
+                          {tSync("admin.facilities.statuses.inactive", "Inactive")}
+                        </Badge>
                       </div>
                     </SelectItem>
                   </SelectContent>
@@ -136,24 +142,24 @@ export const EnhancedFacilityBasicSection: React.FC<EnhancedFacilityBasicSection
         </div>
 
         {/* Capacity and Area Size Row */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <FormField
             control={form.control}
             name="capacity"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{tSync("admin.facilities.form.basic.capacity", "Capacity (people)")} *</FormLabel>
                 <FormControl>
                   <Input
                     type="number"
                     min="1"
-                    placeholder="30"
+                    className="h-9"
+                    placeholder={tSync("admin.facilities.form.basic.capacityPlaceholder", "Capacity (people)*")}
                     {...field}
                     onChange={(e) => field.onChange(parseInt(e.target.value) || 1)}
                   />
                 </FormControl>
-                <FormDescription>
-                  {tSync("admin.facilities.form.basic.capacityHint", "Maximum number of people this facility can accommodate")}
+                <FormDescription className="text-xs pt-1">
+                  {tSync("admin.facilities.form.basic.capacityHint", "Max number of people this facility can accommodate")}
                 </FormDescription>
                 <FormMessage />
               </FormItem>
@@ -165,22 +171,21 @@ export const EnhancedFacilityBasicSection: React.FC<EnhancedFacilityBasicSection
             name="area_sqm"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{tSync("admin.facilities.form.basic.areaSqm", "Area (m²)")}</FormLabel>
                 <FormControl>
                   <Input
                     type="number"
                     min="0"
                     step="0.1"
-                    placeholder="200"
+                    className="h-9"
+                    placeholder={tSync("admin.facilities.form.basic.areaSqmPlaceholder", "Area (m²)")}
                     {...field}
                     onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                   />
                 </FormControl>
-                <FormDescription>
+                <FormDescription className="text-xs pt-1">
                   {watchedAreaSqm && watchedCapacity ? 
-                    `${(watchedAreaSqm / watchedCapacity).toFixed(1)} m² per person` : 
-                    tSync("admin.facilities.form.basic.areaSqmHint", "Total floor area in square meters")
-                  }
+                    `${(watchedAreaSqm / watchedCapacity).toFixed(1)} m² ${tSync("admin.facilities.form.basic.perPerson", "per person")}` : 
+                    tSync("admin.facilities.form.basic.totalAreaHint", "Total area in square meters")}
                 </FormDescription>
                 <FormMessage />
               </FormItem>
@@ -188,76 +193,27 @@ export const EnhancedFacilityBasicSection: React.FC<EnhancedFacilityBasicSection
           />
         </div>
 
-        {/* Description */}
+        {/* Description Field */}
         <FormField
           control={form.control}
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{tSync("admin.facilities.form.basic.description", "Description")}</FormLabel>
               <FormControl>
-                <Textarea
-                  rows={4}
-                  placeholder={tSync("admin.facilities.form.basic.descriptionPlaceholder", "Describe the facility, its features, and what makes it special...")}
-                  className="resize-none"
-                  {...field}
+                <Textarea 
+                  placeholder={tSync("admin.facilities.form.basic.descriptionPlaceholder", "Description (brief overview of the facility)")} 
+                  {...field} 
+                  className="min-h-[70px] text-sm"
                 />
               </FormControl>
-              <FormDescription>
-                {field.value?.length || 0}/500 {tSync("admin.common.characters", "characters")}
+              <FormDescription className="flex justify-end text-xs pt-1">
+                {field.value?.length || 0}/500 {tSync("admin.facilities.form.basic.characters", "characters")}
               </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
-
-        {/* Feature Flags */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t">
-          <FormField
-            control={form.control}
-            name="is_featured"
-            render={({ field }) => (
-              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
-                <div className="space-y-0.5">
-                  <FormLabel className="flex items-center gap-2">
-                    <Star className="w-4 h-4" />
-                    {tSync("admin.facilities.form.basic.featured", "Featured Facility")}
-                  </FormLabel>
-                  <FormDescription>
-                    {tSync("admin.facilities.form.basic.featuredHint", "Show this facility prominently on the homepage")}
-                  </FormDescription>
-                </div>
-                <FormControl>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="has_auto_approval"
-            render={({ field }) => (
-              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
-                <div className="space-y-0.5">
-                  <FormLabel>{tSync("admin.facilities.form.basic.autoApproval", "Auto-approve Bookings")}</FormLabel>
-                  <FormDescription>
-                    {tSync("admin.facilities.form.basic.autoApprovalHint", "Automatically approve booking requests")}
-                  </FormDescription>
-                </div>
-                <FormControl>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-        </div>
+        {/* Feature Flags section moved to Config tab */}
       </CardContent>
     </Card>
   );

@@ -1,6 +1,6 @@
 
-import { supabase } from '@/integrations/supabase/client';
 import { ApiResponse } from '@/types/api';
+import { openingHoursEdgeFunctionRepository } from '@/dal/repositories/OpeningHoursEdgeFunctionRepository';
 
 export interface OpeningHour {
   id?: string;
@@ -13,66 +13,60 @@ export interface OpeningHour {
   valid_to?: string;
 }
 
-export class OpeningHoursService {
-  static async getOpeningHours(facilityId: number): Promise<ApiResponse<OpeningHour[]>> {
-    try {
-      console.log('OpeningHoursService.getOpeningHours - Called with facility ID:', facilityId);
-      
-      const { data, error } = await supabase.functions.invoke('opening-hours', {
-        method: 'GET',
-        body: { facilityId }
-      });
-
-      if (error) {
-        console.error('OpeningHoursService.getOpeningHours - Error:', error);
-        return {
-          success: false,
-          error: { message: error.message || 'Failed to fetch opening hours' }
-        };
-      }
-
-      console.log('OpeningHoursService.getOpeningHours - Success:', data);
-      return {
-        success: true,
-        data: data || []
-      };
-    } catch (error: any) {
-      console.error('OpeningHoursService.getOpeningHours - Exception:', error);
+/**
+ * Service for managing facility opening hours
+ * Uses OpeningHoursEdgeFunctionRepository for data access
+ */
+class OpeningHoursServiceClass {
+  /**
+   * Get opening hours for a specific facility
+   * @param facilityId Facility ID
+   * @returns ApiResponse with array of opening hours
+   */
+  async getOpeningHours(facilityId: number): Promise<ApiResponse<OpeningHour[]>> {
+    console.log('OpeningHoursService.getOpeningHours - Called with facility ID:', facilityId);
+    
+    const response = await openingHoursEdgeFunctionRepository.getOpeningHoursByFacilityId(facilityId);
+    
+    if (response.error) {
       return {
         success: false,
-        error: { message: error.message || 'Failed to fetch opening hours' }
+        error: { message: response.error }
       };
     }
+    
+    console.log('OpeningHoursService.getOpeningHours - Success:', response.data?.length || 0);
+    return {
+      success: true,
+      data: response.data || []
+    };
   }
 
-  static async saveOpeningHours(facilityId: number, hours: OpeningHour[]): Promise<ApiResponse<OpeningHour[]>> {
-    try {
-      console.log('OpeningHoursService.saveOpeningHours - Called with facility ID and hours:', facilityId, hours);
-      
-      const { data, error } = await supabase.functions.invoke('opening-hours', {
-        method: 'POST',
-        body: { facilityId, hours }
-      });
-
-      if (error) {
-        console.error('OpeningHoursService.saveOpeningHours - Error:', error);
-        return {
-          success: false,
-          error: { message: error.message || 'Failed to save opening hours' }
-        };
-      }
-
-      console.log('OpeningHoursService.saveOpeningHours - Success:', data);
-      return {
-        success: true,
-        data: data || []
-      };
-    } catch (error: any) {
-      console.error('OpeningHoursService.saveOpeningHours - Exception:', error);
+  /**
+   * Save opening hours for a facility
+   * @param facilityId Facility ID
+   * @param hours Opening hours data
+   * @returns ApiResponse with saved opening hours
+   */
+  async saveOpeningHours(facilityId: number, hours: OpeningHour[]): Promise<ApiResponse<OpeningHour[]>> {
+    console.log('OpeningHoursService.saveOpeningHours - Called with facility ID and hours:', facilityId, hours);
+    
+    const response = await openingHoursEdgeFunctionRepository.saveOpeningHours(facilityId, hours);
+    
+    if (response.error) {
       return {
         success: false,
-        error: { message: error.message || 'Failed to save opening hours' }
+        error: { message: response.error }
       };
     }
+    
+    console.log('OpeningHoursService.saveOpeningHours - Success:', response.data?.length || 0);
+    return {
+      success: true,
+      data: response.data || []
+    };
   }
 }
+
+// Export singleton instance for use throughout the application
+export const OpeningHoursService = new OpeningHoursServiceClass();

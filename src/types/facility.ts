@@ -126,10 +126,21 @@ export interface Zone {
   coordinates_width: number | null;
   coordinates_height: number | null;
   equipment: string[] | null;
+  amenities: string[] | null; // Added amenities field
   accessibility_features: string[] | null;
   status: 'active' | 'maintenance' | 'inactive';
   created_at: string;
   updated_at: string;
+  
+  // UI-specific fields
+  notes?: string; // UI field that maps to description
+  isMainZone?: boolean; // UI field that maps to is_main_zone
+  areaSqm?: number; // UI field that maps to area_sqm
+  isActive?: boolean; // UI field for active status
+  accessibilityFeatures?: string[]; // UI field that maps to accessibility_features
+  priceMultiplier?: number; // UI field for price multiplier
+  minBookingDuration?: number; // UI field for min booking duration
+  maxBookingDuration?: number; // UI field for max booking duration
   
   // Legacy fields for backwards compatibility
   facilityId?: string;

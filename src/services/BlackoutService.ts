@@ -1,6 +1,6 @@
 
-import { supabase } from '@/integrations/supabase/client';
 import { ApiResponse } from '@/types/api';
+import { blackoutEdgeFunctionRepository } from '@/dal/repositories/BlackoutEdgeFunctionRepository';
 
 export interface BlackoutPeriod {
   id?: string;
@@ -13,128 +13,108 @@ export interface BlackoutPeriod {
   created_at?: string;
 }
 
-export class BlackoutService {
-  static async getBlackoutPeriods(facilityId: number): Promise<ApiResponse<BlackoutPeriod[]>> {
-    try {
-      console.log('BlackoutService.getBlackoutPeriods - Called with facility ID:', facilityId);
-      
-      const { data, error } = await supabase.functions.invoke('facility-blackouts', {
-        method: 'GET',
-        body: { facilityId }
-      });
-
-      if (error) {
-        console.error('BlackoutService.getBlackoutPeriods - Error:', error);
-        return {
-          success: false,
-          error: { message: error.message || 'Failed to fetch blackout periods' }
-        };
-      }
-
-      console.log('BlackoutService.getBlackoutPeriods - Success:', data);
-      return {
-        success: true,
-        data: data || []
-      };
-    } catch (error: any) {
-      console.error('BlackoutService.getBlackoutPeriods - Exception:', error);
+/**
+ * Service for managing facility blackout periods
+ * Uses BlackoutEdgeFunctionRepository for data access
+ */
+class BlackoutServiceClass {
+  /**
+   * Get blackout periods for a specific facility
+   * @param facilityId Facility ID
+   * @returns ApiResponse with array of blackout periods
+   */
+  async getBlackoutPeriods(facilityId: number): Promise<ApiResponse<BlackoutPeriod[]>> {
+    console.log('BlackoutService.getBlackoutPeriods - Called with facility ID:', facilityId);
+    
+    const response = await blackoutEdgeFunctionRepository.getBlackoutPeriodsByFacilityId(facilityId);
+    
+    if (response.error) {
       return {
         success: false,
-        error: { message: error.message || 'Failed to fetch blackout periods' }
+        error: { message: response.error }
       };
     }
+    
+    console.log('BlackoutService.getBlackoutPeriods - Success:', response.data?.length || 0);
+    return {
+      success: true,
+      data: response.data || []
+    };
   }
 
-  static async createBlackoutPeriod(blackoutData: Omit<BlackoutPeriod, 'id' | 'created_at'>): Promise<ApiResponse<BlackoutPeriod>> {
-    try {
-      console.log('BlackoutService.createBlackoutPeriod - Called with data:', blackoutData);
-      
-      const { data, error } = await supabase.functions.invoke('facility-blackouts', {
-        method: 'POST',
-        body: blackoutData
-      });
-
-      if (error) {
-        console.error('BlackoutService.createBlackoutPeriod - Error:', error);
-        return {
-          success: false,
-          error: { message: error.message || 'Failed to create blackout period' }
-        };
-      }
-
-      console.log('BlackoutService.createBlackoutPeriod - Success:', data);
-      return {
-        success: true,
-        data: data
-      };
-    } catch (error: any) {
-      console.error('BlackoutService.createBlackoutPeriod - Exception:', error);
+  /**
+   * Create a new blackout period
+   * @param blackoutData Blackout period data
+   * @returns ApiResponse with created blackout period
+   */
+  async createBlackoutPeriod(blackoutData: Omit<BlackoutPeriod, 'id' | 'created_at'>): Promise<ApiResponse<BlackoutPeriod>> {
+    console.log('BlackoutService.createBlackoutPeriod - Called with data:', blackoutData);
+    
+    const response = await blackoutEdgeFunctionRepository.customCall<BlackoutPeriod>('POST', blackoutData);
+    
+    if (response.error) {
       return {
         success: false,
-        error: { message: error.message || 'Failed to create blackout period' }
+        error: { message: response.error }
       };
     }
+    
+    console.log('BlackoutService.createBlackoutPeriod - Success:', response.data);
+    return {
+      success: true,
+      data: response.data as BlackoutPeriod
+    };
   }
 
-  static async updateBlackoutPeriod(id: string, blackoutData: Partial<BlackoutPeriod>): Promise<ApiResponse<BlackoutPeriod>> {
-    try {
-      console.log('BlackoutService.updateBlackoutPeriod - Called with ID and data:', id, blackoutData);
-      
-      const { data, error } = await supabase.functions.invoke('facility-blackouts', {
-        method: 'PUT',
-        body: { id, ...blackoutData }
-      });
-
-      if (error) {
-        console.error('BlackoutService.updateBlackoutPeriod - Error:', error);
-        return {
-          success: false,
-          error: { message: error.message || 'Failed to update blackout period' }
-        };
-      }
-
-      console.log('BlackoutService.updateBlackoutPeriod - Success:', data);
-      return {
-        success: true,
-        data: data
-      };
-    } catch (error: any) {
-      console.error('BlackoutService.updateBlackoutPeriod - Exception:', error);
+  /**
+   * Update an existing blackout period
+   * @param id Blackout period ID
+   * @param blackoutData Updated blackout period data
+   * @returns ApiResponse with updated blackout period
+   */
+  async updateBlackoutPeriod(id: string, blackoutData: Partial<BlackoutPeriod>): Promise<ApiResponse<BlackoutPeriod>> {
+    console.log('BlackoutService.updateBlackoutPeriod - Called with ID and data:', id, blackoutData);
+    
+    const response = await blackoutEdgeFunctionRepository.update(id, blackoutData);
+    
+    if (response.error) {
       return {
         success: false,
-        error: { message: error.message || 'Failed to update blackout period' }
+        error: { message: response.error }
       };
     }
+    
+    console.log('BlackoutService.updateBlackoutPeriod - Success:', response.data);
+    return {
+      success: true,
+      data: response.data as BlackoutPeriod
+    };
   }
 
-  static async deleteBlackoutPeriod(id: string): Promise<ApiResponse<boolean>> {
-    try {
-      console.log('BlackoutService.deleteBlackoutPeriod - Called with ID:', id);
-      
-      const { error } = await supabase.functions.invoke('facility-blackouts', {
-        method: 'DELETE',
-        body: { id }
-      });
-
-      if (error) {
-        console.error('BlackoutService.deleteBlackoutPeriod - Error:', error);
-        return {
-          success: false,
-          error: { message: error.message || 'Failed to delete blackout period' }
-        };
-      }
-
-      console.log('BlackoutService.deleteBlackoutPeriod - Success');
-      return {
-        success: true,
-        data: true
-      };
-    } catch (error: any) {
-      console.error('BlackoutService.deleteBlackoutPeriod - Exception:', error);
+  /**
+   * Delete a blackout period
+   * @param id Blackout period ID
+   * @returns ApiResponse with success status
+   */
+  async deleteBlackoutPeriod(id: string): Promise<ApiResponse<boolean>> {
+    console.log('BlackoutService.deleteBlackoutPeriod - Called with ID:', id);
+    
+    const response = await blackoutEdgeFunctionRepository.delete(id);
+    
+    if (response.error) {
       return {
         success: false,
-        error: { message: error.message || 'Failed to delete blackout period' }
+        error: { message: response.error }
       };
     }
+    
+    console.log('BlackoutService.deleteBlackoutPeriod - Success');
+    return {
+      success: true,
+      data: true
+    };
   }
 }
+
+// Export singleton instance for use throughout the application
+export const BlackoutService = new BlackoutServiceClass();

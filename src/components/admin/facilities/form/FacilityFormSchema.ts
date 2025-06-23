@@ -49,7 +49,7 @@ export const facilityFormSchema = z.object({
   is_featured: z.boolean().default(false),
   
   // New fields for enhanced functionality
-  next_available: z.string().optional(),
+  next_available: z.string().nullable().optional(),
   rating: z.number().min(0).max(5).optional(),
   review_count: z.number().min(0).optional(),
   

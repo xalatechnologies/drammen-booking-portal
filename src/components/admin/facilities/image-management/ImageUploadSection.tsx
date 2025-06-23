@@ -101,11 +101,7 @@ export const ImageUploadSection: React.FC<ImageUploadSectionProps> = ({
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Upload New Images</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
+    <>
         <div>
           <Label htmlFor="image-upload">Select Images</Label>
           <Input
@@ -146,7 +142,6 @@ export const ImageUploadSection: React.FC<ImageUploadSectionProps> = ({
             </Button>
           </div>
         )}
-      </CardContent>
-    </Card>
+     </>
   );
 };

@@ -1,69 +1,43 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { 
+  createEdgeFunctionHandler, 
+  successResponse, 
+  errorResponse,
+  getPathSegments
+} from '../_shared/edge-function-utils.ts'
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
+serve(createEdgeFunctionHandler(async (req, params, supabase) => {
+  const pathSegments = getPathSegments(req)
 
-serve(async (req) => {
-  // Handle CORS preflight requests
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
-  }
+  // Handle GET requests
+  if (req.method === 'GET') {
+    // Single blackout period by ID
+    if (pathSegments.length >= 2 && pathSegments[1]) {
+      const blackoutId = pathSegments[1]
+      
+      const { data: blackout, error } = await supabase
+        .from('facility_blackout_periods')
+        .select(`
+          *,
+          facility:facilities(id, name, type)
+        `)
+        .eq('id', blackoutId)
+        .single()
 
-  try {
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      {
-        global: {
-          headers: { Authorization: req.headers.get('Authorization')! },
-        },
+      if (error) {
+        console.error('Blackout fetch error:', error)
+        return errorResponse('Blackout period not found', { code: 'NOT_FOUND' }, 404)
       }
-    )
 
-    const url = new URL(req.url)
-    const pathSegments = url.pathname.split('/').filter(Boolean)
-
-    // Handle GET requests
-    if (req.method === 'GET') {
-      // Single blackout period by ID
-      if (pathSegments.length >= 2 && pathSegments[1]) {
-        const blackoutId = pathSegments[1]
-        
-        const { data: blackout, error } = await supabaseClient
-          .from('facility_blackout_periods')
-          .select(`
-            *,
-            facility:facilities(id, name, type)
-          `)
-          .eq('id', blackoutId)
-          .single()
-
-        if (error) {
-          console.error('Blackout fetch error:', error)
-          return new Response(
-            JSON.stringify({ success: false, error: { message: 'Blackout period not found', code: 'NOT_FOUND' } }),
-            { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-          )
-        }
-
-        return new Response(
-          JSON.stringify({ success: true, data: blackout }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        )
-      }
+      return successResponse(blackout)
+    }
 
       // List blackout periods with filters
-      const facilityId = url.searchParams.get('facilityId')
-      const page = parseInt(url.searchParams.get('page') || '1')
-      const limit = parseInt(url.searchParams.get('limit') || '10')
-      const offset = (page - 1) * limit
-      const active = url.searchParams.get('active')
+      const { facilityId, page = 1, limit = 10, active } = params;
+      const offset = (Number(page) - 1) * Number(limit);
 
-      let query = supabaseClient
+      let query = supabase
         .from('facility_blackout_periods')
         .select(`
           *,
@@ -71,7 +45,7 @@ serve(async (req) => {
         `, { count: 'exact' })
 
       if (facilityId) {
-        query = query.eq('facility_id', parseInt(facilityId))
+        query = query.eq('facility_id', Number(facilityId))
       }
 
       if (active === 'true') {
@@ -79,25 +53,19 @@ serve(async (req) => {
         query = query.gte('end_date', now)
       }
 
-      query = query.range(offset, offset + limit - 1).order('start_date', { ascending: false })
+      query = query.range(offset, offset + Number(limit) - 1).order('start_date', { ascending: false })
 
       const { data: blackouts, error, count } = await query
 
       if (error) {
         console.error('Blackouts fetch error:', error)
-        return new Response(
-          JSON.stringify({ success: false, error: { message: 'Failed to fetch blackout periods', details: error } }),
-          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        )
+        return errorResponse('Failed to fetch blackout periods', error, 500)
       }
 
-      const totalPages = Math.ceil((count || 0) / limit)
+      const totalPages = Math.ceil((count || 0) / Number(limit))
 
-      return new Response(
-        JSON.stringify({
-          success: true,
-          data: {
-            data: blackouts || [],
+      return successResponse({
+        data: blackouts || [],
             pagination: {
               page,
               limit,
