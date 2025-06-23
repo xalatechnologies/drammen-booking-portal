@@ -1,90 +1,93 @@
-import { ApiResponse, PaginatedResponse, QueryParams } from './entity';
 
-/**
- * Generic API interface for all entity types
- * This interface defines the standard methods that all entity API adapters must implement
- */
-export interface GenericApi<
-  TEntity,
-  TFilter = Record<string, any>,
-  TCreateInput = Partial<TEntity>,
-  TUpdateInput = Partial<TEntity>
-> {
-  /**
-   * Get a list of entities with optional filtering, pagination, and sorting
-   */
-  getList: (params?: {
-    pagination?: { page: number; limit: number };
-    filters?: TFilter;
-    orderBy?: string;
-    orderDirection?: 'asc' | 'desc';
-  }) => Promise<{
-    data: TEntity[];
-    error?: string;
-    meta: {
-      pagination: {
-        page: number;
-        limit: number;
-        total: number;
-        totalPages: number;
-      }
-    }
-  }>;
-  
-  /**
-   * Get a single entity by ID
-   */
-  getById: (id: string | number) => Promise<{
-    data?: TEntity;
-    error?: string;
-  }>;
-  
-  /**
-   * Create a new entity
-   */
-  create: (input: TCreateInput) => Promise<{
-    data?: TEntity;
-    error?: string;
-  }>;
-  
-  /**
-   * Update an existing entity
-   */
-  update: (id: string | number, input: TUpdateInput) => Promise<{
-    data?: TEntity;
-    error?: string;
-  }>;
-  
-  /**
-   * Delete an entity
-   */
-  delete: (id: string | number) => Promise<{
-    data?: boolean;
-    error?: string;
-  }>;
+export interface ApiResponse<T> {
+  success: boolean;
+  data?: T;
+  error?: {
+    message: string;
+    code?: string;
+    details?: any;
+  };
 }
 
-/**
- * Base repository interface for bridging existing repositories to the Zustand architecture
- * This interface is used by the createRepositoryStore function
- */
-export interface BaseRepository<TEntity, TFilter = Record<string, any>> {
-  getAll: (filters?: TFilter) => Promise<TEntity[]>;
-  getById: (id: string | number) => Promise<TEntity | null>;
-  create: (data: Partial<TEntity>) => Promise<TEntity>;
-  update: (id: string | number, data: Partial<TEntity>) => Promise<TEntity>;
-  delete: (id: string | number) => Promise<boolean>;
+// Add missing RepositoryResponse type
+export interface RepositoryResponse<T> {
+  data?: T;
+  error?: string;
 }
 
-/**
- * Extended API interface with additional methods for specific entity types
- * Implementations can extend this interface to add custom methods
- */
-export interface ExtendedApi<
-  TEntity,
-  TFilter = Record<string, any>,
-  TCreateInput = Partial<TEntity>,
-  TUpdateInput = Partial<TEntity>
-> extends GenericApi<TEntity, TFilter, TCreateInput, TUpdateInput> {
-  [key: string]: any;
+export interface PaginationParams {
+  page: number;
+  limit: number;
+}
+
+export interface PaginationMeta {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+  hasNext: boolean;
+  hasPrev: boolean;
+}
+
+export interface PaginatedResponse<T> {
+  data: T[];
+  pagination: PaginationMeta;
+}
+
+export interface SortParams {
+  field: string;
+  direction: 'asc' | 'desc';
+}
+
+export interface ErrorDetails {
+  field?: string;
+  message: string;
+  code?: string;
+}
+
+export interface ValidationError {
+  message: string;
+  errors: ErrorDetails[];
+}
+
+// Generic list response
+export interface ListResponse<T> {
+  success: boolean;
+  data: T[]; // Fixed: Changed from T[][] to T[]
+  pagination?: PaginationMeta;
+  error?: {
+    message: string;
+    code?: string;
+  };
+}
+
+// Status responses
+export interface StatusResponse {
+  success: boolean;
+  message?: string;
+  error?: {
+    message: string;
+    code?: string;
+  };
+}
+
+// Search and filter interfaces
+export interface SearchParams {
+  query?: string;
+  filters?: Record<string, any>;
+  sort?: SortParams;
+  pagination?: PaginationParams;
+}
+
+export interface FilterOption {
+  label: string;
+  value: string | number;
+  count?: number;
+}
+
+export interface FilterGroup {
+  name: string;
+  label: string;
+  options: FilterOption[];
+  type: 'select' | 'checkbox' | 'range' | 'date';
 }

@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus, Upload } from "lucide-react";
+import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PageHeader, FiltersBar, ViewToggle } from "@/components/layouts";
 import { FacilityCalendarView } from "./calendar/FacilityCalendarView";
@@ -10,8 +10,7 @@ import { FacilityListViewDisplay } from "./views/FacilityListViewDisplay";
 import { FacilityTableView } from "./views/FacilityTableView";
 import { FacilityMapView } from "./views/FacilityMapView";
 import { useTranslation } from "@/hooks/useTranslation";
-import { useFacilityAdmin } from "@/hooks/useFacilityAdmin";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { useFacilityAdminStore } from "@/stores/useFacilityAdminStore";
 
 interface FacilityListViewProps {
   selectedFacilityId?: number;
@@ -20,7 +19,6 @@ interface FacilityListViewProps {
 
 type ViewMode = 'list' | 'calendar' | 'detail';
 type DisplayMode = 'table' | 'grid' | 'list' | 'map';
-type StoreViewMode = 'table' | 'grid' | 'list';
 
 export const FacilityListView: React.FC<FacilityListViewProps> = ({
   selectedFacilityId,
@@ -31,37 +29,32 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
   const [selectedFacility, setSelectedFacility] = React.useState<any>(null);
   const { tSync } = useTranslation();
 
-  // Use our combined hook for both entity data and UI state
+  // Zustand store
   const {
     facilities,
     isLoading,
     error,
     filters,
-    viewMode: storeViewMode,
+    viewMode: displayMode,
     setViewMode,
     setFilters,
-    fetchFacilities,
-    handleFacilitySelect: selectFacility
-  } = useFacilityAdmin();
-  
-  // Local display mode that can include 'map' which isn't in the store
-  const [displayMode, setDisplayMode] = React.useState<DisplayMode>(storeViewMode as DisplayMode || 'list');
+    loadFacilities
+  } = useFacilityAdminStore();
 
   // Local search/filter state
-  const [searchTerm, setSearchTerm] = React.useState(filters.search || "");
-  const [filterType, setFilterType] = React.useState(filters.category || "all");
-  const [filterStatus, setFilterStatus] = React.useState(filters.status || "all");
+  const [searchTerm, setSearchTerm] = React.useState(filters.searchTerm || "");
+  const [filterType, setFilterType] = React.useState(filters.facilityType || "all");
+  const [filterStatus, setFilterStatus] = React.useState("all");
 
   // Load facilities on mount and when filters change
   useEffect(() => {
-    fetchFacilities();
+    loadFacilities();
     // eslint-disable-next-line
   }, [filters]);
 
   // Filter facilities locally (can be moved to store if needed)
   const filteredFacilities = facilities.filter(facility => {
-    const matchesSearch = !searchTerm || 
-                         facility.name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    const matchesSearch = facility.name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
                          facility.area?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesType = filterType === "all" || facility.type === filterType;
     const matchesStatus = filterStatus === "all" || facility.status === filterStatus;
@@ -76,8 +69,7 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
     navigate(`/admin/facilities/${facility.id}`);
   };
 
-  const handleFacilitySelect = (facility: any) => {
-    selectFacility(facility); // Use the combined action from our hook
+  const handleView = (facility: any) => {
     setSelectedFacility(facility);
     setLocalViewMode('detail');
     if (onFacilitySelect) {
@@ -97,12 +89,7 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
 
   const handleViewModeChange = (viewId: string) => {
     setLocalViewMode(viewId as ViewMode);
-    setDisplayMode(viewId as DisplayMode);
-    
-    // Only set store viewMode if it's a valid store view mode (not 'map')
-    if (['list', 'grid', 'table'].includes(viewId)) {
-      setViewMode(viewId as StoreViewMode);
-    }
+    setViewMode(viewId as any); // Zustand store for display mode
   };
 
   const viewOptions = [
@@ -119,7 +106,7 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
       value: filterType,
       onChange: (val: string) => {
         setFilterType(val);
-        setFilters({ category: val === 'all' ? undefined : val });
+        setFilters({ facilityType: val === 'all' ? undefined : val });
       },
       options: [
         { value: 'all', label: tSync("admin.facilities.filters.allTypes", "All Types") },
@@ -131,10 +118,7 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
       id: 'status',
       label: tSync("admin.facilities.filters.status", "Status"),
       value: filterStatus,
-      onChange: (val: string) => {
-        setFilterStatus(val);
-        setFilters({ status: val === 'all' ? undefined : val });
-      },
+      onChange: (val: string) => setFilterStatus(val),
       options: [
         { value: 'all', label: tSync("admin.facilities.filters.allStatuses", "All Statuses") },
         { value: 'active', label: tSync("admin.facilities.filters.active", "Active") },
@@ -167,7 +151,7 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
     }
     const commonProps = {
       facilities: filteredFacilities,
-      onView: handleFacilitySelect,
+      onView: handleView,
       onCalendar: handleCalendar,
       onEdit: handleEdit
     };
@@ -215,9 +199,7 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
           {tSync("admin.facilities.addNew", "Add New Facility")}
         </Button>
       </div>
-      
-      <Card>
-        <CardHeader>
+      <div className="bg-gray-50 border-b border-gray-200 px-4 py-2 flex flex-col md:flex-row md:items-center md:justify-between gap-2 rounded-b-lg">
         <FiltersBar
           searchTerm={searchTerm}
           onSearchChange={setSearchTerm}
@@ -231,12 +213,10 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
             onViewChange={handleViewModeChange}
           />
         </FiltersBar>
-        </CardHeader>
-      <CardContent>
+      </div>
+      <div className="pt-2">
         {renderFacilityContent()}
-      </CardContent>
-      </Card>
-
+      </div>
     </div>
   );
 };

@@ -83,77 +83,9 @@ export const useBlackoutStore = create<BlackoutState>((set, get) => ({
 
   saveBlackoutPeriods: async (facilityId) => {
     console.log('Saving blackout periods for facility:', facilityId);
-    set({ isLoading: true, error: null });
-    
-    try {
-      const { blackoutPeriods } = get();
-      console.log('Current blackout periods to save:', blackoutPeriods);
-      
-      if (!blackoutPeriods || blackoutPeriods.length === 0) {
-        console.log('No blackout periods to save');
-        set({ isLoading: false });
-        return true;
-      }
-      
-      // Track existing periods to identify which ones need to be created vs updated
-      const existingPeriods = blackoutPeriods.filter(period => period.id && !period.id.startsWith('temp-'));
-      const newPeriods = blackoutPeriods.filter(period => !period.id || period.id.startsWith('temp-'));
-      
-      console.log('Existing periods to update:', existingPeriods);
-      console.log('New periods to create:', newPeriods);
-      
-      // Process updates for existing periods
-      const updatePromises = existingPeriods.map(period => {
-        return FacilityBlackoutService.updateBlackout(period.id, {
-          facility_id: facilityId,
-          type: period.type,
-          reason: period.reason,
-          start_date: period.start_date,
-          end_date: period.end_date
-        });
-      });
-      
-      // Process creation for new periods
-      const createPromises = newPeriods.map(period => {
-        // Remove the created_by field as it should be handled by the backend
-        // The backend should use the authenticated user's ID or a default value
-        return FacilityBlackoutService.createBlackout({
-          facility_id: facilityId,
-          type: period.type,
-          reason: period.reason,
-          start_date: period.start_date,
-          end_date: period.end_date
-          // Removed created_by field to let the backend handle it
-        });
-      });
-      
-      // Wait for all operations to complete
-      const results = await Promise.all([...updatePromises, ...createPromises]);
-      
-      // Check if any operations failed
-      const hasFailures = results.some(result => result.error !== undefined);
-      
-      if (hasFailures) {
-        const errors = results
-          .filter(result => result.error !== undefined)
-          .map(result => result.error || 'Unknown error')
-          .join(', ');
-        
-        console.error('Failed to save some blackout periods:', errors);
-        set({ error: `Failed to save some blackout periods: ${errors}`, isLoading: false });
-        return false;
-      }
-      
-      // Refresh the blackout periods from the server
-      await get().fetchBlackoutPeriods(facilityId);
-      
-      set({ isLoading: false });
-      return true;
-    } catch (error: any) {
-      console.error('Error saving blackout periods:', error);
-      set({ error: `Error saving blackout periods: ${error.message}`, isLoading: false });
-      return false;
-    }
+    // For now, just return true since the periods are already saved individually
+    // This could be enhanced to batch save all periods
+    return true;
   },
 
   createBlackoutPeriod: async (periodData) => {
@@ -164,8 +96,8 @@ export const useBlackoutStore = create<BlackoutState>((set, get) => ({
         type: periodData.type!,
         reason: periodData.reason!,
         start_date: periodData.start_date!,
-        end_date: periodData.end_date!
-        // Removed created_by field to let the backend handle it
+        end_date: periodData.end_date!,
+        created_by: 'system' // TODO: Get from auth context
       });
       
       if (response.data) {

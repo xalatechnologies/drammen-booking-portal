@@ -29,5 +29,3 @@
 - Updated `useFacilityAdminStore` to ensure `createFacility` and `updateFacility` methods return the service result, fixing critical type errors and aligning the store with the form's expectations. 
 
 - Aligned `useFacilityAdminStore` and `EnhancedFacilityForm` with the correct `RepositoryResponse` type, checking for `result.error` instead of a `success` property to determine operation outcome. This fixes critical type errors and ensures correct form submission logic. 
-
-- Resolved the persistent form submission bug in `EnhancedFacilityForm` by restructuring the component. The `<form>` element now wraps the entire `<Tabs>` component, isolating the form's `onSubmit` event from the tab-switching logic and preventing any event propagation conflicts. 
