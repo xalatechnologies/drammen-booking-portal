@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Eye, Calendar, Edit } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { useTranslation } from '@/hooks/useTranslation';
+import { useJsonTranslation } from '@/hooks/useJsonTranslation';
 
 interface FacilityTableViewProps {
   facilities: Facility[];
@@ -15,7 +15,7 @@ interface FacilityTableViewProps {
 }
 
 export const FacilityTableView: React.FC<FacilityTableViewProps> = ({ facilities, onView, onCalendar, onEdit, isLoading }) => {
-  const { tSync } = useTranslation();
+  const { tSync } = useJsonTranslation();
 
   // Skeleton loader
   if (isLoading) {

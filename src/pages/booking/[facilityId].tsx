@@ -18,7 +18,7 @@ export default function BookingPage() {
   }
 
   if (error || !facility) {
-    return <div>Fant ikke fasiliteten</div>;
+    return <div>Fant ikke Lokalen</div>;
   }
 
   // Convert zones to booking zones format

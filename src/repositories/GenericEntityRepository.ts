@@ -72,11 +72,15 @@ export class GenericEntityRepository<T extends Record<string, any>> extends Base
    * Get a list of entities with optional pagination and filters
    */
   async findAll(pagination?: PaginationParams, filters?: any): Promise<RepositoryResponse<T[]>> {
+    // Extract skipRelated from filters if present
+    const { skipRelated, ...otherFilters } = filters || {};
+    
     const params = {
       table: this.table,
-      ...(this.related ? { related: this.related } : {}),
+      // Only include related tables if skipRelated is not true
+      ...(this.related && !skipRelated ? { related: this.related } : {}),
       ...(pagination ? { page: pagination.page, limit: pagination.limit } : {}),
-      ...filters
+      ...otherFilters
     };
     
     return this.fetchFromEdgeFunction<T[]>('GET', '', undefined, params);

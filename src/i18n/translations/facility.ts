@@ -25,7 +25,7 @@ export const facilityTranslations = {
     },
     tabs: {
       features: {
-        title: 'Fasiliteter og utstyr',
+        title: 'Lokaler og utstyr',
         capacityAndSize: 'Kapasitet og størrelse',
         maxPersons: 'Maks personer',
         area: 'Areal',
@@ -36,7 +36,7 @@ export const facilityTranslations = {
         holidays: 'Helligdager',
         closed: 'Stengt',
         availableEquipment: 'Tilgjengelig utstyr',
-        facilitiesAndServices: 'Fasiliteter og tjenester'
+        facilitiesAndServices: 'Lokaler og tjenester'
       },
       rules: {
         title: 'Regler og retningslinjer',
@@ -121,7 +121,7 @@ export const facilityTranslations = {
       area: "Areal",
       openingHours: "Åpningstider",
       equipment: "Utstyr",
-      amenities: "Fasiliteter",
+      amenities: "Lokaler",
       bookNow: "Reserver nå",
       zones: "Soner"
     },
@@ -131,7 +131,7 @@ export const facilityTranslations = {
       partialBooking: "Delvis booking",
       selectZone: "Velg sone",
       wholeVenueDescription: "Book hele anlegget for maksimal fleksibilitet",
-      mainZoneInstructions: "Hovedsonen inkluderer alle fasiliteter og utstyr",
+      mainZoneInstructions: "Hovedsonen inkluderer alle Lokaler og utstyr",
       reserveNow: "Reserver nå",
       checkAvailability: "Sjekk tilgjengelighet"
     },

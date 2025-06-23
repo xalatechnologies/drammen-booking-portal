@@ -55,7 +55,14 @@ export function useFacilityAdmin() {
     const queryParams = {
       ...filters,
       ...params,
+      skipRelated: true, // Skip related tables when fetching list for better performance
     };
+    
+    // Remove search parameter as it doesn't exist as a column in the database
+    // We'll handle search filtering client-side in the component
+    if (queryParams.search) {
+      delete queryParams.search;
+    }
     
     // Convert 'all' values to undefined so they don't filter the results
     Object.keys(queryParams).forEach(key => {

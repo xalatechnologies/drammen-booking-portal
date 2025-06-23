@@ -1,15 +1,15 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Card } from './ui/card';
 import { MapContainer } from './map/MapContainer';
 import { MapMarkers } from './map/MapMarkers';
 import { MapInfoOverlay } from './map/MapInfoOverlay';
 import { MapLoadingState } from './map/MapLoadingState';
 import { MapErrorState } from './map/MapErrorState';
-import { useFacilities } from '@/hooks/useFacilities';
-import { FacilityFilters } from '@/types/facility';
+import { Facility, FacilityFilters } from '@/types/facility';
 import ViewHeader from './search/ViewHeader';
 import mapboxgl from 'mapbox-gl';
+import { getFilteredMockFacilities } from '@/mocks/facilityMockData';
 
 // Default token provided by user
 const DEFAULT_MAPBOX_TOKEN = 'pk.eyJ1IjoieGFsYXRlY2hub2xvZ2llc2FzIiwiYSI6ImNtYmh0anh6NTAweDEycXF6cm9xbDFtb2IifQ.81xizRmOh6TLUEsG0EVSEg';
@@ -33,14 +33,28 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location, viewMode, set
     location: location !== "all" ? location : undefined,
   };
 
-  // Use the centralized facilities service
-  const { facilities, isLoading: facilitiesLoading, error: facilitiesError } = useFacilities({
-    pagination: { page: 1, limit: 100 }, // Get all facilities for map
-    filters
-  });
-
-  // Ensure facilities is always an array
-  const facilitiesArray = Array.isArray(facilities) ? facilities : (facilities ? [facilities] : []);
+  // Get facilities from mock data
+  const [facilitiesLoading, setFacilitiesLoading] = useState(true);
+  const [facilitiesError, setFacilitiesError] = useState<string>('');
+  
+  // Get filtered facilities from mock data
+  const facilitiesArray = useMemo(() => {
+    const mockFilters = {
+      facilityType: facilityType !== "all" ? facilityType : undefined,
+      location: location !== "all" ? location : undefined
+    };
+    return getFilteredMockFacilities(mockFilters);
+  }, [facilityType, location]);
+  
+  // Simulate loading delay
+  useEffect(() => {
+    setFacilitiesLoading(true);
+    const timer = setTimeout(() => {
+      setFacilitiesLoading(false);
+    }, 800);
+    
+    return () => clearTimeout(timer);
+  }, [facilityType, location]);
 
   // Convert facilities to map format with enhanced data
   const facilityLocations = facilitiesArray.map(facility => ({

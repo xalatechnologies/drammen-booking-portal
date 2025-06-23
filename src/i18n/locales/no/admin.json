@@ -1,0 +1,118 @@
+{
+  "common": {
+    "loading": "Laster...",
+    "save": "Lagre",
+    "cancel": "Avbryt",
+    "delete": "Slett",
+    "edit": "Rediger",
+    "back": "Tilbake",
+    "next": "Neste",
+    "previous": "Forrige",
+    "search": "Søk",
+    "filter": "Filter",
+    "actions": "Handlinger"
+  },
+  "sidebar": {
+    "overview": "Oversikt",
+    "facilities": "Lokaler",
+    "bookings": "Bookinger",
+    "usersRoles": "Brukere & Roller",
+    "approvalWorkflows": "Godkjenningsprosesser",
+    "roles": "Roller",
+    "reportsAnalytics": "Rapporter & Analyser",
+    "notifications": "Varsler",
+    "profileSettings": "Profilinnstillinger",
+    "systemConfig": "Systemkonfigurasjon",
+    "externalCalendars": "Eksterne kalendere",
+    "messageTemplates": "Meldingsmaler",
+    "authProviders": "Påloggingsleverandører",
+    "supportTickets": "Brukerstøtte",
+    "slaConfig": "SLA Konfigurasjon",
+    "lockConfig": "Låskonfigurasjon",
+    "monitoring": "Overvåking",
+    "integrations": "Integrasjoner",
+    "exchangeIntegration": "Exchange-integrasjon",
+    "auditLogs": "Revisjonslogger",
+    "dataRetention": "Datalagring & anonymisering",
+    "azureDeploy": "Azure/Deploy",
+    "descriptions": {
+      "overview": "Dashboard og oversikt",
+      "facilities": "Administrer Lokaler",
+      "bookings": "Booking oversikt",
+      "usersRoles": "Bruker- og rollestyring",
+      "approvalWorkflows": "Godkjenningsprosesser",
+      "roles": "Rollestyring",
+      "reportsAnalytics": "Rapporter og analyser",
+      "notifications": "Varslingsinnstillinger",
+      "profileSettings": "Profilinnstillinger",
+      "systemConfig": "Systemkonfigurasjon",
+      "externalCalendars": "Eksterne kalendere",
+      "messageTemplates": "Meldingsmaler",
+      "authProviders": "Autentiseringsleverandører",
+      "supportTickets": "Brukerstøtte",
+      "slaConfig": "Tjenestenivåavtaler",
+      "lockConfig": "Låsekonfigurasjon",
+      "monitoring": "Systemovervåking",
+      "integrations": "Tredjepartsintegrasjoner",
+      "exchangeIntegration": "Exchange-integrasjon",
+      "auditLogs": "Revisjonslogger",
+      "dataRetention": "Datalagring & anonymisering",
+      "azureDeploy": "Azure og deployment"
+    }
+  },
+  "facilities": {
+    "management": "Administrasjon av lokaler",
+    "pageDescription": "Administrer Lokaler, tilgjengelighet og innstillinger",
+    "addNew": "Legg til ny Lokal",
+    "views": {
+      "table": "Tabell",
+      "grid": "Rutenett",
+      "list": "Liste",
+      "map": "Kart"
+    },
+    "filters": {
+      "type": "Type",
+      "status": "Status",
+      "allTypes": "Alle typer",
+      "allStatuses": "Alle statuser",
+      "sports": "Sport",
+      "meeting": "Møte",
+      "active": "Aktiv",
+      "inactive": "Inaktiv"
+    },
+    "search": {
+      "placeholder": "Søk Lokaler...",
+      "filterByType": "Filtrer etter type",
+      "filterByStatus": "Filtrer etter status",
+      "allTypes": "Alle typer",
+      "allStatus": "Alle statuser",
+      "noResults": "Ingen Lokaler funnet som matcher kriteriene."
+    },
+    "types": {
+      "fotballhall": "Fotballhall",
+      "idrettshall": "Idrettshall",
+      "gymsal": "Gymsal",
+      "svømmehall": "Svømmehall",
+      "møterom": "Møterom"
+    },
+    "status": {
+      "active": "Aktiv",
+      "maintenance": "Vedlikehold",
+      "inactive": "Inaktiv"
+    },
+    "images": {
+      "uploadNew": "Last opp nye bilder",
+      "currentImages": "Nåværende bilder",
+      "featured": "Fremhevet",
+      "noImages": "Ingen bilder lastet opp ennå",
+      "uploadFirst": "Last opp ditt første bilde ved å bruke seksjonen over"
+    },
+    "form": {
+      "tabs": {
+        "details": "Lokalsdetaljer",
+        "images": "Bilder"
+      },
+      "saveFirst": "Vennligst lagre Lokalen først før du administrerer bilder."
+    }
+  }
+}

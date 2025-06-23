@@ -84,7 +84,7 @@ const ReportsAnalyticsPage = () => {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h2 className="text-2xl font-bold tracking-tight">Rapporter & Analytikk</h2>
-          <p className="text-muted-foreground">Få innsikt i bookinger og bruk av fasiliteter.</p>
+          <p className="text-muted-foreground">Få innsikt i bookinger og bruk av Lokaler.</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <Select value={timeRange} onValueChange={setTimeRange}>
@@ -120,7 +120,7 @@ const ReportsAnalyticsPage = () => {
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:w-[600px]">
           <TabsTrigger value="oversikt">Oversikt</TabsTrigger>
-          <TabsTrigger value="fasiliteter">Fasiliteter</TabsTrigger>
+          <TabsTrigger value="Lokaler">Lokaler</TabsTrigger>
           <TabsTrigger value="trender">Trender</TabsTrigger>
           <TabsTrigger value="detaljer">Detaljert</TabsTrigger>
         </TabsList>
@@ -171,8 +171,8 @@ const ReportsAnalyticsPage = () => {
           <div className="grid gap-4 md:grid-cols-2">
             <Card>
               <CardHeader className="py-3">
-                <CardTitle className="text-sm font-medium">Fasilitetfordeling</CardTitle>
-                <CardDescription>Bookinger fordelt på fasilitetstype</CardDescription>
+                <CardTitle className="text-sm font-medium">Lokalfordeling</CardTitle>
+                <CardDescription>Bookinger fordelt på Lokalstype</CardDescription>
               </CardHeader>
               <CardContent>
                 <ChartContainer config={chartConfig} className="h-[240px]">
@@ -220,11 +220,11 @@ const ReportsAnalyticsPage = () => {
           </div>
         </TabsContent>
 
-        <TabsContent value="fasiliteter" className="space-y-4 mt-4">
+        <TabsContent value="Lokaler" className="space-y-4 mt-4">
           <Card>
             <CardHeader className="py-3">
-              <CardTitle>Populære Fasiliteter</CardTitle>
-              <CardDescription>Oversikt over de mest brukte fasilitetene</CardDescription>
+              <CardTitle>Populære Lokaler</CardTitle>
+              <CardDescription>Oversikt over de mest brukte Lokalene</CardDescription>
             </CardHeader>
             <CardContent>
               <Table>
@@ -335,7 +335,7 @@ const ReportsAnalyticsPage = () => {
                   <div className="text-xl font-semibold">67 (5.4%)</div>
                 </div>
                 <div className="bg-muted rounded-lg p-3">
-                  <div className="text-sm text-muted-foreground">Aktive Fasiliteter</div>
+                  <div className="text-sm text-muted-foreground">Aktive Lokaler</div>
                   <div className="text-xl font-semibold">24 av 28</div>
                 </div>
               </div>

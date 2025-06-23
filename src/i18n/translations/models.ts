@@ -10,7 +10,7 @@ export const modelTranslations = {
         pricePerHour: { label: "Pris per time", description: "Timepris i NOK", placeholder: "Pris i NOK" },
         openingHours: { label: "Åpningstider", description: "Når anlegget er åpent", placeholder: "HH:MM - HH:MM" },
         description: { label: "Beskrivelse", description: "Detaljert beskrivelse av anlegget", placeholder: "Beskriv anlegget..." },
-        amenities: { label: "Fasiliteter", description: "Tilgjengelige fasiliteter", placeholder: "Velg fasiliteter" },
+        amenities: { label: "Lokaler", description: "Tilgjengelige Lokaler", placeholder: "Velg Lokaler" },
         equipment: { label: "Utstyr", description: "Tilgjengelig utstyr", placeholder: "Velg utstyr" },
         type: { label: "Type anlegg", description: "Kategori av anlegg", placeholder: "Velg type" }
       },
@@ -23,7 +23,7 @@ export const modelTranslations = {
       sections: {
         basicInfo: "Grunnleggende informasjon",
         location: "Lokasjon",
-        amenities: "Fasiliteter",
+        amenities: "Lokaler",
         pricing: "Prising",
         availability: "Tilgjengelighet"
       }

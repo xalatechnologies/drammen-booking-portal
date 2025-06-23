@@ -2,123 +2,123 @@ import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { LayoutDashboard, Calendar, Building, Settings, Users, UserCheck, BarChart3, Bell, User, Shield, FileText, HelpCircle, Wrench, Activity, Cloud, Lock, Clock, Database, FileSearch, Globe, MessageSquare, Zap } from "lucide-react";
-import { useTranslation } from "@/hooks/useTranslation";
+import { useJsonTranslation } from "@/hooks/useJsonTranslation";
 import { LAYOUT_CONSTANTS } from "@/components/layouts/constants";
 
 const AdminSidebar: React.FC = () => {
   const location = useLocation();
-  const { tSync } = useTranslation();
+  const { tSync } = useJsonTranslation();
 
   const menuItems = [{
-    title: tSync("admin.sidebar.overview", "Overview"),
+    title: tSync("admin.sidebar.overview"),
     href: "/admin",
     icon: LayoutDashboard,
-    description: tSync("admin.sidebar.descriptions.overview", "Dashboard og oversikt")
+    description: tSync("admin.sidebar.descriptions.overview")
   }, {
-    title: tSync("admin.sidebar.facilities", "Facilities"),
+    title: tSync("admin.sidebar.facilities"),
     href: "/admin/facilities",
     icon: Building,
-    description: tSync("admin.sidebar.descriptions.facilities", "Administrer fasiliteter")
+    description: tSync("admin.sidebar.descriptions.facilities")
   }, {
-    title: tSync("admin.sidebar.bookings", "Bookings"),
-    href: "/admin/bookings",
+    title: tSync("admin.sidebar.bookings"),
+    href: "/admin/bookings-overview",
     icon: Calendar,
-    description: tSync("admin.sidebar.descriptions.bookings", "Booking oversikt")
+    description: tSync("admin.sidebar.descriptions.bookings")
   }, {
-    title: tSync("admin.sidebar.usersRoles", "Users & Roles"),
-    href: "/admin/users-roles",
+    title: tSync("admin.sidebar.usersRoles"),
+    href: "/admin/users",
     icon: Users,
-    description: tSync("admin.sidebar.descriptions.usersRoles", "Bruker- og rollestyring")
+    description: tSync("admin.sidebar.descriptions.usersRoles")
   }, {
-    title: tSync("admin.sidebar.approvalWorkflows", "Approval Workflows"),
-    href: "/admin/approval-workflows",
+    title: tSync("admin.sidebar.approvalWorkflows"),
+    href: "/admin/approvals",
     icon: UserCheck,
-    description: tSync("admin.sidebar.descriptions.approvalWorkflows", "Godkjenningsprosesser")
+    description: tSync("admin.sidebar.descriptions.approvalWorkflows")
   }, {
-    title: tSync("admin.sidebar.roleAssignments", "Role Assignments"),
-    href: "/admin/role-assignments",
+    title: tSync("admin.sidebar.roles"),
+    href: "/admin/roles",
     icon: Shield,
-    description: tSync("admin.sidebar.descriptions.roleAssignments", "Rolletildelinger")
+    description: tSync("admin.sidebar.descriptions.roles")
   }, {
-    title: tSync("admin.sidebar.reportsAnalytics", "Reports & Analytics"),
-    href: "/admin/reports-analytics",
+    title: tSync("admin.sidebar.reportsAnalytics"),
+    href: "/admin/reports",
     icon: BarChart3,
-    description: tSync("admin.sidebar.descriptions.reportsAnalytics", "Rapporter og analyser")
+    description: tSync("admin.sidebar.descriptions.reportsAnalytics")
   }, {
-    title: tSync("admin.sidebar.notifications", "Notifications"),
+    title: tSync("admin.sidebar.notifications"),
     href: "/admin/notifications",
     icon: Bell,
-    description: tSync("admin.sidebar.descriptions.notifications", "Varslingsinnstillinger")
+    description: tSync("admin.sidebar.descriptions.notifications")
   }, {
-    title: tSync("admin.sidebar.profileSettings", "Profile Settings"),
-    href: "/admin/profile-settings",
+    title: tSync("admin.sidebar.profileSettings"),
+    href: "/admin/profile",
     icon: User,
-    description: tSync("admin.sidebar.descriptions.profileSettings", "Profilinnstillinger")
+    description: tSync("admin.sidebar.descriptions.profileSettings")
   }, {
-    title: tSync("admin.sidebar.systemConfig", "System Config"),
+    title: tSync("admin.sidebar.systemConfig"),
     href: "/admin/system-config",
     icon: Settings,
-    description: tSync("admin.sidebar.descriptions.systemConfig", "Systemkonfigurasjon")
+    description: tSync("admin.sidebar.descriptions.systemConfig")
   }, {
-    title: tSync("admin.sidebar.externalCalendars", "External Calendars"),
+    title: tSync("admin.sidebar.externalCalendars"),
     href: "/admin/external-calendars",
     icon: Globe,
-    description: tSync("admin.sidebar.descriptions.externalCalendars", "Eksterne kalendere")
+    description: tSync("admin.sidebar.descriptions.externalCalendars")
   }, {
-    title: tSync("admin.sidebar.messageTemplates", "Message Templates"),
+    title: tSync("admin.sidebar.messageTemplates"),
     href: "/admin/message-templates",
     icon: MessageSquare,
-    description: tSync("admin.sidebar.descriptions.messageTemplates", "Meldingsmaler")
+    description: tSync("admin.sidebar.descriptions.messageTemplates")
   }, {
-    title: tSync("admin.sidebar.authProviders", "Auth Providers"),
+    title: tSync("admin.sidebar.authProviders"),
     href: "/admin/auth-providers",
     icon: Shield,
-    description: tSync("admin.sidebar.descriptions.authProviders", "Autentiseringsleverandører")
+    description: tSync("admin.sidebar.descriptions.authProviders")
   }, {
-    title: tSync("admin.sidebar.supportTickets", "Support Tickets"),
+    title: tSync("admin.sidebar.supportTickets"),
     href: "/admin/support-tickets",
     icon: HelpCircle,
-    description: tSync("admin.sidebar.descriptions.supportTickets", "Brukerstøtte")
+    description: tSync("admin.sidebar.descriptions.supportTickets")
   }, {
-    title: tSync("admin.sidebar.slaConfig", "SLA Configuration"),
+    title: tSync("admin.sidebar.slaConfig"),
     href: "/admin/sla-config",
     icon: Clock,
-    description: tSync("admin.sidebar.descriptions.slaConfig", "Tjenestenivåavtaler")
+    description: tSync("admin.sidebar.descriptions.slaConfig")
   }, {
-    title: tSync("admin.sidebar.lockConfig", "Lock Configuration"),
+    title: tSync("admin.sidebar.lockConfig"),
     href: "/admin/lock-config",
     icon: Lock,
-    description: tSync("admin.sidebar.descriptions.lockConfig", "Låsekonfigurasjon")
+    description: tSync("admin.sidebar.descriptions.lockConfig")
   }, {
-    title: tSync("admin.sidebar.monitoring", "Monitoring"),
+    title: tSync("admin.sidebar.monitoring"),
     href: "/admin/monitoring",
     icon: Activity,
-    description: tSync("admin.sidebar.descriptions.monitoring", "Systemovervåking")
+    description: tSync("admin.sidebar.descriptions.monitoring")
   }, {
-    title: tSync("admin.sidebar.integrations", "Integrations"),
+    title: tSync("admin.sidebar.integrations"),
     href: "/admin/integrations",
     icon: Zap,
-    description: tSync("admin.sidebar.descriptions.integrations", "Tredjepartsintegrasjoner")
+    description: tSync("admin.sidebar.descriptions.integrations")
   }, {
-    title: tSync("admin.sidebar.exchangeIntegration", "Exchange Integration"),
+    title: tSync("admin.sidebar.exchangeIntegration"),
     href: "/admin/exchange-integration",
     icon: Cloud,
-    description: tSync("admin.sidebar.descriptions.exchangeIntegration", "Exchange-integrasjon")
+    description: tSync("admin.sidebar.descriptions.exchangeIntegration")
   }, {
-    title: tSync("admin.sidebar.auditLogs", "Audit Logs"),
+    title: tSync("admin.sidebar.auditLogs"),
     href: "/admin/audit-logs",
     icon: FileSearch,
-    description: tSync("admin.sidebar.descriptions.auditLogs", "Revisjonslogger")
+    description: tSync("admin.sidebar.descriptions.auditLogs")
   }, {
-    title: tSync("admin.sidebar.dataRetention", "Data Retention"),
+    title: tSync("admin.sidebar.dataRetention"),
     href: "/admin/data-retention",
     icon: Database,
-    description: tSync("admin.sidebar.descriptions.dataRetention", "Datalagring & anonymisering")
+    description: tSync("admin.sidebar.descriptions.dataRetention")
   }, {
-    title: tSync("admin.sidebar.azureDeploy", "Azure/Deploy"),
+    title: tSync("admin.sidebar.azureDeploy"),
     href: "/admin/azure-deploy",
     icon: Cloud,
-    description: tSync("admin.sidebar.descriptions.azureDeploy", "Azure og deployment")
+    description: tSync("admin.sidebar.descriptions.azureDeploy")
   }];
   
   return (

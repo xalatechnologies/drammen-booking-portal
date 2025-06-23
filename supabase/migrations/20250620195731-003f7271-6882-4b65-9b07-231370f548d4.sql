@@ -18,7 +18,7 @@ INSERT INTO facilities (
  'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&auto=format&fit=crop'),
 
 (2, 'Fjell Skole - Aktivitetshall', 'Lauritz Hervigs vei 20', 'Drammen', '3035', 'Norway',
- 'Aktivitetshall', 'Konnerud', 'Stor aktivitetshall med mulighet for både sport og kulturarrangementer. God akustikk og moderne fasiliteter.',
+ 'Aktivitetshall', 'Konnerud', 'Stor aktivitetshall med mulighet for både sport og kulturarrangementer. God akustikk og moderne Lokaler.',
  200, ARRAY['wheelchair'], ARRAY['Fotballmål', 'Lydanlegg', 'Scene', 'Garderober'],
  650.00, false, ARRAY['Fotballmål', 'Lydanlegg', 'Scene', 'Garderober'], 1,
  59.7298, 10.1845, ARRAY['engangs', 'fastlan', 'rammetid', 'strotimer']::booking_type[], '2024-01-01', '2024-12-31',
@@ -34,7 +34,7 @@ INSERT INTO facilities (
  'https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=800&auto=format&fit=crop'),
 
 (11, 'Ytterkollen Idrettshall', 'Ytterkollveien 78', 'Drammen', '3037', 'Norway',
- 'Idrettshall', 'Konnerud', 'Stor idrettshall med tribuner og moderne fasiliteter. Ideell for store idrettsarrangementer.',
+ 'Idrettshall', 'Konnerud', 'Stor idrettshall med tribuner og moderne Lokaler. Ideell for store idrettsarrangementer.',
  350, ARRAY['wheelchair', 'hearing-loop'], ARRAY['Kunstgress', 'Tribuner', 'Lydanlegg', 'Garderober', 'Kantine'],
  850.00, false, ARRAY['Kunstgress', 'Tribuner', 'Lydanlegg', 'Garderober', 'Kantine'], 1,
  59.7234, 10.1678, ARRAY['engangs', 'fastlan', 'rammetid', 'strotimer']::booking_type[], '2024-01-01', '2024-12-31',
@@ -51,7 +51,7 @@ INSERT INTO facilities (
 
 -- Swimming Facilities
 (5, 'Drammensbadet - Svømmehall', 'Danvikgata 40', 'Drammen', '3045', 'Norway',
- 'Svømmehall', 'Åssiden', 'Moderne svømmeanlegg med både konkurransebasseng og barneområde. Høy standard på fasiliteter og sikkerhet.',
+ 'Svømmehall', 'Åssiden', 'Moderne svømmeanlegg med både konkurransebasseng og barneområde. Høy standard på Lokaler og sikkerhet.',
  250, ARRAY['wheelchair', 'hearing-loop'], ARRAY['25m basseng', 'Barnebassseng', 'Garderober', 'Dusjer', 'Livredningsutstyr'],
  700.00, false, ARRAY['25m basseng', 'Barnebassseng', 'Garderober', 'Dusjer', 'Livredningsutstyr'], 1,
  59.7545, 10.1798, ARRAY['engangs', 'fastlan', 'rammetid', 'strotimer']::booking_type[], '2024-01-01', '2024-12-31',
@@ -59,7 +59,7 @@ INSERT INTO facilities (
  'https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=800&auto=format&fit=crop'),
 
 (16, 'Holmestrand Svømmehall', 'Storgata 25', 'Holmestrand', '3080', 'Norway',
- 'Svømmehall', 'Holmestrand', 'Moderne svømmeanlegg med varmebasseng og badstue. Familievennlig med gode fasiliteter.',
+ 'Svømmehall', 'Holmestrand', 'Moderne svømmeanlegg med varmebasseng og badstue. Familievennlig med gode Lokaler.',
  180, ARRAY['wheelchair', 'hearing-loop'], ARRAY['25m basseng', 'Varmbasseng', 'Badstue', 'Garderober', 'Kafeteria'],
  550.00, true, ARRAY['25m basseng', 'Varmbasseng', 'Badstue', 'Garderober', 'Kafeteria'], 1,
  59.4894, 10.3123, ARRAY['engangs', 'fastlan', 'rammetid', 'strotimer']::booking_type[], '2024-01-01', '2024-12-31',

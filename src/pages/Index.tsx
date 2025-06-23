@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import { DateRange } from "react-day-picker";
 import GlobalHeader from "@/components/GlobalHeader";
@@ -7,10 +7,13 @@ import SearchFilter from "@/components/SearchFilter";
 import FacilityList from "@/components/FacilityList";
 import MapView from "@/components/MapView";
 import CalendarView from "@/components/CalendarView";
-import { useFacilitiesPagination } from "@/hooks/useFacilities";
-import { FacilityFilters } from "@/types/facility";
+// Import mock data instead of using the hook
+import { getFilteredMockFacilities } from "@/mocks/facilityMockData";
+import { Facility, FacilityFilters } from "@/types/facility";
+import { useJsonTranslation } from "@/hooks/useJsonTranslation";
 
 const Index = () => {
+  const { tSync } = useJsonTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const [date, setDate] = useState<Date>();
   const [facilityType, setFacilityType] = useState<string>("all");
@@ -19,6 +22,7 @@ const Index = () => {
   const [accessibility, setAccessibility] = useState<string>("all");
   const [capacity, setCapacity] = useState<number[]>([0, 200]);
   const [searchTerm, setSearchTerm] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   // Advanced filter states
   const [priceRange, setPriceRange] = useState<number[]>([0, 5000]);
@@ -27,12 +31,49 @@ const Index = () => {
   const [hasParking, setHasParking] = useState<boolean>(false);
   const [hasWifi, setHasWifi] = useState<boolean>(false);
   const [allowsPhotography, setAllowsPhotography] = useState<boolean>(false);
+  
+  // Get filtered facilities based on all filters
+  const facilities = useMemo(() => {
+    return getFilteredMockFacilities({
+      searchTerm,
+      facilityType,
+      location,
+      capacity,
+      accessibility,
+      priceRange,
+      availableNow,
+      hasEquipment,
+      hasParking,
+      hasWifi,
+      allowsPhotography
+    });
+  }, [
+    searchTerm,
+    facilityType,
+    location,
+    capacity,
+    accessibility,
+    priceRange,
+    availableNow,
+    hasEquipment,
+    hasParking,
+    hasWifi,
+    allowsPhotography
+  ]);
 
   // Initialize state from URL parameters
   useEffect(() => {
     const urlFacilityType = searchParams.get('facilityType');
     const urlLocation = searchParams.get('location');
     const urlAccessibility = searchParams.get('accessibility');
+    
+    // Simulate loading delay for a more realistic experience
+    setIsLoading(true);
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 800);
+    
+    return () => clearTimeout(timer);
     const urlCapacity = searchParams.get('capacity');
     const urlViewMode = searchParams.get('viewMode');
     const urlSearchTerm = searchParams.get('searchTerm');

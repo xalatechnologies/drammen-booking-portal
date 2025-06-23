@@ -25,15 +25,15 @@ const RolesPage = () => {
     {
       id: "2",
       name: tSync("admin.roles.adminRole", "Administrator"),
-      description: tSync("admin.roles.adminDescription", "Kan administrere brukere, fasiliteter og bookinger."),
+      description: tSync("admin.roles.adminDescription", "Kan administrere brukere, Lokaler og bookinger."),
       permissions: ["read", "create", "update"],
       users: 15,
       systemRole: false,
     },
     {
       id: "3",
-      name: tSync("admin.roles.facilityManagerRole", "Fasilitetsansvarlig"),
-      description: tSync("admin.roles.facilityManagerDescription", "Administrerer spesifikke fasiliteter og deres tilgjengelighet."),
+      name: tSync("admin.roles.facilityManagerRole", "Lokalsansvarlig"),
+      description: tSync("admin.roles.facilityManagerDescription", "Administrerer spesifikke Lokaler og deres tilgjengelighet."),
       permissions: ["read", "update"],
       users: 8,
       systemRole: false,

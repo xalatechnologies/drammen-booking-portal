@@ -1,0 +1,118 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "search": "Search",
+    "filter": "Filter",
+    "actions": "Actions"
+  },
+  "sidebar": {
+    "overview": "Overview",
+    "facilities": "Facilities",
+    "bookings": "Bookings",
+    "usersRoles": "Users & Roles",
+    "approvalWorkflows": "Approval Workflows",
+    "roles": "Roles",
+    "reportsAnalytics": "Reports & Analytics",
+    "notifications": "Notifications",
+    "profileSettings": "Profile Settings",
+    "systemConfig": "System Config",
+    "externalCalendars": "External Calendars",
+    "messageTemplates": "Message Templates",
+    "authProviders": "Auth Providers",
+    "supportTickets": "Support Tickets",
+    "slaConfig": "SLA Configuration",
+    "lockConfig": "Lock Configuration",
+    "monitoring": "Monitoring",
+    "integrations": "Integrations",
+    "exchangeIntegration": "Exchange Integration",
+    "auditLogs": "Audit Logs",
+    "dataRetention": "Data Retention",
+    "azureDeploy": "Azure/Deploy",
+    "descriptions": {
+      "overview": "Dashboard and overview",
+      "facilities": "Manage facilities",
+      "bookings": "Booking overview",
+      "usersRoles": "User and role management",
+      "approvalWorkflows": "Approval processes",
+      "roles": "Role management",
+      "reportsAnalytics": "Reports and analytics",
+      "notifications": "Notification settings",
+      "profileSettings": "Profile settings",
+      "systemConfig": "System configuration",
+      "externalCalendars": "External calendars",
+      "messageTemplates": "Message templates",
+      "authProviders": "Authentication providers",
+      "supportTickets": "Support tickets",
+      "slaConfig": "Service level agreements",
+      "lockConfig": "Lock configuration",
+      "monitoring": "System monitoring",
+      "integrations": "Third-party integrations",
+      "exchangeIntegration": "Exchange integration",
+      "auditLogs": "Audit logs",
+      "dataRetention": "Data storage & anonymization",
+      "azureDeploy": "Azure and deployment"
+    }
+  },
+  "facilities": {
+    "management": "Facilities Management",
+    "pageDescription": "Manage facility information, availability and settings",
+    "addNew": "Add New Facility",
+    "views": {
+      "table": "Table",
+      "grid": "Grid",
+      "list": "List",
+      "map": "Map"
+    },
+    "filters": {
+      "type": "Type",
+      "status": "Status",
+      "allTypes": "All Types",
+      "allStatuses": "All Statuses",
+      "sports": "Sports",
+      "meeting": "Meeting",
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "search": {
+      "placeholder": "Search facilities...",
+      "filterByType": "Filter by type",
+      "filterByStatus": "Filter by status",
+      "allTypes": "All Types",
+      "allStatus": "All Status",
+      "noResults": "No facilities found matching your criteria."
+    },
+    "types": {
+      "fotballhall": "Football Hall",
+      "idrettshall": "Sports Hall",
+      "gymsal": "Gymnasium",
+      "svømmehall": "Swimming Pool",
+      "møterom": "Meeting Room"
+    },
+    "status": {
+      "active": "Active",
+      "maintenance": "Maintenance",
+      "inactive": "Inactive"
+    },
+    "images": {
+      "uploadNew": "Upload New Images",
+      "currentImages": "Current Images",
+      "featured": "Featured",
+      "noImages": "No images uploaded yet",
+      "uploadFirst": "Upload your first image using the section above"
+    },
+    "form": {
+      "tabs": {
+        "details": "Facility Details",
+        "images": "Images"
+      },
+      "saveFirst": "Please save the facility first before managing images."
+    }
+  }
+}

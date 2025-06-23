@@ -70,7 +70,7 @@ export const adminTranslations = {
       azureDeploy: "Azure og deployment",
       descriptions: {
         overview: "Dashboard og oversikt",
-        facilities: "Administrer fasiliteter",
+        facilities: "Administrer Lokaler",
         bookings: "Booking oversikt",
         usersRoles: "Bruker- og rollestyring",
         approvalWorkflows: "Godkjenningsprosesser",

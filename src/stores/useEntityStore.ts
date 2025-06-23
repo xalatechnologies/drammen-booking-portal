@@ -13,7 +13,7 @@ import { Blackout } from '@/types/blackout';
 
 // Facility store
 export const useFacilityStore = createGenericEntityStore<Facility>('facilities', {
-  related: ['zones', 'opening_hours', 'blackouts', 'images'],
+  related: [], // Removed relationships as they're not needed for the list view
   idField: 'id',
   statusField: 'status',
   activeValue: 'active'
@@ -28,13 +28,13 @@ export const useZoneStore = createGenericEntityStore<Zone>('zones', {
 });
 
 // Opening Hours store
-export const useOpeningHoursStore = createGenericEntityStore<OpeningHours>('opening_hours', {
+export const useOpeningHoursStore = createGenericEntityStore<OpeningHours>('facility_opening_hours', {
   related: ['facility'],
   idField: 'id'
 });
 
 // Blackout store
-export const useBlackoutStore = createGenericEntityStore<Blackout>('blackouts', {
+export const useBlackoutStore = createGenericEntityStore<Blackout>('facility_blackout_periods', {
   related: ['facility'],
   idField: 'id'
 });
