@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
@@ -113,86 +113,6 @@ export const EnhancedFacilityForm: React.FC<EnhancedFacilityFormProps> = ({ onSu
     }
   });
 
-  const mutation = useMutation({
-    mutationFn: async (data: FacilityFormData) => {
-      console.log('Starting facility save process...');
-      
-      // First save the main facility data
-      let facilityResult;
-      if (isEdit && currentFacility) {
-        facilityResult = await FacilityService.updateFacility(currentFacility.id.toString(), data);
-      } else {
-        facilityResult = await FacilityService.createFacility(data);
-      }
-
-      if (!facilityResult.success) {
-        throw new Error(facilityResult.error?.message || 'Failed to save facility');
-      }
-
-      const facilityId = facilityResult.data.id;
-      console.log('Facility saved successfully:', facilityId);
-
-      // Now save data from other sections if they exist and facility is saved
-      const savePromises = [];
-
-      if (openingHoursRef.current) {
-        console.log('Saving opening hours...');
-        savePromises.push(openingHoursRef.current.saveData());
-      }
-
-      if (zonesRef.current) {
-        console.log('Saving zones...');
-        savePromises.push(zonesRef.current.saveData());
-      }
-
-      if (blackoutsRef.current) {
-        console.log('Saving blackouts...');
-        savePromises.push(blackoutsRef.current.saveData());
-      }
-
-      if (pricingRulesRef.current) {
-        console.log('Saving pricing rules...');
-        savePromises.push(pricingRulesRef.current.saveData());
-      }
-
-      // Wait for all section saves to complete
-      if (savePromises.length > 0) {
-        const results = await Promise.all(savePromises);
-        const failed = results.some(result => !result);
-        if (failed) {
-          console.warn('Some sections failed to save, but facility was saved successfully');
-        }
-      }
-
-      return facilityResult;
-    },
-    onSuccess: (response) => {
-      if (response.success) {
-        toast({
-          title: tSync("admin.common.success", "Success"),
-          description: `${tSync("admin.facilities.form.facility", "Facility")} ${isEdit ? tSync("admin.common.updated", "updated") : tSync("admin.common.created", "created")} ${tSync("admin.common.successfully", "successfully")}`,
-        });
-        queryClient.invalidateQueries({ queryKey: ['facilities'] });
-        if (onSuccess) onSuccess();
-        closeForm();
-      } else {
-        toast({
-          title: tSync("admin.common.error", "Error"),
-          description: response.error?.message || `${tSync("admin.common.failedTo", "Failed to")} ${isEdit ? tSync("admin.common.update", "update") : tSync("admin.common.create", "create")} ${tSync("admin.facilities.form.facility", "facility")}`,
-          variant: "destructive",
-        });
-      }
-    },
-    onError: (error: any) => {
-      console.error('Facility save error:', error);
-      toast({
-        title: tSync("admin.common.error", "Error"),
-        description: error.message || `${tSync("admin.common.failedTo", "Failed to")} ${isEdit ? tSync("admin.common.update", "update") : tSync("admin.common.create", "create")} ${tSync("admin.facilities.form.facility", "facility")}`,
-        variant: "destructive",
-      });
-    },
-  });
-
   useEffect(() => {
     console.log('EnhancedFacilityForm useEffect: isEdit', isEdit, 'currentFacility', currentFacility);
     if (isEdit && currentFacility) {
@@ -219,24 +139,57 @@ export const EnhancedFacilityForm: React.FC<EnhancedFacilityFormProps> = ({ onSu
   const onSubmit = async (data: FacilityFormData) => {
     console.log('onSubmit handler triggered');
     setSaveError(null);
+    clearSectionErrors(); // Clear previous section errors
     setSaveSuccess(false);
     console.log('EnhancedFacilityForm onSubmit: data', data);
+
     try {
-      let result;
-      if (isEdit && currentFacility) {
-        result = await updateFacility(currentFacility.id.toString(), data);
-      } else {
-        result = await createFacility(data);
+      // Save main facility data
+      const facilityResult = isEdit && currentFacility
+        ? await updateFacility(currentFacility.id.toString(), data)
+        : await createFacility(data);
+
+      if (facilityResult.error || !facilityResult.data) {
+        throw new Error(facilityResult.error || 'Failed to save facility');
       }
-      console.log('EnhancedFacilityForm onSubmit: result', result);
-      if (result?.success) {
-        setSaveSuccess(true);
-        if (onSuccess) onSuccess();
-      } else {
-        setSaveError(result?.error || 'Unknown error saving facility');
+
+      const facilityId = facilityResult.data.id;
+      console.log('Facility saved successfully:', facilityId);
+      
+      // Save data from other sections
+      const savePromises = [
+        openingHoursRef.current?.saveData(),
+        zonesRef.current?.saveData(),
+        blackoutsRef.current?.saveData(),
+        pricingRulesRef.current?.saveData(),
+      ].filter(Boolean);
+
+      const results = await Promise.all(savePromises);
+      const sectionSaveErrors = results.reduce((errors, result, index) => {
+        if (!result) {
+          // This is a bit generic. In a real app, you'd want more specific error messages from each section
+          const sectionName = ['Opening Hours', 'Zones', 'Blackouts', 'Pricing Rules'][index];
+          errors.push(`Failed to save ${sectionName}.`);
+        }
+        return errors;
+      }, [] as string[]);
+
+      if (sectionSaveErrors.length > 0) {
+        setSectionErrors(sectionSaveErrors);
+        throw new Error('Some sections failed to save.');
       }
-    } catch (err: any) {
-      setSaveError(err?.message || 'Unknown error saving facility');
+
+      setSaveSuccess(true);
+      toast({
+        title: "Success",
+        description: `Facility ${isEdit ? 'updated' : 'created'} successfully.`,
+      });
+      if (onSuccess) onSuccess();
+      closeForm();
+
+    } catch (err: unknown) {
+      const error = err as Error;
+      setSaveError(error.message || 'An unknown error occurred.');
       console.error('EnhancedFacilityForm onSubmit: error', err);
     }
   };
@@ -396,11 +349,6 @@ export const EnhancedFacilityForm: React.FC<EnhancedFacilityFormProps> = ({ onSu
 
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="w-full px-4 sm:px-6 lg:px-8 space-y-4 p-6 bg-white rounded shadow">
-                  {saveError && (
-                    <div className="bg-red-100 text-red-800 p-4 rounded mb-4 text-lg font-semibold border border-red-300">
-                      {saveError}
-                    </div>
-                  )}
                   {saveSuccess && (
                     <div className="bg-green-100 text-green-800 p-4 rounded mb-4 text-lg font-semibold border border-green-300">
                       {tSync('admin.facilities.form.saveSuccess', 'Facility saved successfully!')}

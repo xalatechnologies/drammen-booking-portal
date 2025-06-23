@@ -24,3 +24,8 @@
 - Fixed a critical bug where the save button did not trigger onSubmit in EnhancedFacilityForm by moving all React hooks to the top level of the component, before any conditional returns, to comply with the Rules of Hooks. 
 
 - Implemented delete facility functionality in EnhancedFacilityForm with a confirmation dialog, wired to the existing deleteFacility method in the store. This completes the full CRUD implementation for the main facility form. 
+
+- Refactored `EnhancedFacilityForm` to simplify the submit logic by removing the unused `useMutation` hook.
+- Updated `useFacilityAdminStore` to ensure `createFacility` and `updateFacility` methods return the service result, fixing critical type errors and aligning the store with the form's expectations. 
+
+- Aligned `useFacilityAdminStore` and `EnhancedFacilityForm` with the correct `RepositoryResponse` type, checking for `result.error` instead of a `success` property to determine operation outcome. This fixes critical type errors and ensures correct form submission logic. 

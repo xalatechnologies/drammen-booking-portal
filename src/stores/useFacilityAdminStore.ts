@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { Facility, FacilityFilters } from '@/types/facility';
-import { PaginationParams } from '@/types/api';
+import { PaginationParams, RepositoryResponse } from '@/types/api';
 import { FacilityService } from '@/services/facilityService';
 
 export type FacilityAdminViewMode = 'table' | 'grid' | 'list' | 'map';
@@ -20,8 +20,8 @@ interface FacilityAdminState {
   formMode: FacilityAdminFormMode;
   // Actions
   loadFacilities: (filters?: FacilityFilters) => Promise<void>;
-  createFacility: (data: Partial<Facility>) => Promise<void>;
-  updateFacility: (id: string, data: Partial<Facility>) => Promise<void>;
+  createFacility: (data: Partial<Facility>) => Promise<RepositoryResponse<Facility | null>>;
+  updateFacility: (id: string, data: Partial<Facility>) => Promise<RepositoryResponse<Facility | null>>;
   deleteFacility: (id: string) => Promise<void>;
   setCurrentFacility: (facility: Facility | null) => void;
   setFilters: (filters: Partial<FacilityFilters>) => void;
@@ -86,38 +86,42 @@ export const useFacilityAdminStore = create<FacilityAdminState>()(
         set({ isLoading: true, error: null });
         try {
           const result = await FacilityService.createFacility(data);
-          if (result.success && result.data) {
+          if (!result.error && result.data) {
             set(state => ({
-              facilities: [result.data, ...state.facilities],
+              facilities: [result.data!, ...state.facilities],
               isLoading: false,
               error: null,
               isFormOpen: false,
             }));
             await get().loadFacilities();
           } else {
-            set({ isLoading: false, error: result.error?.message || 'Failed to create facility' });
+            set({ isLoading: false, error: result.error || 'Failed to create facility' });
           }
+          return result;
         } catch (error: any) {
           set({ isLoading: false, error: error.message || 'Failed to create facility' });
+          return { success: false, error: error.message, data: null };
         }
       },
       updateFacility: async (id, data) => {
         set({ isLoading: true, error: null });
         try {
           const result = await FacilityService.updateFacility(id, data);
-          if (result.success && result.data) {
+          if (!result.error && result.data) {
             set(state => ({
-              facilities: state.facilities.map(f => f.id.toString() === id ? result.data : f),
+              facilities: state.facilities.map(f => f.id.toString() === id ? result.data! : f),
               isLoading: false,
               error: null,
               isFormOpen: false,
             }));
             await get().loadFacilities();
           } else {
-            set({ isLoading: false, error: result.error?.message || 'Failed to update facility' });
+            set({ isLoading: false, error: result.error || 'Failed to update facility' });
           }
+          return result;
         } catch (error: any) {
           set({ isLoading: false, error: error.message || 'Failed to update facility' });
+          return { success: false, error: error.message, data: null };
         }
       },
       deleteFacility: async (id) => {
