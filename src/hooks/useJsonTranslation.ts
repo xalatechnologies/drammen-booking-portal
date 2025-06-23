@@ -47,6 +47,9 @@ export function useJsonTranslation() {
     }
   };
 
+  // Add tSync alias for backward compatibility
+  const tSync = t;
+
   const formatCurrency = (amount: number): string => {
     return new Intl.NumberFormat(language === 'NO' ? 'nb-NO' : 'en-US', {
       style: 'currency',
@@ -74,6 +77,7 @@ export function useJsonTranslation() {
 
   return {
     t,
+    tSync,
     language,
     formatCurrency,
     formatDate,

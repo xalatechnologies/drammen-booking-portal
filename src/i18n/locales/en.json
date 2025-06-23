@@ -80,7 +80,126 @@
     "organizations": "Organizations",
     "services": "Services",
     "reports": "Reports",
-    "settings": "Settings"
+    "settings": "Settings",
+    "sidebar": {
+      "overview": "Overview",
+      "facilities": "Facilities",
+      "bookings": "Bookings",
+      "usersRoles": "Users & Roles",
+      "approvalWorkflows": "Approval Workflows",
+      "roles": "Roles",
+      "reportsAnalytics": "Reports & Analytics",
+      "notifications": "Notifications",
+      "profileSettings": "Profile & Settings",
+      "systemConfig": "System Configuration",
+      "externalCalendars": "External Calendars",
+      "messageTemplates": "Message Templates",
+      "authProviders": "Auth Providers",
+      "supportTickets": "Support Tickets",
+      "slaConfig": "SLA Configuration",
+      "lockConfig": "Lock Configuration",
+      "monitoring": "Monitoring",
+      "integrations": "Integrations",
+      "exchangeIntegration": "Exchange Integration",
+      "auditLogs": "Audit Logs",
+      "dataRetention": "Data Retention",
+      "azureDeploy": "Azure Deploy",
+      "descriptions": {
+        "overview": "System overview and statistics",
+        "facilities": "Manage facilities and venues",
+        "bookings": "Overview of all bookings",
+        "usersRoles": "Manage users and access",
+        "approvalWorkflows": "Configure approval flows",
+        "roles": "Manage roles and permissions",
+        "reportsAnalytics": "Reports and analytics",
+        "notifications": "Notification settings",
+        "profileSettings": "Profile and user settings",
+        "systemConfig": "System configuration",
+        "externalCalendars": "External calendar integrations",
+        "messageTemplates": "Email and SMS templates",
+        "authProviders": "Authentication methods",
+        "supportTickets": "Customer support and requests",
+        "slaConfig": "Service Level Agreement",
+        "lockConfig": "Electronic lock system",
+        "monitoring": "System monitoring",
+        "integrations": "Third-party integrations",
+        "exchangeIntegration": "Microsoft Exchange",
+        "auditLogs": "System logs and audit",
+        "dataRetention": "Data storage and deletion",
+        "azureDeploy": "Azure deployment"
+      }
+    },
+    "common": {
+      "loading": "Loading..."
+    },
+    "breadcrumb": {
+      "home": "Admin"
+    },
+    "facilities": {
+      "management": "Facility Management",
+      "pageDescription": "Manage facilities and their configurations",
+      "addNew": "Add New Facility",
+      "noImage": "No image",
+      "nextAvailable": "Next available",
+      "capacity": "Capacity",
+      "type": "Type",
+      "views": {
+        "table": "Table",
+        "grid": "Grid",
+        "list": "List",
+        "map": "Map"
+      },
+      "filters": {
+        "status": "Status",
+        "allStatuses": "All Status",
+        "type": "Type",
+        "allTypes": "All Types"
+      },
+      "status": {
+        "active": "Active",
+        "inactive": "Inactive",
+        "maintenance": "Maintenance"
+      },
+      "actions": {
+        "view": "View",
+        "edit": "Edit",
+        "calendar": "Calendar",
+        "back": "Back"
+      },
+      "search": {
+        "placeholder": "Search facilities...",
+        "noFacilities": "No facilities found in database",
+        "noResults": "No facilities match your search criteria"
+      },
+      "table": {
+        "name": "Name",
+        "type": "Type",
+        "capacity": "Capacity",
+        "status": "Status",
+        "nextAvailable": "Next Available",
+        "actions": "Actions"
+      },
+      "detail": {
+        "noFacility": "No facility selected."
+      },
+      "form": {
+        "edit": "Edit",
+        "facility": "Facility",
+        "addNew": "Add New Facility",
+        "tabs": {
+          "details": "Facility Details",
+          "images": "Images"
+        },
+        "saveFirst": "Please save the facility first before managing images."
+      },
+      "images": {
+        "uploadNew": "Upload New Images",
+        "currentImages": "Current Images",
+        "featured": "Featured",
+        "noImages": "No images uploaded yet",
+        "uploadFirst": "Upload your first image using the section above"
+      }
+    }
   },
   "forms": {
     "required": "Required",
