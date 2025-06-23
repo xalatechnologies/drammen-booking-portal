@@ -18,8 +18,8 @@ export abstract class SupabaseRepository<T extends Record<string, any>> {
       }
 
       if (pagination) {
-        const from = (pagination.page - 1) * pagination.limit;
-        const to = from + pagination.limit - 1;
+        const from = (pagination.page! - 1) * pagination.limit!;
+        const to = from + pagination.limit! - 1;
         query = query.range(from, to);
       }
 
@@ -27,17 +27,18 @@ export abstract class SupabaseRepository<T extends Record<string, any>> {
 
       if (error) {
         return {
-          data: [],
+          data: [] as T[],
           error: error.message
         };
       }
 
       return {
-        data: (data as unknown as T[]) || []
+        data: (data as unknown as T[]) || [],
+        error: null
       };
     } catch (error: any) {
       return {
-        data: [],
+        data: [] as T[],
         error: error.message
       };
     }
@@ -59,7 +60,8 @@ export abstract class SupabaseRepository<T extends Record<string, any>> {
       }
 
       return {
-        data: data as unknown as T | null
+        data: data as unknown as T | null,
+        error: null
       };
     } catch (error: any) {
       return {
@@ -85,7 +87,8 @@ export abstract class SupabaseRepository<T extends Record<string, any>> {
       }
 
       return {
-        data: result as unknown as T | null
+        data: result as unknown as T | null,
+        error: null
       };
     } catch (error: any) {
       return {
@@ -112,7 +115,8 @@ export abstract class SupabaseRepository<T extends Record<string, any>> {
       }
 
       return {
-        data: result as unknown as T | null
+        data: result as unknown as T | null,
+        error: null
       };
     } catch (error: any) {
       return {
@@ -137,7 +141,8 @@ export abstract class SupabaseRepository<T extends Record<string, any>> {
       }
 
       return {
-        data: true
+        data: true,
+        error: null
       };
     } catch (error: any) {
       return {

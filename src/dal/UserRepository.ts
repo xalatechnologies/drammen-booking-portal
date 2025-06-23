@@ -28,7 +28,8 @@ export class UserRepository extends SupabaseRepository<User> {
       }
 
       return {
-        data: data as unknown as User | null
+        data: data as unknown as User | null,
+        error: null
       };
     } catch (error: any) {
       return {
@@ -57,7 +58,8 @@ export class UserRepository extends SupabaseRepository<User> {
       }
 
       return {
-        data: (data?.map((item: any) => item.profiles).filter(Boolean) as User[]) || []
+        data: (data?.map((item: any) => item.profiles).filter(Boolean) as User[]) || [],
+        error: null
       };
     } catch (error: any) {
       return {
@@ -86,7 +88,8 @@ export class UserRepository extends SupabaseRepository<User> {
       }
 
       return {
-        data: data as unknown as User | null
+        data: data as unknown as User | null,
+        error: null
       };
     } catch (error: any) {
       return {

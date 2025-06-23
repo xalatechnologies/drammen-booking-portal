@@ -46,7 +46,8 @@ export class OrganizationRepository extends SupabaseRepository<Organization> {
       }
 
       return {
-        data: data ? this.mapToOrganization(data) : null
+        data: data ? this.mapToOrganization(data) : null,
+        error: null
       };
     } catch (error: any) {
       return {
@@ -71,7 +72,8 @@ export class OrganizationRepository extends SupabaseRepository<Organization> {
       }
 
       return {
-        data: data ? data.map(item => this.mapToOrganization(item)) : []
+        data: data ? data.map(item => this.mapToOrganization(item)) : [],
+        error: null
       };
     } catch (error: any) {
       return {
@@ -101,7 +103,8 @@ export class OrganizationRepository extends SupabaseRepository<Organization> {
       }
 
       return {
-        data: data ? this.mapToOrganization(data) : null
+        data: data ? this.mapToOrganization(data) : null,
+        error: null
       };
     } catch (error: any) {
       return {

@@ -1,3 +1,4 @@
+
 export interface RepositoryResponse<T> {
   data: T;
   error: string | null;
@@ -15,9 +16,25 @@ export interface PaginationResponse {
   totalPages: number;
 }
 
-// Update RepositoryResponse to include pagination
-export interface RepositoryResponse<T> {
-  data: T;
-  error: string | null;
-  pagination?: PaginationResponse;
+// Legacy API response interfaces for backward compatibility
+export interface ApiResponse<T> {
+  success: boolean;
+  data?: T;
+  error?: {
+    message: string;
+    code?: string;
+    details?: any;
+  };
+}
+
+export interface PaginatedResponse<T> {
+  data: T[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+    hasNext: boolean;
+    hasPrev: boolean;
+  };
 }
