@@ -53,9 +53,9 @@ const FacilityListItem: React.FC<FacilityListItemProps> = ({ facility }) => {
   return (
     <Card className="group hover:shadow-lg transition-all duration-300 cursor-pointer border-0 shadow-md hover:shadow-xl transform hover:-translate-y-1 bg-white">
       <CardContent className="p-0" onClick={handleClick}>
-        <div className="flex h-32 sm:h-40">
+        <div className="flex h-48 sm:h-56 md:h-64">
           {/* Image Section - Left */}
-          <div className="w-32 sm:w-48 md:w-56 lg:w-64 flex-shrink-0">
+          <div className="w-48 sm:w-64 md:w-72 lg:w-80 flex-shrink-0">
             <div className="w-full h-full rounded-l-lg overflow-hidden">
               <FacilityListItemImage
                 facilityId={facility.id}
@@ -68,18 +68,18 @@ const FacilityListItem: React.FC<FacilityListItemProps> = ({ facility }) => {
           </div>
 
           {/* Content Section - Center */}
-          <div className="flex-1 p-4 sm:p-6 flex flex-col justify-between min-w-0">
+          <div className="flex-1 p-6 sm:p-8 flex flex-col justify-between min-w-0 mx-4">
             <div className="flex-1">
               {/* Header */}
-              <div className="flex items-start justify-between mb-3">
+              <div className="flex items-start justify-between mb-4">
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-lg sm:text-xl font-bold text-gray-900 truncate group-hover:text-blue-600 transition-colors duration-200">
+                  <h3 className="text-xl sm:text-2xl font-bold text-gray-900 truncate group-hover:text-blue-600 transition-colors duration-200 mb-2">
                     {facility.name}
                   </h3>
-                  <div className="flex items-center text-gray-600 mt-1">
-                    <MapPin className="h-4 w-4 mr-1 flex-shrink-0" />
+                  <div className="flex items-center text-gray-600 mt-2">
+                    <MapPin className="h-5 w-5 mr-2 flex-shrink-0" />
                     <span 
-                      className="text-sm truncate hover:text-blue-600 cursor-pointer"
+                      className="text-base truncate hover:text-blue-600 cursor-pointer"
                       onClick={handleAddressClick}
                     >
                       {facility.address}
@@ -88,39 +88,39 @@ const FacilityListItem: React.FC<FacilityListItemProps> = ({ facility }) => {
                 </div>
                 
                 {/* Action Buttons */}
-                <div className="flex gap-2 ml-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <div className="flex gap-3 ml-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <Button 
                     variant="ghost" 
                     size="sm" 
-                    className="h-8 w-8 p-0 hover:bg-gray-100" 
+                    className="h-10 w-10 p-0 hover:bg-gray-100" 
                     onClick={handleFavorite}
                   >
-                    <Heart className={`h-4 w-4 ${isFavorited ? 'fill-red-500 text-red-500' : 'text-gray-400'}`} />
+                    <Heart className={`h-5 w-5 ${isFavorited ? 'fill-red-500 text-red-500' : 'text-gray-400'}`} />
                   </Button>
                   <Button 
                     variant="ghost" 
                     size="sm" 
-                    className="h-8 w-8 p-0 hover:bg-gray-100" 
+                    className="h-10 w-10 p-0 hover:bg-gray-100" 
                     onClick={handleShare}
                   >
-                    <Share2 className="h-4 w-4 text-gray-400" />
+                    <Share2 className="h-5 w-5 text-gray-400" />
                   </Button>
                 </div>
               </div>
 
               {/* Facility Info */}
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-gray-600 mb-3">
+              <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-base text-gray-600 mb-4">
                 <div className="flex items-center">
-                  <Users className="h-4 w-4 mr-1" />
+                  <Users className="h-5 w-5 mr-2" />
                   <span>{facility.capacity} {t('facility.capacity')}</span>
                 </div>
                 <div className="flex items-center">
-                  <Clock className="h-4 w-4 mr-1" />
+                  <Clock className="h-5 w-5 mr-2" />
                   <span>{facility.nextAvailable}</span>
                 </div>
                 {facility.rating && (
                   <div className="flex items-center">
-                    <Star className="h-4 w-4 mr-1 fill-yellow-400 text-yellow-400" />
+                    <Star className="h-5 w-5 mr-2 fill-yellow-400 text-yellow-400" />
                     <span>{facility.rating}</span>
                   </div>
                 )}
@@ -128,21 +128,21 @@ const FacilityListItem: React.FC<FacilityListItemProps> = ({ facility }) => {
 
               {/* Description */}
               {facility.description && (
-                <p className="text-gray-600 text-sm line-clamp-2 mb-3">
+                <p className="text-gray-600 text-base line-clamp-2 mb-4">
                   {facility.description}
                 </p>
               )}
 
               {/* Equipment/Features */}
               {facility.equipment && facility.equipment.length > 0 && (
-                <div className="flex flex-wrap gap-1 mb-2">
+                <div className="flex flex-wrap gap-2 mb-4">
                   {facility.equipment.slice(0, 3).map((item, index) => (
-                    <Badge key={index} variant="secondary" className="text-xs">
+                    <Badge key={index} variant="secondary" className="text-sm px-3 py-1">
                       {item}
                     </Badge>
                   ))}
                   {facility.equipment.length > 3 && (
-                    <Badge variant="outline" className="text-xs">
+                    <Badge variant="outline" className="text-sm px-3 py-1">
                       +{facility.equipment.length - 3}
                     </Badge>
                   )}
@@ -151,24 +151,24 @@ const FacilityListItem: React.FC<FacilityListItemProps> = ({ facility }) => {
             </div>
 
             {/* Footer */}
-            <div className="flex items-center justify-between mt-2">
-              <div className="flex items-center gap-2">
-                <span className="text-lg font-bold text-gray-900">
+            <div className="flex items-center justify-between mt-4">
+              <div className="flex items-center gap-3">
+                <span className="text-2xl font-bold text-gray-900">
                   {facility.pricePerHour || facility.price_per_hour} kr
                 </span>
-                <span className="text-sm text-gray-500">
+                <span className="text-base text-gray-500">
                   /{t('facility.perHour')}
                 </span>
               </div>
-              <div className="flex items-center text-blue-600 text-sm font-medium group-hover:text-blue-700">
-                <span className="mr-1">{t('facility.viewDetails')}</span>
-                <ChevronRight className="h-4 w-4 transform group-hover:translate-x-1 transition-transform duration-200" />
+              <div className="flex items-center text-blue-600 text-base font-medium group-hover:text-blue-700">
+                <span className="mr-2">{t('facility.viewDetails')}</span>
+                <ChevronRight className="h-5 w-5 transform group-hover:translate-x-1 transition-transform duration-200" />
               </div>
             </div>
           </div>
 
           {/* Map Section - Right */}
-          <div className="w-32 sm:w-48 md:w-56 lg:w-64 flex-shrink-0">
+          <div className="w-48 sm:w-64 md:w-72 lg:w-80 flex-shrink-0">
             <div className="w-full h-full rounded-r-lg overflow-hidden">
               <FacilityListItemMap
                 address={facility.address}
