@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Plus, Upload, Calendar, Map } from "lucide-react";
@@ -61,14 +60,14 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
       ...facility,
       image: FacilityDataUtils.getImageUrl(facility.images),
       address: FacilityDataUtils.computeAddress(facility),
-      openingHours: FacilityDataUtils.transformOpeningHours(facility.opening_hours),
+      openingHours: FacilityDataUtils.transformOpeningHours(facility.openingHours),
       zones: FacilityDataUtils.transformZones(facility.zones),
       // Ensure these properties exist with defaults
-      nextAvailable: facility.next_available || 'Available now',
-      accessibility: facility.accessibility_features || [],
-      suitableFor: facility.suitable_for || [],
+      nextAvailable: facility.nextAvailable || 'Available now',
+      accessibility: facility.accessibility || [],
+      suitableFor: facility.suitableFor || [],
       equipment: facility.equipment || [],
-      availableTimes: facility.available_times || []
+      availableTimes: facility.availableTimes || []
     }));
   }, [facilities]);
 
