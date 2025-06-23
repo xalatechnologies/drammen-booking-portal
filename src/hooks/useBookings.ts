@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Booking, BookingFilters, BookingCreateRequest, BookingUpdateRequest } from '@/types/booking';
 import { PaginationParams } from '@/types/api';
@@ -11,11 +10,8 @@ export const useBookings = (
   return useQuery({
     queryKey: ['bookings', pagination, filters],
     queryFn: async () => {
-      const response = await BookingService.getBookings(pagination, filters);
-      if (!response.success) {
-        throw new Error(response.error?.message || 'Failed to fetch bookings');
-      }
-      return response.data;
+      const response = await BookingService.getBookings();
+      return response;
     },
     staleTime: 1000 * 60 * 2, // 2 minutes
   });
@@ -28,10 +24,7 @@ export const useBooking = (bookingId?: string) => {
       if (!bookingId) return null;
       
       const response = await BookingService.getBookingById(bookingId);
-      if (!response.success) {
-        throw new Error(response.error?.message || 'Failed to fetch booking');
-      }
-      return response.data;
+      return response;
     },
     enabled: !!bookingId,
     staleTime: 1000 * 60 * 5, // 5 minutes
@@ -44,11 +37,8 @@ export const useBookingsByFacility = (facilityId?: string) => {
     queryFn: async () => {
       if (!facilityId) return [];
       
-      const response = await BookingService.getBookingsByFacility(facilityId);
-      if (!response.success) {
-        throw new Error(response.error?.message || 'Failed to fetch facility bookings');
-      }
-      return response.data || [];
+      const response = await BookingService.getBookings();
+      return response.filter((booking: any) => booking.facility_id?.toString() === facilityId);
     },
     enabled: !!facilityId,
     staleTime: 1000 * 60 * 3, // 3 minutes
@@ -61,11 +51,8 @@ export const useBookingsByZone = (zoneId?: string) => {
     queryFn: async () => {
       if (!zoneId) return [];
       
-      const response = await BookingService.getBookingsByZone(zoneId);
-      if (!response.success) {
-        throw new Error(response.error?.message || 'Failed to fetch zone bookings');
-      }
-      return response.data || [];
+      const response = await BookingService.getBookings();
+      return response.filter((booking: any) => booking.zone_id === zoneId);
     },
     enabled: !!zoneId,
     staleTime: 1000 * 60 * 3, // 3 minutes

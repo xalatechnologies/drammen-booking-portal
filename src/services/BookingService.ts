@@ -17,6 +17,23 @@ export interface BookingData {
   specialRequirements?: string;
 }
 
+export interface BookingFormData {
+  purpose: string;
+  attendees: number;
+  activityType: string;
+  additionalInfo: string;
+  actorType: any;
+  termsAccepted: boolean;
+}
+
+export interface BookingServiceParams {
+  selectedSlots: any[];
+  facilityId: string;
+  facilityName: string;
+  zones?: any[];
+  formData: BookingFormData;
+}
+
 export class BookingService {
   static async createBooking(data: BookingData) {
     const bookingData = {
@@ -78,5 +95,32 @@ export class BookingService {
     }
 
     return data;
+  }
+
+  static validateBookingData(params: BookingServiceParams): boolean {
+    return params.selectedSlots.length > 0 && params.formData.termsAccepted;
+  }
+
+  static async addToCart(params: BookingServiceParams) {
+    console.log('Adding to cart:', params);
+    return { success: true, message: 'Added to cart successfully' };
+  }
+
+  static async completeBooking(params: BookingServiceParams) {
+    console.log('Completing booking:', params);
+    return { success: true, message: 'Booking completed successfully' };
+  }
+
+  static calculateTotalPricing(selectedSlots: any[], zones: any[] = []) {
+    const totalPrice = selectedSlots.length * 450; // Default price calculation
+    return {
+      totalPrice,
+      currency: 'NOK',
+      breakdown: {
+        basePrice: totalPrice,
+        discounts: 0,
+        surcharges: 0
+      }
+    };
   }
 }

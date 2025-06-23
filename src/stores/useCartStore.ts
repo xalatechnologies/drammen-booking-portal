@@ -7,9 +7,13 @@ export interface CartItem {
   facilityId: string;
   facilityName: string;
   zoneName?: string;
+  zoneId?: string;
+  date?: Date;
+  timeSlot?: string;
   startTime: Date;
   endTime: Date;
   price: number;
+  pricePerHour?: number;
   duration: number;
   purpose: string;
   expectedAttendees: number;
@@ -22,6 +26,19 @@ export interface CartItem {
   contactName: string;
   contactEmail: string;
   contactPhone: string;
+  timeSlots?: any[];
+  pricing?: {
+    totalPrice: number;
+    baseFacilityPrice: number;
+    servicesPrice: number;
+    discounts: number;
+    vatAmount: number;
+  };
+  customerInfo?: {
+    name: string;
+    email: string;
+    phone: string;
+  };
 }
 
 interface CartStore {

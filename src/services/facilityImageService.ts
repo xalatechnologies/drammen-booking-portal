@@ -49,4 +49,8 @@ export class FacilityImageService {
 
     return data || [];
   }
+
+  static async getFacilityImages(facilityId: number) {
+    return this.getAllImages(facilityId);
+  }
 }
