@@ -1,3 +1,4 @@
+
 import { Facility, OpeningHours } from '@/types/facility';
 
 // Constants for generating realistic data
@@ -97,11 +98,15 @@ const generateImages = (facilityId: number, type: string) => {
     images.push({
       id: `img-${facilityId}-${i}`,
       facility_id: facilityId,
-      url: `/bilder/${filename}`,
-      alt: `${type} - ${filename.split('.')[0]}`,
-      is_primary: i === 0,
-      created_at: "2025-01-01T00:00:00Z",
-      updated_at: "2025-01-01T00:00:00Z"
+      image_url: `/bilder/${filename}`,
+      alt_text: `${type} - ${filename.split('.')[0]}`,
+      caption: `Bilde ${i + 1} av ${type}`,
+      display_order: i,
+      is_featured: i === 0,
+      file_size: Math.floor(Math.random() * 2000000) + 500000, // 500KB to 2.5MB
+      uploaded_by: 'system',
+      uploaded_at: "2025-01-01T00:00:00Z",
+      created_at: "2025-01-01T00:00:00Z"
     });
   });
   
@@ -133,7 +138,7 @@ export const mockFacilities: Facility[] = Array.from({ length: 20 }).map((_, ind
   if (allowedBookingTypes.length === 0) allowedBookingTypes.push("engangslan" as 'engangs'); // Ensure at least one type
   
   const images = generateImages(id, type);
-  const featuredImage = images.find(img => img.is_primary);
+  const featuredImage = images.find(img => img.is_featured);
   const pricePerHour = Math.floor(Math.random() * 500) + 100; // 100-600 NOK per hour
   const accessibilityFeatures = Math.random() > 0.7 ? ["wheelchair", "hearing_loop"] : 
                              (Math.random() > 0.5 ? ["wheelchair"] : []);
@@ -147,7 +152,7 @@ export const mockFacilities: Facility[] = Array.from({ length: 20 }).map((_, ind
     address_country: country,
     type,
     status,
-    image_url: featuredImage?.url || null,
+    image_url: featuredImage?.image_url || null,
     capacity,
     area: `${Math.floor(Math.random() * 300) + 50}m²`,
     description: `En flott ${type.toLowerCase()} i ${location} området av Drammen. Passer for ulike aktiviteter og arrangementer.`,
@@ -178,7 +183,7 @@ export const mockFacilities: Facility[] = Array.from({ length: 20 }).map((_, ind
     
     // Computed/derived fields for backwards compatibility
     address,
-    image: featuredImage?.url || "",
+    image: featuredImage?.image_url || "",
     pricePerHour,
     accessibility: accessibilityFeatures,
     suitableFor: ["sports", "meetings", "events"].filter(() => Math.random() > 0.5),
@@ -186,7 +191,14 @@ export const mockFacilities: Facility[] = Array.from({ length: 20 }).map((_, ind
     nextAvailable: Math.random() > 0.3 ? "I dag, 18:00" : `${WEEKDAYS[Math.floor(Math.random() * 7)]}, ${Math.floor(Math.random() * 12) + 8}:00`,
     openingHours: generateOpeningHours(id),
     zones: [],
-    featuredImage: featuredImage
+    featuredImage: featuredImage,
+    images: images,
+    timeSlotDuration: Math.random() > 0.5 ? 1 : 2,
+    availableTimes: [],
+    season: {
+      from: "2025-01-01",
+      to: "2025-12-31"
+    }
   } as Facility;
 });
 
