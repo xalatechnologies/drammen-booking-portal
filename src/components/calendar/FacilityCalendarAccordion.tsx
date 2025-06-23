@@ -78,12 +78,18 @@ export const FacilityCalendarAccordion: React.FC<FacilityCalendarAccordionProps>
     }
   };
 
+  const handleBookNow = (facility: Facility) => {
+    // Navigate to facility booking page
+    window.location.href = `/facilities/${facility.id}`;
+  };
+
   return (
     <Accordion type="multiple" className="w-full">
       {facilities.map((facility) => (
         <FacilityAccordionItem
           key={facility.id}
           facility={facility}
+          onBookNow={handleBookNow}
           currentWeekStart={currentWeekStart}
           timeSlots={timeSlots}
           getAvailabilityStatus={getAvailabilityStatus}

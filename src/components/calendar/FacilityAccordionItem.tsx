@@ -12,6 +12,12 @@ interface FacilityAccordionItemProps {
   onBookNow: (facility: Facility) => void;
   isExpanded?: boolean;
   onToggle?: () => void;
+  currentWeekStart?: Date;
+  timeSlots?: string[];
+  getAvailabilityStatus?: (zoneId: string, date: Date, timeSlot: string) => { status: string; conflict: any };
+  isSlotSelected?: () => boolean;
+  handleSlotClick?: (zoneId: string, date: Date, timeSlot: string, availability: string) => void;
+  onFacilitySelect?: (facilityId: string) => void;
 }
 
 export const FacilityAccordionItem: React.FC<FacilityAccordionItemProps> = ({
@@ -55,7 +61,7 @@ export const FacilityAccordionItem: React.FC<FacilityAccordionItemProps> = ({
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <Badge variant={facility.status === 'active' ? 'default' : 'secondary'}>
+            <Badge variant={facility.status === 'active' ? 'secondary' : 'outline'}>
               {facility.status}
             </Badge>
             <Button
@@ -138,4 +144,3 @@ export const FacilityAccordionItem: React.FC<FacilityAccordionItemProps> = ({
     </Card>
   );
 };
-

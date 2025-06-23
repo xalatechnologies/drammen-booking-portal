@@ -1,7 +1,6 @@
 
 import { BaseRepository } from '@/dal/BaseRepository';
 import { RepositoryResponse, PaginationParams } from '@/types/api';
-import { SUPABASE_ANON_KEY } from '@/config/env';
 import { supabase } from '@/integrations/supabase/client';
 
 /**
@@ -50,8 +49,8 @@ export class GenericEntityRepository<T extends Record<string, any>> extends Base
       // Extract skipRelated from filters if present
       const { skipRelated, ...otherFilters } = filters || {};
       
-      // Build query
-      let query = supabase.from(this.table);
+      // Build query using .from() with proper type assertion
+      let query = supabase.from(this.table as any);
       
       // Add related tables if specified
       if (this.related && !skipRelated) {
@@ -62,14 +61,14 @@ export class GenericEntityRepository<T extends Record<string, any>> extends Base
       
       // Apply status filter if needed
       if (this.statusField && !otherFilters.includeInactive) {
-        (query as any) = query.eq(this.statusField, this.activeValue || 'active');
+        query = query.eq(this.statusField, this.activeValue || 'active');
       }
       
       // Apply pagination
       if (pagination && pagination.page && pagination.limit) {
         const start = (pagination.page - 1) * pagination.limit;
         const end = start + pagination.limit - 1;
-        (query as any) = query.range(start, end);
+        query = query.range(start, end);
       }
       
       const result = await query;
@@ -98,7 +97,7 @@ export class GenericEntityRepository<T extends Record<string, any>> extends Base
    */
   async findById(id: string): Promise<RepositoryResponse<T | null>> {
     try {
-      let query = supabase.from(this.table);
+      let query = supabase.from(this.table as any);
       
       if (this.related) {
         query = query.select(`*, ${this.related}`);
@@ -106,7 +105,7 @@ export class GenericEntityRepository<T extends Record<string, any>> extends Base
         query = query.select('*');
       }
       
-      const result = await (query as any).eq(this.idField, id).single();
+      const result = await query.eq(this.idField, id).single();
       
       if (result.error) {
         return {
@@ -132,7 +131,7 @@ export class GenericEntityRepository<T extends Record<string, any>> extends Base
    */
   async create(data: Omit<T, 'id' | 'created_at' | 'updated_at'>): Promise<RepositoryResponse<T | null>> {
     try {
-      const result = await (supabase.from(this.table) as any).insert(data).select();
+      const result = await supabase.from(this.table as any).insert(data).select();
       
       if (result.error) {
         return {
@@ -158,7 +157,7 @@ export class GenericEntityRepository<T extends Record<string, any>> extends Base
    */
   async update(id: string, data: Partial<Omit<T, 'id' | 'created_at'>>): Promise<RepositoryResponse<T | null>> {
     try {
-      const result = await (supabase.from(this.table) as any)
+      const result = await supabase.from(this.table as any)
         .update(data)
         .eq(this.idField, id)
         .select();
@@ -191,12 +190,12 @@ export class GenericEntityRepository<T extends Record<string, any>> extends Base
       
       if (this.statusField) {
         // Soft delete by updating status
-        result = await (supabase.from(this.table) as any)
+        result = await supabase.from(this.table as any)
           .update({ [this.statusField]: 'inactive' })
           .eq(this.idField, id);
       } else {
         // Hard delete
-        result = await (supabase.from(this.table) as any)
+        result = await supabase.from(this.table as any)
           .delete()
           .eq(this.idField, id);
       }
