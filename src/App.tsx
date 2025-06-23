@@ -34,6 +34,7 @@ import NotificationsPage from "./pages/user/Notifications";
 import HistoryLogPage from "./pages/umbrella/HistoryLog";
 import MessagesPage from "./pages/umbrella/Messages";
 import ReleaseTimePage from "./pages/umbrella/ReleaseTime";
+import CaseworkerDashboard from "./pages/caseworker";
 
 import FacilityDetailsPage from '@/pages/facilities/[id]';
 import BookingConfirmationPage from '@/pages/BookingConfirmationPage';
@@ -89,6 +90,7 @@ const App = () => (
                         <Route path="profil" element={<UserProfilePage />} />
                         <Route path="fakturaer" element={<InvoicesPage />} />
                       </Route>
+                      <Route path="/caseworker" element={<CaseworkerDashboard />} />
                     </Routes>
                   </BrowserRouter>
                 </TooltipProvider>
