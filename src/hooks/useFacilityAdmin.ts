@@ -9,9 +9,6 @@ import { toast } from 'sonner';
  * 
  * This custom hook combines the generic entity store for facilities with the UI-specific state,
  * providing a unified interface for components to interact with.
- * 
- * It follows the pattern of separating data and UI concerns while providing convenient
- * access to both through a single hook.
  */
 export function useFacilityAdmin() {
   // Entity state and actions from the generic entity store
@@ -80,12 +77,12 @@ export function useFacilityAdmin() {
       if (result) {
         toast.success('Facility created successfully');
         closeForm();
-        return result;
+        return { data: result, error: null };
       }
-      return null;
+      return { data: null, error: 'Failed to create facility' };
     } catch (error: any) {
       toast.error(`Error creating facility: ${error.message}`);
-      throw error;
+      return { data: null, error: error.message };
     }
   };
   
@@ -95,12 +92,12 @@ export function useFacilityAdmin() {
       if (result) {
         toast.success('Facility updated successfully');
         closeForm();
-        return result;
+        return { data: result, error: null };
       }
-      return null;
+      return { data: null, error: 'Failed to update facility' };
     } catch (error: any) {
       toast.error(`Error updating facility: ${error.message}`);
-      throw error;
+      return { data: null, error: error.message };
     }
   };
   

@@ -1,3 +1,4 @@
+
 import { BaseRepository } from '@/dal/BaseRepository';
 import { RepositoryResponse, PaginationParams } from '@/types/api';
 import { supabase } from '@/integrations/supabase/client';
@@ -7,7 +8,6 @@ import { supabase } from '@/integrations/supabase/client';
  */
 export class GenericEntityRepository<T extends Record<string, any>> extends BaseRepository<T> {
   private table: string;
-  private related?: string;
   private idField: string;
   private statusField?: string;
   private activeValue?: string;
@@ -15,7 +15,6 @@ export class GenericEntityRepository<T extends Record<string, any>> extends Base
   constructor(
     table: string,
     options: {
-      related?: string | string[];
       idField?: string;
       statusField?: string;
       activeValue?: string;
@@ -23,9 +22,6 @@ export class GenericEntityRepository<T extends Record<string, any>> extends Base
   ) {
     super();
     this.table = table;
-    this.related = Array.isArray(options.related)
-      ? options.related.join(',')
-      : options.related;
     this.idField = options.idField || 'id';
     this.statusField = options.statusField;
     this.activeValue = options.activeValue;
@@ -35,7 +31,6 @@ export class GenericEntityRepository<T extends Record<string, any>> extends Base
     try {
       console.log('GenericEntityRepository.findAll - Starting query for table:', this.table);
       
-      // Build the select query - keep it simple to avoid relation errors
       let query = supabase
         .from(this.table as any)
         .select('*', { count: 'exact' });

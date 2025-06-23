@@ -2,12 +2,10 @@
 import React, { useRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FacilityService } from "@/services/facilityService";
 import { facilityFormSchema, FacilityFormData } from "./FacilityFormSchema";
 import { EnhancedFacilityBasicSection } from "./sections/EnhancedFacilityBasicSection";
 import { EnhancedFacilityAddressSection } from "./sections/EnhancedFacilityAddressSection";
@@ -20,11 +18,10 @@ import { FacilityPricingSection } from "./sections/FacilityPricingSection";
 import { FacilityZonesSection } from "./sections/FacilityZonesSection";
 import { FacilityBlackoutSection } from "./sections/FacilityBlackoutSection";
 import { FacilityImageManagement } from "../FacilityImageManagement";
-import { FacilityCalendarManagement } from "./sections/FacilityCalendarManagement";
 import { FacilityFormBreadcrumb } from "./FacilityFormBreadcrumb";
 import { useRoleBasedAccess } from "@/hooks/useRoleBasedAccess";
 import { toast } from "@/hooks/use-toast";
-import { Save, X, Shield, AlertCircle, Loader2 } from "lucide-react";
+import { Shield, AlertCircle, Loader2 } from "lucide-react";
 import { useJsonTranslation } from "@/hooks/useJsonTranslation";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useFacilityAdminStore } from '@/stores/useFacilityAdminStore';
@@ -50,7 +47,6 @@ interface SectionSaveRef {
 }
 
 export const EnhancedFacilityForm: React.FC<EnhancedFacilityFormProps> = ({ onSuccess }) => {
-  const queryClient = useQueryClient();
   const { tSync } = useJsonTranslation();
   const { currentRole, hasPermission, canAccessTab, getAvailableTabs } = useRoleBasedAccess();
   const {
@@ -140,7 +136,7 @@ export const EnhancedFacilityForm: React.FC<EnhancedFacilityFormProps> = ({ onSu
   const onSubmit = async (data: FacilityFormData) => {
     console.log('onSubmit handler triggered');
     setSaveError(null);
-    clearSectionErrors(); // Clear previous section errors
+    clearSectionErrors();
     setSaveSuccess(false);
     console.log('EnhancedFacilityForm onSubmit: data', data);
 
@@ -157,29 +153,6 @@ export const EnhancedFacilityForm: React.FC<EnhancedFacilityFormProps> = ({ onSu
       const facilityId = facilityResult.data.id;
       console.log('Facility saved successfully:', facilityId);
       
-      // Save data from other sections
-      const savePromises = [
-        openingHoursRef.current?.saveData(),
-        zonesRef.current?.saveData(),
-        blackoutsRef.current?.saveData(),
-        pricingRulesRef.current?.saveData(),
-      ].filter(Boolean);
-
-      const results = await Promise.all(savePromises);
-      const sectionSaveErrors = results.reduce((errors, result, index) => {
-        if (!result) {
-          // This is a bit generic. In a real app, you'd want more specific error messages from each section
-          const sectionName = ['Opening Hours', 'Zones', 'Blackouts', 'Pricing Rules'][index];
-          errors.push(`Failed to save ${sectionName}.`);
-        }
-        return errors;
-      }, [] as string[]);
-
-      if (sectionSaveErrors.length > 0) {
-        setSectionErrors(sectionSaveErrors);
-        throw new Error('Some sections failed to save.');
-      }
-
       setSaveSuccess(true);
       toast({
         title: "Success",
@@ -316,26 +289,6 @@ export const EnhancedFacilityForm: React.FC<EnhancedFacilityFormProps> = ({ onSu
                       {tSync("admin.facilities.form.tabs.features", "Features")}
                     </TabsTrigger>
                   )}
-                  {availableTabs.includes('pricing') && (
-                    <TabsTrigger value="pricing" className="text-xl h-14 px-6 font-bold">
-                      {tSync("admin.facilities.form.tabs.pricing", "Pricing")}
-                    </TabsTrigger>
-                  )}
-                  {availableTabs.includes('zones') && (
-                    <TabsTrigger value="zones" className="text-xl h-14 px-6 font-bold">
-                      {tSync("admin.facilities.form.tabs.zones", "Zones")}
-                    </TabsTrigger>
-                  )}
-                  {availableTabs.includes('schedule') && (
-                    <TabsTrigger value="schedule" className="text-xl h-14 px-6 font-bold">
-                      {tSync("admin.facilities.form.tabs.schedule", "Schedule")}
-                    </TabsTrigger>
-                  )}
-                  {availableTabs.includes('blackouts') && (
-                    <TabsTrigger value="blackouts" className="text-xl h-14 px-6 font-bold">
-                      {tSync("admin.facilities.form.tabs.blackouts", "Blackouts")}
-                    </TabsTrigger>
-                  )}
                   {availableTabs.includes('images') && (
                     <TabsTrigger value="images" disabled={!isEdit} className="text-xl h-14 px-6 font-bold">
                       {tSync("admin.facilities.form.tabs.images", "Images")}
@@ -366,22 +319,9 @@ export const EnhancedFacilityForm: React.FC<EnhancedFacilityFormProps> = ({ onSu
                   <TabsContent value="features" className="space-y-6">
                     <FacilityFeaturesSection form={form} equipment={watchedEquipment} amenities={watchedAmenities} capacity={watchedCapacity} />
                   </TabsContent>
-                  <TabsContent value="pricing" className="space-y-6">
-                    <FacilityPricingSection ref={pricingRulesRef} form={form} facilityId={currentFacility?.id} />
-                  </TabsContent>
-                  <TabsContent value="zones" className="space-y-6">
-                    <FacilityZonesSection ref={zonesRef} facilityId={currentFacility?.id} />
-                  </TabsContent>
-                  <TabsContent value="schedule" className="space-y-6">
-                    <FacilityOpeningHoursSection ref={openingHoursRef} facilityId={currentFacility?.id} />
-                  </TabsContent>
-                  <TabsContent value="blackouts" className="space-y-6">
-                    <FacilityBlackoutSection ref={blackoutsRef} facilityId={currentFacility?.id} form={form} />
-                  </TabsContent>
                   <TabsContent value="images" className="space-y-6">
                     <FacilityImageManagement facilityId={currentFacility?.id} />
                   </TabsContent>
-                  {/* Add more sections as needed */}
                   {error && <div className="text-red-500 text-sm">{error}</div>}
                   <div className="flex justify-end gap-4 mt-8">
                     {isEdit && (

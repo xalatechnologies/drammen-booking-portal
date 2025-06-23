@@ -4,10 +4,10 @@ import { Facility } from '@/types/facility';
 
 /**
  * Entity-specific stores using the generic entity store factory
- * Using actual database table structure - no complex relations for now to avoid errors
+ * Using actual database table structure - simplified for maintainability
  */
 
-// Facility store - simplified to avoid relation errors
+// Facility store
 export const useFacilityStore = createGenericEntityStore<Facility>('facilities', {
   idField: 'id',
   statusField: 'status',

@@ -1,11 +1,6 @@
 
+// Only export the working repositories that are actually used
 export { facilityRepository } from './FacilityRepository';
-export { zoneRepository } from './ZoneRepository';
 export { supabaseFacilityRepository } from './SupabaseFacilityRepository';
-export { serviceBookingRepository } from './ServiceBookingRepository';
-export { pricingRuleRepository } from './PricingRuleRepository';
 
-// Export repository classes for manual instantiation if needed
-export { ServiceBookingRepository } from './ServiceBookingRepository';
-export { ZoneRepository } from './ZoneRepository';
-export { PricingRuleRepository } from './PricingRuleRepository';
+// No manual instantiation exports needed since we're using generic stores
