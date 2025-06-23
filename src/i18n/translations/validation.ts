@@ -1,4 +1,3 @@
-
 export const validationTranslations = {
   NO: {
     messages: {
@@ -23,31 +22,6 @@ export const validationTranslations = {
       selectDate: "Velg dato",
       selectTime: "Velg tidspunkt",
       selectZone: "Velg område"
-    }
-  },
-  EN: {
-    messages: {
-      required: "This field is required",
-      email: "Invalid email address",
-      phone: "Phone number must be at least 8 digits",
-      minLength: "Minimum {count} characters",
-      maxLength: "Maximum {count} characters",
-      nameMinLength: "Name must be at least 2 characters",
-      purposeMinLength: "Describe the purpose (minimum 3 characters)",
-      attendeesMin: "Minimum 1 participant",
-      attendeesMax: "Maximum 1000 participants",
-      cardRequired: "This field is required",
-      invalidCard: "Invalid card number",
-      invalidExpiry: "Invalid expiry date",
-      invalidCvv: "Invalid CVV"
-    },
-    actions: {
-      selectCustomerType: "Select price group",
-      selectEventType: "Select event type",
-      selectAgeGroup: "Select age group",
-      selectDate: "Select date",
-      selectTime: "Select time",
-      selectZone: "Select zone"
     }
   }
 };

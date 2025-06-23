@@ -1,4 +1,3 @@
-
 import { Language } from '../types';
 
 // Flat structure for direct key-value enum translations
@@ -48,51 +47,5 @@ export const enumTranslations: Record<Language, Record<string, string>> = {
     'seniors': 'Seniorer',
     'mixed': 'Blandet',
     'family': 'Familie'
-  },
-  EN: {
-    // User Roles
-    'system-admin': 'System Administrator',
-    'facility-manager': 'Facility Manager',
-    'caseworker': 'Caseworker',
-    'municipal-staff': 'Municipal Staff',
-    'organization-rep': 'Organization Representative',
-    'regular-user': 'Regular User',
-
-    // Booking Status
-    'draft': 'Draft',
-    'pending-approval': 'Pending Approval',
-    'approved': 'Approved',
-    'confirmed': 'Confirmed',
-    'in-progress': 'In Progress',
-    'completed': 'Completed',
-    'cancelled': 'Cancelled',
-    'rejected': 'Rejected',
-    'no-show': 'No Show',
-
-    // Actor Types
-    'lag-foreninger': 'Teams and Associations (Voluntary)',
-    'paraply': 'Umbrella Organizations',
-    'private-firma': 'Private Companies',
-    'kommunale-enheter': 'Municipal Units',
-    'private-person': 'Private Persons',
-
-    // Event Types
-    'training': 'Training',
-    'competition': 'Competition',
-    'meeting': 'Meeting',
-    'celebration': 'Celebration',
-    'course': 'Course',
-    'conference': 'Conference',
-    'performance': 'Performance',
-    'exhibition': 'Exhibition',
-    'other': 'Other',
-
-    // Age Groups
-    'children': 'Children',
-    'youth': 'Youth',
-    'adults': 'Adults',
-    'seniors': 'Seniors',
-    'mixed': 'Mixed',
-    'family': 'Family'
   }
 };

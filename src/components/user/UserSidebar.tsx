@@ -7,6 +7,8 @@ import {
   LifeBuoy,
   Receipt,
   ChevronRight,
+  FileText,
+  Bell
 } from "lucide-react";
 import {
   Sidebar,
@@ -18,35 +20,42 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
 } from "@/components/ui/sidebar";
+import { useTranslation } from "@/i18n/hooks/useTranslation";
 
 const UserSidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const currentPath = location.pathname;
+  const { t } = useTranslation();
 
   const menuItems = [
     {
-      title: "Min Oversikt",
+      title: t("user.sidebar.overview"),
       path: "/minside/bruker",
       icon: LayoutDashboard,
     },
     {
-      title: "Mine Søknader",
+      title: t("user.sidebar.applications"),
+      path: "/minside/bruker/soknader",
+      icon: FileText,
+    },
+    {
+      title: t("user.sidebar.bookings"),
       path: "/minside/bruker/bookinger",
       icon: Calendar,
     },
     {
-      title: "Ny Søknad",
-      path: "/minside/bruker/soknad",
-      icon: FilePlus,
+      title: t("user.sidebar.notifications"),
+      path: "/minside/bruker/varslinger",
+      icon: Bell,
     },
     {
-      title: "Mine Fakturaer",
+      title: t("user.sidebar.invoices"),
       path: "/minside/bruker/fakturaer",
       icon: Receipt,
     },
     {
-      title: "Hjelp & Støtte",
+      title: t("user.sidebar.help"),
       path: "/minside/bruker/hjelp",
       icon: LifeBuoy,
     },
@@ -103,7 +112,7 @@ const UserSidebar = () => {
       style={{ ...( { ['--sidebar-width']: '20rem' } as any ) }}
     >
       <SidebarContent className="px-4 pt-8 sm:pt-16 pb-10 space-y-4 overflow-y-auto max-h-screen scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
-        {renderMenuGroup(menuItems, "MENY")}
+        {renderMenuGroup(menuItems, t("user.sidebar.menu"))}
       </SidebarContent>
     </Sidebar>
   );
