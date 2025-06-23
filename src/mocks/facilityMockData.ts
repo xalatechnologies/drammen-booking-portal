@@ -15,15 +15,6 @@ const LOCATIONS = [
   'Fjell', 'Skoger', 'Tangen', 'Brandengen', 'Marienlyst'
 ];
 
-// Generate realistic opening hours
-const generateOpeningHours = (facilityId: number): OpeningHours[] => {
-  return WEEKDAYS.map((day, index) => ({
-    dayOfWeek: index as 0 | 1 | 2 | 3 | 4 | 5 | 6,
-    opens: index < 5 ? "08:00" : "10:00", // Weekdays vs weekend
-    closes: index < 5 ? "22:00" : "18:00", // Weekdays vs weekend
-  })) as OpeningHours[];
-};
-
 // Local images from public/bilder directory
 const LOCAL_IMAGES = [
   'Ankerskogen_svoemmehall1.jpg',
@@ -182,7 +173,7 @@ export const mockFacilities: Facility[] = Array.from({ length: 20 }).map((_, ind
     suitableFor: ["sports", "meetings", "events"].filter(() => Math.random() > 0.5),
     hasAutoApproval: Math.random() > 0.5,
     nextAvailable: Math.random() > 0.3 ? "I dag, 18:00" : `${WEEKDAYS[Math.floor(Math.random() * 7)]}, ${Math.floor(Math.random() * 12) + 8}:00`,
-    openingHours: generateOpeningHours(id),
+    openingHours: [], // Empty array since we don't need opening hours on front page
     zones: [],
     featuredImage: featuredImage,
     images: images,
