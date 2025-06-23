@@ -4,7 +4,7 @@ import { FacilityCard } from './facility/FacilityCard';
 import FacilityListItem from './facility/FacilityListItem';
 import ViewHeader from './search/ViewHeader';
 import { Facility, FacilityFilters } from '@/types/facility';
-import { getFilteredMockFacilities } from '@/mocks/facilityMockData';
+import { useFacilities } from '@/hooks/useFacilities';
 
 interface InfiniteScrollFacilitiesProps {
   filters: FacilityFilters;
@@ -18,63 +18,30 @@ export const InfiniteScrollFacilities: React.FC<InfiniteScrollFacilitiesProps> =
   setViewMode
 }) => {
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [allFacilities, setAllFacilities] = useState<Facility[]>([]);
   const ITEMS_PER_PAGE = 6;
 
   console.log('InfiniteScrollFacilities - Rendering with filters:', filters);
   console.log('InfiniteScrollFacilities - Current viewMode:', viewMode);
-  console.log('InfiniteScrollFacilities - allFacilities count:', allFacilities.length);
 
-  // Get all filtered facilities from mock data
-  const allFilteredFacilities = useMemo(() => {
-    const mockFilters: Parameters<typeof getFilteredMockFacilities>[0] = {
-      searchTerm: filters.searchTerm,
-      facilityType: filters.facilityType,
-      location: filters.location,
-      capacity: filters.capacity,
-      accessibility: filters.accessibility,
-      availableNow: filters.availableNow,
-      hasEquipment: filters.amenities?.includes('av-equipment'),
-      hasParking: filters.amenities?.includes('parking'),
-      hasWifi: filters.amenities?.includes('wifi'),
-      allowsPhotography: filters.amenities?.includes('photography'),
-      ...(filters.priceRange ? {
-        priceRange: [filters.priceRange.min, filters.priceRange.max]
-      } : {})
-    };
-    
-    return getFilteredMockFacilities(mockFilters);
-  }, [filters]);
+  // Use the DAL layer to fetch facilities
+  const { facilities, isLoading, pagination } = useFacilities({
+    pagination: { page: currentPage, limit: ITEMS_PER_PAGE },
+    filters,
+  });
+
+  console.log('InfiniteScrollFacilities - Facilities from DAL:', facilities);
+  console.log('InfiniteScrollFacilities - Pagination info:', pagination);
 
   const filterString = useMemo(() => JSON.stringify(filters), [filters]);
 
   useEffect(() => {
     console.log('InfiniteScrollFacilities - Filters changed, resetting to page 1');
-    setAllFacilities([]);
     setCurrentPage(1);
   }, [filterString]);
 
-  useEffect(() => {
-    const loadFacilities = async () => {
-      setIsLoading(true);
-      
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-      const endIndex = currentPage * ITEMS_PER_PAGE;
-      const paginatedFacilities = allFilteredFacilities.slice(startIndex, endIndex);
-      
-      setAllFacilities(paginatedFacilities);
-      setIsLoading(false);
-    };
-    
-    loadFacilities();
-  }, [currentPage, allFilteredFacilities]);
-
   const hasMore = useMemo(() => {
-    return allFacilities.length < allFilteredFacilities.length;
-  }, [allFacilities, allFilteredFacilities]);
+    return pagination?.hasNext || false;
+  }, [pagination]);
 
   const loadMore = useCallback(() => {
     if (!isLoading && hasMore) {
@@ -103,24 +70,27 @@ export const InfiniteScrollFacilities: React.FC<InfiniteScrollFacilitiesProps> =
     console.log("Address clicked for facility:", facility.name);
   }, []);
 
+  const totalFacilities = pagination?.total || 0;
+
   console.log('InfiniteScrollFacilities - Render state:', {
-    allFacilitiesCount: allFacilities.length,
+    facilitiesCount: facilities.length,
     isLoading,
     hasMore,
     currentPage,
-    viewMode
+    viewMode,
+    totalFacilities
   });
 
   return (
     <div className="w-full">
       <ViewHeader 
-        facilityCount={allFilteredFacilities.length} 
+        facilityCount={totalFacilities} 
         viewMode={viewMode} 
         setViewMode={setViewMode}
         isLoading={isLoading}
       />
 
-      {isLoading && allFacilities.length === 0 ? (
+      {isLoading && facilities.length === 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
           {Array.from({ length: 6 }).map((_, index) => (
             <div 
@@ -137,7 +107,7 @@ export const InfiniteScrollFacilities: React.FC<InfiniteScrollFacilitiesProps> =
         </div>
       ) : viewMode === "grid" ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-          {allFacilities.map((facility) => (
+          {facilities.map((facility) => (
             <FacilityCard 
               key={facility.id} 
               facility={facility} 
@@ -163,7 +133,7 @@ export const InfiniteScrollFacilities: React.FC<InfiniteScrollFacilitiesProps> =
         </div>
       ) : (
         <div className="flex flex-col gap-4 mt-6">
-          {allFacilities.map((facility) => (
+          {facilities.map((facility) => (
             <FacilityListItem 
               key={facility.id} 
               facility={facility} 
