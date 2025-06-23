@@ -1,4 +1,3 @@
-
 export type Language = 'NO' | 'EN';
 
 export interface TranslationParams {

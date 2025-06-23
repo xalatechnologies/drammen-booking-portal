@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
@@ -23,47 +22,49 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
 } from "@/components/ui/sidebar";
+import { useTranslation } from "@/i18n/hooks/useTranslation";
 
 const UmbrellaSidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const currentPath = location.pathname;
+  const { t } = useTranslation();
 
   const menuItems = [
     {
-      title: "Dashboard",
+      title: t("umbrella.sidebar.dashboard", undefined, "Dashboard"),
       path: "/minside/paraply",
       icon: LayoutDashboard,
     },
     {
-      title: "Tildelt rammetid",
+      title: t("umbrella.sidebar.allocatedTime", undefined, "Tildelt rammetid"),
       path: "/minside/paraply/rammetid",
       icon: CalendarCheck,
     },
     {
-      title: "Fordeling",
+      title: t("umbrella.sidebar.distribution", undefined, "Fordeling"),
       path: "/minside/paraply/fordeling",
       icon: PieChart,
     },
     {
-      title: "Brukere",
+      title: t("umbrella.sidebar.users", undefined, "Brukere"),
       path: "/minside/paraply/brukere",
       icon: Users,
     },
     {
-      title: "Logg / Historikk",
-      path: "/minside/paraply/logg",
-      icon: History,
+      title: t("umbrella.sidebar.releaseTime", undefined, "Strøtimer"),
+      path: "/minside/paraply/frigjor-tid",
+      icon: Clock,
     },
     {
-      title: "Meldinger / Varsler",
+      title: t("umbrella.sidebar.messages", undefined, "Varsler"),
       path: "/minside/paraply/meldinger",
       icon: MessageSquare,
     },
     {
-      title: "Frigi tid til strøtimer",
-      path: "/minside/paraply/frigjor-tid",
-      icon: Clock,
+      title: t("umbrella.sidebar.historyLog", undefined, "Logg"),
+      path: "/minside/paraply/logg",
+      icon: History,
     },
   ];
 
@@ -119,7 +120,7 @@ const UmbrellaSidebar = () => {
       style={{ ...( { ['--sidebar-width']: '20rem' } as any ) }}
     >
       <SidebarContent className="px-4 pt-8 sm:pt-16 pb-10 space-y-4 overflow-y-auto max-h-screen scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
-        {renderMenuGroup(menuItems, "MENY")}
+        {renderMenuGroup(menuItems, t("umbrella.sidebar.menu", undefined, "MENY"))}
       </SidebarContent>
     </Sidebar>
   );

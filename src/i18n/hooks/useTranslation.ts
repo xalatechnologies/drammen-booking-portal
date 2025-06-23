@@ -6,7 +6,7 @@ import { errorTranslations } from '../translations/errors';
 import { navigationTranslations } from '../translations/navigation';
 import { adminTranslations } from '../translations/admin';
 import { enumTranslations } from '../translations/enums';
-import { modelTranslations } from '../translations/models';
+import { modelsTranslations } from '../translations/models';
 import { serviceTranslations } from '../translations/services';
 import { formsTranslations } from '../translations/forms';
 import { validationTranslations } from '../translations/validation';
@@ -14,6 +14,8 @@ import { accessibilityTranslations } from '../translations/accessibility';
 import { paymentTranslations } from '../translations/payment';
 import { searchTranslations } from '../translations/search';
 import { heroTranslations } from '../translations/hero';
+import { umbrellaTranslations } from '../translations/umbrella';
+import { userTranslations } from '../translations/user';
 import { TranslationParams, TranslationFunction } from '../types';
 
 type TranslationPath = string;
@@ -29,14 +31,16 @@ export function useTranslation() {
     navigation: navigationTranslations[language],
     admin: adminTranslations[language],
     enum: enumTranslations[language],
-    models: modelTranslations[language],
+    models: modelsTranslations[language],
     services: serviceTranslations[language],
     forms: formsTranslations[language],
     validation: validationTranslations[language],
     accessibility: accessibilityTranslations[language],
     payment: paymentTranslations[language],
     search: searchTranslations[language],
-    hero: heroTranslations[language]
+    hero: heroTranslations[language],
+    umbrella: umbrellaTranslations[language],
+    user: userTranslations[language]
   };
 
   const t: TranslationFunction = (path: TranslationPath, params?: TranslationParams, defaultValue?: string): string => {

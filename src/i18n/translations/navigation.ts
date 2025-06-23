@@ -1,4 +1,3 @@
-
 export const navigationTranslations = {
   NO: {
     main: {
@@ -29,37 +28,6 @@ export const navigationTranslations = {
       privacy: "Personvern",
       terms: "Vilkår",
       accessibility: "Tilgjengelighet"
-    }
-  },
-  EN: {
-    main: {
-      home: "Home",
-      facilities: "Facilities",
-      bookings: "Bookings",
-      profile: "Profile",
-      settings: "Settings",
-      admin: "Admin"
-    },
-    breadcrumbs: {
-      home: "Home",
-      back: "Back",
-      skipToMain: "Skip to main content"
-    },
-    search: {
-      placeholder: "Search for facilities...",
-      filters: "Filter",
-      viewMode: "View",
-      grid: "Grid",
-      list: "List",
-      map: "Map",
-      calendar: "Calendar"
-    },
-    footer: {
-      contact: "Contact",
-      about: "About",
-      privacy: "Privacy",
-      terms: "Terms",
-      accessibility: "Accessibility"
     }
   }
 };

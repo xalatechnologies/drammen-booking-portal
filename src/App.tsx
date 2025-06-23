@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -15,7 +14,7 @@ import Index from "./pages/Index";
 import FacilityPage from "./pages/facilities/[id]";
 import BookingPage from "./pages/booking/[facilityId]";
 import { BookingSuccessPage } from "./components/facility/booking/BookingSuccessPage";
-import BookingsPage from "./pages/bookings/index";
+import BookingsPage from "./pages/user/Bookings";
 import LoginPage from "./pages/LoginSelection";
 import ProfilePage from "./pages/profile/index";
 import SettingsPage from "./pages/settings/index";
@@ -27,14 +26,16 @@ import Distribution from "./pages/umbrella/Distribution";
 import Users from "./pages/umbrella/Users";
 import UserLayout from "./pages/user/UserLayout";
 import UserOverviewPage from "./pages/user/Overview";
-import UserBookingsPage from "./pages/user/Bookings";
-import NewApplicationPage from "./pages/user/NewApplication";
+import ApplicationsPage from "./pages/user/Applications";
 import HelpPage from "./pages/user/Help";
 import UserProfilePage from "./pages/user/Profile";
 import InvoicesPage from "./pages/user/Invoices";
+import NotificationsPage from "./pages/user/Notifications";
 import HistoryLogPage from "./pages/umbrella/HistoryLog";
 import MessagesPage from "./pages/umbrella/Messages";
 import ReleaseTimePage from "./pages/umbrella/ReleaseTime";
+import CaseworkerDashboard from "./pages/caseworker";
+import LocationsPage from "./pages/caseworker/LocationsPage";
 
 import FacilityDetailsPage from '@/pages/facilities/[id]';
 import BookingConfirmationPage from '@/pages/BookingConfirmationPage';
@@ -83,12 +84,15 @@ const App = () => (
                       </Route>
                       <Route path="/minside/bruker" element={<UserLayout />}>
                         <Route index element={<UserOverviewPage />} />
-                        <Route path="bookinger" element={<UserBookingsPage />} />
-                        <Route path="soknad" element={<NewApplicationPage />} />
+                        <Route path="soknader" element={<ApplicationsPage />} />
+                        <Route path="bookinger" element={<BookingsPage />} />
+                        <Route path="varslinger" element={<NotificationsPage />} />
                         <Route path="hjelp" element={<HelpPage />} />
                         <Route path="profil" element={<UserProfilePage />} />
                         <Route path="fakturaer" element={<InvoicesPage />} />
                       </Route>
+                      <Route path="/caseworker" element={<CaseworkerDashboard />} />
+                      <Route path="/caseworker/locations" element={<LocationsPage />} />
                     </Routes>
                   </BrowserRouter>
                 </TooltipProvider>
