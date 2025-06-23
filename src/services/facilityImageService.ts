@@ -4,17 +4,26 @@ import { FacilityImage } from "@/types/facility";
 
 export const FacilityImageService = {
   async getFacilityImages(facilityId: number): Promise<FacilityImage[]> {
+    console.log('FacilityImageService.getFacilityImages - Fetching images for facility:', facilityId);
+    
     const { data, error } = await supabase
       .from('facility_images')
       .select('*')
       .eq('facility_id', facilityId)
       .order('display_order', { ascending: true });
     
-    if (error) throw error;
+    if (error) {
+      console.error('FacilityImageService.getFacilityImages - Error:', error);
+      throw error;
+    }
+    
+    console.log('FacilityImageService.getFacilityImages - Retrieved images:', data);
     return data || [];
   },
 
   async getFeaturedImage(facilityId: number): Promise<FacilityImage | null> {
+    console.log('FacilityImageService.getFeaturedImage - Fetching featured image for facility:', facilityId);
+    
     const { data, error } = await supabase
       .from('facility_images')
       .select('*')
@@ -22,11 +31,18 @@ export const FacilityImageService = {
       .eq('is_featured', true)
       .maybeSingle();
     
-    if (error) throw error;
+    if (error) {
+      console.error('FacilityImageService.getFeaturedImage - Error:', error);
+      throw error;
+    }
+    
+    console.log('FacilityImageService.getFeaturedImage - Retrieved featured image:', data);
     return data;
   },
 
   async getFirstImage(facilityId: number): Promise<FacilityImage | null> {
+    console.log('FacilityImageService.getFirstImage - Fetching first image for facility:', facilityId);
+    
     const { data, error } = await supabase
       .from('facility_images')
       .select('*')
@@ -35,7 +51,12 @@ export const FacilityImageService = {
       .limit(1)
       .maybeSingle();
     
-    if (error) throw error;
+    if (error) {
+      console.error('FacilityImageService.getFirstImage - Error:', error);
+      throw error;
+    }
+    
+    console.log('FacilityImageService.getFirstImage - Retrieved first image:', data);
     return data;
   },
 

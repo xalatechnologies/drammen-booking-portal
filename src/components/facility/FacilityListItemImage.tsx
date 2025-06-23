@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
@@ -41,7 +42,10 @@ export function FacilityListItemImage({
                   firstImage?.alt_text || 
                   `Bilde av ${facilityName}`;
 
-  console.log('FacilityListItemImage - Final image URL:', imageUrl, 'for facility:', facilityId);
+  console.log('FacilityListItemImage - Facility ID:', facilityId);
+  console.log('FacilityListItemImage - Featured image:', featuredImage);
+  console.log('FacilityListItemImage - First image:', firstImage);
+  console.log('FacilityListItemImage - Final image URL:', imageUrl);
 
   return (
     <div className="h-full w-full relative overflow-hidden">
@@ -51,6 +55,7 @@ export function FacilityListItemImage({
         className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110" 
         onError={(e) => {
           const target = e.target as HTMLImageElement;
+          console.log('Image failed to load:', imageUrl);
           target.src = "https://images.unsplash.com/photo-1525361147853-4bf9f54a0e98?w=600&auto=format&fit=crop";
           target.onerror = null;
         }} 
