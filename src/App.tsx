@@ -35,6 +35,7 @@ import HistoryLogPage from "./pages/umbrella/HistoryLog";
 import MessagesPage from "./pages/umbrella/Messages";
 import ReleaseTimePage from "./pages/umbrella/ReleaseTime";
 import CaseworkerDashboard from "./pages/caseworker";
+import LocationsPage from "./pages/caseworker/LocationsPage";
 
 import FacilityDetailsPage from '@/pages/facilities/[id]';
 import BookingConfirmationPage from '@/pages/BookingConfirmationPage';
@@ -91,6 +92,7 @@ const App = () => (
                         <Route path="fakturaer" element={<InvoicesPage />} />
                       </Route>
                       <Route path="/caseworker" element={<CaseworkerDashboard />} />
+                      <Route path="/caseworker/locations" element={<LocationsPage />} />
                     </Routes>
                   </BrowserRouter>
                 </TooltipProvider>
