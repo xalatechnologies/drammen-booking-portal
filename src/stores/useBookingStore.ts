@@ -1,200 +1,257 @@
-
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import { SelectedTimeSlot } from '@/utils/recurrenceEngine';
-import { ActorType } from '@/types/pricing';
+import { BookingApi } from './api/bookingApi';
+import { createGenericStore } from './createGenericStore';
+import { Booking, BookingCreateRequest, BookingUpdateRequest } from '@/types/models';
+import { combineMiddleware, createLogger, createPerformanceMonitor } from '../middleware';
 
-interface BookingFormData {
-  purpose: string;
-  attendees: number;
-  activityType: string;
-  additionalInfo: string;
-  actorType: ActorType;
-  termsAccepted: boolean;
-  contactName: string;
-  contactEmail: string;
-  contactPhone: string;
-  organization?: string;
-}
-
-interface BookingState {
-  // State
-  selectedSlots: SelectedTimeSlot[];
-  formData: BookingFormData;
-  currentStep: 'selection' | 'activity' | 'pricing' | 'details';
-  isSubmitting: boolean;
-  errors: string[];
-  
-  // Facility context
-  currentFacilityId: string;
-  currentFacilityName: string;
-  
-  // Actions
-  setSelectedSlots: (slots: SelectedTimeSlot[]) => void;
-  addSlot: (slot: SelectedTimeSlot) => void;
-  removeSlot: (zoneId: string, date: Date, timeSlot: string) => void;
-  clearSlots: () => void;
-  bulkAddSlots: (slots: SelectedTimeSlot[]) => void;
-  
-  updateFormData: (data: Partial<BookingFormData>) => void;
-  setCurrentStep: (step: 'selection' | 'activity' | 'pricing' | 'details') => void;
-  setSubmitting: (submitting: boolean) => void;
-  addError: (error: string) => void;
-  clearErrors: () => void;
-  
-  setFacilityContext: (facilityId: string, facilityName: string) => void;
-  resetBooking: () => void;
-}
-
-const initialFormData: BookingFormData = {
-  purpose: '',
-  attendees: 1,
-  activityType: '',
-  additionalInfo: '',
-  actorType: 'private-person',
-  termsAccepted: false,
-  contactName: '',
-  contactEmail: '',
-  contactPhone: '',
-  organization: ''
+// Create the base booking store using the generic store creator
+const createBaseBookingStore = () => {
+  const api = new BookingApi();
+  return createGenericStore<Booking, BookingCreateRequest, BookingUpdateRequest>(api);
 };
 
-// Helper function to ensure date is a Date object
-const ensureDate = (date: Date | string): Date => {
-  return date instanceof Date ? date : new Date(date);
-};
+// Define additional booking-specific state and actions
+interface BookingStoreExtensions {
+  // Additional state
+  recurringBookings: Record<string, Booking[]>;
+  conflictingBookings: Booking[];
+  availableAlternatives: any[];
+  calendarView: 'day' | 'week' | 'month';
+  selectedDate: Date;
+  
+  // Additional actions
+  approveBooking: (id: string, adminNotes?: string) => Promise<Booking>;
+  rejectBooking: (id: string, reason: string) => Promise<Booking>;
+  cancelBooking: (id: string, reason?: string) => Promise<Booking>;
+  checkInBooking: (id: string) => Promise<Booking>;
+  createRecurringBooking: (booking: BookingCreateRequest, recurrencePattern: any) => Promise<Booking[]>;
+  getUserBookings: (userId: string) => Promise<void>;
+  getFacilityBookings: (facilityId: string) => Promise<void>;
+  getZoneBookings: (zoneId: string) => Promise<void>;
+  getBookingsInDateRange: (startDate: Date, endDate: Date) => Promise<void>;
+  checkForConflicts: (zoneId: string, startTime: Date, endTime: Date) => Promise<boolean>;
+  setCalendarView: (view: 'day' | 'week' | 'month') => void;
+  setSelectedDate: (date: Date) => void;
+}
 
-export const useBookingStore = create<BookingState>()(
-  persist(
+// Create the extended booking store with additional functionality
+export const useBookingStore = create<
+  ReturnType<typeof createBaseBookingStore> & BookingStoreExtensions
+>(
+  // Apply middleware for development tools
+  combineMiddleware(
+    createLogger('BookingStore'),
+    createPerformanceMonitor({ storeName: 'BookingStore' })
+  )(
     (set, get) => ({
-      // Initial state
-      selectedSlots: [],
-      formData: initialFormData,
-      currentStep: 'selection',
-      isSubmitting: false,
-      errors: [],
-      currentFacilityId: '',
-      currentFacilityName: '',
-
-      // Slot management actions
-      setSelectedSlots: (slots) => {
-        // Ensure all dates are Date objects
-        const normalizedSlots = slots.map(slot => ({
-          ...slot,
-          date: ensureDate(slot.date)
-        }));
-        set({ selectedSlots: normalizedSlots });
-      },
-
-      addSlot: (slot) => {
-        const { selectedSlots } = get();
-        const normalizedSlot = {
-          ...slot,
-          date: ensureDate(slot.date)
-        };
-        
-        const exists = selectedSlots.some(s => {
-          const sDate = ensureDate(s.date);
-          return s.zoneId === normalizedSlot.zoneId &&
-            sDate.toDateString() === normalizedSlot.date.toDateString() &&
-            s.timeSlot === normalizedSlot.timeSlot;
-        });
-        
-        if (!exists) {
-          set({ selectedSlots: [...selectedSlots, normalizedSlot] });
+      // Include all base store functionality
+      ...createBaseBookingStore(),
+      
+      // Additional state
+      recurringBookings: {},
+      conflictingBookings: [],
+      availableAlternatives: [],
+      calendarView: 'week',
+      selectedDate: new Date(),
+      
+      // Additional actions
+      approveBooking: async (id: string, adminNotes?: string) => {
+        const api = new BookingApi();
+        try {
+          set({ isLoading: true, error: null });
+          const booking = await api.approveBooking(id, adminNotes);
+          
+          // Update the item in the items array
+          const items = get().items;
+          const updatedItems = items.map(item => 
+            item.id === booking.id ? booking : item
+          );
+          
+          set({ items: updatedItems, isLoading: false });
+          return booking;
+        } catch (error) {
+          set({ error: error as Error, isLoading: false });
+          throw error;
         }
       },
-
-      removeSlot: (zoneId, date, timeSlot) => {
-        const { selectedSlots } = get();
-        const targetDate = ensureDate(date);
-        
-        const filtered = selectedSlots.filter(slot => {
-          const slotDate = ensureDate(slot.date);
-          return !(slot.zoneId === zoneId &&
-            slotDate.toDateString() === targetDate.toDateString() &&
-            slot.timeSlot === timeSlot);
-        });
-        set({ selectedSlots: filtered });
-      },
-
-      clearSlots: () => {
-        set({ selectedSlots: [] });
-      },
-
-      bulkAddSlots: (slots) => {
-        const { selectedSlots } = get();
-        const normalizedNewSlots = slots.map(slot => ({
-          ...slot,
-          date: ensureDate(slot.date)
-        }));
-        
-        const newSlots = normalizedNewSlots.filter(newSlot => 
-          !selectedSlots.some(existingSlot => {
-            const existingDate = ensureDate(existingSlot.date);
-            return existingSlot.zoneId === newSlot.zoneId &&
-              existingDate.toDateString() === newSlot.date.toDateString() &&
-              existingSlot.timeSlot === newSlot.timeSlot;
-          })
-        );
-        
-        if (newSlots.length > 0) {
-          set({ selectedSlots: [...selectedSlots, ...newSlots] });
+      
+      rejectBooking: async (id: string, reason: string) => {
+        const api = new BookingApi();
+        try {
+          set({ isLoading: true, error: null });
+          const booking = await api.rejectBooking(id, reason);
+          
+          // Update the item in the items array
+          const items = get().items;
+          const updatedItems = items.map(item => 
+            item.id === booking.id ? booking : item
+          );
+          
+          set({ items: updatedItems, isLoading: false });
+          return booking;
+        } catch (error) {
+          set({ error: error as Error, isLoading: false });
+          throw error;
         }
       },
-
-      // Form management actions
-      updateFormData: (data) => {
-        set(state => ({
-          formData: { ...state.formData, ...data }
-        }));
+      
+      cancelBooking: async (id: string, reason?: string) => {
+        const api = new BookingApi();
+        try {
+          set({ isLoading: true, error: null });
+          const booking = await api.cancelBooking(id, reason);
+          
+          // Update the item in the items array
+          const items = get().items;
+          const updatedItems = items.map(item => 
+            item.id === booking.id ? booking : item
+          );
+          
+          set({ items: updatedItems, isLoading: false });
+          return booking;
+        } catch (error) {
+          set({ error: error as Error, isLoading: false });
+          throw error;
+        }
       },
-
-      setCurrentStep: (step) => {
-        set({ currentStep: step });
+      
+      checkInBooking: async (id: string) => {
+        const api = new BookingApi();
+        try {
+          set({ isLoading: true, error: null });
+          const booking = await api.checkInBooking(id);
+          
+          // Update the item in the items array
+          const items = get().items;
+          const updatedItems = items.map(item => 
+            item.id === booking.id ? booking : item
+          );
+          
+          set({ items: updatedItems, isLoading: false });
+          return booking;
+        } catch (error) {
+          set({ error: error as Error, isLoading: false });
+          throw error;
+        }
       },
-
-      setSubmitting: (submitting) => {
-        set({ isSubmitting: submitting });
+      
+      createRecurringBooking: async (booking: BookingCreateRequest, recurrencePattern: any) => {
+        const api = new BookingApi();
+        try {
+          set({ isLoading: true, error: null });
+          const bookings = await api.createRecurringBooking(booking, recurrencePattern);
+          
+          // Add the new bookings to the items array
+          const items = get().items;
+          const updatedItems = [...items, ...bookings];
+          
+          // Store recurring bookings by group ID for easy access
+          const recurringBookings = { ...get().recurringBookings };
+          if (bookings.length > 0 && bookings[0].recurrence_group_id) {
+            recurringBookings[bookings[0].recurrence_group_id] = bookings;
+          }
+          
+          set({ 
+            items: updatedItems, 
+            recurringBookings,
+            isLoading: false 
+          });
+          
+          return bookings;
+        } catch (error) {
+          set({ error: error as Error, isLoading: false });
+          throw error;
+        }
       },
-
-      addError: (error) => {
-        set(state => ({
-          errors: [...state.errors, error]
-        }));
+      
+      getUserBookings: async (userId: string) => {
+        const api = new BookingApi();
+        try {
+          set({ isLoading: true, error: null });
+          const result = await api.getUserBookings(userId);
+          set({ 
+            items: result.items, 
+            total: result.total,
+            page: result.page,
+            isLoading: false 
+          });
+        } catch (error) {
+          set({ error: error as Error, isLoading: false });
+          throw error;
+        }
       },
-
-      clearErrors: () => {
-        set({ errors: [] });
+      
+      getFacilityBookings: async (facilityId: string) => {
+        const api = new BookingApi();
+        try {
+          set({ isLoading: true, error: null });
+          const result = await api.getFacilityBookings(facilityId);
+          set({ 
+            items: result.items, 
+            total: result.total,
+            page: result.page,
+            isLoading: false 
+          });
+        } catch (error) {
+          set({ error: error as Error, isLoading: false });
+          throw error;
+        }
       },
-
-      setFacilityContext: (facilityId, facilityName) => {
-        set({ 
-          currentFacilityId: facilityId, 
-          currentFacilityName: facilityName 
-        });
+      
+      getZoneBookings: async (zoneId: string) => {
+        const api = new BookingApi();
+        try {
+          set({ isLoading: true, error: null });
+          const result = await api.getZoneBookings(zoneId);
+          set({ 
+            items: result.items, 
+            total: result.total,
+            page: result.page,
+            isLoading: false 
+          });
+        } catch (error) {
+          set({ error: error as Error, isLoading: false });
+          throw error;
+        }
       },
-
-      resetBooking: () => {
-        set({
-          selectedSlots: [],
-          formData: initialFormData,
-          currentStep: 'selection',
-          isSubmitting: false,
-          errors: [],
-          currentFacilityId: '',
-          currentFacilityName: ''
-        });
+      
+      getBookingsInDateRange: async (startDate: Date, endDate: Date) => {
+        const api = new BookingApi();
+        try {
+          set({ isLoading: true, error: null });
+          const result = await api.getBookingsInDateRange(startDate, endDate);
+          set({ 
+            items: result.items, 
+            total: result.total,
+            page: result.page,
+            isLoading: false 
+          });
+        } catch (error) {
+          set({ error: error as Error, isLoading: false });
+          throw error;
+        }
+      },
+      
+      checkForConflicts: async (zoneId: string, startTime: Date, endTime: Date) => {
+        const api = new BookingApi();
+        try {
+          set({ isLoading: true, error: null });
+          const hasConflicts = await api.checkForConflicts(zoneId, startTime, endTime);
+          set({ isLoading: false });
+          return hasConflicts;
+        } catch (error) {
+          set({ error: error as Error, isLoading: false });
+          throw error;
+        }
+      },
+      
+      setCalendarView: (view: 'day' | 'week' | 'month') => {
+        set({ calendarView: view });
+      },
+      
+      setSelectedDate: (date: Date) => {
+        set({ selectedDate: date });
       }
-    }),
-    {
-      name: 'booking-storage',
-      partialize: (state) => ({
-        selectedSlots: state.selectedSlots,
-        formData: state.formData,
-        currentFacilityId: state.currentFacilityId,
-        currentFacilityName: state.currentFacilityName
-      }),
-    }
+    })
   )
 );
