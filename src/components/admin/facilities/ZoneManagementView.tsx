@@ -5,8 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { FacilityService } from "@/services/facilityService";
-import { ZoneService } from "@/services/ZoneService";
+import { useFacilities } from "@/hooks/useFacilities";
+import { useZones } from "@/hooks/useZones";
+import { supabase } from "@/integrations/supabase/client";
 import { Plus, Edit, Trash2, Map } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
@@ -22,21 +23,20 @@ export const ZoneManagementView: React.FC<ZoneManagementViewProps> = ({
   );
   const queryClient = useQueryClient();
 
-  const { data: facilitiesResponse } = useQuery({
-    queryKey: ['admin-facilities-list'],
-    queryFn: () => FacilityService.getFacilities({ page: 1, limit: 100 }, {}, {}),
-  });
-
-  const { data: zonesResponse, isLoading } = useQuery({
-    queryKey: ['facility-zones', editingFacilityId],
-    queryFn: () => editingFacilityId ? ZoneService.getZonesByFacilityId(editingFacilityId) : null,
-    enabled: !!editingFacilityId,
-  });
+  const { data: facilities = [] } = useFacilities();
+  const { data: zones = [], isLoading } = useZones(editingFacilityId || 0);
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => ZoneService.deleteZone(id),
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('zones')
+        .delete()
+        .eq('id', id);
+      
+      if (error) throw error;
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['facility-zones'] });
+      queryClient.invalidateQueries({ queryKey: ['zones'] });
       toast({
         title: "Success",
         description: "Zone deleted successfully",
@@ -50,9 +50,6 @@ export const ZoneManagementView: React.FC<ZoneManagementViewProps> = ({
       });
     },
   });
-
-  const facilities = facilitiesResponse?.success ? facilitiesResponse.data?.data || [] : [];
-  const zones = zonesResponse?.success ? zonesResponse.data || [] : [];
 
   const handleDelete = (id: string) => {
     if (confirm("Are you sure you want to delete this zone?")) {

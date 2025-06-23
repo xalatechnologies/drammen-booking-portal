@@ -1,9 +1,10 @@
+
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FacilityService } from "@/services/facilityService";
-import { FacilityAnalyticsService } from "@/services/FacilityAnalyticsService";
+import { useFacilities } from "@/hooks/useFacilities";
+import { supabase } from "@/integrations/supabase/client";
 import { BarChart3, TrendingUp, Users, Calendar } from "lucide-react";
 
 interface FacilityAnalyticsDashboardProps {
@@ -17,19 +18,38 @@ export const FacilityAnalyticsDashboard: React.FC<FacilityAnalyticsDashboardProp
     selectedFacilityId || null
   );
 
-  const { data: facilitiesResponse } = useQuery({
-    queryKey: ['admin-facilities-list'],
-    queryFn: () => FacilityService.getFacilities({ page: 1, limit: 100 }, {}, {}),
-  });
+  const { data: facilities = [], isLoading: facilitiesLoading } = useFacilities();
 
-  const { data: analyticsResponse, isLoading } = useQuery({
+  const { data: analytics, isLoading: analyticsLoading } = useQuery({
     queryKey: ['facility-analytics', editingFacilityId],
-    queryFn: () => editingFacilityId ? FacilityAnalyticsService.getFacilityUsageStats(editingFacilityId) : null,
+    queryFn: async () => {
+      if (!editingFacilityId) return null;
+      
+      // Get basic booking statistics
+      const { data: bookings, error } = await supabase
+        .from('bookings')
+        .select('*')
+        .eq('facility_id', editingFacilityId);
+
+      if (error) throw error;
+
+      // Calculate analytics from bookings
+      const totalBookings = bookings?.length || 0;
+      const totalRevenue = bookings?.reduce((sum, booking) => sum + (booking.total_price || 0), 0) || 0;
+      const averageBookingDuration = bookings?.reduce((sum, booking) => sum + (booking.duration_minutes || 0), 0) / totalBookings || 0;
+      
+      // Simple occupancy calculation (this could be more sophisticated)
+      const occupancyRate = totalBookings > 0 ? Math.min(totalBookings / 100 * 100, 100) : 0;
+
+      return {
+        totalBookings,
+        totalRevenue,
+        averageBookingDuration,
+        occupancyRate
+      };
+    },
     enabled: !!editingFacilityId,
   });
-
-  const facilities = facilitiesResponse?.success ? facilitiesResponse.data?.data || [] : [];
-  const analytics = analyticsResponse?.success ? analyticsResponse.data : null;
 
   return (
     <div className="space-y-6">
@@ -65,7 +85,7 @@ export const FacilityAnalyticsDashboard: React.FC<FacilityAnalyticsDashboardProp
 
       {editingFacilityId && (
         <>
-          {isLoading ? (
+          {analyticsLoading ? (
             <Card>
               <CardContent className="pt-6">
                 <div className="text-center py-4">Loading analytics...</div>

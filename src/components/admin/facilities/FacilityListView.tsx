@@ -8,6 +8,7 @@ import { Facility } from "@/types/facility";
 import { useJsonTranslation } from "@/hooks/useJsonTranslation";
 import { useFacilities } from "@/hooks/useFacilities";
 import { useUIStore } from "@/stores/useUIStore";
+import { transformFacilitiesForUI } from "@/utils/facilityTransforms";
 
 // Import the components we created
 import FacilityTableView from "./FacilityTableView";
@@ -36,7 +37,7 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
   const { currentView, setCurrentView } = useUIStore();
 
   // Use the simplified facilities hook
-  const { data: facilities, isLoading, error } = useFacilities();
+  const { data: facilities = [], isLoading, error } = useFacilities();
 
   // Local state for filters
   const [searchFilter, setSearchFilter] = useState<string>('');
@@ -46,20 +47,14 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
   // Local display mode
   const [displayMode, setDisplayMode] = React.useState<DisplayMode>('list');
 
-  // Transform facilities to ensure they have proper images
+  // Transform facilities to ensure they have proper structure for UI
   const transformedFacilities = React.useMemo(() => {
     if (!facilities || facilities.length === 0) {
       console.log('FacilityListView - No facilities to transform');
       return [];
     }
 
-    return facilities.map(facility => ({
-      ...facility,
-      address: `${facility.address_street}, ${facility.address_city}`,
-      image: facility.facility_images?.find(img => img.is_featured)?.image_url || null,
-      pricePerHour: facility.price_per_hour || 450,
-      nextAvailable: facility.next_available || 'Available now'
-    }));
+    return transformFacilitiesForUI(facilities);
   }, [facilities]);
 
   // Apply filters

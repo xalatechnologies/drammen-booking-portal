@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -6,8 +7,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { FacilityService } from "@/services/facilityService";
-import { OpeningHoursService } from "@/services/OpeningHoursService";
+import { useFacilities } from "@/hooks/useFacilities";
+import { useOpeningHours, useOpeningHoursMutations } from "@/hooks/useOpeningHours";
 import { Clock, Save } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
@@ -21,39 +22,10 @@ export const OpeningHoursManagement: React.FC<OpeningHoursManagementProps> = ({
   const [editingFacilityId, setEditingFacilityId] = useState<number | null>(
     selectedFacilityId || null
   );
-  const queryClient = useQueryClient();
 
-  const { data: facilitiesResponse } = useQuery({
-    queryKey: ['admin-facilities-list'],
-    queryFn: () => FacilityService.getFacilities({ page: 1, limit: 100 }, {}, {}),
-  });
-
-  const { data: openingHoursResponse, isLoading } = useQuery({
-    queryKey: ['facility-opening-hours', editingFacilityId],
-    queryFn: () => editingFacilityId ? OpeningHoursService.getOpeningHours(editingFacilityId) : null,
-    enabled: !!editingFacilityId,
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: (data: any) => OpeningHoursService.saveOpeningHours(data.facility_id, data.opening_hours),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['facility-opening-hours'] });
-      toast({
-        title: "Success",
-        description: "Opening hours updated successfully",
-      });
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to update opening hours",
-        variant: "destructive",
-      });
-    },
-  });
-
-  const facilities = facilitiesResponse?.success ? facilitiesResponse.data?.data || [] : [];
-  const openingHours = openingHoursResponse?.success ? openingHoursResponse.data || [] : [];
+  const { data: facilities = [] } = useFacilities();
+  const { data: openingHours = [], isLoading } = useOpeningHours(editingFacilityId || 0);
+  const { saveOpeningHours, isSaving } = useOpeningHoursMutations();
 
   const dayNames = [
     'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'
@@ -91,9 +63,9 @@ export const OpeningHoursManagement: React.FC<OpeningHoursManagementProps> = ({
     if (!editingFacilityId) return;
 
     const hoursArray = Object.values(hours);
-    updateMutation.mutate({
-      facility_id: editingFacilityId,
-      opening_hours: hoursArray,
+    saveOpeningHours({
+      facilityId: editingFacilityId,
+      hours: hoursArray,
     });
   };
 
@@ -144,9 +116,9 @@ export const OpeningHoursManagement: React.FC<OpeningHoursManagementProps> = ({
           <CardHeader>
             <div className="flex justify-between items-center">
               <CardTitle>Weekly Schedule</CardTitle>
-              <Button onClick={handleSave} disabled={updateMutation.isPending}>
+              <Button onClick={handleSave} disabled={isSaving}>
                 <Save className="w-4 h-4 mr-2" />
-                {updateMutation.isPending ? "Saving..." : "Save Changes"}
+                {isSaving ? "Saving..." : "Save Changes"}
               </Button>
             </div>
           </CardHeader>
