@@ -45,7 +45,7 @@ export interface Facility {
   suitableFor: string[];
   hasAutoApproval: boolean; // Alias for has_auto_approval
   nextAvailable: string; // Alias for next_available - REQUIRED
-  openingHours: OpeningHours[];
+  openingHours: OpeningHours[]; // Changed from string to array
   zones: Zone[];
   featuredImage?: FacilityImage;
   images?: FacilityImage[];
