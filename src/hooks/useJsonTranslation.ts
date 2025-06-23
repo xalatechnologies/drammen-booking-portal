@@ -21,7 +21,7 @@ export function useJsonTranslation() {
     return translations[language] || translations['NO'];
   }, [language]);
 
-  const t = (key: TranslationKey, params?: TranslationParams, defaultValue?: string): string => {
+  const t = (key: TranslationKey, defaultValue?: string, params?: TranslationParams): string => {
     try {
       const keys = key.split('.');
       let value: any = currentTranslations;
@@ -47,7 +47,7 @@ export function useJsonTranslation() {
     }
   };
 
-  // Add tSync alias for backward compatibility
+  // Add tSync alias for backward compatibility with the same signature
   const tSync = t;
 
   const formatCurrency = (amount: number): string => {
