@@ -3,14 +3,51 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { FacilityCard } from './facility/FacilityCard';
 import FacilityListItem from './facility/FacilityListItem';
 import ViewHeader from './search/ViewHeader';
-import { Facility, FacilityFilters } from '@/types/facility';
+import { FacilityFilters } from '@/types/facility';
 import { useFacilities } from '@/hooks/useFacilities';
+
+// Local interface that matches what we actually need for display
+interface DisplayFacility {
+  id: number;
+  name: string;
+  address: string;
+  type: string;
+  image: string;
+  nextAvailable: string;
+  capacity: number;
+  accessibility: string[];
+  area: string;
+  suitableFor: string[];
+  equipment: string[];
+  openingHours: string; // Keep as string for compatibility
+  description: string;
+  availableTimes?: {
+    date: Date;
+    slots: {
+      start: string;
+      end: string;
+      available: boolean;
+    }[];
+  }[];
+}
 
 interface InfiniteScrollFacilitiesProps {
   filters: FacilityFilters;
   viewMode: "grid" | "list";
   setViewMode?: (mode: "grid" | "map" | "calendar" | "list") => void;
 }
+
+// Fallback images from public/bilder directory
+const FALLBACK_IMAGES = [
+  '/bilder/Ankerskogen_svoemmehall1.jpg',
+  '/bilder/Bergsjöns_kulturhus_sett_från_Bergsjöns_centrum.jpg',
+  '/bilder/Elverum_svømmehall.jpg',
+  '/bilder/Hamar_kulturhus_I.jpg',
+  '/bilder/Mollebakken-skole.jpg',
+  '/bilder/Nesøya_skole_og_idrettshall_Asker.jpg',
+  '/bilder/standard_compressed_Kulturhuset_1200px.jpg',
+  '/bilder/standard_compressed_drammensbadet_71.jpg'
+];
 
 export const InfiniteScrollFacilities: React.FC<InfiniteScrollFacilitiesProps> = ({
   filters,
@@ -24,12 +61,49 @@ export const InfiniteScrollFacilities: React.FC<InfiniteScrollFacilitiesProps> =
   console.log('InfiniteScrollFacilities - Current viewMode:', viewMode);
 
   // Use the DAL layer to fetch facilities
-  const { facilities, isLoading, pagination } = useFacilities({
+  const { facilities: rawFacilities, isLoading, pagination } = useFacilities({
     pagination: { page: currentPage, limit: ITEMS_PER_PAGE },
     filters,
   });
 
-  console.log('InfiniteScrollFacilities - Facilities from DAL:', facilities);
+  // Transform facilities to match display interface
+  const facilities = useMemo(() => {
+    return rawFacilities.map((facility, index): DisplayFacility => {
+      // Compute address from components
+      const addressParts = [
+        facility.address_street,
+        facility.address_city,
+        facility.address_postal_code
+      ].filter(part => part && part.trim() !== '');
+      
+      const address = addressParts.length > 0 
+        ? addressParts.join(', ') 
+        : 'Address not available';
+
+      // Use local fallback image if no image_url
+      const fallbackImage = FALLBACK_IMAGES[index % FALLBACK_IMAGES.length];
+      const image = facility.image_url || fallbackImage;
+
+      return {
+        id: facility.id,
+        name: facility.name,
+        address,
+        type: facility.type,
+        image,
+        nextAvailable: facility.next_available || 'Available now',
+        capacity: facility.capacity,
+        accessibility: facility.accessibility_features || [],
+        area: facility.area || `${facility.area_sqm || 100}m²`,
+        suitableFor: [], // Will be inferred from type
+        equipment: facility.equipment || [],
+        openingHours: '06:00-23:00', // Default string for compatibility
+        description: facility.description || `En flott ${facility.type.toLowerCase()} i Drammen.`,
+        availableTimes: []
+      };
+    });
+  }, [rawFacilities]);
+
+  console.log('InfiniteScrollFacilities - Transformed facilities:', facilities);
   console.log('InfiniteScrollFacilities - Pagination info:', pagination);
 
   const filterString = useMemo(() => JSON.stringify(filters), [filters]);
@@ -64,7 +138,7 @@ export const InfiniteScrollFacilities: React.FC<InfiniteScrollFacilitiesProps> =
     return () => window.removeEventListener('scroll', handleScroll);
   }, [loadMore]);
 
-  const handleAddressClick = useCallback((e: React.MouseEvent, facility: Facility) => {
+  const handleAddressClick = useCallback((e: React.MouseEvent, facility: DisplayFacility) => {
     e.preventDefault();
     e.stopPropagation();
     console.log("Address clicked for facility:", facility.name);
