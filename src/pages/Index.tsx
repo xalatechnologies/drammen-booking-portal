@@ -66,17 +66,10 @@ const Index = () => {
     const urlFacilityType = searchParams.get('facilityType');
     const urlLocation = searchParams.get('location');
     const urlAccessibility = searchParams.get('accessibility');
-    
-    // Simulate loading delay for a more realistic experience
-    setIsLoading(true);
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 800);
-    
-    return () => clearTimeout(timer);
     const urlCapacity = searchParams.get('capacity');
     const urlViewMode = searchParams.get('viewMode');
     const urlSearchTerm = searchParams.get('searchTerm');
+    
     if (urlFacilityType) setFacilityType(urlFacilityType);
     if (urlLocation) setLocation(urlLocation);
     if (urlAccessibility) setAccessibility(urlAccessibility);
@@ -93,10 +86,23 @@ const Index = () => {
     if (searchParams.toString()) {
       setSearchParams({});
     }
+
+    // Simulate loading delay for a more realistic experience
+    setIsLoading(true);
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 800);
+    
+    return () => clearTimeout(timer);
   }, [searchParams, setSearchParams]);
 
   // Create amenities array from individual boolean states
-  const amenities = [...(hasEquipment ? ['av-equipment'] : []), ...(hasParking ? ['parking'] : []), ...(hasWifi ? ['wifi'] : []), ...(allowsPhotography ? ['photography'] : [])];
+  const amenities = [
+    ...(hasEquipment ? ['av-equipment'] : []), 
+    ...(hasParking ? ['parking'] : []), 
+    ...(hasWifi ? ['wifi'] : []), 
+    ...(allowsPhotography ? ['photography'] : [])
+  ];
 
   // Create filters object with proper handling
   const filters: FacilityFilters = {
@@ -131,6 +137,7 @@ const Index = () => {
       amenities
     } : {})
   };
+  
   console.log("Index.tsx - Created filters:", filters);
   
   const renderContent = () => {
