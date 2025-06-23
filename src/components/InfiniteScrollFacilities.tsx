@@ -6,31 +6,6 @@ import ViewHeader from './search/ViewHeader';
 import { FacilityFilters } from '@/types/facility';
 import { useFacilities } from '@/hooks/useFacilities';
 
-// Local interface that matches what we actually need for display
-interface DisplayFacility {
-  id: number;
-  name: string;
-  address: string;
-  type: string;
-  image: string;
-  nextAvailable: string;
-  capacity: number;
-  accessibility: string[];
-  area: string;
-  suitableFor: string[];
-  equipment: string[];
-  openingHours: string; // Keep as string for compatibility
-  description: string;
-  availableTimes?: {
-    date: Date;
-    slots: {
-      start: string;
-      end: string;
-      available: boolean;
-    }[];
-  }[];
-}
-
 interface InfiniteScrollFacilitiesProps {
   filters: FacilityFilters;
   viewMode: "grid" | "list";
@@ -66,39 +41,27 @@ export const InfiniteScrollFacilities: React.FC<InfiniteScrollFacilitiesProps> =
     filters,
   });
 
-  // Transform facilities to match display interface
+  // Transform facilities to ensure they have the right structure
   const facilities = useMemo(() => {
-    return rawFacilities.map((facility, index): DisplayFacility => {
-      // Compute address from components
-      const addressParts = [
-        facility.address_street,
-        facility.address_city,
-        facility.address_postal_code
-      ].filter(part => part && part.trim() !== '');
-      
-      const address = addressParts.length > 0 
-        ? addressParts.join(', ') 
-        : 'Address not available';
-
+    return rawFacilities.map((facility, index) => {
       // Use local fallback image if no image_url
       const fallbackImage = FALLBACK_IMAGES[index % FALLBACK_IMAGES.length];
-      const image = facility.image_url || fallbackImage;
+      const imageUrl = facility.image_url || fallbackImage;
 
+      // Ensure we have all required properties
       return {
-        id: facility.id,
-        name: facility.name,
-        address,
-        type: facility.type,
-        image,
-        nextAvailable: facility.next_available || 'Available now',
-        capacity: facility.capacity,
-        accessibility: facility.accessibility_features || [],
-        area: facility.area || `${facility.area_sqm || 100}m²`,
-        suitableFor: [], // Will be inferred from type
+        ...facility,
+        image: imageUrl,
+        // Ensure openingHours is an array, not a string
+        openingHours: facility.openingHours || [],
+        // Ensure address is computed properly
+        address: facility.address || 'Address not available',
+        // Default values for missing properties
+        nextAvailable: facility.nextAvailable || 'Available now',
+        accessibility: facility.accessibility || [],
+        suitableFor: facility.suitableFor || [],
         equipment: facility.equipment || [],
-        openingHours: '06:00-23:00', // Default string for compatibility
-        description: facility.description || `En flott ${facility.type.toLowerCase()} i Drammen.`,
-        availableTimes: []
+        availableTimes: facility.availableTimes || []
       };
     });
   }, [rawFacilities]);
@@ -138,7 +101,7 @@ export const InfiniteScrollFacilities: React.FC<InfiniteScrollFacilitiesProps> =
     return () => window.removeEventListener('scroll', handleScroll);
   }, [loadMore]);
 
-  const handleAddressClick = useCallback((e: React.MouseEvent, facility: DisplayFacility) => {
+  const handleAddressClick = useCallback((e: React.MouseEvent, facility: any) => {
     e.preventDefault();
     e.stopPropagation();
     console.log("Address clicked for facility:", facility.name);
@@ -210,8 +173,7 @@ export const InfiniteScrollFacilities: React.FC<InfiniteScrollFacilitiesProps> =
           {facilities.map((facility) => (
             <FacilityListItem 
               key={facility.id} 
-              facility={facility} 
-              onAddressClick={(e) => handleAddressClick(e, facility)}
+              facility={facility}
             />
           ))}
           {isLoading && (
