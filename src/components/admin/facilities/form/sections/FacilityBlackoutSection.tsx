@@ -45,32 +45,18 @@ export const FacilityBlackoutSection = forwardRef<FacilityBlackoutSectionRef, Fa
   useImperativeHandle(ref, () => ({
     saveData: async () => {
       if (!facilityId) {
-        console.log('FacilityBlackoutSection.saveData - No facility ID available for saving blackout periods');
+        console.log('No facility ID available for saving blackout periods');
         return true;
       }
 
-      console.log('FacilityBlackoutSection.saveData - Saving blackout periods for facility ID:', facilityId);
-      console.log('FacilityBlackoutSection.saveData - Current blackout periods:', blackoutPeriods);
-      
       try {
-        // Ensure all blackout periods have the correct facility ID
-        blackoutPeriods.forEach((period, index) => {
-          if (period.facility_id !== facilityId) {
-            console.log(`FacilityBlackoutSection.saveData - Updating facility ID for period at index ${index}`);
-            updateBlackoutPeriod(index, { facility_id: facilityId });
-          }
-        });
-        
         const success = await saveBlackoutPeriods(facilityId);
-        console.log('FacilityBlackoutSection.saveData - Save result:', success);
-        
         if (success) {
           toast({
             title: "Success",
             description: "Blackout periods saved successfully",
           });
         } else {
-          console.error('FacilityBlackoutSection.saveData - Failed to save blackout periods');
           toast({
             title: "Error", 
             description: "Failed to save blackout periods",
@@ -79,10 +65,10 @@ export const FacilityBlackoutSection = forwardRef<FacilityBlackoutSectionRef, Fa
         }
         return success;
       } catch (error) {
-        console.error('FacilityBlackoutSection.saveData - Error saving blackout periods:', error);
+        console.error('Error saving blackout periods:', error);
         toast({
           title: "Error",
-          description: `An error occurred while saving blackout periods: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          description: "An error occurred while saving blackout periods",
           variant: "destructive",
         });
         return false;

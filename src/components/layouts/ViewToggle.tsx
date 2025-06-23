@@ -11,7 +11,7 @@ export const ViewToggle: React.FC<ViewToggleProps> = ({
   className = ""
 }) => {
   return (
-    <div className={cn("flex items-center h-12 p-2 border rounded-md", className)}>
+    <div className={cn("flex items-center border rounded-md", className)}>
       {views.map((view) => {
         const Icon = view.icon;
         const isActive = activeView === view.id;
