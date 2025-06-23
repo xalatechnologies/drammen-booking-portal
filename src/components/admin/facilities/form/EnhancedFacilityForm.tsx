@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -24,7 +25,7 @@ import { FacilityFormBreadcrumb } from "./FacilityFormBreadcrumb";
 import { useRoleBasedAccess } from "@/hooks/useRoleBasedAccess";
 import { toast } from "@/hooks/use-toast";
 import { Save, X, Shield, AlertCircle, Loader2 } from "lucide-react";
-import { useTranslation } from "@/hooks/useTranslation";
+import { useJsonTranslation } from "@/hooks/useJsonTranslation";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useFacilityAdminStore } from '@/stores/useFacilityAdminStore';
 import {
@@ -50,7 +51,7 @@ interface SectionSaveRef {
 
 export const EnhancedFacilityForm: React.FC<EnhancedFacilityFormProps> = ({ onSuccess }) => {
   const queryClient = useQueryClient();
-  const { tSync, isInitialized } = useTranslation();
+  const { tSync } = useJsonTranslation();
   const { currentRole, hasPermission, canAccessTab, getAvailableTabs } = useRoleBasedAccess();
   const {
     currentFacility,
@@ -218,10 +219,6 @@ export const EnhancedFacilityForm: React.FC<EnhancedFacilityFormProps> = ({ onSu
   const availableTabs = getAvailableTabs().filter(tab => tab !== 'analytics' && tab !== 'advanced');
 
   // Early returns *after* all hooks have been called
-  if (!isInitialized) {
-    return <div>Loading translations...</div>;
-  }
-  
   if (isEdit && !currentFacility) {
     return <div>Loading facility data...</div>;
   }

@@ -3,6 +3,7 @@ import { GenericSupabaseRepository } from '../GenericSupabaseRepository';
 import { AdditionalService, ServiceFilters } from '@/types/additionalServices';
 import { PaginationParams, RepositoryResponse } from '@/types/api';
 import { Database } from '@/integrations/supabase/types';
+import { supabase } from '@/integrations/supabase/client';
 
 type DatabaseAdditionalService = Database['public']['Tables']['additional_services']['Row'];
 type DatabaseAdditionalServiceInsert = Database['public']['Tables']['additional_services']['Insert'];
@@ -20,7 +21,7 @@ export class AdditionalServiceRepository extends GenericSupabaseRepository<Addit
       pricing: {
         basePrice: Number(dbRecord.base_price),
         currency: 'NOK',
-        pricingType: dbRecord.pricing_model as 'flat' | 'per-hour' | 'per-person',
+        pricingType: dbRecord.pricing_model === 'per-hour' ? 'hourly' : dbRecord.pricing_model as 'flat' | 'per-person' | 'hourly' | 'daily' | 'per-item',
         actorTypeMultipliers: {
           'private-person': 1,
           'lag-foreninger': 1,
@@ -54,8 +55,8 @@ export class AdditionalServiceRepository extends GenericSupabaseRepository<Addit
       name: frontendRecord.name,
       category: frontendRecord.category as any,
       description: frontendRecord.description,
-      base_price: frontendRecord.pricing?.basePrice ? String(frontendRecord.pricing.basePrice) : undefined,
-      pricing_model: frontendRecord.pricing?.pricingType || 'fixed',
+      base_price: frontendRecord.pricing?.basePrice?.toString(),
+      pricing_model: frontendRecord.pricing?.pricingType === 'hourly' ? 'per-hour' : (frontendRecord.pricing?.pricingType || 'fixed'),
       advance_booking_required: frontendRecord.availability ? !frontendRecord.availability.isAlwaysAvailable : false,
       advance_booking_hours: frontendRecord.availability?.leadTimeHours,
       equipment_required: frontendRecord.requirements?.equipmentRequired,

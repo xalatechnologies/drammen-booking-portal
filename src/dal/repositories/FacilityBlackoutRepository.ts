@@ -18,7 +18,7 @@ export class FacilityBlackoutRepository extends GenericSupabaseRepository<Facili
       startDate: new Date(dbRecord.start_date),
       endDate: new Date(dbRecord.end_date),
       reason: dbRecord.reason,
-      type: dbRecord.type,
+      type: dbRecord.type as any,
       createdBy: dbRecord.created_by,
       createdAt: new Date(dbRecord.created_at)
     };

@@ -41,7 +41,7 @@ export abstract class GenericSupabaseRepository<TFrontend, TDatabase = any> {
         };
       }
 
-      const mappedData = (data || []).map(record => this.mapFromDatabase(record));
+      const mappedData = (data || []).map(record => this.mapFromDatabase(record as TDatabase));
 
       return {
         data: mappedData,
@@ -77,7 +77,7 @@ export abstract class GenericSupabaseRepository<TFrontend, TDatabase = any> {
       }
 
       return {
-        data: data ? this.mapFromDatabase(data) : null,
+        data: data ? this.mapFromDatabase(data as TDatabase) : null,
         error: null
       };
     } catch (error: any) {
@@ -105,7 +105,7 @@ export abstract class GenericSupabaseRepository<TFrontend, TDatabase = any> {
       }
 
       return {
-        data: result ? this.mapFromDatabase(result) : null,
+        data: result ? this.mapFromDatabase(result as TDatabase) : null,
         error: null
       };
     } catch (error: any) {
@@ -134,7 +134,7 @@ export abstract class GenericSupabaseRepository<TFrontend, TDatabase = any> {
       }
 
       return {
-        data: result ? this.mapFromDatabase(result) : null,
+        data: result ? this.mapFromDatabase(result as TDatabase) : null,
         error: null
       };
     } catch (error: any) {

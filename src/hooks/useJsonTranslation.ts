@@ -82,5 +82,6 @@ export function useJsonTranslation() {
     formatCurrency,
     formatDate,
     formatTime,
+    isInitialized: true, // Always true for JSON-based translations
   };
 }

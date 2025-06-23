@@ -85,10 +85,10 @@ export class LocalizedAdditionalServiceRepository extends GenericSupabaseReposit
     }
   }
 
+  // Override findAll to match the base class signature
   async findAll(
     pagination?: PaginationParams,
-    orderBy?: string,
-    orderDirection?: "asc" | "desc"
+    filters?: Record<string, any>
   ): Promise<RepositoryResponse<AdditionalService[]>> {
     try {
       const services = this.servicesData[this.currentLanguage] || [];
