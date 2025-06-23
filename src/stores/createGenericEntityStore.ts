@@ -8,12 +8,19 @@ interface GenericEntityState<T> {
   currentEntity: T | null;
   isLoading: boolean;
   error: string | null;
+  pagination: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  } | null;
   
   // Actions
   setEntities: (entities: T[]) => void;
   setCurrentEntity: (entity: T | null) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
+  setPagination: (pagination: any) => void;
   fetchAll: (pagination?: PaginationParams, filters?: any) => Promise<void>;
   fetchById: (id: string) => Promise<void>;
   createEntity: (data: Partial<T>) => Promise<boolean>;
@@ -38,22 +45,36 @@ export function createGenericEntityStore<T extends Record<string, any>>(
     currentEntity: null,
     isLoading: false,
     error: null,
+    pagination: null,
 
     setEntities: (entities) => set({ entities }),
     setCurrentEntity: (entity) => set({ currentEntity: entity }),
     setLoading: (loading) => set({ isLoading: loading }),
     setError: (error) => set({ error }),
+    setPagination: (pagination) => set({ pagination }),
 
     fetchAll: async (pagination, filters) => {
       set({ isLoading: true, error: null });
       try {
+        console.log('GenericEntityStore.fetchAll - Starting fetch for table:', tableName);
         const result = await repository.findAll(pagination, filters);
+        
         if (result.error) {
+          console.error('GenericEntityStore.fetchAll - Repository error:', result.error);
           set({ error: result.error, isLoading: false });
         } else {
-          set({ entities: result.data, isLoading: false });
+          console.log('GenericEntityStore.fetchAll - Success:', {
+            entitiesCount: result.data.length,
+            pagination: result.pagination
+          });
+          set({ 
+            entities: result.data, 
+            pagination: result.pagination || null,
+            isLoading: false 
+          });
         }
       } catch (error) {
+        console.error('GenericEntityStore.fetchAll - Unexpected error:', error);
         set({ 
           error: error instanceof Error ? error.message : 'Unknown error', 
           isLoading: false 
@@ -142,7 +163,8 @@ export function createGenericEntityStore<T extends Record<string, any>>(
       entities: [],
       currentEntity: null,
       isLoading: false,
-      error: null
+      error: null,
+      pagination: null
     })
   }));
 }

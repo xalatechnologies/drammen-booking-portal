@@ -4,10 +4,7 @@ import { RepositoryResponse, PaginationParams } from '@/types/api';
 import { supabase } from '@/integrations/supabase/client';
 
 /**
- * Simplified Generic Entity Repository
- * 
- * A basic repository that uses direct Supabase client calls
- * to avoid complex TypeScript issues with the edge function approach.
+ * Generic Entity Repository with actual Supabase implementation
  */
 export class GenericEntityRepository<T extends Record<string, any>> extends BaseRepository<T> {
   private table: string;
@@ -16,12 +13,6 @@ export class GenericEntityRepository<T extends Record<string, any>> extends Base
   private statusField?: string;
   private activeValue?: string;
   
-  /**
-   * Create a new GenericEntityRepository
-   * 
-   * @param table The database table name
-   * @param options Configuration options
-   */
   constructor(
     table: string,
     options: {
@@ -41,21 +32,67 @@ export class GenericEntityRepository<T extends Record<string, any>> extends Base
     this.activeValue = options.activeValue;
   }
 
-  /**
-   * Get a list of entities with optional pagination and filters
-   */
   async findAll(pagination?: PaginationParams, filters?: any): Promise<RepositoryResponse<T[]>> {
     try {
-      console.log('GenericEntityRepository.findAll - Called with table:', this.table);
+      console.log('GenericEntityRepository.findAll - Starting query for table:', this.table);
       
-      // For now, return empty data to avoid complex type issues
-      // This should be implemented with proper table validation
+      // Build the select query with related data
+      let selectQuery = '*';
+      if (this.related) {
+        selectQuery = `*, ${this.related}(*)`;
+      }
+      
+      let query = supabase
+        .from(this.table as any)
+        .select(selectQuery, { count: 'exact' });
+
+      // Apply status filter if configured
+      if (this.statusField && this.activeValue) {
+        query = query.eq(this.statusField, this.activeValue);
+      }
+
+      // Apply pagination if provided
+      if (pagination) {
+        const from = (pagination.page - 1) * pagination.limit;
+        const to = from + pagination.limit - 1;
+        query = query.range(from, to);
+      }
+
+      // Order by name if it exists, otherwise by id
+      if (this.table === 'facilities') {
+        query = query.order('name');
+      } else {
+        query = query.order(this.idField);
+      }
+
+      const { data, error, count } = await query;
+
+      if (error) {
+        console.error('GenericEntityRepository.findAll - Supabase error:', error);
+        return {
+          data: [] as T[],
+          error: error.message
+        };
+      }
+
+      console.log('GenericEntityRepository.findAll - Success:', {
+        table: this.table,
+        count: data?.length || 0,
+        totalCount: count
+      });
+
       return {
-        data: [] as T[],
+        data: (data as T[]) || [],
         error: null,
+        pagination: count !== null ? {
+          total: count,
+          page: pagination?.page || 1,
+          limit: pagination?.limit || 20,
+          totalPages: Math.ceil(count / (pagination?.limit || 20))
+        } : undefined
       };
     } catch (error) {
-      console.error('GenericEntityRepository.findAll - Error:', error);
+      console.error('GenericEntityRepository.findAll - Unexpected error:', error);
       return {
         data: [] as T[],
         error: error instanceof Error ? error.message : 'Unknown error'
@@ -63,20 +100,37 @@ export class GenericEntityRepository<T extends Record<string, any>> extends Base
     }
   }
 
-  /**
-   * Get a single entity by ID
-   */
   async findById(id: string): Promise<RepositoryResponse<T | null>> {
     try {
-      console.log('GenericEntityRepository.findById - Called with ID:', id);
+      console.log('GenericEntityRepository.findById - Starting query for ID:', id);
       
-      // For now, return null to avoid complex type issues
+      let selectQuery = '*';
+      if (this.related) {
+        selectQuery = `*, ${this.related}(*)`;
+      }
+      
+      const { data, error } = await supabase
+        .from(this.table as any)
+        .select(selectQuery)
+        .eq(this.idField, id)
+        .maybeSingle();
+
+      if (error) {
+        console.error('GenericEntityRepository.findById - Supabase error:', error);
+        return {
+          data: null,
+          error: error.message
+        };
+      }
+
+      console.log('GenericEntityRepository.findById - Success:', !!data);
+
       return {
-        data: null,
-        error: null,
+        data: data as T | null,
+        error: null
       };
     } catch (error) {
-      console.error('GenericEntityRepository.findById - Error:', error);
+      console.error('GenericEntityRepository.findById - Unexpected error:', error);
       return {
         data: null,
         error: error instanceof Error ? error.message : 'Unknown error'
@@ -84,20 +138,32 @@ export class GenericEntityRepository<T extends Record<string, any>> extends Base
     }
   }
 
-  /**
-   * Create a new entity
-   */
   async create(data: Omit<T, 'id' | 'created_at' | 'updated_at'>): Promise<RepositoryResponse<T | null>> {
     try {
-      console.log('GenericEntityRepository.create - Called with data:', data);
+      console.log('GenericEntityRepository.create - Creating record in table:', this.table);
       
-      // For now, return null to avoid complex type issues
+      const { data: result, error } = await supabase
+        .from(this.table as any)
+        .insert(data as any)
+        .select()
+        .maybeSingle();
+
+      if (error) {
+        console.error('GenericEntityRepository.create - Supabase error:', error);
+        return {
+          data: null,
+          error: error.message
+        };
+      }
+
+      console.log('GenericEntityRepository.create - Success');
+
       return {
-        data: null,
-        error: null,
+        data: result as T | null,
+        error: null
       };
     } catch (error) {
-      console.error('GenericEntityRepository.create - Error:', error);
+      console.error('GenericEntityRepository.create - Unexpected error:', error);
       return {
         data: null,
         error: error instanceof Error ? error.message : 'Unknown error'
@@ -105,20 +171,38 @@ export class GenericEntityRepository<T extends Record<string, any>> extends Base
     }
   }
 
-  /**
-   * Update an existing entity
-   */
   async update(id: string, data: Partial<Omit<T, 'id' | 'created_at'>>): Promise<RepositoryResponse<T | null>> {
     try {
-      console.log('GenericEntityRepository.update - Called with ID:', id, 'data:', data);
+      console.log('GenericEntityRepository.update - Updating record ID:', id);
       
-      // For now, return null to avoid complex type issues
+      const updateData = {
+        ...data,
+        updated_at: new Date().toISOString()
+      };
+      
+      const { data: result, error } = await supabase
+        .from(this.table as any)
+        .update(updateData as any)
+        .eq(this.idField, id)
+        .select()
+        .maybeSingle();
+
+      if (error) {
+        console.error('GenericEntityRepository.update - Supabase error:', error);
+        return {
+          data: null,
+          error: error.message
+        };
+      }
+
+      console.log('GenericEntityRepository.update - Success');
+
       return {
-        data: null,
-        error: null,
+        data: result as T | null,
+        error: null
       };
     } catch (error) {
-      console.error('GenericEntityRepository.update - Error:', error);
+      console.error('GenericEntityRepository.update - Unexpected error:', error);
       return {
         data: null,
         error: error instanceof Error ? error.message : 'Unknown error'
@@ -126,20 +210,50 @@ export class GenericEntityRepository<T extends Record<string, any>> extends Base
     }
   }
 
-  /**
-   * Delete an entity (soft delete if statusField is provided)
-   */
   async delete(id: string): Promise<RepositoryResponse<boolean>> {
     try {
-      console.log('GenericEntityRepository.delete - Called with ID:', id);
+      console.log('GenericEntityRepository.delete - Deleting record ID:', id);
       
-      // For now, return true to avoid complex type issues
+      // If we have a status field, do soft delete, otherwise hard delete
+      if (this.statusField) {
+        const { error } = await supabase
+          .from(this.table as any)
+          .update({ 
+            [this.statusField]: 'inactive',
+            updated_at: new Date().toISOString()
+          } as any)
+          .eq(this.idField, id);
+
+        if (error) {
+          console.error('GenericEntityRepository.delete - Supabase soft delete error:', error);
+          return {
+            data: false,
+            error: error.message
+          };
+        }
+      } else {
+        const { error } = await supabase
+          .from(this.table as any)
+          .delete()
+          .eq(this.idField, id);
+
+        if (error) {
+          console.error('GenericEntityRepository.delete - Supabase hard delete error:', error);
+          return {
+            data: false,
+            error: error.message
+          };
+        }
+      }
+
+      console.log('GenericEntityRepository.delete - Success');
+
       return {
         data: true,
-        error: null,
+        error: null
       };
     } catch (error) {
-      console.error('GenericEntityRepository.delete - Error:', error);
+      console.error('GenericEntityRepository.delete - Unexpected error:', error);
       return {
         data: false,
         error: error instanceof Error ? error.message : 'Unknown error'

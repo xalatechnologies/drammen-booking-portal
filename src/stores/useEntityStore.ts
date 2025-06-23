@@ -7,14 +7,16 @@ import { Blackout } from '@/types/blackout';
 
 /**
  * Entity-specific stores using the generic entity store factory
- * 
- * This approach allows us to use the generic entity pattern consistently across all entities
- * while maintaining type safety and specific configuration for each entity type.
  */
 
-// Facility store
+// Facility store with related data
 export const useFacilityStore = createGenericEntityStore<Facility>('facilities', {
-  related: [], // Removed relationships as they're not needed for the list view
+  related: [
+    'facility_opening_hours',
+    'zones',
+    'facility_images',
+    'facility_translations'
+  ],
   idField: 'id',
   statusField: 'status',
   activeValue: 'active'
