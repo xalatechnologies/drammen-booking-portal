@@ -38,7 +38,7 @@ export class BookingRepository extends GenericSupabaseRepository<Booking, Databa
   protected mapFromDatabase(dbRecord: DatabaseBooking): Booking {
     return {
       id: dbRecord.id,
-      facilityId: dbRecord.facility_id,
+      facilityId: String(dbRecord.facility_id),
       zoneId: dbRecord.zone_id || undefined,
       userId: dbRecord.user_id,
       organizationId: dbRecord.organization_id || undefined,
@@ -57,23 +57,22 @@ export class BookingRepository extends GenericSupabaseRepository<Booking, Databa
       specialRequirements: dbRecord.special_requirements || undefined,
       startDate: new Date(dbRecord.start_date),
       endDate: new Date(dbRecord.end_date),
-      durationMinutes: dbRecord.duration_minutes,
       recurrenceRule: dbRecord.recurrence_rule || undefined,
       recurrenceEndDate: dbRecord.recurrence_end_date ? new Date(dbRecord.recurrence_end_date) : undefined,
       requiresApproval: dbRecord.requires_approval,
       approvalStatus: dbRecord.approval_status as Booking['approvalStatus'],
-      approvedBy: dbRecord.approved_by || undefined,
-      approvedAt: dbRecord.approved_at ? new Date(dbRecord.approved_at) : undefined,
-      rejectionReason: dbRecord.rejection_reason || undefined,
-      basePrice: Number(dbRecord.base_price),
-      servicesPrice: Number(dbRecord.services_price),
-      totalPrice: Number(dbRecord.total_price),
-      paymentStatus: dbRecord.payment_status as Booking['paymentStatus'],
-      paymentDueDate: dbRecord.payment_due_date ? new Date(dbRecord.payment_due_date) : undefined,
+      additionalServices: [],
+      pricing: {
+        basePrice: Number(dbRecord.base_price),
+        servicesPrice: Number(dbRecord.services_price),
+        totalPrice: Number(dbRecord.total_price),
+        currency: 'NOK',
+        breakdown: []
+      },
       cancelledAt: dbRecord.cancelled_at ? new Date(dbRecord.cancelled_at) : undefined,
       cancellationReason: dbRecord.cancellation_reason || undefined,
-      noShowAt: dbRecord.no_show_at ? new Date(dbRecord.no_show_at) : undefined,
-      internalNotes: dbRecord.internal_notes || undefined,
+      notes: [],
+      attachments: [],
       createdAt: new Date(dbRecord.created_at),
       updatedAt: new Date(dbRecord.updated_at)
     };
@@ -81,7 +80,7 @@ export class BookingRepository extends GenericSupabaseRepository<Booking, Databa
 
   protected mapToDatabase(frontendRecord: Partial<Booking>): Partial<DatabaseBookingInsert> {
     return {
-      facility_id: frontendRecord.facilityId,
+      facility_id: frontendRecord.facilityId ? Number(frontendRecord.facilityId) : undefined,
       zone_id: frontendRecord.zoneId,
       user_id: frontendRecord.userId,
       organization_id: frontendRecord.organizationId,
@@ -100,23 +99,18 @@ export class BookingRepository extends GenericSupabaseRepository<Booking, Databa
       special_requirements: frontendRecord.specialRequirements,
       start_date: frontendRecord.startDate?.toISOString(),
       end_date: frontendRecord.endDate?.toISOString(),
-      duration_minutes: frontendRecord.durationMinutes,
+      duration_minutes: frontendRecord.startDate && frontendRecord.endDate ? 
+        Math.floor((frontendRecord.endDate.getTime() - frontendRecord.startDate.getTime()) / (1000 * 60)) : undefined,
       recurrence_rule: frontendRecord.recurrenceRule,
       recurrence_end_date: frontendRecord.recurrenceEndDate?.toISOString(),
       requires_approval: frontendRecord.requiresApproval,
       approval_status: frontendRecord.approvalStatus as any,
-      approved_by: frontendRecord.approvedBy,
-      approved_at: frontendRecord.approvedAt?.toISOString(),
-      rejection_reason: frontendRecord.rejectionReason,
-      base_price: frontendRecord.basePrice?.toString(),
-      services_price: frontendRecord.servicesPrice?.toString(),
-      total_price: frontendRecord.totalPrice?.toString(),
-      payment_status: frontendRecord.paymentStatus,
-      payment_due_date: frontendRecord.paymentDueDate?.toISOString().split('T')[0],
+      base_price: frontendRecord.pricing?.basePrice?.toString(),
+      services_price: frontendRecord.pricing?.servicesPrice?.toString(),
+      total_price: frontendRecord.pricing?.totalPrice?.toString(),
+      payment_status: 'pending',
       cancelled_at: frontendRecord.cancelledAt?.toISOString(),
-      cancellation_reason: frontendRecord.cancellationReason,
-      no_show_at: frontendRecord.noShowAt?.toISOString(),
-      internal_notes: frontendRecord.internalNotes
+      cancellation_reason: frontendRecord.cancellationReason
     };
   }
 
@@ -174,7 +168,7 @@ export class BookingRepository extends GenericSupabaseRepository<Booking, Databa
       }
 
       return {
-        data: data ? this.mapFromDatabase(data) : null,
+        data: data ? this.mapFromDatabase(data as DatabaseBooking) : null,
         error: null
       };
     } catch (error: any) {
@@ -224,7 +218,7 @@ export class BookingRepository extends GenericSupabaseRepository<Booking, Databa
       }
 
       return {
-        data: data ? this.mapFromDatabase(data) : null,
+        data: data ? this.mapFromDatabase(data as DatabaseBooking) : null,
         error: null
       };
     } catch (error: any) {
@@ -266,7 +260,7 @@ export class BookingRepository extends GenericSupabaseRepository<Booking, Databa
         };
       }
   
-      const conflictingBookings = (data || []).map(record => this.mapFromDatabase(record));
+      const conflictingBookings = (data || []).map(record => this.mapFromDatabase(record as DatabaseBooking));
       const hasConflict = conflictingBookings.length > 0;
   
       return {

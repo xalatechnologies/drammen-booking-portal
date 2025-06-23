@@ -1,135 +1,58 @@
-import { BaseRepository } from "@/dal/BaseRepository";
-import { Facility, FacilityFilters } from "@/types/facility";
-import { Zone } from "@/types/zone";
-import { PaginatedResponse, RepositoryResponse } from "@/types/api";
-import { LocalizedFacility } from "@/types/localization";
 
-export class OptimizedLocalizedFacilityRepository extends BaseRepository<LocalizedFacility> {
-  private localizedFacilities: LocalizedFacility[] = [];
+import { GenericSupabaseRepository } from '../GenericSupabaseRepository';
+import { LocalizedFacility } from '@/types/facility';
+import { Zone } from '@/types/zone';
+import { RepositoryResponse, PaginationParams, PaginatedResponse } from '@/types/api';
 
-  constructor() {
-    super();
+export class OptimizedLocalizedFacilityRepository extends GenericSupabaseRepository<LocalizedFacility, any> {
+  protected tableName = 'facilities';
+  private currentLanguage: 'NO' | 'EN' = 'NO';
+  private facilitiesData: Record<string, LocalizedFacility[]> = {
+    'NO': [],
+    'EN': []
+  };
+
+  protected mapFromDatabase(dbRecord: any): LocalizedFacility {
+    return dbRecord as LocalizedFacility;
   }
 
-  // Implement required abstract methods
-  protected getId(item: LocalizedFacility): string {
-    return item.id.toString();
+  protected mapToDatabase(frontendRecord: Partial<LocalizedFacility>): any {
+    return frontendRecord;
+  }
+
+  setLanguage(language: 'NO' | 'EN') {
+    this.currentLanguage = language;
   }
 
   protected applyFilters(items: LocalizedFacility[], filters: any): LocalizedFacility[] {
-    return items; // Filtering is handled in findAllRaw method
+    if (!filters) return items;
+    
+    return items.filter(item => {
+      if (filters.area && item.area !== filters.area) return false;
+      if (filters.type && item.type !== filters.type) return false;
+      if (filters.status && item.status !== filters.status) return false;
+      if (filters.search) {
+        const searchLower = filters.search.toLowerCase();
+        return item.name.toLowerCase().includes(searchLower) ||
+               item.description?.toLowerCase().includes(searchLower);
+      }
+      return true;
+    });
   }
 
-  protected createEntity(data: Partial<LocalizedFacility>): LocalizedFacility {
-    throw new Error("Create operation not implemented for mock data");
-  }
-
-  protected updateEntity(existing: LocalizedFacility, updates: Partial<LocalizedFacility>): LocalizedFacility {
-    return { ...existing, ...updates };
-  }
-
-  async findAllRaw(
-    pagination: { page: number; limit: number },
-    filters?: FacilityFilters,
-    sortField?: string,
-    sortDirection?: 'asc' | 'desc'
+  async findAllWithPagination(
+    pagination: PaginationParams,
+    searchTerm?: string,
+    filters?: any
   ): Promise<RepositoryResponse<PaginatedResponse<LocalizedFacility>>> {
     try {
-      let facilities = [...this.localizedFacilities];
-
-      // Apply filters (language-agnostic filtering)
-      if (filters) {
-        if (filters.searchTerm) {
-          const searchLower = filters.searchTerm.toLowerCase();
-          facilities = facilities.filter(facility =>
-            Object.values(facility.name).some(name => name.toLowerCase().includes(searchLower)) ||
-            Object.values(facility.address).some(addr => typeof addr === 'string' && addr.toLowerCase().includes(searchLower)) ||
-            Object.values(facility.description).some(desc => desc.toLowerCase().includes(searchLower))
-          );
-        }
-
-        if (filters.facilityType) {
-          facilities = facilities.filter(facility =>
-            facility.type === filters.facilityType
-          );
-        }
-
-        if (filters.location) {
-          facilities = facilities.filter(facility =>
-            facility.area === filters.location
-          );
-        }
-
-        if (filters.capacity && Array.isArray(filters.capacity) && filters.capacity.length === 2) {
-          const [min, max] = filters.capacity;
-          facilities = facilities.filter(facility => 
-            facility.capacity >= min && facility.capacity <= max
-          );
-        }
-
-        if (filters.amenities && filters.amenities.length > 0) {
-          facilities = facilities.filter(facility =>
-            filters.amenities!.some(amenity => 
-              Object.values(facility.equipment).some(equipList => 
-                Array.isArray(equipList) && equipList.includes(amenity)
-              ) ||
-              (facility.amenities && Object.values(facility.amenities).some(amenityList => 
-                Array.isArray(amenityList) && amenityList.includes(amenity)
-              ))
-            )
-          );
-        }
-
-        if (filters.accessibility) {
-          facilities = facilities.filter(facility =>
-            facility.accessibility.includes(filters.accessibility!)
-          );
-        }
-      }
-
-      // Apply sorting
-      if (sortField && sortDirection) {
-        facilities.sort((a, b) => {
-          let aValue: any, bValue: any;
-          
-          switch (sortField) {
-            case 'name':
-              // Sort by first available language name
-              aValue = Object.values(a.name)[0];
-              bValue = Object.values(b.name)[0];
-              break;
-            case 'capacity':
-              aValue = a.capacity;
-              bValue = b.capacity;
-              break;
-            case 'area':
-              aValue = a.area;
-              bValue = b.area;
-              break;
-            case 'type':
-              aValue = a.type;
-              bValue = b.type;
-              break;
-            default:
-              return 0;
-          }
-
-          if (typeof aValue === 'string' && typeof bValue === 'string') {
-            aValue = aValue.toLowerCase();
-            bValue = bValue.toLowerCase();
-          }
-
-          if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
-          if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
-          return 0;
-        });
-      }
-
-      // Apply pagination
-      const total = facilities.length;
+      const facilities = this.facilitiesData[this.currentLanguage] || [];
+      const filteredFacilities = this.applyFilters(facilities, { ...filters, search: searchTerm });
+      
+      const total = filteredFacilities.length;
       const totalPages = Math.ceil(total / pagination.limit);
       const start = (pagination.page - 1) * pagination.limit;
-      const paginatedFacilities = facilities.slice(start, start + pagination.limit);
+      const paginatedFacilities = filteredFacilities.slice(start, start + pagination.limit);
 
       return {
         data: {
@@ -140,9 +63,10 @@ export class OptimizedLocalizedFacilityRepository extends BaseRepository<Localiz
             total,
             totalPages,
             hasNext: pagination.page < totalPages,
-            hasPrev: pagination.page > 1,
-          },
+            hasPrev: pagination.page > 1
+          }
         },
+        error: null
       };
     } catch (error) {
       return {
@@ -154,28 +78,41 @@ export class OptimizedLocalizedFacilityRepository extends BaseRepository<Localiz
             total: 0,
             totalPages: 0,
             hasNext: false,
-            hasPrev: false,
-          },
+            hasPrev: false
+          }
         },
         error: "Failed to fetch facilities"
       };
     }
   }
 
-  async findByIdRaw(id: string): Promise<RepositoryResponse<LocalizedFacility | null>> {
+  // Override findAll to match the base class signature
+  async findAll(
+    pagination?: PaginationParams,
+    filters?: Record<string, any>
+  ): Promise<RepositoryResponse<LocalizedFacility[]>> {
     try {
-      const facilityId = parseInt(id, 10);
-      const facility = this.localizedFacilities.find(f => f.id === facilityId);
-      
-      if (!facility) {
-        return {
-          data: null,
-          error: "Facility not found"
-        };
-      }
-
+      const facilities = this.facilitiesData[this.currentLanguage] || [];
       return {
-        data: facility,
+        data: facilities,
+        error: null
+      };
+    } catch (error) {
+      return {
+        data: [],
+        error: "Failed to fetch facilities"
+      };
+    }
+  }
+
+  async findById(id: string): Promise<RepositoryResponse<LocalizedFacility | null>> {
+    try {
+      const facilities = this.facilitiesData[this.currentLanguage] || [];
+      const facility = facilities.find(f => f.id === parseInt(id));
+      
+      return {
+        data: facility || null,
+        error: null
       };
     } catch (error) {
       return {
@@ -185,39 +122,61 @@ export class OptimizedLocalizedFacilityRepository extends BaseRepository<Localiz
     }
   }
 
-  async getRawFacilitiesByType(type: string): Promise<RepositoryResponse<LocalizedFacility[]>> {
+  async getOptimizedFacility(id: string): Promise<RepositoryResponse<LocalizedFacility | null>> {
     try {
-      const facilities = this.localizedFacilities.filter(f => f.type === type);
+      const facilities = this.facilitiesData[this.currentLanguage] || [];
+      const facility = facilities.find(f => f.id === parseInt(id));
+      
       return {
-        data: facilities,
+        data: facility || null,
+        error: null
       };
     } catch (error) {
       return {
-        data: [],
-        error: "Failed to fetch facilities by type"
+        data: null,
+        error: "Failed to fetch facility"
       };
     }
   }
 
-  async getRawFacilitiesByArea(area: string): Promise<RepositoryResponse<LocalizedFacility[]>> {
+  async getFacilitiesByArea(area: string): Promise<RepositoryResponse<LocalizedFacility[]>> {
     try {
-      const facilities = this.localizedFacilities.filter(f => f.area === area);
+      const facilities = this.facilitiesData[this.currentLanguage] || [];
+      const filteredFacilities = facilities.filter(facility => facility.area === area);
       return {
-        data: facilities,
+        data: filteredFacilities,
+        error: null
       };
     } catch (error) {
       return {
         data: [],
-        error: "Failed to fetch facilities by area"
+        error: "Failed to fetch facilities"
+      };
+    }
+  }
+
+  async getFacilitiesByType(type: string): Promise<RepositoryResponse<LocalizedFacility[]>> {
+    try {
+      const facilities = this.facilitiesData[this.currentLanguage] || [];
+      const filteredFacilities = facilities.filter(facility => facility.type === type);
+      return {
+        data: filteredFacilities,
+        error: null
+      };
+    } catch (error) {
+      return {
+        data: [],
+        error: "Failed to fetch facilities"
       };
     }
   }
 
   async getZonesByFacilityId(facilityId: string): Promise<RepositoryResponse<Zone[]>> {
     try {
-      // For now return empty zones - this should connect to actual zone repository
+      // Mock implementation - return empty array for now
       return {
         data: [],
+        error: null
       };
     } catch (error) {
       return {
@@ -227,39 +186,66 @@ export class OptimizedLocalizedFacilityRepository extends BaseRepository<Localiz
     }
   }
 
-  async getZoneById(zoneId: string): Promise<RepositoryResponse<Zone | null>> {
+  async create(data: Partial<LocalizedFacility>): Promise<RepositoryResponse<LocalizedFacility | null>> {
     try {
-      // For now return null - this should connect to actual zone repository
+      const facility = data as LocalizedFacility;
       return {
-        data: null,
-        error: "Zone not found"
+        data: facility,
+        error: null
       };
     } catch (error) {
       return {
         data: null,
-        error: "Failed to fetch zone"
+        error: "Failed to create facility"
       };
     }
   }
 
-  async create(item: Partial<LocalizedFacility>): Promise<RepositoryResponse<LocalizedFacility>> {
-    return {
-      data: item as LocalizedFacility,
-      error: "Create operation not implemented for mock data"
-    };
-  }
-
-  async update(id: string, item: Partial<LocalizedFacility>): Promise<RepositoryResponse<LocalizedFacility>> {
-    return {
-      data: item as LocalizedFacility,
-      error: "Update operation not implemented for mock data"
-    };
+  async update(id: string, data: Partial<LocalizedFacility>): Promise<RepositoryResponse<LocalizedFacility | null>> {
+    try {
+      const existing = await this.findById(id);
+      if (!existing.data) {
+        return {
+          data: null,
+          error: "Facility not found"
+        };
+      }
+      
+      const updated = { ...existing.data, ...data };
+      return {
+        data: updated,
+        error: null
+      };
+    } catch (error) {
+      return {
+        data: null,
+        error: "Failed to update facility"
+      };
+    }
   }
 
   async delete(id: string): Promise<RepositoryResponse<boolean>> {
-    return {
-      data: false,
-      error: "Delete operation not implemented for mock data"
-    };
+    try {
+      const existing = await this.findById(id);
+      if (!existing.data) {
+        return {
+          data: false,
+          error: "Facility not found"
+        };
+      }
+      
+      return {
+        data: true,
+        error: null
+      };
+    } catch (error) {
+      return {
+        data: false,
+        error: "Failed to delete facility"
+      };
+    }
   }
 }
+
+// Export singleton instance
+export const optimizedLocalizedFacilityRepository = new OptimizedLocalizedFacilityRepository();

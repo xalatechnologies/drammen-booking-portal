@@ -55,7 +55,7 @@ export class AdditionalServiceRepository extends GenericSupabaseRepository<Addit
       name: frontendRecord.name,
       category: frontendRecord.category as any,
       description: frontendRecord.description,
-      base_price: frontendRecord.pricing?.basePrice?.toString(),
+      base_price: frontendRecord.pricing?.basePrice || 0,
       pricing_model: frontendRecord.pricing?.pricingType === 'hourly' ? 'per-hour' : (frontendRecord.pricing?.pricingType || 'fixed'),
       advance_booking_required: frontendRecord.availability ? !frontendRecord.availability.isAlwaysAvailable : false,
       advance_booking_hours: frontendRecord.availability?.leadTimeHours,
@@ -101,7 +101,7 @@ export class AdditionalServiceRepository extends GenericSupabaseRepository<Addit
         };
       }
 
-      const mappedData = (data || []).map(record => this.mapFromDatabase(record));
+      const mappedData = (data || []).map(record => this.mapFromDatabase(record as DatabaseAdditionalService));
 
       return {
         data: mappedData,
@@ -130,7 +130,7 @@ export class AdditionalServiceRepository extends GenericSupabaseRepository<Addit
         };
       }
 
-      const mappedData = (data || []).map(record => this.mapFromDatabase(record));
+      const mappedData = (data || []).map(record => this.mapFromDatabase(record as DatabaseAdditionalService));
 
       return {
         data: mappedData,

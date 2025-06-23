@@ -14,24 +14,24 @@ export class FacilityBlackoutRepository extends GenericSupabaseRepository<Facili
   protected mapFromDatabase(dbRecord: DatabaseBlackoutPeriod): FacilityBlackoutPeriod {
     return {
       id: dbRecord.id,
-      facilityId: dbRecord.facility_id,
-      startDate: new Date(dbRecord.start_date),
-      endDate: new Date(dbRecord.end_date),
+      facility_id: dbRecord.facility_id,
+      start_date: new Date(dbRecord.start_date).toISOString(),
+      end_date: new Date(dbRecord.end_date).toISOString(),
       reason: dbRecord.reason,
       type: dbRecord.type as any,
-      createdBy: dbRecord.created_by,
-      createdAt: new Date(dbRecord.created_at)
+      created_by: dbRecord.created_by,
+      created_at: new Date(dbRecord.created_at).toISOString()
     };
   }
 
   protected mapToDatabase(frontendRecord: Partial<FacilityBlackoutPeriod>): Partial<DatabaseBlackoutPeriodInsert> {
     return {
-      facility_id: frontendRecord.facilityId,
-      start_date: frontendRecord.startDate?.toISOString(),
-      end_date: frontendRecord.endDate?.toISOString(),
+      facility_id: frontendRecord.facility_id,
+      start_date: frontendRecord.start_date,
+      end_date: frontendRecord.end_date,
       reason: frontendRecord.reason,
       type: frontendRecord.type || 'maintenance',
-      created_by: frontendRecord.createdBy
+      created_by: frontendRecord.created_by
     };
   }
 
@@ -52,7 +52,7 @@ export class FacilityBlackoutRepository extends GenericSupabaseRepository<Facili
         };
       }
 
-      const mappedData = (data || []).map(record => this.mapFromDatabase(record));
+      const mappedData = (data || []).map(record => this.mapFromDatabase(record as DatabaseBlackoutPeriod));
 
       return {
         data: mappedData,
