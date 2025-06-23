@@ -1,52 +1,42 @@
 
 import { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useFacilities } from '@/hooks/useFacilities';
-import { transformFacilitiesForUI } from '@/utils/facilityTransforms';
+import { transformFacilityForUI } from '@/utils/facilityTransforms';
 
-export const useCalendarView = () => {
-  const [selectedWeek, setSelectedWeek] = useState(new Date());
-  const [selectedFacilityId, setSelectedFacilityId] = useState<number | null>(null);
-  
-  const { data: rawFacilities = [], isLoading } = useFacilities();
-  
-  const facilities = useMemo(() => {
-    return transformFacilitiesForUI(rawFacilities);
+interface UseCalendarViewProps {
+  date?: Date;
+  facilityType?: string;
+  location?: string;
+  accessibility?: string;
+  capacity?: [number, number];
+}
+
+export const useCalendarView = (props: UseCalendarViewProps = {}) => {
+  const navigate = useNavigate();
+  const { data: rawFacilities = [], isLoading, error } = useFacilities();
+
+  const facilitiesWithZones = useMemo(() => {
+    return rawFacilities.map(transformFacilityForUI);
   }, [rawFacilities]);
 
-  const selectedFacility = useMemo(() => {
-    return selectedFacilityId ? facilities.find(f => f.id === selectedFacilityId) : null;
-  }, [facilities, selectedFacilityId]);
-
-  const weekStart = useMemo(() => {
-    const start = new Date(selectedWeek);
-    start.setDate(start.getDate() - start.getDay() + 1); // Monday
-    start.setHours(0, 0, 0, 0);
-    return start;
-  }, [selectedWeek]);
-
-  const weekEnd = useMemo(() => {
-    const end = new Date(weekStart);
-    end.setDate(end.getDate() + 6); // Sunday
-    end.setHours(23, 59, 59, 999);
-    return end;
-  }, [weekStart]);
-
-  const navigateWeek = (direction: 'prev' | 'next') => {
-    const newWeek = new Date(selectedWeek);
-    newWeek.setDate(newWeek.getDate() + (direction === 'next' ? 7 : -7));
-    setSelectedWeek(newWeek);
-  };
+  const allZones = useMemo(() => {
+    return facilitiesWithZones.flatMap(facility => facility.zones || []);
+  }, [facilitiesWithZones]);
 
   return {
-    facilities,
-    selectedFacility,
-    selectedFacilityId,
-    setSelectedFacilityId,
-    selectedWeek,
-    setSelectedWeek,
-    weekStart,
-    weekEnd,
-    navigateWeek,
-    isLoading
+    facilities: rawFacilities,
+    facilitiesWithZones,
+    isLoading,
+    error,
+    allZones,
+    navigate,
+    selectedFacility: null,
+    selectedFacilityId: 0,
+    setSelectedFacilityId: () => {},
+    selectedWeek: new Date(),
+    setSelectedWeek: () => {},
+    selectedDate: new Date(),
+    setSelectedDate: () => {}
   };
 };

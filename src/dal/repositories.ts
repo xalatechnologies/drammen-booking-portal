@@ -4,3 +4,15 @@ export const searchRepository = {
     return [];
   }
 };
+
+export const facilityRepository = {
+  search: async (query: string) => {
+    return [];
+  },
+  getAll: async () => {
+    return [];
+  },
+  getById: async (id: string) => {
+    return null;
+  }
+};

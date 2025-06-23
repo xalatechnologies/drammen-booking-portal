@@ -8,4 +8,12 @@ export class BookingSessionService {
     const data = sessionStorage.getItem('booking_session');
     return data ? JSON.parse(data) : null;
   }
+
+  static saveSessionData(data: any) {
+    return this.saveSession(data);
+  }
+
+  static getSessionData() {
+    return this.getSession();
+  }
 }

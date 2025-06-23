@@ -112,7 +112,7 @@ export class BookingService {
   }
 
   static calculateTotalPricing(selectedSlots: any[], zones: any[] = []) {
-    const totalPrice = selectedSlots.length * 450; // Default price calculation
+    const totalPrice = selectedSlots.length * 450;
     return {
       totalPrice,
       currency: 'NOK',
@@ -122,5 +122,33 @@ export class BookingService {
         surcharges: 0
       }
     };
+  }
+
+  static async checkAvailability(zoneId: string, date: Date, timeSlots: string[]) {
+    return { success: true, data: {} };
+  }
+
+  static async getConflictingBookings(zoneId: string, startDate: Date, endDate: Date) {
+    return { success: true, data: [] };
+  }
+
+  static async updateBooking(id: string, request: any) {
+    return { success: true, data: { id, ...request } };
+  }
+
+  static async cancelBooking(id: string, reason?: string) {
+    return { success: true, data: { id, status: 'cancelled', reason } };
+  }
+
+  static async approveBooking(id: string, notes?: string) {
+    return { success: true, data: { id, status: 'approved', notes } };
+  }
+
+  static async rejectBooking(id: string, reason: string) {
+    return { success: true, data: { id, status: 'rejected', reason } };
+  }
+
+  static async createRecurringBooking(request: any, pattern: any) {
+    return { success: true, data: [] };
   }
 }

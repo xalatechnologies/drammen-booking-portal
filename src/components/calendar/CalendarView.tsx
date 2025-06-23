@@ -25,7 +25,6 @@ const CalendarView: React.FC<CalendarViewWithToggleProps> = ({
   viewMode,
   setViewMode,
 }) => {
-  // Fix the capacity type issue by ensuring it's properly typed as a tuple
   const capacityRange: [number, number] | undefined = capacity && Array.isArray(capacity) && capacity.length === 2 
     ? [capacity[0], capacity[1]] 
     : undefined;
@@ -44,7 +43,6 @@ const CalendarView: React.FC<CalendarViewWithToggleProps> = ({
     capacity: capacityRange
   });
 
-  // Use slot selection hook for managing selected slots
   const {
     selectedSlots,
     handleSlotClick,
@@ -52,7 +50,6 @@ const CalendarView: React.FC<CalendarViewWithToggleProps> = ({
     clearSelection
   } = useSlotSelection();
 
-  // Use cart hook for handling cart operations
   const { handleAddToCart } = useCalendarCart();
 
   const handleRemoveSlot = (zoneId: string, date: Date, timeSlot: string) => {
@@ -65,7 +62,6 @@ const CalendarView: React.FC<CalendarViewWithToggleProps> = ({
 
   const handleCompleteBooking = (bookingData: any) => {
     console.log('CalendarView: Complete booking:', bookingData);
-    // Navigate to checkout or booking flow
     navigate('/checkout');
   };
 

@@ -22,4 +22,28 @@ export class ZoneService {
     if (error) throw error;
     return data;
   }
+
+  static async updateZone(id: string, zoneData: any) {
+    const { data, error } = await supabase
+      .from('zones')
+      .update(zoneData)
+      .eq('id', id)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
+  }
+
+  static async deleteZone(id: string) {
+    const { data, error } = await supabase
+      .from('zones')
+      .delete()
+      .eq('id', id)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
+  }
 }
