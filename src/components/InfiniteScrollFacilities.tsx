@@ -192,4 +192,3 @@ export const InfiniteScrollFacilities: React.FC<InfiniteScrollFacilitiesProps> =
     </div>
   );
 };
-

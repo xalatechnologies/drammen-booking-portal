@@ -3,6 +3,7 @@ import React from "react";
 import { Accordion } from "@/components/ui/accordion";
 import { FacilityAccordionItem } from "./FacilityAccordionItem";
 import { SelectedTimeSlot } from "@/utils/recurrenceEngine";
+import { Facility } from "@/types/facility";
 
 // Simplified Zone interface for calendar view
 interface CalendarZone {
@@ -13,19 +14,8 @@ interface CalendarZone {
   description: string;
 }
 
-interface FacilityWithZones {
-  id: number;
-  name: string;
-  address: string;
-  capacity: number;
-  accessibility: string[];
-  suitableFor: string[];
-  image?: string;
-  zones: CalendarZone[];
-}
-
 interface FacilityCalendarAccordionProps {
-  facilities: FacilityWithZones[];
+  facilities: Facility[];
   currentWeekStart: Date;
   onFacilitySelect?: (facilityId: string) => void;
   onSlotSelection?: (facilityId: string, slots: SelectedTimeSlot[]) => void;

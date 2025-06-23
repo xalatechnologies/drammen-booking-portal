@@ -8,5 +8,12 @@ export const env = {
   PROD: import.meta.env.PROD,
 };
 
-export default env;
+// Export individual constants for backward compatibility
+export const SUPABASE_URL = env.SUPABASE_URL;
+export const SUPABASE_ANON_KEY = env.SUPABASE_ANON_KEY;
+export const SUPABASE_SERVICE_ROLE_KEY = env.SUPABASE_SERVICE_ROLE_KEY;
 
+// Mock GENERIC_ENTITY_URL since it's not defined in environment
+export const GENERIC_ENTITY_URL = `${env.SUPABASE_URL}/functions/v1/generic-entity`;
+
+export default env;
