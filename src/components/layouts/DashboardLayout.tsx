@@ -1,4 +1,3 @@
-
 import React from "react";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { DashboardLayoutProps } from "./types";
@@ -21,9 +20,9 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
           {sidebar}
         </div>
         
-        {/* Main Content - full width on mobile, margin on desktop */}
-        <main className="flex-1 pt-[6rem] md:ml-[20rem] overflow-auto min-h-screen">
-          <div className="w-full h-full">
+        {/* Main Content - full width, responsive, with padding */}
+        <main className="flex-1 pt-[6rem] md:ml-[20rem] min-h-screen">
+          <div className="w-full h-full px-4 sm:px-6 lg:px-8">
             {children}
           </div>
         </main>

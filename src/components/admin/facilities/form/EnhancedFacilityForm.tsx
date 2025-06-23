@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -23,14 +23,24 @@ import { FacilityCalendarManagement } from "./sections/FacilityCalendarManagemen
 import { FacilityFormBreadcrumb } from "./FacilityFormBreadcrumb";
 import { useRoleBasedAccess } from "@/hooks/useRoleBasedAccess";
 import { toast } from "@/hooks/use-toast";
-import { Save, X, Shield, AlertCircle } from "lucide-react";
+import { Save, X, Shield, AlertCircle, Loader2 } from "lucide-react";
 import { useTranslation } from "@/hooks/useTranslation";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useFacilityAdminStore } from '@/stores/useFacilityAdminStore';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
 interface EnhancedFacilityFormProps {
-  facility?: any;
-  onSuccess: () => void;
-  onCancel: () => void;
+  onSuccess?: () => void;
 }
 
 // Define ref interfaces for each section that needs to save data
@@ -38,15 +48,29 @@ interface SectionSaveRef {
   saveData: () => Promise<boolean>;
 }
 
-export const EnhancedFacilityForm: React.FC<EnhancedFacilityFormProps> = ({
-  facility,
-  onSuccess,
-  onCancel
-}) => {
+export const EnhancedFacilityForm: React.FC<EnhancedFacilityFormProps> = ({ onSuccess }) => {
   const queryClient = useQueryClient();
-  const isEditing = !!facility;
-  const { tSync } = useTranslation();
+  const { tSync, isInitialized } = useTranslation();
   const { currentRole, hasPermission, canAccessTab, getAvailableTabs } = useRoleBasedAccess();
+  const {
+    currentFacility,
+    createFacility,
+    updateFacility,
+    deleteFacility,
+    isLoading,
+    error,
+    formMode,
+    closeForm
+  } = useFacilityAdminStore();
+  const [saveError, setSaveError] = React.useState<string | null>(null);
+  const [saveSuccess, setSaveSuccess] = React.useState<boolean>(false);
+  const [sectionErrors, setSectionErrors] = React.useState<string[]>([]);
+  const [sectionLoading, setSectionLoading] = React.useState(false);
+  const [isDeleting, setIsDeleting] = React.useState(false);
+
+  console.log('EnhancedFacilityForm: currentFacility', currentFacility);
+
+  const isEdit = formMode === 'edit';
 
   // Create refs for sections that need to save their own data
   const openingHoursRef = useRef<SectionSaveRef>(null);
@@ -56,43 +80,38 @@ export const EnhancedFacilityForm: React.FC<EnhancedFacilityFormProps> = ({
 
   const form = useForm<FacilityFormData>({
     resolver: zodResolver(facilityFormSchema),
-    defaultValues: {
-      name: facility?.name || "",
-      type: facility?.type || "",
-      area: facility?.area || "",
-      description: facility?.description || "",
-      capacity: facility?.capacity || 1,
-      area_sqm: facility?.area_sqm || 0,
-      address_street: facility?.address_street || "",
-      address_city: facility?.address_city || "",
-      address_postal_code: facility?.address_postal_code || "",
-      address_country: facility?.address_country || "Norway",
-      contact_name: facility?.contact_name || "",
-      contact_email: facility?.contact_email || "",
-      contact_phone: facility?.contact_phone || "",
-      status: facility?.status || "active",
-      has_auto_approval: facility?.has_auto_approval || false,
-      price_per_hour: facility?.price_per_hour || 450,
-      time_slot_duration: facility?.time_slot_duration || 1,
-      booking_lead_time_hours: facility?.booking_lead_time_hours || 2,
-      max_advance_booking_days: facility?.max_advance_booking_days || 365,
-      cancellation_deadline_hours: facility?.cancellation_deadline_hours || 24,
-      allowed_booking_types: facility?.allowed_booking_types || ["engangs"],
-      equipment: facility?.equipment || [],
-      amenities: facility?.amenities || [],
-      accessibility_features: facility?.accessibility_features || [],
-      latitude: facility?.latitude || undefined,
-      longitude: facility?.longitude || undefined,
-      season_from: facility?.season_from || "",
-      season_to: facility?.season_to || "",
-      is_featured: facility?.is_featured || false,
+    defaultValues: isEdit && currentFacility ? currentFacility : {
+      name: currentFacility?.name || "",
+      type: currentFacility?.type || "",
+      area: currentFacility?.area || "",
+      description: currentFacility?.description || "",
+      capacity: currentFacility?.capacity || 1,
+      area_sqm: currentFacility?.area_sqm || 0,
+      address_street: currentFacility?.address_street || "",
+      address_city: currentFacility?.address_city || "",
+      address_postal_code: currentFacility?.address_postal_code || "",
+      address_country: currentFacility?.address_country || "Norway",
+      contact_name: currentFacility?.contact_name || "",
+      contact_email: currentFacility?.contact_email || "",
+      contact_phone: currentFacility?.contact_phone || "",
+      status: currentFacility?.status || "active",
+      has_auto_approval: currentFacility?.has_auto_approval || false,
+      price_per_hour: currentFacility?.price_per_hour || 450,
+      time_slot_duration: currentFacility?.time_slot_duration || 1,
+      booking_lead_time_hours: currentFacility?.booking_lead_time_hours || 2,
+      max_advance_booking_days: currentFacility?.max_advance_booking_days || 365,
+      cancellation_deadline_hours: currentFacility?.cancellation_deadline_hours || 24,
+      allowed_booking_types: currentFacility?.allowed_booking_types || ["engangs"],
+      equipment: currentFacility?.equipment || [],
+      amenities: currentFacility?.amenities || [],
+      accessibility_features: currentFacility?.accessibility_features || [],
+      latitude: currentFacility?.latitude || undefined,
+      longitude: currentFacility?.longitude || undefined,
+      season_from: currentFacility?.season_from || "",
+      season_to: currentFacility?.season_to || "",
+      is_featured: currentFacility?.is_featured || false,
     }
   });
-
-  // Watch form values to pass to components
-  const watchedEquipment = form.watch("equipment");
-  const watchedAmenities = form.watch("amenities");
-  const watchedCapacity = form.watch("capacity");
 
   const mutation = useMutation({
     mutationFn: async (data: FacilityFormData) => {
@@ -100,8 +119,8 @@ export const EnhancedFacilityForm: React.FC<EnhancedFacilityFormProps> = ({
       
       // First save the main facility data
       let facilityResult;
-      if (isEditing) {
-        facilityResult = await FacilityService.updateFacility(facility.id.toString(), data);
+      if (isEdit && currentFacility) {
+        facilityResult = await FacilityService.updateFacility(currentFacility.id.toString(), data);
       } else {
         facilityResult = await FacilityService.createFacility(data);
       }
@@ -151,14 +170,15 @@ export const EnhancedFacilityForm: React.FC<EnhancedFacilityFormProps> = ({
       if (response.success) {
         toast({
           title: tSync("admin.common.success", "Success"),
-          description: `${tSync("admin.facilities.form.facility", "Facility")} ${isEditing ? tSync("admin.common.updated", "updated") : tSync("admin.common.created", "created")} ${tSync("admin.common.successfully", "successfully")}`,
+          description: `${tSync("admin.facilities.form.facility", "Facility")} ${isEdit ? tSync("admin.common.updated", "updated") : tSync("admin.common.created", "created")} ${tSync("admin.common.successfully", "successfully")}`,
         });
         queryClient.invalidateQueries({ queryKey: ['facilities'] });
-        onSuccess();
+        if (onSuccess) onSuccess();
+        closeForm();
       } else {
         toast({
           title: tSync("admin.common.error", "Error"),
-          description: response.error?.message || `${tSync("admin.common.failedTo", "Failed to")} ${isEditing ? tSync("admin.common.update", "update") : tSync("admin.common.create", "create")} ${tSync("admin.facilities.form.facility", "facility")}`,
+          description: response.error?.message || `${tSync("admin.common.failedTo", "Failed to")} ${isEdit ? tSync("admin.common.update", "update") : tSync("admin.common.create", "create")} ${tSync("admin.facilities.form.facility", "facility")}`,
           variant: "destructive",
         });
       }
@@ -167,20 +187,92 @@ export const EnhancedFacilityForm: React.FC<EnhancedFacilityFormProps> = ({
       console.error('Facility save error:', error);
       toast({
         title: tSync("admin.common.error", "Error"),
-        description: error.message || `${tSync("admin.common.failedTo", "Failed to")} ${isEditing ? tSync("admin.common.update", "update") : tSync("admin.common.create", "create")} ${tSync("admin.facilities.form.facility", "facility")}`,
+        description: error.message || `${tSync("admin.common.failedTo", "Failed to")} ${isEdit ? tSync("admin.common.update", "update") : tSync("admin.common.create", "create")} ${tSync("admin.facilities.form.facility", "facility")}`,
         variant: "destructive",
       });
     },
   });
 
-  const onSubmit = (data: FacilityFormData) => {
-    console.log('Submitting facility form data:', data);
-    mutation.mutate(data);
+  useEffect(() => {
+    console.log('EnhancedFacilityForm useEffect: isEdit', isEdit, 'currentFacility', currentFacility);
+    if (isEdit && currentFacility) {
+      form.reset(currentFacility);
+    } else {
+      form.reset({});
+    }
+  }, [isEdit, currentFacility]);
+
+  // Watch form values to pass to components
+  const watchedEquipment = form.watch("equipment");
+  const watchedAmenities = form.watch("amenities");
+  const watchedCapacity = form.watch("capacity");
+
+  // Helper to show global loading if main or any section is loading
+  const globalLoading = isLoading || sectionLoading;
+
+  // Helper to collect section errors
+  const handleSectionError = (err: string) => {
+    setSectionErrors(prev => [...prev, err]);
+  };
+  const clearSectionErrors = () => setSectionErrors([]);
+
+  const onSubmit = async (data: FacilityFormData) => {
+    console.log('onSubmit handler triggered');
+    setSaveError(null);
+    setSaveSuccess(false);
+    console.log('EnhancedFacilityForm onSubmit: data', data);
+    try {
+      let result;
+      if (isEdit && currentFacility) {
+        result = await updateFacility(currentFacility.id.toString(), data);
+      } else {
+        result = await createFacility(data);
+      }
+      console.log('EnhancedFacilityForm onSubmit: result', result);
+      if (result?.success) {
+        setSaveSuccess(true);
+        if (onSuccess) onSuccess();
+      } else {
+        setSaveError(result?.error || 'Unknown error saving facility');
+      }
+    } catch (err: any) {
+      setSaveError(err?.message || 'Unknown error saving facility');
+      console.error('EnhancedFacilityForm onSubmit: error', err);
+    }
   };
 
-  const availableTabs = getAvailableTabs();
+  const handleDelete = async () => {
+    if (!currentFacility) return;
+    setIsDeleting(true);
+    try {
+      await deleteFacility(currentFacility.id.toString());
+      toast({
+        title: "Facility Deleted",
+        description: "The facility has been permanently removed.",
+      });
+      closeForm();
+    } catch (error) {
+      toast({
+        title: "Error Deleting Facility",
+        description: "Could not delete the facility. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
-  // Check if user can create/edit facilities
+  const availableTabs = getAvailableTabs().filter(tab => tab !== 'analytics' && tab !== 'advanced');
+
+  // Early returns *after* all hooks have been called
+  if (!isInitialized) {
+    return <div>Loading translations...</div>;
+  }
+  
+  if (isEdit && !currentFacility) {
+    return <div>Loading facility data...</div>;
+  }
+  
   if (!hasPermission('edit_facility') && !hasPermission('create_facility')) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -195,14 +287,20 @@ export const EnhancedFacilityForm: React.FC<EnhancedFacilityFormProps> = ({
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <div className="min-h-screen bg-gray-50 relative">
+      {/* Full-page loading spinner overlay */}
+      {globalLoading && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
+          <Loader2 className="animate-spin w-16 h-16 text-blue-600" />
+        </div>
+      )}
+      <div className="px-4 sm:px-6 lg:px-8 py-6">
         {/* Breadcrumb */}
         <div className="mb-4">
           <FacilityFormBreadcrumb 
-            isEditing={isEditing} 
-            facilityName={facility?.name}
-            onCancel={onCancel}
+            isEditing={isEdit} 
+            facilityName={currentFacility?.name}
+            onCancel={closeForm}
           />
         </div>
 
@@ -210,7 +308,7 @@ export const EnhancedFacilityForm: React.FC<EnhancedFacilityFormProps> = ({
         <div className="mb-6">
           <div className="flex items-center gap-3 mb-2">
             <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
-              {isEditing ? `${tSync("admin.facilities.form.edit", "Edit")}: ${facility.name}` : tSync("admin.facilities.form.addNew", "Add New Facility")}
+              {isEdit ? `${tSync("admin.facilities.form.edit", "Edit")}: ${currentFacility?.name}` : tSync("admin.facilities.form.addNew", "Add New Facility")}
             </h1>
             <div className="flex items-center gap-1.5 text-xs bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full border border-blue-200">
               <Shield className="w-3 h-3" />
@@ -218,7 +316,7 @@ export const EnhancedFacilityForm: React.FC<EnhancedFacilityFormProps> = ({
             </div>
           </div>
           <p className="text-gray-600 leading-relaxed">
-            {isEditing 
+            {isEdit 
               ? tSync("admin.facilities.form.editDescription", "Update facility information and settings")
               : tSync("admin.facilities.form.createDescription", "Create a new facility with all necessary details")
             }
@@ -235,174 +333,142 @@ export const EnhancedFacilityForm: React.FC<EnhancedFacilityFormProps> = ({
           </Alert>
         )}
 
+        {/* Global Error Summary */}
+        {(saveError || sectionErrors.length > 0) && (
+          <div className="bg-red-100 text-red-800 p-4 rounded mb-4 text-lg font-semibold border border-red-300">
+            {saveError && <div>{saveError}</div>}
+            {sectionErrors.length > 0 && (
+              <ul className="list-disc ml-6 mt-2">
+                {sectionErrors.map((err, idx) => <li key={idx}>{err}</li>)}
+              </ul>
+            )}
+          </div>
+        )}
+
         {/* Main Content */}
         <Card className="shadow-sm border-0 ring-1 ring-gray-200">
           <CardContent className="p-0">
             <Tabs defaultValue={availableTabs[0]} className="w-full">
               <div className="border-b border-gray-100 px-6 pt-6 pb-2">
-                <TabsList className="grid w-full" style={{ gridTemplateColumns: `repeat(${availableTabs.length}, 1fr)` }}>
-                  {/* ... keep existing code (tabs list) */}
+                <TabsList className="grid w-full gap-2" style={{ gridTemplateColumns: `repeat(${availableTabs.length}, 1fr)` }}>
                   {availableTabs.includes('basic') && (
-                    <TabsTrigger value="basic" className="text-sm">
+                    <TabsTrigger value="basic" className="text-xl h-14 px-6 font-bold">
                       {tSync("admin.facilities.form.tabs.basic", "Basic")}
                     </TabsTrigger>
                   )}
                   {availableTabs.includes('location') && (
-                    <TabsTrigger value="location" className="text-sm">
+                    <TabsTrigger value="location" className="text-xl h-14 px-6 font-bold">
                       {tSync("admin.facilities.form.tabs.location", "Location")}
                     </TabsTrigger>
                   )}
                   {availableTabs.includes('features') && (
-                    <TabsTrigger value="features" className="text-sm">
+                    <TabsTrigger value="features" className="text-xl h-14 px-6 font-bold">
                       {tSync("admin.facilities.form.tabs.features", "Features")}
                     </TabsTrigger>
                   )}
                   {availableTabs.includes('pricing') && (
-                    <TabsTrigger value="pricing" className="text-sm">
+                    <TabsTrigger value="pricing" className="text-xl h-14 px-6 font-bold">
                       {tSync("admin.facilities.form.tabs.pricing", "Pricing")}
                     </TabsTrigger>
                   )}
                   {availableTabs.includes('zones') && (
-                    <TabsTrigger value="zones" className="text-sm">
+                    <TabsTrigger value="zones" className="text-xl h-14 px-6 font-bold">
                       {tSync("admin.facilities.form.tabs.zones", "Zones")}
                     </TabsTrigger>
                   )}
                   {availableTabs.includes('schedule') && (
-                    <TabsTrigger value="schedule" className="text-sm">
+                    <TabsTrigger value="schedule" className="text-xl h-14 px-6 font-bold">
                       {tSync("admin.facilities.form.tabs.schedule", "Schedule")}
                     </TabsTrigger>
                   )}
                   {availableTabs.includes('blackouts') && (
-                    <TabsTrigger value="blackouts" className="text-sm">
+                    <TabsTrigger value="blackouts" className="text-xl h-14 px-6 font-bold">
                       {tSync("admin.facilities.form.tabs.blackouts", "Blackouts")}
                     </TabsTrigger>
                   )}
                   {availableTabs.includes('images') && (
-                    <TabsTrigger value="images" disabled={!isEditing} className="text-sm">
+                    <TabsTrigger value="images" disabled={!isEdit} className="text-xl h-14 px-6 font-bold">
                       {tSync("admin.facilities.form.tabs.images", "Images")}
-                    </TabsTrigger>
-                  )}
-                  {availableTabs.includes('analytics') && (
-                    <TabsTrigger value="analytics" disabled={!isEditing} className="text-sm">
-                      {tSync("admin.facilities.form.tabs.analytics", "Analytics")}
-                    </TabsTrigger>
-                  )}
-                  {availableTabs.includes('advanced') && (
-                    <TabsTrigger value="advanced" disabled={!isEditing} className="text-sm">
-                      {tSync("admin.facilities.form.tabs.advanced", "Advanced")}
                     </TabsTrigger>
                   )}
                 </TabsList>
               </div>
 
               <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)}>
-                  <div className="p-6 space-y-6">
-                    <TabsContent value="basic" className="mt-0 space-y-6">
-                      <EnhancedFacilityBasicSection form={form} />
-                      <FacilityContactSection form={form} />
-                    </TabsContent>
-
-                    <TabsContent value="location" className="mt-0 space-y-6">
-                      <EnhancedFacilityAddressSection form={form} />
-                      <FacilitySeasonSection form={form} />
-                    </TabsContent>
-
-                    <TabsContent value="features" className="mt-0 space-y-6">
-                      <FacilityFeaturesSection 
-                        form={form} 
-                        equipment={watchedEquipment}
-                        amenities={watchedAmenities}
-                        capacity={watchedCapacity}
-                      />
-                      <FacilityConfigSection form={form} />
-                    </TabsContent>
-
-                    <TabsContent value="pricing" className="mt-0 space-y-6">
-                      <FacilityPricingSection form={form} ref={pricingRulesRef} />
-                    </TabsContent>
-
-                    <TabsContent value="zones" className="mt-0 space-y-6">
-                      <FacilityZonesSection form={form} facilityId={facility?.id} ref={zonesRef} />
-                    </TabsContent>
-
-                    <TabsContent value="schedule" className="mt-0 space-y-6">
-                      <FacilityOpeningHoursSection facilityId={facility?.id} ref={openingHoursRef} />
-                    </TabsContent>
-
-                    <TabsContent value="blackouts" className="mt-0 space-y-6">
-                      <FacilityBlackoutSection form={form} facilityId={facility?.id} ref={blackoutsRef} />
-                    </TabsContent>
-
-                    <TabsContent value="images" className="mt-0">
-                      {isEditing ? (
-                        <FacilityImageManagement facilityId={facility.id} />
-                      ) : (
-                        <div className="text-center py-8 text-gray-500">
-                          <p className="text-sm">{tSync("admin.facilities.form.saveFirstForImages", "Please save the facility first before managing images.")}</p>
-                        </div>
-                      )}
-                    </TabsContent>
-
-                    <TabsContent value="analytics" className="mt-0">
-                      {/* ... keep existing code (analytics tab content) */}
-                      {isEditing ? (
-                        <Card>
-                          <CardContent className="p-6">
-                            <h3 className="text-lg font-semibold mb-4">{tSync("admin.facilities.form.analytics.title", "Facility Analytics")}</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                              <div className="text-center p-4 border rounded-lg">
-                                <div className="text-2xl font-bold text-blue-600">0</div>
-                                <div className="text-sm text-muted-foreground">{tSync("admin.facilities.form.analytics.totalBookings", "Total Bookings")}</div>
-                              </div>
-                              <div className="text-center p-4 border rounded-lg">
-                                <div className="text-2xl font-bold text-green-600">0%</div>
-                                <div className="text-sm text-muted-foreground">{tSync("admin.facilities.form.analytics.utilization", "Utilization Rate")}</div>
-                              </div>
-                              <div className="text-center p-4 border rounded-lg">
-                                <div className="text-2xl font-bold text-purple-600">0</div>
-                                <div className="text-sm text-muted-foreground">{tSync("admin.facilities.form.analytics.revenue", "Revenue (NOK)")}</div>
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      ) : (
-                        <div className="text-center py-8 text-gray-500">
-                          <p className="text-sm">{tSync("admin.facilities.form.saveFirstForAnalytics", "Please save the facility first before viewing analytics.")}</p>
-                        </div>
-                      )}
-                    </TabsContent>
-
-                    <TabsContent value="advanced" className="mt-0">
-                      {isEditing ? (
-                        <FacilityCalendarManagement facilityId={facility.id} />
-                      ) : (
-                        <div className="text-center py-8 text-gray-500">
-                          <p className="text-sm">{tSync("admin.facilities.form.saveFirstForAdvanced", "Please save the facility first before accessing advanced features.")}</p>
-                        </div>
-                      )}
-                    </TabsContent>
-                  </div>
-
-                  {/* Form Actions */}
-                  <div className="border-t border-gray-100 bg-gray-50/50 px-6 py-4">
-                    <div className="flex justify-end space-x-3">
-                      <Button type="button" variant="outline" onClick={onCancel} className="px-4 h-9 text-sm">
-                        <X className="w-4 h-4 mr-2" />
-                        {tSync("admin.common.cancel", "Cancel")}
-                      </Button>
-                      <Button 
-                        type="submit" 
-                        disabled={mutation.isPending || (!hasPermission('create_facility') && !isEditing) || (!hasPermission('edit_facility') && isEditing)} 
-                        className="px-4 h-9 text-sm"
-                      >
-                        <Save className="w-4 h-4 mr-2" />
-                        {mutation.isPending 
-                          ? tSync("admin.common.saving", "Saving...") 
-                          : (isEditing ? tSync("admin.facilities.form.updateFacility", "Update Facility") : tSync("admin.facilities.form.createFacility", "Create Facility"))
-                        }
-                      </Button>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="w-full px-4 sm:px-6 lg:px-8 space-y-4 p-6 bg-white rounded shadow">
+                  {saveError && (
+                    <div className="bg-red-100 text-red-800 p-4 rounded mb-4 text-lg font-semibold border border-red-300">
+                      {saveError}
                     </div>
+                  )}
+                  {saveSuccess && (
+                    <div className="bg-green-100 text-green-800 p-4 rounded mb-4 text-lg font-semibold border border-green-300">
+                      {tSync('admin.facilities.form.saveSuccess', 'Facility saved successfully!')}
+                    </div>
+                  )}
+                  <TabsContent value="basic" className="space-y-6">
+                    <EnhancedFacilityBasicSection form={form} />
+                  </TabsContent>
+                  <TabsContent value="location" className="space-y-6">
+                    <EnhancedFacilityAddressSection form={form} />
+                  </TabsContent>
+                  <TabsContent value="contact" className="space-y-6">
+                    <FacilityContactSection form={form} />
+                  </TabsContent>
+                  <TabsContent value="config" className="space-y-6">
+                    <FacilityConfigSection form={form} />
+                  </TabsContent>
+                  <TabsContent value="features" className="space-y-6">
+                    <FacilityFeaturesSection form={form} equipment={watchedEquipment} amenities={watchedAmenities} capacity={watchedCapacity} />
+                  </TabsContent>
+                  <TabsContent value="pricing" className="space-y-6">
+                    <FacilityPricingSection ref={pricingRulesRef} form={form} facilityId={currentFacility?.id} />
+                  </TabsContent>
+                  <TabsContent value="zones" className="space-y-6">
+                    <FacilityZonesSection ref={zonesRef} facilityId={currentFacility?.id} />
+                  </TabsContent>
+                  <TabsContent value="schedule" className="space-y-6">
+                    <FacilityOpeningHoursSection ref={openingHoursRef} facilityId={currentFacility?.id} />
+                  </TabsContent>
+                  <TabsContent value="blackouts" className="space-y-6">
+                    <FacilityBlackoutSection ref={blackoutsRef} facilityId={currentFacility?.id} form={form} />
+                  </TabsContent>
+                  <TabsContent value="images" className="space-y-6">
+                    <FacilityImageManagement facilityId={currentFacility?.id} />
+                  </TabsContent>
+                  {/* Add more sections as needed */}
+                  {error && <div className="text-red-500 text-sm">{error}</div>}
+                  <div className="flex justify-end gap-4 mt-8">
+                    {isEdit && (
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="destructive" className="h-12 px-6 text-lg font-bold" disabled={isDeleting}>
+                            {isDeleting ? "Deleting..." : "Delete"}
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This action cannot be undone. This will permanently delete the
+                              facility and all its related data.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={handleDelete}>Continue</AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    )}
+                    <Button type="submit" className="h-12 px-6 text-lg font-bold" disabled={isLoading}>
+                      {isLoading ? "Saving..." : (isEdit ? tSync('admin.facilities.form.save', 'Save Changes') : tSync('admin.facilities.form.create', 'Create Facility'))}
+                    </Button>
+                    {closeForm && (
+                      <Button type="button" variant="secondary" onClick={closeForm} className="h-12 px-6 text-lg">
+                        {tSync('admin.facilities.form.cancel', 'Cancel')}
+                      </Button>
+                    )}
                   </div>
                 </form>
               </Form>

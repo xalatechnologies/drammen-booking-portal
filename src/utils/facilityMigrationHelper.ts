@@ -1,8 +1,7 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { facilityTranslationService } from '@/services/FacilityTranslationService';
 import { translationService } from '@/services/TranslationService';
-import { coreFacilities } from '@/data/coreFacilities';
+// import { coreFacilities } from '@/data/coreFacilities';
 import { Language } from '@/i18n/types';
 
 export class FacilityMigrationHelper {
@@ -103,15 +102,15 @@ export class FacilityMigrationHelper {
     }
   }
 
-  async migrateAllCoreFacilities() {
-    console.log('Starting migration of all core facilities...');
-    
-    for (const facility of coreFacilities) {
-      await this.migrateFacilityToDatabase(facility);
-    }
-    
-    console.log('Migration completed!');
-  }
+  // async migrateAllCoreFacilities() {
+  //   console.log('Starting migration of all core facilities...');
+  //   
+  //   for (const facility of coreFacilities) {
+  //     await this.migrateFacilityToDatabase(facility);
+  //   }
+  //   
+  //   console.log('Migration completed!');
+  // }
 }
 
 export const facilityMigrationHelper = new FacilityMigrationHelper();

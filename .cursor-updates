@@ -6,4 +6,21 @@
 - Created `plan/` folder with comprehensive planning structure for project features
 - Added detailed admin/facilities management implementation plan with 8 phases and checklists
 - Documented current repository/service pattern architecture and Zustand state management integration
-- Identified mock data removal requirements and Supabase integration optimizations 
+- Identified mock data removal requirements and Supabase integration optimizations
+
+### 2024-01-XX - Localization Implementation Plan Added
+- Created comprehensive localization plan for Norwegian and English translations
+- Analyzed existing i18n infrastructure with both static and dynamic translation systems
+- Identified inconsistent hook usage between `@/i18n` and `@/hooks/useTranslation`
+- Planned 8-phase implementation covering hook standardization, component coverage, and quality assurance
+- Documented translation key structure improvements and component-by-component audit requirements 
+
+- Refactored FacilityPricingSection to accept facilityId as a prop instead of reading from form, resolving linter/type errors and ensuring robust CRUD for pricing rules. 
+
+- Refactored FacilityZonesSection for robust CRUD: loads from Supabase, saves/updates/deletes via ZoneService, tracks deleted zones, handles errors/loading, and uses shared UI. Accepts facilityId as prop. 
+
+- Added global error summary and full-page loading spinner to EnhancedFacilityForm. Passed facilityId prop to all relevant sections for robust CRUD. Removed unused form prop from FacilityZonesSection. 
+
+- Fixed a critical bug where the save button did not trigger onSubmit in EnhancedFacilityForm by moving all React hooks to the top level of the component, before any conditional returns, to comply with the Rules of Hooks. 
+
+- Implemented delete facility functionality in EnhancedFacilityForm with a confirmation dialog, wired to the existing deleteFacility method in the store. This completes the full CRUD implementation for the main facility form. 

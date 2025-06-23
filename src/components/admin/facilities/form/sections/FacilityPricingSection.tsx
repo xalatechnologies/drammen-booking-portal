@@ -1,5 +1,4 @@
-
-import React, { useState, forwardRef, useImperativeHandle } from "react";
+import React, { useState, forwardRef, useImperativeHandle, useEffect } from "react";
 import { UseFormReturn } from "react-hook-form";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage, FormDescription } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -11,9 +10,12 @@ import { Badge } from "@/components/ui/badge";
 import { FacilityFormData } from "../FacilityFormSchema";
 import { useTranslation } from "@/hooks/useTranslation";
 import { DollarSign, Plus, Trash2, Clock, Calendar, Sun, Moon, Percent } from "lucide-react";
+import PricingService from '@/services/PricingService';
+import { Database } from '@/integrations/supabase/types';
 
 interface FacilityPricingSectionProps {
   form: UseFormReturn<FacilityFormData>;
+  facilityId: number;
 }
 
 interface FacilityPricingSectionRef {
@@ -30,6 +32,9 @@ interface PricingRule {
   isActive: boolean;
 }
 
+type DBPricingRule = Database['public']['Tables']['pricing_rules']['Row'];
+type DBPricingRuleInsert = Omit<Database['public']['Tables']['pricing_rules']['Insert'], 'id' | 'created_at' | 'updated_at'>;
+
 const RENTAL_TYPES = [
   { value: 'hourly', label: 'Hourly Rental', icon: <Clock className="w-4 h-4" /> },
   { value: 'daily', label: 'Daily Rental', icon: <Calendar className="w-4 h-4" /> },
@@ -45,33 +50,95 @@ const PRICING_RULE_TEMPLATES = [
   { type: 'actor_based', name: 'Organization Discount', condition: 'Organizations', adjustment: -15, adjustmentType: 'percentage' }
 ];
 
-export const FacilityPricingSection = forwardRef<FacilityPricingSectionRef, FacilityPricingSectionProps>(({ form }, ref) => {
+// Map DB pricing rule to UI pricing rule
+function toUIPricingRule(db: DBPricingRule): PricingRule {
+  return {
+    id: db.id,
+    name: db.description || '',
+    type: db.time_slot_category ? 'time_based' : db.day_type ? 'day_based' : db.facility_id ? 'actor_based' : 'seasonal',
+    condition: (db.time_slot_category as string) || (db.day_type as string) || '',
+    adjustment: db.multiplier ?? 1,
+    adjustmentType: db.fixed_price ? 'fixed' : 'percentage',
+    isActive: db.is_active,
+  };
+}
+
+// Map UI pricing rule to DB pricing rule insert/update
+function toDBPricingRule(ui: PricingRule, facilityId: number): DBPricingRuleInsert {
+  return {
+    description: ui.name,
+    time_slot_category: ui.type === 'time_based' ? (ui.condition as any) : null,
+    day_type: ui.type === 'day_based' ? (ui.condition as any) : null,
+    multiplier: ui.adjustment,
+    fixed_price: ui.adjustmentType === 'fixed' ? ui.adjustment : null,
+    is_active: ui.isActive,
+    facility_id: facilityId,
+    base_price: 0, // Set as needed
+    actor_type: 'private-person', // Set as needed
+    booking_type: 'engangs', // Set as needed
+    valid_from: new Date().toISOString(),
+    valid_to: null,
+    minimum_duration: null,
+    maximum_duration: null,
+    zone_id: null,
+  };
+}
+
+export const FacilityPricingSection = forwardRef<FacilityPricingSectionRef, FacilityPricingSectionProps>(({ form, facilityId }, ref) => {
   const { tSync } = useTranslation();
   const [pricingRules, setPricingRules] = useState<PricingRule[]>([]);
   const [selectedRentalType, setSelectedRentalType] = useState<string>('hourly');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [deletedRuleIds, setDeletedRuleIds] = useState<string[]>([]);
+
+  // Load pricing rules on mount
+  useEffect(() => {
+    if (!facilityId) return;
+    setLoading(true);
+    PricingService.getPricingRulesByFacility(facilityId)
+      .then(res => {
+        if (res.error) {
+          setError(res.error);
+          setPricingRules([]);
+        } else {
+          setPricingRules((res.data || []).map(toUIPricingRule));
+        }
+      })
+      .catch(e => setError(e.message))
+      .finally(() => setLoading(false));
+  }, [facilityId]);
 
   // Expose save function to parent via ref
   useImperativeHandle(ref, () => ({
     saveData: async () => {
-      console.log('Saving pricing configuration:', {
-        rentalType: selectedRentalType,
-        pricingRules: pricingRules
-      });
-      
+      if (!facilityId) return true;
+      setLoading(true);
+      setError(null);
       try {
-        // Here you would implement the actual API call to save pricing configuration
-        console.log('Pricing configuration would be saved:', {
-          rentalType: selectedRentalType,
-          basePrice: form.watch('price_per_hour'),
-          pricingRules: pricingRules
+        // Save all pricing rules (add/update)
+        const promises = pricingRules.map(rule => {
+          if (rule.id && rule.id.length > 10) {
+            // Existing rule, update
+            return PricingService.updatePricingRule(rule.id, toDBPricingRule(rule, facilityId));
+          } else {
+            // New rule, create
+            return PricingService.createPricingRule(toDBPricingRule(rule, facilityId));
+          }
         });
+        // Delete removed rules
+        const deletePromises = deletedRuleIds.map(id => PricingService.deletePricingRule(id));
+        await Promise.all([...promises, ...deletePromises]);
+        setDeletedRuleIds([]);
         return true;
-      } catch (error) {
-        console.error('Failed to save pricing configuration:', error);
+      } catch (error: any) {
+        setError(error.message || 'Failed to save pricing configuration');
         return false;
+      } finally {
+        setLoading(false);
       }
     }
-  }), [selectedRentalType, pricingRules, form]);
+  }), [pricingRules, facilityId, deletedRuleIds]);
 
   const addPricingRule = (template: any) => {
     const newRule: PricingRule = {
@@ -88,6 +155,7 @@ export const FacilityPricingSection = forwardRef<FacilityPricingSectionRef, Faci
 
   const removePricingRule = (id: string) => {
     setPricingRules(pricingRules.filter(rule => rule.id !== id));
+    if (id && id.length > 10) setDeletedRuleIds([...deletedRuleIds, id]);
   };
 
   const getRuleIcon = (type: string) => {
@@ -119,6 +187,8 @@ export const FacilityPricingSection = forwardRef<FacilityPricingSectionRef, Faci
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
+        {loading && <div className="text-center text-muted-foreground">Loading pricing rules...</div>}
+        {error && <div className="text-center text-red-500">{error}</div>}
         <Accordion type="multiple" defaultValue={["rental-type", "base-pricing"]} className="space-y-4">
           
           {/* Rental Type Selection */}
@@ -190,7 +260,7 @@ export const FacilityPricingSection = forwardRef<FacilityPricingSectionRef, Faci
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Minimum Booking Duration</FormLabel>
-                      <Select onValueChange={(value) => field.onChange(parseInt(value))} defaultValue={field.value?.toString()}>
+                      <Select onValueChange={(value) => field.onChange(parseInt(value, 10))} defaultValue={String(field.value)}>
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Select duration" />
@@ -201,7 +271,6 @@ export const FacilityPricingSection = forwardRef<FacilityPricingSectionRef, Faci
                           <SelectItem value="2">2 hours</SelectItem>
                           <SelectItem value="3">3 hours</SelectItem>
                           <SelectItem value="4">4 hours</SelectItem>
-                          <SelectItem value="8">8 hours (1 day)</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />

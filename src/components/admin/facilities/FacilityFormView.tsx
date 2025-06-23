@@ -1,6 +1,5 @@
-
 import React from "react";
-import { SimplifiedFacilityForm } from "./form/SimplifiedFacilityForm";
+import { EnhancedFacilityForm } from "./form/EnhancedFacilityForm";
 
 interface FacilityFormViewProps {
   facility?: any;
@@ -14,10 +13,8 @@ export const FacilityFormView: React.FC<FacilityFormViewProps> = ({
   onCancel
 }) => {
   return (
-    <SimplifiedFacilityForm 
-      facility={facility}
+    <EnhancedFacilityForm 
       onSuccess={onSuccess}
-      onCancel={onCancel}
     />
   );
 };

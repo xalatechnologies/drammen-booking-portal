@@ -18,6 +18,11 @@ The plan directory serves as:
 - **Status**: Planning Phase
 - **Description**: Comprehensive plan to restructure facility management with proper UI, remove mock data, and integrate with Supabase via repository/service pattern
 
+### Localization Implementation
+- **File**: `localization-implementation.md`
+- **Status**: Planning Phase
+- **Description**: Complete Norwegian and English localization across all components and pages with proper translation hook implementation
+
 ## Plan Structure
 
 Each plan follows this structure:

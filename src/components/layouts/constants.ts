@@ -32,5 +32,5 @@ export const LAYOUT_CONSTANTS = {
   
   // Responsive
   RESPONSIVE_GRID: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6",
-  RESPONSIVE_CONTAINER: "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8",
+  RESPONSIVE_CONTAINER: "w-full px-4 sm:px-6 lg:px-8",
 } as const;

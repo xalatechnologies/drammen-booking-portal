@@ -11,112 +11,45 @@ Restructure and enhance the admin facilities management feature to ensure proper
 - [x] Supabase edge functions are operational (`supabase/functions/facilities/`)
 - [x] Basic UI components exist in `src/components/admin/facilities/`
 - [x] Form validation with Zod schemas
-- [x] React Query for data fetching
-- [x] Role-based access control
+- [x] React/TypeScript best practices in use
 
-### Identified Issues
-- [ ] Mock data exists in `src/data/coreFacilities.ts`
-- [ ] Zustand state management not fully integrated
-- [ ] UI components need better structure and reusability
-- [ ] Inconsistent error handling across components
-- [ ] Missing loading states and optimistic updates
+## Phase 2: Remove Mock Data ✅
+- [x] Delete all mock data files (`src/data/coreFacilities.ts`, `src/data/facilities/`)
+- [x] Remove all references to mock data in codebase
+- [x] Ensure all facility data is loaded from Supabase via repository/service
 
-## Phase 2: Mock Data Removal
+## Phase 3: State Management Integration ✅
+- [x] Create Zustand store for admin/facilities (`useFacilityAdminStore`)
+- [x] Move all facility list, selection, filter, pagination, and CRUD state to store
+- [x] Refactor admin/facilities UI to use store (remove React Query for admin)
 
-### Files to Clean
-- [ ] Remove `src/data/coreFacilities.ts`
-- [ ] Remove `src/data/facilities/` directory and all mock files
-- [ ] Audit components for hardcoded facility data
-- [ ] Remove any seed data or development-only mock implementations
+## Phase 4: UI Refactor & Localization Integration ✅
+- [x] Refactor all admin/facilities list/grid/table/detail/form views to use store
+- [x] Remove all direct data fetching and local state for facilities in admin
+- [x] Use localization hooks (`tSync`) for all UI strings
+- [x] All admin/facilities UI is now store-driven, uses localization, and is free of mock data
 
-### Data Transition
-- [ ] Ensure all facility data comes from Supabase
-- [ ] Verify edge functions return proper data structure
-- [ ] Test facility CRUD operations with real database
-- [ ] Validate data transformation in `SupabaseFacilityService`
+## Phase 5: Shared Component Enforcement ⬜
+- [ ] Ensure all UI elements (labels, buttons, etc.) use shared library components
+- [ ] Refactor any custom UI to use global/shared components for consistency
 
-## Phase 3: State Management Integration
+## Phase 6: UI/UX Polish & Accessibility ⬜
+- [ ] Review and enhance UI/UX for admin/facilities
+- [ ] Ensure accessibility best practices
+- [ ] Add tests for critical flows
 
-### Zustand Store Enhancement
-- [ ] Create or enhance `useFacilityAdminStore.ts`
-  - [ ] Facility list state with pagination
-  - [ ] Current facility selection
-  - [ ] Form state management
-  - [ ] Filter and search state
-  - [ ] Loading and error states
-  - [ ] CRUD operation states
+## Phase 7: QA & Testing ⬜
+- [ ] Manual and automated testing of all admin/facilities features
+- [ ] Fix any bugs or inconsistencies
 
-### Store Structure
-```typescript
-interface FacilityAdminState {
-  // Data state
-  facilities: Facility[];
-  currentFacility: Facility | null;
-  totalCount: number;
-  
-  // UI state
-  isLoading: boolean;
-  error: string | null;
-  filters: FacilityFilters;
-  pagination: PaginationParams;
-  viewMode: 'table' | 'grid' | 'list' | 'map';
-  
-  // Form state
-  isFormOpen: boolean;
-  formMode: 'create' | 'edit' | 'view';
-  
-  // Actions
-  loadFacilities: (filters?: FacilityFilters) => Promise<void>;
-  createFacility: (data: Partial<Facility>) => Promise<void>;
-  updateFacility: (id: string, data: Partial<Facility>) => Promise<void>;
-  deleteFacility: (id: string) => Promise<void>;
-  setCurrentFacility: (facility: Facility | null) => void;
-  setFilters: (filters: Partial<FacilityFilters>) => void;
-  setPagination: (pagination: Partial<PaginationParams>) => void;
-  setViewMode: (mode: ViewMode) => void;
-  openForm: (mode: FormMode, facility?: Facility) => void;
-  closeForm: () => void;
-  clearError: () => void;
-}
-```
+## Phase 8: Documentation & Handover ⬜
+- [ ] Update documentation for admin/facilities management
+- [ ] Handover to QA or next team
 
-### Integration Tasks
-- [ ] Connect `FacilityListView` to Zustand store
-- [ ] Replace React Query with Zustand where appropriate
-- [ ] Implement optimistic updates for better UX
-- [ ] Add proper error state management
-- [ ] Implement auto-refresh and cache invalidation
+---
 
-## Phase 4: UI Structure Enhancement
-
-### Component Refactoring
-- [ ] **FacilityListView.tsx**
-  - [ ] Simplify component by extracting logic to Zustand
-  - [ ] Improve loading and error states
-  - [ ] Better responsive design
-  - [ ] Add skeleton loading states
-
-- [ ] **Enhanced Facility Form**
-  - [ ] Break down large form into smaller components
-  - [ ] Improve validation feedback
-  - [ ] Add auto-save functionality
-  - [ ] Better step navigation
-  - [ ] Optimize performance with form chunks
-
-### New Shared Components
-- [ ] **FacilityCard** - Reusable facility card component
-- [ ] **FacilityTable** - Enhanced table with sorting/filtering
-- [ ] **FacilityFilters** - Comprehensive filter component
-- [ ] **FacilitySearch** - Advanced search with autocomplete
-- [ ] **FacilityActions** - Consistent action buttons
-- [ ] **FacilityStatus** - Status indicator component
-
-### Layout Improvements
-- [ ] Consistent spacing and typography
-- [ ] Better mobile responsiveness
-- [ ] Improved accessibility (ARIA labels, keyboard navigation)
-- [ ] Dark mode support
-- [ ] Print-friendly layouts
+**Note:**
+- All admin/facilities list, grid, table, detail, and form views are now store-driven, use localization, and are free of mock data.
 
 ## Phase 5: Repository & Service Integration
 
