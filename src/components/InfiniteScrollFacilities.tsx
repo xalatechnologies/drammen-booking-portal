@@ -6,24 +6,13 @@ import ViewHeader from './search/ViewHeader';
 import { FacilityFilters } from '@/types/facility';
 import { useFacilities } from '@/hooks/useFacilities';
 import { Button } from '@/components/ui/button';
+import { transformFacilitiesForUI } from '@/utils/facilityTransforms';
 
 interface InfiniteScrollFacilitiesProps {
   filters: FacilityFilters;
   viewMode: "grid" | "list";
   setViewMode?: (mode: "grid" | "map" | "calendar" | "list") => void;
 }
-
-// Fallback images from public/bilder directory
-const FALLBACK_IMAGES = [
-  '/bilder/Ankerskogen_svoemmehall1.jpg',
-  '/bilder/Bergsjöns_kulturhus_sett_från_Bergsjöns_centrum.jpg',
-  '/bilder/Elverum_svømmehall.jpg',
-  '/bilder/Hamar_kulturhus_I.jpg',
-  '/bilder/Mollebakken-skole.jpg',
-  '/bilder/Nesøya_skole_og_idrettshall_Asker.jpg',
-  '/bilder/standard_compressed_Kulturhuset_1200px.jpg',
-  '/bilder/standard_compressed_drammensbadet_71.jpg'
-];
 
 export const InfiniteScrollFacilities: React.FC<InfiniteScrollFacilitiesProps> = ({
   filters,
@@ -38,27 +27,7 @@ export const InfiniteScrollFacilities: React.FC<InfiniteScrollFacilitiesProps> =
 
   // Transform facilities to ensure they have the right structure
   const transformedFacilities = useMemo(() => {
-    return rawFacilities.map((facility, index) => {
-      // Use local fallback image if no image_url
-      const fallbackImage = FALLBACK_IMAGES[index % FALLBACK_IMAGES.length];
-      const imageUrl = facility.facility_images?.find(img => img.is_featured)?.image_url || fallbackImage;
-
-      // Ensure we have all required properties
-      return {
-        ...facility,
-        image: imageUrl,
-        image_url: imageUrl,
-        openingHours: facility.facility_opening_hours || [],
-        address: `${facility.address_street}, ${facility.address_city}`,
-        nextAvailable: facility.next_available || 'Available now',
-        accessibility: facility.accessibility_features || [],
-        suitableFor: [],
-        equipment: facility.equipment || [],
-        availableTimes: [],
-        hasAutoApproval: facility.has_auto_approval || false,
-        pricePerHour: facility.price_per_hour || 450
-      };
-    });
+    return transformFacilitiesForUI(rawFacilities);
   }, [rawFacilities]);
 
   const handleAddressClick = (e: React.MouseEvent, facility: any) => {

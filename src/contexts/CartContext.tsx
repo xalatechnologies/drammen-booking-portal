@@ -1,8 +1,7 @@
 
-import React, { createContext, useContext, useEffect } from 'react';
-import { useCartStore } from '@/stores/useCartStore';
+import React, { createContext, useContext } from 'react';
+import { useCartStore, CartItem } from '@/stores/useCartStore';
 import { useUIStore } from '@/stores/useUIStore';
-import { CartItem } from '@/types/cart';
 
 interface CartContextType {
   items: CartItem[];

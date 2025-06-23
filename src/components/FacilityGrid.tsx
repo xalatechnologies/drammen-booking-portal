@@ -6,6 +6,7 @@ import { useFacilities } from "@/hooks/useFacilities";
 import { FacilityFilters } from "@/types/facility";
 import { PaginationParams } from "@/types/api";
 import { Skeleton } from "@/components/ui/skeleton";
+import { transformFacilitiesForUI } from "@/utils/facilityTransforms";
 
 interface FacilityGridProps {
   pagination: PaginationParams;
@@ -18,7 +19,12 @@ const FacilityGrid: React.FC<FacilityGridProps> = ({
 }) => {
   const navigate = useNavigate();
   
-  const { data: facilities = [], isLoading, error } = useFacilities();
+  const { data: rawFacilities = [], isLoading, error } = useFacilities();
+
+  // Transform facilities for UI consumption
+  const facilities = React.useMemo(() => {
+    return transformFacilitiesForUI(rawFacilities);
+  }, [rawFacilities]);
 
   console.log("FacilityGrid - Facilities:", facilities.length);
   console.log("FacilityGrid - Filters:", filters);

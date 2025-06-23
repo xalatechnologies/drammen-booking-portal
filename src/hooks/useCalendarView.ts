@@ -1,52 +1,52 @@
 
-import { FacilityFilters } from "@/types/facility";
-import { useFacilities } from "@/hooks/useFacilities";
-import { useNavigate } from "react-router-dom";
-import { transformFacilitiesToCalendarFormat } from "@/components/calendar/utils/facilityTransformer";
-import { getStableAvailabilityStatus } from "@/utils/availabilityUtils";
+import { useState, useMemo } from 'react';
+import { useFacilities } from '@/hooks/useFacilities';
+import { transformFacilitiesForUI } from '@/utils/facilityTransforms';
 
-interface UseCalendarViewProps {
-  date?: Date;
-  facilityType?: string;
-  location?: string;
-  accessibility?: string;
-  capacity?: [number, number];
-}
-
-export function useCalendarView({
-  date,
-  facilityType,
-  location,
-  accessibility,
-  capacity
-}: UseCalendarViewProps) {
-  const navigate = useNavigate();
+export const useCalendarView = () => {
+  const [selectedWeek, setSelectedWeek] = useState(new Date());
+  const [selectedFacilityId, setSelectedFacilityId] = useState<number | null>(null);
   
-  // Create filters from props
-  const filters: FacilityFilters = {
-    facilityType: facilityType !== "all" ? facilityType : undefined,
-    location: location !== "all" ? location : undefined,
-    accessibility: accessibility !== "all" ? accessibility : undefined,
-    capacity: capacity && (capacity[0] > 0 || capacity[1] < 200) ? capacity : undefined,
-    date: date || undefined,
+  const { data: rawFacilities = [], isLoading } = useFacilities();
+  
+  const facilities = useMemo(() => {
+    return transformFacilitiesForUI(rawFacilities);
+  }, [rawFacilities]);
+
+  const selectedFacility = useMemo(() => {
+    return selectedFacilityId ? facilities.find(f => f.id === selectedFacilityId) : null;
+  }, [facilities, selectedFacilityId]);
+
+  const weekStart = useMemo(() => {
+    const start = new Date(selectedWeek);
+    start.setDate(start.getDate() - start.getDay() + 1); // Monday
+    start.setHours(0, 0, 0, 0);
+    return start;
+  }, [selectedWeek]);
+
+  const weekEnd = useMemo(() => {
+    const end = new Date(weekStart);
+    end.setDate(end.getDate() + 6); // Sunday
+    end.setHours(23, 59, 59, 999);
+    return end;
+  }, [weekStart]);
+
+  const navigateWeek = (direction: 'prev' | 'next') => {
+    const newWeek = new Date(selectedWeek);
+    newWeek.setDate(newWeek.getDate() + (direction === 'next' ? 7 : -7));
+    setSelectedWeek(newWeek);
   };
-
-  const { facilities, isLoading, error } = useFacilities({
-    pagination: { page: 1, limit: 50 },
-    filters
-  });
-
-  const facilitiesWithZones = transformFacilitiesToCalendarFormat(facilities);
-  const displayFacility = facilitiesWithZones[0];
-  const allZones = facilitiesWithZones.flatMap(f => f.zones);
 
   return {
-    facilitiesWithZones,
-    isLoading,
-    error,
-    getAvailabilityStatus: getStableAvailabilityStatus,
-    displayFacility,
-    allZones,
-    navigate
+    facilities,
+    selectedFacility,
+    selectedFacilityId,
+    setSelectedFacilityId,
+    selectedWeek,
+    setSelectedWeek,
+    weekStart,
+    weekEnd,
+    navigateWeek,
+    isLoading
   };
-}
+};
