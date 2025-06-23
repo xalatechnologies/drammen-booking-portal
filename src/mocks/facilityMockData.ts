@@ -1,3 +1,4 @@
+
 import { Facility, OpeningHours } from '@/types/facility';
 
 // Constants for generating realistic data
