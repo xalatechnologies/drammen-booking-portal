@@ -1,4 +1,3 @@
-
 import { BaseRepository } from '@/dal/BaseRepository';
 import { RepositoryResponse, PaginationParams } from '@/types/api';
 import { supabase } from '@/integrations/supabase/client';
@@ -36,15 +35,10 @@ export class GenericEntityRepository<T extends Record<string, any>> extends Base
     try {
       console.log('GenericEntityRepository.findAll - Starting query for table:', this.table);
       
-      // Build the select query with related data
-      let selectQuery = '*';
-      if (this.related) {
-        selectQuery = `*, ${this.related}(*)`;
-      }
-      
+      // Build the select query - keep it simple to avoid relation errors
       let query = supabase
         .from(this.table as any)
-        .select(selectQuery, { count: 'exact' });
+        .select('*', { count: 'exact' });
 
       // Apply status filter if configured
       if (this.statusField && this.activeValue) {
@@ -113,14 +107,9 @@ export class GenericEntityRepository<T extends Record<string, any>> extends Base
     try {
       console.log('GenericEntityRepository.findById - Starting query for ID:', id);
       
-      let selectQuery = '*';
-      if (this.related) {
-        selectQuery = `*, ${this.related}(*)`;
-      }
-      
       const { data, error } = await supabase
         .from(this.table as any)
-        .select(selectQuery)
+        .select('*')
         .eq(this.idField, id)
         .maybeSingle();
 
