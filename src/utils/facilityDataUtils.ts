@@ -1,3 +1,4 @@
+
 import { Facility, OpeningHours, Zone, FacilityImage } from '@/types/facility';
 
 export class FacilityDataUtils {
@@ -36,26 +37,7 @@ export class FacilityDataUtils {
       return fallbackImage;
     }
     
-    // Handle both absolute URLs and relative paths
-    let imageUrl = imageToUse.image_url;
-    
-    // If it's a relative path starting with /bilder or /Bilder, make it absolute
-    if (imageUrl.startsWith('/bilder/') || imageUrl.startsWith('/Bilder/')) {
-      imageUrl = imageUrl; // Keep as-is, the browser will resolve it correctly
-    }
-    // If it's already an absolute URL, keep it as-is
-    else if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
-      imageUrl = imageToUse.image_url;
-    }
-    // If it's some other format, use fallback
-    else if (!imageUrl.startsWith('/')) {
-      console.warn('FacilityDataUtils.getImageUrl - Unexpected image URL format:', imageUrl);
-      imageUrl = fallbackImage;
-    }
-    
-    console.log('FacilityDataUtils.getImageUrl - Final image URL:', imageUrl);
-    
-    return imageUrl;
+    return imageToUse.image_url;
   }
 
   /**
@@ -157,5 +139,23 @@ export class FacilityDataUtils {
         height: 3
       } : undefined
     }));
+  }
+
+  /**
+   * Gets fallback image URL for facilities without images - using local images
+   */
+  static getFallbackImageUrl(index: number = 0): string {
+    const fallbackImages = [
+      '/bilder/Ankerskogen_svoemmehall1.jpg',
+      '/bilder/Bergsjöns_kulturhus_sett_från_Bergsjöns_centrum.jpg',
+      '/bilder/Elverum_svømmehall.jpg',
+      '/bilder/Hamar_kulturhus_I.jpg',
+      '/bilder/Mollebakken-skole.jpg',
+      '/bilder/Nesøya_skole_og_idrettshall_Asker.jpg',
+      '/bilder/standard_compressed_Kulturhuset_1200px.jpg',
+      '/bilder/standard_compressed_drammensbadet_71.jpg'
+    ];
+    
+    return fallbackImages[index % fallbackImages.length];
   }
 }

@@ -5,8 +5,10 @@ import { Plus, Upload, Calendar, Map } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PageHeader, FiltersBar, ViewToggle } from "@/components/layouts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Facility, OpeningHours } from "@/types/facility";
+import { Facility } from "@/types/facility";
 import { useJsonTranslation } from "@/hooks/useJsonTranslation";
+import { useFacilityAdmin } from "@/hooks/useFacilityAdmin";
+import { FacilityDataUtils } from "@/utils/facilityDataUtils";
 
 // Import the components we created
 import FacilityTableView from "./FacilityTableView";
@@ -15,82 +17,6 @@ import FacilityListViewDisplay from "./FacilityListViewDisplay";
 import FacilityMapViewComponent from "./FacilityMapViewComponent";
 import FacilityCalendarViewComponent from "./FacilityCalendarViewComponent";
 import FacilityDetailViewComponent from "./FacilityDetailViewComponent";
-
-// Local WEEKDAYS constant for mock data
-const WEEKDAYS = [
-  "Mandag", "Tirsdag", "Onsdag", "Torsdag", "Fredag", "Lørdag", "Søndag"
-];
-
-// Create a helper function to generate full facility objects
-const createMockFacility = (baseData: any): Facility => ({
-  // Core facility fields
-  id: baseData.id,
-  name: baseData.name,
-  type: baseData.type,
-  status: baseData.status,
-  capacity: baseData.capacity,
-  area: baseData.area || "Drammen",
-  description: baseData.description || null,
-  
-  // Address fields - both formats for compatibility
-  address: baseData.address,
-  address_street: baseData.address.split(',')[0] || baseData.address,
-  address_city: baseData.address.split(',')[1]?.trim() || "Drammen",
-  address_postal_code: baseData.address.match(/\d{4}/)?.[0] || "3000",
-  address_country: "Norway",
-  
-  // Pricing and booking
-  price_per_hour: 450,
-  pricePerHour: 450,
-  time_slot_duration: 1,
-  timeSlotDuration: 1 as 1 | 2,
-  has_auto_approval: false,
-  hasAutoApproval: false,
-  allowed_booking_types: baseData.allowed_booking_types,
-  booking_lead_time_hours: 2,
-  max_advance_booking_days: 365,
-  cancellation_deadline_hours: 24,
-  
-  // Availability and features
-  next_available: baseData.nextAvailable,
-  nextAvailable: baseData.nextAvailable,
-  rating: null,
-  review_count: 0,
-  is_featured: false,
-  
-  // Location and media
-  latitude: null,
-  longitude: null,
-  image_url: null,
-  image: "",
-  
-  // Arrays and features
-  amenities: [],
-  equipment: [],
-  accessibility_features: [],
-  accessibility: [],
-  suitableFor: [],
-  
-  // Season and contact
-  season_from: baseData.season?.from,
-  season_to: baseData.season?.to,
-  season: baseData.season,
-  contact_name: null,
-  contact_email: null,
-  contact_phone: null,
-  
-  // Dates
-  created_at: new Date().toISOString(),
-  updated_at: new Date().toISOString(),
-  area_sqm: null,
-  
-  // Related data
-  openingHours: baseData.openingHours,
-  zones: [],
-  featuredImage: undefined,
-  images: undefined,
-  availableTimes: undefined,
-});
 
 interface FacilityListViewProps {
   selectedFacilityId?: number;
@@ -109,147 +35,54 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
   const [selectedFacility, setSelectedFacility] = useState<Facility | null>(null);
   const { tSync } = useJsonTranslation();
 
-  // Mock data for development - create proper Facility objects
-  const mockFacilitiesBase = [
-    {
-      id: 1,
-      name: "Brandengen Skole - Gymsal",
-      address: "Knoffs gate 8, 3044 Drammen",
-      type: "Gymsal",
-      status: "active" as const,
-      capacity: 120,
-      nextAvailable: "I dag, 18:00",
-      allowed_booking_types: ["engangs", "fastlan"],
-      openingHours: WEEKDAYS.map((day, index) => ({
-        dayOfWeek: index as 0 | 1 | 2 | 3 | 4 | 5 | 6,
-        opens: "08:00",
-        closes: "22:00",
-      })) as OpeningHours[],
-      season: { from: "2025-01-01", to: "2025-12-31" },
-    },
-    {
-      id: 2,
-      name: "Fjell Skole - Aktivitetshall",
-      address: "Lauritz Grønlands vei 40, 3035 Drammen",
-      type: "Aktivitetshall",
-      status: "active" as const,
-      capacity: 200,
-      nextAvailable: "Fredag, 17:00",
-      allowed_booking_types: ["engangs", "rammetid", "strotimer"],
-      openingHours: WEEKDAYS.map((day, index) => ({
-        dayOfWeek: index as 0 | 1 | 2 | 3 | 4 | 5 | 6,
-        opens: "08:00",
-        closes: "22:00",
-      })) as OpeningHours[],
-      season: { from: "2025-01-01", to: "2025-12-31" },
-    },
-    {
-      id: 3,
-      name: "Gulskogen Skole - Auditorium",
-      address: "Smithestrømsveien 13, 3048 Drammen",
-      type: "Auditorium",
-      status: "maintenance" as const,
-      capacity: 150,
-      nextAvailable: "Torsdag, 19:00",
-      allowed_booking_types: ["engangs"],
-      openingHours: WEEKDAYS.map((day, index) => ({
-        dayOfWeek: index as 0 | 1 | 2 | 3 | 4 | 5 | 6,
-        opens: "08:00",
-        closes: "22:00",
-      })) as OpeningHours[],
-      season: { from: "2025-01-01", to: "2025-12-31" },
-    },
-    {
-      id: 4,
-      name: "Marienlyst Stadion - Møtesal",
-      address: "Marienlyst 14, 3045 Drammen",
-      type: "Møterom",
-      status: "active" as const,
-      capacity: 80,
-      nextAvailable: "Lørdag, 10:00",
-      allowed_booking_types: ["fastlan", "rammetid"],
-      openingHours: WEEKDAYS.map((day, index) => ({
-        dayOfWeek: index as 0 | 1 | 2 | 3 | 4 | 5 | 6,
-        opens: "08:00",
-        closes: "22:00",
-      })) as OpeningHours[],
-      season: { from: "2025-01-01", to: "2025-12-31" },
-    },
-    {
-      id: 5,
-      name: "Drammensbadet - Svømmehall",
-      address: "Ormåsen 1, 3048 Drammen",
-      type: "Svømmehall",
-      status: "inactive" as const,
-      capacity: 250,
-      nextAvailable: "Søndag, 12:00",
-      allowed_booking_types: ["engangs", "strotimer"],
-      openingHours: WEEKDAYS.map((day, index) => ({
-        dayOfWeek: index as 0 | 1 | 2 | 3 | 4 | 5 | 6,
-        opens: "08:00",
-        closes: "22:00",
-      })) as OpeningHours[],
-      season: { from: "2025-01-01", to: "2025-12-31" },
-    },
-    {
-      id: 6,
-      name: "Åssiden Fotballhall",
-      address: "Buskerudveien 54, 3024 Drammen",
-      type: "Fotballhall",
-      status: "active" as const,
-      capacity: 300,
-      nextAvailable: "Lørdag, 18:30",
-      allowed_booking_types: ["engangs", "fastlan", "rammetid", "strotimer"],
-      openingHours: WEEKDAYS.map((day, index) => ({
-        dayOfWeek: index as 0 | 1 | 2 | 3 | 4 | 5 | 6,
-        opens: "08:00",
-        closes: "22:00",
-      })) as OpeningHours[],
-      season: { from: "2025-01-01", to: "2025-12-31" },
-    },
-    {
-      id: 7,
-      name: "Drammen Bibliotek - Møterom",
-      address: "Grønland 32, 3045 Drammen",
-      type: "Møterom",
-      status: "active" as const,
-      capacity: 40,
-      nextAvailable: "I morgen, 14:00",
-      allowed_booking_types: ["engangs"],
-      openingHours: WEEKDAYS.map((day, index) => ({
-        dayOfWeek: index as 0 | 1 | 2 | 3 | 4 | 5 | 6,
-        opens: "08:00",
-        closes: "22:00",
-      })) as OpeningHours[],
-      season: { from: "2025-01-01", to: "2025-12-31" },
-    },
-  ];
-
-  const [facilities, setFacilities] = useState<Facility[]>(() => 
-    mockFacilitiesBase.map(createMockFacility)
-  );
-
-  // Mock loading and error states
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  // Use the real facility admin hook instead of mock data
+  const {
+    facilities,
+    isLoading,
+    error,
+    filters,
+    fetchFacilities,
+    setSearchFilter,
+    setStatusFilter,
+    setCategoryFilter,
+  } = useFacilityAdmin();
 
   // Local display mode
   const [displayMode, setDisplayMode] = React.useState<DisplayMode>('list');
 
-  // Local search/filter state
-  const [searchTerm, setSearchTerm] = React.useState("");
-  const [filterType, setFilterType] = React.useState("all");
-  const [filterStatus, setFilterStatus] = React.useState("all");
+  // Load facilities on component mount
+  useEffect(() => {
+    fetchFacilities();
+  }, []);
 
-  // Filter facilities locally
-  const filteredFacilities = facilities.filter(facility => {
-    const matchesSearch = !searchTerm || 
-                         facility.name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                         facility.address?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesType = filterType === "all" || facility.type === filterType;
-    const matchesStatus = filterStatus === "all" || facility.status === filterStatus;
-    return matchesSearch && matchesType && matchesStatus;
-  });
+  // Transform facilities to ensure they have proper images using FacilityDataUtils
+  const transformedFacilities = React.useMemo(() => {
+    return facilities.map(facility => ({
+      ...facility,
+      image: FacilityDataUtils.getImageUrl(facility.images),
+      address: FacilityDataUtils.computeAddress(facility),
+      openingHours: FacilityDataUtils.transformOpeningHours(facility.opening_hours),
+      zones: FacilityDataUtils.transformZones(facility.zones),
+      // Ensure these properties exist with defaults
+      nextAvailable: facility.next_available || 'Available now',
+      accessibility: facility.accessibility_features || [],
+      suitableFor: facility.suitable_for || [],
+      equipment: facility.equipment || [],
+      availableTimes: facility.available_times || []
+    }));
+  }, [facilities]);
+
+  // Filter facilities based on current filters
+  const filteredFacilities = React.useMemo(() => {
+    return transformedFacilities.filter(facility => {
+      const matchesSearch = !filters.search || 
+                           facility.name?.toLowerCase().includes(filters.search.toLowerCase()) || 
+                           facility.address?.toLowerCase().includes(filters.search.toLowerCase());
+      const matchesStatus = filters.status === 'all' || !filters.status || facility.status === filters.status;
+      const matchesCategory = filters.category === 'all' || !filters.category || facility.type === filters.category;
+      return matchesSearch && matchesStatus && matchesCategory;
+    });
+  }, [transformedFacilities, filters]);
 
   const handleAddNew = () => {
     navigate('/admin/facilities/new');
@@ -291,29 +124,34 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
 
   const filterOptions = [
     {
-      id: 'type',
-      label: tSync("admin.facilities.filters.type", "Type"),
-      value: filterType,
-      onChange: (val: string) => {
-        setFilterType(val);
-      },
-      options: [
-        { value: 'all', label: tSync("admin.facilities.filters.allTypes", "All Types") },
-        { value: 'sports', label: tSync("admin.facilities.filters.sports", "Sports") },
-        { value: 'meeting', label: tSync("admin.facilities.filters.meeting", "Meeting") }
-      ]
-    },
-    {
       id: 'status',
       label: tSync("admin.facilities.filters.status", "Status"),
-      value: filterStatus,
+      value: filters.status || 'all',
       onChange: (val: string) => {
-        setFilterStatus(val);
+        setStatusFilter(val === 'all' ? undefined : val);
       },
       options: [
         { value: 'all', label: tSync("admin.facilities.filters.allStatuses", "All Status") },
         { value: 'active', label: tSync("admin.facilities.status.active", "Active") },
-        { value: 'inactive', label: tSync("admin.facilities.status.inactive", "Inactive") }
+        { value: 'inactive', label: tSync("admin.facilities.status.inactive", "Inactive") },
+        { value: 'maintenance', label: tSync("admin.facilities.status.maintenance", "Maintenance") }
+      ]
+    },
+    {
+      id: 'category',
+      label: tSync("admin.facilities.filters.type", "Type"),
+      value: filters.category || 'all',
+      onChange: (val: string) => {
+        setCategoryFilter(val === 'all' ? undefined : val);
+      },
+      options: [
+        { value: 'all', label: tSync("admin.facilities.filters.allTypes", "All Types") },
+        { value: 'Gymsal', label: 'Gymsal' },
+        { value: 'Aktivitetshall', label: 'Aktivitetshall' },
+        { value: 'Auditorium', label: 'Auditorium' },
+        { value: 'Møterom', label: 'Møterom' },
+        { value: 'Svømmehall', label: 'Svømmehall' },
+        { value: 'Fotballhall', label: 'Fotballhall' }
       ]
     }
   ];
@@ -394,8 +232,8 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
       <Card>
         <CardHeader>
         <FiltersBar
-          searchTerm={searchTerm}
-          onSearchChange={setSearchTerm}
+          searchTerm={filters.search || ''}
+          onSearchChange={setSearchFilter}
           searchPlaceholder={tSync("admin.facilities.search.placeholder", "Search facilities...")}
           selectFilters={filterOptions}
           className="flex-1"
@@ -415,4 +253,3 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
     </div>
   );
 };
-

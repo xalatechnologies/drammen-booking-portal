@@ -131,7 +131,8 @@ export const FacilityImageGallery: React.FC<FacilityImageGalleryProps> = ({ faci
                   className="w-full h-48 object-cover"
                   onError={(e) => {
                     console.error('Image failed to load:', image.image_url);
-                    e.currentTarget.src = 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&auto=format&fit=crop';
+                    // Use a fallback image from the local bilder directory
+                    e.currentTarget.src = FacilityDataUtils.getFallbackImageUrl(0);
                   }}
                 />
                 {image.is_featured && (
