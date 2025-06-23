@@ -1,514 +1,353 @@
-import React, { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { PageHeader } from "@/components/layouts";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Plus, Search, AlertTriangle, Save, FileText, MessageSquare, Info } from "lucide-react";
-import { useTranslation } from "@/i18n/hooks/useTranslation";
-import { toast } from "sonner";
-import { Checkbox } from "@/components/ui/checkbox";
 
-let mockApplications = [
-  { 
-    id: 'APP-001', 
-    type: 'Fastlån', 
-    location: 'Drammenshallen', 
-    time: 'Tirsdager 18:00 - 20:00 (Høst 2024)',
-    applicant: 'Drammen IF',
-    status: 'Godkjent',
-    purpose: 'Trening for G16-laget.',
-    submittedDate: '2024-06-01',
-    communicationLog: [
-      { from: 'Saksbehandler', message: 'Søknaden er mottatt og vil bli behandlet.', timestamp: '2024-06-01 14:30' },
-      { from: 'Ola Nordmann', message: 'Takk for bekreftelsen!', timestamp: '2024-06-01 15:00' },
-      { from: 'Saksbehandler', message: 'Søknaden er godkjent. Lykke til med sesongen!', timestamp: '2024-06-10 10:00' },
-    ]
+import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Calendar, MapPin, Clock, Users, FileText, Search, Filter, Eye, MessageSquare } from 'lucide-react';
+import { useTranslation } from '@/i18n/hooks/useTranslation';
+
+interface Application {
+  id: string;
+  facility: string;
+  date: string;
+  time: string;
+  duration: string;
+  status: 'pending' | 'approved' | 'rejected' | 'under-review';
+  type: 'engangs' | 'fastlan' | 'rammetid';
+  participants: number;
+  purpose: string;
+  submittedDate: string;
+  priority: 'normal' | 'high' | 'urgent';
+  location: string;
+  contact: string;
+  notes?: string;
+  estimatedCost: number;
+  isPaid: boolean;
+  hasSpecialRequirements: boolean;
+}
+
+const mockApplications: Application[] = [
+  {
+    id: 'APP-2025-001',
+    facility: 'Brandengen Skole - Gymsal',
+    date: '2025-07-15',
+    time: '18:00',
+    duration: '2 timer',
+    status: 'pending',
+    type: 'engangs',
+    participants: 25,
+    purpose: 'Fotballtrening',
+    submittedDate: '2025-06-20',
+    priority: 'normal',
+    location: 'Drammen',
+    contact: 'Lars Hansen',
+    estimatedCost: 800,
+    isPaid: false,
+    hasSpecialRequirements: false,
   },
-  { 
-    id: 'APP-002', 
-    type: 'Engangslån', 
-    location: 'Åssidenhallen', 
-    time: '2024-11-20, 10:00 - 16:00',
-    applicant: 'Privatperson',
-    status: 'Under behandling',
-    purpose: 'Bursdagsfeiring for 10-åring.',
-    submittedDate: '2024-10-15',
-    communicationLog: [
-        { from: 'Saksbehandler', message: 'Søknaden er mottatt.', timestamp: '2024-10-15 11:00' },
-    ]
+  {
+    id: 'APP-2025-002',
+    facility: 'Åssiden Fotballhall',
+    date: '2025-07-22',
+    time: '20:00',
+    duration: '1.5 timer',
+    status: 'approved',
+    type: 'fastlan',
+    participants: 40,
+    purpose: 'Kamper og turneringer',
+    submittedDate: '2025-06-18',
+    priority: 'high',
+    location: 'Drammen',
+    contact: 'Maria Andersen',
+    notes: 'Trenger ekstra utstyr for lyd',
+    estimatedCost: 1200,
+    isPaid: true,
+    hasSpecialRequirements: true,
   },
-  { 
-    id: 'APP-003', 
-    type: 'Engangslån', 
-    location: 'Konnerudhallen', 
-    time: '2024-12-05, 19:00 - 21:00',
-    applicant: 'Konnerud IL',
-    status: 'Avslått',
-    purpose: 'Ekstratrening før cup.',
-    submittedDate: '2024-10-12',
-    communicationLog: [
-      { from: 'Saksbehandler', message: 'Søknad mottatt.', timestamp: '2024-10-12 09:00' },
-      { from: 'Saksbehandler', message: 'Beklager, hallen er allerede booket for et annet arrangement denne dagen.', timestamp: '2024-10-14 13:00' },
-    ]
+  {
+    id: 'APP-2025-003',
+    facility: 'Gulskogen Skole - Auditorium',
+    date: '2025-08-05',
+    time: '19:00',
+    duration: '3 timer',
+    status: 'under-review',
+    type: 'engangs',
+    participants: 80,
+    purpose: 'Årsmøte og presentasjon',
+    submittedDate: '2025-06-22',
+    priority: 'normal',
+    location: 'Drammen',
+    contact: 'Erik Solberg',
+    estimatedCost: 950,
+    isPaid: false,
+    hasSpecialRequirements: false,
   },
-  { 
-    id: 'APP-004', 
-    type: 'Fastlån', 
-    location: 'Brandengen Skole - Gymsal', 
-    time: 'Mandager 17:00 - 18:00 (Vår 2025)',
-    applicant: 'Brandengen SFO',
-    status: 'Mellomlagret',
-    purpose: 'Aktivitet for 3. trinn.',
-    submittedDate: '2024-10-20',
-    communicationLog: []
+  {
+    id: 'APP-2025-004',
+    facility: 'Drammensbadet - Svømmehall',
+    date: '2025-07-30',
+    time: '17:00',
+    duration: '2 timer',
+    status: 'rejected',
+    type: 'rammetid',
+    participants: 15,
+    purpose: 'Svømmetrening for barn',
+    submittedDate: '2025-06-19',
+    priority: 'normal',
+    location: 'Drammen',
+    contact: 'Anne Knutsen',
+    notes: 'Avvist på grunn av overlapping med vedlikehold',
+    estimatedCost: 600,
+    isPaid: false,
+    hasSpecialRequirements: false,
   },
 ];
 
-const submitNewApplication = async (newApplication: any) => {
-    console.log("Submitting to mock API:", newApplication);
-    await new Promise(resolve => setTimeout(resolve, 500));
-    mockApplications.unshift(newApplication);
-    return newApplication;
-};
-
-const initialNewApplicationState = {
-    facilityName: '',
-    applicantName: '',
-    department: '',
-    description: '',
-    resourceType: '', // Engangslån vs Fastlån
-    priority: '',
-    additionalNotes: '',
-    // Time-specific fields
-    date: new Date().toISOString().slice(0, 10),
-    startTime: '17:00',
-    endTime: '18:00',
-    recurringDays: [] as string[],
-    recurringPeriod: '',
-};
-
 const ApplicationsPage = () => {
   const { t } = useTranslation();
-  const queryClient = useQueryClient();
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterStatus, setFilterStatus] = useState("all");
-  const [filterType, setFilterType] = useState("all");
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [typeFilter, setTypeFilter] = useState('all');
+  const [selectedTab, setSelectedTab] = useState('all');
 
-  const [dialogState, setDialogState] = useState({
-      withdraw: false,
-      newApplication: false,
-      view: false,
-  });
-  const [selectedApplication, setSelectedApplication] = useState<any>(null);
-
-  const [newApplicationData, setNewApplicationData] = useState(initialNewApplicationState);
-
-  const { data: applications, isLoading } = useQuery({
-    queryKey: ['user-applications', searchTerm, filterStatus, filterType],
-    queryFn: () => {
-      return mockApplications.filter(app => {
-        const matchesSearch = app.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                              app.location.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesStatus = filterStatus === "all" || app.status === filterStatus;
-        const matchesType = filterType === "all" || app.type === filterType;
-        return matchesSearch && matchesStatus && matchesType;
-      });
-    },
-  });
-
-  const newApplicationMutation = useMutation({
-    mutationFn: submitNewApplication,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['user-applications'] });
-      toast.success("Søknaden ble sendt!");
-      closeDialog('newApplication');
-    },
-    onError: () => {
-        toast.error("Noe gikk galt under innsending.");
-    }
-  });
-
-  const handleNewApplicationInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { id, value } = e.target;
-    setNewApplicationData(prev => ({ ...prev, [id]: value }));
-  };
-
-  const handleNewApplicationSelectChange = (id: string, value: string) => {
-    setNewApplicationData(prev => ({ ...prev, [id]: value }));
-  };
-
-  const handleDayToggle = (day: string) => {
-    setNewApplicationData(prev => ({
-        ...prev,
-        recurringDays: prev.recurringDays.includes(day)
-            ? prev.recurringDays.filter(d => d !== day)
-            : [...prev.recurringDays, day]
-    }));
-  };
-
-  const handleNewApplicationSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    let timeString = '';
-    if (newApplicationData.resourceType === 'Fastlån') {
-        const weekdays = t('user.newApplication.weekdays', { returnObjects: true });
-        const selectedDays = newApplicationData.recurringDays.map(d => weekdays[d]).join(', ');
-        const period = t('user.newApplication.periods', { returnObjects: true })[newApplicationData.recurringPeriod];
-        timeString = `${selectedDays} ${newApplicationData.startTime} - ${newApplicationData.endTime} (${period})`;
-    } else {
-        timeString = `${newApplicationData.date}, ${newApplicationData.startTime} - ${newApplicationData.endTime}`;
-    }
-    
-    const newApp = {
-        id: `APP-${String(Math.floor(Math.random() * 900) + 100)}`,
-        type: newApplicationData.resourceType,
-        location: newApplicationData.facilityName,
-        time: timeString,
-        applicant: newApplicationData.applicantName || 'Privatperson',
-        status: t('user.applications.status.pending'),
-        purpose: newApplicationData.description,
-        submittedDate: new Date().toISOString().slice(0, 10),
-        communicationLog: []
-    };
-    newApplicationMutation.mutate(newApp);
-  };
-
-  const handleConfirmWithdraw = () => {
-    console.log("Withdrawing application:", selectedApplication.id);
-    closeDialog('withdraw');
-  };
-
-  const getStatusBadge = (status: string) => {
-    // @ts-ignore
-    const statusKey = Object.keys(t('user.applications.status', { returnObjects: true })).find(key => t(`user.applications.status.${key}`) === status);
-    switch (statusKey) {
-        case 'approved': return <Badge variant="default" className="bg-green-600">{status}</Badge>;
-        case 'pending': return <Badge variant="secondary">{status}</Badge>;
-        case 'rejected': return <Badge variant="destructive">{status}</Badge>;
-        case 'withdrawn': return <Badge variant="outline">{status}</Badge>;
-        case 'draft': return <Badge variant="outline" className="border-dashed">{status}</Badge>;
-        default: return <Badge>{status}</Badge>;
+  const getStatusColor = (status: Application['status']) => {
+    switch (status) {
+      case 'approved':
+        return 'bg-green-100 text-green-800';
+      case 'rejected':
+        return 'bg-red-100 text-red-800';
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'under-review':
+        return 'bg-blue-100 text-blue-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
     }
   };
 
-  const openDialog = (type: 'withdraw' | 'newApplication' | 'view', application?: any) => {
-      if (application) setSelectedApplication(application);
-      setDialogState(prev => ({ ...prev, [type]: true }));
+  const getPriorityColor = (priority: Application['priority']) => {
+    switch (priority) {
+      case 'urgent':
+        return 'bg-red-100 text-red-800';
+      case 'high':
+        return 'bg-orange-100 text-orange-800';
+      case 'normal':
+        return 'bg-gray-100 text-gray-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
   };
 
-  const closeDialog = (type: 'withdraw' | 'newApplication' | 'view') => {
-      setDialogState(prev => ({ ...prev, [type]: false }));
-      setSelectedApplication(null);
+  const filteredApplications = mockApplications.filter(app => {
+    const matchesSearch = searchTerm === '' || 
+      app.facility.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      app.purpose.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      app.id.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesStatus = statusFilter === 'all' || app.status === statusFilter;
+    const matchesType = typeFilter === 'all' || app.type === typeFilter;
+    const matchesTab = selectedTab === 'all' || app.status === selectedTab;
+
+    return matchesSearch && matchesStatus && matchesType && matchesTab;
+  });
+
+  const getTabCount = (status: string) => {
+    if (status === 'all') return mockApplications.length;
+    return mockApplications.filter(app => app.status === status).length;
   };
 
   return (
-    <div className="space-y-8">
-      <PageHeader 
-        title={t('user.applications.title')}
-        description={t('user.applications.description')}
-        actions={
-          <Button onClick={() => openDialog('newApplication')}>
-            <Plus className="mr-2 h-4 w-4" />
-            {t('user.applications.newApplication')}
-          </Button>
-        }
-      />
-      
+    <div className="space-y-6">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">
+            {t('user.applications.title', {}, 'Mine søknader')}
+          </h1>
+          <p className="text-gray-600 mt-1">
+            {t('user.applications.subtitle', {}, 'Oversikt over alle dine anleggssøknader')}
+          </p>
+        </div>
+        <Button>
+          <FileText className="h-4 w-4 mr-2" />
+          {t('user.applications.newApplication', {}, 'Ny søknad')}
+        </Button>
+      </div>
+
+      {/* Filters */}
       <Card>
-        <CardHeader>
-          <CardTitle>{t('user.applications.allApplications')}</CardTitle>
-          <CardDescription>{t('user.applications.allApplicationsDescription')}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="mb-6 flex flex-col sm:flex-row gap-4">
-            <div className="relative w-full max-w-sm">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
-                <Input
-                placeholder={t('user.applications.searchPlaceholder')}
+        <CardContent className="pt-6">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Input
+                placeholder={t('user.applications.search', {}, 'Søk i søknader...')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
-                />
+              />
             </div>
-            <Select value={filterStatus} onValueChange={setFilterStatus}>
-              <SelectTrigger className="w-full sm:w-[180px]">
-                <SelectValue placeholder={t('user.applications.filterStatus')} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">{t('user.applications.status.all')}</SelectItem>
-                <SelectItem value={t('user.applications.status.pending')}>{t('user.applications.status.pending')}</SelectItem>
-                <SelectItem value={t('user.applications.status.approved')}>{t('user.applications.status.approved')}</SelectItem>
-                <SelectItem value={t('user.applications.status.rejected')}>{t('user.applications.status.rejected')}</SelectItem>
-                <SelectItem value={t('user.applications.status.withdrawn')}>{t('user.applications.status.withdrawn')}</SelectItem>
-                 <SelectItem value={t('user.applications.status.draft')}>{t('user.applications.status.draft')}</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={filterType} onValueChange={setFilterType}>
-              <SelectTrigger className="w-full sm:w-[180px]">
-                <SelectValue placeholder={t('user.applications.filterType')} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">{t('user.applications.types.all')}</SelectItem>
-                <SelectItem value={t('user.applications.types.oneTime')}>{t('user.applications.types.oneTime')}</SelectItem>
-                <SelectItem value={t('user.applications.types.fixed')}>{t('user.applications.types.fixed')}</SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="flex gap-2">
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-[150px]">
+                  <Filter className="h-4 w-4 mr-2" />
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{t('common.all', {}, 'Alle')}</SelectItem>
+                  <SelectItem value="pending">{t('booking.status.pending', {}, 'Venter')}</SelectItem>
+                  <SelectItem value="approved">{t('booking.status.approved', {}, 'Godkjent')}</SelectItem>
+                  <SelectItem value="rejected">{t('booking.status.rejected', {}, 'Avvist')}</SelectItem>
+                  <SelectItem value="under-review">{t('booking.status.underReview', {}, 'Under vurdering')}</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={typeFilter} onValueChange={setTypeFilter}>
+                <SelectTrigger className="w-[150px]">
+                  <SelectValue placeholder="Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{t('common.all', {}, 'Alle')}</SelectItem>
+                  <SelectItem value="engangs">{t('booking.types.engangs', {}, 'Engangs')}</SelectItem>
+                  <SelectItem value="fastlan">{t('booking.types.fastlan', {}, 'Fast leie')}</SelectItem>
+                  <SelectItem value="rammetid">{t('booking.types.rammetid', {}, 'Rammetid')}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
-
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>{t('user.applications.table.id')}</TableHead>
-                  <TableHead>{t('user.applications.table.locationTime')}</TableHead>
-                  <TableHead>{t('user.applications.table.applicant')}</TableHead>
-                  <TableHead>{t('user.applications.table.status')}</TableHead>
-                  <TableHead className="text-right">{t('user.applications.table.actions')}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {isLoading ? (
-                  <TableRow><TableCell colSpan={5} className="text-center">{t('user.applications.loading')}</TableCell></TableRow>
-                ) : applications && applications.length > 0 ? (
-                  applications.map(app => (
-                    <TableRow key={app.id}>
-                      <TableCell className="font-medium">{app.id}</TableCell>
-                      <TableCell>
-                        <div className="font-semibold">{app.location}</div>
-                        <div className="text-sm text-gray-500">{app.time}</div>
-                        <div className="text-xs text-gray-400">{t('user.applications.types.fixed') === app.type ? t('user.applications.types.fixed') : t('user.applications.types.oneTime')}</div>
-                      </TableCell>
-                      <TableCell>{app.applicant}</TableCell>
-                      <TableCell>{getStatusBadge(app.status)}</TableCell>
-                      <TableCell className="text-right">
-                          <Button variant="ghost" size="sm" onClick={() => openDialog('view', app)}>
-                            {t('user.applications.viewApplication')}
-                          </Button>
-                          {app.status === t('user.applications.status.pending') && (
-                            <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-700" onClick={() => openDialog('withdraw', app)}>
-                              {t('user.applications.withdraw')}
-                            </Button>
-                          )}
-                      </TableCell>
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow><TableCell colSpan={5} className="text-center">{t('user.applications.noApplications')}</TableCell></TableRow>
-                )}
-              </TableBody>
-            </Table>
         </CardContent>
       </Card>
-      
-      {/* Withdraw Application Dialog */}
-      <Dialog open={dialogState.withdraw} onOpenChange={() => closeDialog('withdraw')}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle className="flex items-center">
-              <AlertTriangle className="mr-2 text-yellow-500" />
-              {t('user.applications.withdrawDialog.title')}
-            </DialogTitle>
-            <DialogDescription>
-              {t('user.applications.withdrawDialog.description', { facilityName: selectedApplication?.location })}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-2 py-4">
-            <Label htmlFor="withdraw-reason">{t('user.applications.withdrawDialog.reasonLabel')}</Label>
-            <Textarea id="withdraw-reason" placeholder={t('user.applications.withdrawDialog.reasonPlaceholder')} />
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => closeDialog('withdraw')}>{t('user.applications.withdrawDialog.cancel')}</Button>
-            <Button variant="destructive" onClick={handleConfirmWithdraw}>{t('user.applications.withdrawDialog.confirm')}</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-      
-      {/* New Application Dialog */}
-      <Dialog open={dialogState.newApplication} onOpenChange={() => closeDialog('newApplication')}>
-        <DialogContent className="sm:max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>{t('user.newApplication.title')}</DialogTitle>
-            <DialogDescription>{t('user.newApplication.description')}</DialogDescription>
-          </DialogHeader>
-          <form onSubmit={handleNewApplicationSubmit} className="space-y-6 py-4 max-h-[80vh] overflow-y-auto pr-6">
-            <div className="space-y-4">
-               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                      <Label htmlFor="facilityName">{t('user.newApplication.facilityName')}</Label>
-                      <Input id="facilityName" placeholder={t('user.newApplication.facilityNamePlaceholder')} value={newApplicationData.facilityName} onChange={handleNewApplicationInputChange} required/>
-                  </div>
-                  <div>
-                      <Label htmlFor="applicantName">{t('user.newApplication.applicantName')}</Label>
-                      <Input id="applicantName" placeholder={t('user.newApplication.applicantNamePlaceholder')} value={newApplicationData.applicantName} onChange={handleNewApplicationInputChange} />
-                  </div>
-               </div>
-               <div>
-                   <Label htmlFor="department">{t('user.newApplication.department')}</Label>
-                   <Input id="department" placeholder={t('user.newApplication.departmentPlaceholder')} value={newApplicationData.department} onChange={handleNewApplicationInputChange} />
-               </div>
-               <div>
-                   <Label htmlFor="description">{t('user.newApplication.descriptionLabel')}</Label>
-                   <Textarea id="description" placeholder={t('user.newApplication.descriptionPlaceholder')} value={newApplicationData.description} onChange={handleNewApplicationInputChange} required/>
-               </div>
-            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <Label htmlFor="resourceType">{t('user.newApplication.resourceType')}</Label>
-                    <Select onValueChange={(value) => handleNewApplicationSelectChange('resourceType', value)} required>
-                        <SelectTrigger><SelectValue placeholder={t('user.newApplication.resourceTypePlaceholder')} /></SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="Engangslån">{t('user.applications.types.oneTime')}</SelectItem>
-                            <SelectItem value="Fastlån">{t('user.applications.types.fixed')}</SelectItem>
-                        </SelectContent>
-                    </Select>
-                </div>
-                <div>
-                    <Label htmlFor="priority">{t('user.newApplication.priority')}</Label>
-                    <Select onValueChange={(value) => handleNewApplicationSelectChange('priority', value)}>
-                        <SelectTrigger><SelectValue placeholder={t('user.newApplication.priorityPlaceholder')} /></SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="Høy">{t('user.newApplication.priorities.high')}</SelectItem>
-                            <SelectItem value="Middels">{t('user.newApplication.priorities.medium')}</SelectItem>
-                            <SelectItem value="Lav">{t('user.newApplication.priorities.low')}</SelectItem>
-                        </SelectContent>
-                    </Select>
-                </div>
-            </div>
-            
-            <div>
-                <Label htmlFor="additionalNotes">{t('user.newApplication.additionalNotes')}</Label>
-                <Textarea id="additionalNotes" placeholder={t('user.newApplication.additionalNotesPlaceholder')} value={newApplicationData.additionalNotes} onChange={handleNewApplicationInputChange} />
-            </div>
+      {/* Tabs */}
+      <Tabs value={selectedTab} onValueChange={setSelectedTab}>
+        <TabsList className="grid w-full grid-cols-5">
+          <TabsTrigger value="all">
+            {t('common.all', {}, 'Alle')} ({getTabCount('all')})
+          </TabsTrigger>
+          <TabsTrigger value="pending">
+            {t('booking.status.pending', {}, 'Venter')} ({getTabCount('pending')})
+          </TabsTrigger>
+          <TabsTrigger value="approved">
+            {t('booking.status.approved', {}, 'Godkjent')} ({getTabCount('approved')})
+          </TabsTrigger>
+          <TabsTrigger value="under-review">
+            {t('booking.status.underReview', {}, 'Under vurdering')} ({getTabCount('under-review')})
+          </TabsTrigger>
+          <TabsTrigger value="rejected">
+            {t('booking.status.rejected', {}, 'Avvist')} ({getTabCount('rejected')})
+          </TabsTrigger>
+        </TabsList>
 
-            {/* Time Selection Section */}
-            {newApplicationData.resourceType && (
-                <div className="space-y-4 pt-4 border-t">
-                    <h3 className="text-lg font-semibold">{t('user.newApplication.timeSelectionTitle')}</h3>
-                    {newApplicationData.resourceType === 'Engangslån' && (
-                         <div>
-                            <Label htmlFor="date">{t('user.newApplication.oneTimeDate')}</Label>
-                            <Input type="date" id="date" value={newApplicationData.date} onChange={handleNewApplicationInputChange} required />
+        <TabsContent value={selectedTab} className="space-y-4">
+          {filteredApplications.length === 0 ? (
+            <Card>
+              <CardContent className="text-center py-12">
+                <FileText className="h-12 w-12 mx-auto text-gray-300 mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                  {t('user.applications.noApplications', {}, 'Ingen søknader funnet')}
+                </h3>
+                <p className="text-gray-500">
+                  {t('user.applications.noApplicationsDescription', {}, 'Du har ingen søknader som matcher de valgte filtrene.')}
+                </p>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="grid gap-4">
+              {filteredApplications.map((application) => (
+                <Card key={application.id} className="hover:shadow-lg transition-shadow">
+                  <CardContent className="p-6">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-3">
+                          <h3 className="text-lg font-semibold text-gray-900">
+                            {application.facility}
+                          </h3>
+                          <Badge className={getStatusColor(application.status)}>
+                            {t(`booking.status.${application.status}`, {}, application.status)}
+                          </Badge>
+                          <Badge className={getPriorityColor(application.priority)}>
+                            {t(`booking.priority.${application.priority}`, {}, application.priority)}
+                          </Badge>
+                          <Badge variant="outline">
+                            {t(`booking.types.${application.type}`, {}, application.type)}
+                          </Badge>
                         </div>
-                    )}
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <Label htmlFor="startTime">{t('user.newApplication.startTime')}</Label>
-                            <Input type="time" id="startTime" value={newApplicationData.startTime} onChange={handleNewApplicationInputChange} required />
+
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-gray-600">
+                          <div className="flex items-center gap-2">
+                            <Calendar className="h-4 w-4" />
+                            <span>{application.date}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Clock className="h-4 w-4" />
+                            <span>{application.time} ({application.duration})</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Users className="h-4 w-4" />
+                            <span>{application.participants} personer</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <MapPin className="h-4 w-4" />
+                            <span>{application.location}</span>
+                          </div>
                         </div>
-                        <div>
-                            <Label htmlFor="endTime">{t('user.newApplication.endTime')}</Label>
-                            <Input type="time" id="endTime" value={newApplicationData.endTime} onChange={handleNewApplicationInputChange} required />
+
+                        <div className="mt-3">
+                          <p className="text-sm text-gray-600">
+                            <span className="font-medium">{t('user.applications.purpose', {}, 'Formål')}:</span> {application.purpose}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            <span className="font-medium">{t('user.applications.contact', {}, 'Kontakt')}:</span> {application.contact}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            <span className="font-medium">{t('user.applications.submitted', {}, 'Innsendt')}:</span> {application.submittedDate}
+                          </p>
+                          {application.notes && (
+                            <p className="text-sm text-gray-600 mt-2">
+                              <span className="font-medium">{t('user.applications.notes', {}, 'Notater')}:</span> {application.notes}
+                            </p>
+                          )}
                         </div>
+
+                        <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-200">
+                          <div className="flex items-center gap-4 text-sm">
+                            <span className="font-medium text-gray-900">
+                              {application.estimatedCost} NOK
+                            </span>
+                            <Badge variant={application.isPaid ? 'default' : 'secondary'}>
+                              {application.isPaid ? t('user.applications.paid', {}, 'Betalt') : t('user.applications.unpaid', {}, 'Ikke betalt')}
+                            </Badge>
+                            {application.hasSpecialRequirements && (
+                              <Badge variant="outline">
+                                {t('user.applications.specialRequirements', {}, 'Spesielle krav')}
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex gap-2 ml-4">
+                        <Button variant="outline" size="sm">
+                          <Eye className="h-4 w-4 mr-2" />
+                          {t('common.view', {}, 'Se')}
+                        </Button>
+                        <Button variant="outline" size="sm">
+                          <MessageSquare className="h-4 w-4 mr-2" />
+                          {t('common.messages', {}, 'Meldinger')}
+                        </Button>
+                      </div>
                     </div>
-                    {newApplicationData.resourceType === 'Fastlån' && (
-                        <div className="space-y-4">
-                            <div>
-                                <Label>{t('user.newApplication.recurringDays')}</Label>
-                                <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 pt-2">
-                                    {/* @ts-ignore */}
-                                    {Object.entries(t('user.newApplication.weekdays', { returnObjects: true })).map(([key, value]) => (
-                                        <div key={key} className="flex items-center space-x-2">
-                                            <Checkbox id={key} onCheckedChange={() => handleDayToggle(key)} checked={newApplicationData.recurringDays.includes(key)} />
-                                            <Label htmlFor={key} className="font-normal">{value as string}</Label>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                            <div>
-                                <Label htmlFor="recurringPeriod">{t('user.newApplication.recurringPeriod')}</Label>
-                                <Select onValueChange={(value) => handleNewApplicationSelectChange('recurringPeriod', value)} required>
-                                    <SelectTrigger><SelectValue placeholder={t('user.newApplication.recurringPeriod')} /></SelectTrigger>
-                                    <SelectContent>
-                                         {/* @ts-ignore */}
-                                         {Object.entries(t('user.newApplication.periods', { returnObjects: true })).map(([key, value]) => (
-                                            <SelectItem key={key} value={key}>{value as string}</SelectItem>
-                                         ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                        </div>
-                    )}
-                </div>
-            )}
-            
-            <DialogFooter className="pt-4">
-              <Button type="button" variant="outline" onClick={() => closeDialog('newApplication')}>{t('user.applications.withdrawDialog.cancel')}</Button>
-              <Button type="submit" disabled={newApplicationMutation.isPending || !newApplicationData.resourceType}>
-                {newApplicationMutation.isPending ? "Sender..." : <Save className="w-4 h-4 mr-2" />}
-                {t('user.newApplication.submit')}
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
-
-      {/* View Application Dialog */}
-      <Dialog open={dialogState.view} onOpenChange={() => closeDialog('view')}>
-        <DialogContent className="sm:max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>{t('user.applications.viewDialog.title')}: {selectedApplication?.id}</DialogTitle>
-          </DialogHeader>
-          {selectedApplication && (
-            <Tabs defaultValue="details" className="w-full pt-4">
-              <TabsList>
-                <TabsTrigger value="details"><Info className="mr-2 h-4 w-4" />{t('user.applications.viewDialog.detailsTab')}</TabsTrigger>
-                <TabsTrigger value="communication"><MessageSquare className="mr-2 h-4 w-4" />{t('user.applications.viewDialog.communicationTab')}</TabsTrigger>
-              </TabsList>
-              <TabsContent value="details" className="mt-4 space-y-4">
-                <div className="flex justify-between border-b pb-2">
-                    <span className="text-sm font-semibold text-gray-600">{t('user.applications.viewDialog.facility')}</span>
-                    <span className="font-medium">{selectedApplication.location}</span>
-                </div>
-                <div className="flex justify-between border-b pb-2">
-                    <span className="text-sm font-semibold text-gray-600">{t('user.applications.table.locationTime')}</span>
-                    <span className="font-medium">{selectedApplication.time}</span>
-                </div>
-                <div className="flex justify-between border-b pb-2">
-                    <span className="text-sm font-semibold text-gray-600">{t('user.applications.viewDialog.applicant')}</span>
-                    <span className="font-medium">{selectedApplication.applicant}</span>
-                </div>
-                <div className="flex justify-between border-b pb-2">
-                    <span className="text-sm font-semibold text-gray-600">{t('user.applications.viewDialog.purpose')}</span>
-                    <span className="font-medium">{selectedApplication.purpose}</span>
-                </div>
-                 <div className="flex justify-between items-center">
-                    <span className="text-sm font-semibold text-gray-600">{t('user.applications.viewDialog.status')}</span>
-                    {getStatusBadge(selectedApplication.status)}
-                </div>
-              </TabsContent>
-              <TabsContent value="communication" className="mt-4">
-                 {selectedApplication.communicationLog.length > 0 ? (
-                    <div className="space-y-4 max-h-64 overflow-y-auto pr-4">
-                        {selectedApplication.communicationLog.map((log: any, index: number) => (
-                            <div key={index} className={`flex flex-col ${log.from === 'Saksbehandler' ? 'items-start' : 'items-end'}`}>
-                                <div className={`rounded-lg px-4 py-2 ${log.from === 'Saksbehandler' ? 'bg-gray-100' : 'bg-blue-100'}`}>
-                                    <p className="text-sm">{log.message}</p>
-                                </div>
-                                <span className="text-xs text-gray-400 mt-1">{log.from} - {log.timestamp}</span>
-                            </div>
-                        ))}
-                    </div>
-                 ) : (
-                    <p className="text-sm text-gray-500 text-center py-8">{t('user.applications.viewDialog.noMessages')}</p>
-                 )}
-              </TabsContent>
-            </Tabs>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           )}
-          <DialogFooter>
-            <Button variant="outline" onClick={() => closeDialog('view')}>{t('user.applications.viewDialog.close')}</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
 
-export default ApplicationsPage; 
+export default ApplicationsPage;
+

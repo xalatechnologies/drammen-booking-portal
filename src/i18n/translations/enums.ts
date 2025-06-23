@@ -1,9 +1,9 @@
+
 import { Language } from '../types';
 
-// Flat structure for direct key-value enum translations
 export const enumTranslations: Record<Language, Record<string, string>> = {
   NO: {
-    // User Roles
+    // User roles
     'system-admin': 'Systemadministrator',
     'facility-manager': 'Anleggsansvarlig',
     'caseworker': 'Saksbehandler',
@@ -11,41 +11,86 @@ export const enumTranslations: Record<Language, Record<string, string>> = {
     'organization-rep': 'Organisasjonsrepresentant',
     'regular-user': 'Vanlig bruker',
 
-    // Booking Status
+    // Booking status
     'draft': 'Utkast',
-    'pending-approval': 'Venter godkjenning',
+    'pending-approval': 'Venter på godkjenning',
     'approved': 'Godkjent',
-    'confirmed': 'Bekreftet',
-    'in-progress': 'Pågår',
-    'completed': 'Fullført',
-    'cancelled': 'Avlyst',
     'rejected': 'Avvist',
-    'no-show': 'Ikke møtt',
+    'confirmed': 'Bekreftet',
+    'cancelled': 'Avlyst',
+    'completed': 'Fullført',
+    'no-show': 'Møtte ikke opp',
 
-    // Actor Types
-    'lag-foreninger': 'Lag og foreninger (frivillige)',
-    'paraply': 'Paraplyorganisasjoner',
-    'private-firma': 'Private firmaer',
+    // Facility status
+    'active': 'Aktiv',
+    'maintenance': 'Under vedlikehold',
+    'inactive': 'Inaktiv',
+
+    // Booking types
+    'engangs': 'Engangsbooking',
+    'fastlan': 'Fast leie',
+    'rammetid': 'Rammetid',
+    'strotimer': 'Strøtimer',
+
+    // Actor types
+    'lag-foreninger': 'Lag og foreninger',
+    'paraply': 'Paraplyorganisasjon',
+    'private-firma': 'Private firma',
     'kommunale-enheter': 'Kommunale enheter',
-    'private-person': 'Private personer',
+    'private-person': 'Privatperson',
 
-    // Event Types
-    'training': 'Trening',
-    'competition': 'Konkurranse',
-    'meeting': 'Møte',
-    'celebration': 'Feiring',
-    'course': 'Kurs',
-    'conference': 'Konferanse',
-    'performance': 'Forestilling',
-    'exhibition': 'Utstilling',
-    'other': 'Annet',
-
-    // Age Groups
+    // Age groups
     'children': 'Barn',
     'youth': 'Ungdom',
     'adults': 'Voksne',
     'seniors': 'Seniorer',
     'mixed': 'Blandet',
-    'family': 'Familie'
+    'family': 'Familie',
+  },
+  EN: {
+    // User roles
+    'system-admin': 'System Administrator',
+    'facility-manager': 'Facility Manager',
+    'caseworker': 'Caseworker',
+    'municipal-staff': 'Municipal Staff',
+    'organization-rep': 'Organization Representative',
+    'regular-user': 'Regular User',
+
+    // Booking status
+    'draft': 'Draft',
+    'pending-approval': 'Pending Approval',
+    'approved': 'Approved',
+    'rejected': 'Rejected',
+    'confirmed': 'Confirmed',
+    'cancelled': 'Cancelled',
+    'completed': 'Completed',
+    'no-show': 'No Show',
+
+    // Facility status
+    'active': 'Active',
+    'maintenance': 'Under Maintenance',
+    'inactive': 'Inactive',
+
+    // Booking types
+    'engangs': 'One-time Booking',
+    'fastlan': 'Regular Rental',
+    'rammetid': 'Allocated Time',
+    'strotimer': 'Drop-in Hours',
+
+    // Actor types
+    'lag-foreninger': 'Teams and Associations',
+    'paraply': 'Umbrella Organization',
+    'private-firma': 'Private Company',
+    'kommunale-enheter': 'Municipal Units',
+    'private-person': 'Private Person',
+
+    // Age groups
+    'children': 'Children',
+    'youth': 'Youth',
+    'adults': 'Adults',
+    'seniors': 'Seniors',
+    'mixed': 'Mixed',
+    'family': 'Family',
   }
 };
+

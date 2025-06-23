@@ -28,7 +28,6 @@ export const InfiniteScrollFacilities: React.FC<InfiniteScrollFacilitiesProps> =
 
   // Get all filtered facilities from mock data
   const allFilteredFacilities = useMemo(() => {
-    // Convert filters to the format expected by getFilteredMockFacilities
     const mockFilters: Parameters<typeof getFilteredMockFacilities>[0] = {
       searchTerm: filters.searchTerm,
       facilityType: filters.facilityType,
@@ -40,7 +39,6 @@ export const InfiniteScrollFacilities: React.FC<InfiniteScrollFacilitiesProps> =
       hasParking: filters.amenities?.includes('parking'),
       hasWifi: filters.amenities?.includes('wifi'),
       allowsPhotography: filters.amenities?.includes('photography'),
-      // Convert priceRange object to array if it exists
       ...(filters.priceRange ? {
         priceRange: [filters.priceRange.min, filters.priceRange.max]
       } : {})
@@ -49,22 +47,18 @@ export const InfiniteScrollFacilities: React.FC<InfiniteScrollFacilitiesProps> =
     return getFilteredMockFacilities(mockFilters);
   }, [filters]);
 
-  // Memoize the filter string to detect changes
   const filterString = useMemo(() => JSON.stringify(filters), [filters]);
 
-  // Reset when filters change
   useEffect(() => {
     console.log('InfiniteScrollFacilities - Filters changed, resetting to page 1');
     setAllFacilities([]);
     setCurrentPage(1);
   }, [filterString]);
 
-  // Load facilities based on current page
   useEffect(() => {
     const loadFacilities = async () => {
       setIsLoading(true);
       
-      // Simulate API delay
       await new Promise(resolve => setTimeout(resolve, 500));
       
       const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -78,7 +72,6 @@ export const InfiniteScrollFacilities: React.FC<InfiniteScrollFacilitiesProps> =
     loadFacilities();
   }, [currentPage, allFilteredFacilities]);
 
-  // Calculate if there are more facilities to load
   const hasMore = useMemo(() => {
     return allFacilities.length < allFilteredFacilities.length;
   }, [allFacilities, allFilteredFacilities]);
@@ -108,7 +101,6 @@ export const InfiniteScrollFacilities: React.FC<InfiniteScrollFacilitiesProps> =
     e.preventDefault();
     e.stopPropagation();
     console.log("Address clicked for facility:", facility.name);
-    // Additional logic for address click, e.g., show on map
   }, []);
 
   console.log('InfiniteScrollFacilities - Render state:', {
@@ -200,3 +192,4 @@ export const InfiniteScrollFacilities: React.FC<InfiniteScrollFacilitiesProps> =
     </div>
   );
 };
+
