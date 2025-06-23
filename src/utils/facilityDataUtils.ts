@@ -1,4 +1,3 @@
-
 import { Facility, OpeningHours, Zone, FacilityImage } from '@/types/facility';
 
 export class FacilityDataUtils {
@@ -32,7 +31,28 @@ export class FacilityDataUtils {
     
     console.log('FacilityDataUtils.getImageUrl - Selected image:', imageToUse);
     
-    const imageUrl = imageToUse?.image_url || fallbackImage;
+    if (!imageToUse?.image_url) {
+      console.log('FacilityDataUtils.getImageUrl - No image URL, using fallback');
+      return fallbackImage;
+    }
+    
+    // Handle both absolute URLs and relative paths
+    let imageUrl = imageToUse.image_url;
+    
+    // If it's a relative path starting with /bilder or /Bilder, make it absolute
+    if (imageUrl.startsWith('/bilder/') || imageUrl.startsWith('/Bilder/')) {
+      imageUrl = imageUrl; // Keep as-is, the browser will resolve it correctly
+    }
+    // If it's already an absolute URL, keep it as-is
+    else if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+      imageUrl = imageToUse.image_url;
+    }
+    // If it's some other format, use fallback
+    else if (!imageUrl.startsWith('/')) {
+      console.warn('FacilityDataUtils.getImageUrl - Unexpected image URL format:', imageUrl);
+      imageUrl = fallbackImage;
+    }
+    
     console.log('FacilityDataUtils.getImageUrl - Final image URL:', imageUrl);
     
     return imageUrl;
