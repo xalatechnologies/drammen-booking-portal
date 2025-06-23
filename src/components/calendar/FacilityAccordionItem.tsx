@@ -1,135 +1,141 @@
 
-import React from "react";
-import { AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
-import { CalendarGrid } from "../facility/tabs/CalendarGrid";
-import { FacilityHeader } from "./FacilityHeader";
-import { convertCalendarZoneToBookingZone } from "./zoneConverter";
-
-interface CalendarZone {
-  id: string;
-  name: string;
-  capacity: number;
-  pricePerHour: number;
-  description: string;
-}
-
-interface FacilityWithZones {
-  id: number;
-  name: string;
-  address: string;
-  capacity: number;
-  accessibility: string[];
-  suitableFor: string[];
-  image?: string;
-  zones: CalendarZone[];
-}
+import React from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { MapPin, Users, Clock, Calendar, Star } from 'lucide-react';
+import { Facility } from '@/types/facility';
+import { useJsonTranslation } from '@/hooks/useJsonTranslation';
 
 interface FacilityAccordionItemProps {
-  facility: FacilityWithZones;
-  currentWeekStart: Date;
-  timeSlots: string[];
-  getAvailabilityStatus: (zoneId: string, date: Date, timeSlot: string) => { status: string; conflict: any };
-  isSlotSelected: (zoneId: string, date: Date, timeSlot: string) => boolean;
-  handleSlotClick: (zoneId: string, date: Date, timeSlot: string, availability: string) => void;
-  onFacilitySelect?: (facilityId: string) => void;
+  facility: Facility;
+  onBookNow: (facility: Facility) => void;
+  isExpanded?: boolean;
+  onToggle?: () => void;
 }
 
 export const FacilityAccordionItem: React.FC<FacilityAccordionItemProps> = ({
   facility,
-  currentWeekStart,
-  timeSlots,
-  getAvailabilityStatus,
-  isSlotSelected,
-  handleSlotClick,
-  onFacilitySelect,
+  onBookNow,
+  isExpanded = false,
+  onToggle
 }) => {
-  const handleFacilityClick = () => {
-    if (onFacilitySelect) {
-      onFacilitySelect(facility.id.toString());
-    }
+  const { tSync } = useJsonTranslation();
+
+  const handleBookingClick = () => {
+    onBookNow(facility);
   };
 
-  const renderZoneContent = (zone: CalendarZone) => (
-    <div>
-      <div className="mb-6 p-6 bg-slate-100 rounded-lg border border-slate-200">
-        <h4 className="font-semibold text-xl text-gray-900 mb-3">{zone.name}</h4>
-        <div className="flex items-center gap-6 text-lg text-gray-600">
-          <span className="font-medium">{zone.capacity} personer</span>
-          <span className="font-medium">{zone.pricePerHour} kr/time</span>
-        </div>
-        <p className="text-lg text-gray-600 mt-2">{zone.description}</p>
-      </div>
-      <CalendarGrid
-        zone={convertCalendarZoneToBookingZone(zone, facility.id)}
-        currentWeekStart={currentWeekStart}
-        timeSlots={timeSlots}
-        selectedSlots={[]}
-        getAvailabilityStatus={getAvailabilityStatus}
-        isSlotSelected={isSlotSelected}
-        onSlotClick={handleSlotClick}
-      />
-    </div>
-  );
-
   return (
-    <AccordionItem value={`facility-${facility.id}`} className="border-b border-gray-200 bg-slate-50 rounded-lg mb-2">
-      <AccordionTrigger 
-        className="hover:no-underline py-6 px-6 hover:bg-slate-100"
-        onClick={handleFacilityClick}
+    <Card className={`transition-all duration-200 ${isExpanded ? 'shadow-lg' : 'shadow-sm'}`}>
+      <CardHeader 
+        className="cursor-pointer hover:bg-gray-50 transition-colors"
+        onClick={onToggle}
       >
-        <div className="flex items-center justify-between w-full pr-4">
-          <FacilityHeader facility={facility} />
-          <div className="flex gap-3">
+        <div className="flex items-center justify-between">
+          <div className="flex-1">
+            <CardTitle className="text-lg font-semibold text-gray-900 mb-2">
+              {facility.name}
+            </CardTitle>
+            <div className="flex items-center gap-4 text-sm text-gray-600">
+              <div className="flex items-center gap-1">
+                <MapPin className="h-4 w-4" />
+                <span>{facility.address}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Users className="h-4 w-4" />
+                <span>{facility.capacity} people</span>
+              </div>
+              {facility.rating && (
+                <div className="flex items-center gap-1">
+                  <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                  <span>{facility.rating}</span>
+                </div>
+              )}
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <Badge variant={facility.status === 'active' ? 'default' : 'secondary'}>
+              {facility.status}
+            </Badge>
             <Button
-              variant="outline"
-              size="default"
-              className="shrink-0 text-lg px-6 py-3"
+              size="sm"
               onClick={(e) => {
                 e.stopPropagation();
-                if (onFacilitySelect) {
-                  onFacilitySelect(facility.id.toString());
-                }
+                handleBookingClick();
               }}
+              className="whitespace-nowrap"
             >
-              Reserver nå
-            </Button>
-            <Button
-              variant="ghost"
-              size="default"
-              className="shrink-0 text-lg px-6 py-3"
-              onClick={(e) => {
-                e.stopPropagation();
-                window.location.href = `/facilities/${facility.id}`;
-              }}
-            >
-              Se detaljer
+              <Calendar className="h-4 w-4 mr-2" />
+              {tSync('facility.bookNow', 'Book Now')}
             </Button>
           </div>
         </div>
-      </AccordionTrigger>
-      
-      <AccordionContent className="pt-4 px-6 pb-6 bg-white">
-        {facility.zones.length > 1 ? (
-          <Tabs defaultValue={facility.zones[0].id}>
-            <TabsList className="grid w-full grid-cols-2 mb-8 h-14">
-              {facility.zones.map(zone => (
-                <TabsTrigger key={zone.id} value={zone.id} className="text-lg py-4">
-                  {zone.name}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-            {facility.zones.map(zone => (
-              <TabsContent key={zone.id} value={zone.id}>
-                {renderZoneContent(zone)}
-              </TabsContent>
-            ))}
-          </Tabs>
-        ) : (
-          renderZoneContent(facility.zones[0])
-        )}
-      </AccordionContent>
-    </AccordionItem>
+      </CardHeader>
+
+      {isExpanded && (
+        <CardContent className="pt-0">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <h4 className="font-medium text-gray-900 mb-2">
+                {tSync('facility.details', 'Details')}
+              </h4>
+              <div className="space-y-2 text-sm text-gray-600">
+                <div className="flex items-center gap-2">
+                  <Clock className="h-4 w-4" />
+                  <span>{tSync('facility.nextAvailable', 'Next available')}: {facility.nextAvailable}</span>
+                </div>
+                <div>
+                  <span className="font-medium">{tSync('facility.type', 'Type')}: </span>
+                  {facility.type}
+                </div>
+                <div>
+                  <span className="font-medium">{tSync('facility.pricePerHour', 'Price per hour')}: </span>
+                  {facility.pricePerHour} NOK
+                </div>
+              </div>
+            </div>
+            
+            {facility.description && (
+              <div>
+                <h4 className="font-medium text-gray-900 mb-2">
+                  {tSync('facility.description', 'Description')}
+                </h4>
+                <p className="text-sm text-gray-600">
+                  {facility.description}
+                </p>
+              </div>
+            )}
+
+            {facility.amenities && facility.amenities.length > 0 && (
+              <div className="md:col-span-2">
+                <h4 className="font-medium text-gray-900 mb-2">
+                  {tSync('facility.amenities', 'Amenities')}
+                </h4>
+                <div className="flex flex-wrap gap-2">
+                  {facility.amenities.map((amenity, index) => (
+                    <Badge key={index} variant="outline" className="text-xs">
+                      {amenity}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="mt-4 pt-4 border-t border-gray-100">
+            <Button
+              size="sm"
+              onClick={handleBookingClick}
+              className="w-full md:w-auto"
+            >
+              <Calendar className="h-4 w-4 mr-2" />
+              {tSync('facility.bookNow', 'Book Now')}
+            </Button>
+          </div>
+        </CardContent>
+      )}
+    </Card>
   );
 };
+
