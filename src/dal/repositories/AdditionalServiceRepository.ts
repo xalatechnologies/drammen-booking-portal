@@ -1,16 +1,68 @@
-import { SupabaseRepository } from '../SupabaseRepository';
+
+import { GenericSupabaseRepository } from '../GenericSupabaseRepository';
 import { AdditionalService, ServiceFilters } from '@/types/additionalServices';
 import { PaginationParams, RepositoryResponse } from '@/types/api';
-import { supabase } from '@/integrations/supabase/client';
+import { Database } from '@/integrations/supabase/types';
 
-interface AdditionalServiceCreateRequest extends Omit<AdditionalService, 'id' | 'created_at' | 'updated_at'> {}
-interface AdditionalServiceUpdateRequest extends Partial<AdditionalServiceCreateRequest> {}
+type DatabaseAdditionalService = Database['public']['Tables']['additional_services']['Row'];
+type DatabaseAdditionalServiceInsert = Database['public']['Tables']['additional_services']['Insert'];
 
-export class AdditionalServiceRepository extends SupabaseRepository<AdditionalService> {
+export class AdditionalServiceRepository extends GenericSupabaseRepository<AdditionalService, DatabaseAdditionalService> {
   protected tableName = 'additional_services';
 
-  constructor() {
-    super();
+  protected mapFromDatabase(dbRecord: DatabaseAdditionalService): AdditionalService {
+    return {
+      id: dbRecord.id,
+      name: dbRecord.name,
+      category: dbRecord.category as AdditionalService['category'],
+      description: dbRecord.description || '',
+      facilityIds: [], // This would need to be populated from a separate table if needed
+      pricing: {
+        basePrice: Number(dbRecord.base_price),
+        currency: 'NOK',
+        pricingType: dbRecord.pricing_model as 'flat' | 'per-hour' | 'per-person',
+        actorTypeMultipliers: {
+          'private-person': 1,
+          'lag-foreninger': 1,
+          'paraply': 1,
+          'private-firma': 1,
+          'kommunale-enheter': 1
+        }
+      },
+      availability: {
+        isAlwaysAvailable: !dbRecord.advance_booking_required,
+        leadTimeHours: dbRecord.advance_booking_hours || 0,
+        maxAdvanceBookingDays: 365,
+        blackoutPeriods: []
+      },
+      requirements: {
+        requiresMainBooking: true,
+        equipmentProvided: [],
+        equipmentRequired: dbRecord.equipment_required || []
+      },
+      metadata: {
+        tags: []
+      },
+      isActive: dbRecord.is_active,
+      createdAt: new Date(dbRecord.created_at),
+      updatedAt: new Date(dbRecord.updated_at)
+    };
+  }
+
+  protected mapToDatabase(frontendRecord: Partial<AdditionalService>): Partial<DatabaseAdditionalServiceInsert> {
+    return {
+      name: frontendRecord.name,
+      category: frontendRecord.category as any,
+      description: frontendRecord.description,
+      base_price: frontendRecord.pricing?.basePrice ? String(frontendRecord.pricing.basePrice) : undefined,
+      pricing_model: frontendRecord.pricing?.pricingType || 'fixed',
+      advance_booking_required: frontendRecord.availability ? !frontendRecord.availability.isAlwaysAvailable : false,
+      advance_booking_hours: frontendRecord.availability?.leadTimeHours,
+      equipment_required: frontendRecord.requirements?.equipmentRequired,
+      is_active: frontendRecord.isActive,
+      staff_required: false,
+      minimum_quantity: 1
+    };
   }
 
   // Override findAll to add filtering support
@@ -31,9 +83,6 @@ export class AdditionalServiceRepository extends SupabaseRepository<AdditionalSe
       if (filters?.searchTerm) {
         query = query.or(`name.ilike.%${filters.searchTerm}%,description.ilike.%${filters.searchTerm}%`);
       }
-      if (filters?.priceRange) {
-        query = query.gte('base_price', filters.priceRange.min).lte('base_price', filters.priceRange.max);
-      }
 
       // Apply pagination
       if (pagination) {
@@ -51,8 +100,11 @@ export class AdditionalServiceRepository extends SupabaseRepository<AdditionalSe
         };
       }
 
+      const mappedData = (data || []).map(record => this.mapFromDatabase(record));
+
       return {
-        data: (data as unknown as AdditionalService[]) || []
+        data: mappedData,
+        error: null
       };
     } catch (error: any) {
       return {
@@ -77,8 +129,10 @@ export class AdditionalServiceRepository extends SupabaseRepository<AdditionalSe
         };
       }
 
+      const mappedData = (data || []).map(record => this.mapFromDatabase(record));
+
       return {
-        data: data || [],
+        data: mappedData,
         error: null
       };
     } catch (error: any) {

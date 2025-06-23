@@ -1,21 +1,27 @@
-import { BaseRepository } from '@/dal/BaseRepository';
-import { Language } from '@/i18n/types';
+
+import { GenericSupabaseRepository } from '../GenericSupabaseRepository';
 import { AdditionalService, ServiceFilters } from '@/types/additionalServices';
 import { RepositoryResponse, PaginationParams, PaginatedResponse } from '@/types/api';
 
-export class LocalizedAdditionalServiceRepository extends BaseRepository<AdditionalService> {
-  private currentLanguage: Language = 'NO';
+export class LocalizedAdditionalServiceRepository extends GenericSupabaseRepository<AdditionalService, any> {
+  protected tableName = 'additional_services';
+  private currentLanguage: 'NO' | 'EN' = 'NO';
   private servicesData: Record<string, AdditionalService[]> = {
     'NO': [],
     'EN': []
   };
 
-  setLanguage(language: Language) {
-    this.currentLanguage = language;
+  protected mapFromDatabase(dbRecord: any): AdditionalService {
+    // This would be implemented when we have actual localized data
+    return dbRecord as AdditionalService;
   }
 
-  protected getId(item: AdditionalService): string {
-    return item.id;
+  protected mapToDatabase(frontendRecord: Partial<AdditionalService>): any {
+    return frontendRecord;
+  }
+
+  setLanguage(language: 'NO' | 'EN') {
+    this.currentLanguage = language;
   }
 
   protected applyFilters(items: AdditionalService[], filters: any): AdditionalService[] {
@@ -33,52 +39,6 @@ export class LocalizedAdditionalServiceRepository extends BaseRepository<Additio
     });
   }
 
-  protected createEntity(data: Partial<AdditionalService>): AdditionalService {
-    return {
-      id: data.id || this.generateId(),
-      name: data.name || '',
-      category: data.category || 'equipment',
-      description: data.description || '',
-      facilityIds: data.facilityIds || [],
-      pricing: data.pricing || {
-        basePrice: 0,
-        currency: 'NOK',
-        pricingType: 'flat',
-        actorTypeMultipliers: {
-          'private-person': 1,
-          'lag-foreninger': 1,
-          'paraply': 1,
-          'private-firma': 1,
-          'kommunale-enheter': 1
-        }
-      },
-      availability: data.availability || {
-        isAlwaysAvailable: true,
-        leadTimeHours: 0,
-        maxAdvanceBookingDays: 365,
-        blackoutPeriods: []
-      },
-      requirements: data.requirements || {
-        requiresMainBooking: false,
-        equipmentProvided: [],
-        equipmentRequired: []
-      },
-      metadata: data.metadata || { tags: [] },
-      isActive: data.isActive ?? true,
-      createdAt: data.createdAt || new Date(),
-      updatedAt: data.updatedAt || new Date()
-    };
-  }
-
-  protected updateEntity(existing: AdditionalService, updates: Partial<AdditionalService>): AdditionalService {
-    return { 
-      ...existing, 
-      ...updates, 
-      updatedAt: new Date() 
-    };
-  }
-
-  // Override base findAll to match expected signature for services
   async findAllWithPagination(
     pagination: PaginationParams,
     searchTerm?: string,
@@ -104,7 +64,8 @@ export class LocalizedAdditionalServiceRepository extends BaseRepository<Additio
             hasNext: pagination.page < totalPages,
             hasPrev: pagination.page > 1
           }
-        }
+        },
+        error: null
       };
     } catch (error) {
       return {
@@ -124,7 +85,6 @@ export class LocalizedAdditionalServiceRepository extends BaseRepository<Additio
     }
   }
 
-  // Keep base repository findAll for compatibility
   async findAll(
     pagination?: PaginationParams,
     orderBy?: string,
@@ -133,7 +93,8 @@ export class LocalizedAdditionalServiceRepository extends BaseRepository<Additio
     try {
       const services = this.servicesData[this.currentLanguage] || [];
       return {
-        data: services
+        data: services,
+        error: null
       };
     } catch (error) {
       return {
@@ -149,7 +110,8 @@ export class LocalizedAdditionalServiceRepository extends BaseRepository<Additio
       const service = services.find(s => s.id === id);
       
       return {
-        data: service || null
+        data: service || null,
+        error: null
       };
     } catch (error) {
       return {
@@ -159,11 +121,12 @@ export class LocalizedAdditionalServiceRepository extends BaseRepository<Additio
     }
   }
 
-  async create(data: Partial<AdditionalService>): Promise<RepositoryResponse<AdditionalService>> {
+  async create(data: Partial<AdditionalService>): Promise<RepositoryResponse<AdditionalService | null>> {
     try {
-      const service = this.createEntity(data);
+      const service = data as AdditionalService;
       return {
-        data: service
+        data: service,
+        error: null
       };
     } catch (error) {
       return {
@@ -173,7 +136,7 @@ export class LocalizedAdditionalServiceRepository extends BaseRepository<Additio
     }
   }
 
-  async update(id: string, data: Partial<AdditionalService>): Promise<RepositoryResponse<AdditionalService>> {
+  async update(id: string, data: Partial<AdditionalService>): Promise<RepositoryResponse<AdditionalService | null>> {
     try {
       const existing = await this.findById(id);
       if (!existing.data) {
@@ -183,9 +146,10 @@ export class LocalizedAdditionalServiceRepository extends BaseRepository<Additio
         };
       }
       
-      const updated = this.updateEntity(existing.data, data);
+      const updated = { ...existing.data, ...data };
       return {
-        data: updated
+        data: updated,
+        error: null
       };
     } catch (error) {
       return {
@@ -206,7 +170,8 @@ export class LocalizedAdditionalServiceRepository extends BaseRepository<Additio
       }
       
       return {
-        data: true
+        data: true,
+        error: null
       };
     } catch (error) {
       return {
@@ -225,3 +190,6 @@ export class LocalizedAdditionalServiceRepository extends BaseRepository<Additio
     return this.servicesData[this.currentLanguage] || [];
   }
 }
+
+// Export singleton instance
+export const localizedAdditionalServiceRepository = new LocalizedAdditionalServiceRepository();

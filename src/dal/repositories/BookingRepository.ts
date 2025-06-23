@@ -1,96 +1,168 @@
-import { SupabaseRepository } from '../SupabaseRepository';
+
+import { GenericSupabaseRepository } from '../GenericSupabaseRepository';
 import { Booking } from '@/types/booking';
 import { RepositoryResponse } from '@/types/api';
 import { supabase } from '@/integrations/supabase/client';
+import { Database } from '@/integrations/supabase/types';
+
+type DatabaseBooking = Database['public']['Tables']['bookings']['Row'];
+type DatabaseBookingInsert = Database['public']['Tables']['bookings']['Insert'];
+type DatabaseBookingUpdate = Database['public']['Tables']['bookings']['Update'];
 
 interface BookingCreateRequest {
   facility_id: number;
-  zone_id: number;
-  start_time: string;
-  end_time: string;
+  zone_id?: string;
+  start_date: string;
+  end_date: string;
   user_id: string;
-  status: string;
+  contact_name: string;
+  contact_email: string;
+  contact_phone?: string;
+  purpose: string;
+  expected_attendees: number;
+  actor_type: string;
+  event_type: string;
+  age_group: string;
   total_price: number;
-  additional_notes?: string;
+  description?: string;
+  special_requirements?: string;
 }
 
 interface BookingUpdateRequest extends Partial<BookingCreateRequest> {
   status?: string;
-  total_price?: number;
 }
 
-export class BookingRepository extends SupabaseRepository<Booking> {
+export class BookingRepository extends GenericSupabaseRepository<Booking, DatabaseBooking> {
   protected tableName = 'bookings';
 
-  constructor() {
-    super();
+  protected mapFromDatabase(dbRecord: DatabaseBooking): Booking {
+    return {
+      id: dbRecord.id,
+      facilityId: dbRecord.facility_id,
+      zoneId: dbRecord.zone_id || undefined,
+      userId: dbRecord.user_id,
+      organizationId: dbRecord.organization_id || undefined,
+      bookingReference: dbRecord.booking_reference,
+      type: dbRecord.type as Booking['type'],
+      status: dbRecord.status as Booking['status'],
+      eventType: dbRecord.event_type as Booking['eventType'],
+      expectedAttendees: dbRecord.expected_attendees,
+      ageGroup: dbRecord.age_group as Booking['ageGroup'],
+      actorType: dbRecord.actor_type as Booking['actorType'],
+      contactName: dbRecord.contact_name,
+      contactEmail: dbRecord.contact_email,
+      contactPhone: dbRecord.contact_phone || undefined,
+      purpose: dbRecord.purpose,
+      description: dbRecord.description || undefined,
+      specialRequirements: dbRecord.special_requirements || undefined,
+      startDate: new Date(dbRecord.start_date),
+      endDate: new Date(dbRecord.end_date),
+      durationMinutes: dbRecord.duration_minutes,
+      recurrenceRule: dbRecord.recurrence_rule || undefined,
+      recurrenceEndDate: dbRecord.recurrence_end_date ? new Date(dbRecord.recurrence_end_date) : undefined,
+      requiresApproval: dbRecord.requires_approval,
+      approvalStatus: dbRecord.approval_status as Booking['approvalStatus'],
+      approvedBy: dbRecord.approved_by || undefined,
+      approvedAt: dbRecord.approved_at ? new Date(dbRecord.approved_at) : undefined,
+      rejectionReason: dbRecord.rejection_reason || undefined,
+      basePrice: Number(dbRecord.base_price),
+      servicesPrice: Number(dbRecord.services_price),
+      totalPrice: Number(dbRecord.total_price),
+      paymentStatus: dbRecord.payment_status as Booking['paymentStatus'],
+      paymentDueDate: dbRecord.payment_due_date ? new Date(dbRecord.payment_due_date) : undefined,
+      cancelledAt: dbRecord.cancelled_at ? new Date(dbRecord.cancelled_at) : undefined,
+      cancellationReason: dbRecord.cancellation_reason || undefined,
+      noShowAt: dbRecord.no_show_at ? new Date(dbRecord.no_show_at) : undefined,
+      internalNotes: dbRecord.internal_notes || undefined,
+      createdAt: new Date(dbRecord.created_at),
+      updatedAt: new Date(dbRecord.updated_at)
+    };
+  }
+
+  protected mapToDatabase(frontendRecord: Partial<Booking>): Partial<DatabaseBookingInsert> {
+    return {
+      facility_id: frontendRecord.facilityId,
+      zone_id: frontendRecord.zoneId,
+      user_id: frontendRecord.userId,
+      organization_id: frontendRecord.organizationId,
+      booking_reference: frontendRecord.bookingReference,
+      type: frontendRecord.type as any,
+      status: frontendRecord.status as any,
+      event_type: frontendRecord.eventType as any,
+      expected_attendees: frontendRecord.expectedAttendees,
+      age_group: frontendRecord.ageGroup as any,
+      actor_type: frontendRecord.actorType as any,
+      contact_name: frontendRecord.contactName,
+      contact_email: frontendRecord.contactEmail,
+      contact_phone: frontendRecord.contactPhone,
+      purpose: frontendRecord.purpose,
+      description: frontendRecord.description,
+      special_requirements: frontendRecord.specialRequirements,
+      start_date: frontendRecord.startDate?.toISOString(),
+      end_date: frontendRecord.endDate?.toISOString(),
+      duration_minutes: frontendRecord.durationMinutes,
+      recurrence_rule: frontendRecord.recurrenceRule,
+      recurrence_end_date: frontendRecord.recurrenceEndDate?.toISOString(),
+      requires_approval: frontendRecord.requiresApproval,
+      approval_status: frontendRecord.approvalStatus as any,
+      approved_by: frontendRecord.approvedBy,
+      approved_at: frontendRecord.approvedAt?.toISOString(),
+      rejection_reason: frontendRecord.rejectionReason,
+      base_price: frontendRecord.basePrice?.toString(),
+      services_price: frontendRecord.servicesPrice?.toString(),
+      total_price: frontendRecord.totalPrice?.toString(),
+      payment_status: frontendRecord.paymentStatus,
+      payment_due_date: frontendRecord.paymentDueDate?.toISOString().split('T')[0],
+      cancelled_at: frontendRecord.cancelledAt?.toISOString(),
+      cancellation_reason: frontendRecord.cancellationReason,
+      no_show_at: frontendRecord.noShowAt?.toISOString(),
+      internal_notes: frontendRecord.internalNotes
+    };
   }
 
   async getAllBookings(filters?: any): Promise<RepositoryResponse<Booking[]>> {
-    try {
-      let query = supabase.from('bookings').select('*');
-      
-      if (filters) {
-        Object.keys(filters).forEach(key => {
-          if (filters[key] !== undefined) {
-            query = query.eq(key, filters[key]);
-          }
-        });
-      }
-
-      const { data, error } = await query;
-
-      if (error) {
-        return {
-          data: [],
-          error: error.message
-        };
-      }
-
-      return {
-        data: data || [],
-        error: null
-      };
-    } catch (error: any) {
-      return {
-        data: [],
-        error: error.message
-      };
-    }
+    return this.findAll(undefined, filters);
   }
 
   async getBookingById(id: string): Promise<RepositoryResponse<Booking | null>> {
-    try {
-      const { data, error } = await supabase
-        .from('bookings')
-        .select('*')
-        .eq('id', id)
-        .maybeSingle();
-
-      if (error) {
-        return {
-          data: null,
-          error: error.message
-        };
-      }
-
-      return {
-        data: data as Booking | null,
-        error: null
-      };
-    } catch (error: any) {
-      return {
-        data: null,
-        error: error.message
-      };
-    }
+    return this.findById(id);
   }
 
   async createBooking(bookingData: BookingCreateRequest): Promise<RepositoryResponse<Booking | null>> {
     try {
+      // Generate booking reference
+      const bookingReference = `BK-${Date.now()}-${Math.random().toString(36).substr(2, 4).toUpperCase()}`;
+      
+      const dbData: Partial<DatabaseBookingInsert> = {
+        facility_id: bookingData.facility_id,
+        zone_id: bookingData.zone_id,
+        user_id: bookingData.user_id,
+        booking_reference: bookingReference,
+        contact_name: bookingData.contact_name,
+        contact_email: bookingData.contact_email,
+        contact_phone: bookingData.contact_phone,
+        purpose: bookingData.purpose,
+        expected_attendees: bookingData.expected_attendees,
+        actor_type: bookingData.actor_type as any,
+        event_type: bookingData.event_type as any,
+        age_group: bookingData.age_group as any,
+        start_date: bookingData.start_date,
+        end_date: bookingData.end_date,
+        duration_minutes: Math.floor((new Date(bookingData.end_date).getTime() - new Date(bookingData.start_date).getTime()) / (1000 * 60)),
+        total_price: bookingData.total_price.toString(),
+        base_price: bookingData.total_price.toString(),
+        services_price: '0',
+        description: bookingData.description,
+        special_requirements: bookingData.special_requirements,
+        status: 'draft' as any,
+        type: 'engangs' as any,
+        approval_status: 'not-required' as any,
+        payment_status: 'pending'
+      };
+
       const { data, error } = await supabase
         .from('bookings')
-        .insert(bookingData)
+        .insert(dbData as any)
         .select()
         .maybeSingle();
 
@@ -102,7 +174,7 @@ export class BookingRepository extends SupabaseRepository<Booking> {
       }
 
       return {
-        data: data as Booking | null,
+        data: data ? this.mapFromDatabase(data) : null,
         error: null
       };
     } catch (error: any) {
@@ -115,9 +187,31 @@ export class BookingRepository extends SupabaseRepository<Booking> {
 
   async updateBooking(id: string, bookingData: BookingUpdateRequest): Promise<RepositoryResponse<Booking | null>> {
     try {
+      const dbData: Partial<DatabaseBookingUpdate> = {
+        facility_id: bookingData.facility_id,
+        zone_id: bookingData.zone_id,
+        contact_name: bookingData.contact_name,
+        contact_email: bookingData.contact_email,
+        contact_phone: bookingData.contact_phone,
+        purpose: bookingData.purpose,
+        expected_attendees: bookingData.expected_attendees,
+        actor_type: bookingData.actor_type as any,
+        event_type: bookingData.event_type as any,
+        age_group: bookingData.age_group as any,
+        start_date: bookingData.start_date,
+        end_date: bookingData.end_date,
+        duration_minutes: bookingData.start_date && bookingData.end_date ? 
+          Math.floor((new Date(bookingData.end_date).getTime() - new Date(bookingData.start_date).getTime()) / (1000 * 60)) : undefined,
+        total_price: bookingData.total_price?.toString(),
+        description: bookingData.description,
+        special_requirements: bookingData.special_requirements,
+        status: bookingData.status as any,
+        updated_at: new Date().toISOString()
+      };
+
       const { data, error } = await supabase
         .from('bookings')
-        .update(bookingData)
+        .update(dbData as any)
         .eq('id', id)
         .select()
         .maybeSingle();
@@ -130,7 +224,7 @@ export class BookingRepository extends SupabaseRepository<Booking> {
       }
 
       return {
-        data: data as Booking | null,
+        data: data ? this.mapFromDatabase(data) : null,
         error: null
       };
     } catch (error: any) {
@@ -142,29 +236,7 @@ export class BookingRepository extends SupabaseRepository<Booking> {
   }
 
   async deleteBooking(id: string): Promise<RepositoryResponse<boolean>> {
-    try {
-      const { error } = await supabase
-        .from('bookings')
-        .delete()
-        .eq('id', id);
-
-      if (error) {
-        return {
-          data: false,
-          error: error.message
-        };
-      }
-
-      return {
-        data: true,
-        error: null
-      };
-    } catch (error: any) {
-      return {
-        data: false,
-        error: error.message
-      };
-    }
+    return this.delete(id);
   }
 
   async checkBookingConflicts(bookingData: any): Promise<RepositoryResponse<{
@@ -173,17 +245,15 @@ export class BookingRepository extends SupabaseRepository<Booking> {
     availableAlternatives: any[];
   }>> {
     try {
-      // Extract relevant data from bookingData
-      const { facility_id, zone_id, start_time, end_time } = bookingData;
+      const { facility_id, zone_id, start_date, end_date } = bookingData;
   
-      // Construct the conflict query
       const { data, error } = await supabase
         .from('bookings')
         .select('*')
         .eq('facility_id', facility_id)
         .eq('zone_id', zone_id)
-        .lte('start_time', end_time)
-        .gte('end_time', start_time);
+        .lte('start_date', end_date)
+        .gte('end_date', start_date);
   
       if (error) {
         return {
@@ -196,13 +266,13 @@ export class BookingRepository extends SupabaseRepository<Booking> {
         };
       }
   
-      const conflictingBookings = data as Booking[];
+      const conflictingBookings = (data || []).map(record => this.mapFromDatabase(record));
       const hasConflict = conflictingBookings.length > 0;
   
       return {
         data: {
-          hasConflict: false,
-          conflictingBookings: [],
+          hasConflict,
+          conflictingBookings,
           availableAlternatives: []
         },
         error: null
@@ -219,3 +289,6 @@ export class BookingRepository extends SupabaseRepository<Booking> {
     }
   }
 }
+
+// Export singleton instance
+export const bookingRepository = new BookingRepository();

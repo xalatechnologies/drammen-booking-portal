@@ -1,9 +1,13 @@
 
+// Re-export the new JSON-based translation hook for backward compatibility
+export { useJsonTranslation as useTranslation } from './useJsonTranslation';
+
+// Also provide the old service-based hook for components that still use it
 import { useQuery } from '@tanstack/react-query';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { translationService } from '@/services/TranslationService';
 
-export const useTranslation = () => {
+export const useServiceTranslation = () => {
   const { language } = useLanguage();
 
   const { data: isInitialized } = useQuery({
@@ -20,10 +24,8 @@ export const useTranslation = () => {
   };
 
   const tSync = (key: string, fallback?: string): string => {
-    // This is a synchronous version that tries to get from cache
     if (!isInitialized) return fallback || key;
     
-    // Try to get from cache synchronously
     const keyCache = translationService['cache'].get(key);
     if (keyCache) {
       return keyCache.get(language) || keyCache.get('NO') || fallback || key;
