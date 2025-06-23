@@ -1,4 +1,3 @@
-
 import { BaseRepository } from '@/dal/BaseRepository';
 import { RepositoryResponse, PaginationParams } from '@/types/api';
 import { supabase } from '@/integrations/supabase/client';
@@ -51,10 +50,19 @@ export class GenericEntityRepository<T extends Record<string, any>> extends Base
         query = query.eq(this.statusField, this.activeValue);
       }
 
+      // Apply additional filters
+      if (filters) {
+        Object.keys(filters).forEach(key => {
+          if (filters[key] !== undefined && filters[key] !== null && filters[key] !== 'all') {
+            query = query.eq(key, filters[key]);
+          }
+        });
+      }
+
       // Apply pagination if provided
       if (pagination) {
-        const from = (pagination.page - 1) * pagination.limit;
-        const to = from + pagination.limit - 1;
+        const from = (pagination.page! - 1) * pagination.limit!;
+        const to = from + pagination.limit! - 1;
         query = query.range(from, to);
       }
 
@@ -82,7 +90,7 @@ export class GenericEntityRepository<T extends Record<string, any>> extends Base
       });
 
       return {
-        data: (data as T[]) || [],
+        data: (data || []) as T[],
         error: null,
         pagination: count !== null ? {
           total: count,
