@@ -1,3 +1,4 @@
+
 import { useFacilityStore } from '@/stores/useEntityStore';
 import { useFacilityUIStore } from '@/stores/ui/useFacilityUIStore';
 import { Facility } from '@/types/facility';
@@ -15,17 +16,17 @@ import { toast } from 'sonner';
 export function useFacilityAdmin() {
   // Entity state and actions from the generic entity store
   const {
-    items: facilities,
-    selectedItem: selectedFacility,
+    entities: facilities,
+    currentEntity: selectedFacility,
     isLoading,
     error,
-    fetchList,
+    fetchAll,
     fetchById,
-    create,
-    update,
-    delete: deleteEntity,
-    setSelectedItem,
-    clearError,
+    createEntity,
+    updateEntity,
+    deleteEntity,
+    setCurrentEntity,
+    setError,
   } = useFacilityStore();
   
   // UI state and actions from the UI store
@@ -46,7 +47,7 @@ export function useFacilityAdmin() {
   
   // Combined actions that interact with both stores
   const handleFacilitySelect = (facility: Facility) => {
-    setSelectedItem(facility);
+    setCurrentEntity(facility);
     openEditForm();
   };
   
@@ -71,19 +72,19 @@ export function useFacilityAdmin() {
       }
     });
     
-    return fetchList(queryParams);
+    return fetchAll(undefined, queryParams);
   };
   
   const createFacility = async (data: Partial<Facility>) => {
     try {
-      const result = await create(data);
+      const result = await createEntity(data);
       if (result) {
         toast.success('Facility created successfully');
         closeForm();
         return result;
       }
       return null;
-    } catch (error) {
+    } catch (error: any) {
       toast.error(`Error creating facility: ${error.message}`);
       throw error;
     }
@@ -91,14 +92,14 @@ export function useFacilityAdmin() {
   
   const updateFacility = async (id: string, data: Partial<Facility>) => {
     try {
-      const result = await update(id, data);
+      const result = await updateEntity(id, data);
       if (result) {
         toast.success('Facility updated successfully');
         closeForm();
         return result;
       }
       return null;
-    } catch (error) {
+    } catch (error: any) {
       toast.error(`Error updating facility: ${error.message}`);
       throw error;
     }
@@ -113,10 +114,14 @@ export function useFacilityAdmin() {
         return true;
       }
       return false;
-    } catch (error) {
+    } catch (error: any) {
       toast.error(`Error deleting facility: ${error.message}`);
       throw error;
     }
+  };
+  
+  const clearError = () => {
+    setError(null);
   };
   
   return {
@@ -137,7 +142,7 @@ export function useFacilityAdmin() {
     createFacility,
     updateFacility,
     deleteFacility,
-    setSelectedFacility: setSelectedItem,
+    setSelectedFacility: setCurrentEntity,
     clearError,
     
     // UI actions
