@@ -2889,7 +2889,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _user_id: string
+          _role: Database["public"]["Enums"]["user_role"]
+        }
+        Returns: boolean
+      }
+      is_organization_member: {
+        Args: { _user_id: string; _org_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       actor_type:
