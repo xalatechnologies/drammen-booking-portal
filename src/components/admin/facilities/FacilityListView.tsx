@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Plus, Upload, Calendar, Map } from "lucide-react";
@@ -6,7 +7,7 @@ import { PageHeader, FiltersBar, ViewToggle } from "@/components/layouts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Facility } from "@/types/facility";
 import { useJsonTranslation } from "@/hooks/useJsonTranslation";
-import { useFacilityAdmin } from "@/hooks/useFacilityAdmin";
+import { useFacilityStore } from "@/stores/useEntityStore";
 import { FacilityDataUtils } from "@/utils/facilityDataUtils";
 
 // Import the components we created
@@ -34,54 +35,75 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
   const [selectedFacility, setSelectedFacility] = useState<Facility | null>(null);
   const { tSync } = useJsonTranslation();
 
-  // Use the real facility admin hook instead of mock data
+  // Use the generic entity store for facilities
   const {
-    facilities,
+    entities: facilities,
     isLoading,
     error,
-    filters,
-    fetchFacilities,
-    setSearchFilter,
-    setStatusFilter,
-    setCategoryFilter,
-  } = useFacilityAdmin();
+    fetchAll,
+  } = useFacilityStore();
+
+  // Local state for filters
+  const [searchFilter, setSearchFilter] = useState<string>('');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [categoryFilter, setCategoryFilter] = useState<string>('all');
 
   // Local display mode
   const [displayMode, setDisplayMode] = React.useState<DisplayMode>('list');
 
   // Load facilities on component mount
   useEffect(() => {
-    fetchFacilities();
-  }, []);
+    console.log('FacilityListView - Loading facilities using generic store');
+    fetchAll();
+  }, [fetchAll]);
 
   // Transform facilities to ensure they have proper images using FacilityDataUtils
   const transformedFacilities = React.useMemo(() => {
-    return facilities.map(facility => ({
-      ...facility,
-      image: FacilityDataUtils.getImageUrl(facility.images),
-      address: FacilityDataUtils.computeAddress(facility),
-      openingHours: FacilityDataUtils.transformOpeningHours(facility.openingHours),
-      zones: FacilityDataUtils.transformZones(facility.zones),
-      // Ensure these properties exist with defaults
-      nextAvailable: facility.nextAvailable || 'Available now',
-      accessibility: facility.accessibility || [],
-      suitableFor: facility.suitableFor || [],
-      equipment: facility.equipment || [],
-      availableTimes: facility.availableTimes || []
-    }));
+    if (!facilities || facilities.length === 0) {
+      console.log('FacilityListView - No facilities to transform');
+      return [];
+    }
+
+    console.log('FacilityListView - Transforming facilities:', facilities.length);
+    return facilities.map((facility, index) => {
+      const transformed = {
+        ...facility,
+        image: FacilityDataUtils.getImageUrl(facility.images),
+        address: FacilityDataUtils.computeAddress(facility),
+        openingHours: FacilityDataUtils.transformOpeningHours(facility.openingHours),
+        zones: FacilityDataUtils.transformZones(facility.zones),
+        // Ensure these properties exist with defaults
+        nextAvailable: facility.nextAvailable || 'Available now',
+        accessibility: facility.accessibility || [],
+        suitableFor: facility.suitableFor || [],
+        equipment: facility.equipment || [],
+        availableTimes: facility.availableTimes || []
+      };
+      
+      // Use fallback image if no image is available
+      if (!transformed.image || transformed.image.includes('unsplash')) {
+        transformed.image = FacilityDataUtils.getFallbackImageUrl(index);
+      }
+      
+      return transformed;
+    });
   }, [facilities]);
 
   // Filter facilities based on current filters
   const filteredFacilities = React.useMemo(() => {
+    if (!transformedFacilities || transformedFacilities.length === 0) {
+      return [];
+    }
+
     return transformedFacilities.filter(facility => {
-      const matchesSearch = !filters.search || 
-                           facility.name?.toLowerCase().includes(filters.search.toLowerCase()) || 
-                           facility.address?.toLowerCase().includes(filters.search.toLowerCase());
-      const matchesStatus = filters.status === 'all' || !filters.status || facility.status === filters.status;
-      const matchesCategory = filters.category === 'all' || !filters.category || facility.type === filters.category;
+      const matchesSearch = !searchFilter || 
+                           facility.name?.toLowerCase().includes(searchFilter.toLowerCase()) || 
+                           facility.address?.toLowerCase().includes(searchFilter.toLowerCase());
+      const matchesStatus = statusFilter === 'all' || !statusFilter || facility.status === statusFilter;
+      const matchesCategory = categoryFilter === 'all' || !categoryFilter || facility.type === categoryFilter;
       return matchesSearch && matchesStatus && matchesCategory;
     });
-  }, [transformedFacilities, filters]);
+  }, [transformedFacilities, searchFilter, statusFilter, categoryFilter]);
 
   const handleAddNew = () => {
     navigate('/admin/facilities/new');
@@ -125,10 +147,8 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
     {
       id: 'status',
       label: tSync("admin.facilities.filters.status", "Status"),
-      value: filters.status || 'all',
-      onChange: (val: string) => {
-        setStatusFilter(val === 'all' ? undefined : val);
-      },
+      value: statusFilter,
+      onChange: (val: string) => setStatusFilter(val),
       options: [
         { value: 'all', label: tSync("admin.facilities.filters.allStatuses", "All Status") },
         { value: 'active', label: tSync("admin.facilities.status.active", "Active") },
@@ -139,10 +159,8 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
     {
       id: 'category',
       label: tSync("admin.facilities.filters.type", "Type"),
-      value: filters.category || 'all',
-      onChange: (val: string) => {
-        setCategoryFilter(val === 'all' ? undefined : val);
-      },
+      value: categoryFilter,
+      onChange: (val: string) => setCategoryFilter(val),
       options: [
         { value: 'all', label: tSync("admin.facilities.filters.allTypes", "All Types") },
         { value: 'Gymsal', label: 'Gymsal' },
@@ -163,26 +181,44 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
         </div>
       );
     }
+    
     if (error) {
       return (
         <div className="text-center py-8 text-red-500">
-          {error}
+          <p>Error loading facilities: {error}</p>
+          <Button onClick={() => fetchAll()} className="mt-4">
+            Try Again
+          </Button>
         </div>
       );
     }
+    
     if (filteredFacilities.length === 0) {
+      if (transformedFacilities.length === 0) {
+        return (
+          <div className="text-center py-8 text-gray-500">
+            <p>{tSync("admin.facilities.search.noFacilities", "No facilities found in database")}</p>
+            <Button onClick={handleAddNew} className="mt-4">
+              <Plus className="h-4 w-4 mr-2" />
+              Add First Facility
+            </Button>
+          </div>
+        );
+      }
       return (
         <div className="text-center py-8 text-gray-500">
-          {tSync("admin.facilities.search.noResults", "No facilities found")}
+          {tSync("admin.facilities.search.noResults", "No facilities match your search criteria")}
         </div>
       );
     }
+    
     const commonProps = {
       facilities: filteredFacilities,
       onView: handleFacilitySelect,
       onCalendar: handleCalendar,
       onEdit: handleEdit
     };
+    
     switch (displayMode) {
       case 'table':
         return <FacilityTableView {...commonProps} />;
@@ -205,6 +241,7 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
       />
     );
   }
+  
   if (viewMode === 'detail' && selectedFacility) {
     return (
       <FacilityDetailViewComponent 
@@ -215,12 +252,17 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
       />
     );
   }
+  
   return (
     <div className="w-full px-4 sm:px-6 lg:px-8 space-y-4">
       <div className="bg-white border-b border-gray-200 px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between shadow-sm rounded-t-lg">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 leading-tight">{tSync("admin.facilities.management", "Facility Management")}</h1>
-          <p className="text-gray-500 text-sm mt-1">{tSync("admin.facilities.pageDescription", "Manage facilities and their configurations")}</p>
+          <h1 className="text-2xl font-bold text-gray-900 leading-tight">
+            {tSync("admin.facilities.management", "Facility Management")}
+          </h1>
+          <p className="text-gray-500 text-sm mt-1">
+            {tSync("admin.facilities.pageDescription", "Manage facilities and their configurations")}
+          </p>
         </div>
         <Button onClick={handleAddNew} size="sm" className="mt-3 sm:mt-0 flex items-center gap-2">
           <Plus className="h-4 w-4" />
@@ -230,25 +272,24 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
       
       <Card>
         <CardHeader>
-        <FiltersBar
-          searchTerm={filters.search || ''}
-          onSearchChange={setSearchFilter}
-          searchPlaceholder={tSync("admin.facilities.search.placeholder", "Search facilities...")}
-          selectFilters={filterOptions}
-          className="flex-1"
-        >
-          <ViewToggle
-            views={viewOptions}
-            activeView={displayMode}
-            onViewChange={handleViewModeChange}
-          />
-        </FiltersBar>
+          <FiltersBar
+            searchTerm={searchFilter}
+            onSearchChange={(value) => setSearchFilter(value)}
+            searchPlaceholder={tSync("admin.facilities.search.placeholder", "Search facilities...")}
+            selectFilters={filterOptions}
+            className="flex-1"
+          >
+            <ViewToggle
+              views={viewOptions}
+              activeView={displayMode}
+              onViewChange={handleViewModeChange}
+            />
+          </FiltersBar>
         </CardHeader>
-      <CardContent>
-        {renderFacilityContent()}
-      </CardContent>
+        <CardContent>
+          {renderFacilityContent()}
+        </CardContent>
       </Card>
-
     </div>
   );
 };
