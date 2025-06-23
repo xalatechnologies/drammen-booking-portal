@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { FacilityListItemImage } from "./FacilityListItemImage";
+import { FacilityListItemMap } from "./FacilityListItemMap";
 import { useTranslation } from "@/i18n";
 import { Facility } from "@/types/facility";
 
@@ -53,7 +54,7 @@ const FacilityListItem: React.FC<FacilityListItemProps> = ({ facility }) => {
     <Card className="group hover:shadow-lg transition-all duration-300 cursor-pointer border-0 shadow-md hover:shadow-xl transform hover:-translate-y-1 bg-white">
       <CardContent className="p-0" onClick={handleClick}>
         <div className="flex h-32 sm:h-40">
-          {/* Image Section */}
+          {/* Image Section - Left */}
           <div className="w-32 sm:w-48 md:w-56 lg:w-64 flex-shrink-0">
             <div className="w-full h-full rounded-l-lg overflow-hidden">
               <FacilityListItemImage
@@ -66,7 +67,7 @@ const FacilityListItem: React.FC<FacilityListItemProps> = ({ facility }) => {
             </div>
           </div>
 
-          {/* Content Section */}
+          {/* Content Section - Center */}
           <div className="flex-1 p-4 sm:p-6 flex flex-col justify-between min-w-0">
             <div className="flex-1">
               {/* Header */}
@@ -163,6 +164,16 @@ const FacilityListItem: React.FC<FacilityListItemProps> = ({ facility }) => {
                 <span className="mr-1">{t('facility.viewDetails')}</span>
                 <ChevronRight className="h-4 w-4 transform group-hover:translate-x-1 transition-transform duration-200" />
               </div>
+            </div>
+          </div>
+
+          {/* Map Section - Right */}
+          <div className="w-32 sm:w-48 md:w-56 lg:w-64 flex-shrink-0">
+            <div className="w-full h-full rounded-r-lg overflow-hidden">
+              <FacilityListItemMap
+                address={facility.address}
+                facilityName={facility.name}
+              />
             </div>
           </div>
         </div>
