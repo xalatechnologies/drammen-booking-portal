@@ -144,52 +144,116 @@ export class GenericEntityRepository<T extends Record<string, any>> extends Base
       }
       
       try {
-        // Get the current session to retrieve the access token
-        const { data } = await supabase.auth.getSession();
+        // First try to get a fresh session
+        await supabase.auth.refreshSession();
+        const { data: sessionData } = await supabase.auth.getSession();
         
-        // Create a new Supabase client with the same configuration as our main client
-        // This ensures we're using the same authentication mechanism
+        // Prepare headers exactly as the edge function expects them
         const headers: Record<string, string> = {
           'Content-Type': 'application/json',
         };
         
-        // Set the Authorization header with the JWT token if available
-        if (data.session?.access_token) {
-          headers['Authorization'] = `Bearer ${data.session.access_token}`;
-        }
+        // IMPORTANT: The order and format of these headers matter for Supabase Edge Functions
         
-        // Always include the apikey header
+        // 1. Set the apikey header - this is required for all requests
         headers['apikey'] = SUPABASE_ANON_KEY;
         
-        // Add client info header that Supabase expects
+        // 2. Set the Authorization header - this is used by the edge function's createSupabaseClient
+        if (sessionData?.session?.access_token) {
+          // When authenticated, use the JWT token
+          headers['Authorization'] = `Bearer ${sessionData.session.access_token}`;
+        } else {
+          // For anonymous access, use the anon key
+          headers['Authorization'] = `Bearer ${SUPABASE_ANON_KEY}`;
+        }
+        
+        // 3. Add the client info header that Supabase expects
         headers['x-client-info'] = 'supabase-js/2.0.0';
+        
+        console.log('[EdgeFunction] Sending request with headers:', JSON.stringify(headers, null, 2));
         
         const response = await fetch(url.toString(), {
           method,
           headers,
           body: body ? JSON.stringify(body) : undefined,
-          // Include credentials to ensure cookies are sent
-          credentials: 'include',
         });
         
-        const data = await response.json();
+        console.log(`[EdgeFunction] Response status: ${response.status} ${response.statusText}`);
         
-        if (data.code === 'NOT_FOUND' && data.message === 'Requested function was not found') {
-          // Edge function not found, use fallback
-          console.warn('Edge function not found, using direct Supabase client fallback');
-          return this.fallbackToDirectSupabase<R>(method, path, body, params);
-        }
+        // Log response headers for debugging
+        const responseHeaders: Record<string, string> = {};
+        response.headers.forEach((value, key) => {
+          responseHeaders[key] = value;
+        });
+        console.log('[EdgeFunction] Response headers:', JSON.stringify(responseHeaders, null, 2));
         
-        if (!response.ok) {
+        // Clone the response for debugging
+        const responseClone = response.clone();
+        const responseText = await responseClone.text();
+        console.log('[EdgeFunction] Response body:', responseText);
+        
+        // Try to parse the response as JSON
+        let responseData;
+        try {
+          responseData = JSON.parse(responseText);
+        } catch (parseError) {
+          console.error('[EdgeFunction] Failed to parse response as JSON:', parseError);
           return {
-            error: data.message || 'Unknown error',
-            data: null as unknown as R,
+            data: null,
+            error: `Failed to parse response: ${parseError.message}. Raw response: ${responseText.substring(0, 100)}...`
           };
         }
         
+        // Handle error responses
+        if (!response.ok) {
+          console.error(`[EdgeFunction] Error ${response.status}: ${JSON.stringify(responseData)}`);
+          
+          // If we have a 401 error, it's likely an authentication issue
+          if (response.status === 401) {
+            console.log('[EdgeFunction] 401 Unauthorized - Attempting to refresh session...');
+            
+            // Try to refresh the session and retry the request
+            try {
+              const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
+              console.log('[EdgeFunction] Session refresh result:', refreshError ? 'Failed' : 'Success');
+              
+              if (!refreshError && refreshData?.session) {
+                console.log('[EdgeFunction] Session refreshed successfully, retrying request...');
+                // If refresh was successful, retry the request recursively
+                return this.fetchFromEdgeFunction<R>(method, path, body, params);
+              } else {
+                console.error('[EdgeFunction] Failed to refresh session:', refreshError);
+              }
+            } catch (refreshError) {
+              console.error('[EdgeFunction] Error during session refresh:', refreshError);
+            }
+            
+            // If we're still here, refresh didn't work, try to get a new session directly
+            try {
+              const { data: authData } = await supabase.auth.getSession();
+              if (authData?.session) {
+                console.log('[EdgeFunction] Got fresh session, retrying with new token...');
+                return this.fetchFromEdgeFunction<R>(method, path, body, params);
+              }
+            } catch (authError) {
+              console.error('[EdgeFunction] Error getting fresh session:', authError);
+            }
+          }
+          
+          // Return a structured error response
+          return {
+            data: null,
+            error: responseData.error?.message || 
+                   responseData.error?.code || 
+                   `HTTP error ${response.status}: ${response.statusText}`
+          };
+        }
+        
+        // Return successful response
+        console.log('[EdgeFunction] Request successful');
         return {
-          data: data.data,
-          meta: data.meta,
+          data: responseData.data,
+          error: null
         };
       } catch (fetchError) {
         // Network error or other fetch issue, try fallback
@@ -198,9 +262,8 @@ export class GenericEntityRepository<T extends Record<string, any>> extends Base
       }
     } catch (error) {
       return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
         data: null as unknown as R,
+        error: error instanceof Error ? error.message : 'Unknown error'
       };
     }
   }
@@ -345,9 +408,8 @@ export class GenericEntityRepository<T extends Record<string, any>> extends Base
       };
     } catch (error) {
       return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
         data: null as unknown as R,
+        error: error instanceof Error ? error.message : 'Unknown error'
       };
     }
   }
