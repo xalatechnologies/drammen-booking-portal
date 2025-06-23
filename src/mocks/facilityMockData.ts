@@ -1,4 +1,3 @@
-
 import { Facility, OpeningHours } from '@/types/facility';
 
 // Constants for generating realistic data
@@ -19,15 +18,9 @@ const LOCATIONS = [
 // Generate realistic opening hours
 const generateOpeningHours = (facilityId: number): OpeningHours[] => {
   return WEEKDAYS.map((day, index) => ({
-    id: `${facilityId}-${index}`,
-    facility_id: facilityId,
-    day_of_week: index as 0 | 1 | 2 | 3 | 4 | 5 | 6,
     dayOfWeek: index as 0 | 1 | 2 | 3 | 4 | 5 | 6,
     opens: index < 5 ? "08:00" : "10:00", // Weekdays vs weekend
     closes: index < 5 ? "22:00" : "18:00", // Weekdays vs weekend
-    is_closed: index === 6, // Closed on Sundays for some facilities
-    created_at: "2025-01-01T00:00:00Z",
-    updated_at: "2025-01-01T00:00:00Z"
   })) as OpeningHours[];
 };
 
