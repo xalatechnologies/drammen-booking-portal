@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { MapPin, Users, Clock, Star, Heart, Share2, ChevronRight } from "lucide-react";
@@ -59,7 +58,6 @@ const FacilityListItem: React.FC<FacilityListItemProps> = ({ facility }) => {
             <div className="w-full h-full rounded-l-lg overflow-hidden">
               <FacilityListItemImage
                 facilityId={facility.id}
-                image={facility.image}
                 facilityName={facility.name}
                 facilityType={facility.type}
                 area={facility.area}
