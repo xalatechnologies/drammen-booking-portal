@@ -648,111 +648,57 @@ export type Database = {
       }
       app_locations: {
         Row: {
-          accessibility_features: string[] | null
           address: string
-          allowed_booking_types: string[] | null
-          amenities: string[] | null
-          area_sqm: number | null
-          booking_lead_time_hours: number | null
-          cancellation_deadline_hours: number | null
           capacity: number | null
           code: string
           contact_email: string | null
           contact_phone: string | null
           created_at: string | null
           description: Json | null
-          equipment: string[] | null
           facilities: string[] | null
-          has_auto_approval: boolean | null
           id: string
-          is_featured: boolean | null
           is_published: boolean | null
           latitude: number | null
           location_type: string | null
           longitude: number | null
-          max_advance_booking_days: number | null
           metadata: Json | null
           name: Json
-          next_available: string | null
-          price_per_hour: number | null
-          rating: number | null
-          review_count: number | null
-          season_from: string | null
-          season_to: string | null
-          status: string | null
-          time_slot_duration: number | null
           updated_at: string | null
         }
         Insert: {
-          accessibility_features?: string[] | null
           address: string
-          allowed_booking_types?: string[] | null
-          amenities?: string[] | null
-          area_sqm?: number | null
-          booking_lead_time_hours?: number | null
-          cancellation_deadline_hours?: number | null
           capacity?: number | null
           code: string
           contact_email?: string | null
           contact_phone?: string | null
           created_at?: string | null
           description?: Json | null
-          equipment?: string[] | null
           facilities?: string[] | null
-          has_auto_approval?: boolean | null
           id?: string
-          is_featured?: boolean | null
           is_published?: boolean | null
           latitude?: number | null
           location_type?: string | null
           longitude?: number | null
-          max_advance_booking_days?: number | null
           metadata?: Json | null
           name: Json
-          next_available?: string | null
-          price_per_hour?: number | null
-          rating?: number | null
-          review_count?: number | null
-          season_from?: string | null
-          season_to?: string | null
-          status?: string | null
-          time_slot_duration?: number | null
           updated_at?: string | null
         }
         Update: {
-          accessibility_features?: string[] | null
           address?: string
-          allowed_booking_types?: string[] | null
-          amenities?: string[] | null
-          area_sqm?: number | null
-          booking_lead_time_hours?: number | null
-          cancellation_deadline_hours?: number | null
           capacity?: number | null
           code?: string
           contact_email?: string | null
           contact_phone?: string | null
           created_at?: string | null
           description?: Json | null
-          equipment?: string[] | null
           facilities?: string[] | null
-          has_auto_approval?: boolean | null
           id?: string
-          is_featured?: boolean | null
           is_published?: boolean | null
           latitude?: number | null
           location_type?: string | null
           longitude?: number | null
-          max_advance_booking_days?: number | null
           metadata?: Json | null
           name?: Json
-          next_available?: string | null
-          price_per_hour?: number | null
-          rating?: number | null
-          review_count?: number | null
-          season_from?: string | null
-          season_to?: string | null
-          status?: string | null
-          time_slot_duration?: number | null
           updated_at?: string | null
         }
         Relationships: []
@@ -1021,186 +967,44 @@ export type Database = {
       }
       app_zones: {
         Row: {
-          accessibility_features: string[] | null
-          area_sqm: number | null
-          bookable_independently: boolean | null
           capacity: number | null
           code: string
-          coordinates_height: number | null
-          coordinates_width: number | null
-          coordinates_x: number | null
-          coordinates_y: number | null
           created_at: string | null
-          description: string | null
-          equipment: string[] | null
-          facility_id: string | null
-          floor: string | null
           id: string
           interval: string | null
-          is_main_zone: boolean | null
           location_id: string | null
           metadata: Json | null
           name: Json
-          parent_zone_id: string | null
-          status: string | null
-          type: string | null
           updated_at: string | null
         }
         Insert: {
-          accessibility_features?: string[] | null
-          area_sqm?: number | null
-          bookable_independently?: boolean | null
           capacity?: number | null
           code: string
-          coordinates_height?: number | null
-          coordinates_width?: number | null
-          coordinates_x?: number | null
-          coordinates_y?: number | null
           created_at?: string | null
-          description?: string | null
-          equipment?: string[] | null
-          facility_id?: string | null
-          floor?: string | null
           id?: string
           interval?: string | null
-          is_main_zone?: boolean | null
           location_id?: string | null
           metadata?: Json | null
           name: Json
-          parent_zone_id?: string | null
-          status?: string | null
-          type?: string | null
           updated_at?: string | null
         }
         Update: {
-          accessibility_features?: string[] | null
-          area_sqm?: number | null
-          bookable_independently?: boolean | null
           capacity?: number | null
           code?: string
-          coordinates_height?: number | null
-          coordinates_width?: number | null
-          coordinates_x?: number | null
-          coordinates_y?: number | null
           created_at?: string | null
-          description?: string | null
-          equipment?: string[] | null
-          facility_id?: string | null
-          floor?: string | null
           id?: string
           interval?: string | null
-          is_main_zone?: boolean | null
           location_id?: string | null
           metadata?: Json | null
           name?: Json
-          parent_zone_id?: string | null
-          status?: string | null
-          type?: string | null
           updated_at?: string | null
         }
         Relationships: [
-          {
-            foreignKeyName: "app_zones_facility_id_fkey"
-            columns: ["facility_id"]
-            isOneToOne: false
-            referencedRelation: "app_locations"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "app_zones_location_id_fkey"
             columns: ["location_id"]
             isOneToOne: false
             referencedRelation: "app_locations"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "app_zones_parent_zone_id_fkey"
-            columns: ["parent_zone_id"]
-            isOneToOne: false
-            referencedRelation: "app_zones"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      organizations: {
-        Row: {
-          address_city: string
-          address_country: string | null
-          address_postal_code: string
-          address_street: string
-          bank_account: string | null
-          contact_email: string
-          contact_phone: string | null
-          created_at: string | null
-          description: string | null
-          founded_year: number | null
-          id: string
-          is_active: boolean | null
-          member_count: number | null
-          name: string
-          org_number: string | null
-          parent_organization_id: string | null
-          status: string | null
-          type: string
-          updated_at: string | null
-          vat_number: string | null
-          verification_level: string | null
-          website: string | null
-        }
-        Insert: {
-          address_city: string
-          address_country?: string | null
-          address_postal_code: string
-          address_street: string
-          bank_account?: string | null
-          contact_email: string
-          contact_phone?: string | null
-          created_at?: string | null
-          description?: string | null
-          founded_year?: number | null
-          id?: string
-          is_active?: boolean | null
-          member_count?: number | null
-          name: string
-          org_number?: string | null
-          parent_organization_id?: string | null
-          status?: string | null
-          type: string
-          updated_at?: string | null
-          vat_number?: string | null
-          verification_level?: string | null
-          website?: string | null
-        }
-        Update: {
-          address_city?: string
-          address_country?: string | null
-          address_postal_code?: string
-          address_street?: string
-          bank_account?: string | null
-          contact_email?: string
-          contact_phone?: string | null
-          created_at?: string | null
-          description?: string | null
-          founded_year?: number | null
-          id?: string
-          is_active?: boolean | null
-          member_count?: number | null
-          name?: string
-          org_number?: string | null
-          parent_organization_id?: string | null
-          status?: string | null
-          type?: string
-          updated_at?: string | null
-          vat_number?: string | null
-          verification_level?: string | null
-          website?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "organizations_parent_organization_id_fkey"
-            columns: ["parent_organization_id"]
-            isOneToOne: false
-            referencedRelation: "organizations"
             referencedColumns: ["id"]
           },
         ]
