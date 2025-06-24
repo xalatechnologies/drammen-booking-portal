@@ -2,17 +2,47 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { FacilityFilters } from "@/types/facility";
+import { PaginationParams } from "@/types/api";
 
-export function useOptimizedFacilities() {
+interface UseOptimizedFacilitiesParams {
+  pagination?: PaginationParams;
+  filters?: FacilityFilters;
+}
+
+export function useOptimizedFacilities(params?: UseOptimizedFacilitiesParams) {
   const { language } = useLanguage();
+  const { pagination, filters } = params || {};
 
   return useQuery({
-    queryKey: ['optimized-facilities', language],
+    queryKey: ['optimized-facilities', language, pagination, filters],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from('app_locations')
         .select('*')
         .order('created_at', { ascending: false });
+
+      // Apply filters
+      if (filters?.searchTerm) {
+        query = query.or(`name->>NO.ilike.%${filters.searchTerm}%,name->>EN.ilike.%${filters.searchTerm}%,code.ilike.%${filters.searchTerm}%`);
+      }
+
+      if (filters?.location) {
+        query = query.ilike('address', `%${filters.location}%`);
+      }
+
+      if (filters?.facilityType) {
+        query = query.contains('facilities', [filters.facilityType]);
+      }
+
+      // Apply pagination
+      if (pagination) {
+        const from = (pagination.page - 1) * pagination.limit;
+        const to = from + pagination.limit - 1;
+        query = query.range(from, to);
+      }
+
+      const { data, error } = await query;
 
       if (error) throw new Error(error.message);
 
@@ -30,7 +60,7 @@ export function useOptimizedFacilities() {
         created_at: location.created_at
       }));
 
-      return facilities;
+      return { facilities, isLoading: false, error: null };
     },
     staleTime: 30000, // Cache for 30 seconds for optimization
   });

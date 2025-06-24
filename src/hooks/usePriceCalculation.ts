@@ -39,7 +39,7 @@ export function usePriceCalculation({
         return null;
       }
 
-      const rules = await PriceRuleService.getPriceRules(facilityId, zoneId);
+      const rules = await PriceRuleService.getPriceRules(facilityId);
       const priceActorType = convertActorType(customerType);
       const unitPrice = PriceRuleService.calculateUnitPrice(rules, startDate, priceActorType);
       

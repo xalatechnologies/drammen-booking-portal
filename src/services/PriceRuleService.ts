@@ -1,6 +1,18 @@
 
 import { supabase } from "@/integrations/supabase/client";
-import { ActorType, PriceRuleType } from "@/types/pricing";
+
+export enum ActorType {
+  INDIVIDUAL = 'individual',
+  ORGANIZATION = 'organization',
+  PARAPLY = 'paraply'
+}
+
+export enum PriceRuleType {
+  BASE = 'base',
+  DISCOUNT = 'discount',
+  SURCHARGE = 'surcharge',
+  TIME_BASED = 'time_based'
+}
 
 interface PriceRule {
   id: string;
@@ -44,14 +56,27 @@ export class PriceRuleService {
         priority: rule.priority || 1,
         config: typeof rule.config === 'object' ? rule.config as any : {},
         price: rule.price,
-        isActive: true, // Default since this field doesn't exist in schema
+        isActive: true,
         createdAt: rule.created_at || '',
-        updatedAt: rule.created_at || '' // Use created_at since updated_at doesn't exist
+        updatedAt: rule.created_at || ''
       }));
     } catch (error) {
       console.error('Error fetching price rules:', error);
       return [];
     }
+  }
+
+  static calculateUnitPrice(rules: PriceRule[], date: Date, actorType: ActorType): number {
+    const applicableRules = rules.filter(rule => 
+      rule.actorType === actorType && rule.isActive
+    );
+
+    if (applicableRules.length === 0) {
+      return 450; // Default price
+    }
+
+    // Return the first matching rule's price
+    return applicableRules[0].price;
   }
 
   static async createPriceRule(rule: Omit<PriceRule, 'id' | 'createdAt' | 'updatedAt'>): Promise<PriceRule | null> {

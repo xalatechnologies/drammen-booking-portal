@@ -9,9 +9,9 @@ export function useProfile() {
     queryFn: async () => {
       const result = await ProfileService.getCurrentProfile();
       if (!result.success) {
-        throw new Error(result.error.message);
+        throw new Error(result.error?.message || 'Failed to get profile');
       }
-      return result.data;
+      return result.data!;
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
@@ -21,12 +21,12 @@ export function useUpdateProfile() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (updates: Partial<Profile>) => {
-      const result = await ProfileService.updateProfile(updates);
+    mutationFn: async ({ userId, updates }: { userId: string; updates: Partial<Profile> }) => {
+      const result = await ProfileService.updateProfile(userId, updates);
       if (!result.success) {
-        throw new Error(result.error.message);
+        throw new Error(result.error?.message || 'Failed to update profile');
       }
-      return result.data;
+      return result.data!;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['profile'] });
@@ -44,9 +44,9 @@ export function useUserRoles(userId?: string) {
     queryFn: async () => {
       const result = await ProfileService.getUserRoles(userId);
       if (!result.success) {
-        throw new Error(result.error.message);
+        throw new Error(result.error?.message || 'Failed to get user roles');
       }
-      return result.data;
+      return result.data!;
     },
     staleTime: 1000 * 60 * 10, // 10 minutes
   });

@@ -12,11 +12,18 @@ const FacilityFormPage = () => {
     navigate("/admin/facilities");
   };
 
+  const handleCancel = () => {
+    navigate("/admin/facilities");
+  };
+
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <FacilityFormBreadcrumb />
-        <EnhancedFacilityForm onSuccess={handleSuccess} />
+        <FacilityFormBreadcrumb 
+          isEditing={false}
+          onCancel={handleCancel}
+        />
+        <EnhancedFacilityForm />
       </div>
     </AdminLayout>
   );

@@ -6,9 +6,9 @@ import FacilityTypeGrid from "@/components/FacilityTypeGrid";
 import MapView from "@/components/MapView";
 import CalendarView from "@/components/calendar/CalendarView";
 import FacilityGrid from "@/components/FacilityGrid";
-import SearchFilter from "@/components/SearchFilter";
+import { SearchFilter } from "@/components/SearchFilter";
 import GlobalFooter from "@/components/GlobalFooter";
-import { useFacilities } from "@/hooks/useFacilities";
+import { useOptimizedFacilities } from "@/hooks/useOptimizedFacilities";
 
 const Index = () => {
   const [viewMode, setViewMode] = useState<"grid" | "map" | "calendar" | "list">("grid");
@@ -22,16 +22,18 @@ const Index = () => {
   const [date, setDate] = useState<Date>(new Date());
 
   // Fetch facilities with pagination
-  const { facilities = [], isLoading } = useFacilities({
+  const { data, isLoading } = useOptimizedFacilities({
     pagination: { page: 1, limit: 20 },
     filters: {
-      search: searchTerm,
+      searchTerm,
       facilityType,
       location,
       accessibility,
       capacity
     }
   });
+
+  const facilities = data?.facilities || [];
 
   const renderContent = () => {
     if (isLoading) {
@@ -40,7 +42,7 @@ const Index = () => {
 
     switch (viewMode) {
       case "map":
-        return <MapView facilities={facilities} />;
+        return <MapView />;
       case "calendar":
         return (
           <CalendarView
@@ -55,7 +57,16 @@ const Index = () => {
         );
       case "grid":
       default:
-        return <FacilityGrid facilities={facilities} />;
+        return <FacilityGrid 
+          pagination={{ page: 1, limit: 20 }}
+          filters={{
+            searchTerm,
+            facilityType,
+            location,
+            accessibility,
+            capacity
+          }}
+        />;
     }
   };
 

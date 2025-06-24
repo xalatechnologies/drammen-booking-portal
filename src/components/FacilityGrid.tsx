@@ -18,10 +18,12 @@ const FacilityGrid: React.FC<FacilityGridProps> = ({
 }) => {
   const navigate = useNavigate();
   
-  const { facilities, isLoading, error } = useOptimizedFacilities({
+  const { data, isLoading, error } = useOptimizedFacilities({
     pagination,
     filters
   });
+
+  const facilities = data?.facilities || [];
 
   console.log("FacilityGrid - Facilities:", facilities.length);
   console.log("FacilityGrid - Filters:", filters);
