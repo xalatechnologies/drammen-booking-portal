@@ -38,15 +38,36 @@ const getLocalizedText = (value: any, fallback: string = ''): string => {
 };
 
 const computeAddress = (location: any): string => {
-  const addressParts = [
-    location.address_street,
-    location.address_city,
-    location.address_postal_code
-  ].filter(part => part && part.trim() !== '');
+  console.log('computeAddress - Input location:', {
+    address_street: location.address_street,
+    address_city: location.address_city,
+    address_postal_code: location.address_postal_code,
+    address: location.address
+  });
+
+  const addressParts = [];
   
-  return addressParts.length > 0 
-    ? addressParts.join(', ')
-    : location.address || '';
+  if (location.address_street && location.address_street.trim() !== '') {
+    addressParts.push(location.address_street.trim());
+  }
+  
+  if (location.address_postal_code && location.address_postal_code.trim() !== '') {
+    addressParts.push(location.address_postal_code.trim());
+  }
+  
+  if (location.address_city && location.address_city.trim() !== '') {
+    addressParts.push(location.address_city.trim());
+  }
+  
+  let result = '';
+  if (addressParts.length > 0) {
+    result = addressParts.join(', ');
+  } else if (location.address) {
+    result = location.address;
+  }
+  
+  console.log('computeAddress - Result:', result);
+  return result;
 };
 
 export const useFacilities = () => {
@@ -68,7 +89,7 @@ export const useFacilities = () => {
           return [];
         }
 
-        console.log('useFacilities - Raw locations data:', locations);
+        console.log('useFacilities - Raw locations data:', JSON.stringify(locations?.slice(0, 1), null, 2));
 
         // Get images separately to avoid relationship conflicts
         const { data: images, error: imagesError } = await supabase
@@ -79,6 +100,8 @@ export const useFacilities = () => {
         if (imagesError) {
           console.warn('useFacilities - Images error (non-critical):', imagesError);
         }
+
+        console.log('useFacilities - Images data:', images?.length || 0, 'images found');
 
         // Group images by location_id
         const imagesByLocation = (images || []).reduce((acc, img) => {
@@ -94,23 +117,28 @@ export const useFacilities = () => {
           return acc;
         }, {} as Record<string, any[]>);
 
+        console.log('useFacilities - Images grouped by location:', Object.keys(imagesByLocation).length, 'locations have images');
+
         const facilities = (locations || []).map((location: any) => {
           console.log('useFacilities - Processing location:', {
             id: location.id,
             name: location.name,
             description: location.description,
             address_street: location.address_street,
-            address_city: location.address_city
+            address_city: location.address_city,
+            address: location.address
           });
 
           const facilityName = getLocalizedText(location.name, 'Unnamed Facility');
           const facilityDescription = getLocalizedText(location.description, '');
           const facilityAddress = computeAddress(location);
+          const facilityImages = imagesByLocation[location.id] || [];
 
           console.log('useFacilities - Processed values:', {
             facilityName,
             facilityDescription,
-            facilityAddress
+            facilityAddress,
+            imagesCount: facilityImages.length
           });
 
           return {
@@ -129,7 +157,7 @@ export const useFacilities = () => {
             accessibility_features: location.accessibility_features || [],
             is_featured: location.is_featured || false,
             status: location.status || 'active',
-            facility_images: imagesByLocation[location.id] || []
+            facility_images: facilityImages
           };
         });
 
