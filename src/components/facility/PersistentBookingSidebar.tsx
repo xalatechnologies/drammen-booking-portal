@@ -5,8 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useCart } from "@/contexts/CartContext";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "@/i18n/hooks/useTranslation";
+import { format } from "date-fns";
 
 interface PersistentBookingSidebarProps {
   facilityName: string;
@@ -24,6 +27,8 @@ export function PersistentBookingSidebar({
     getItemCount
   } = useCart();
   const navigate = useNavigate();
+  const { t } = useTranslation();
+  const [customerType, setCustomerType] = useState<string>('private');
 
   const facilityCartItems = items.filter(item => item.facilityId === facilityId);
 
@@ -31,8 +36,19 @@ export function PersistentBookingSidebar({
     navigate('/checkout');
   };
 
+  const addTimeSlot = (item: any) => {
+    console.log('Add time slot for:', item);
+  };
+
+  const removeTimeSlot = (item: any) => {
+    console.log('Remove time slot for:', item);
+  };
+
   return (
     <div className="space-y-6">
+      {/* Customer Type Selection */}
+      
+
       {/* Booking Cart */}
       <Card>
         <CardHeader className="pb-3">
@@ -60,12 +76,9 @@ export function PersistentBookingSidebar({
                         </Badge>
                       </div>
                       <p className="text-sm font-medium text-gray-900">
-                        {new Date(item.startTime).toLocaleDateString('no-NO')}
+                        {format(new Date(item.date), 'dd.MM.yyyy')}
                       </p>
-                      <p className="text-sm text-gray-600">
-                        {new Date(item.startTime).toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' })} - 
-                        {new Date(item.endTime).toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' })}
-                      </p>
+                      <p className="text-sm text-gray-600">{item.timeSlot}</p>
                     </div>
                     <Button variant="ghost" size="sm" onClick={() => removeFromCart(item.id)} className="p-1 h-auto text-gray-400 hover:text-red-500">
                       <X className="h-4 w-4" />
@@ -74,10 +87,16 @@ export function PersistentBookingSidebar({
                   
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs text-gray-500">{item.duration} min</span>
+                      <Button variant="outline" size="sm" className="h-6 w-6 p-0" onClick={() => removeTimeSlot(item)}>
+                        <Minus className="h-3 w-3" />
+                      </Button>
+                      <span className="text-xs text-gray-500">2t</span>
+                      <Button variant="outline" size="sm" className="h-6 w-6 p-0" onClick={() => addTimeSlot(item)}>
+                        <Plus className="h-3 w-3" />
+                      </Button>
                     </div>
                     <Badge className="bg-green-100 text-green-800 font-medium">
-                      {item.price} kr
+                      {item.pricePerHour * 2} kr
                     </Badge>
                   </div>
                   

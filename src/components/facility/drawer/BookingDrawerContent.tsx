@@ -5,6 +5,7 @@ import { SelectedTimeSlot } from '@/utils/recurrenceEngine';
 import { ActorType as PricingActorType, BookingType } from '@/types/pricing';
 import { ActorType as CartActorType } from '@/types/cart';
 import { Zone } from '@/components/booking/types';
+import { BookingService, BookingFormData } from '@/services/BookingService';
 import { useToast } from '@/hooks/use-toast';
 import { BookingActivityStep } from './BookingActivityStep';
 import { BookingPricingStep } from './BookingPricingStep';
@@ -101,60 +102,91 @@ export function BookingDrawerContent({
       return;
     }
 
-    // Simplified booking submission - just log for now
-    console.log('Booking submission:', {
+    const bookingFormData: BookingFormData = {
+      purpose,
+      attendees,
+      activityType,
+      additionalInfo: formData.notes,
+      actorType: pricingActorType,
+      termsAccepted: true // Assuming accepted at this point
+    };
+
+    const result = await BookingService.completeBooking({
       selectedSlots,
       facilityId,
       facilityName,
-      formData,
-      pricingActorType,
-      bookingType
+      zones,
+      formData: bookingFormData
     });
 
-    toast({
-      title: "Reservasjon opprettet",
-      description: "Booking has been created successfully",
-    });
+    if (result.success) {
+      toast({
+        title: "Reservasjon opprettet",
+        description: result.message,
+      });
 
-    // Navigate to confirmation page
-    navigate(`/booking/${facilityId}/confirm`, {
-      state: {
-        selectedSlots,
-        formData: {
-          ...formData,
-          purpose
-        },
-        actorType: convertActorType(pricingActorType),
-        bookingType,
-        requiresApproval: ['lag-foreninger', 'paraply'].includes(pricingActorType)
-      }
-    });
+      // Navigate to booking confirmation
+      navigate(`/booking/${facilityId}/confirm`, {
+        state: {
+          selectedSlots,
+          formData: {
+            ...formData,
+            purpose
+          },
+          actorType: convertActorType(pricingActorType),
+          bookingType,
+          requiresApproval: ['lag-foreninger', 'paraply'].includes(pricingActorType)
+        }
+      });
+    } else {
+      toast({
+        title: "Feil",
+        description: result.message,
+        variant: "destructive",
+      });
+    }
   };
 
   const handleAddToCart = async () => {
-    // Simplified cart addition - just log for now
-    console.log('Adding to cart:', {
+    const bookingFormData: BookingFormData = {
+      purpose,
+      attendees,
+      activityType,
+      additionalInfo: formData.notes,
+      actorType: pricingActorType,
+      termsAccepted: true
+    };
+
+    const result = await BookingService.addToCart({
       selectedSlots,
       facilityId,
       facilityName,
-      formData,
-      pricingActorType
+      zones,
+      formData: bookingFormData
     });
 
-    toast({
-      title: "Lagt til i handlekurv",
-      description: "Items have been added to cart",
-    });
+    if (result.success) {
+      toast({
+        title: "Lagt til i handlekurv",
+        description: result.message,
+      });
 
-    // Reset form state after adding to cart
-    resetFormState();
-    
-    // Clear selected slots in parent component if callback provided
-    if (onSlotsCleared) {
-      onSlotsCleared();
+      // Reset form state after adding to cart
+      resetFormState();
+      
+      // Clear selected slots in parent component if callback provided
+      if (onSlotsCleared) {
+        onSlotsCleared();
+      }
+
+      console.log('Added slots to cart and reset state');
+    } else {
+      toast({
+        title: "Feil",
+        description: result.message,
+        variant: "destructive",
+      });
     }
-
-    console.log('Added slots to cart and reset state');
   };
 
   // Show message if no slots are selected

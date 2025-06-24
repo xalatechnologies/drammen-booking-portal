@@ -8,17 +8,11 @@ import { SelectedSlotsAccordion } from './SelectedSlotsAccordion';
 import { BookingFormFields } from './BookingFormFields';
 import { EnhancedPriceCalculationCard } from './EnhancedPriceCalculationCard';
 import { BookingActionButtons } from './BookingActionButtons';
+import { BookingService, BookingFormData } from '@/services/BookingService';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
-
-interface BookingFormData {
-  purpose: string;
-  attendees: number;
-  activityType: string;
-  additionalInfo: string;
-  actorType: ActorType;
-  termsAccepted: boolean;
-}
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { AlertTriangle } from 'lucide-react';
 
 interface BookingFormProps {
   selectedSlots: SelectedTimeSlot[];
@@ -41,6 +35,9 @@ export function BookingForm({
   onSlotsCleared,
   onRemoveSlot
 }: BookingFormProps) {
+  console.log('BookingForm: Rendering with selectedSlots:', selectedSlots);
+  console.log('BookingForm: facilityId:', facilityId, 'facilityName:', facilityName);
+  
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -53,37 +50,61 @@ export function BookingForm({
     termsAccepted: false
   });
 
+  const [conflicts, setConflicts] = useState<any[]>([]);
+
   const updateFormData = (updates: Partial<BookingFormData>) => {
     setFormData(prev => ({ ...prev, ...updates }));
   };
 
   const handleRemoveSlot = (slot: SelectedTimeSlot) => {
+    console.log('BookingForm: handleRemoveSlot called:', slot);
     if (onRemoveSlot) {
       onRemoveSlot(slot.zoneId, slot.date, slot.timeSlot);
     }
   };
 
   const handleClearAll = () => {
+    console.log('BookingForm: handleClearAll called');
+    setConflicts([]);
     if (onSlotsCleared) {
       onSlotsCleared();
     }
   };
 
   const isFormValid = () => {
-    return selectedSlots.length > 0 && formData.termsAccepted;
+    return BookingService.validateBookingData({
+      selectedSlots,
+      facilityId,
+      facilityName,
+      zones,
+      formData
+    });
   };
 
   const handleAddToCart = async () => {
-    try {
+    console.log('BookingForm: handleAddToCart called');
+
+    const result = await BookingService.addToCart({
+      selectedSlots,
+      facilityId,
+      facilityName,
+      zones,
+      formData
+    });
+
+    if (result.success) {
       toast({
         title: "Lagt til i handlekurv",
-        description: "Items added to cart successfully",
+        description: result.message,
       });
 
+      // Clear conflicts and slots after successful addition
+      setConflicts([]);
       if (onSlotsCleared) {
         onSlotsCleared();
       }
 
+      // Call parent callback if provided
       if (onAddToCart) {
         onAddToCart({
           selectedSlots,
@@ -92,20 +113,35 @@ export function BookingForm({
           formData
         });
       }
-    } catch (error) {
+    } else {
+      // Handle conflicts
+      if (result.conflicts) {
+        setConflicts(result.conflicts);
+      }
+      
       toast({
         title: "Feil",
-        description: "Failed to add to cart",
+        description: result.message,
         variant: "destructive",
       });
     }
   };
 
   const handleCompleteBooking = async () => {
-    try {
+    console.log('BookingForm: handleCompleteBooking called');
+
+    const result = await BookingService.completeBooking({
+      selectedSlots,
+      facilityId,
+      facilityName,
+      zones,
+      formData
+    });
+
+    if (result.success) {
       toast({
         title: "Reservasjon opprettet",
-        description: "Booking created successfully",
+        description: result.message,
       });
 
       setTimeout(() => {
@@ -120,55 +156,83 @@ export function BookingForm({
           formData
         });
       }
-    } catch (error) {
+    } else {
+      // Handle conflicts
+      if (result.conflicts) {
+        setConflicts(result.conflicts);
+      }
+      
       toast({
         title: "Feil",
-        description: "Failed to create booking",
+        description: result.message,
         variant: "destructive",
       });
     }
   };
 
-  const calculateTotalPrice = () => {
-    return selectedSlots.length * 450;
-  };
-
   if (selectedSlots.length === 0) {
     return (
-      <Card>
-        <CardContent className="text-center p-8">
-          <p className="text-gray-500">Ingen tidslukker valgt</p>
+      <Card className="w-full">
+        <CardContent className="p-6 text-center">
+          <h3 className="text-xl font-semibold text-gray-900 mb-3">
+            Ingen tidspunkt valgt
+          </h3>
+          <p className="text-gray-600">
+            Velg tidspunkt i kalenderen først for å starte booking prosessen.
+          </p>
         </CardContent>
       </Card>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <SelectedSlotsAccordion
-        selectedSlots={selectedSlots}
-        zones={zones}
-        onRemoveSlot={handleRemoveSlot}
-        onClearAll={handleClearAll}
-      />
+    <Card className="w-full">
+      <CardContent className="space-y-5 p-5">
+        {/* Conflict Warning */}
+        {conflicts.length > 0 && (
+          <Alert variant="destructive">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertDescription>
+              {conflicts.length === 1 
+                ? "Det valgte tidspunktet har en konflikt med en eksisterende booking." 
+                : `${conflicts.length} av de valgte tidspunktene har konflikter med eksisterende bookinger.`
+              }
+              Vennligst velg andre tidspunkt eller kontakt oss for å løse konflikten.
+            </AlertDescription>
+          </Alert>
+        )}
 
-      <BookingFormFields
-        formData={formData}
-        onUpdateFormData={updateFormData}
-      />
+        {/* Selected Times Overview Accordion */}
+        <SelectedSlotsAccordion
+          selectedSlots={selectedSlots}
+          zones={zones}
+          onRemoveSlot={handleRemoveSlot}
+          onClearAll={handleClearAll}
+        />
 
-      <EnhancedPriceCalculationCard
-        selectedSlots={selectedSlots}
-        actorType={formData.actorType}
-      />
+        {/* Basic Information */}
+        <BookingFormFields
+          formData={formData}
+          onUpdateFormData={updateFormData}
+        />
 
-      <BookingActionButtons
-        termsAccepted={formData.termsAccepted}
-        onTermsAcceptedChange={(accepted) => setFormData(prev => ({ ...prev, termsAccepted: accepted }))}
-        onAddToCart={handleAddToCart}
-        onCompleteBooking={handleCompleteBooking}
-        isFormValid={isFormValid()}
-      />
-    </div>
+        {/* Enhanced Price Calculation */}
+        <EnhancedPriceCalculationCard
+          selectedSlots={selectedSlots}
+          facilityId={facilityId}
+          actorType={formData.actorType}
+          activityType={formData.activityType}
+        />
+
+        {/* Terms and Action Buttons */}
+        <BookingActionButtons
+          termsAccepted={formData.termsAccepted}
+          onTermsAcceptedChange={(accepted) => updateFormData({ termsAccepted: accepted })}
+          onAddToCart={handleAddToCart}
+          onCompleteBooking={handleCompleteBooking}
+          isFormValid={isFormValid()}
+        />
+      </CardContent>
+    </Card>
   );
 }

@@ -1,62 +1,108 @@
 
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { MapPin, Plus } from 'lucide-react';
-
-interface Zone {
-  id: string;
-  name: string;
-  capacity: number;
-  area?: string;
-}
+import React from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Plus, Edit, Eye } from "lucide-react";
+import { useZones } from "@/hooks/useZones";
 
 interface FacilityZonesSectionProps {
-  facility: {
-    id: number;
-    zones?: Zone[];
-  };
+  facility: any;
 }
 
-export function FacilityZonesSection({ facility }: FacilityZonesSectionProps) {
-  const handleAddZone = () => {
-    console.log('Add zone for facility:', facility.id);
-  };
+export const FacilityZonesSection: React.FC<FacilityZonesSectionProps> = ({ facility }) => {
+  const { data: zones = [], isLoading } = useZones(facility.id?.toString());
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardContent className="p-8 text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading zones...</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <MapPin className="h-5 w-5" />
-            Zones
-          </div>
-          <Button onClick={handleAddZone} size="sm">
-            <Plus className="h-4 w-4 mr-2" />
-            Add Zone
-          </Button>
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        {!facility.zones || facility.zones.length === 0 ? (
-          <div className="text-center py-8">
-            <MapPin className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-            <p className="text-gray-500 mb-2">No zones configured</p>
-            <p className="text-sm text-gray-400">
-              Add zones to divide the facility into bookable areas
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-semibold">Zones & Areas</h2>
+        <Button>
+          <Plus className="h-4 w-4 mr-2" />
+          Add New Zone
+        </Button>
+      </div>
+
+      {zones.length === 0 ? (
+        <Card>
+          <CardContent className="p-8 text-center">
+            <div className="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+              <Plus className="h-8 w-8 text-gray-400" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">No Zones Configured</h3>
+            <p className="text-gray-600 mb-4">
+              This facility doesn't have any zones configured yet. Zones help organize bookable areas within the facility.
             </p>
-          </div>
-        ) : (
-          <div className="space-y-2">
-            {facility.zones.map((zone) => (
-              <div key={zone.id} className="p-3 border rounded-lg">
-                <h4 className="font-medium">{zone.name}</h4>
-                <p className="text-sm text-gray-500">Capacity: {zone.capacity}</p>
-              </div>
-            ))}
-          </div>
-        )}
-      </CardContent>
-    </Card>
+            <Button>
+              <Plus className="h-4 w-4 mr-2" />
+              Create First Zone
+            </Button>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {zones.map((zone: any) => (
+            <Card key={zone.id}>
+              <CardHeader className="pb-3">
+                <div className="flex items-start justify-between">
+                  <CardTitle className="text-lg">{zone.name}</CardTitle>
+                  <Badge variant={zone.status === 'active' ? 'default' : 'secondary'}>
+                    {zone.status}
+                  </Badge>
+                </div>
+                {zone.description && (
+                  <p className="text-sm text-gray-600">{zone.description}</p>
+                )}
+              </CardHeader>
+              <CardContent className="pt-0">
+                <div className="space-y-2 mb-4">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Type:</span>
+                    <span className="font-medium">{zone.type}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Capacity:</span>
+                    <span className="font-medium">{zone.capacity} people</span>
+                  </div>
+                  {zone.area_sqm && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Area:</span>
+                      <span className="font-medium">{zone.area_sqm} m²</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Bookable:</span>
+                    <Badge variant={zone.bookable_independently ? "default" : "secondary"} className="text-xs">
+                      {zone.bookable_independently ? "Yes" : "No"}
+                    </Badge>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm" className="flex-1">
+                    <Eye className="h-4 w-4 mr-1" />
+                    View
+                  </Button>
+                  <Button variant="outline" size="sm">
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+    </div>
   );
-}
+};

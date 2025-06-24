@@ -1,104 +1,118 @@
 
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
-export type NotificationType = 'info' | 'success' | 'warning' | 'error';
-
-export interface Notification {
-  id: string;
-  type: NotificationType;
-  title: string;
-  message: string;
-  duration?: number;
-}
-
-export type ViewMode = 'grid' | 'list' | 'map' | 'calendar';
-
-interface UIStore {
-  // View mode
-  currentView: ViewMode;
-  setCurrentView: (view: ViewMode) => void;
+interface UIState {
+  // Global UI state
+  isSidebarOpen: boolean;
+  isDrawerOpen: boolean;
+  drawerContent: 'booking' | 'filters' | 'cart' | null;
+  activeModal: string | null;
+  theme: 'light' | 'dark' | 'system';
   
   // Loading states
-  isLoading: boolean;
-  setIsLoading: (loading: boolean) => void;
-  
-  // Modal states
-  isModalOpen: boolean;
-  setIsModalOpen: (open: boolean) => void;
-  
-  // Sidebar states
-  isSidebarOpen: boolean;
-  setIsSidebarOpen: (open: boolean) => void;
-  
-  // Mobile menu
-  isMobileMenuOpen: boolean;
-  setIsMobileMenuOpen: (open: boolean) => void;
+  globalLoading: boolean;
+  loadingStates: Record<string, boolean>;
   
   // Notifications
-  notifications: Notification[];
-  addNotification: (notification: Omit<Notification, 'id'>) => void;
+  notifications: Array<{
+    id: string;
+    type: 'success' | 'error' | 'warning' | 'info';
+    title: string;
+    message: string;
+    timestamp: number;
+  }>;
+  
+  // Actions
+  setSidebarOpen: (open: boolean) => void;
+  setDrawerOpen: (open: boolean, content?: 'booking' | 'filters' | 'cart' | null) => void;
+  setActiveModal: (modalId: string | null) => void;
+  setTheme: (theme: 'light' | 'dark' | 'system') => void;
+  setGlobalLoading: (loading: boolean) => void;
+  setLoadingState: (key: string, loading: boolean) => void;
+  addNotification: (notification: Omit<UIState['notifications'][0], 'id' | 'timestamp'>) => void;
   removeNotification: (id: string) => void;
   clearNotifications: () => void;
-  
-  // Search state
-  searchQuery: string;
-  setSearchQuery: (query: string) => void;
-  
-  // Filter states
-  activeFilters: Record<string, any>;
-  setActiveFilters: (filters: Record<string, any>) => void;
-  clearFilters: () => void;
 }
 
-export const useUIStore = create<UIStore>((set, get) => ({
-  // View mode
-  currentView: 'grid',
-  setCurrentView: (view) => set({ currentView: view }),
-  
-  // Loading states
-  isLoading: false,
-  setIsLoading: (loading) => set({ isLoading: loading }),
-  
-  // Modal states
-  isModalOpen: false,
-  setIsModalOpen: (open) => set({ isModalOpen: open }),
-  
-  // Sidebar states
-  isSidebarOpen: false,
-  setIsSidebarOpen: (open) => set({ isSidebarOpen: open }),
-  
-  // Mobile menu
-  isMobileMenuOpen: false,
-  setIsMobileMenuOpen: (open) => set({ isMobileMenuOpen: open }),
-  
-  // Notifications
-  notifications: [],
-  addNotification: (notification) => {
-    const id = Date.now().toString();
-    const newNotification = { ...notification, id };
-    set((state) => ({
-      notifications: [...state.notifications, newNotification]
-    }));
-    
-    // Auto-remove after duration (default 5 seconds)
-    const duration = notification.duration || 5000;
-    setTimeout(() => {
-      get().removeNotification(id);
-    }, duration);
-  },
-  
-  removeNotification: (id) => set((state) => ({
-    notifications: state.notifications.filter(n => n.id !== id)
-  })),
-  
-  clearNotifications: () => set({ notifications: [] }),
-  
-  // Search state
-  searchQuery: '',
-  setSearchQuery: (query) => set({ searchQuery: query }),
-  
-  // Filter states
-  activeFilters: {},
-  setActiveFilters: (filters) => set({ activeFilters: filters }),
-  clearFilters: () => set({ activeFilters: {} }),
-}));
+export const useUIStore = create<UIState>()(
+  persist(
+    (set, get) => ({
+      // Initial state
+      isSidebarOpen: false,
+      isDrawerOpen: false,
+      drawerContent: null,
+      activeModal: null,
+      theme: 'system',
+      globalLoading: false,
+      loadingStates: {},
+      notifications: [],
+
+      // Actions
+      setSidebarOpen: (open) => {
+        set({ isSidebarOpen: open });
+      },
+
+      setDrawerOpen: (open, content = null) => {
+        set({ 
+          isDrawerOpen: open,
+          drawerContent: open ? content : null
+        });
+      },
+
+      setActiveModal: (modalId) => {
+        set({ activeModal: modalId });
+      },
+
+      setTheme: (theme) => {
+        set({ theme });
+      },
+
+      setGlobalLoading: (loading) => {
+        set({ globalLoading: loading });
+      },
+
+      setLoadingState: (key, loading) => {
+        set(state => ({
+          loadingStates: {
+            ...state.loadingStates,
+            [key]: loading
+          }
+        }));
+      },
+
+      addNotification: (notification) => {
+        const id = Math.random().toString(36).substring(2);
+        const timestamp = Date.now();
+        set(state => ({
+          notifications: [
+            ...state.notifications,
+            { ...notification, id, timestamp }
+          ]
+        }));
+
+        // Auto-remove after 5 seconds
+        setTimeout(() => {
+          get().removeNotification(id);
+        }, 5000);
+      },
+
+      removeNotification: (id) => {
+        set(state => ({
+          notifications: state.notifications.filter(n => n.id !== id)
+        }));
+      },
+
+      clearNotifications: () => {
+        set({ notifications: [] });
+      }
+    }),
+    {
+      name: 'ui-storage',
+      partialize: (state) => ({
+        theme: state.theme,
+        isSidebarOpen: state.isSidebarOpen
+      }),
+    }
+  )
+);

@@ -1,8 +1,9 @@
 
-import { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useFacilities } from '@/hooks/useFacilities';
-import { transformFacilityForUI } from '@/utils/facilityTransforms';
+import { FacilityFilters } from "@/types/facility";
+import { useFacilities } from "@/hooks/useFacilities";
+import { useNavigate } from "react-router-dom";
+import { transformFacilitiesToCalendarFormat } from "@/components/calendar/utils/facilityTransformer";
+import { getStableAvailabilityStatus } from "@/utils/availabilityUtils";
 
 interface UseCalendarViewProps {
   date?: Date;
@@ -12,33 +13,40 @@ interface UseCalendarViewProps {
   capacity?: [number, number];
 }
 
-export const useCalendarView = (props: UseCalendarViewProps = {}) => {
+export function useCalendarView({
+  date,
+  facilityType,
+  location,
+  accessibility,
+  capacity
+}: UseCalendarViewProps) {
   const navigate = useNavigate();
-  const { data: rawFacilities = [], isLoading, error } = useFacilities();
+  
+  // Create filters from props
+  const filters: FacilityFilters = {
+    facilityType: facilityType !== "all" ? facilityType : undefined,
+    location: location !== "all" ? location : undefined,
+    accessibility: accessibility !== "all" ? accessibility : undefined,
+    capacity: capacity && (capacity[0] > 0 || capacity[1] < 200) ? capacity : undefined,
+    date: date || undefined,
+  };
 
-  const facilitiesWithZones = useMemo(() => {
-    // Ensure rawFacilities is an array
-    const facilitiesArray = Array.isArray(rawFacilities) ? rawFacilities : [];
-    return facilitiesArray.map(transformFacilityForUI);
-  }, [rawFacilities]);
+  const { facilities, isLoading, error } = useFacilities({
+    pagination: { page: 1, limit: 50 },
+    filters
+  });
 
-  const allZones = useMemo(() => {
-    return facilitiesWithZones.flatMap(facility => facility.zones || []);
-  }, [facilitiesWithZones]);
+  const facilitiesWithZones = transformFacilitiesToCalendarFormat(facilities);
+  const displayFacility = facilitiesWithZones[0];
+  const allZones = facilitiesWithZones.flatMap(f => f.zones);
 
   return {
-    facilities: Array.isArray(rawFacilities) ? rawFacilities : [],
     facilitiesWithZones,
     isLoading,
     error,
+    getAvailabilityStatus: getStableAvailabilityStatus,
+    displayFacility,
     allZones,
-    navigate,
-    selectedFacility: null,
-    selectedFacilityId: 0,
-    setSelectedFacilityId: () => {},
-    selectedWeek: new Date(),
-    setSelectedWeek: () => {},
-    selectedDate: new Date(),
-    setSelectedDate: () => {}
+    navigate
   };
-};
+}

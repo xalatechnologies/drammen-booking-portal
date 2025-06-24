@@ -1,24 +1,57 @@
 
-import React, { useState } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Heart, Share2, MapPin, Users, Clock, Euro } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { Facility } from '@/types/facility';
-import { FacilityCardImage } from './FacilityCardImage';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Card } from "@/components/ui/card";
+import { useTranslation } from "@/i18n";
+import { FacilityCardImage } from "./FacilityCardImage";
+import { FacilityCardContent } from "./FacilityCardContent";
+import { OpeningHours } from "@/types/facility";
+
+interface Facility {
+  id: number;
+  name: string;
+  address: string;
+  type: string;
+  image: string;
+  nextAvailable: string;
+  capacity: number;
+  accessibility: string[];
+  area: string;
+  suitableFor: string[];
+  equipment: string[];
+  openingHours: OpeningHours[];
+  description: string;
+  availableTimes?: {
+    date: Date;
+    slots: {
+      start: string;
+      end: string;
+      available: boolean;
+    }[];
+  }[];
+}
 
 interface FacilityCardProps {
   facility: Facility;
-  className?: string;
+  onAddressClick: (e: React.MouseEvent, facility: Facility) => void;
 }
 
-export function FacilityCard({ facility, className = '' }: FacilityCardProps) {
-  const [isFavorited, setIsFavorited] = useState(false);
+export function FacilityCard({ facility, onAddressClick }: FacilityCardProps) {
   const navigate = useNavigate();
+  const { t } = useTranslation();
+  const [isFavorited, setIsFavorited] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
-  const handleCardClick = () => {
-    navigate(`/facilities/${facility.id}`);
+  const handleShare = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (navigator.share) {
+      navigator.share({
+        title: facility.name,
+        url: window.location.href,
+      });
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+    }
   };
 
   const handleFavorite = (e: React.MouseEvent) => {
@@ -26,98 +59,38 @@ export function FacilityCard({ facility, className = '' }: FacilityCardProps) {
     setIsFavorited(!isFavorited);
   };
 
-  const handleShare = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (navigator.share) {
-      navigator.share({
-        title: facility.name,
-        text: facility.description || 'Check out this facility',
-        url: window.location.origin + `/facilities/${facility.id}`
-      });
-    }
-  };
-
   return (
-    <Card className={`group cursor-pointer hover:shadow-lg transition-all duration-200 overflow-hidden ${className}`} onClick={handleCardClick}>
-      <div className="relative">
-        <FacilityCardImage 
+    <Card 
+      className="group overflow-hidden hover:shadow-2xl transition-all duration-500 hover:translate-y-[-8px] border-0 shadow-lg bg-white relative cursor-pointer focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-opacity-50 h-full flex flex-col"
+      onClick={() => navigate(`/facilities/${facility.id}`)}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      role="button"
+      tabIndex={0}
+      aria-label={t('facility.actions.viewDetails', { name: facility.name, address: facility.address })}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          navigate(`/facilities/${facility.id}`);
+        }
+      }}
+    >
+      <FacilityCardImage
+        facility={facility}
+        isFavorited={isFavorited}
+        onFavorite={handleFavorite}
+        onShare={handleShare}
+      />
+      
+      <div className="flex-1 flex flex-col">
+        <FacilityCardContent
           facility={facility}
-          className="aspect-[4/3]"
+          onAddressClick={onAddressClick}
         />
-        
-        {/* Action buttons overlay */}
-        <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-          <Button
-            variant="secondary"
-            size="sm"
-            className="h-8 w-8 p-0 bg-white/90 hover:bg-white"
-            onClick={handleFavorite}
-          >
-            <Heart className={`h-4 w-4 ${isFavorited ? 'fill-red-500 text-red-500' : ''}`} />
-          </Button>
-          <Button
-            variant="secondary"
-            size="sm"
-            className="h-8 w-8 p-0 bg-white/90 hover:bg-white"
-            onClick={handleShare}
-          >
-            <Share2 className="h-4 w-4" />
-          </Button>
-        </div>
-
-        {/* Status badge */}
-        {facility.status && (
-          <div className="absolute top-3 left-3">
-            <Badge variant={facility.status === 'active' ? 'default' : 'secondary'}>
-              {facility.status}
-            </Badge>
-          </div>
-        )}
       </div>
 
-      <CardContent className="p-4">
-        <div className="space-y-3">
-          {/* Title and type */}
-          <div>
-            <h3 className="font-semibold text-lg text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-1">
-              {facility.name}
-            </h3>
-            <p className="text-sm text-gray-600">{facility.type}</p>
-          </div>
-
-          {/* Location */}
-          <div className="flex items-center gap-1 text-sm text-gray-600">
-            <MapPin className="h-4 w-4 flex-shrink-0" />
-            <span className="line-clamp-1">{facility.address_street}, {facility.address_city}</span>
-          </div>
-
-          {/* Stats */}
-          <div className="flex items-center justify-between text-sm text-gray-600">
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-1">
-                <Users className="h-4 w-4" />
-                <span>{facility.capacity}</span>
-              </div>
-              {facility.area_sqm && (
-                <div className="flex items-center gap-1">
-                  <span>{facility.area_sqm} m²</span>
-                </div>
-              )}
-            </div>
-            <div className="flex items-center gap-1 font-medium text-gray-900">
-              <Euro className="h-4 w-4" />
-              <span>{facility.price_per_hour} kr/t</span>
-            </div>
-          </div>
-
-          {/* Description */}
-          {facility.description && (
-            <p className="text-sm text-gray-600 line-clamp-2">
-              {facility.description}
-            </p>
-          )}
-        </div>
-      </CardContent>
+      {/* Hover Effect Border */}
+      <div className={`absolute inset-0 rounded-xl border-2 border-blue-400 transition-opacity duration-300 pointer-events-none ${isHovered ? 'opacity-100' : 'opacity-0'}`} />
     </Card>
   );
 }

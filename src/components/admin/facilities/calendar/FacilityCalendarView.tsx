@@ -6,7 +6,6 @@ import { ArrowLeft, Calendar, Clock, Users, MapPin } from "lucide-react";
 import { CalendarWithBooking } from "@/components/shared/CalendarWithBooking";
 import { useZones } from "@/hooks/useZones";
 import { SelectedTimeSlot } from "@/utils/recurrenceEngine";
-import { transformZoneForUI } from "@/utils/facilityTransforms";
 
 interface FacilityCalendarViewProps {
   facility: any;
@@ -18,12 +17,7 @@ export const FacilityCalendarView: React.FC<FacilityCalendarViewProps> = ({
   onBack
 }) => {
   const [selectedSlots, setSelectedSlots] = useState<SelectedTimeSlot[]>([]);
-  const { data: rawZones = [], isLoading: zonesLoading } = useZones(facility.id?.toString());
-
-  // Transform zones for UI
-  const zones = React.useMemo(() => {
-    return rawZones.map(transformZoneForUI);
-  }, [rawZones]);
+  const { data: zones = [], isLoading: zonesLoading } = useZones(facility.id?.toString());
 
   const handleSlotClick = (zoneId: string, date: Date, timeSlot: string, availability: string) => {
     console.log('Slot clicked:', { zoneId, date, timeSlot, availability });

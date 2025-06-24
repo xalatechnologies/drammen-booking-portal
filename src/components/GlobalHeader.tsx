@@ -102,7 +102,7 @@ const GlobalHeader = () => {
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-96 p-0 z-50" align="end">
-                <CartDropdown />
+                <CartDropdown onClose={() => setCartOpen(false)} />
               </PopoverContent>
             </Popover>
             

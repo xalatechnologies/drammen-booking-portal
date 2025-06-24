@@ -1,108 +1,112 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import GlobalHeader from '@/components/GlobalHeader';
+import GlobalFooter from '@/components/GlobalFooter';
+import { useCart } from '@/contexts/CartContext';
+import { useAuthStore } from '@/stores/useAuthStore';
 import { CheckoutHeader } from '@/components/checkout/CheckoutHeader';
-import { CheckoutBreadcrumb } from '@/components/checkout/CheckoutBreadcrumb';
-import { ProgressIndicator } from '@/components/checkout/ProgressIndicator';
-import { ContactDetailsStep } from '@/components/checkout/ContactDetailsStep';
-import { ReviewStep } from '@/components/checkout/ReviewStep';
-import { ConfirmationStep } from '@/components/checkout/ConfirmationStep';
 import { EmptyCart } from '@/components/checkout/EmptyCart';
-import { useCartStore } from '@/stores/useCartStore';
+import { ReviewStep } from '@/components/checkout/ReviewStep';
+import { LoginSelectionModal } from '@/components/auth/LoginSelectionModal';
+import { useToast } from '@/hooks/use-toast';
 
-type CheckoutStep = 'contact' | 'review' | 'confirmation';
-
-export default function CheckoutPage() {
-  const { items, clearCart } = useCartStore();
-  const [currentStep, setCurrentStep] = useState<CheckoutStep>('contact');
-  const [contactData, setContactData] = useState({
-    name: '',
-    email: '',
-    phone: ''
-  });
-  const [bookingReference, setBookingReference] = useState<string>('');
+const CheckoutPage = () => {
   const navigate = useNavigate();
+  const { items, removeFromCart, clearCart } = useCart();
+  const { isAuthenticated } = useAuthStore();
+  const { toast } = useToast();
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [pendingAction, setPendingAction] = useState<'individual' | 'all' | null>(null);
 
-  // Convert cart items to match expected format
-  const cartItems = items.map(item => ({
-    id: item.id,
-    facilityName: item.facilityName,
-    price: item.price,
-    date: new Date(item.startTime),
-    timeSlot: `${item.startTime} - ${item.endTime}`,
-    pricePerHour: item.price
-  }));
-
-  const handleContactSubmit = (data: typeof contactData) => {
-    setContactData(data);
-    setCurrentStep('review');
-  };
-
-  const handleReviewSubmit = async () => {
-    try {
-      // Generate booking reference
-      const reference = `BOK-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
-      setBookingReference(reference);
-      
-      console.log('Processing booking:', {
-        contactData,
-        items: cartItems,
-        reference
-      });
-      
-      // Clear cart after successful booking
-      clearCart();
-      setCurrentStep('confirmation');
-    } catch (error) {
-      console.error('Booking failed:', error);
+  const handleEditReservation = (reservationId: string) => {
+    const reservation = items.find(item => item.id === reservationId);
+    if (reservation) {
+      sessionStorage.setItem('editing_reservation', JSON.stringify(reservation));
+      navigate(`/facility/${reservation.facilityId}`);
     }
   };
 
-  const handleBackToFacilities = () => {
-    navigate('/');
+  const handleRemoveReservation = (reservationId: string) => {
+    removeFromCart(reservationId);
   };
 
-  const handleBack = () => {
-    navigate(-1);
+  const handleSendToApproval = (reservationId?: string) => {
+    if (!isAuthenticated) {
+      setPendingAction(reservationId ? 'individual' : 'all');
+      setShowLoginModal(true);
+      return;
+    }
+
+    // Simulate sending to approval
+    const message = reservationId 
+      ? 'Reservasjon sendt til godkjenning'
+      : 'Alle reservasjoner sendt til godkjenning';
+    
+    toast({
+      title: 'Sendt til godkjenning',
+      description: message,
+    });
+
+    setTimeout(() => {
+      navigate('/bookings');
+    }, 1500);
   };
 
-  if (cartItems.length === 0 && currentStep !== 'confirmation') {
-    return <EmptyCart onNavigateHome={handleBackToFacilities} />;
+  const handleLoginMethodSelect = (method: 'id-porten' | 'feide' | 'municipal') => {
+    console.log('Selected login method:', method);
+    setShowLoginModal(false);
+    // Here you would normally handle the actual login
+    // For now, we'll just proceed with the approval action
+    if (pendingAction) {
+      handleSendToApproval(pendingAction === 'individual' ? items[0]?.id : undefined);
+      setPendingAction(null);
+    }
+  };
+
+  const handleEmptyCart = () => {
+    clearCart();
+  };
+
+  if (items.length === 0) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col">
+        <GlobalHeader />
+        <div className="flex-grow flex items-center justify-center">
+          <EmptyCart onNavigateHome={() => navigate('/')} />
+        </div>
+        <GlobalFooter />
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <CheckoutHeader onBack={handleBack} />
-      <CheckoutBreadcrumb currentStep={currentStep} />
-      
-      <div className="max-w-4xl mx-auto py-8 px-4">
-        <ProgressIndicator currentStep={currentStep} />
-        
-        <div className="mt-8">
-          {currentStep === 'contact' && (
-            <ContactDetailsStep
-              onNext={handleContactSubmit}
-              initialData={contactData}
-            />
-          )}
-          
-          {currentStep === 'review' && (
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      <GlobalHeader />
+      <div className="flex-grow py-8">
+        <div className="container mx-auto px-4 max-w-4xl">
+          <CheckoutHeader onBack={() => navigate(-1)} />
+
+          <div className="w-full">
             <ReviewStep
-              contactData={contactData}
-              items={cartItems}
-              onSubmit={handleReviewSubmit}
-              onBack={() => setCurrentStep('contact')}
+              items={items}
+              onEditReservation={handleEditReservation}
+              onRemoveReservation={handleRemoveReservation}
+              onSendToApproval={handleSendToApproval}
+              onEmptyCart={handleEmptyCart}
             />
-          )}
-          
-          {currentStep === 'confirmation' && (
-            <ConfirmationStep
-              reference={bookingReference}
-              onBackToFacilities={handleBackToFacilities}
-            />
-          )}
+          </div>
         </div>
       </div>
+      <GlobalFooter />
+
+      <LoginSelectionModal
+        isOpen={showLoginModal}
+        onClose={() => setShowLoginModal(false)}
+        onLoginMethodSelect={handleLoginMethodSelect}
+      />
     </div>
   );
-}
+};
+
+export default CheckoutPage;

@@ -1,21 +1,18 @@
-
-import React from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from "react";
 import { PageLayout } from "@/components/layouts";
 import { FacilityListView } from "@/components/admin/facilities/FacilityListView";
 
 const LocationsPage = () => {
-  const navigate = useNavigate();
-
-  const handleEdit = (facilityId: number) => {
-    navigate(`/caseworker/locations/${facilityId}`);
-  };
+  const [selectedFacilityId, setSelectedFacilityId] = useState<number | undefined>();
 
   return (
     <PageLayout>
-      <FacilityListView onEdit={handleEdit} />
+      <FacilityListView 
+        selectedFacilityId={selectedFacilityId}
+        onFacilitySelect={setSelectedFacilityId}
+      />
     </PageLayout>
   );
 };
 
-export default LocationsPage;
+export default LocationsPage; 

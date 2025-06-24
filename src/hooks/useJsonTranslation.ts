@@ -1,87 +1,48 @@
-
+import { useQuery } from '@tanstack/react-query';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useMemo } from 'react';
+import { jsonTranslationService } from '@/i18n/JsonTranslationService';
 
-// Import JSON translation files
-import enTranslations from '@/i18n/locales/en.json';
-import noTranslations from '@/i18n/locales/no.json';
-
-type TranslationKey = string;
-type TranslationParams = Record<string, string | number>;
-
-const translations = {
-  'EN': enTranslations,
-  'NO': noTranslations
-};
-
-export function useJsonTranslation() {
+/**
+ * Hook for accessing translations from JSON files
+ * 
+ * This hook provides access to the JSON-based translation system,
+ * which is more efficient and maintainable than the database-driven approach.
+ */
+export const useJsonTranslation = () => {
   const { language } = useLanguage();
 
-  const currentTranslations = useMemo(() => {
-    return translations[language] || translations['NO'];
-  }, [language]);
+  const { data: isInitialized } = useQuery({
+    queryKey: ['json-translation-service-init'],
+    queryFn: async () => {
+      await jsonTranslationService.initialize();
+      return true;
+    },
+    staleTime: Infinity,
+  });
 
-  const t = (key: TranslationKey, defaultValue?: string, params?: TranslationParams): string => {
-    try {
-      const keys = key.split('.');
-      let value: any = currentTranslations;
-
-      for (const k of keys) {
-        value = value?.[k];
-      }
-
-      if (typeof value === 'string') {
-        // Handle parameter substitution
-        if (params) {
-          return Object.entries(params).reduce((str, [paramKey, paramValue]) => {
-            return str.replace(`{{${paramKey}}}`, String(paramValue));
-          }, value);
-        }
-        return value;
-      }
-
-      return defaultValue || key;
-    } catch (error) {
-      console.warn(`Translation not found for key: ${key}`);
-      return defaultValue || key;
-    }
+  /**
+   * Get a translation asynchronously
+   * @param key The translation key in dot notation (e.g. 'admin.sidebar.overview')
+   * @param fallback Optional fallback text if translation is not found
+   */
+  const t = async (key: string, fallback?: string): Promise<string> => {
+    return await jsonTranslationService.getTranslation(key, language, fallback);
   };
 
-  // Add tSync alias for backward compatibility with the same signature
-  const tSync = t;
-
-  const formatCurrency = (amount: number): string => {
-    return new Intl.NumberFormat(language === 'NO' ? 'nb-NO' : 'en-US', {
-      style: 'currency',
-      currency: 'NOK',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(amount);
-  };
-
-  const formatDate = (date: Date): string => {
-    return new Intl.DateTimeFormat(language === 'NO' ? 'nb-NO' : 'en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    }).format(date);
-  };
-
-  const formatTime = (date: Date): string => {
-    return new Intl.DateTimeFormat(language === 'NO' ? 'nb-NO' : 'en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
-    }).format(date);
+  /**
+   * Get a translation synchronously
+   * @param key The translation key in dot notation (e.g. 'admin.sidebar.overview')
+   * @param fallback Optional fallback text if translation is not found
+   */
+  const tSync = (key: string, fallback?: string): string => {
+    if (!isInitialized) return fallback || key;
+    return jsonTranslationService.getTranslationSync(key, language, fallback);
   };
 
   return {
     t,
     tSync,
     language,
-    formatCurrency,
-    formatDate,
-    formatTime,
-    isInitialized: true, // Always true for JSON-based translations
+    isInitialized: !!isInitialized
   };
-}
+};

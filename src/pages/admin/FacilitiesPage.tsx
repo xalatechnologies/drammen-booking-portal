@@ -1,25 +1,16 @@
 
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { PageLayout } from "@/components/layouts";
 import { FacilityListView } from "@/components/admin/facilities/FacilityListView";
 
 const FacilitiesPage = () => {
-  const navigate = useNavigate();
-
-  const handleCreateNew = () => {
-    navigate('/admin/facilities/new');
-  };
-
-  const handleEdit = (facilityId: number) => {
-    navigate(`/admin/facilities/${facilityId}`);
-  };
+  const [selectedFacilityId, setSelectedFacilityId] = useState<number | undefined>();
 
   return (
     <PageLayout>
       <FacilityListView 
-        onCreateNew={handleCreateNew}
-        onEdit={handleEdit}
+        selectedFacilityId={selectedFacilityId}
+        onFacilitySelect={setSelectedFacilityId}
       />
     </PageLayout>
   );

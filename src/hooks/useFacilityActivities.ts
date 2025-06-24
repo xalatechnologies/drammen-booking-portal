@@ -1,19 +1,15 @@
 
-import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { FacilityActivityService } from '@/services/facilityActivityService';
+import { useLanguage } from '@/contexts/LanguageContext';
 
-// Simple hook for facility activities without service dependency
 export function useFacilityActivities(facilityId: number) {
-  const [activities, setActivities] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const { language } = useLanguage();
 
-  useEffect(() => {
-    // Simple mock activities - replace with actual logic if needed
-    setActivities(['Fotball', 'Basketball', 'Volleyball', 'Tennis']);
-  }, [facilityId]);
-
-  return {
-    activities,
-    isLoading,
-    error: null
-  };
+  return useQuery({
+    queryKey: ['facility-activities', facilityId, language],
+    queryFn: () => FacilityActivityService.getFacilitySuitableActivities(facilityId, language),
+    enabled: !!facilityId && facilityId > 0,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
 }

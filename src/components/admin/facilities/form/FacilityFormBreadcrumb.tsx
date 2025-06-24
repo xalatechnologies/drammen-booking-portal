@@ -1,28 +1,56 @@
 
-import React from 'react';
-import { ChevronRight, Home } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import React from "react";
+import { Button } from "@/components/ui/button";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
+import { ArrowLeft, Home } from "lucide-react";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface FacilityFormBreadcrumbProps {
+  isEditing: boolean;
   facilityName?: string;
-  isEditing?: boolean;
+  onCancel: () => void;
 }
 
-export function FacilityFormBreadcrumb({ facilityName, isEditing }: FacilityFormBreadcrumbProps) {
+export const FacilityFormBreadcrumb: React.FC<FacilityFormBreadcrumbProps> = ({
+  isEditing,
+  facilityName,
+  onCancel
+}) => {
+  const { tSync } = useTranslation();
+
   return (
-    <nav className="flex items-center space-x-1 text-sm text-gray-600 mb-6">
-      <Button variant="ghost" size="sm" className="p-0 h-auto font-normal">
-        <Home className="h-4 w-4 mr-1" />
-        Admin
-      </Button>
-      <ChevronRight className="h-4 w-4" />
-      <Button variant="ghost" size="sm" className="p-0 h-auto font-normal">
-        Facilities
-      </Button>
-      <ChevronRight className="h-4 w-4" />
-      <span className="font-medium">
-        {isEditing ? (facilityName || 'Edit Facility') : 'New Facility'}
-      </span>
-    </nav>
+    <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center space-x-4">
+        <Button variant="ghost" size="sm" onClick={onCancel} className="p-2">
+          <ArrowLeft className="w-4 h-4" />
+        </Button>
+        
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/admin" className="flex items-center">
+                <Home className="w-4 h-4 mr-1" />
+                {tSync("admin.breadcrumb.home", "Admin")}
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/admin/facilities">
+                {tSync("admin.facilities.management", "Facilities")}
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>
+                {isEditing 
+                  ? `${tSync("admin.facilities.form.edit", "Edit")} ${facilityName || tSync("admin.facilities.form.facility", "Facility")}`
+                  : tSync("admin.facilities.form.addNew", "Add New Facility")
+                }
+              </BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+      </div>
+    </div>
   );
-}
+};

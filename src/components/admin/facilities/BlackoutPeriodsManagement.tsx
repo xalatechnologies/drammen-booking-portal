@@ -1,46 +1,169 @@
 
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { FacilityBlackoutService } from '@/services/FacilityBlackoutService';
+import { FacilityBlackoutPeriod } from '@/types/facility';
 
 interface BlackoutPeriodsManagementProps {
-  facilityId: number;
+  facilityId: string;
 }
 
 export function BlackoutPeriodsManagement({ facilityId }: BlackoutPeriodsManagementProps) {
-  const [periods, setPeriods] = useState<any[]>([]);
+  const [blackoutPeriods, setBlackoutPeriods] = useState<FacilityBlackoutPeriod[]>([]);
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [reason, setReason] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleAddPeriod = () => {
-    console.log('Add blackout period for facility:', facilityId);
+  useEffect(() => {
+    fetchBlackoutPeriods();
+  }, [facilityId]);
+
+  const fetchBlackoutPeriods = async () => {
+    setLoading(true);
+    try {
+      const response = await FacilityBlackoutService.getBlackoutsByFacility(parseInt(facilityId));
+      
+      if (response.data) {
+        setBlackoutPeriods(response.data);
+      } else {
+        setError('Failed to fetch blackout periods');
+      }
+    } catch (err) {
+      setError('An error occurred while fetching blackout periods');
+    } finally {
+      setLoading(false);
+    }
   };
 
+  const handleAddBlackoutPeriod = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const newPeriod = {
+        facility_id: parseInt(facilityId),
+        start_date: new Date(startDate),
+        end_date: new Date(endDate),
+        reason: reason,
+        type: 'maintenance' as const,
+        created_by: 'admin',
+      };
+      const response = await FacilityBlackoutService.createBlackout(newPeriod);
+      if (response.data) {
+        setBlackoutPeriods([...blackoutPeriods, response.data]);
+        setStartDate('');
+        setEndDate('');
+        setReason('');
+        await fetchBlackoutPeriods();
+      } else {
+        setError('Failed to add blackout period');
+      }
+    } catch (err) {
+      setError('An error occurred while adding the blackout period');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRemoveBlackoutPeriod = async (periodId: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await FacilityBlackoutService.deleteBlackout(periodId);
+      if (response.data) {
+        setBlackoutPeriods(blackoutPeriods.filter(period => period.id !== periodId));
+        await fetchBlackoutPeriods();
+      } else {
+        setError('Failed to remove blackout period');
+      }
+    } catch (err) {
+      setError('An error occurred while removing the blackout period');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const formatDate = (date: Date | string) => {
+    if (typeof date === 'string') {
+      return new Date(date).toLocaleDateString();
+    }
+    return date.toLocaleDateString();
+  };
+
+  if (loading) {
+    return <div className="p-4">Loading blackout periods...</div>;
+  }
+
+  if (error) {
+    return <div className="p-4 text-red-600">Error: {error}</div>;
+  }
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center justify-between">
-          Blackout Periods
-          <Button onClick={handleAddPeriod} size="sm">
-            <Plus className="h-4 w-4 mr-2" />
-            Add Period
-          </Button>
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        {periods.length === 0 ? (
-          <p className="text-gray-500 text-center py-4">
-            No blackout periods configured
-          </p>
+    <div className="space-y-6">
+      <div>
+        <h3 className="text-lg font-medium mb-4">Add New Blackout Period</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label htmlFor="startDate" className="block text-sm font-medium text-gray-700">Start Date</label>
+            <input
+              type="date"
+              id="startDate"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+            />
+          </div>
+          <div>
+            <label htmlFor="endDate" className="block text-sm font-medium text-gray-700">End Date</label>
+            <input
+              type="date"
+              id="endDate"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+            />
+          </div>
+          <div>
+            <label htmlFor="reason" className="block text-sm font-medium text-gray-700">Reason</label>
+            <input
+              type="text"
+              id="reason"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+            />
+          </div>
+        </div>
+        <button
+          onClick={handleAddBlackoutPeriod}
+          className="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+        >
+          Add Blackout Period
+        </button>
+      </div>
+
+      <div>
+        <h3 className="text-lg font-medium mb-4">Current Blackout Periods</h3>
+        {blackoutPeriods.length === 0 ? (
+          <p className="text-gray-500">No blackout periods configured.</p>
         ) : (
           <div className="space-y-2">
-            {periods.map((period, index) => (
-              <div key={index} className="p-3 border rounded-lg">
-                {period.name}
+            {blackoutPeriods.map((period) => (
+              <div key={period.id} className="flex items-center justify-between p-3 border rounded">
+                <div>
+                  {formatDate(period.start_date)} - {formatDate(period.end_date)}: {period.reason}
+                </div>
+                <button
+                  onClick={() => handleRemoveBlackoutPeriod(period.id)}
+                  className="bg-red-600 hover:bg-red-700 text-white font-medium py-1 px-3 rounded focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                >
+                  Remove
+                </button>
               </div>
             ))}
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

@@ -1,4 +1,3 @@
-
 import React from "react";
 import { EnhancedFacilityForm } from "./form/EnhancedFacilityForm";
 
@@ -15,7 +14,6 @@ export const FacilityFormView: React.FC<FacilityFormViewProps> = ({
 }) => {
   return (
     <EnhancedFacilityForm 
-      facilityId={facility?.id}
       onSuccess={onSuccess}
     />
   );
