@@ -76,7 +76,7 @@ export function BookingForm({
 
   const isFormValid = () => {
     // Check if actor type is selected and not empty string
-    if (!formData.actorType || formData.actorType === '') {
+    if (!formData.actorType) {
       return false;
     }
     
