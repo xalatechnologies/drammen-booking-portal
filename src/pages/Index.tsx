@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import { DateRange } from "react-day-picker";
@@ -10,10 +9,10 @@ import CalendarView from "@/components/CalendarView";
 // Import mock data instead of using the hook
 import { getFilteredMockFacilities } from "@/mocks/facilityMockData";
 import { Facility, FacilityFilters } from "@/types/facility";
-import { useJsonTranslation } from "@/hooks/useJsonTranslation";
+import { useTranslation } from "@/i18n/hooks/useTranslation";
 
 const Index = () => {
-  const { tSync } = useJsonTranslation();
+  const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const [date, setDate] = useState<Date>();
   const [facilityType, setFacilityType] = useState<string>("all");
@@ -166,7 +165,7 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex flex-col w-full">
       {/* Skip to main content link for screen readers */}
       <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-0 focus:left-0 bg-blue-600 text-white p-2 z-50 rounded-br-md focus:outline-none focus:ring-2 focus:ring-blue-500" tabIndex={0}>
-        Hopp til hovedinnhold
+        {t('accessibility.skipToMainContent', 'Hopp til hovedinnhold')}
       </a>
 
       {/* Fixed Global Header */}
