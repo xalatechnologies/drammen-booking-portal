@@ -35,7 +35,6 @@ export function convertDatabaseZoneToZone(dbZone: any): Zone {
     coordinates_width: dbZone.coordinates_width || null,
     coordinates_height: dbZone.coordinates_height || null,
     floor: dbZone.floor || null,
-    interval: dbZone.interval || '60min',
     status: normalizeStatus(dbZone.status || 'active'),
     metadata: dbZone.metadata || {},
     created_at: dbZone.created_at,

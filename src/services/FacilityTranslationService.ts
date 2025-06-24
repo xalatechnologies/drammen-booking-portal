@@ -12,5 +12,9 @@ export const facilityTranslationService = {
 
   async deleteFacilityContentKey(facilityId: string, contentType: string): Promise<void> {
     console.log('Mock: Deleting facility content key', facilityId, contentType);
+  },
+
+  async clearCache(): Promise<void> {
+    console.log('Mock: Clearing translation cache');
   }
 };

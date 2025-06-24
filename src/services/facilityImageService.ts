@@ -9,6 +9,16 @@ export const facilityImageService = {
     return [];
   },
 
+  async getFeaturedImage(facilityId: number): Promise<FacilityImage | null> {
+    console.log('Mock: Getting featured image for facility', facilityId);
+    return null;
+  },
+
+  async getFirstImage(facilityId: number): Promise<FacilityImage | null> {
+    console.log('Mock: Getting first image for facility', facilityId);
+    return null;
+  },
+
   async uploadFacilityImage(facilityId: string, imageFile: File): Promise<FacilityImage> {
     // Mock implementation
     const mockImage: FacilityImage = {

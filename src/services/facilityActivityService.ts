@@ -18,6 +18,12 @@ export const facilityActivityService = {
     return [];
   },
 
+  async getFacilitySuitableActivities(facilityId: string): Promise<FacilityActivity[]> {
+    // Mock implementation - return empty array since table doesn't exist
+    console.log('Mock: Getting facility suitable activities for facility', facilityId);
+    return [];
+  },
+
   async addFacilityActivity(facilityId: string, activityName: string, category: string): Promise<FacilityActivity> {
     // Mock implementation
     const mockActivity: FacilityActivity = {

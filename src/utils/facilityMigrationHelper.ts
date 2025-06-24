@@ -11,23 +11,20 @@ export class FacilityMigrationHelper {
 
     // 1. Insert the core facility data if it doesn't exist
     const { data: existingFacility } = await supabase
-      .from('facilities')
+      .from('app_locations')
       .select('id')
       .eq('id', facilityData.id)
       .single();
 
     if (!existingFacility) {
       const { error: facilityError } = await supabase
-        .from('facilities')
+        .from('app_locations')
         .insert({
           id: facilityData.id,
           name: facilityData.name.EN || facilityData.name.NO || `Facility ${facilityData.id}`,
-          address_street: facilityData.address_street,
-          address_city: facilityData.address_city,
-          address_postal_code: facilityData.address_postal_code,
-          address_country: facilityData.address_country,
-          type: facilityData.type,
-          area: facilityData.area,
+          address: facilityData.address_street,
+          code: facilityData.code || `FAC${facilityData.id}`,
+          location_type: facilityData.type,
           status: facilityData.status,
           capacity: facilityData.capacity,
           price_per_hour: facilityData.price_per_hour,
@@ -44,7 +41,8 @@ export class FacilityMigrationHelper {
           booking_lead_time_hours: facilityData.booking_lead_time_hours,
           max_advance_booking_days: facilityData.max_advance_booking_days,
           cancellation_deadline_hours: facilityData.cancellation_deadline_hours,
-          is_featured: facilityData.is_featured
+          is_featured: facilityData.is_featured,
+          is_published: true
         });
 
       if (facilityError) {
