@@ -76,7 +76,19 @@ export const useZoneStore = create<ZoneState>((set, get) => ({
           coordinates_height: zone.coordinates_height || 100,
           floor: '1',
           created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
+          // Add required computed fields
+          pricePerHour: 250,
+          availableTimes: [],
+          openingHours: [],
+          bookingRules: {
+            minBookingDuration: 1,
+            maxBookingDuration: 8,
+            allowedTimeSlots: ["08:00-10:00", "10:00-12:00", "12:00-14:00", "14:00-16:00", "16:00-18:00", "18:00-20:00"],
+            bookingTypes: ['one-time', 'recurring', 'fixed-lease'],
+            advanceBookingDays: 90,
+            cancellationHours: 24
+          }
         }));
         set({ zones: facilityZones, isLoading: false });
       } else {
@@ -113,7 +125,19 @@ export const useZoneStore = create<ZoneState>((set, get) => ({
           coordinates_height: response.data.coordinates_height || 100,
           floor: '1',
           created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
+          // Add required computed fields
+          pricePerHour: 250,
+          availableTimes: [],
+          openingHours: [],
+          bookingRules: {
+            minBookingDuration: 1,
+            maxBookingDuration: 8,
+            allowedTimeSlots: ["08:00-10:00", "10:00-12:00", "12:00-14:00", "14:00-16:00", "16:00-18:00", "18:00-20:00"],
+            bookingTypes: ['one-time', 'recurring', 'fixed-lease'],
+            advanceBookingDays: 90,
+            cancellationHours: 24
+          }
         };
         
         get().addZone(facilityZone);
@@ -149,7 +173,19 @@ export const useZoneStore = create<ZoneState>((set, get) => ({
           coordinates_y: response.data.coordinates_y || 0,
           coordinates_width: response.data.coordinates_width || 100,
           coordinates_height: response.data.coordinates_height || 100,
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
+          // Add required computed fields
+          pricePerHour: 250,
+          availableTimes: [],
+          openingHours: [],
+          bookingRules: {
+            minBookingDuration: 1,
+            maxBookingDuration: 8,
+            allowedTimeSlots: ["08:00-10:00", "10:00-12:00", "12:00-14:00", "14:00-16:00", "16:00-18:00", "18:00-20:00"],
+            bookingTypes: ['one-time', 'recurring', 'fixed-lease'],
+            advanceBookingDays: 90,
+            cancellationHours: 24
+          }
         };
         
         get().updateZone(id, facilityZoneUpdates);

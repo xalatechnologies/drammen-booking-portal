@@ -644,6 +644,13 @@ export type Database = {
             referencedRelation: "app_users"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "fk_location_images_location_id"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "app_locations"
+            referencedColumns: ["id"]
+          },
         ]
       }
       app_locations: {
