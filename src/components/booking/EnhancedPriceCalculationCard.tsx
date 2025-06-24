@@ -76,24 +76,6 @@ export function EnhancedPriceCalculationCard({
     };
   };
 
-  if (selectedSlots.length === 0) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Calculator className="h-5 w-5" />
-            Prisberegning
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-gray-600 text-center py-4">
-            Velg tidspunkt for å se prisberegning
-          </p>
-        </CardContent>
-      </Card>
-    );
-  }
-
   const priceBreakdown = calculateMockPrice();
 
   return (
