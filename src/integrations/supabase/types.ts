@@ -9,7 +9,645 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      app_actor_memberships: {
+        Row: {
+          actor_id: string | null
+          created_at: string | null
+          id: string
+          role: string | null
+          user_id: string | null
+        }
+        Insert: {
+          actor_id?: string | null
+          created_at?: string | null
+          id?: string
+          role?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          actor_id?: string | null
+          created_at?: string | null
+          id?: string
+          role?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "app_actor_memberships_actor_id_fkey"
+            columns: ["actor_id"]
+            isOneToOne: false
+            referencedRelation: "app_actors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "app_actor_memberships_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "app_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      app_actors: {
+        Row: {
+          contact_info: Json | null
+          created_at: string | null
+          id: string
+          metadata: Json | null
+          name: Json
+          type: string
+          updated_at: string | null
+        }
+        Insert: {
+          contact_info?: Json | null
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          name: Json
+          type: string
+          updated_at?: string | null
+        }
+        Update: {
+          contact_info?: Json | null
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          name?: Json
+          type?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      app_availability_rules: {
+        Row: {
+          config: Json
+          created_at: string | null
+          created_by_id: string | null
+          end_date_time: string | null
+          id: string
+          location_id: string | null
+          start_date_time: string | null
+          type: string
+        }
+        Insert: {
+          config: Json
+          created_at?: string | null
+          created_by_id?: string | null
+          end_date_time?: string | null
+          id?: string
+          location_id?: string | null
+          start_date_time?: string | null
+          type: string
+        }
+        Update: {
+          config?: Json
+          created_at?: string | null
+          created_by_id?: string | null
+          end_date_time?: string | null
+          id?: string
+          location_id?: string | null
+          start_date_time?: string | null
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "app_availability_rules_created_by_id_fkey"
+            columns: ["created_by_id"]
+            isOneToOne: false
+            referencedRelation: "app_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "app_availability_rules_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "app_locations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      app_bookings: {
+        Row: {
+          actor_id: string | null
+          created_at: string | null
+          end_date_time: string
+          id: string
+          location_id: string | null
+          metadata: Json | null
+          price: number | null
+          start_date_time: string
+          status: string | null
+          type: string
+          updated_at: string | null
+          user_id: string | null
+          zone_id: string | null
+        }
+        Insert: {
+          actor_id?: string | null
+          created_at?: string | null
+          end_date_time: string
+          id?: string
+          location_id?: string | null
+          metadata?: Json | null
+          price?: number | null
+          start_date_time: string
+          status?: string | null
+          type: string
+          updated_at?: string | null
+          user_id?: string | null
+          zone_id?: string | null
+        }
+        Update: {
+          actor_id?: string | null
+          created_at?: string | null
+          end_date_time?: string
+          id?: string
+          location_id?: string | null
+          metadata?: Json | null
+          price?: number | null
+          start_date_time?: string
+          status?: string | null
+          type?: string
+          updated_at?: string | null
+          user_id?: string | null
+          zone_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "app_bookings_actor_id_fkey"
+            columns: ["actor_id"]
+            isOneToOne: false
+            referencedRelation: "app_actors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "app_bookings_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "app_locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "app_bookings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "app_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "app_bookings_zone_id_fkey"
+            columns: ["zone_id"]
+            isOneToOne: false
+            referencedRelation: "app_zones"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      app_cart_items: {
+        Row: {
+          actor_id: string | null
+          cart_id: string | null
+          created_at: string | null
+          end_date_time: string
+          id: string
+          location_id: string | null
+          metadata: Json | null
+          price: number | null
+          start_date_time: string
+          type: string
+          zone_id: string | null
+        }
+        Insert: {
+          actor_id?: string | null
+          cart_id?: string | null
+          created_at?: string | null
+          end_date_time: string
+          id?: string
+          location_id?: string | null
+          metadata?: Json | null
+          price?: number | null
+          start_date_time: string
+          type: string
+          zone_id?: string | null
+        }
+        Update: {
+          actor_id?: string | null
+          cart_id?: string | null
+          created_at?: string | null
+          end_date_time?: string
+          id?: string
+          location_id?: string | null
+          metadata?: Json | null
+          price?: number | null
+          start_date_time?: string
+          type?: string
+          zone_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "app_cart_items_actor_id_fkey"
+            columns: ["actor_id"]
+            isOneToOne: false
+            referencedRelation: "app_actors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "app_cart_items_cart_id_fkey"
+            columns: ["cart_id"]
+            isOneToOne: false
+            referencedRelation: "app_carts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "app_cart_items_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "app_locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "app_cart_items_zone_id_fkey"
+            columns: ["zone_id"]
+            isOneToOne: false
+            referencedRelation: "app_zones"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      app_carts: {
+        Row: {
+          created_at: string | null
+          id: string
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "app_carts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "app_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      app_feedbacks: {
+        Row: {
+          comment: string | null
+          created_at: string | null
+          id: string
+          location_id: string | null
+          rating: number | null
+          user_id: string | null
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string | null
+          id?: string
+          location_id?: string | null
+          rating?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string | null
+          id?: string
+          location_id?: string | null
+          rating?: number | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "app_feedbacks_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "app_locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "app_feedbacks_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "app_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      app_locations: {
+        Row: {
+          address: string
+          code: string
+          created_at: string | null
+          description: Json | null
+          id: string
+          latitude: number | null
+          longitude: number | null
+          metadata: Json | null
+          name: Json
+          updated_at: string | null
+        }
+        Insert: {
+          address: string
+          code: string
+          created_at?: string | null
+          description?: Json | null
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          metadata?: Json | null
+          name: Json
+          updated_at?: string | null
+        }
+        Update: {
+          address?: string
+          code?: string
+          created_at?: string | null
+          description?: Json | null
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          metadata?: Json | null
+          name?: Json
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      app_notifications: {
+        Row: {
+          booking_id: string | null
+          created_at: string | null
+          id: string
+          message: string
+          read_at: string | null
+          type: string
+          user_id: string | null
+        }
+        Insert: {
+          booking_id?: string | null
+          created_at?: string | null
+          id?: string
+          message: string
+          read_at?: string | null
+          type: string
+          user_id?: string | null
+        }
+        Update: {
+          booking_id?: string | null
+          created_at?: string | null
+          id?: string
+          message?: string
+          read_at?: string | null
+          type?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "app_notifications_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "app_bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "app_notifications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "app_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      app_price_rules: {
+        Row: {
+          actor_type: string
+          config: Json | null
+          created_at: string | null
+          id: string
+          location_id: string | null
+          price: number
+          priority: number | null
+          type: string
+        }
+        Insert: {
+          actor_type: string
+          config?: Json | null
+          created_at?: string | null
+          id?: string
+          location_id?: string | null
+          price: number
+          priority?: number | null
+          type: string
+        }
+        Update: {
+          actor_type?: string
+          config?: Json | null
+          created_at?: string | null
+          id?: string
+          location_id?: string | null
+          price?: number
+          priority?: number | null
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "app_price_rules_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "app_locations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      app_roles: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          name: string
+          permissions: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          permissions?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          permissions?: Json | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      app_templates: {
+        Row: {
+          content: Json
+          created_at: string | null
+          created_by_id: string | null
+          id: string
+          name: string
+          slug: string
+          type: string
+          updated_at: string | null
+          visibility: string | null
+        }
+        Insert: {
+          content: Json
+          created_at?: string | null
+          created_by_id?: string | null
+          id?: string
+          name: string
+          slug: string
+          type: string
+          updated_at?: string | null
+          visibility?: string | null
+        }
+        Update: {
+          content?: Json
+          created_at?: string | null
+          created_by_id?: string | null
+          id?: string
+          name?: string
+          slug?: string
+          type?: string
+          updated_at?: string | null
+          visibility?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "app_templates_created_by_id_fkey"
+            columns: ["created_by_id"]
+            isOneToOne: false
+            referencedRelation: "app_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      app_user_roles: {
+        Row: {
+          created_at: string | null
+          id: string
+          role_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          role_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          role_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "app_user_roles_role_id_fkey"
+            columns: ["role_id"]
+            isOneToOne: false
+            referencedRelation: "app_roles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "app_user_roles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "app_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      app_users: {
+        Row: {
+          created_at: string | null
+          email: string
+          id: string
+          locale: string | null
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          id?: string
+          locale?: string | null
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          id?: string
+          locale?: string | null
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      app_zones: {
+        Row: {
+          capacity: number | null
+          code: string
+          created_at: string | null
+          id: string
+          interval: string | null
+          location_id: string | null
+          metadata: Json | null
+          name: Json
+          updated_at: string | null
+        }
+        Insert: {
+          capacity?: number | null
+          code: string
+          created_at?: string | null
+          id?: string
+          interval?: string | null
+          location_id?: string | null
+          metadata?: Json | null
+          name: Json
+          updated_at?: string | null
+        }
+        Update: {
+          capacity?: number | null
+          code?: string
+          created_at?: string | null
+          id?: string
+          interval?: string | null
+          location_id?: string | null
+          metadata?: Json | null
+          name?: Json
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "app_zones_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "app_locations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

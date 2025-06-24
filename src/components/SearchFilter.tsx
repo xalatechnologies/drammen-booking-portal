@@ -1,210 +1,193 @@
 
-import React, { useEffect, useState } from "react";
-import { MapPin, Users, Building } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { supabase } from "@/integrations/supabase/client";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Search, Filter, X } from "lucide-react";
+import { useAppLocations } from "@/hooks/useAppData";
 
 interface SearchFilterProps {
-  date?: Date;
-  setDate: (date?: Date) => void;
-  facilityType: string;
-  setFacilityType: (type: string) => void;
-  location: string;
-  setLocation: (location: string) => void;
-  viewMode: "grid" | "map" | "calendar" | "list";
-  setViewMode: (mode: "grid" | "map" | "calendar" | "list") => void;
-  accessibility: string;
-  setAccessibility: (accessibility: string) => void;
-  capacity: number[];
-  setCapacity: (capacity: number[]) => void;
-  searchTerm: string;
-  setSearchTerm: (term: string) => void;
-  priceRange: number[];
-  setPriceRange: (range: number[]) => void;
-  availableNow: boolean;
-  setAvailableNow: (available: boolean) => void;
-  hasEquipment: boolean;
-  setHasEquipment: (hasEquipment: boolean) => void;
-  hasParking: boolean;
-  setHasParking: (hasParking: boolean) => void;
-  hasWifi: boolean;
-  setHasWifi: (hasWifi: boolean) => void;
-  allowsPhotography: boolean;
-  setAllowsPhotography: (allowsPhotography: boolean) => void;
+  onFilter: (filters: any) => void;
+  onSearch: (query: string) => void;
 }
 
-const SearchFilter: React.FC<SearchFilterProps> = ({
-  facilityType,
-  setFacilityType,
-  location,
-  setLocation,
-  accessibility,
-  setAccessibility,
-  capacity,
-  setCapacity
-}) => {
-  const [availableTypes, setAvailableTypes] = useState<string[]>([]);
-  const [availableAreas, setAvailableAreas] = useState<string[]>([]);
-  const [availableAccessibility, setAvailableAccessibility] = useState<string[]>([]);
-  const [loading, setLoading] = useState(true);
+export function SearchFilter({ onFilter, onSearch }: SearchFilterProps) {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedType, setSelectedType] = useState<string>("");
+  const [selectedArea, setSelectedArea] = useState<string>("");
+  const [selectedAccessibility, setSelectedAccessibility] = useState<string[]>([]);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  // Fetch ALL available filter options (without applying current filters)
-  const fetchFilterOptions = async () => {
-    try {
-      setLoading(true);
-      console.log('SearchFilter - Fetching ALL available filter options');
+  const { data: locations, isLoading } = useAppLocations();
 
-      // Get ALL facilities to extract complete option lists
-      const { data, error } = await supabase
-        .from('facilities')
-        .select('type, area, accessibility_features')
-        .eq('status', 'active');
-      
-      if (error) {
-        console.error('SearchFilter - Error fetching filter options:', error);
-        return;
-      }
+  // Extract unique types and areas from locations
+  const uniqueTypes = React.useMemo(() => {
+    if (!locations) return [];
+    return [...new Set(locations.map(loc => loc.metadata?.type).filter(Boolean))];
+  }, [locations]);
 
-      // Extract unique values for each filter from ALL facilities
-      const types = [...new Set(data?.map(f => f.type).filter(Boolean) || [])];
-      const areas = [...new Set(data?.map(f => f.area).filter(Boolean) || [])];
-      const accessibilityFeatures = [...new Set(
-        data?.flatMap(f => f.accessibility_features || []).filter(Boolean) || []
-      )];
+  const uniqueAreas = React.useMemo(() => {
+    if (!locations) return [];
+    return [...new Set(locations.map(loc => loc.metadata?.area).filter(Boolean))];
+  }, [locations]);
 
-      console.log('SearchFilter - ALL available options:', { types, areas, accessibilityFeatures });
-
-      setAvailableTypes(types);
-      setAvailableAreas(areas);
-      setAvailableAccessibility(accessibilityFeatures);
-    } catch (error) {
-      console.error('SearchFilter - Failed to fetch filter options:', error);
-    } finally {
-      setLoading(false);
-    }
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    onSearch(query);
   };
 
-  // Fetch options only once on mount
+  const handleFilterChange = () => {
+    const filters = {
+      type: selectedType || undefined,
+      area: selectedArea || undefined,
+      accessibility: selectedAccessibility.length > 0 ? selectedAccessibility : undefined,
+    };
+    onFilter(filters);
+  };
+
+  const clearFilters = () => {
+    setSelectedType("");
+    setSelectedArea("");
+    setSelectedAccessibility([]);
+    onFilter({});
+  };
+
+  const hasActiveFilters = selectedType || selectedArea || selectedAccessibility.length > 0;
+
   useEffect(() => {
-    fetchFilterOptions();
-  }, []); // Removed dependencies to avoid re-fetching when filters change
+    handleFilterChange();
+  }, [selectedType, selectedArea, selectedAccessibility]);
 
-  const handleCapacityChange = (value: string) => {
-    console.log('SearchFilter - Capacity filter changed to:', value);
-    switch (value) {
-      case "small":
-        setCapacity([0, 20]);
-        break;
-      case "medium":
-        setCapacity([21, 50]);
-        break;
-      case "large":
-        setCapacity([51, 100]);
-        break;
-      case "extra-large":
-        setCapacity([101, 200]);
-        break;
-      default:
-        setCapacity([0, 200]);
-    }
-  };
-
-  const getCapacityValue = () => {
-    const [min, max] = capacity;
-    if (min === 0 && max === 20) return "small";
-    if (min === 21 && max === 50) return "medium";
-    if (min === 51 && max === 100) return "large";
-    if (min === 101 && max === 200) return "extra-large";
-    return "all";
-  };
+  if (isLoading) {
+    return (
+      <Card>
+        <CardContent className="p-4">
+          <div className="animate-pulse">
+            <div className="h-10 bg-gray-200 rounded mb-4"></div>
+            <div className="h-8 bg-gray-200 rounded"></div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
-    <div className="bg-gradient-to-r from-slate-600/90 to-slate-700/90 backdrop-blur-sm w-full shadow-lg border-b border-slate-500/30 my-[22px] py-[8px]">
-      <div className="max-w-7xl mx-auto px-4 py-3">
-        {/* Single filter row - equally distributed */}
-        <div className="flex flex-col lg:flex-row gap-3 items-stretch w-full">
-          {/* Facility type */}
-          <div className="flex-1">
-            <Select value={facilityType} onValueChange={setFacilityType} disabled={loading}>
-              <SelectTrigger className="h-14 w-full border-gray-300 hover:border-blue-500 text-base rounded-lg bg-white/95 backdrop-blur-sm shadow-sm">
-                <div className="flex items-center text-left">
-                  <Building className="mr-2 h-4 w-4" />
-                  <SelectValue placeholder="Velg type" />
-                </div>
-              </SelectTrigger>
-              <SelectContent className="bg-white z-50">
-                <SelectItem value="all" className="text-base">Alle typer</SelectItem>
-                {availableTypes.map((type) => (
-                  <SelectItem key={type} value={type} className="text-base">{type}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Location */}
-          <div className="flex-1">
-            <Select value={location} onValueChange={setLocation} disabled={loading}>
-              <SelectTrigger className="h-14 w-full border-gray-300 hover:border-blue-500 text-base rounded-lg bg-white/95 backdrop-blur-sm shadow-sm">
-                <div className="flex items-center text-left">
-                  <MapPin className="mr-2 h-4 w-4" />
-                  <SelectValue placeholder="Velg område" />
-                </div>
-              </SelectTrigger>
-              <SelectContent className="bg-white z-50">
-                <SelectItem value="all" className="text-base">Alle områder</SelectItem>
-                {availableAreas.map((area) => (
-                  <SelectItem key={area} value={area} className="text-base">{area}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Capacity */}
-          <div className="flex-1">
-            <Select value={getCapacityValue()} onValueChange={handleCapacityChange}>
-              <SelectTrigger className="h-14 w-full border-gray-300 hover:border-blue-500 text-base rounded-lg bg-white/95 backdrop-blur-sm shadow-sm">
-                <div className="flex items-center text-left">
-                  <Users className="mr-2 h-4 w-4" />
-                  <SelectValue placeholder="Velg kapasitet" />
-                </div>
-              </SelectTrigger>
-              <SelectContent className="bg-white z-50">
-                <SelectItem value="all" className="text-base">Alle størrelser</SelectItem>
-                <SelectItem value="small" className="text-base">Liten (1-20 personer)</SelectItem>
-                <SelectItem value="medium" className="text-base">Middels (21-50 personer)</SelectItem>
-                <SelectItem value="large" className="text-base">Stor (51-100 personer)</SelectItem>
-                <SelectItem value="extra-large" className="text-base">Ekstra stor (100+ personer)</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Accessibility */}
-          <div className="flex-1">
-            <Select value={accessibility} onValueChange={setAccessibility} disabled={loading}>
-              <SelectTrigger className="h-14 w-full border-gray-300 hover:border-blue-500 text-base rounded-lg bg-white/95 backdrop-blur-sm shadow-sm">
-                <div className="flex items-center text-left">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="mr-2 h-4 w-4">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
-                  </svg>
-                  <SelectValue placeholder="Velg tilgjengelighet" />
-                </div>
-              </SelectTrigger>
-              <SelectContent className="bg-white z-50">
-                <SelectItem value="all" className="text-base">Alle</SelectItem>
-                {availableAccessibility.map((feature) => (
-                  <SelectItem key={feature} value={feature} className="text-base">
-                    {feature === 'wheelchair' ? 'Rullestoltilpasset' : 
-                     feature === 'hearing-loop' ? 'Teleslynge' : 
-                     feature === 'visual-aids' ? 'Synshjelpemidler' : feature}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Search className="h-5 w-5" />
+          Search & Filter
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {/* Search Input */}
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+          <Input
+            placeholder="Search locations..."
+            value={searchQuery}
+            onChange={(e) => handleSearch(e.target.value)}
+            className="pl-10"
+          />
         </div>
-      </div>
-    </div>
-  );
-};
 
-export default SearchFilter;
+        {/* Filter Toggle */}
+        <div className="flex items-center justify-between">
+          <Button
+            variant="outline"
+            onClick={() => setIsFilterOpen(!isFilterOpen)}
+            className="flex items-center gap-2"
+          >
+            <Filter className="h-4 w-4" />
+            Filters
+            {hasActiveFilters && (
+              <Badge variant="secondary" className="ml-1">
+                {[selectedType, selectedArea, ...selectedAccessibility].filter(Boolean).length}
+              </Badge>
+            )}
+          </Button>
+          
+          {hasActiveFilters && (
+            <Button variant="ghost" size="sm" onClick={clearFilters}>
+              <X className="h-4 w-4 mr-1" />
+              Clear
+            </Button>
+          )}
+        </div>
+
+        {/* Filter Options */}
+        {isFilterOpen && (
+          <div className="space-y-3 border-t pt-4">
+            {/* Type Filter */}
+            {uniqueTypes.length > 0 && (
+              <div>
+                <label className="text-sm font-medium mb-2 block">Type</label>
+                <Select value={selectedType} onValueChange={setSelectedType}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {uniqueTypes.map((type) => (
+                      <SelectItem key={type} value={type}>
+                        {type}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            {/* Area Filter */}
+            {uniqueAreas.length > 0 && (
+              <div>
+                <label className="text-sm font-medium mb-2 block">Area</label>
+                <Select value={selectedArea} onValueChange={setSelectedArea}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select area" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {uniqueAreas.map((area) => (
+                      <SelectItem key={area} value={area}>
+                        {area}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            {/* Active Filters Display */}
+            {hasActiveFilters && (
+              <div className="flex flex-wrap gap-2 pt-2">
+                {selectedType && (
+                  <Badge variant="secondary">
+                    Type: {selectedType}
+                    <button
+                      onClick={() => setSelectedType("")}
+                      className="ml-1 hover:bg-gray-300 rounded-full p-0.5"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </Badge>
+                )}
+                {selectedArea && (
+                  <Badge variant="secondary">
+                    Area: {selectedArea}
+                    <button
+                      onClick={() => setSelectedArea("")}
+                      className="ml-1 hover:bg-gray-300 rounded-full p-0.5"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </Badge>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}

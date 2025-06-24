@@ -1,153 +1,174 @@
 
-import { supabase } from '@/integrations/supabase/client';
-import { PaginationParams, RepositoryResponse } from '@/types/api';
+import { supabase } from "@/integrations/supabase/client";
+import { BaseRepository, QueryOptions, ApiResponse, PaginationParams } from "./BaseRepository";
 
-export abstract class SupabaseRepository<T extends Record<string, any>> {
-  protected abstract tableName: string;
+export class SupabaseRepository<T = any> implements BaseRepository<T> {
+  constructor(private tableName: string) {}
 
-  async findAll(
-    pagination?: PaginationParams,
-    orderBy?: string,
-    orderDirection: 'asc' | 'desc' = 'asc'
-  ): Promise<RepositoryResponse<T[]>> {
+  async getAll(options?: QueryOptions): Promise<ApiResponse<T[]>> {
     try {
-      let query = supabase.from(this.tableName as any).select('*', { count: 'exact' });
-
-      if (orderBy) {
-        query = query.order(orderBy, { ascending: orderDirection === 'asc' });
+      // Check if table exists in the new schema by trying common app_ tables
+      const appTables = ['app_locations', 'app_actors', 'app_users', 'app_zones', 'app_bookings'];
+      const actualTable = appTables.includes(this.tableName) ? this.tableName : `app_${this.tableName}`;
+      
+      let query = supabase.from(actualTable).select('*');
+      
+      if (options?.filters) {
+        Object.entries(options.filters).forEach(([key, value]) => {
+          if (value !== undefined && value !== null) {
+            query = query.eq(key, value);
+          }
+        });
       }
-
-      if (pagination) {
-        const from = (pagination.page! - 1) * pagination.limit!;
-        const to = from + pagination.limit! - 1;
+      
+      if (options?.sortBy) {
+        query = query.order(options.sortBy, { 
+          ascending: options.sortOrder === 'asc'
+        });
+      }
+      
+      if (options?.pagination) {
+        const { page, limit } = options.pagination;
+        const from = (page - 1) * limit;
+        const to = from + limit - 1;
         query = query.range(from, to);
       }
 
-      const { data, error } = await query;
-
+      const { data, error, count } = await query;
+      
       if (error) {
-        return {
-          data: [] as T[],
-          error: error.message
-        };
+        return { success: false, error: { message: error.message, code: error.code } };
       }
 
       return {
-        data: (data as unknown as T[]) || [],
-        error: null
+        success: true,
+        data: {
+          data: data || [],
+          pagination: options?.pagination ? {
+            page: options.pagination.page,
+            limit: options.pagination.limit,
+            total: count || 0,
+            totalPages: Math.ceil((count || 0) / options.pagination.limit),
+            hasNext: (options.pagination.page * options.pagination.limit) < (count || 0),
+            hasPrev: options.pagination.page > 1
+          } : undefined
+        }
       };
-    } catch (error: any) {
+    } catch (error) {
       return {
-        data: [] as T[],
-        error: error.message
+        success: false,
+        error: {
+          message: error instanceof Error ? error.message : 'Unknown error occurred',
+          code: 'UNKNOWN_ERROR'
+        }
       };
     }
   }
 
-  async findById(id: string): Promise<RepositoryResponse<T | null>> {
+  async getById(id: string): Promise<ApiResponse<T>> {
     try {
+      const appTables = ['app_locations', 'app_actors', 'app_users', 'app_zones', 'app_bookings'];
+      const actualTable = appTables.includes(this.tableName) ? this.tableName : `app_${this.tableName}`;
+      
       const { data, error } = await supabase
-        .from(this.tableName as any)
+        .from(actualTable)
         .select('*')
         .eq('id', id)
-        .maybeSingle();
+        .single();
 
       if (error) {
-        return {
-          data: null,
-          error: error.message
-        };
+        return { success: false, error: { message: error.message, code: error.code } };
       }
 
+      return { success: true, data };
+    } catch (error) {
       return {
-        data: data as unknown as T | null,
-        error: null
-      };
-    } catch (error: any) {
-      return {
-        data: null,
-        error: error.message
+        success: false,
+        error: {
+          message: error instanceof Error ? error.message : 'Unknown error occurred',
+          code: 'UNKNOWN_ERROR'
+        }
       };
     }
   }
 
-  async create(data: Omit<T, 'id' | 'created_at' | 'updated_at'>): Promise<RepositoryResponse<T | null>> {
+  async create(data: Partial<T>): Promise<ApiResponse<T>> {
     try {
+      const appTables = ['app_locations', 'app_actors', 'app_users', 'app_zones', 'app_bookings'];
+      const actualTable = appTables.includes(this.tableName) ? this.tableName : `app_${this.tableName}`;
+      
       const { data: result, error } = await supabase
-        .from(this.tableName as any)
-        .insert(data as any)
+        .from(actualTable)
+        .insert(data)
         .select()
-        .maybeSingle();
+        .single();
 
       if (error) {
-        return {
-          data: null,
-          error: error.message
-        };
+        return { success: false, error: { message: error.message, code: error.code } };
       }
 
+      return { success: true, data: result };
+    } catch (error) {
       return {
-        data: result as unknown as T | null,
-        error: null
-      };
-    } catch (error: any) {
-      return {
-        data: null,
-        error: error.message
+        success: false,
+        error: {
+          message: error instanceof Error ? error.message : 'Unknown error occurred',
+          code: 'UNKNOWN_ERROR'
+        }
       };
     }
   }
 
-  async update(id: string, data: Partial<Omit<T, 'id' | 'created_at'>>): Promise<RepositoryResponse<T | null>> {
+  async update(id: string, data: Partial<T>): Promise<ApiResponse<T>> {
     try {
+      const appTables = ['app_locations', 'app_actors', 'app_users', 'app_zones', 'app_bookings'];
+      const actualTable = appTables.includes(this.tableName) ? this.tableName : `app_${this.tableName}`;
+      
       const { data: result, error } = await supabase
-        .from(this.tableName as any)
-        .update(data as any)
+        .from(actualTable)
+        .update(data)
         .eq('id', id)
         .select()
-        .maybeSingle();
+        .single();
 
       if (error) {
-        return {
-          data: null,
-          error: error.message
-        };
+        return { success: false, error: { message: error.message, code: error.code } };
       }
 
+      return { success: true, data: result };
+    } catch (error) {
       return {
-        data: result as unknown as T | null,
-        error: null
-      };
-    } catch (error: any) {
-      return {
-        data: null,
-        error: error.message
+        success: false,
+        error: {
+          message: error instanceof Error ? error.message : 'Unknown error occurred',
+          code: 'UNKNOWN_ERROR'
+        }
       };
     }
   }
 
-  async delete(id: string): Promise<RepositoryResponse<boolean>> {
+  async delete(id: string): Promise<ApiResponse<void>> {
     try {
+      const appTables = ['app_locations', 'app_actors', 'app_users', 'app_zones', 'app_bookings'];
+      const actualTable = appTables.includes(this.tableName) ? this.tableName : `app_${this.tableName}`;
+      
       const { error } = await supabase
-        .from(this.tableName as any)
+        .from(actualTable)
         .delete()
         .eq('id', id);
 
       if (error) {
-        return {
-          data: false,
-          error: error.message
-        };
+        return { success: false, error: { message: error.message, code: error.code } };
       }
 
+      return { success: true, data: undefined };
+    } catch (error) {
       return {
-        data: true,
-        error: null
-      };
-    } catch (error: any) {
-      return {
-        data: false,
-        error: error.message
+        success: false,
+        error: {
+          message: error instanceof Error ? error.message : 'Unknown error occurred',
+          code: 'UNKNOWN_ERROR'
+        }
       };
     }
   }
