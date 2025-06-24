@@ -1,6 +1,7 @@
 
 import { Zone as FacilityZone } from '@/types/facility';
 import { Zone as BookingZone } from '@/components/booking/types';
+import { convertDatabaseZoneToZone } from '@/utils/dbZoneConverter';
 
 export function convertZoneToBookingZone(facilityZone: FacilityZone): BookingZone {
   return {
@@ -43,4 +44,11 @@ export function convertZoneToBookingZone(facilityZone: FacilityZone): BookingZon
     features: facilityZone.equipment || [],
     isActive: facilityZone.status === 'active'
   };
+}
+
+// Add helper to convert database zones to booking zones
+export function convertDatabaseZoneToBookingZone(dbZone: any): BookingZone {
+  // First convert to facility zone, then to booking zone
+  const facilityZone = convertDatabaseZoneToZone(dbZone);
+  return convertZoneToBookingZone(facilityZone);
 }

@@ -126,7 +126,7 @@ export class FacilityRepository extends SupabaseRepository<Facility> {
         allowed_booking_types: normalizeBookingTypes(location.allowed_booking_types || ['engangs']),
         season_from: location.season_from || null,
         season_to: location.season_to || null,
-        contact_name: location.contact_name || null,
+        contact_name: location.contact_name || null,  // This might be null in DB
         contact_email: location.contact_email || null,
         contact_phone: location.contact_phone || null,
         booking_lead_time_hours: location.booking_lead_time_hours || 2,
@@ -143,7 +143,7 @@ export class FacilityRepository extends SupabaseRepository<Facility> {
         accessibility: location.accessibility_features || [],
         suitableFor: [],
         hasAutoApproval: location.has_auto_approval || false,
-        nextAvailable: location.next_available || '',
+        nextAvailable: location.next_available || 'Available now',
         openingHours: [],
         zones: [],
         featuredImage: location.app_location_images?.find((img: any) => img.is_featured) ? {
@@ -275,7 +275,7 @@ export class FacilityRepository extends SupabaseRepository<Facility> {
         accessibility: data.accessibility_features || [],
         suitableFor: [],
         hasAutoApproval: data.has_auto_approval || false,
-        nextAvailable: data.next_available || '',
+        nextAvailable: data.next_available || 'Available now',
         openingHours: [],
         zones: [],
         featuredImage: data.app_location_images?.find((img: any) => img.is_featured) ? {

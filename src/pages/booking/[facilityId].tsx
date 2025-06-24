@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom';
 import { BookingForm } from '@/components/booking/BookingForm';
 import { useFacility } from '@/hooks/useFacility';
 import { useZones } from '@/hooks/useZones';
-import { convertZoneToBookingZone } from '@/utils/zoneConverter';
+import { convertDatabaseZoneToBookingZone } from '@/utils/zoneConverter';
 
 export default function BookingPage() {
   const { facilityId } = useParams();
@@ -21,8 +21,8 @@ export default function BookingPage() {
     return <div>Fant ikke fasiliteten</div>;
   }
 
-  // Convert zones to booking zones format
-  const bookingZones = zones.map(convertZoneToBookingZone);
+  // Convert database zones to booking zones format
+  const bookingZones = zones.map(convertDatabaseZoneToBookingZone);
 
   return (
     <div className="container mx-auto py-8">
