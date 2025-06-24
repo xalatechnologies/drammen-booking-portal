@@ -2,25 +2,20 @@
 import React from 'react';
 
 interface FacilityListItemImageProps {
-  facility: any;
-  className?: string;
+  facility: {
+    id: number;
+    name: string;
+    type: string;
+    area: string;
+  };
 }
 
-export function FacilityListItemImage({ facility, className = '' }: FacilityListItemImageProps) {
-  const imageUrl = facility.facility_images?.find((img: any) => img.is_featured)?.image_url || 
-                   facility.image_url || 
-                   '/bilder/standard_compressed_Kulturhuset_1200px.jpg';
-
+export function FacilityListItemImage({ facility }: FacilityListItemImageProps) {
   return (
-    <div className={`relative overflow-hidden ${className}`}>
-      <img
-        src={imageUrl}
-        alt={facility.name}
-        className="w-full h-full object-cover"
-        onError={(e) => {
-          e.currentTarget.src = '/bilder/standard_compressed_Kulturhuset_1200px.jpg';
-        }}
-      />
+    <div className="w-24 h-24 bg-gray-200 rounded-lg flex items-center justify-center">
+      <span className="text-xs text-gray-500 text-center">
+        {facility.name}
+      </span>
     </div>
   );
 }

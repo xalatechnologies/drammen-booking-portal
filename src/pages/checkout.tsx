@@ -26,33 +26,11 @@ export default function CheckoutPage() {
   // Convert cart items to match expected format
   const cartItems = items.map(item => ({
     id: item.id,
-    facilityId: item.facilityId,
     facilityName: item.facilityName,
-    zoneId: item.zoneId,
-    startTime: item.startTime,
-    endTime: item.endTime,
-    duration: item.duration,
     price: item.price,
-    purpose: item.purpose,
-    expectedAttendees: item.expectedAttendees,
-    actorType: item.actorType,
-    eventType: item.eventType,
-    ageGroup: item.ageGroup,
-    contactName: item.contactName,
-    contactEmail: item.contactEmail,
-    contactPhone: item.contactPhone,
-    // Add missing properties with defaults
-    organizationType: 'individual' as const,
-    additionalServices: [],
-    timeSlots: [],
-    pricing: {
-      basePrice: item.price,
-      totalPrice: item.price,
-      currency: 'NOK'
-    },
-    specialRequirements: '',
-    internalNotes: '',
-    createdAt: new Date().toISOString()
+    date: new Date(item.startTime),
+    timeSlot: `${item.startTime} - ${item.endTime}`,
+    pricePerHour: item.price
   }));
 
   const handleContactSubmit = (data: typeof contactData) => {
@@ -84,13 +62,17 @@ export default function CheckoutPage() {
     navigate('/');
   };
 
+  const handleBack = () => {
+    navigate(-1);
+  };
+
   if (cartItems.length === 0 && currentStep !== 'confirmation') {
-    return <EmptyCart />;
+    return <EmptyCart onNavigateHome={handleBackToFacilities} />;
   }
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <CheckoutHeader />
+      <CheckoutHeader onBack={handleBack} />
       <CheckoutBreadcrumb currentStep={currentStep} />
       
       <div className="max-w-4xl mx-auto py-8 px-4">
@@ -99,7 +81,7 @@ export default function CheckoutPage() {
         <div className="mt-8">
           {currentStep === 'contact' && (
             <ContactDetailsStep
-              onSubmit={handleContactSubmit}
+              onNext={handleContactSubmit}
               initialData={contactData}
             />
           )}
@@ -115,7 +97,7 @@ export default function CheckoutPage() {
           
           {currentStep === 'confirmation' && (
             <ConfirmationStep
-              bookingReference={bookingReference}
+              reference={bookingReference}
               onBackToFacilities={handleBackToFacilities}
             />
           )}

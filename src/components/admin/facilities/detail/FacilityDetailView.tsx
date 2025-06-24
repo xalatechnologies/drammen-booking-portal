@@ -14,6 +14,15 @@ interface FacilityDetailViewProps {
 }
 
 export function FacilityDetailView({ facility }: FacilityDetailViewProps) {
+  // Transform facility opening hours to match expected interface
+  const transformedOpeningHours = facility.openingHours?.map(hour => ({
+    id: hour.id || `${hour.day_of_week}-${hour.open_time}`,
+    dayOfWeek: hour.day_of_week || 0,
+    openTime: hour.open_time || '09:00',
+    closeTime: hour.close_time || '17:00',
+    isOpen: hour.is_open ?? true
+  })) || [];
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -39,7 +48,7 @@ export function FacilityDetailView({ facility }: FacilityDetailViewProps) {
         </TabsContent>
 
         <TabsContent value="hours" className="space-y-6">
-          <FacilityOpeningHours facility={{ id: facility.id, openingHours: facility.openingHours }} />
+          <FacilityOpeningHours facility={{ id: facility.id, openingHours: transformedOpeningHours }} />
         </TabsContent>
 
         <TabsContent value="zones" className="space-y-6">

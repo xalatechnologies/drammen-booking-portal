@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { ShoppingCart } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ShoppingCart } from 'lucide-react';
 
 interface EmptyCartProps {
   onNavigateHome: () => void;
@@ -10,15 +10,19 @@ interface EmptyCartProps {
 
 export function EmptyCart({ onNavigateHome }: EmptyCartProps) {
   return (
-    <Card className="max-w-md mx-auto text-center">
-      <CardContent className="pt-8">
-        <ShoppingCart className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-        <h2 className="text-xl font-semibold mb-2">Reservasjonskurven er tom</h2>
-        <p className="text-gray-600 mb-6">Du har ingen reservasjoner i reservasjonskurven din.</p>
-        <Button onClick={onNavigateHome}>
-          Tilbake til forsiden
-        </Button>
-      </CardContent>
-    </Card>
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <Card className="w-full max-w-md">
+        <CardHeader>
+          <CardTitle className="text-center">Empty Cart</CardTitle>
+        </CardHeader>
+        <CardContent className="text-center space-y-4">
+          <ShoppingCart className="h-16 w-16 text-gray-300 mx-auto" />
+          <p className="text-gray-500">Your cart is empty</p>
+          <Button onClick={onNavigateHome}>
+            Browse Facilities
+          </Button>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

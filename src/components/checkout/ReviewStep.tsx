@@ -1,76 +1,71 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { CartItem } from '@/types/cart';
-import { ReservationAccordion } from './ReservationAccordion';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-interface ReviewStepProps {
-  items: CartItem[];
-  onEditReservation: (reservationId: string) => void;
-  onRemoveReservation: (reservationId: string) => void;
-  onSendToApproval: (reservationId?: string) => void;
-  onEmptyCart: () => void;
+interface CartItem {
+  id: string;
+  facilityName: string;
+  price: number;
+  date: Date;
+  timeSlot: string;
+  pricePerHour: number;
 }
 
-export function ReviewStep({ 
-  items, 
-  onEditReservation, 
-  onRemoveReservation, 
-  onSendToApproval,
-  onEmptyCart
-}: ReviewStepProps) {
-  const totalSlots = items.reduce((total, item) => total + (item.timeSlots?.length || 1), 0);
-  const totalPrice = items.reduce((total, item) => total + (item.pricing?.totalPrice || (item.pricePerHour * 2)), 0);
+interface ReviewStepProps {
+  contactData: {
+    name: string;
+    email: string;
+    phone: string;
+  };
+  items: CartItem[];
+  onSubmit: () => void;
+  onBack: () => void;
+}
+
+export function ReviewStep({ contactData, items, onSubmit, onBack }: ReviewStepProps) {
+  const total = items.reduce((sum, item) => sum + item.price, 0);
 
   return (
     <div className="space-y-6">
-      <ReservationAccordion 
-        reservations={items}
-        onEditReservation={onEditReservation}
-        onRemoveReservation={onRemoveReservation}
-        onSendToApproval={onSendToApproval}
-      />
-      
-      {/* Total Price Summary */}
-      <Card className="bg-blue-50 border-blue-200">
-        <CardContent className="p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900">
-                Total for {items.length} reservasjon{items.length !== 1 ? 'er' : ''}
-              </h3>
-              <p className="text-sm text-gray-600">
-                {totalSlots} tidspunkt totalt
-              </p>
-            </div>
-            <div className="text-right">
-              <div className="text-2xl font-bold text-green-600">
-                {totalPrice} kr
+      <Card>
+        <CardHeader>
+          <CardTitle>Review Your Booking</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <h3 className="font-medium mb-2">Contact Information</h3>
+            <p>{contactData.name}</p>
+            <p>{contactData.email}</p>
+            <p>{contactData.phone}</p>
+          </div>
+          
+          <div>
+            <h3 className="font-medium mb-2">Booking Items</h3>
+            {items.map((item) => (
+              <div key={item.id} className="border rounded p-3 mb-2">
+                <p className="font-medium">{item.facilityName}</p>
+                <p className="text-sm text-gray-600">{item.timeSlot}</p>
+                <p className="text-sm font-medium">{item.price} kr</p>
               </div>
-              <Badge variant="outline" className="text-xs mt-1">
-                Inkl. MVA
-              </Badge>
+            ))}
+          </div>
+          
+          <div className="border-t pt-4">
+            <div className="flex justify-between font-bold">
+              <span>Total:</span>
+              <span>{total} kr</span>
             </div>
           </div>
         </CardContent>
       </Card>
       
       <div className="flex gap-4">
-        <Button 
-          variant="outline" 
-          className="flex-1"
-          onClick={onEmptyCart}
-        >
-          Tøm handlekurv
+        <Button variant="outline" onClick={onBack} className="flex-1">
+          Back
         </Button>
-        
-        <Button 
-          onClick={() => onSendToApproval()} 
-          className="flex-1 bg-blue-600 hover:bg-blue-700"
-        >
-          Send alle sammen til godkjenning
+        <Button onClick={onSubmit} className="flex-1">
+          Confirm Booking
         </Button>
       </div>
     </div>

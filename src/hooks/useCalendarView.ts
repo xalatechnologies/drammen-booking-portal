@@ -17,7 +17,9 @@ export const useCalendarView = (props: UseCalendarViewProps = {}) => {
   const { data: rawFacilities = [], isLoading, error } = useFacilities();
 
   const facilitiesWithZones = useMemo(() => {
-    return rawFacilities.map(transformFacilityForUI);
+    // Ensure rawFacilities is an array
+    const facilitiesArray = Array.isArray(rawFacilities) ? rawFacilities : [];
+    return facilitiesArray.map(transformFacilityForUI);
   }, [rawFacilities]);
 
   const allZones = useMemo(() => {
@@ -25,7 +27,7 @@ export const useCalendarView = (props: UseCalendarViewProps = {}) => {
   }, [facilitiesWithZones]);
 
   return {
-    facilities: rawFacilities,
+    facilities: Array.isArray(rawFacilities) ? rawFacilities : [],
     facilitiesWithZones,
     isLoading,
     error,
