@@ -108,6 +108,11 @@ export function EnhancedPriceCalculationCard({
           {/* Price Breakdown */}
           <div className="space-y-3">
             <div className="flex justify-between items-center">
+              <span className="text-sm text-gray-600">Grunnpris</span>
+              <span className="font-medium">{priceBreakdown.basePrice} NOK</span>
+            </div>
+            
+            <div className="flex justify-between items-center">
               <span className="text-sm text-gray-600">Subtotal</span>
               <span className="font-medium">{priceBreakdown.subtotal} NOK</span>
             </div>
