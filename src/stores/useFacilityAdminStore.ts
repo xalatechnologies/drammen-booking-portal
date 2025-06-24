@@ -58,7 +58,6 @@ const transformToFacility = (dbRecord: any): Facility => {
   return {
     id: parseInt(dbRecord.id),
     name,
-    code: dbRecord.code,
     address_street: dbRecord.address || '',
     address_city: '',
     address_postal_code: '',
