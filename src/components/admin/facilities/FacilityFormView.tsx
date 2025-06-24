@@ -1,6 +1,5 @@
-
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { EnhancedFacilityForm } from "./form/EnhancedFacilityForm";
 
 interface FacilityFormViewProps {
   facility?: any;
@@ -14,15 +13,8 @@ export const FacilityFormView: React.FC<FacilityFormViewProps> = ({
   onCancel
 }) => {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Facility Form</CardTitle>
-      </CardHeader>
-      <CardContent className="py-8">
-        <div className="text-center text-gray-500">
-          <p>Facility form {facility ? `for ${facility.name}` : 'for new facility'} will be available soon...</p>
-        </div>
-      </CardContent>
-    </Card>
+    <EnhancedFacilityForm 
+      onSuccess={onSuccess}
+    />
   );
 };

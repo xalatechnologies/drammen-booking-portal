@@ -50,11 +50,10 @@ export const InfiniteScrollFacilities: React.FC<InfiniteScrollFacilitiesProps> =
       const fallbackImage = FALLBACK_IMAGES[index % FALLBACK_IMAGES.length];
       const imageUrl = facility.image_url || fallbackImage;
 
-      // Ensure we have all required properties with proper defaults
+      // Ensure we have all required properties
       return {
         ...facility,
         image: imageUrl,
-        image_url: imageUrl,
         openingHours: facility.openingHours || [],
         address: facility.address || 'Address not available',
         nextAvailable: facility.nextAvailable || 'Available now',

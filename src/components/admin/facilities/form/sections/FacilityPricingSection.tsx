@@ -1,57 +1,429 @@
-
-import React, { forwardRef, useImperativeHandle } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import React, { useState, forwardRef, useImperativeHandle, useEffect } from "react";
 import { UseFormReturn } from "react-hook-form";
+import { FormField, FormItem, FormLabel, FormControl, FormMessage, FormDescription } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { FacilityFormData } from "../FacilityFormSchema";
+import { useTranslation } from "@/hooks/useTranslation";
+import { DollarSign, Plus, Trash2, Clock, Calendar, Sun, Moon, Percent } from "lucide-react";
+import PricingService from '@/services/PricingService';
+import { Database } from '@/integrations/supabase/types';
 
 interface FacilityPricingSectionProps {
   form: UseFormReturn<FacilityFormData>;
-  facilityId?: number;
+  facilityId: number;
 }
 
-export interface PricingSectionRef {
+interface FacilityPricingSectionRef {
   saveData: () => Promise<boolean>;
 }
 
-export const FacilityPricingSection = forwardRef<PricingSectionRef, FacilityPricingSectionProps>(
-  ({ form, facilityId }, ref) => {
-    useImperativeHandle(ref, () => ({
-      saveData: async () => {
-        try {
-          console.log('Saving pricing data for facility:', facilityId);
-          return true;
-        } catch (error) {
-          console.error('Error saving pricing data:', error);
-          return false;
-        }
-      }
-    }));
+interface PricingRule {
+  id: string;
+  name: string;
+  type: 'time_based' | 'day_based' | 'seasonal' | 'actor_based';
+  condition: string;
+  adjustment: number;
+  adjustmentType: 'percentage' | 'fixed';
+  isActive: boolean;
+}
 
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Pricing Configuration</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <Label htmlFor="price_per_hour">Price per Hour</Label>
-            <Input
-              id="price_per_hour"
-              type="number"
-              step="0.01"
-              {...form.register('price_per_hour', { valueAsNumber: true })}
-            />
-          </div>
+type DBPricingRule = Database['public']['Tables']['pricing_rules']['Row'];
+type DBPricingRuleInsert = Omit<Database['public']['Tables']['pricing_rules']['Insert'], 'id' | 'created_at' | 'updated_at'>;
+
+const RENTAL_TYPES = [
+  { value: 'hourly', label: 'Hourly Rental', icon: <Clock className="w-4 h-4" /> },
+  { value: 'daily', label: 'Daily Rental', icon: <Calendar className="w-4 h-4" /> },
+  { value: 'fixed', label: 'Fixed Season Price', icon: <DollarSign className="w-4 h-4" /> }
+];
+
+const PRICING_RULE_TEMPLATES = [
+  { type: 'time_based', name: 'Evening Premium', condition: '18:00-22:00', adjustment: 25, adjustmentType: 'percentage' },
+  { type: 'time_based', name: 'Night Surcharge', condition: '22:00-06:00', adjustment: 50, adjustmentType: 'percentage' },
+  { type: 'day_based', name: 'Weekend Premium', condition: 'Saturday-Sunday', adjustment: 30, adjustmentType: 'percentage' },
+  { type: 'day_based', name: 'Holiday Surcharge', condition: 'Public Holidays', adjustment: 40, adjustmentType: 'percentage' },
+  { type: 'seasonal', name: 'Summer Peak', condition: 'June-August', adjustment: 20, adjustmentType: 'percentage' },
+  { type: 'actor_based', name: 'Organization Discount', condition: 'Organizations', adjustment: -15, adjustmentType: 'percentage' }
+];
+
+// Map DB pricing rule to UI pricing rule
+function toUIPricingRule(db: DBPricingRule): PricingRule {
+  return {
+    id: db.id,
+    name: db.description || '',
+    type: db.time_slot_category ? 'time_based' : db.day_type ? 'day_based' : db.facility_id ? 'actor_based' : 'seasonal',
+    condition: (db.time_slot_category as string) || (db.day_type as string) || '',
+    adjustment: db.multiplier ?? 1,
+    adjustmentType: db.fixed_price ? 'fixed' : 'percentage',
+    isActive: db.is_active,
+  };
+}
+
+// Map UI pricing rule to DB pricing rule insert/update
+function toDBPricingRule(ui: PricingRule, facilityId: number): DBPricingRuleInsert {
+  return {
+    description: ui.name,
+    time_slot_category: ui.type === 'time_based' ? (ui.condition as any) : null,
+    day_type: ui.type === 'day_based' ? (ui.condition as any) : null,
+    multiplier: ui.adjustment,
+    fixed_price: ui.adjustmentType === 'fixed' ? ui.adjustment : null,
+    is_active: ui.isActive,
+    facility_id: facilityId,
+    base_price: 0, // Set as needed
+    actor_type: 'private-person', // Set as needed
+    booking_type: 'engangs', // Set as needed
+    valid_from: new Date().toISOString(),
+    valid_to: null,
+    minimum_duration: null,
+    maximum_duration: null,
+    zone_id: null,
+  };
+}
+
+export const FacilityPricingSection = forwardRef<FacilityPricingSectionRef, FacilityPricingSectionProps>(({ form, facilityId }, ref) => {
+  const { tSync } = useTranslation();
+  const [pricingRules, setPricingRules] = useState<PricingRule[]>([]);
+  const [selectedRentalType, setSelectedRentalType] = useState<string>('hourly');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [deletedRuleIds, setDeletedRuleIds] = useState<string[]>([]);
+
+  // Load pricing rules on mount
+  useEffect(() => {
+    if (!facilityId) return;
+    setLoading(true);
+    PricingService.getPricingRulesByFacility(facilityId)
+      .then(res => {
+        if (res.error) {
+          setError(res.error);
+          setPricingRules([]);
+        } else {
+          setPricingRules((res.data || []).map(toUIPricingRule));
+        }
+      })
+      .catch(e => setError(e.message))
+      .finally(() => setLoading(false));
+  }, [facilityId]);
+
+  // Expose save function to parent via ref
+  useImperativeHandle(ref, () => ({
+    saveData: async () => {
+      if (!facilityId) return true;
+      setLoading(true);
+      setError(null);
+      try {
+        // Save all pricing rules (add/update)
+        const promises = pricingRules.map(rule => {
+          if (rule.id && rule.id.length > 10) {
+            // Existing rule, update
+            return PricingService.updatePricingRule(rule.id, toDBPricingRule(rule, facilityId));
+          } else {
+            // New rule, create
+            return PricingService.createPricingRule(toDBPricingRule(rule, facilityId));
+          }
+        });
+        // Delete removed rules
+        const deletePromises = deletedRuleIds.map(id => PricingService.deletePricingRule(id));
+        await Promise.all([...promises, ...deletePromises]);
+        setDeletedRuleIds([]);
+        return true;
+      } catch (error: any) {
+        setError(error.message || 'Failed to save pricing configuration');
+        return false;
+      } finally {
+        setLoading(false);
+      }
+    }
+  }), [pricingRules, facilityId, deletedRuleIds]);
+
+  const addPricingRule = (template: any) => {
+    const newRule: PricingRule = {
+      id: Date.now().toString(),
+      name: template.name,
+      type: template.type,
+      condition: template.condition,
+      adjustment: template.adjustment,
+      adjustmentType: template.adjustmentType,
+      isActive: true
+    };
+    setPricingRules([...pricingRules, newRule]);
+  };
+
+  const removePricingRule = (id: string) => {
+    setPricingRules(pricingRules.filter(rule => rule.id !== id));
+    if (id && id.length > 10) setDeletedRuleIds([...deletedRuleIds, id]);
+  };
+
+  const getRuleIcon = (type: string) => {
+    switch (type) {
+      case 'time_based': return <Clock className="w-4 h-4" />;
+      case 'day_based': return <Calendar className="w-4 h-4" />;
+      case 'seasonal': return <Sun className="w-4 h-4" />;
+      case 'actor_based': return <Percent className="w-4 h-4" />;
+      default: return <DollarSign className="w-4 h-4" />;
+    }
+  };
+
+  const getRuleBadgeColor = (type: string) => {
+    switch (type) {
+      case 'time_based': return 'bg-blue-100 text-blue-800';
+      case 'day_based': return 'bg-green-100 text-green-800';
+      case 'seasonal': return 'bg-yellow-100 text-yellow-800';
+      case 'actor_based': return 'bg-purple-100 text-purple-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  return (
+    <Card>
+      <CardHeader className="pb-3">
+        <CardTitle className="text-lg flex items-center gap-2">
+          <DollarSign className="w-5 h-5" />
+          {tSync("admin.facilities.form.pricing.title", "Pricing Management")}
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {loading && <div className="text-center text-muted-foreground">Loading pricing rules...</div>}
+        {error && <div className="text-center text-red-500">{error}</div>}
+        <Accordion type="multiple" defaultValue={["rental-type", "base-pricing"]} className="space-y-4">
           
-          <div className="text-center py-8 text-gray-500">
-            <p>Advanced pricing rules will be available soon...</p>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-);
+          {/* Rental Type Selection */}
+          <AccordionItem value="rental-type" className="border rounded-lg">
+            <AccordionTrigger className="px-4 hover:no-underline">
+              <div className="flex items-center gap-2">
+                <DollarSign className="w-4 h-4" />
+                <span className="font-medium">Rental Type</span>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="px-4 pb-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                {RENTAL_TYPES.map((type) => (
+                  <Button
+                    key={type.value}
+                    type="button"
+                    variant={selectedRentalType === type.value ? "default" : "outline"}
+                    className="h-auto p-4 flex flex-col items-center gap-2"
+                    onClick={() => setSelectedRentalType(type.value)}
+                  >
+                    {type.icon}
+                    <span className="text-sm font-medium">{type.label}</span>
+                  </Button>
+                ))}
+              </div>
+              <p className="text-sm text-muted-foreground mt-3">
+                Choose how this facility can be rented: by the hour, by the day, or as a fixed seasonal package.
+              </p>
+            </AccordionContent>
+          </AccordionItem>
+
+          {/* Base Pricing */}
+          <AccordionItem value="base-pricing" className="border rounded-lg">
+            <AccordionTrigger className="px-4 hover:no-underline">
+              <div className="flex items-center gap-2">
+                <DollarSign className="w-4 h-4" />
+                <span className="font-medium">Base Pricing</span>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="px-4 pb-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <FormField
+                  control={form.control}
+                  name="price_per_hour"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        {selectedRentalType === 'hourly' ? 'Price per Hour (NOK)' :
+                         selectedRentalType === 'daily' ? 'Price per Day (NOK)' :
+                         'Fixed Season Price (NOK)'}
+                      </FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="number" 
+                          step="0.01"
+                          placeholder="450.00"
+                          {...field}
+                          onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="time_slot_duration"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Minimum Booking Duration</FormLabel>
+                      <Select onValueChange={(value) => field.onChange(parseInt(value, 10))} defaultValue={String(field.value)}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select duration" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="1">1 hour</SelectItem>
+                          <SelectItem value="2">2 hours</SelectItem>
+                          <SelectItem value="3">3 hours</SelectItem>
+                          <SelectItem value="4">4 hours</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="flex items-end">
+                  <div className="text-sm text-muted-foreground">
+                    <div className="font-medium">Price Preview</div>
+                    <div className="text-lg font-bold text-green-600">
+                      {form.watch('price_per_hour') || 450} NOK/{selectedRentalType === 'hourly' ? 'hour' : selectedRentalType === 'daily' ? 'day' : 'season'}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+
+          {/* Pricing Rules */}
+          <AccordionItem value="pricing-rules" className="border rounded-lg">
+            <AccordionTrigger className="px-4 hover:no-underline">
+              <div className="flex items-center gap-2">
+                <Percent className="w-4 h-4" />
+                <span className="font-medium">Dynamic Pricing Rules</span>
+                <Badge variant="outline" className="ml-auto mr-8">
+                  {pricingRules.length} active
+                </Badge>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="px-4 pb-4">
+              
+              {/* Rule Templates */}
+              <div className="mb-4">
+                <h4 className="text-sm font-medium mb-3">Quick Add Rules</h4>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                  {PRICING_RULE_TEMPLATES.map((template, index) => (
+                    <Button
+                      key={index}
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="h-auto p-3 flex flex-col items-center gap-1 text-xs"
+                      onClick={() => addPricingRule(template)}
+                    >
+                      {getRuleIcon(template.type)}
+                      <span className="font-medium">{template.name}</span>
+                      <span className="text-muted-foreground">
+                        {template.adjustment > 0 ? '+' : ''}{template.adjustment}%
+                      </span>
+                    </Button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Active Rules */}
+              {pricingRules.length > 0 && (
+                <div className="space-y-2">
+                  <h4 className="text-sm font-medium">Active Rules</h4>
+                  {pricingRules.map((rule) => (
+                    <div key={rule.id} className="flex items-center justify-between p-3 border rounded-lg bg-card">
+                      <div className="flex items-center gap-3">
+                        {getRuleIcon(rule.type)}
+                        <div>
+                          <div className="font-medium text-sm">{rule.name}</div>
+                          <div className="text-xs text-muted-foreground">{rule.condition}</div>
+                        </div>
+                        <Badge className={getRuleBadgeColor(rule.type)}>
+                          {rule.type.replace('_', ' ')}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono text-sm">
+                          {rule.adjustment > 0 ? '+' : ''}{rule.adjustment}%
+                        </span>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removePricingRule(rule.id)}
+                          className="text-red-500 hover:text-red-700"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {pricingRules.length === 0 && (
+                <div className="text-center py-6 text-muted-foreground border-2 border-dashed rounded-lg">
+                  <Percent className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                  <p className="text-sm">No pricing rules configured</p>
+                  <p className="text-xs">Add rules above to adjust pricing based on time, day, season, or customer type</p>
+                </div>
+              )}
+            </AccordionContent>
+          </AccordionItem>
+
+          {/* Payment Terms */}
+          <AccordionItem value="payment-terms" className="border rounded-lg">
+            <AccordionTrigger className="px-4 hover:no-underline">
+              <div className="flex items-center gap-2">
+                <DollarSign className="w-4 h-4" />
+                <span className="font-medium">Payment Terms & Policies</span>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="px-4 pb-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-3">
+                  <h4 className="font-medium">Payment Requirements</h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span>Advance Payment:</span>
+                      <span className="font-medium">Required</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Cancellation Fee:</span>
+                      <span className="font-medium">50% if &lt; 24h</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Late Booking Fee:</span>
+                      <span className="font-medium">25% if &lt; 2h</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <h4 className="font-medium">Available Discounts</h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span>Organization:</span>
+                      <span className="font-medium text-green-600">-15%</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Recurring bookings:</span>
+                      <span className="font-medium text-green-600">-10%</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Off-peak hours:</span>
+                      <span className="font-medium text-green-600">-20%</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+
+        </Accordion>
+      </CardContent>
+    </Card>
+  );
+});
 
 FacilityPricingSection.displayName = "FacilityPricingSection";
