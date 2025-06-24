@@ -1,3 +1,4 @@
+
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -25,15 +26,27 @@ export interface Facility {
   }>;
 }
 
-const getLocalizedText = (value: any, fallback: string = 'Unknown'): string => {
+const getLocalizedText = (value: any, fallback: string = ''): string => {
   if (typeof value === 'string') {
     return value;
   }
   if (typeof value === 'object' && value !== null) {
-    // Try different language codes
-    return value.no || value.en || value.nb || fallback;
+    // Try different language codes - prioritize Norwegian
+    return value.no || value.nb || value.en || value.NO || value.EN || fallback;
   }
   return fallback;
+};
+
+const computeAddress = (location: any): string => {
+  const addressParts = [
+    location.address_street,
+    location.address_city,
+    location.address_postal_code
+  ].filter(part => part && part.trim() !== '');
+  
+  return addressParts.length > 0 
+    ? addressParts.join(', ')
+    : location.address || '';
 };
 
 export const useFacilities = () => {
@@ -43,7 +56,7 @@ export const useFacilities = () => {
       try {
         console.log('useFacilities - Starting query...');
         
-        // First get the locations
+        // Get the locations with better error handling
         const { data: locations, error: locationsError } = await supabase
           .from('app_locations')
           .select('*')
@@ -55,9 +68,9 @@ export const useFacilities = () => {
           return [];
         }
 
-        console.log('useFacilities - Got locations:', locations?.length || 0);
+        console.log('useFacilities - Raw locations data:', locations);
 
-        // Then get images separately to avoid relationship conflicts
+        // Get images separately to avoid relationship conflicts
         const { data: images, error: imagesError } = await supabase
           .from('app_location_images')
           .select('*')
@@ -81,26 +94,46 @@ export const useFacilities = () => {
           return acc;
         }, {} as Record<string, any[]>);
 
-        const facilities = (locations || []).map((location: any) => ({
-          id: location.id,
-          name: getLocalizedText(location.name, 'Unknown Facility'),
-          type: location.location_type || 'facility',
-          area: location.address || '',
-          description: getLocalizedText(location.description, ''),
-          capacity: location.capacity || 0,
-          price_per_hour: location.price_per_hour || 450,
-          address_street: location.address_street || '',
-          address_city: location.address_city || '',
-          address_postal_code: location.address_postal_code || '',
-          equipment: location.equipment || [],
-          amenities: location.amenities || [],
-          accessibility_features: location.accessibility_features || [],
-          is_featured: location.is_featured || false,
-          status: location.status || 'active',
-          facility_images: imagesByLocation[location.id] || []
-        }));
+        const facilities = (locations || []).map((location: any) => {
+          console.log('useFacilities - Processing location:', {
+            id: location.id,
+            name: location.name,
+            description: location.description,
+            address_street: location.address_street,
+            address_city: location.address_city
+          });
 
-        console.log('useFacilities - Processed facilities:', facilities.length);
+          const facilityName = getLocalizedText(location.name, 'Unnamed Facility');
+          const facilityDescription = getLocalizedText(location.description, '');
+          const facilityAddress = computeAddress(location);
+
+          console.log('useFacilities - Processed values:', {
+            facilityName,
+            facilityDescription,
+            facilityAddress
+          });
+
+          return {
+            id: location.id,
+            name: facilityName,
+            type: location.location_type || 'facility',
+            area: facilityAddress,
+            description: facilityDescription,
+            capacity: location.capacity || 0,
+            price_per_hour: location.price_per_hour || 450,
+            address_street: location.address_street || '',
+            address_city: location.address_city || '',
+            address_postal_code: location.address_postal_code || '',
+            equipment: location.equipment || [],
+            amenities: location.amenities || [],
+            accessibility_features: location.accessibility_features || [],
+            is_featured: location.is_featured || false,
+            status: location.status || 'active',
+            facility_images: imagesByLocation[location.id] || []
+          };
+        });
+
+        console.log('useFacilities - Final processed facilities:', facilities);
         return facilities;
       } catch (error) {
         console.error('useFacilities - Catch error:', error);
