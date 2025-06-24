@@ -1,61 +1,42 @@
 
 import React from "react";
-import { useNavigate } from "react-router-dom";
-import { CheckCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 
 interface BookingSuccessPageProps {
   bookingReference: string;
-  facilityId: string | undefined;
+  facilityId: string;
 }
 
-export function BookingSuccessPage({ bookingReference, facilityId }: BookingSuccessPageProps) {
-  const navigate = useNavigate();
-
+export const BookingSuccessPage: React.FC<BookingSuccessPageProps> = ({
+  bookingReference,
+  facilityId
+}) => {
   return (
-    <div className="flex-grow flex items-center justify-center py-12 px-4">
-      <Card className="w-full max-w-2xl">
-        <CardContent className="text-center py-12">
-          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <CheckCircle className="h-10 w-10 text-green-600" />
+    <div className="flex flex-col items-center justify-center min-h-screen p-8">
+      <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-6 text-center">
+        <div className="mb-6">
+          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
           </div>
-          
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">
-            Reservasjon fullført!
-          </h1>
-          
-          <p className="text-lg text-gray-600 mb-6 max-w-md mx-auto">
-            Din reservasjon er mottatt og vil bli behandlet. Referansenummer: <strong>{bookingReference}</strong>
-          </p>
-          
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8 text-left">
-            <h3 className="font-semibold text-blue-900 mb-2">Hva skjer nå?</h3>
-            <ul className="text-blue-800 space-y-1 text-sm">
-              <li>• En bekreftelse er sendt til din e-post</li>
-              <li>• Du vil motta SMS når reservasjonen er godkjent</li>
-              <li>• Behandlingstid er vanligvis 1-2 virkedager</li>
-            </ul>
-          </div>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button 
-              onClick={() => navigate("/bookings")}
-              className="bg-blue-600 hover:bg-blue-700"
-              size="lg"
-            >
-              Se dine reservasjoner
-            </Button>
-            <Button 
-              variant="outline" 
-              onClick={() => navigate(`/facilities/${facilityId}`)}
-              size="lg"
-            >
-              Tilbake til lokalet
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Booking Confirmed!</h1>
+          <p className="text-gray-600">Your booking has been successfully confirmed.</p>
+        </div>
+        
+        <div className="bg-gray-50 rounded-lg p-4 mb-6">
+          <p className="text-sm text-gray-600 mb-1">Booking Reference</p>
+          <p className="font-semibold text-gray-900">{bookingReference}</p>
+        </div>
+        
+        <div className="space-y-3">
+          <button className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
+            View Booking Details
+          </button>
+          <button className="w-full bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors">
+            Back to Home
+          </button>
+        </div>
+      </div>
     </div>
   );
-}
+};

@@ -31,35 +31,47 @@ export const useFacilities = () => {
     queryKey: ['facilities'],
     queryFn: async (): Promise<Facility[]> => {
       try {
-        // Try the edge function first
-        const { data, error } = await supabase.functions.invoke('facilities');
-        
+        // Use app_locations table since that's what exists in the database
+        const { data, error } = await supabase
+          .from('app_locations')
+          .select(`
+            *,
+            app_location_images (
+              id,
+              image_url,
+              alt_text,
+              is_featured
+            )
+          `)
+          .eq('is_published', true)
+          .order('name');
+
         if (error) {
-          console.error('Edge function error:', error);
-          // Fallback to direct database query
-          const { data: facilities, error: dbError } = await supabase
-            .from('facilities')
-            .select(`
-              *,
-              facility_images (
-                id,
-                image_url,
-                alt_text,
-                is_featured
-              )
-            `)
-            .eq('status', 'active')
-            .order('name');
-
-          if (dbError) {
-            console.error('Database error:', dbError);
-            return [];
-          }
-
-          return facilities || [];
+          console.error('Database error:', error);
+          return [];
         }
 
-        return data?.data || [];
+        // Transform the data to match the expected Facility interface
+        const facilities = (data || []).map((location: any) => ({
+          id: location.id,
+          name: typeof location.name === 'string' ? location.name : location.name?.en || 'Unknown',
+          type: location.location_type || 'facility',
+          area: location.address || '',
+          description: typeof location.description === 'string' ? location.description : location.description?.en || '',
+          capacity: location.capacity || 0,
+          price_per_hour: 450, // Default price
+          address_street: location.address || '',
+          address_city: '',
+          address_postal_code: '',
+          equipment: location.facilities || [],
+          amenities: [],
+          accessibility_features: [],
+          is_featured: false,
+          status: 'active',
+          facility_images: location.app_location_images || []
+        }));
+
+        return facilities;
       } catch (error) {
         console.error('Facilities fetch error:', error);
         return [];
@@ -77,38 +89,47 @@ export const useFacility = (id: string) => {
       if (!id) return null;
       
       try {
-        // Try the edge function first
-        const { data, error } = await supabase.functions.invoke('facilities', {
-          body: { id: parseInt(id) }
-        });
-        
+        const { data, error } = await supabase
+          .from('app_locations')
+          .select(`
+            *,
+            app_location_images (
+              id,
+              image_url,
+              alt_text,
+              is_featured
+            )
+          `)
+          .eq('id', id)
+          .eq('is_published', true)
+          .single();
+
         if (error) {
-          console.error('Edge function error:', error);
-          // Fallback to direct database query
-          const { data: facility, error: dbError } = await supabase
-            .from('facilities')
-            .select(`
-              *,
-              facility_images (
-                id,
-                image_url,
-                alt_text,
-                is_featured
-              )
-            `)
-            .eq('id', parseInt(id))
-            .eq('status', 'active')
-            .single();
-
-          if (dbError) {
-            console.error('Database error:', dbError);
-            return null;
-          }
-
-          return facility;
+          console.error('Database error:', error);
+          return null;
         }
 
-        return data?.data || null;
+        // Transform the data to match the expected Facility interface
+        const facility = {
+          id: data.id,
+          name: typeof data.name === 'string' ? data.name : data.name?.en || 'Unknown',
+          type: data.location_type || 'facility',
+          area: data.address || '',
+          description: typeof data.description === 'string' ? data.description : data.description?.en || '',
+          capacity: data.capacity || 0,
+          price_per_hour: 450, // Default price
+          address_street: data.address || '',
+          address_city: '',
+          address_postal_code: '',
+          equipment: data.facilities || [],
+          amenities: [],
+          accessibility_features: [],
+          is_featured: false,
+          status: 'active',
+          facility_images: data.app_location_images || []
+        };
+
+        return facility;
       } catch (error) {
         console.error('Facility fetch error:', error);
         return null;

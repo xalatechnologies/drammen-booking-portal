@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { useFacilities, useFacilitiesPagination } from '@/hooks/useFacilities';
+import { useFacilities } from '@/hooks/useFacilities';
 import { FacilityCard } from './facility/FacilityCard';
 import FacilityListItem from './facility/FacilityListItem';
 import ViewHeader from './search/ViewHeader';
@@ -17,82 +17,51 @@ export const InfiniteScrollFacilities: React.FC<InfiniteScrollFacilitiesProps> =
   viewMode,
   setViewMode
 }) => {
-  const { pagination, nextPage, goToPage } = useFacilitiesPagination(1, 6);
   const [allFacilities, setAllFacilities] = useState<any[]>([]);
 
   console.log('InfiniteScrollFacilities - Rendering with filters:', filters);
   console.log('InfiniteScrollFacilities - Current viewMode:', viewMode);
   console.log('InfiniteScrollFacilities - allFacilities count:', allFacilities.length);
 
-  const { facilities, isLoading, pagination: paginationInfo } = useFacilities({
-    pagination,
-    filters,
-  });
+  const { data: facilities, isLoading, error } = useFacilities();
 
-  // Memoize the filter string to detect changes
-  const filterString = useMemo(() => JSON.stringify(filters), [filters]);
-
-  // Reset when filters change - but only when we actually have a change
-  useEffect(() => {
-    console.log('InfiniteScrollFacilities - Filters changed, resetting to page 1');
-    setAllFacilities([]);
-    if (pagination.page !== 1) {
-      goToPage(1);
-    }
-  }, [filterString]); // Remove goToPage from dependencies to avoid loop
-
-  // Handle facility data updates - separate effect without filter dependencies
+  // Update facilities when data changes
   useEffect(() => {
     if (!isLoading && facilities && Array.isArray(facilities)) {
-      console.log('InfiniteScrollFacilities - Processing facilities data', {
-        page: pagination.page,
-        facilitiesLength: facilities.length,
-        allFacilitiesLength: allFacilities.length
-      });
-
-      setAllFacilities(prev => {
-        if (pagination.page === 1) {
-          // For page 1, replace all facilities
-          console.log('InfiniteScrollFacilities - Setting facilities for page 1:', facilities.length);
-          return [...facilities];
-        } else {
-          // For subsequent pages, append new facilities
-          const newFacilities = facilities.filter(facility => 
-            !prev.some(existing => existing.id === facility.id)
-          );
-          const updated = [...prev, ...newFacilities];
-          console.log('InfiniteScrollFacilities - Appended facilities for page', pagination.page, ':', newFacilities.length);
-          return updated;
-        }
-      });
-    }
-  }, [facilities, isLoading, pagination.page]); // Only depend on data-related values
-
-  // Calculate hasMore based on pagination info
-  const hasMore = useMemo(() => {
-    return paginationInfo?.hasNext || false;
-  }, [paginationInfo]);
-
-  const loadMore = useCallback(() => {
-    if (!isLoading && hasMore) {
-      console.log('InfiniteScrollFacilities - Loading more, current page:', pagination.page);
-      nextPage();
-    }
-  }, [isLoading, hasMore, pagination.page, nextPage]);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      if (
-        window.innerHeight + document.documentElement.scrollTop
-        >= document.documentElement.offsetHeight - 1000
-      ) {
-        loadMore();
+      console.log('InfiniteScrollFacilities - Processing facilities data:', facilities.length);
+      
+      // Apply client-side filtering based on the filters
+      let filteredFacilities = facilities;
+      
+      if (filters.searchTerm) {
+        filteredFacilities = filteredFacilities.filter(facility =>
+          facility.name.toLowerCase().includes(filters.searchTerm!.toLowerCase()) ||
+          facility.description?.toLowerCase().includes(filters.searchTerm!.toLowerCase())
+        );
       }
-    };
+      
+      if (filters.facilityType && filters.facilityType !== 'all') {
+        filteredFacilities = filteredFacilities.filter(facility =>
+          facility.type === filters.facilityType
+        );
+      }
+      
+      if (filters.location && filters.location !== 'all') {
+        filteredFacilities = filteredFacilities.filter(facility =>
+          facility.area.includes(filters.location!)
+        );
+      }
+      
+      if (filters.capacity) {
+        const [min, max] = filters.capacity;
+        filteredFacilities = filteredFacilities.filter(facility =>
+          facility.capacity >= min && facility.capacity <= max
+        );
+      }
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [loadMore]);
+      setAllFacilities(filteredFacilities);
+    }
+  }, [facilities, isLoading, filters]);
 
   const handleAddressClick = (e: React.MouseEvent, facility: any) => {
     e.stopPropagation();
@@ -102,15 +71,12 @@ export const InfiniteScrollFacilities: React.FC<InfiniteScrollFacilitiesProps> =
   console.log('InfiniteScrollFacilities - Render state:', {
     allFacilitiesCount: allFacilities.length,
     isLoading,
-    hasMore,
-    currentPage: pagination.page,
     facilitiesFromAPI: facilities?.length || 0,
-    paginationTotal: paginationInfo?.total,
     viewMode
   });
 
-  // Get total count from pagination info or fall back to current facilities count
-  const facilityCount = paginationInfo?.total || allFacilities.length;
+  // Get total count from filtered facilities
+  const facilityCount = allFacilities.length;
 
   return (
     <div>
@@ -129,8 +95,15 @@ export const InfiniteScrollFacilities: React.FC<InfiniteScrollFacilitiesProps> =
         </div>
       )}
 
+      {/* Error state */}
+      {error && (
+        <div className="text-center py-8 text-red-500">
+          Error loading facilities: {error.message}
+        </div>
+      )}
+
       {/* No results state */}
-      {!isLoading && allFacilities.length === 0 && (
+      {!isLoading && !error && allFacilities.length === 0 && (
         <div className="text-center py-8 text-gray-500">
           No facilities found matching your criteria
         </div>
@@ -157,20 +130,6 @@ export const InfiniteScrollFacilities: React.FC<InfiniteScrollFacilitiesProps> =
             </div>
           )}
         </>
-      )}
-      
-      {/* Loading indicator for pagination */}
-      {isLoading && allFacilities.length > 0 && (
-        <div className="flex justify-center items-center h-16 mt-4">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-        </div>
-      )}
-      
-      {/* End of list indicator */}
-      {!hasMore && allFacilities.length > 0 && (
-        <div className="text-center py-4 text-gray-500">
-          No more facilities to load
-        </div>
       )}
     </div>
   );

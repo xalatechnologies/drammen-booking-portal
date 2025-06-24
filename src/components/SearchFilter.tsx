@@ -45,7 +45,6 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
 }) => {
   const [availableTypes, setAvailableTypes] = useState<string[]>([]);
   const [availableAreas, setAvailableAreas] = useState<string[]>([]);
-  const [availableAccessibility, setAvailableAccessibility] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Fetch ALL available filter options (without applying current filters)
@@ -54,29 +53,25 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
       setLoading(true);
       console.log('SearchFilter - Fetching ALL available filter options');
 
-      // Get ALL facilities to extract complete option lists
+      // Get ALL locations to extract complete option lists
       const { data, error } = await supabase
-        .from('facilities')
-        .select('type, area, accessibility_features')
-        .eq('status', 'active');
+        .from('app_locations')
+        .select('location_type, address')
+        .eq('is_published', true);
       
       if (error) {
         console.error('SearchFilter - Error fetching filter options:', error);
         return;
       }
 
-      // Extract unique values for each filter from ALL facilities
-      const types = [...new Set(data?.map(f => f.type).filter(Boolean) || [])];
-      const areas = [...new Set(data?.map(f => f.area).filter(Boolean) || [])];
-      const accessibilityFeatures = [...new Set(
-        data?.flatMap(f => f.accessibility_features || []).filter(Boolean) || []
-      )];
+      // Extract unique values for each filter from ALL locations
+      const types = [...new Set(data?.map(f => f.location_type).filter(Boolean) || [])];
+      const areas = [...new Set(data?.map(f => f.address).filter(Boolean) || [])];
 
-      console.log('SearchFilter - ALL available options:', { types, areas, accessibilityFeatures });
+      console.log('SearchFilter - ALL available options:', { types, areas });
 
       setAvailableTypes(types);
       setAvailableAreas(areas);
-      setAvailableAccessibility(accessibilityFeatures);
     } catch (error) {
       console.error('SearchFilter - Failed to fetch filter options:', error);
     } finally {
@@ -178,9 +173,9 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
             </Select>
           </div>
 
-          {/* Accessibility */}
+          {/* Accessibility - simplified for now */}
           <div className="flex-1">
-            <Select value={accessibility} onValueChange={setAccessibility} disabled={loading}>
+            <Select value={accessibility} onValueChange={setAccessibility}>
               <SelectTrigger className="h-14 w-full border-gray-300 hover:border-blue-500 text-base rounded-lg bg-white/95 backdrop-blur-sm shadow-sm">
                 <div className="flex items-center text-left">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="mr-2 h-4 w-4">
@@ -191,13 +186,9 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
               </SelectTrigger>
               <SelectContent className="bg-white z-50">
                 <SelectItem value="all" className="text-base">Alle</SelectItem>
-                {availableAccessibility.map((feature) => (
-                  <SelectItem key={feature} value={feature} className="text-base">
-                    {feature === 'wheelchair' ? 'Rullestoltilpasset' : 
-                     feature === 'hearing-loop' ? 'Teleslynge' : 
-                     feature === 'visual-aids' ? 'Synshjelpemidler' : feature}
-                  </SelectItem>
-                ))}
+                <SelectItem value="wheelchair" className="text-base">Rullestoltilpasset</SelectItem>
+                <SelectItem value="hearing-loop" className="text-base">Teleslynge</SelectItem>
+                <SelectItem value="visual-aids" className="text-base">Synshjelpemidler</SelectItem>
               </SelectContent>
             </Select>
           </div>

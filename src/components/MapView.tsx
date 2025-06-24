@@ -7,7 +7,6 @@ import { MapInfoOverlay } from './map/MapInfoOverlay';
 import { MapLoadingState } from './map/MapLoadingState';
 import { MapErrorState } from './map/MapErrorState';
 import { useFacilities } from '@/hooks/useFacilities';
-import { FacilityFilters } from '@/types/facility';
 import ViewHeader from './search/ViewHeader';
 import mapboxgl from 'mapbox-gl';
 
@@ -27,32 +26,30 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location, viewMode, set
   const [error, setError] = useState<string>('');
   const [isInitialized, setIsInitialized] = useState<boolean>(false);
 
-  // Create filters from props
-  const filters: FacilityFilters = {
-    facilityType: facilityType !== "all" ? facilityType : undefined,
-    location: location !== "all" ? location : undefined,
-  };
-
   // Use the centralized facilities service
-  const { facilities, isLoading: facilitiesLoading, error: facilitiesError } = useFacilities({
-    pagination: { page: 1, limit: 100 }, // Get all facilities for map
-    filters
-  });
+  const { data: facilities, isLoading: facilitiesLoading, error: facilitiesError } = useFacilities();
 
   // Ensure facilities is always an array
   const facilitiesArray = Array.isArray(facilities) ? facilities : (facilities ? [facilities] : []);
 
+  // Apply client-side filtering
+  const filteredFacilities = facilitiesArray.filter(facility => {
+    if (facilityType !== "all" && facility.type !== facilityType) return false;
+    if (location !== "all" && !facility.area.includes(location)) return false;
+    return true;
+  });
+
   // Convert facilities to map format with enhanced data
-  const facilityLocations = facilitiesArray.map(facility => ({
+  const facilityLocations = filteredFacilities.map(facility => ({
     id: facility.id,
     name: facility.name,
-    address: facility.address,
+    address: facility.address_street || facility.area,
     lat: 59.7440 + (Math.random() - 0.5) * 0.02, // Spread around Drammen
     lng: 10.2052 + (Math.random() - 0.5) * 0.02,
-    image: facility.image,
+    image: facility.facility_images?.[0]?.image_url || '',
     type: facility.type,
     capacity: facility.capacity,
-    nextAvailable: facility.nextAvailable || facility.next_available || "Not available"
+    nextAvailable: "Available now"
   }));
 
   const handleMapLoad = (mapInstance: mapboxgl.Map) => {
@@ -75,7 +72,7 @@ const MapView: React.FC<MapViewProps> = ({ facilityType, location, viewMode, set
     <div className="max-w-7xl mx-auto px-4 my-[12px]">
       {/* Reusable Header with consistent positioning */}
       <ViewHeader 
-        facilityCount={facilitiesArray.length}
+        facilityCount={filteredFacilities.length}
         isLoading={facilitiesLoading}
         viewMode={viewMode}
         setViewMode={setViewMode}
