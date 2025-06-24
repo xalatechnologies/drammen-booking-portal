@@ -1,7 +1,7 @@
 
 import React, { useState } from "react";
 import { PageLayout } from "@/components/layouts";
-import { FacilityListView } from "@/components/admin/facilities/FacilityListView";
+import { FacilityManagementTabs } from "@/components/admin/facilities/FacilityManagementTabs";
 
 const FacilitiesPage = () => {
   const [selectedFacilityId, setSelectedFacilityId] = useState<number | undefined>();
@@ -12,7 +12,7 @@ const FacilitiesPage = () => {
 
   return (
     <PageLayout>
-      <FacilityListView 
+      <FacilityManagementTabs 
         selectedFacilityId={selectedFacilityId}
         onFacilitySelect={handleFacilitySelect}
       />

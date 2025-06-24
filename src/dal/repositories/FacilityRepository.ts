@@ -66,6 +66,8 @@ export class FacilityRepository extends SupabaseRepository<Facility> {
 
   async getAll(pagination?: PaginationParams, filters?: FacilityFilters): Promise<ApiResponse<PaginatedResponse<Facility>>> {
     try {
+      console.log("FacilityRepository.getAll - Starting query with filters:", filters);
+      
       let query = supabase
         .from('app_locations')
         .select(`
@@ -96,9 +98,11 @@ export class FacilityRepository extends SupabaseRepository<Facility> {
 
       query = query.order('name');
 
+      console.log("FacilityRepository.getAll - Executing query");
       const { data, error, count } = await query;
 
       if (error) {
+        console.error("FacilityRepository.getAll - Database error:", error);
         return {
           success: false,
           error: {
@@ -108,80 +112,89 @@ export class FacilityRepository extends SupabaseRepository<Facility> {
         };
       }
 
-      const facilities = (data || []).map((location: any): Facility => ({
-        id: parseInt(location.id),
-        name: getLocalizedText(location.name, 'Unknown Facility'),
-        address_street: location.address_street || location.address || '',
-        address_city: location.address_city || '',
-        address_postal_code: location.address_postal_code || '',
-        address_country: location.address_country || 'Norway',
-        type: location.location_type || 'facility',
-        status: normalizeStatus(location.status || 'active'),
-        image_url: location.image || location.app_location_images?.[0]?.image_url || null,
-        capacity: location.capacity || 0,
-        area: location.address || '',
-        description: getLocalizedText(location.description, ''),
-        next_available: location.next_available || null,
-        rating: location.rating || null,
-        review_count: location.review_count || 0,
-        price_per_hour: location.price_per_hour || 450,
-        has_auto_approval: location.has_auto_approval || false,
-        amenities: location.amenities || [],
-        time_slot_duration: location.time_slot_duration || 60,
-        latitude: location.latitude || null,
-        longitude: location.longitude || null,
-        accessibility_features: location.accessibility_features || [],
-        equipment: location.equipment || [],
-        allowed_booking_types: normalizeBookingTypes(location.allowed_booking_types || ['engangs']),
-        season_from: location.season_from || null,
-        season_to: location.season_to || null,
-        contact_name: location.contact_name || null,
-        contact_email: location.contact_email || null,
-        contact_phone: location.contact_phone || null,
-        booking_lead_time_hours: location.booking_lead_time_hours || 2,
-        max_advance_booking_days: location.max_advance_booking_days || 365,
-        cancellation_deadline_hours: location.cancellation_deadline_hours || 24,
-        is_featured: location.is_featured || false,
-        created_at: location.created_at,
-        updated_at: location.updated_at,
-        area_sqm: location.area_sqm || null,
-        // Computed/derived fields for backwards compatibility - all required to avoid conflicts
-        address: computeAddress(location),
-        image: location.image || location.app_location_images?.[0]?.image_url || '',
-        pricePerHour: location.price_per_hour || 450,
-        accessibility: location.accessibility_features || [],
-        suitableFor: [],
-        hasAutoApproval: location.has_auto_approval || false,
-        nextAvailable: location.next_available || 'Available now',
-        openingHours: [],
-        zones: [],
-        featuredImage: location.app_location_images?.find((img: any) => img.is_featured) ? {
-          id: location.app_location_images.find((img: any) => img.is_featured).id,
-          facility_id: parseInt(location.id),
-          image_url: location.app_location_images.find((img: any) => img.is_featured).image_url,
-          alt_text: location.app_location_images.find((img: any) => img.is_featured).alt_text || '',
-          display_order: location.app_location_images.find((img: any) => img.is_featured).display_order || 0,
-          is_featured: true,
-          uploaded_at: location.app_location_images.find((img: any) => img.is_featured).uploaded_at || location.created_at,
-          created_at: location.app_location_images.find((img: any) => img.is_featured).created_at || location.created_at
-        } : undefined,
-        images: (location.app_location_images || []).map((img: any) => ({
-          id: img.id,
-          facility_id: parseInt(location.id),
-          image_url: img.image_url,
-          alt_text: img.alt_text || '',
-          display_order: img.display_order || 0,
-          is_featured: img.is_featured || false,
-          uploaded_at: img.uploaded_at || location.created_at,
-          created_at: img.created_at || location.created_at
-        })),
-        timeSlotDuration: location.time_slot_duration === 60 ? 1 : 2,
-        availableTimes: [],
-        season: {
-          from: location.season_from || '',
-          to: location.season_to || ''
-        }
-      }));
+      console.log("FacilityRepository.getAll - Raw data received:", data?.length || 0, "facilities");
+
+      const facilities = (data || []).map((location: any): Facility => {
+        // Convert UUID to number for backwards compatibility
+        const facilityId = parseInt(location.id) || Math.floor(Math.random() * 1000000);
+        
+        return {
+          id: facilityId,
+          name: getLocalizedText(location.name, 'Unknown Facility'),
+          address_street: location.address_street || location.address || '',
+          address_city: location.address_city || '',
+          address_postal_code: location.address_postal_code || '',
+          address_country: location.address_country || 'Norway',
+          type: location.location_type || 'facility',
+          status: normalizeStatus(location.status || 'active'),
+          image_url: location.image || location.app_location_images?.[0]?.image_url || null,
+          capacity: location.capacity || 0,
+          area: location.address || '',
+          description: getLocalizedText(location.description, ''),
+          next_available: location.next_available || null,
+          rating: location.rating || null,
+          review_count: location.review_count || 0,
+          price_per_hour: location.price_per_hour || 450,
+          has_auto_approval: location.has_auto_approval || false,
+          amenities: location.amenities || [],
+          time_slot_duration: location.time_slot_duration || 60,
+          latitude: location.latitude || null,
+          longitude: location.longitude || null,
+          accessibility_features: location.accessibility_features || [],
+          equipment: location.equipment || [],
+          allowed_booking_types: normalizeBookingTypes(location.allowed_booking_types || ['engangs']),
+          season_from: location.season_from || null,
+          season_to: location.season_to || null,
+          contact_name: location.contact_name || null,
+          contact_email: location.contact_email || null,
+          contact_phone: location.contact_phone || null,
+          booking_lead_time_hours: location.booking_lead_time_hours || 2,
+          max_advance_booking_days: location.max_advance_booking_days || 365,
+          cancellation_deadline_hours: location.cancellation_deadline_hours || 24,
+          is_featured: location.is_featured || false,
+          created_at: location.created_at,
+          updated_at: location.updated_at,
+          area_sqm: location.area_sqm || null,
+          // Computed/derived fields for backwards compatibility - all required to avoid conflicts
+          address: computeAddress(location),
+          image: location.image || location.app_location_images?.[0]?.image_url || '',
+          pricePerHour: location.price_per_hour || 450,
+          accessibility: location.accessibility_features || [],
+          suitableFor: [],
+          hasAutoApproval: location.has_auto_approval || false,
+          nextAvailable: location.next_available || 'Available now',
+          openingHours: [],
+          zones: [],
+          featuredImage: location.app_location_images?.find((img: any) => img.is_featured) ? {
+            id: location.app_location_images.find((img: any) => img.is_featured).id,
+            facility_id: facilityId,
+            image_url: location.app_location_images.find((img: any) => img.is_featured).image_url,
+            alt_text: location.app_location_images.find((img: any) => img.is_featured).alt_text || '',
+            display_order: location.app_location_images.find((img: any) => img.is_featured).display_order || 0,
+            is_featured: true,
+            uploaded_at: location.app_location_images.find((img: any) => img.is_featured).uploaded_at || location.created_at,
+            created_at: location.app_location_images.find((img: any) => img.is_featured).created_at || location.created_at
+          } : undefined,
+          images: (location.app_location_images || []).map((img: any) => ({
+            id: img.id,
+            facility_id: facilityId,
+            image_url: img.image_url,
+            alt_text: img.alt_text || '',
+            display_order: img.display_order || 0,
+            is_featured: img.is_featured || false,
+            uploaded_at: img.uploaded_at || location.created_at,
+            created_at: img.created_at || location.created_at
+          })),
+          timeSlotDuration: location.time_slot_duration === 60 ? 1 : 2,
+          availableTimes: [],
+          season: {
+            from: location.season_from || '',
+            to: location.season_to || ''
+          }
+        };
+      });
+
+      console.log("FacilityRepository.getAll - Processed facilities:", facilities.length);
 
       const totalPages = pagination ? Math.ceil((count || 0) / pagination.limit) : 1;
 
@@ -200,6 +213,7 @@ export class FacilityRepository extends SupabaseRepository<Facility> {
         }
       };
     } catch (error) {
+      console.error("FacilityRepository.getAll - Catch error:", error);
       return {
         success: false,
         error: {
@@ -212,6 +226,8 @@ export class FacilityRepository extends SupabaseRepository<Facility> {
 
   async getById(id: string): Promise<ApiResponse<Facility>> {
     try {
+      console.log("FacilityRepository.getById - Fetching facility with ID:", id);
+      
       const { data, error } = await supabase
         .from('app_locations')
         .select(`
@@ -231,6 +247,7 @@ export class FacilityRepository extends SupabaseRepository<Facility> {
         .single();
 
       if (error) {
+        console.error("FacilityRepository.getById - Database error:", error);
         return {
           success: false,
           error: {
@@ -240,8 +257,11 @@ export class FacilityRepository extends SupabaseRepository<Facility> {
         };
       }
 
+      // Convert UUID to number for backwards compatibility
+      const facilityId = parseInt(data.id) || Math.floor(Math.random() * 1000000);
+
       const facility: Facility = {
-        id: parseInt(data.id),
+        id: facilityId,
         name: getLocalizedText(data.name, 'Unknown Facility'),
         address_street: data.address_street || data.address || '',
         address_city: data.address_city || '',
@@ -289,7 +309,7 @@ export class FacilityRepository extends SupabaseRepository<Facility> {
         zones: [],
         featuredImage: data.app_location_images?.find((img: any) => img.is_featured) ? {
           id: data.app_location_images.find((img: any) => img.is_featured).id,
-          facility_id: parseInt(data.id),
+          facility_id: facilityId,
           image_url: data.app_location_images.find((img: any) => img.is_featured).image_url,
           alt_text: data.app_location_images.find((img: any) => img.is_featured).alt_text || '',
           display_order: data.app_location_images.find((img: any) => img.is_featured).display_order || 0,
@@ -299,7 +319,7 @@ export class FacilityRepository extends SupabaseRepository<Facility> {
         } : undefined,
         images: (data.app_location_images || []).map((img: any) => ({
           id: img.id,
-          facility_id: parseInt(data.id),
+          facility_id: facilityId,
           image_url: img.image_url,
           alt_text: img.alt_text || '',
           display_order: img.display_order || 0,
@@ -315,11 +335,14 @@ export class FacilityRepository extends SupabaseRepository<Facility> {
         }
       };
 
+      console.log("FacilityRepository.getById - Processed facility:", facility);
+
       return {
         success: true,
         data: facility
       };
     } catch (error) {
+      console.error("FacilityRepository.getById - Catch error:", error);
       return {
         success: false,
         error: {
