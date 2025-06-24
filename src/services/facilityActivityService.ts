@@ -2,14 +2,14 @@
 import { supabase } from '@/integrations/supabase/client';
 
 export class FacilityActivityService {
-  static async getFacilitySuitableActivities(facilityId: number, languageCode: 'NO' | 'EN' = 'NO'): Promise<string[]> {
+  static async getFacilitySuitableActivities(facilityId: number | string, languageCode: 'NO' | 'EN' = 'NO'): Promise<string[]> {
     try {
       // Since the facility_suitable_activities table doesn't exist,
       // we'll return activities based on the facilities array in app_locations
       const { data, error } = await supabase
         .from('app_locations')
         .select('facilities')
-        .eq('id', facilityId)
+        .eq('id', String(facilityId))
         .maybeSingle();
 
       if (error) {

@@ -45,6 +45,72 @@ const initialFilters: FacilityFilters = {
   amenities: [],
 };
 
+// Helper function to transform database records to Facility interface
+const transformToFacility = (dbRecord: any): Facility => {
+  const name = typeof dbRecord.name === 'object' 
+    ? dbRecord.name['NO'] || dbRecord.name['EN'] || dbRecord.code
+    : dbRecord.name || dbRecord.code;
+  
+  const description = typeof dbRecord.description === 'object'
+    ? dbRecord.description['NO'] || dbRecord.description['EN'] || ''
+    : dbRecord.description || '';
+
+  return {
+    id: parseInt(dbRecord.id),
+    name,
+    code: dbRecord.code,
+    address_street: dbRecord.address || '',
+    address_city: '',
+    address_postal_code: '',
+    address_country: 'Norway',
+    type: dbRecord.location_type || 'facility',
+    status: 'active' as const,
+    image_url: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&auto=format&fit=crop',
+    capacity: dbRecord.capacity || 0,
+    area: dbRecord.code || 'General',
+    description,
+    next_available: 'Available now',
+    rating: null,
+    review_count: null,
+    price_per_hour: 450,
+    has_auto_approval: true,
+    amenities: dbRecord.facilities || [],
+    time_slot_duration: 1,
+    latitude: dbRecord.latitude,
+    longitude: dbRecord.longitude,
+    accessibility_features: [],
+    equipment: [],
+    allowed_booking_types: ['engangs', 'fastlan'] as const,
+    season_from: null,
+    season_to: null,
+    contact_name: null,
+    contact_email: dbRecord.contact_email,
+    contact_phone: dbRecord.contact_phone,
+    booking_lead_time_hours: 24,
+    max_advance_booking_days: 365,
+    cancellation_deadline_hours: 24,
+    is_featured: false,
+    created_at: dbRecord.created_at,
+    updated_at: dbRecord.updated_at || dbRecord.created_at,
+    area_sqm: null,
+    // Computed fields for backwards compatibility
+    address: dbRecord.address || '',
+    image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&auto=format&fit=crop',
+    pricePerHour: 450,
+    accessibility: [],
+    suitableFor: ['General Use'],
+    hasAutoApproval: true,
+    nextAvailable: 'Available now',
+    openingHours: [],
+    zones: [],
+    timeSlotDuration: 1 as 1 | 2,
+    season: {
+      from: '',
+      to: ''
+    }
+  };
+};
+
 export const useFacilityAdminStore = create<FacilityAdminState>()(
   persist(
     (set, get) => ({
@@ -69,8 +135,9 @@ export const useFacilityAdminStore = create<FacilityAdminState>()(
             undefined
           );
           if (result.success && result.data) {
+            const transformedFacilities = result.data.data.map(transformToFacility);
             set({
-              facilities: result.data.data,
+              facilities: transformedFacilities,
               totalCount: result.data.pagination.total,
               isLoading: false,
               error: null,
@@ -80,7 +147,7 @@ export const useFacilityAdminStore = create<FacilityAdminState>()(
               facilities: [], 
               totalCount: 0, 
               isLoading: false, 
-              error: typeof result.error === 'string' ? result.error : result.error?.message || 'Failed to load facilities'
+              error: result.error?.message || 'Failed to load facilities'
             });
           }
         } catch (error: any) {
@@ -92,16 +159,17 @@ export const useFacilityAdminStore = create<FacilityAdminState>()(
         try {
           const result = await FacilityService.createFacility(data);
           if (result.success && result.data) {
+            const transformedFacility = transformToFacility(result.data);
             set(state => ({
-              facilities: [result.data!, ...state.facilities],
+              facilities: [transformedFacility, ...state.facilities],
               isLoading: false,
               error: null,
               isFormOpen: false,
             }));
             await get().loadFacilities();
-            return { success: true, data: result.data };
+            return { success: true, data: transformedFacility };
           } else {
-            const errorMsg = typeof result.error === 'string' ? result.error : result.error?.message || 'Failed to create facility';
+            const errorMsg = result.error?.message || 'Failed to create facility';
             set({ isLoading: false, error: errorMsg });
             return { success: false, error: errorMsg };
           }
@@ -116,16 +184,17 @@ export const useFacilityAdminStore = create<FacilityAdminState>()(
         try {
           const result = await FacilityService.updateFacility(id, data);
           if (result.success && result.data) {
+            const transformedFacility = transformToFacility(result.data);
             set(state => ({
-              facilities: state.facilities.map(f => f.id.toString() === id ? result.data! : f),
+              facilities: state.facilities.map(f => f.id.toString() === id ? transformedFacility : f),
               isLoading: false,
               error: null,
               isFormOpen: false,
             }));
             await get().loadFacilities();
-            return { success: true, data: result.data };
+            return { success: true, data: transformedFacility };
           } else {
-            const errorMsg = typeof result.error === 'string' ? result.error : result.error?.message || 'Failed to update facility';
+            const errorMsg = result.error?.message || 'Failed to update facility';
             set({ isLoading: false, error: errorMsg });
             return { success: false, error: errorMsg };
           }
@@ -147,7 +216,7 @@ export const useFacilityAdminStore = create<FacilityAdminState>()(
             }));
             await get().loadFacilities();
           } else {
-            const errorMsg = typeof result.error === 'string' ? result.error : result.error?.message || 'Failed to delete facility';
+            const errorMsg = result.error?.message || 'Failed to delete facility';
             set({ isLoading: false, error: errorMsg });
           }
         } catch (error: any) {

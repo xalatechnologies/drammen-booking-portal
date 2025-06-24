@@ -43,9 +43,20 @@ export class UserService {
 
   static async createUser(userData: Partial<User>): Promise<User | null> {
     try {
+      // Ensure required fields are present
+      if (!userData.name || !userData.email) {
+        throw new Error('Name and email are required');
+      }
+
+      const insertData = {
+        name: userData.name,
+        email: userData.email,
+        locale: userData.locale || 'NO'
+      };
+
       const { data, error } = await supabase
         .from('app_users')
-        .insert(userData)
+        .insert(insertData)
         .select()
         .single();
 
