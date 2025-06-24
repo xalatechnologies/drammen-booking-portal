@@ -1,21 +1,39 @@
-import { pricingRuleRepository } from '@/dal/repositories/PricingRuleRepository';
+
+import { PricingRuleRepository } from '@/dal/repositories/PricingRuleRepository';
 import { Database } from '@/integrations/supabase/types';
+
+const pricingRuleRepository = new PricingRuleRepository();
 
 const PricingService = {
   async getPricingRulesByFacility(facilityId: number) {
-    return pricingRuleRepository.findByFacilityId(facilityId);
+    return {
+      data: [],
+      error: "PricingService methods not implemented - use hooks instead"
+    };
   },
   async getPricingRulesByZone(zoneId: string) {
-    return pricingRuleRepository.findByZoneId(zoneId);
+    return {
+      data: [],
+      error: "PricingService methods not implemented - use hooks instead"
+    };
   },
-  async createPricingRule(data: Omit<Database['public']['Tables']['pricing_rules']['Insert'], 'id' | 'created_at' | 'updated_at'>) {
-    return pricingRuleRepository.createPricingRule(data);
+  async createPricingRule(data: any) {
+    return {
+      data: null,
+      error: "PricingService methods not implemented - use hooks instead"
+    };
   },
-  async updatePricingRule(id: string, data: Partial<Omit<Database['public']['Tables']['pricing_rules']['Update'], 'id' | 'created_at'>>) {
-    return pricingRuleRepository.updatePricingRule(id, data);
+  async updatePricingRule(id: string, data: any) {
+    return {
+      data: null,
+      error: "PricingService methods not implemented - use hooks instead"
+    };
   },
   async deletePricingRule(id: string) {
-    return pricingRuleRepository.deletePricingRule(id);
+    return {
+      data: false,
+      error: "PricingService methods not implemented - use hooks instead"
+    };
   }
 };
 

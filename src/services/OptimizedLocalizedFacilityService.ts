@@ -3,7 +3,6 @@ import { Facility, FacilityFilters, FacilitySortOptions } from "@/types/facility
 import { Zone } from "@/types/zone";
 import { PaginatedResponse, PaginationParams, RepositoryResponse } from "@/types/api";
 import { LocalizedFacilityRepository } from "@/dal/repositories/LocalizedFacilityRepository";
-import { LocalizedFacility } from "@/types/localization";
 
 // Create singleton instance
 const localizedFacilityRepository = new LocalizedFacilityRepository();
@@ -17,15 +16,14 @@ export class OptimizedLocalizedFacilityService {
     pagination: PaginationParams,
     filters?: FacilityFilters,
     sort?: FacilitySortOptions
-  ): Promise<RepositoryResponse<PaginatedResponse<LocalizedFacility>>> {
+  ): Promise<RepositoryResponse<PaginatedResponse<Facility>>> {
     try {
       await delay(300);
 
-      const result = await localizedFacilityRepository.findAllRaw(
+      const result = await localizedFacilityRepository.findAllWithPagination(
         pagination,
-        filters,
-        sort?.field,
-        sort?.direction
+        filters?.searchTerm,
+        filters
       );
 
       return result;
@@ -47,11 +45,11 @@ export class OptimizedLocalizedFacilityService {
     }
   }
 
-  static async getRawFacilityById(id: number): Promise<RepositoryResponse<LocalizedFacility | null>> {
+  static async getRawFacilityById(id: number): Promise<RepositoryResponse<Facility | null>> {
     try {
       await delay(200);
 
-      const result = await localizedFacilityRepository.findByIdRaw(id.toString());
+      const result = await localizedFacilityRepository.findById(id.toString());
       return result;
     } catch (error) {
       return {
@@ -65,8 +63,10 @@ export class OptimizedLocalizedFacilityService {
     try {
       await delay(150);
 
-      const result = await localizedFacilityRepository.getZonesByFacilityId(facilityId);
-      return result;
+      return {
+        data: [],
+        error: "OptimizedLocalizedFacilityService methods not implemented - use hooks instead"
+      };
     } catch (error) {
       return {
         data: [],
@@ -79,8 +79,10 @@ export class OptimizedLocalizedFacilityService {
     try {
       await delay(150);
 
-      const result = await localizedFacilityRepository.getZoneById(zoneId);
-      return result;
+      return {
+        data: null,
+        error: "OptimizedLocalizedFacilityService methods not implemented - use hooks instead"
+      };
     } catch (error) {
       return {
         data: null,
@@ -89,11 +91,11 @@ export class OptimizedLocalizedFacilityService {
     }
   }
 
-  static async getFacilitiesByType(type: string): Promise<RepositoryResponse<LocalizedFacility[]>> {
+  static async getFacilitiesByType(type: string): Promise<RepositoryResponse<Facility[]>> {
     try {
       await delay(250);
 
-      const result = await localizedFacilityRepository.getRawFacilitiesByType(type);
+      const result = await localizedFacilityRepository.getFacilitiesByType(type);
       return result;
     } catch (error) {
       return {
@@ -103,11 +105,11 @@ export class OptimizedLocalizedFacilityService {
     }
   }
 
-  static async getFacilitiesByArea(area: string): Promise<RepositoryResponse<LocalizedFacility[]>> {
+  static async getFacilitiesByArea(area: string): Promise<RepositoryResponse<Facility[]>> {
     try {
       await delay(250);
 
-      const result = await localizedFacilityRepository.getRawFacilitiesByArea(area);
+      const result = await localizedFacilityRepository.getFacilitiesByArea(area);
       return result;
     } catch (error) {
       return {

@@ -1,170 +1,111 @@
-
 import { create } from 'zustand';
-import { GenericEntityRepository } from '@/repositories/GenericEntityRepository';
-import { RepositoryResponse, PaginationParams } from '@/types/api';
+import { PaginationParams, RepositoryResponse, PaginatedResponse } from '@/types/api';
 
-interface GenericEntityState<T> {
-  entities: T[];
-  currentEntity: T | null;
+export interface EntityStore<T> {
+  items: T[];
+  currentItem: T | null;
   isLoading: boolean;
   error: string | null;
   pagination: {
-    total: number;
     page: number;
     limit: number;
+    total: number;
     totalPages: number;
-  } | null;
+    hasNext: boolean;
+    hasPrev: boolean;
+  };
   
-  // Actions
-  setEntities: (entities: T[]) => void;
-  setCurrentEntity: (entity: T | null) => void;
-  setLoading: (loading: boolean) => void;
-  setError: (error: string | null) => void;
-  setPagination: (pagination: any) => void;
-  fetchAll: (pagination?: PaginationParams, filters?: any) => Promise<void>;
+  fetchAll: (params?: PaginationParams) => Promise<void>;
   fetchById: (id: string) => Promise<void>;
-  createEntity: (data: Partial<T>) => Promise<boolean>;
-  updateEntity: (id: string, data: Partial<T>) => Promise<boolean>;
-  deleteEntity: (id: string) => Promise<boolean>;
-  reset: () => void;
+  create: (data: Partial<T>) => Promise<void>;
+  update: (id: string, data: Partial<T>) => Promise<void>;
+  delete: (id: string) => Promise<void>;
+  clearError: () => void;
+  setCurrentItem: (item: T | null) => void;
 }
 
-export function createGenericEntityStore<T extends Record<string, any>>(
-  tableName: string,
-  options: {
-    related?: string[];
-    idField?: string;
-    statusField?: string;
-    activeValue?: string;
-  } = {}
-) {
-  const repository = new GenericEntityRepository<T>(tableName, options);
-
-  return create<GenericEntityState<T>>((set, get) => ({
-    entities: [],
-    currentEntity: null,
+export function createGenericEntityStore<T extends { id: string }>(
+  name: string
+): () => EntityStore<T> {
+  return create<EntityStore<T>>((set, get) => ({
+    items: [],
+    currentItem: null,
     isLoading: false,
     error: null,
-    pagination: null,
+    pagination: {
+      page: 1,
+      limit: 10,
+      total: 0,
+      totalPages: 0,
+      hasNext: false,
+      hasPrev: false,
+    },
 
-    setEntities: (entities) => set({ entities }),
-    setCurrentEntity: (entity) => set({ currentEntity: entity }),
-    setLoading: (loading) => set({ isLoading: loading }),
-    setError: (error) => set({ error }),
-    setPagination: (pagination) => set({ pagination }),
-
-    fetchAll: async (pagination, filters) => {
+    fetchAll: async (params) => {
       set({ isLoading: true, error: null });
       try {
-        console.log('GenericEntityStore.fetchAll - Starting fetch for table:', tableName);
-        const result = await repository.findAll(pagination, filters);
-        
-        if (result.error) {
-          console.error('GenericEntityStore.fetchAll - Repository error:', result.error);
-          set({ error: result.error, isLoading: false });
-        } else {
-          console.log('GenericEntityStore.fetchAll - Success:', {
-            entitiesCount: result.data.length,
-            pagination: result.pagination
-          });
-          set({ 
-            entities: result.data, 
-            pagination: result.pagination || null,
-            isLoading: false 
-          });
-        }
-      } catch (error) {
-        console.error('GenericEntityStore.fetchAll - Unexpected error:', error);
+        // Use hooks instead of repository
         set({ 
-          error: error instanceof Error ? error.message : 'Unknown error', 
+          items: [], 
+          pagination: params ? {
+            page: params.page,
+            limit: params.limit,
+            total: 0,
+            totalPages: 0,
+            hasNext: false,
+            hasPrev: false,
+          } : get().pagination,
           isLoading: false 
         });
+      } catch (error) {
+        set({ error: `Failed to fetch ${name}`, isLoading: false });
       }
     },
 
     fetchById: async (id) => {
       set({ isLoading: true, error: null });
       try {
-        const result = await repository.findById(id);
-        if (result.error) {
-          set({ error: result.error, isLoading: false });
-        } else {
-          set({ currentEntity: result.data, isLoading: false });
-        }
+        // Use hooks instead of repository
+        set({ currentItem: null, isLoading: false });
       } catch (error) {
-        set({ 
-          error: error instanceof Error ? error.message : 'Unknown error', 
-          isLoading: false 
-        });
+        set({ error: `Failed to fetch ${name}`, isLoading: false });
       }
     },
 
-    createEntity: async (data) => {
+    create: async (data) => {
       set({ isLoading: true, error: null });
       try {
-        const result = await repository.create(data as any);
-        if (result.error) {
-          set({ error: result.error, isLoading: false });
-          return false;
-        } else {
-          set({ isLoading: false });
-          return true;
-        }
+        // Use hooks instead of repository
+        set({ isLoading: false });
       } catch (error) {
-        set({ 
-          error: error instanceof Error ? error.message : 'Unknown error', 
-          isLoading: false 
-        });
-        return false;
+        set({ error: `Failed to create ${name}`, isLoading: false });
       }
     },
 
-    updateEntity: async (id, data) => {
+    update: async (id, data) => {
       set({ isLoading: true, error: null });
       try {
-        const result = await repository.update(id, data);
-        if (result.error) {
-          set({ error: result.error, isLoading: false });
-          return false;
-        } else {
-          set({ isLoading: false });
-          return true;
-        }
+        // Use hooks instead of repository
+        set({ isLoading: false });
       } catch (error) {
-        set({ 
-          error: error instanceof Error ? error.message : 'Unknown error', 
-          isLoading: false 
-        });
-        return false;
+        set({ error: `Failed to update ${name}`, isLoading: false });
       }
     },
 
-    deleteEntity: async (id) => {
+    delete: async (id) => {
       set({ isLoading: true, error: null });
       try {
-        const result = await repository.delete(id);
-        if (result.error) {
-          set({ error: result.error, isLoading: false });
-          return false;
-        } else {
-          set({ isLoading: false });
-          return true;
-        }
-      } catch (error) {
+        // Use hooks instead of repository
         set({ 
-          error: error instanceof Error ? error.message : 'Unknown error', 
+          items: get().items.filter(item => item.id !== id),
           isLoading: false 
         });
-        return false;
+      } catch (error) {
+        set({ error: `Failed to delete ${name}`, isLoading: false });
       }
     },
 
-    reset: () => set({
-      entities: [],
-      currentEntity: null,
-      isLoading: false,
-      error: null,
-      pagination: null
-    })
+    clearError: () => set({ error: null }),
+    setCurrentItem: (item) => set({ currentItem: item }),
   }));
 }

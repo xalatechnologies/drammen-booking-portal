@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -19,6 +18,7 @@ interface BookingFormData {
   activityType: string;
   additionalInfo: string;
   actorType: ActorType | '';
+  termsAccepted: boolean;
 }
 
 interface ReusableBookingSidebarProps {
@@ -51,7 +51,8 @@ export const ReusableBookingSidebar: React.FC<ReusableBookingSidebarProps> = ({
     attendees: 1,
     activityType: '',
     additionalInfo: '',
-    actorType: ''
+    actorType: '',
+    termsAccepted: false
   });
 
   const [termsAccepted, setTermsAccepted] = useState(false);

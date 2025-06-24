@@ -1,6 +1,6 @@
 
 export { facilityRepository } from './FacilityRepository';
-export { zoneRepository } from './ZoneRepository';
+export { ZoneRepository } from './ZoneRepository';
 export { supabaseFacilityRepository } from './SupabaseFacilityRepository';
 export { facilityBlackoutRepository } from './FacilityBlackoutRepository';
 

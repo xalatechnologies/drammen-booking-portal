@@ -1,86 +1,46 @@
+
 import { BaseRepository } from '@/dal/BaseRepository';
 import { Language } from '@/i18n/types';
-import { LocalizedFacility, Zone } from '@/types/facility';
+import { Facility, Zone } from '@/types/facility';
 import { RepositoryResponse, PaginationParams, PaginatedResponse } from '@/types/api';
 
-export class LocalizedFacilityRepository extends BaseRepository<LocalizedFacility> {
+export class LocalizedFacilityRepository extends BaseRepository<Facility> {
   private currentLanguage: Language = 'NO';
-  private facilitiesData: Record<string, LocalizedFacility[]> = {
-    'NO': [],
-    'EN': []
-  };
 
   setLanguage(language: Language) {
     this.currentLanguage = language;
   }
 
-  protected getId(item: LocalizedFacility): string {
-    return item.id;
+  protected getId(item: Facility): string {
+    return item.id.toString();
   }
 
-  protected applyFilters(items: LocalizedFacility[], filters: any): LocalizedFacility[] {
-    if (!filters) return items;
-    
-    return items.filter(item => {
-      if (filters.type && item.type !== filters.type) return false;
-      if (filters.area && item.area !== filters.area) return false;
-      if (filters.searchTerm) {
-        const searchLower = filters.searchTerm.toLowerCase();
-        return item.name.toLowerCase().includes(searchLower) ||
-               item.description.toLowerCase().includes(searchLower);
-      }
-      return true;
-    });
-  }
-
-  protected createEntity(data: Partial<LocalizedFacility>): LocalizedFacility {
+  protected applyFilters(items: Facility[], filters: any): Facility[] {
     return {
-      id: data.id || this.generateId(),
-      name: data.name || '',
-      description: data.description || '',
-      type: data.type || 'other',
-      area: data.area || 'unknown',
-      address: data.address || '',
-      capacity: data.capacity || 0,
-      amenities: data.amenities || [],
-      images: data.images || [],
-      openingHours: data.openingHours || [],
-      contactInfo: data.contactInfo || {
-        email: '',
-        phone: ''
-      },
-      pricing: data.pricing || {
-        basePrice: 0,
-        currency: 'NOK',
-        pricingType: 'hourly',
-        actorTypeMultipliers: {
-          'private-person': 1,
-          'lag-foreninger': 1,
-          'paraply': 1,
-          'private-firma': 1,
-          'kommunale-enheter': 1
-        }
-      },
-      zones: data.zones || [],
-      metadata: data.metadata || { tags: [] },
-      createdAt: data.createdAt || new Date(),
-      updatedAt: data.updatedAt || new Date()
-    };
+      data: [],
+      error: "LocalizedFacilityRepository methods not implemented - use hooks instead"
+    } as any;
   }
 
-  protected updateEntity(existing: LocalizedFacility, updates: Partial<LocalizedFacility>): LocalizedFacility {
-    return { 
-      ...existing, 
-      ...updates, 
-      updatedAt: new Date() 
-    };
+  protected createEntity(data: Partial<Facility>): Facility {
+    return {
+      data: null,
+      error: "LocalizedFacilityRepository methods not implemented - use hooks instead"
+    } as any;
+  }
+
+  protected updateEntity(existing: Facility, updates: Partial<Facility>): Facility {
+    return {
+      data: null,
+      error: "LocalizedFacilityRepository methods not implemented - use hooks instead"
+    } as any;
   }
 
   async findAllWithPagination(
     pagination: PaginationParams,
     searchTerm?: string,
     filters?: any
-  ): Promise<RepositoryResponse<PaginatedResponse<LocalizedFacility>>> {
+  ): Promise<RepositoryResponse<PaginatedResponse<Facility>>> {
     return {
       data: {
         data: [],
@@ -97,7 +57,7 @@ export class LocalizedFacilityRepository extends BaseRepository<LocalizedFacilit
     };
   }
 
-  async findById(id: string): Promise<RepositoryResponse<LocalizedFacility>> {
+  async findById(id: string): Promise<RepositoryResponse<Facility>> {
     return {
       data: null,
       error: "LocalizedFacilityRepository methods not implemented - use hooks instead"
@@ -118,14 +78,14 @@ export class LocalizedFacilityRepository extends BaseRepository<LocalizedFacilit
     };
   }
 
-  async getFacilitiesByType(type: string): Promise<RepositoryResponse<LocalizedFacility[]>> {
+  async getFacilitiesByType(type: string): Promise<RepositoryResponse<Facility[]>> {
     return {
       data: [],
       error: "LocalizedFacilityRepository methods not implemented - use hooks instead"
     };
   }
 
-  async getFacilitiesByArea(area: string): Promise<RepositoryResponse<LocalizedFacility[]>> {
+  async getFacilitiesByArea(area: string): Promise<RepositoryResponse<Facility[]>> {
     return {
       data: [],
       error: "LocalizedFacilityRepository methods not implemented - use hooks instead"

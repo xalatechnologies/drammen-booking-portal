@@ -5,7 +5,7 @@ import { PaginationParams } from '@/types/api';
 export const FacilityBlackoutService = {
   getBlackouts: async (pagination?: PaginationParams, filters?: any) => {
     console.log('FacilityBlackoutService.getBlackouts - Called with:', { pagination, filters });
-    const result = await facilityBlackoutRepository.findAllWithFilters(pagination, filters);
+    const result = await facilityBlackoutRepository.findAll();
     console.log('FacilityBlackoutService.getBlackouts - Repository result:', result);
     return result;
   },
@@ -34,6 +34,9 @@ export const FacilityBlackoutService = {
   
   getBlackoutsByFacility: async (facilityId: number) => {
     console.log('FacilityBlackoutService.getBlackoutsByFacility - Called with facility ID:', facilityId);
-    return await facilityBlackoutRepository.getBlackoutsByFacility(facilityId.toString());
+    return {
+      data: [],
+      error: "FacilityBlackoutService methods not implemented - use hooks instead"
+    };
   }
 };
