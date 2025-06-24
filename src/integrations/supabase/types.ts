@@ -650,6 +650,10 @@ export type Database = {
         Row: {
           accessibility_features: string[] | null
           address: string
+          address_city: string | null
+          address_country: string | null
+          address_postal_code: string | null
+          address_street: string | null
           allowed_booking_types: string[] | null
           amenities: string[] | null
           area_sqm: number | null
@@ -666,6 +670,7 @@ export type Database = {
           facilities: string[] | null
           has_auto_approval: boolean | null
           id: string
+          image: string | null
           is_featured: boolean | null
           is_published: boolean | null
           latitude: number | null
@@ -687,6 +692,10 @@ export type Database = {
         Insert: {
           accessibility_features?: string[] | null
           address: string
+          address_city?: string | null
+          address_country?: string | null
+          address_postal_code?: string | null
+          address_street?: string | null
           allowed_booking_types?: string[] | null
           amenities?: string[] | null
           area_sqm?: number | null
@@ -703,6 +712,7 @@ export type Database = {
           facilities?: string[] | null
           has_auto_approval?: boolean | null
           id?: string
+          image?: string | null
           is_featured?: boolean | null
           is_published?: boolean | null
           latitude?: number | null
@@ -724,6 +734,10 @@ export type Database = {
         Update: {
           accessibility_features?: string[] | null
           address?: string
+          address_city?: string | null
+          address_country?: string | null
+          address_postal_code?: string | null
+          address_street?: string | null
           allowed_booking_types?: string[] | null
           amenities?: string[] | null
           area_sqm?: number | null
@@ -740,6 +754,7 @@ export type Database = {
           facilities?: string[] | null
           has_auto_approval?: boolean | null
           id?: string
+          image?: string | null
           is_featured?: boolean | null
           is_published?: boolean | null
           latitude?: number | null

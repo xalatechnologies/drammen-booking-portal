@@ -1,4 +1,3 @@
-
 import { SupabaseRepository } from '../SupabaseRepository';
 import { Facility, FacilityFilters, OpeningHours } from '@/types/facility';
 import { PaginationParams, ApiResponse, PaginatedResponse } from '@/types/api';
@@ -45,6 +44,16 @@ const normalizeStatus = (status: string): 'active' | 'maintenance' | 'inactive' 
 const normalizeBookingTypes = (types: string[]): ('engangs' | 'fastlan' | 'rammetid' | 'strotimer')[] => {
   const validTypes: ('engangs' | 'fastlan' | 'rammetid' | 'strotimer')[] = ['engangs', 'fastlan', 'rammetid', 'strotimer'];
   return types.filter(type => validTypes.includes(type as any)) as any[] || ['engangs'];
+};
+
+const computeAddress = (location: any): string => {
+  const addressParts = [
+    location.address_street,
+    location.address_city,
+    location.address_postal_code
+  ].filter(part => part && part.trim() !== '');
+  
+  return addressParts.length > 0 ? addressParts.join(', ') : location.address || 'Address not available';
 };
 
 export class FacilityRepository extends SupabaseRepository<Facility> {
@@ -102,13 +111,13 @@ export class FacilityRepository extends SupabaseRepository<Facility> {
       const facilities = (data || []).map((location: any): Facility => ({
         id: parseInt(location.id),
         name: getLocalizedText(location.name, 'Unknown Facility'),
-        address_street: location.address || '',
-        address_city: '',
-        address_postal_code: '',
-        address_country: 'Norway',
+        address_street: location.address_street || location.address || '',
+        address_city: location.address_city || '',
+        address_postal_code: location.address_postal_code || '',
+        address_country: location.address_country || 'Norway',
         type: location.location_type || 'facility',
         status: normalizeStatus(location.status || 'active'),
-        image_url: location.app_location_images?.[0]?.image_url || null,
+        image_url: location.image || location.app_location_images?.[0]?.image_url || null,
         capacity: location.capacity || 0,
         area: location.address || '',
         description: getLocalizedText(location.description, ''),
@@ -136,9 +145,9 @@ export class FacilityRepository extends SupabaseRepository<Facility> {
         created_at: location.created_at,
         updated_at: location.updated_at,
         area_sqm: location.area_sqm || null,
-        // Computed/derived fields for backwards compatibility
-        address: location.address || '',
-        image: location.app_location_images?.[0]?.image_url || '',
+        // Computed/derived fields for backwards compatibility - all required to avoid conflicts
+        address: computeAddress(location),
+        image: location.image || location.app_location_images?.[0]?.image_url || '',
         pricePerHour: location.price_per_hour || 450,
         accessibility: location.accessibility_features || [],
         suitableFor: [],
@@ -234,13 +243,13 @@ export class FacilityRepository extends SupabaseRepository<Facility> {
       const facility: Facility = {
         id: parseInt(data.id),
         name: getLocalizedText(data.name, 'Unknown Facility'),
-        address_street: data.address || '',
-        address_city: '',
-        address_postal_code: '',
-        address_country: 'Norway',
+        address_street: data.address_street || data.address || '',
+        address_city: data.address_city || '',
+        address_postal_code: data.address_postal_code || '',
+        address_country: data.address_country || 'Norway',
         type: data.location_type || 'facility',
         status: normalizeStatus(data.status || 'active'),
-        image_url: data.app_location_images?.[0]?.image_url || null,
+        image_url: data.image || data.app_location_images?.[0]?.image_url || null,
         capacity: data.capacity || 0,
         area: data.address || '',
         description: getLocalizedText(data.description, ''),
@@ -268,9 +277,9 @@ export class FacilityRepository extends SupabaseRepository<Facility> {
         created_at: data.created_at,
         updated_at: data.updated_at,
         area_sqm: data.area_sqm || null,
-        // Computed/derived fields for backwards compatibility
-        address: data.address || '',
-        image: data.app_location_images?.[0]?.image_url || '',
+        // Computed/derived fields for backwards compatibility - all required to avoid conflicts
+        address: computeAddress(data),
+        image: data.image || data.app_location_images?.[0]?.image_url || '',
         pricePerHour: data.price_per_hour || 450,
         accessibility: data.accessibility_features || [],
         suitableFor: [],

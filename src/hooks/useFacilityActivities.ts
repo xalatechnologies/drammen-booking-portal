@@ -8,7 +8,7 @@ export function useFacilityActivities(facilityId: number) {
 
   return useQuery({
     queryKey: ['facility-activities', facilityId, language],
-    queryFn: () => FacilityActivityService.getFacilitySuitableActivities(facilityId, language),
+    queryFn: () => FacilityActivityService.getFacilitySuitableActivities(facilityId.toString()),
     enabled: !!facilityId && facilityId > 0,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });

@@ -36,7 +36,6 @@ export function convertDatabaseZoneToZone(dbZone: any): Zone {
     coordinates_height: dbZone.coordinates_height || null,
     floor: dbZone.floor || null,
     status: normalizeStatus(dbZone.status || 'active'),
-    metadata: dbZone.metadata || {},
     created_at: dbZone.created_at,
     updated_at: dbZone.updated_at,
     // Computed/derived fields for backwards compatibility
