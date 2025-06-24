@@ -1,64 +1,57 @@
 
-import { useQuery } from '@tanstack/react-query';
-import { Zone } from '@/types/zone';
-import { FacilityService } from '@/services/facilityService';
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
-export const useZones = (facilityId?: string) => {
-  console.log('useZones - Fetching zones for facility ID:', facilityId);
+export interface Zone {
+  id: string;
+  name: string;
+  facility_id: number;
+  type: string;
+  capacity: number;
+  description: string | null;
+  is_main_zone: boolean;
+  parent_zone_id: string | null;
+  bookable_independently: boolean;
+  area_sqm: number | null;
+  floor: string | null;
+  coordinates_x: number | null;
+  coordinates_y: number | null;
+  coordinates_width: number | null;
+  coordinates_height: number | null;
+  equipment: string[] | null;
+  accessibility_features: string[] | null;
+  status: string;
+  created_at: string;
+  updated_at: string;
+}
 
+export function useZones(facilityId?: number) {
   return useQuery({
     queryKey: ['zones', facilityId],
     queryFn: async () => {
-      if (!facilityId) {
-        console.log('useZones - No facility ID provided, returning empty array');
-        return [];
-      }
-      
-      console.log('useZones - Calling FacilityService.getZonesByFacilityId with:', facilityId);
-      const response = await FacilityService.getZonesByFacilityId(facilityId);
-      console.log('useZones - FacilityService response:', response);
-      
-      if (!response.success) {
-        console.warn('useZones - Failed to fetch zones:', response.error);
-        throw new Error(response.error?.message || 'Failed to fetch zones');
-      }
-      
-      const zones = response.data || [];
-      console.log('useZones - Final zones data:', zones);
-      return zones;
-    },
-    enabled: !!facilityId,
-    staleTime: 0, // No cache - always fetch fresh data
-    gcTime: 30 * 1000, // Keep in memory for 30 seconds only
-  });
-};
+      let query = supabase
+        .from('zones')
+        .select('*')
+        .eq('status', 'active')
+        .order('name');
 
-export const useZone = (zoneId?: string) => {
-  console.log('useZone - Fetching zone with ID:', zoneId);
+      if (facilityId) {
+        query = query.eq('facility_id', facilityId);
+      }
 
-  return useQuery({
-    queryKey: ['zone', zoneId],
-    queryFn: async () => {
-      if (!zoneId) {
-        console.log('useZone - No zone ID provided, returning null');
-        return null;
+      const { data, error } = await query;
+
+      if (error) {
+        console.error('Error fetching zones:', error);
+        throw error;
       }
-      
-      console.log('useZone - Calling FacilityService.getZoneById with:', zoneId);
-      const response = await FacilityService.getZoneById(zoneId);
-      console.log('useZone - FacilityService response:', response);
-      
-      if (!response.success) {
-        console.warn('useZone - Failed to fetch zone:', response.error);
-        throw new Error(response.error?.message || 'Failed to fetch zone');
-      }
-      
-      const zone = response.success && 'data' in response ? response.data || null : null;
-      console.log('useZone - Final zone data:', zone);
-      return zone;
+
+      return data || [];
     },
-    enabled: !!zoneId,
-    staleTime: 0, // No cache - always fetch fresh data
-    gcTime: 30 * 1000, // Keep in memory for 30 seconds only
+    enabled: true,
   });
-};
+}
+
+export function useZonesByFacility(facilityId: number) {
+  return useZones(facilityId);
+}

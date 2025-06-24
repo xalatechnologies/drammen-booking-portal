@@ -59,12 +59,12 @@ export function createGenericEntityStore<T>(
     fetchAll: async (params) => {
       set({ isLoading: true, error: null });
       try {
-        // Use hooks instead of repository
+        // Since we're now using hooks for data fetching, just reset the store
         set({ 
           items: [], 
           pagination: params ? {
-            page: params.page,
-            limit: params.limit,
+            page: params.page || 1,
+            limit: params.limit || 10,
             total: 0,
             totalPages: 0,
             hasNext: false,
@@ -80,7 +80,7 @@ export function createGenericEntityStore<T>(
     fetchById: async (id) => {
       set({ isLoading: true, error: null });
       try {
-        // Use hooks instead of repository
+        // Since we're now using hooks for data fetching, just reset current item
         set({ currentItem: null, isLoading: false });
       } catch (error) {
         set({ error: `Failed to fetch ${name}`, isLoading: false });
@@ -90,7 +90,8 @@ export function createGenericEntityStore<T>(
     create: async (data) => {
       set({ isLoading: true, error: null });
       try {
-        // Use hooks instead of repository
+        // Placeholder - actual creation should use hooks/services
+        console.log(`Creating ${name}:`, data);
         set({ isLoading: false });
       } catch (error) {
         set({ error: `Failed to create ${name}`, isLoading: false });
@@ -104,7 +105,8 @@ export function createGenericEntityStore<T>(
     update: async (id, data) => {
       set({ isLoading: true, error: null });
       try {
-        // Use hooks instead of repository
+        // Placeholder - actual update should use hooks/services
+        console.log(`Updating ${name} ${id}:`, data);
         set({ isLoading: false });
       } catch (error) {
         set({ error: `Failed to update ${name}`, isLoading: false });
@@ -118,7 +120,7 @@ export function createGenericEntityStore<T>(
     delete: async (id) => {
       set({ isLoading: true, error: null });
       try {
-        // Use hooks instead of repository
+        // Remove from items if it exists
         set({ 
           items: get().items.filter(item => getEntityId(item) !== id),
           isLoading: false 
