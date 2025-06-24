@@ -26,7 +26,7 @@ export function BookingPriceCalculation({
 
   const firstSlot = selectedSlots[0];
   
-  const { calculation, isLoading } = usePriceCalculation({
+  const { data: calculation, isLoading } = usePriceCalculation({
     facilityId,
     zoneId: firstSlot?.zoneId,
     startDate: firstSlot?.date,

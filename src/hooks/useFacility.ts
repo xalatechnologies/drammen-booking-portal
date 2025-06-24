@@ -77,7 +77,7 @@ export function useFacility(id: number | string) {
         time_slot_duration: 60,
         accessibility_features: [],
         equipment: data.facilities || [],
-        allowed_booking_types: ['engangs'] as const,
+        allowed_booking_types: ['engangs'] as ('engangs' | 'fastlan' | 'rammetid' | 'strotimer')[],
         season_from: null,
         season_to: null,
         contact_name: null,

@@ -16,5 +16,12 @@ export function useTranslation() {
     return defaultValue || key;
   };
 
-  return { t, tSync, language };
+  const formatCurrency = (amount: number, currency: string = 'NOK'): string => {
+    return new Intl.NumberFormat(language === 'NO' ? 'nb-NO' : 'en-US', {
+      style: 'currency',
+      currency,
+    }).format(amount);
+  };
+
+  return { t, tSync, language, formatCurrency };
 }

@@ -1,10 +1,18 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { AdditionalServicesService } from "@/services/AdditionalServicesService";
-import { ServiceFilters } from "@/types/additionalServices";
-import { PaginationParams } from "@/types/api";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { ActorType } from "@/types/pricing";
+
+interface ServiceFilters {
+  category?: string;
+  priceRange?: [number, number];
+}
+
+interface PaginationParams {
+  page: number;
+  limit: number;
+}
 
 interface UseAdditionalServicesParams {
   pagination: PaginationParams;
@@ -18,32 +26,29 @@ export function useAdditionalServices({
   const { language } = useLanguage();
 
   const {
-    data: response,
+    data: services,
     isLoading,
     error,
     refetch
   } = useQuery({
     queryKey: ['additionalServices', language, pagination, filters],
-    queryFn: () => AdditionalServicesService.getServices(pagination, filters),
+    queryFn: () => AdditionalServicesService.getServices(),
     staleTime: 0,
     gcTime: 30 * 1000,
   });
 
-  const services = response?.success ? response.data?.data || [] : [];
-  const paginationInfo = response?.success ? {
-    page: response.data?.pagination?.page || pagination.page,
-    limit: response.data?.pagination?.limit || pagination.limit,
-    total: response.data?.pagination?.total || 0,
-    totalPages: response.data?.pagination?.totalPages || 0,
-    hasNext: response.data?.pagination?.hasNext || false,
-    hasPrev: response.data?.pagination?.hasPrev || false
-  } : null;
-
   return {
     services: services || [],
-    pagination: paginationInfo,
+    pagination: {
+      page: pagination.page,
+      limit: pagination.limit,
+      total: services?.length || 0,
+      totalPages: Math.ceil((services?.length || 0) / pagination.limit),
+      hasNext: false,
+      hasPrev: false
+    },
     isLoading,
-    error: response?.success === false ? (response.error?.message || "Failed to fetch services") : (error?.message || null),
+    error: error?.message || null,
     refetch,
   };
 }
@@ -52,7 +57,7 @@ export function useAdditionalService(id: string) {
   const { language } = useLanguage();
 
   const {
-    data: response,
+    data: service,
     isLoading,
     error,
     refetch
@@ -65,9 +70,9 @@ export function useAdditionalService(id: string) {
   });
 
   return {
-    service: response?.success ? response.data : null,
+    service,
     isLoading,
-    error: response?.success === false ? (response.error?.message || "Failed to fetch service") : (error?.message || null),
+    error: error?.message || null,
     refetch,
   };
 }

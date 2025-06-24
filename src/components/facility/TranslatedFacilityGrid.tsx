@@ -16,7 +16,7 @@ export const TranslatedFacilityGrid = () => {
     );
   }
 
-  if (error || response?.error) {
+  if (error) {
     return (
       <div className="text-center py-8">
         <p className="text-red-600">Failed to load facilities</p>
