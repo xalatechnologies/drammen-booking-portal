@@ -19,20 +19,25 @@ export interface EntityStore<T> {
   };
   
   fetchAll: (params?: PaginationParams) => Promise<void>;
-  fetchById: (id: string) => Promise<void>;
+  fetchById: (id: string | number) => Promise<void>;
   create: (data: Partial<T>) => Promise<void>;
   createEntity: (data: Partial<T>) => Promise<void>; // Add this alias
-  update: (id: string, data: Partial<T>) => Promise<void>;
-  updateEntity: (id: string, data: Partial<T>) => Promise<void>; // Add this alias
-  delete: (id: string) => Promise<void>;
-  deleteEntity: (id: string) => Promise<void>; // Add this alias
+  update: (id: string | number, data: Partial<T>) => Promise<void>;
+  updateEntity: (id: string | number, data: Partial<T>) => Promise<void>; // Add this alias
+  delete: (id: string | number) => Promise<void>;
+  deleteEntity: (id: string | number) => Promise<void>; // Add this alias
   clearError: () => void;
   setError: (error: string | null) => void; // Add this method
   setCurrentItem: (item: T | null) => void;
   setCurrentEntity: (item: T | null) => void; // Add this alias
 }
 
-export function createGenericEntityStore<T extends { id: string }>(
+// Helper function to get entity ID
+function getEntityId(entity: any): string | number | undefined {
+  return entity?.id;
+}
+
+export function createGenericEntityStore<T>(
   name: string
 ): () => EntityStore<T> {
   return create<EntityStore<T>>((set, get) => ({
@@ -115,7 +120,7 @@ export function createGenericEntityStore<T extends { id: string }>(
       try {
         // Use hooks instead of repository
         set({ 
-          items: get().items.filter(item => item.id !== id),
+          items: get().items.filter(item => getEntityId(item) !== id),
           isLoading: false 
         });
       } catch (error) {
