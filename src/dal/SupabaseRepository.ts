@@ -7,7 +7,7 @@ export class SupabaseRepository<T = any> implements BaseRepository<T> {
 
   async getAll(options?: QueryOptions): Promise<ApiResponse<T[]>> {
     try {
-      let query = supabase.from(this.tableName as any).select('*');
+      let query = supabase.from(this.tableName).select('*');
       
       if (options?.filters) {
         Object.entries(options.filters).forEach(([key, value]) => {
@@ -38,17 +38,7 @@ export class SupabaseRepository<T = any> implements BaseRepository<T> {
 
       return {
         success: true,
-        data: {
-          data: (data || []) as T[],
-          pagination: options?.pagination ? {
-            page: options.pagination.page,
-            limit: options.pagination.limit,
-            total: count || 0,
-            totalPages: Math.ceil((count || 0) / options.pagination.limit),
-            hasNext: (options.pagination.page * options.pagination.limit) < (count || 0),
-            hasPrev: options.pagination.page > 1
-          } : undefined
-        } as any
+        data: (data || []) as T[]
       };
     } catch (error) {
       return {
@@ -64,7 +54,7 @@ export class SupabaseRepository<T = any> implements BaseRepository<T> {
   async getById(id: string): Promise<ApiResponse<T>> {
     try {
       const { data, error } = await supabase
-        .from(this.tableName as any)
+        .from(this.tableName)
         .select('*')
         .eq('id', id)
         .maybeSingle();
@@ -88,7 +78,7 @@ export class SupabaseRepository<T = any> implements BaseRepository<T> {
   async create(data: Partial<T>): Promise<ApiResponse<T>> {
     try {
       const { data: result, error } = await supabase
-        .from(this.tableName as any)
+        .from(this.tableName)
         .insert(data as any)
         .select()
         .single();
@@ -112,7 +102,7 @@ export class SupabaseRepository<T = any> implements BaseRepository<T> {
   async update(id: string, data: Partial<T>): Promise<ApiResponse<T>> {
     try {
       const { data: result, error } = await supabase
-        .from(this.tableName as any)
+        .from(this.tableName)
         .update(data as any)
         .eq('id', id)
         .select()
@@ -137,7 +127,7 @@ export class SupabaseRepository<T = any> implements BaseRepository<T> {
   async delete(id: string): Promise<ApiResponse<void>> {
     try {
       const { error } = await supabase
-        .from(this.tableName as any)
+        .from(this.tableName)
         .delete()
         .eq('id', id);
 

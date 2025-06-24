@@ -1,46 +1,6 @@
 
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useSimpleQuery } from './useSimpleQuery';
 
-export interface BlackoutPeriod {
-  id: string;
-  facility_id: number;
-  start_date: string;
-  end_date: string;
-  type: string;
-  reason: string;
-  created_by: string | null;
-  created_at: string;
-}
-
-export function useBlackoutPeriods(facilityId?: number | string) {
-  const numericFacilityId = typeof facilityId === 'string' ? parseInt(facilityId, 10) : facilityId;
-  
-  return useQuery({
-    queryKey: ['blackout-periods', numericFacilityId],
-    queryFn: async () => {
-      let query = supabase
-        .from('facility_blackout_periods')
-        .select('*')
-        .order('start_date');
-
-      if (numericFacilityId) {
-        query = query.eq('facility_id', numericFacilityId);
-      }
-
-      const { data, error } = await query;
-
-      if (error) {
-        console.error('Error fetching blackout periods:', error);
-        throw error;
-      }
-
-      return data || [];
-    },
-    enabled: true,
-  });
-}
-
-export function useBlackoutPeriodsByFacility(facilityId: number | string) {
-  return useBlackoutPeriods(facilityId);
+export function useBlackoutPeriods(facilityId?: string) {
+  return useSimpleQuery('app_availability_rules', facilityId);
 }

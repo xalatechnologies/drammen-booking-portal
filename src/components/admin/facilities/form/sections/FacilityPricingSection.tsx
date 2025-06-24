@@ -20,7 +20,6 @@ export const FacilityPricingSection = forwardRef<PricingSectionRef, FacilityPric
     useImperativeHandle(ref, () => ({
       saveData: async () => {
         try {
-          // Save pricing data logic here
           console.log('Saving pricing data for facility:', facilityId);
           return true;
         } catch (error) {
@@ -37,12 +36,12 @@ export const FacilityPricingSection = forwardRef<PricingSectionRef, FacilityPric
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <Label htmlFor="pricePerHour">Price per Hour</Label>
+            <Label htmlFor="price_per_hour">Price per Hour</Label>
             <Input
-              id="pricePerHour"
+              id="price_per_hour"
               type="number"
               step="0.01"
-              {...form.register('pricePerHour', { valueAsNumber: true })}
+              {...form.register('price_per_hour', { valueAsNumber: true })}
             />
           </div>
           
