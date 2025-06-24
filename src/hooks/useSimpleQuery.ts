@@ -9,7 +9,21 @@ export function useSimpleQuery<T = any>(
   return useQuery({
     queryKey: [tableName, facilityId],
     queryFn: async () => {
-      let query = supabase.from(tableName).select('*');
+      // Type-safe table access with proper table names
+      const validTables = [
+        'app_bookings',
+        'app_availability_rules',
+        'app_locations',
+        'app_zones',
+        'app_actors',
+        'app_users'
+      ];
+
+      if (!validTables.includes(tableName)) {
+        throw new Error(`Invalid table name: ${tableName}`);
+      }
+
+      let query = supabase.from(tableName as any).select('*');
       
       if (facilityId && tableName === 'app_bookings') {
         query = query.eq('location_id', facilityId);
