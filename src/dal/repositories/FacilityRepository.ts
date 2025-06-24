@@ -68,20 +68,10 @@ export class FacilityRepository extends SupabaseRepository<Facility> {
     try {
       console.log("FacilityRepository.getAll - Starting query with filters:", filters);
       
+      // Start with a simple query first to test connectivity
       let query = supabase
         .from('app_locations')
-        .select(`
-          *,
-          app_location_images (
-            id,
-            image_url,
-            alt_text,
-            is_featured,
-            display_order,
-            uploaded_at,
-            created_at
-          )
-        `, { count: 'exact' })
+        .select('*', { count: 'exact' })
         .eq('is_published', true);
 
       // Apply filters
@@ -98,7 +88,7 @@ export class FacilityRepository extends SupabaseRepository<Facility> {
 
       query = query.order('name');
 
-      console.log("FacilityRepository.getAll - Executing query");
+      console.log("FacilityRepository.getAll - Executing basic query");
       const { data, error, count } = await query;
 
       if (error) {
@@ -114,9 +104,13 @@ export class FacilityRepository extends SupabaseRepository<Facility> {
 
       console.log("FacilityRepository.getAll - Raw data received:", data?.length || 0, "facilities");
 
+      // Process facilities without trying to fetch images for now
       const facilities = (data || []).map((location: any): Facility => {
-        // Convert UUID to number for backwards compatibility
-        const facilityId = parseInt(location.id) || Math.floor(Math.random() * 1000000);
+        // Generate a simple numeric ID from UUID for backwards compatibility
+        const facilityId = Math.abs(location.id.split('-')[0].split('').reduce((a, b) => {
+          a = ((a << 5) - a) + b.charCodeAt(0);
+          return a & a;
+        }, 0));
         
         return {
           id: facilityId,
@@ -127,7 +121,7 @@ export class FacilityRepository extends SupabaseRepository<Facility> {
           address_country: location.address_country || 'Norway',
           type: location.location_type || 'facility',
           status: normalizeStatus(location.status || 'active'),
-          image_url: location.image || location.app_location_images?.[0]?.image_url || null,
+          image_url: location.image || null,
           capacity: location.capacity || 0,
           area: location.address || '',
           description: getLocalizedText(location.description, ''),
@@ -155,9 +149,9 @@ export class FacilityRepository extends SupabaseRepository<Facility> {
           created_at: location.created_at,
           updated_at: location.updated_at,
           area_sqm: location.area_sqm || null,
-          // Computed/derived fields for backwards compatibility - all required to avoid conflicts
+          // Computed/derived fields for backwards compatibility
           address: computeAddress(location),
-          image: location.image || location.app_location_images?.[0]?.image_url || '',
+          image: location.image || '',
           pricePerHour: location.price_per_hour || 450,
           accessibility: location.accessibility_features || [],
           suitableFor: [],
@@ -165,26 +159,8 @@ export class FacilityRepository extends SupabaseRepository<Facility> {
           nextAvailable: location.next_available || 'Available now',
           openingHours: [],
           zones: [],
-          featuredImage: location.app_location_images?.find((img: any) => img.is_featured) ? {
-            id: location.app_location_images.find((img: any) => img.is_featured).id,
-            facility_id: facilityId,
-            image_url: location.app_location_images.find((img: any) => img.is_featured).image_url,
-            alt_text: location.app_location_images.find((img: any) => img.is_featured).alt_text || '',
-            display_order: location.app_location_images.find((img: any) => img.is_featured).display_order || 0,
-            is_featured: true,
-            uploaded_at: location.app_location_images.find((img: any) => img.is_featured).uploaded_at || location.created_at,
-            created_at: location.app_location_images.find((img: any) => img.is_featured).created_at || location.created_at
-          } : undefined,
-          images: (location.app_location_images || []).map((img: any) => ({
-            id: img.id,
-            facility_id: facilityId,
-            image_url: img.image_url,
-            alt_text: img.alt_text || '',
-            display_order: img.display_order || 0,
-            is_featured: img.is_featured || false,
-            uploaded_at: img.uploaded_at || location.created_at,
-            created_at: img.created_at || location.created_at
-          })),
+          featuredImage: undefined,
+          images: [],
           timeSlotDuration: location.time_slot_duration === 60 ? 1 : 2,
           availableTimes: [],
           season: {
@@ -230,18 +206,7 @@ export class FacilityRepository extends SupabaseRepository<Facility> {
       
       const { data, error } = await supabase
         .from('app_locations')
-        .select(`
-          *,
-          app_location_images (
-            id,
-            image_url,
-            alt_text,
-            is_featured,
-            display_order,
-            uploaded_at,
-            created_at
-          )
-        `)
+        .select('*')
         .eq('id', id)
         .eq('is_published', true)
         .single();
@@ -257,8 +222,11 @@ export class FacilityRepository extends SupabaseRepository<Facility> {
         };
       }
 
-      // Convert UUID to number for backwards compatibility
-      const facilityId = parseInt(data.id) || Math.floor(Math.random() * 1000000);
+      // Generate a simple numeric ID from UUID for backwards compatibility
+      const facilityId = Math.abs(data.id.split('-')[0].split('').reduce((a, b) => {
+        a = ((a << 5) - a) + b.charCodeAt(0);
+        return a & a;
+      }, 0));
 
       const facility: Facility = {
         id: facilityId,
@@ -269,7 +237,7 @@ export class FacilityRepository extends SupabaseRepository<Facility> {
         address_country: data.address_country || 'Norway',
         type: data.location_type || 'facility',
         status: normalizeStatus(data.status || 'active'),
-        image_url: data.image || data.app_location_images?.[0]?.image_url || null,
+        image_url: data.image || null,
         capacity: data.capacity || 0,
         area: data.address || '',
         description: getLocalizedText(data.description, ''),
@@ -297,9 +265,9 @@ export class FacilityRepository extends SupabaseRepository<Facility> {
         created_at: data.created_at,
         updated_at: data.updated_at,
         area_sqm: data.area_sqm || null,
-        // Computed/derived fields for backwards compatibility - all required to avoid conflicts
+        // Computed/derived fields for backwards compatibility
         address: computeAddress(data),
-        image: data.image || data.app_location_images?.[0]?.image_url || '',
+        image: data.image || '',
         pricePerHour: data.price_per_hour || 450,
         accessibility: data.accessibility_features || [],
         suitableFor: [],
@@ -307,26 +275,8 @@ export class FacilityRepository extends SupabaseRepository<Facility> {
         nextAvailable: data.next_available || 'Available now',
         openingHours: [],
         zones: [],
-        featuredImage: data.app_location_images?.find((img: any) => img.is_featured) ? {
-          id: data.app_location_images.find((img: any) => img.is_featured).id,
-          facility_id: facilityId,
-          image_url: data.app_location_images.find((img: any) => img.is_featured).image_url,
-          alt_text: data.app_location_images.find((img: any) => img.is_featured).alt_text || '',
-          display_order: data.app_location_images.find((img: any) => img.is_featured).display_order || 0,
-          is_featured: true,
-          uploaded_at: data.app_location_images.find((img: any) => img.is_featured).uploaded_at || data.created_at,
-          created_at: data.app_location_images.find((img: any) => img.is_featured).created_at || data.created_at
-        } : undefined,
-        images: (data.app_location_images || []).map((img: any) => ({
-          id: img.id,
-          facility_id: facilityId,
-          image_url: img.image_url,
-          alt_text: img.alt_text || '',
-          display_order: img.display_order || 0,
-          is_featured: img.is_featured || false,
-          uploaded_at: img.uploaded_at || data.created_at,
-          created_at: img.created_at || data.created_at
-        })),
+        featuredImage: undefined,
+        images: [],
         timeSlotDuration: data.time_slot_duration === 60 ? 1 : 2,
         availableTimes: [],
         season: {
@@ -354,7 +304,6 @@ export class FacilityRepository extends SupabaseRepository<Facility> {
   }
 
   async createAsync(facilityData: Partial<Facility>): Promise<ApiResponse<Facility>> {
-    // Implementation for creating facilities would go here
     return {
       success: false,
       error: {
@@ -364,7 +313,6 @@ export class FacilityRepository extends SupabaseRepository<Facility> {
   }
 
   async updateAsync(id: string, facilityData: Partial<Facility>): Promise<ApiResponse<Facility>> {
-    // Implementation for updating facilities would go here
     return {
       success: false,
       error: {
@@ -374,7 +322,6 @@ export class FacilityRepository extends SupabaseRepository<Facility> {
   }
 
   async deleteAsync(id: string): Promise<ApiResponse<Facility>> {
-    // Implementation for deleting facilities would go here
     return {
       success: false,
       error: {
@@ -388,7 +335,6 @@ export class FacilityRepository extends SupabaseRepository<Facility> {
   }
 
   async getFacilitiesByArea(area: string) {
-    // Implementation for getting facilities by area would go here
     return {
       success: false,
       error: {
