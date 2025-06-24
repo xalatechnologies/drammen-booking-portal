@@ -104,7 +104,8 @@ export class LocalizedAdditionalServiceRepository extends BaseRepository<Additio
             hasNext: pagination.page < totalPages,
             hasPrev: pagination.page > 1
           }
-        }
+        },
+        error: null
       };
     } catch (error) {
       return {
@@ -133,7 +134,8 @@ export class LocalizedAdditionalServiceRepository extends BaseRepository<Additio
     try {
       const services = this.servicesData[this.currentLanguage] || [];
       return {
-        data: services
+        data: services,
+        error: null
       };
     } catch (error) {
       return {
@@ -149,7 +151,8 @@ export class LocalizedAdditionalServiceRepository extends BaseRepository<Additio
       const service = services.find(s => s.id === id);
       
       return {
-        data: service || null
+        data: service || null,
+        error: null
       };
     } catch (error) {
       return {
@@ -163,7 +166,8 @@ export class LocalizedAdditionalServiceRepository extends BaseRepository<Additio
     try {
       const service = this.createEntity(data);
       return {
-        data: service
+        data: service,
+        error: null
       };
     } catch (error) {
       return {
@@ -185,7 +189,8 @@ export class LocalizedAdditionalServiceRepository extends BaseRepository<Additio
       
       const updated = this.updateEntity(existing.data, data);
       return {
-        data: updated
+        data: updated,
+        error: null
       };
     } catch (error) {
       return {
@@ -206,7 +211,8 @@ export class LocalizedAdditionalServiceRepository extends BaseRepository<Additio
       }
       
       return {
-        data: true
+        data: true,
+        error: null
       };
     } catch (error) {
       return {
