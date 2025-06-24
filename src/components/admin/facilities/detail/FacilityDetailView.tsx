@@ -20,7 +20,7 @@ export function FacilityDetailView({ facility }: FacilityDetailViewProps) {
     dayOfWeek: hour.dayOfWeek || 0,
     openTime: hour.opens || '09:00',
     closeTime: hour.closes || '17:00',
-    isOpen: hour.isOpen ?? true
+    isOpen: true // Default to true since the original type expects this property
   })) || [];
 
   return (
