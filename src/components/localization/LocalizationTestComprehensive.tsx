@@ -1,129 +1,75 @@
 
-import React from "react";
-import { useLanguage } from "@/contexts/LanguageContext";
-import { useFacilities } from "@/hooks/useFacilities";
-import { useFacilitiesPagination } from "@/hooks/useFacilities";
-import { useLocalization } from "@/contexts/LocalizationContext";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Globe, Check, X } from "lucide-react";
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { useTranslation } from '@/hooks/useTranslation';
+import { useFacilities } from '@/hooks/useFacilities';
 
-export function LocalizationTestComprehensive() {
-  const { language, toggleLanguage } = useLanguage();
-  const { getLocalizedFacility } = useLocalization();
-  const { pagination } = useFacilitiesPagination(1, 3);
-  const { facilities, isLoading, error } = useFacilities({
-    pagination,
-    filters: {}
-  });
+export const LocalizationTestComprehensive: React.FC = () => {
+  const { tSync, currentLanguage } = useTranslation();
+  const { data: allFacilities, isLoading } = useFacilities();
 
-  const translations = {
-    NO: {
-      title: "Komplett lokaliseringstest",
-      currentLanguage: "Nåværende språk",
-      switchLanguage: "Bytt språk",
-      dataTest: "Data-test",
-      facilitiesLoaded: "Lokaler lastet",
-      loading: "Laster...",
-      error: "Feil",
-      testResults: "Testresultater",
-      facilitiesCount: "Antall lokaler",
-      firstFacility: "Første lokale",
-      localizationWorking: "Lokalisering fungerer",
-      localizationNotWorking: "Lokalisering fungerer ikke"
-    },
-    EN: {
-      title: "Comprehensive localization test",
-      currentLanguage: "Current language",
-      switchLanguage: "Switch language",
-      dataTest: "Data test",
-      facilitiesLoaded: "Facilities loaded",
-      loading: "Loading...",
-      error: "Error",
-      testResults: "Test results",
-      facilitiesCount: "Number of facilities",
-      firstFacility: "First facility",
-      localizationWorking: "Localization working",
-      localizationNotWorking: "Localization not working"
-    }
-  };
-
-  const t = translations[language];
-
-  // Convert localized facilities to regular facilities for display
-  const localizedFacilities = facilities.map(facility => getLocalizedFacility(facility));
-
-  const isLocalizationWorking = () => {
-    if (!localizedFacilities || localizedFacilities.length === 0) return false;
-    
-    // Check if facility names are properly localized (not objects)
-    const firstFacility = localizedFacilities[0];
-    return typeof firstFacility.name === 'string' && 
-           typeof firstFacility.description === 'string' &&
-           Array.isArray(firstFacility.suitableFor);
-  };
+  const testFacilities = (allFacilities || []).slice(0, 3);
 
   return (
-    <div className="max-w-4xl mx-auto m-4 space-y-6">
+    <div className="space-y-6 p-6">
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Globe className="h-5 w-5" />
-            {t.title}
+          <CardTitle>
+            {tSync('localization.test.title', 'Localization Test')}
           </CardTitle>
+          <Badge variant="outline">
+            {tSync('localization.currentLanguage', 'Current Language')}: {currentLanguage}
+          </Badge>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
-            <span className="font-medium">{t.currentLanguage}: {language}</span>
-            <Button onClick={toggleLanguage} variant="outline">
-              {t.switchLanguage}
-            </Button>
+          <div>
+            <h3 className="font-semibold mb-2">
+              {tSync('localization.test.commonPhrases', 'Common Phrases')}
+            </h3>
+            <ul className="space-y-1 text-sm">
+              <li>{tSync('common.loading', 'Loading...')}</li>
+              <li>{tSync('common.save', 'Save')}</li>
+              <li>{tSync('common.cancel', 'Cancel')}</li>
+              <li>{tSync('common.search', 'Search...')}</li>
+            </ul>
           </div>
 
-          <div className="border-t pt-4">
-            <h3 className="font-semibold mb-3">{t.testResults}</h3>
-            
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                {isLocalizationWorking() ? (
-                  <Check className="h-4 w-4 text-green-600" />
-                ) : (
-                  <X className="h-4 w-4 text-red-600" />
-                )}
-                <span>
-                  {isLocalizationWorking() ? t.localizationWorking : t.localizationNotWorking}
-                </span>
-              </div>
-
-              <div className="text-sm text-gray-600">
-                <p>{t.facilitiesCount}: {localizedFacilities?.length || 0}</p>
-                
-                {isLoading && <p>{t.loading}</p>}
-                {error && <p className="text-red-600">{t.error}: {error.message}</p>}
-                
-                {localizedFacilities && localizedFacilities.length > 0 && (
-                  <div className="mt-2">
-                    <p className="font-medium">{t.firstFacility}:</p>
-                    <div className="ml-4 space-y-1">
-                      <p>Name: {localizedFacilities[0].name}</p>
-                      <p>Type: {localizedFacilities[0].type}</p>
-                      <p>Area: {localizedFacilities[0].area}</p>
-                      <div className="flex flex-wrap gap-1">
-                        {localizedFacilities[0].suitableFor?.slice(0, 3).map((activity, i) => (
-                          <Badge key={i} variant="outline" className="text-xs">
-                            {activity}
-                          </Badge>
-                        ))}
-                      </div>
+          <div>
+            <h3 className="font-semibold mb-2">
+              {tSync('localization.test.facilityData', 'Facility Data')}
+            </h3>
+            {isLoading ? (
+              <p>{tSync('common.loading', 'Loading...')}</p>
+            ) : (
+              <div className="space-y-2">
+                {testFacilities.map((facility) => (
+                  <div key={facility.id} className="p-2 border rounded">
+                    <div className="font-medium">{facility.name}</div>
+                    <div className="text-sm text-gray-600">
+                      {tSync('facility.capacity', 'Capacity')}: {facility.capacity}
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      {tSync('facility.area', 'Area')}: {facility.area}
                     </div>
                   </div>
-                )}
+                ))}
               </div>
-            </div>
+            )}
+          </div>
+
+          <div>
+            <h3 className="font-semibold mb-2">
+              {tSync('localization.test.navigation', 'Navigation')}
+            </h3>
+            <ul className="space-y-1 text-sm">
+              <li>{tSync('navigation.home', 'Home')}</li>
+              <li>{tSync('navigation.facilities', 'Facilities')}</li>
+              <li>{tSync('navigation.bookings', 'Bookings')}</li>
+            </ul>
           </div>
         </CardContent>
       </Card>
     </div>
   );
-}
+};

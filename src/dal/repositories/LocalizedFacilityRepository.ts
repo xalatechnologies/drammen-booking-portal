@@ -1,249 +1,138 @@
 
-import { SupabaseRepository } from '../SupabaseRepository';
-import { LocalizedFacility } from '@/types/localization';
-import { Zone } from '@/types/zone';
-import { FacilityFilters } from '@/types/facility';
-import { PaginationParams, PaginatedResponse, RepositoryResponse } from '@/types/api';
 import { supabase } from '@/integrations/supabase/client';
 
-// Define local filters interface that matches the actual usage
-interface LocalFacilityFilters {
-  facilityType?: string;
-  location?: string;
-  searchTerm?: string;
-}
-
-export class LocalizedFacilityRepository extends SupabaseRepository<LocalizedFacility> {
-  protected tableName = 'facilities';
-
-  constructor() {
-    super();
-  }
-
-  async findAllRaw(
-    pagination: PaginationParams,
-    filters?: FacilityFilters,
-    orderBy?: string,
-    orderDirection: 'asc' | 'desc' = 'asc'
-  ): Promise<RepositoryResponse<PaginatedResponse<LocalizedFacility>>> {
+export class LocalizedFacilityRepository {
+  async getFacilities(language: string = 'en') {
     try {
-      let query = supabase
-        .from('facilities')
-        .select(`
-          *,
-          facility_translations(*),
-          facility_images(*)
-        `, { count: 'exact' });
-
-      // Apply filters based on standard FacilityFilters
-      if (filters?.facilityType) {
-        query = query.eq('type', filters.facilityType);
-      }
-      if (filters?.location) {
-        query = query.or(`address_city.ilike.%${filters.location}%,area.ilike.%${filters.location}%`);
-      }
-      if (filters?.searchTerm) {
-        query = query.or(`name.ilike.%${filters.searchTerm}%,description.ilike.%${filters.searchTerm}%`);
-      }
-
-      // Apply sorting
-      if (orderBy) {
-        query = query.order(orderBy, { ascending: orderDirection === 'asc' });
-      }
-
-      // Apply pagination
-      const from = (pagination.page - 1) * pagination.limit;
-      const to = from + pagination.limit - 1;
-      query = query.range(from, to);
-
-      const { data, error, count } = await query;
-
-      if (error) {
-        return {
-          data: {
-            data: [],
-            pagination: {
-              page: pagination.page,
-              limit: pagination.limit,
-              total: 0,
-              totalPages: 0,
-              hasNext: false,
-              hasPrev: false
-            }
-          },
-          error: error.message
-        };
-      }
-
-      const totalPages = Math.ceil((count || 0) / pagination.limit);
-
-      return {
-        data: {
-          data: (data as unknown as LocalizedFacility[]) || [],
-          pagination: {
-            page: pagination.page,
-            limit: pagination.limit,
-            total: count || 0,
-            totalPages,
-            hasNext: pagination.page < totalPages,
-            hasPrev: pagination.page > 1
-          }
-        }
-      };
-    } catch (error: any) {
-      return {
-        data: {
-          data: [],
-          pagination: {
-            page: pagination.page,
-            limit: pagination.limit,
-            total: 0,
-            totalPages: 0,
-            hasNext: false,
-            hasPrev: false
-          }
-        },
-        error: error.message
-      };
-    }
-  }
-
-  async findByIdRaw(id: string): Promise<RepositoryResponse<LocalizedFacility | null>> {
-    try {
+      // Use app_locations instead of facilities
       const { data, error } = await supabase
-        .from('facilities')
+        .from('app_locations')
         .select(`
           *,
-          facility_translations(*),
-          facility_images(*)
+          app_location_images (
+            id,
+            image_url,
+            alt_text,
+            is_featured,
+            display_order
+          ),
+          app_zones (
+            id,
+            code,
+            name,
+            capacity,
+            interval
+          )
         `)
-        .eq('id', parseInt(id))
-        .maybeSingle();
+        .eq('is_published', true)
+        .order('created_at', { ascending: false });
 
       if (error) {
-        return {
-          data: null,
-          error: error.message
-        };
+        console.error('Error fetching localized facilities:', error);
+        return [];
       }
 
-      return {
-        data: data as unknown as LocalizedFacility | null
-      };
-    } catch (error: any) {
-      return {
-        data: null,
-        error: error.message
-      };
+      // Transform data to match expected format
+      return (data || []).map(location => ({
+        id: location.id,
+        name: this.getLocalizedValue(location.name, language),
+        description: this.getLocalizedValue(location.description, language),
+        type: location.location_type,
+        area: location.address,
+        capacity: location.capacity,
+        images: location.app_location_images || [],
+        zones: location.app_zones || []
+      }));
+    } catch (error) {
+      console.error('Localized facility fetch error:', error);
+      return [];
     }
   }
 
-  async getZonesByFacilityId(facilityId: string): Promise<RepositoryResponse<Zone[]>> {
+  async getFacilityById(id: string, language: string = 'en') {
     try {
       const { data, error } = await supabase
-        .from('zones')
+        .from('app_locations')
+        .select(`
+          *,
+          app_location_images (
+            id,
+            image_url,
+            alt_text,
+            is_featured,
+            display_order
+          ),
+          app_zones (
+            id,
+            code,
+            name,
+            capacity,
+            interval
+          )
+        `)
+        .eq('id', id)
+        .eq('is_published', true)
+        .single();
+
+      if (error) {
+        console.error('Error fetching localized facility:', error);
+        return null;
+      }
+
+      // Transform data to match expected format
+      return {
+        id: data.id,
+        name: this.getLocalizedValue(data.name, language),
+        description: this.getLocalizedValue(data.description, language),
+        type: data.location_type,
+        area: data.address,
+        capacity: data.capacity,
+        images: data.app_location_images || [],
+        zones: data.app_zones || []
+      };
+    } catch (error) {
+      console.error('Localized facility fetch error:', error);
+      return null;
+    }
+  }
+
+  private getLocalizedValue(value: any, language: string): string {
+    if (typeof value === 'string') {
+      return value;
+    }
+    
+    if (typeof value === 'object' && value !== null) {
+      return value[language] || value['en'] || value['no'] || 'Unknown';
+    }
+    
+    return 'Unknown';
+  }
+
+  async getZonesByFacilityId(facilityId: string, language: string = 'en') {
+    try {
+      const { data, error } = await supabase
+        .from('app_zones')
         .select('*')
-        .eq('facility_id', parseInt(facilityId));
+        .eq('location_id', facilityId)
+        .order('created_at', { ascending: true });
 
       if (error) {
-        return {
-          data: [],
-          error: error.message
-        };
+        console.error('Error fetching zones:', error);
+        return [];
       }
 
-      return {
-        data: (data as unknown as Zone[]) || []
-      };
-    } catch (error: any) {
-      return {
-        data: [],
-        error: error.message
-      };
-    }
-  }
-
-  async getZoneById(zoneId: string): Promise<RepositoryResponse<Zone | null>> {
-    try {
-      const { data, error } = await supabase
-        .from('zones')
-        .select('*')
-        .eq('id', zoneId)
-        .maybeSingle();
-
-      if (error) {
-        return {
-          data: null,
-          error: error.message
-        };
-      }
-
-      return {
-        data: data as unknown as Zone | null
-      };
-    } catch (error: any) {
-      return {
-        data: null,
-        error: error.message
-      };
-    }
-  }
-
-  async getRawFacilitiesByType(type: string): Promise<RepositoryResponse<LocalizedFacility[]>> {
-    try {
-      const { data, error } = await supabase
-        .from('facilities')
-        .select(`
-          *,
-          facility_translations(*),
-          facility_images(*)
-        `)
-        .eq('type', type);
-
-      if (error) {
-        return {
-          data: [],
-          error: error.message
-        };
-      }
-
-      return {
-        data: (data as unknown as LocalizedFacility[]) || []
-      };
-    } catch (error: any) {
-      return {
-        data: [],
-        error: error.message
-      };
-    }
-  }
-
-  async getRawFacilitiesByArea(area: string): Promise<RepositoryResponse<LocalizedFacility[]>> {
-    try {
-      const { data, error } = await supabase
-        .from('facilities')
-        .select(`
-          *,
-          facility_translations(*),
-          facility_images(*)
-        `)
-        .eq('area', area);
-
-      if (error) {
-        return {
-          data: [],
-          error: error.message
-        };
-      }
-
-      return {
-        data: (data as unknown as LocalizedFacility[]) || []
-      };
-    } catch (error: any) {
-      return {
-        data: [],
-        error: error.message
-      };
+      return (data || []).map(zone => ({
+        id: zone.id,
+        name: this.getLocalizedValue(zone.name, language),
+        code: zone.code,
+        capacity: zone.capacity,
+        interval: zone.interval
+      }));
+    } catch (error) {
+      console.error('Zone fetch error:', error);
+      return [];
     }
   }
 }
+
+export const localizedFacilityRepository = new LocalizedFacilityRepository();

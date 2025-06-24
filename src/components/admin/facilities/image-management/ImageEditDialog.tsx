@@ -17,7 +17,7 @@ interface ImageEditDialogProps {
 export const ImageEditDialog: React.FC<ImageEditDialogProps> = ({
   image,
   onClose,
-  facil
+  facilityId
 }) => {
   if (!image) return null;
 
@@ -28,7 +28,7 @@ export const ImageEditDialog: React.FC<ImageEditDialogProps> = ({
           <DialogTitle>Edit Image</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
-          <p>Image editing functionality will be available here.</p>
+          <p>Image editing functionality will be available here for facility {facilityId}.</p>
           <div className="flex justify-end space-x-2">
             <Button variant="outline" onClick={onClose}>
               Cancel
