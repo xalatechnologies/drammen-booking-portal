@@ -1,4 +1,3 @@
-
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -42,26 +41,47 @@ export const useFacilities = () => {
     queryKey: ['facilities'],
     queryFn: async (): Promise<Facility[]> => {
       try {
-        const { data, error } = await supabase
+        console.log('useFacilities - Starting query...');
+        
+        // First get the locations
+        const { data: locations, error: locationsError } = await supabase
           .from('app_locations')
-          .select(`
-            *,
-            app_location_images (
-              id,
-              image_url,
-              alt_text,
-              is_featured
-            )
-          `)
+          .select('*')
           .eq('is_published', true)
           .order('name');
 
-        if (error) {
-          console.error('Database error:', error);
+        if (locationsError) {
+          console.error('useFacilities - Locations error:', locationsError);
           return [];
         }
 
-        const facilities = (data || []).map((location: any) => ({
+        console.log('useFacilities - Got locations:', locations?.length || 0);
+
+        // Then get images separately to avoid relationship conflicts
+        const { data: images, error: imagesError } = await supabase
+          .from('app_location_images')
+          .select('*')
+          .order('display_order');
+
+        if (imagesError) {
+          console.warn('useFacilities - Images error (non-critical):', imagesError);
+        }
+
+        // Group images by location_id
+        const imagesByLocation = (images || []).reduce((acc, img) => {
+          if (!acc[img.location_id]) {
+            acc[img.location_id] = [];
+          }
+          acc[img.location_id].push({
+            id: img.id,
+            image_url: img.image_url,
+            alt_text: img.alt_text,
+            is_featured: img.is_featured
+          });
+          return acc;
+        }, {} as Record<string, any[]>);
+
+        const facilities = (locations || []).map((location: any) => ({
           id: location.id,
           name: getLocalizedText(location.name, 'Unknown Facility'),
           type: location.location_type || 'facility',
@@ -69,20 +89,21 @@ export const useFacilities = () => {
           description: getLocalizedText(location.description, ''),
           capacity: location.capacity || 0,
           price_per_hour: location.price_per_hour || 450,
-          address_street: location.address || '',
-          address_city: '',
-          address_postal_code: '',
+          address_street: location.address_street || '',
+          address_city: location.address_city || '',
+          address_postal_code: location.address_postal_code || '',
           equipment: location.equipment || [],
           amenities: location.amenities || [],
           accessibility_features: location.accessibility_features || [],
           is_featured: location.is_featured || false,
           status: location.status || 'active',
-          facility_images: location.app_location_images || []
+          facility_images: imagesByLocation[location.id] || []
         }));
 
+        console.log('useFacilities - Processed facilities:', facilities.length);
         return facilities;
       } catch (error) {
-        console.error('Facilities fetch error:', error);
+        console.error('useFacilities - Catch error:', error);
         return [];
       }
     },
@@ -98,48 +119,55 @@ export const useFacility = (id: string) => {
       if (!id) return null;
       
       try {
-        const { data, error } = await supabase
+        console.log('useFacility - Fetching facility:', id);
+        
+        const { data: location, error: locationError } = await supabase
           .from('app_locations')
-          .select(`
-            *,
-            app_location_images (
-              id,
-              image_url,
-              alt_text,
-              is_featured
-            )
-          `)
+          .select('*')
           .eq('id', id)
           .eq('is_published', true)
           .single();
 
-        if (error) {
-          console.error('Database error:', error);
+        if (locationError) {
+          console.error('useFacility - Location error:', locationError);
           return null;
         }
 
+        // Get images separately
+        const { data: images } = await supabase
+          .from('app_location_images')
+          .select('*')
+          .eq('location_id', id)
+          .order('display_order');
+
         const facility = {
-          id: data.id,
-          name: getLocalizedText(data.name, 'Unknown Facility'),
-          type: data.location_type || 'facility',
-          area: data.address || '',
-          description: getLocalizedText(data.description, ''),
-          capacity: data.capacity || 0,
-          price_per_hour: data.price_per_hour || 450,
-          address_street: data.address || '',
-          address_city: '',
-          address_postal_code: '',
-          equipment: data.equipment || [],
-          amenities: data.amenities || [],
-          accessibility_features: data.accessibility_features || [],
-          is_featured: data.is_featured || false,
-          status: data.status || 'active',
-          facility_images: data.app_location_images || []
+          id: location.id,
+          name: getLocalizedText(location.name, 'Unknown Facility'),
+          type: location.location_type || 'facility',
+          area: location.address || '',
+          description: getLocalizedText(location.description, ''),
+          capacity: location.capacity || 0,
+          price_per_hour: location.price_per_hour || 450,
+          address_street: location.address_street || '',
+          address_city: location.address_city || '',
+          address_postal_code: location.address_postal_code || '',
+          equipment: location.equipment || [],
+          amenities: location.amenities || [],
+          accessibility_features: location.accessibility_features || [],
+          is_featured: location.is_featured || false,
+          status: location.status || 'active',
+          facility_images: (images || []).map(img => ({
+            id: img.id,
+            image_url: img.image_url,
+            alt_text: img.alt_text,
+            is_featured: img.is_featured
+          }))
         };
 
+        console.log('useFacility - Processed facility:', facility);
         return facility;
       } catch (error) {
-        console.error('Facility fetch error:', error);
+        console.error('useFacility - Catch error:', error);
         return null;
       }
     },
