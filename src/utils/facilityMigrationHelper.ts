@@ -1,6 +1,6 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { facilityTranslationService } from '@/services/FacilityTranslationService';
+import { FacilityTranslationService } from '@/services/FacilityTranslationService';
 import { TranslationService } from '@/services/TranslationService';
 // import { coreFacilities } from '@/data/coreFacilities';
 import { Language } from '@/i18n/types';
@@ -68,8 +68,8 @@ export class FacilityMigrationHelper {
     for (const contentType of contentTypes) {
       const contentKey = `facility.${facilityId}.${contentType}`;
 
-      // Set the facility content key
-      await facilityTranslationService.setFacilityContentKey(facilityId, contentType, contentKey);
+      // Set the facility content key using static method
+      await FacilityTranslationService.setFacilityContentKey(facilityId, contentType, contentKey);
 
       // Add translation key
       await TranslationService.createTranslationKey(contentKey, {});
