@@ -51,40 +51,38 @@ export class NewSystemTester {
   }
 
   static async testDatabaseQueries() {
-    console.log('🗃️ Testing database queries...');
+    console.log('🗃️ Testing database queries via edge function...');
     
     try {
-      // Test users query
-      const { data: users, error: usersError } = await supabase
-        .from('app_users')
-        .select('id, email, name, locale')
-        .limit(5);
+      // Test users query via edge function
+      const { data: usersResult, error: usersError } = await supabase.functions.invoke('app-api', {
+        body: { path: 'users' }
+      });
 
       if (usersError) {
         console.error('Users query error:', usersError);
         return { success: false, error: usersError };
       }
 
-      console.log('Sample users:', users);
+      console.log('Users query result:', usersResult);
 
-      // Test locations with localized names
-      const { data: locations, error: locationsError } = await supabase
-        .from('app_locations')
-        .select('id, name, description')
-        .limit(3);
+      // Test locations query via edge function
+      const { data: locationsResult, error: locationsError } = await supabase.functions.invoke('app-api', {
+        body: { path: 'locations' }
+      });
 
       if (locationsError) {
         console.error('Locations query error:', locationsError);
         return { success: false, error: locationsError };
       }
 
-      console.log('Sample locations with localized data:', locations);
+      console.log('Locations query result:', locationsResult);
 
       return { 
         success: true, 
         data: { 
-          usersCount: users?.length || 0, 
-          locationsCount: locations?.length || 0 
+          usersResult, 
+          locationsResult 
         } 
       };
     } catch (error) {
