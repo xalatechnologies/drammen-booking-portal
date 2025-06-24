@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -46,10 +45,10 @@ export function EnhancedPriceCalculationCard({
       case 'private-person':
         actorTypeMultiplier = 1.0;
         break;
-      case 'organization':
+      case 'lag-foreninger':
         actorTypeMultiplier = 0.8;
         break;
-      case 'commercial':
+      case 'private-firma':
         actorTypeMultiplier = 1.5;
         break;
     }
@@ -97,7 +96,10 @@ export function EnhancedPriceCalculationCard({
   return (
     <div className="space-y-4">
       {!hidePricingModeSelector && (
-        <PricingModeSelector />
+        <PricingModeSelector 
+          selectedMode="standard"
+          onModeChange={() => {}}
+        />
       )}
       
       <Card>
@@ -151,8 +153,8 @@ export function EnhancedPriceCalculationCard({
               <span className="font-medium text-gray-700">Aktørtype: </span>
               <Badge variant="outline">
                 {actorType === 'private-person' && 'Privatperson'}
-                {actorType === 'organization' && 'Organisasjon'}
-                {actorType === 'commercial' && 'Kommersiell'}
+                {actorType === 'lag-foreninger' && 'Organisasjon'}
+                {actorType === 'private-firma' && 'Kommersiell'}
               </Badge>
             </div>
             {activityType && (

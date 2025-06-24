@@ -1,3 +1,4 @@
+
 import { SelectedTimeSlot } from '@/utils/recurrenceEngine';
 import { Zone } from '@/components/booking/types';
 import { ActorType } from '@/types/pricing';
@@ -29,6 +30,14 @@ export interface BookingFormData {
   additionalInfo: string;
   actorType: ActorType;
   termsAccepted: boolean;
+}
+
+export interface BookingServiceParams {
+  selectedSlots: SelectedTimeSlot[];
+  facilityId: string;
+  facilityName: string;
+  zones?: Zone[];
+  formData: BookingFormData;
 }
 
 export const BookingService = {
@@ -71,5 +80,62 @@ export const BookingService = {
       success: true,
       message: "Tidspunkt lagt til i handlekurven."
     };
+  },
+
+  completeBooking: async (bookingData: BookingData): Promise<AddToCartResult> => {
+    // For now, just use the same logic as addToCart
+    return await BookingService.addToCart(bookingData);
+  },
+
+  getBookings: async () => {
+    return { success: true, data: [] };
+  },
+
+  getBookingById: async (id: string) => {
+    return { success: true, data: null };
+  },
+
+  getBookingsByFacility: async (facilityId: string) => {
+    return { success: true, data: [] };
+  },
+
+  getBookingsByZone: async (zoneId: string) => {
+    return { success: true, data: [] };
+  },
+
+  checkAvailability: async (facilityId: string, date: Date, timeSlot: string) => {
+    return { success: true, available: true };
+  },
+
+  getConflictingBookings: async (facilityId: string, date: Date, timeSlot: string) => {
+    return { success: true, data: [] };
+  },
+
+  createBooking: async (bookingData: any) => {
+    return { success: true, data: null };
+  },
+
+  updateBooking: async (id: string, updates: any) => {
+    return { success: true, data: null };
+  },
+
+  cancelBooking: async (id: string, reason?: string) => {
+    return { success: true, data: null };
+  },
+
+  approveBooking: async (id: string) => {
+    return { success: true, data: null };
+  },
+
+  rejectBooking: async (id: string, reason: string) => {
+    return { success: true, data: null };
+  },
+
+  createRecurringBooking: async (bookingData: any) => {
+    return { success: true, data: null };
+  },
+
+  calculateTotalPricing: async (bookingData: any) => {
+    return { success: true, data: { total: 0 } };
   }
 };

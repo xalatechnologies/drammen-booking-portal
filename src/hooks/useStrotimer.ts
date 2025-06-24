@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { addDays } from 'date-fns';
 import { StrotimeService, StrotimeSlot } from '@/services/StrotimeService';
@@ -70,8 +69,8 @@ const mockStrotimeSlots: StrotimeSlot[] = [
     zone_id: 'zone-1',
     slot_date: '2025-06-26',
     start_time: '15:00',
-    end_time: '16:30',
-    duration_minutes: 90,
+    end_time: '16:00',
+    duration_minutes: 60,
     price_per_slot: 300,
     max_participants: 8,
     current_participants: 1,

@@ -16,4 +16,6 @@ export interface LocalizedContent {
 
 export interface LocalizationHelper {
   getLocalizedContent: (key: string, fallback?: string) => string;
+  getCurrentContent: (content: any, fallback?: string) => string;
+  getCurrentArray: (content: any[]) => string[];
 }

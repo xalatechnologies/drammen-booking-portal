@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { SelectedTimeSlot } from '@/utils/recurrenceEngine';
@@ -72,13 +71,14 @@ export function BookingForm({
   };
 
   const isFormValid = () => {
-    return BookingService.validateBookingData({
+    const validation = BookingService.validateBookingData({
       selectedSlots,
       facilityId,
       facilityName,
       zones,
       formData
     });
+    return validation.isValid;
   };
 
   const handleAddToCart = async () => {
