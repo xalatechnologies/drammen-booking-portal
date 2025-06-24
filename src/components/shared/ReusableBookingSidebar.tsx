@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,12 +13,12 @@ import { BookingFormFields } from "@/components/booking/BookingFormFields";
 import { BookingActionButtons } from "@/components/booking/BookingActionButtons";
 import { ActorType } from "@/types/pricing";
 
-interface BookingFormData {
+interface ReusableBookingFormData {
   purpose: string;
   attendees: number;
   activityType: string;
   additionalInfo: string;
-  actorType: ActorType | '';
+  actorType: ActorType;
   termsAccepted: boolean;
 }
 
@@ -46,12 +47,12 @@ export const ReusableBookingSidebar: React.FC<ReusableBookingSidebarProps> = ({
   onCompleteBooking,
   compact = false
 }) => {
-  const [formData, setFormData] = useState<BookingFormData>({
+  const [formData, setFormData] = useState<ReusableBookingFormData>({
     purpose: '',
     attendees: 1,
     activityType: '',
     additionalInfo: '',
-    actorType: '',
+    actorType: 'private-person',
     termsAccepted: false
   });
 
@@ -80,7 +81,7 @@ export const ReusableBookingSidebar: React.FC<ReusableBookingSidebarProps> = ({
     return acc;
   }, {} as Record<string, SelectedTimeSlot[]>);
 
-  const updateFormData = (updates: Partial<BookingFormData>) => {
+  const updateFormData = (updates: Partial<ReusableBookingFormData>) => {
     setFormData(prev => ({ ...prev, ...updates }));
   };
 

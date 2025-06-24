@@ -1,27 +1,26 @@
 
-import { Language } from '@/i18n/types';
 import { LocalizedContent, LocalizationHelper } from '@/types/localization';
 
 export const localizationHelper: LocalizationHelper = {
-  getCurrentContent<T extends LocalizedContent[keyof LocalizedContent]>(
-    content: T,
-    language: Language,
-    fallbackLanguage: Language = 'NO'
-  ): string {
+  getLocalizedContent: (key: string, fallback?: string): string => {
+    return fallback || key;
+  },
+
+  getCurrentContent: (content: any, language: string, fallbackLanguage: string = 'NO'): string => {
+    if (typeof content === 'string') return content;
+    if (!content) return '';
     return content[language] || content[fallbackLanguage] || Object.values(content)[0] || '';
   },
 
-  getCurrentArray<T extends { [K in Language]: string[] }>(
-    content: T,
-    language: Language,
-    fallbackLanguage: Language = 'NO'
-  ): string[] {
+  getCurrentArray: (content: any, language: string, fallbackLanguage: string = 'NO'): string[] => {
+    if (Array.isArray(content)) return content;
+    if (!content) return [];
     return content[language] || content[fallbackLanguage] || Object.values(content)[0] || [];
   }
 };
 
 // Helper function to get localized facility data
-export const getLocalizedFacility = (facility: any, language: Language): any => {
+export const getLocalizedFacility = (facility: any, language: string): any => {
   if (!facility.name || typeof facility.name === 'string') {
     // Already a regular facility, return as-is
     return facility;
@@ -39,7 +38,7 @@ export const getLocalizedFacility = (facility: any, language: Language): any => 
 };
 
 // Helper function to get localized service data
-export const getLocalizedService = (service: any, language: Language): any => {
+export const getLocalizedService = (service: any, language: string): any => {
   if (!service.name || typeof service.name === 'string') {
     // Already a regular service, return as-is
     return service;

@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -97,7 +98,7 @@ export function EnhancedPriceCalculationCard({
     <div className="space-y-4">
       {!hidePricingModeSelector && (
         <PricingModeSelector 
-          selectedMode="standard"
+          selectedMode="hourly"
           onModeChange={() => {}}
         />
       )}
