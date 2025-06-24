@@ -77,7 +77,15 @@ export function EnhancedPriceCalculationCard({
   };
 
   if (selectedSlots.length === 0) {
-    return ();
+    return (
+      <></>
+    );
+  }
+
+  if (!actorType) {
+    return (
+      <></>
+    );
   }
 
   const priceBreakdown = calculateMockPrice();
