@@ -1,17 +1,13 @@
 
 import { supabase } from "@/integrations/supabase/client";
-import { BaseRepository, QueryOptions, ApiResponse, PaginationParams } from "./BaseRepository";
+import { BaseRepository, QueryOptions, ApiResponse } from "./BaseRepository";
 
 export class SupabaseRepository<T = any> implements BaseRepository<T> {
   constructor(private tableName: string) {}
 
   async getAll(options?: QueryOptions): Promise<ApiResponse<T[]>> {
     try {
-      // Check if table exists in the new schema by trying common app_ tables
-      const appTables = ['app_locations', 'app_actors', 'app_users', 'app_zones', 'app_bookings'];
-      const actualTable = appTables.includes(this.tableName) ? this.tableName : `app_${this.tableName}`;
-      
-      let query = supabase.from(actualTable).select('*');
+      let query = supabase.from(this.tableName).select('*');
       
       if (options?.filters) {
         Object.entries(options.filters).forEach(([key, value]) => {
@@ -43,7 +39,7 @@ export class SupabaseRepository<T = any> implements BaseRepository<T> {
       return {
         success: true,
         data: {
-          data: data || [],
+          data: (data || []) as T[],
           pagination: options?.pagination ? {
             page: options.pagination.page,
             limit: options.pagination.limit,
@@ -67,20 +63,17 @@ export class SupabaseRepository<T = any> implements BaseRepository<T> {
 
   async getById(id: string): Promise<ApiResponse<T>> {
     try {
-      const appTables = ['app_locations', 'app_actors', 'app_users', 'app_zones', 'app_bookings'];
-      const actualTable = appTables.includes(this.tableName) ? this.tableName : `app_${this.tableName}`;
-      
       const { data, error } = await supabase
-        .from(actualTable)
+        .from(this.tableName)
         .select('*')
         .eq('id', id)
-        .single();
+        .maybeSingle();
 
       if (error) {
         return { success: false, error: { message: error.message, code: error.code } };
       }
 
-      return { success: true, data };
+      return { success: true, data: data as T };
     } catch (error) {
       return {
         success: false,
@@ -94,11 +87,8 @@ export class SupabaseRepository<T = any> implements BaseRepository<T> {
 
   async create(data: Partial<T>): Promise<ApiResponse<T>> {
     try {
-      const appTables = ['app_locations', 'app_actors', 'app_users', 'app_zones', 'app_bookings'];
-      const actualTable = appTables.includes(this.tableName) ? this.tableName : `app_${this.tableName}`;
-      
       const { data: result, error } = await supabase
-        .from(actualTable)
+        .from(this.tableName)
         .insert(data)
         .select()
         .single();
@@ -107,7 +97,7 @@ export class SupabaseRepository<T = any> implements BaseRepository<T> {
         return { success: false, error: { message: error.message, code: error.code } };
       }
 
-      return { success: true, data: result };
+      return { success: true, data: result as T };
     } catch (error) {
       return {
         success: false,
@@ -121,11 +111,8 @@ export class SupabaseRepository<T = any> implements BaseRepository<T> {
 
   async update(id: string, data: Partial<T>): Promise<ApiResponse<T>> {
     try {
-      const appTables = ['app_locations', 'app_actors', 'app_users', 'app_zones', 'app_bookings'];
-      const actualTable = appTables.includes(this.tableName) ? this.tableName : `app_${this.tableName}`;
-      
       const { data: result, error } = await supabase
-        .from(actualTable)
+        .from(this.tableName)
         .update(data)
         .eq('id', id)
         .select()
@@ -135,7 +122,7 @@ export class SupabaseRepository<T = any> implements BaseRepository<T> {
         return { success: false, error: { message: error.message, code: error.code } };
       }
 
-      return { success: true, data: result };
+      return { success: true, data: result as T };
     } catch (error) {
       return {
         success: false,
@@ -149,11 +136,8 @@ export class SupabaseRepository<T = any> implements BaseRepository<T> {
 
   async delete(id: string): Promise<ApiResponse<void>> {
     try {
-      const appTables = ['app_locations', 'app_actors', 'app_users', 'app_zones', 'app_bookings'];
-      const actualTable = appTables.includes(this.tableName) ? this.tableName : `app_${this.tableName}`;
-      
       const { error } = await supabase
-        .from(actualTable)
+        .from(this.tableName)
         .delete()
         .eq('id', id);
 

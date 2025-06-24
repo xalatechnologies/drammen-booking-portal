@@ -7,6 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Search, Filter, X } from "lucide-react";
 import { useAppLocations } from "@/hooks/useAppData";
+import { AppLocalizationService } from "@/services/AppLocalizationService";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface SearchFilterProps {
   onFilter: (filters: any) => void;
@@ -21,6 +23,7 @@ export function SearchFilter({ onFilter, onSearch }: SearchFilterProps) {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   const { data: locations, isLoading } = useAppLocations();
+  const { language } = useLanguage();
 
   // Extract unique types and areas from locations
   const uniqueTypes = React.useMemo(() => {

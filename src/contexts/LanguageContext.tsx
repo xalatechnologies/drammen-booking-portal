@@ -1,7 +1,7 @@
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode } from 'react';
 
-type Language = 'NO' | 'EN';
+export type Language = 'NO' | 'EN';
 
 interface LanguageContextType {
   language: Language;
@@ -11,22 +11,15 @@ interface LanguageContextType {
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
-export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguageState] = useState<Language>(() => {
-    // Initialize from localStorage or default to 'NO'
-    const stored = localStorage.getItem('language') as Language;
-    return stored && ['NO', 'EN'].includes(stored) ? stored : 'NO';
-  });
+interface LanguageProviderProps {
+  children: ReactNode;
+}
 
-  const setLanguage = (lang: Language) => {
-    setLanguageState(lang);
-    localStorage.setItem('language', lang);
-    // Dispatch custom event for components that need it
-    window.dispatchEvent(new CustomEvent('languageChange', { detail: lang }));
-  };
+export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) => {
+  const [language, setLanguage] = useState<Language>('NO');
 
   const toggleLanguage = () => {
-    setLanguage(language === 'NO' ? 'EN' : 'NO');
+    setLanguage(prev => prev === 'NO' ? 'EN' : 'NO');
   };
 
   return (
@@ -34,12 +27,12 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       {children}
     </LanguageContext.Provider>
   );
-}
+};
 
-export function useLanguage() {
+export const useLanguage = () => {
   const context = useContext(LanguageContext);
   if (context === undefined) {
     throw new Error('useLanguage must be used within a LanguageProvider');
   }
   return context;
-}
+};
