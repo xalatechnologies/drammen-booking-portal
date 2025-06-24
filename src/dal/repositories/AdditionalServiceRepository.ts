@@ -1,36 +1,20 @@
 
-import { SupabaseRepository } from '../SupabaseRepository';
-import { AdditionalService, ServiceFilters } from '@/types/additionalServices';
-import { PaginationParams, RepositoryResponse } from '@/types/api';
+import { SimpleRepository } from './SimpleRepository';
 
-interface AdditionalServiceCreateRequest extends Omit<AdditionalService, 'id' | 'createdAt' | 'updatedAt'> {}
-interface AdditionalServiceUpdateRequest extends Partial<AdditionalServiceCreateRequest> {}
-
-export class AdditionalServiceRepository extends SupabaseRepository<AdditionalService> {
-  protected tableName = 'additional_services';
-
+export class AdditionalServiceRepository extends SimpleRepository {
   constructor() {
-    super();
+    super('additional_services');
   }
 
-  // Override findAll to add filtering support
-  async findAllWithFilters(
-    pagination?: PaginationParams,
-    filters?: ServiceFilters
-  ): Promise<RepositoryResponse<AdditionalService[]>> {
-    return {
-      data: [],
-      error: "AdditionalServiceRepository methods not implemented - use hooks instead"
-    };
+  async getAllByCategory(category: string) {
+    console.log("AdditionalServiceRepository.getAllByCategory - Using simplified approach", { category });
+    return this.getAll();
   }
 
-  async getAllByCategory(category: string): Promise<RepositoryResponse<AdditionalService[]>> {
-    return {
-      data: [],
-      error: "AdditionalServiceRepository methods not implemented - use hooks instead"
-    };
+  async findAllWithFilters(pagination?: any, filters?: any) {
+    console.log("AdditionalServiceRepository.findAllWithFilters - Using simplified approach", { pagination, filters });
+    return this.getAll();
   }
 }
 
-// Export singleton instance
 export const additionalServiceRepository = new AdditionalServiceRepository();

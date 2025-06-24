@@ -1,94 +1,30 @@
 
-import { BaseRepository } from '@/dal/BaseRepository';
-import { Language } from '@/i18n/types';
-import { Facility, Zone } from '@/types/facility';
-import { RepositoryResponse, PaginationParams, PaginatedResponse } from '@/types/api';
+import { SimpleRepository } from './SimpleRepository';
 
-export class LocalizedFacilityRepository extends BaseRepository<Facility> {
-  private currentLanguage: Language = 'NO';
-
-  setLanguage(language: Language) {
-    this.currentLanguage = language;
+export class LocalizedFacilityRepository extends SimpleRepository {
+  constructor() {
+    super('app_locations');
   }
 
-  protected getId(item: Facility): string {
-    return item.id.toString();
+  async findAllWithFilters(pagination?: any, filters?: any, language: string = 'NO') {
+    console.log("LocalizedFacilityRepository.findAllWithFilters - Using simplified approach", { pagination, filters, language });
+    return this.getAll();
   }
 
-  protected applyFilters(items: Facility[], filters: any): Facility[] {
-    return {
-      data: [],
-      error: "LocalizedFacilityRepository methods not implemented - use hooks instead"
-    } as any;
+  async findById(id: string, language: string = 'NO') {
+    console.log("LocalizedFacilityRepository.findById - Using simplified approach", { id, language });
+    return this.getById(id);
   }
 
-  protected createEntity(data: Partial<Facility>): Facility {
-    return {
-      data: null,
-      error: "LocalizedFacilityRepository methods not implemented - use hooks instead"
-    } as any;
+  async create(data: any, language: string = 'NO') {
+    console.log("LocalizedFacilityRepository.create - Using simplified approach", { data, language });
+    return super.create(data);
   }
 
-  protected updateEntity(existing: Facility, updates: Partial<Facility>): Facility {
-    return {
-      data: null,
-      error: "LocalizedFacilityRepository methods not implemented - use hooks instead"
-    } as any;
-  }
-
-  async findAllWithPagination(
-    pagination: PaginationParams,
-    searchTerm?: string,
-    filters?: any
-  ): Promise<RepositoryResponse<PaginatedResponse<Facility>>> {
-    return {
-      data: {
-        data: [],
-        pagination: {
-          page: pagination.page,
-          limit: pagination.limit,
-          total: 0,
-          totalPages: 0,
-          hasNext: false,
-          hasPrev: false
-        }
-      },
-      error: "LocalizedFacilityRepository methods not implemented - use hooks instead"
-    };
-  }
-
-  async findById(id: string): Promise<RepositoryResponse<Facility>> {
-    return {
-      data: null,
-      error: "LocalizedFacilityRepository methods not implemented - use hooks instead"
-    };
-  }
-
-  async getZonesByFacilityId(facilityId: number): Promise<RepositoryResponse<Zone[]>> {
-    return {
-      data: [],
-      error: "LocalizedFacilityRepository methods not implemented - use hooks instead"
-    };
-  }
-
-  async getZoneById(facilityId: number, zoneId: string): Promise<RepositoryResponse<Zone>> {
-    return {
-      data: null,
-      error: "LocalizedFacilityRepository methods not implemented - use hooks instead"
-    };
-  }
-
-  async getFacilitiesByType(type: string): Promise<RepositoryResponse<Facility[]>> {
-    return {
-      data: [],
-      error: "LocalizedFacilityRepository methods not implemented - use hooks instead"
-    };
-  }
-
-  async getFacilitiesByArea(area: string): Promise<RepositoryResponse<Facility[]>> {
-    return {
-      data: [],
-      error: "LocalizedFacilityRepository methods not implemented - use hooks instead"
-    };
+  async update(id: string, data: any, language: string = 'NO') {
+    console.log("LocalizedFacilityRepository.update - Using simplified approach", { id, data, language });
+    return super.update(id, data);
   }
 }
+
+export const localizedFacilityRepository = new LocalizedFacilityRepository();

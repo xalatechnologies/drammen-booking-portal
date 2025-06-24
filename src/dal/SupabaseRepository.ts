@@ -1,11 +1,16 @@
 
 import { supabase } from "@/integrations/supabase/client";
-import { BaseRepository, QueryOptions, ApiResponse } from "./BaseRepository";
 
-export class SupabaseRepository<T = any> implements BaseRepository<T> {
+export interface SimpleResponse<T> {
+  success: boolean;
+  data?: T;
+  error?: { message: string; code?: string };
+}
+
+export class SupabaseRepository {
   constructor(private tableName: string) {}
 
-  async getAll(options?: QueryOptions): Promise<ApiResponse<T[]>> {
+  async getAll(): Promise<SimpleResponse<any[]>> {
     try {
       const { data, error } = await supabase
         .from(this.tableName)
@@ -17,7 +22,7 @@ export class SupabaseRepository<T = any> implements BaseRepository<T> {
 
       return {
         success: true,
-        data: data as T[]
+        data: data || []
       };
     } catch (error) {
       return {
@@ -30,7 +35,7 @@ export class SupabaseRepository<T = any> implements BaseRepository<T> {
     }
   }
 
-  async getById(id: string): Promise<ApiResponse<T>> {
+  async getById(id: string): Promise<SimpleResponse<any>> {
     try {
       const { data, error } = await supabase
         .from(this.tableName)
@@ -42,7 +47,7 @@ export class SupabaseRepository<T = any> implements BaseRepository<T> {
         return { success: false, error: { message: error.message, code: error.code } };
       }
 
-      return { success: true, data: data as T };
+      return { success: true, data };
     } catch (error) {
       return {
         success: false,
@@ -54,11 +59,11 @@ export class SupabaseRepository<T = any> implements BaseRepository<T> {
     }
   }
 
-  async create(data: Partial<T>): Promise<ApiResponse<T>> {
+  async create(data: any): Promise<SimpleResponse<any>> {
     try {
       const { data: result, error } = await supabase
         .from(this.tableName)
-        .insert(data as any)
+        .insert(data)
         .select()
         .single();
 
@@ -66,7 +71,7 @@ export class SupabaseRepository<T = any> implements BaseRepository<T> {
         return { success: false, error: { message: error.message, code: error.code } };
       }
 
-      return { success: true, data: result as T };
+      return { success: true, data: result };
     } catch (error) {
       return {
         success: false,
@@ -78,11 +83,11 @@ export class SupabaseRepository<T = any> implements BaseRepository<T> {
     }
   }
 
-  async update(id: string, data: Partial<T>): Promise<ApiResponse<T>> {
+  async update(id: string, data: any): Promise<SimpleResponse<any>> {
     try {
       const { data: result, error } = await supabase
         .from(this.tableName)
-        .update(data as any)
+        .update(data)
         .eq('id', id)
         .select()
         .single();
@@ -91,7 +96,7 @@ export class SupabaseRepository<T = any> implements BaseRepository<T> {
         return { success: false, error: { message: error.message, code: error.code } };
       }
 
-      return { success: true, data: result as T };
+      return { success: true, data: result };
     } catch (error) {
       return {
         success: false,
@@ -103,7 +108,7 @@ export class SupabaseRepository<T = any> implements BaseRepository<T> {
     }
   }
 
-  async delete(id: string): Promise<ApiResponse<void>> {
+  async delete(id: string): Promise<SimpleResponse<void>> {
     try {
       const { error } = await supabase
         .from(this.tableName)

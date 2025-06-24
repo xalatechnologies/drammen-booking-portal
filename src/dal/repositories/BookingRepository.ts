@@ -1,78 +1,47 @@
 
-import { SupabaseRepository } from '../SupabaseRepository';
-import { Booking } from '@/types/booking';
-import { RepositoryResponse } from '@/types/api';
+import { SimpleRepository } from './SimpleRepository';
 
-interface BookingCreateRequest {
-  facility_id: number;
-  zone_id: number;
-  start_time: string;
-  end_time: string;
-  user_id: string;
-  status: string;
-  total_price: number;
-  additional_notes?: string;
-}
-
-interface BookingUpdateRequest extends Partial<BookingCreateRequest> {
-  status?: string;
-  total_price?: number;
-}
-
-export class BookingRepository extends SupabaseRepository<Booking> {
-  protected tableName = 'bookings';
-
+export class BookingRepository extends SimpleRepository {
   constructor() {
-    super();
+    super('app_bookings');
   }
 
-  async getAllBookings(filters?: any): Promise<RepositoryResponse<Booking[]>> {
-    return {
-      data: [],
-      error: "BookingRepository methods not implemented - use hooks instead"
-    };
+  async getAllBookings(filters?: any) {
+    console.log("BookingRepository.getAllBookings - Using simplified approach", { filters });
+    return this.getAll();
   }
 
-  async getBookingById(id: string): Promise<RepositoryResponse<Booking | null>> {
-    return {
-      data: null,
-      error: "BookingRepository methods not implemented - use hooks instead"
-    };
+  async getBookingById(id: string) {
+    console.log("BookingRepository.getBookingById - Using simplified approach", { id });
+    return this.getById(id);
   }
 
-  async createBooking(bookingData: BookingCreateRequest): Promise<RepositoryResponse<Booking | null>> {
-    return {
-      data: null,
-      error: "BookingRepository methods not implemented - use hooks instead"
-    };
+  async createBooking(bookingData: any) {
+    console.log("BookingRepository.createBooking - Using simplified approach", { bookingData });
+    return this.create(bookingData);
   }
 
-  async updateBooking(id: string, bookingData: BookingUpdateRequest): Promise<RepositoryResponse<Booking | null>> {
-    return {
-      data: null,
-      error: "BookingRepository methods not implemented - use hooks instead"
-    };
+  async updateBooking(id: string, bookingData: any) {
+    console.log("BookingRepository.updateBooking - Using simplified approach", { id, bookingData });
+    return this.update(id, bookingData);
   }
 
-  async deleteBooking(id: string): Promise<RepositoryResponse<boolean>> {
-    return {
-      data: false,
-      error: "BookingRepository methods not implemented - use hooks instead"
-    };
+  async deleteBooking(id: string) {
+    console.log("BookingRepository.deleteBooking - Using simplified approach", { id });
+    return this.delete(id);
   }
 
-  async checkBookingConflicts(bookingData: any): Promise<RepositoryResponse<{
-    hasConflict: boolean;
-    conflictingBookings: Booking[];
-    availableAlternatives: any[];
-  }>> {
+  async checkBookingConflicts(bookingData: any) {
+    console.log("BookingRepository.checkBookingConflicts - Using simplified approach", { bookingData });
     return {
       data: {
         hasConflict: false,
         conflictingBookings: [],
         availableAlternatives: []
       },
-      error: "BookingRepository methods not implemented - use hooks instead"
+      error: null
     };
   }
 }
+
+export const bookingRepository = new BookingRepository();

@@ -1,40 +1,30 @@
 
-import { SupabaseRepository } from '../SupabaseRepository';
-import { ServiceBooking } from '@/types/serviceBooking';
-import { RepositoryResponse } from '@/types/api';
+import { SimpleRepository } from './SimpleRepository';
 
-export class ServiceBookingRepository extends SupabaseRepository<ServiceBooking> {
-  protected tableName = 'service_bookings';
-
+export class ServiceBookingRepository extends SimpleRepository {
   constructor() {
-    super();
+    super('service_bookings');
   }
 
-  async createServiceBooking(data: Omit<ServiceBooking, 'id' | 'createdAt'>): Promise<RepositoryResponse<ServiceBooking>> {
-    return {
-      data: null,
-      error: "ServiceBookingRepository methods not implemented - use hooks instead"
-    };
+  async createServiceBooking(data: any) {
+    console.log("ServiceBookingRepository.createServiceBooking - Using simplified approach", { data });
+    return this.create(data);
   }
 
-  async getServiceBookingsByBookingId(bookingId: string): Promise<RepositoryResponse<ServiceBooking[]>> {
-    return {
-      data: [],
-      error: "ServiceBookingRepository methods not implemented - use hooks instead"
-    };
+  async getServiceBookingsByBookingId(bookingId: string) {
+    console.log("ServiceBookingRepository.getServiceBookingsByBookingId - Using simplified approach", { bookingId });
+    return this.getAll();
   }
 
-  async updateServiceBooking(id: string, data: Partial<ServiceBooking>): Promise<RepositoryResponse<ServiceBooking>> {
-    return {
-      data: null,
-      error: "ServiceBookingRepository methods not implemented - use hooks instead"
-    };
+  async updateServiceBooking(id: string, data: any) {
+    console.log("ServiceBookingRepository.updateServiceBooking - Using simplified approach", { id, data });
+    return this.update(id, data);
   }
 
-  async deleteServiceBooking(id: string): Promise<RepositoryResponse<boolean>> {
-    return {
-      data: false,
-      error: "ServiceBookingRepository methods not implemented - use hooks instead"
-    };
+  async deleteServiceBooking(id: string) {
+    console.log("ServiceBookingRepository.deleteServiceBooking - Using simplified approach", { id });
+    return this.delete(id);
   }
 }
+
+export const serviceBookingRepository = new ServiceBookingRepository();

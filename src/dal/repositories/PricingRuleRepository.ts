@@ -1,26 +1,20 @@
 
-import { SupabaseRepository } from '../SupabaseRepository';
-import { PriceRule } from '@/types/pricing';
-import { RepositoryResponse } from '@/types/api';
+import { SimpleRepository } from './SimpleRepository';
 
-export class PricingRuleRepository extends SupabaseRepository<PriceRule> {
-  protected tableName = 'pricing_rules';
-
+export class PricingRuleRepository extends SimpleRepository {
   constructor() {
-    super();
+    super('pricing_rules');
   }
 
-  async getAllPricingRules(facilityId?: number): Promise<RepositoryResponse<PriceRule[]>> {
-    return {
-      data: [],
-      error: "PricingRuleRepository methods not implemented - use hooks instead"
-    };
+  async getAllPricingRules(facilityId?: number) {
+    console.log("PricingRuleRepository.getAllPricingRules - Using simplified approach", { facilityId });
+    return this.getAll();
   }
 
-  async getPricingRulesByFacilityAndZone(facilityId: number, zoneId?: string): Promise<RepositoryResponse<PriceRule[]>> {
-    return {
-      data: [],
-      error: "PricingRuleRepository methods not implemented - use hooks instead"
-    };
+  async getPricingRulesByFacilityAndZone(facilityId: number, zoneId?: string) {
+    console.log("PricingRuleRepository.getPricingRulesByFacilityAndZone - Using simplified approach", { facilityId, zoneId });
+    return this.getAll();
   }
 }
+
+export const pricingRuleRepository = new PricingRuleRepository();

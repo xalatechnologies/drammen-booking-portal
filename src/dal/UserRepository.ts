@@ -18,7 +18,7 @@ export class UserRepository extends SimpleRepository {
 
   async findByEmail(email: string) {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('app_users')
         .select('*')
         .eq('email', email.toLowerCase())

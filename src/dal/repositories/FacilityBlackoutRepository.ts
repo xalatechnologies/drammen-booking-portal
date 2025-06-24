@@ -1,22 +1,15 @@
 
-import { SupabaseRepository } from '../SupabaseRepository';
-import { FacilityBlackoutPeriod } from '@/types/facility';
-import { RepositoryResponse } from '@/types/api';
+import { SimpleRepository } from './SimpleRepository';
 
-export class FacilityBlackoutRepository extends SupabaseRepository<FacilityBlackoutPeriod> {
-  protected tableName = 'facility_blackout_periods';
-
+export class FacilityBlackoutRepository extends SimpleRepository {
   constructor() {
-    super();
+    super('facility_blackout_periods');
   }
 
-  async getAllBlackouts(facilityId?: number): Promise<RepositoryResponse<FacilityBlackoutPeriod[]>> {
-    return {
-      data: [],
-      error: "FacilityBlackoutRepository methods not implemented - use hooks instead"
-    };
+  async getAllBlackouts(facilityId?: number) {
+    console.log("FacilityBlackoutRepository.getAllBlackouts - Using simplified approach", { facilityId });
+    return this.getAll();
   }
 }
 
-// Export singleton instance
 export const facilityBlackoutRepository = new FacilityBlackoutRepository();

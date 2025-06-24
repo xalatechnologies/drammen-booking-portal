@@ -15,7 +15,7 @@ import Logo from "@/components/header/Logo";
 import LanguageToggle from "@/components/header/LanguageToggle";
 import ProfileMenu from "@/components/header/ProfileMenu";
 import MobileMenu from "@/components/header/MobileMenu";
-import GlobalSearch from "@/components/header/GlobalSearch";
+import { GlobalSearch } from "@/components/header/GlobalSearch";
 import { CartDropdown } from "@/components/header/CartDropdown";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useCart } from "@/contexts/CartContext";
