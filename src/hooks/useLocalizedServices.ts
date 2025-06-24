@@ -11,8 +11,8 @@ export function useLocalizedServices() {
   const { language } = useLanguage();
 
   useEffect(() => {
-    // Update language for localized services when language changes
-    localizedAdditionalServiceRepository.setLanguage(language);
+    // Language effect - services handle their own language context
+    console.log('Language changed to:', language);
   }, [language]);
 
   return {

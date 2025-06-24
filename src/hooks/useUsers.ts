@@ -1,89 +1,83 @@
 
-import { useQuery } from '@tanstack/react-query';
-import { userRepository } from '@/dal/UserRepository';
-import { PaginationParams } from '@/types/api';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { userRepository } from '@/dal/repositories';
 
-export function useUsers(pagination: PaginationParams) {
-  const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ['users', pagination],
+export function useUsers() {
+  return useQuery({
+    queryKey: ['users'],
     queryFn: async () => {
-      const result = await userRepository.findAll(pagination);
+      const result = await userRepository.getAll();
       if (result.error) {
         throw new Error(result.error);
       }
-      return {
-        data: result.data,
-        pagination: {
-          page: pagination.page,
-          limit: pagination.limit,
-          total: result.data.length,
-          totalPages: Math.ceil(result.data.length / pagination.limit),
-          hasNext: pagination.page * pagination.limit < result.data.length,
-          hasPrev: pagination.page > 1
-        }
-      };
-    }
+      return result.data || [];
+    },
   });
-
-  return {
-    users: data?.data || [],
-    pagination: data?.pagination,
-    isLoading,
-    error,
-    refetch
-  };
 }
 
 export function useUser(id: string) {
-  const { data, isLoading, error, refetch } = useQuery({
+  return useQuery({
     queryKey: ['user', id],
     queryFn: async () => {
-      const result = await userRepository.findById(id);
+      if (!id) return null;
+      const result = await userRepository.getById(id);
       if (result.error) {
         throw new Error(result.error);
       }
       return result.data;
     },
-    enabled: !!id
+    enabled: !!id,
   });
-
-  return {
-    user: data,
-    isLoading,
-    error,
-    refetch
-  };
 }
 
-export function useUsersByRole(role: string) {
-  const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ['users', 'role', role],
-    queryFn: async () => {
-      const result = await userRepository.findByRole(role);
+export function useCreateUser() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async (userData: any) => {
+      const result = await userRepository.create(userData);
       if (result.error) {
         throw new Error(result.error);
       }
       return result.data;
     },
-    enabled: !!role
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+    },
   });
-
-  return {
-    users: data || [],
-    isLoading,
-    error,
-    refetch
-  };
 }
 
 export function useUpdateUser() {
-  return {
-    updateUser: async (id: string, data: any) => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async ({ id, data }: { id: string; data: any }) => {
       const result = await userRepository.update(id, data);
       if (result.error) {
         throw new Error(result.error);
       }
       return result.data;
-    }
-  };
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+      queryClient.invalidateQueries({ queryKey: ['user', variables.id] });
+    },
+  });
+}
+
+export function useDeleteUser() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const result = await userRepository.delete(id);
+      if (result.error) {
+        throw new Error(result.error);
+      }
+      return result.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+    },
+  });
 }

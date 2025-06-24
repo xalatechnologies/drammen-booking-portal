@@ -1,14 +1,12 @@
 
-import { SupabaseRepository } from '../SupabaseRepository';
+import { SimpleRepository } from './SimpleRepository';
 import { Facility, FacilityFilters } from '@/types/facility';
 import { SupabaseFacilityService } from '@/services/SupabaseFacilityService';
 import { PaginationParams, ApiResponse, PaginatedResponse } from '@/types/api';
 
-export class SupabaseFacilityRepository extends SupabaseRepository<Facility> {
-  protected tableName = 'facilities';
-
+export class SupabaseFacilityRepository extends SimpleRepository {
   constructor() {
-    super();
+    super('facilities');
   }
 
   // Override base methods to use Supabase edge functions

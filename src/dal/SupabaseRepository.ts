@@ -12,7 +12,7 @@ export class SupabaseRepository {
 
   async getAll(): Promise<SimpleResponse<any[]>> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from(this.tableName)
         .select('*');
       
@@ -37,7 +37,7 @@ export class SupabaseRepository {
 
   async getById(id: string): Promise<SimpleResponse<any>> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from(this.tableName)
         .select('*')
         .eq('id', id)
@@ -61,7 +61,7 @@ export class SupabaseRepository {
 
   async create(data: any): Promise<SimpleResponse<any>> {
     try {
-      const { data: result, error } = await supabase
+      const { data: result, error } = await (supabase as any)
         .from(this.tableName)
         .insert(data)
         .select()
@@ -85,7 +85,7 @@ export class SupabaseRepository {
 
   async update(id: string, data: any): Promise<SimpleResponse<any>> {
     try {
-      const { data: result, error } = await supabase
+      const { data: result, error } = await (supabase as any)
         .from(this.tableName)
         .update(data)
         .eq('id', id)
@@ -110,7 +110,7 @@ export class SupabaseRepository {
 
   async delete(id: string): Promise<SimpleResponse<void>> {
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from(this.tableName)
         .delete()
         .eq('id', id);

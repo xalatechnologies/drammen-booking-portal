@@ -1,13 +1,11 @@
 
-import { SupabaseRepository } from '../SupabaseRepository';
+import { SimpleRepository } from './SimpleRepository';
 import { Zone } from '@/types/facility';
 import { RepositoryResponse } from '@/types/api';
 
-export class ZoneRepository extends SupabaseRepository<Zone> {
-  protected tableName = 'zones';
-
+export class ZoneRepository extends SimpleRepository {
   constructor() {
-    super();
+    super('zones');
   }
 
   async getAllZones(facilityId?: number): Promise<RepositoryResponse<Zone[]>> {
