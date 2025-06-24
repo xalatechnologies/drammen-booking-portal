@@ -6,6 +6,7 @@ import { useOptimizedFacilities } from "@/hooks/useOptimizedFacilities";
 import { FacilityFilters } from "@/types/facility";
 import { PaginationParams } from "@/types/api";
 import { Skeleton } from "@/components/ui/skeleton";
+import { normalizeFacilityData } from "@/utils/facilityDataUtils";
 
 interface FacilityGridProps {
   pagination: PaginationParams;
@@ -83,9 +84,12 @@ const FacilityGrid: React.FC<FacilityGridProps> = ({
     );
   }
 
+  // Normalize facilities to ensure all required fields are present
+  const normalizedFacilities = facilities.map(facility => normalizeFacilityData(facility));
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 animate-fade-in">
-      {facilities.map((facility, index) => (
+      {normalizedFacilities.map((facility, index) => (
         <div 
           key={facility.id} 
           className="animate-scale-in"

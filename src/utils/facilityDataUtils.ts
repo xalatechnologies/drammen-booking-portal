@@ -45,3 +45,24 @@ export const normalizeZoneData = (dbZones: any[]): Zone[] => {
     }
   }));
 };
+
+export const normalizeFacilityData = (dbFacility: any): any => {
+  return {
+    ...dbFacility,
+    // Add required computed fields
+    address: `${dbFacility.address_street || ''} ${dbFacility.address_city || ''} ${dbFacility.address_postal_code || ''}`.trim() || dbFacility.address,
+    image: dbFacility.image_url || dbFacility.image || '',
+    nextAvailable: dbFacility.next_available || null,
+    accessibility: dbFacility.accessibility_features || [],
+    suitableFor: dbFacility.amenities || [],
+    hasAutoApproval: dbFacility.has_auto_approval || false,
+    pricePerHour: dbFacility.price_per_hour || 0,
+    openingHours: [],
+    zones: [],
+    timeSlotDuration: dbFacility.time_slot_duration === 120 ? 2 : 1,
+    season: {
+      from: dbFacility.season_from || '',
+      to: dbFacility.season_to || ''
+    }
+  };
+};
