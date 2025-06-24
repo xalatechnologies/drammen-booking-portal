@@ -11,6 +11,7 @@ import { BookingActionButtons } from './BookingActionButtons';
 import { BookingService, BookingFormData } from '@/services/BookingService';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
+import { useCart } from '@/contexts/CartContext';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertTriangle } from 'lucide-react';
 
@@ -40,6 +41,7 @@ export function BookingForm({
   
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { addToCart } = useCart();
 
   const [formData, setFormData] = useState<BookingFormData>({
     purpose: '',
@@ -94,6 +96,34 @@ export function BookingForm({
     });
 
     if (result.success) {
+      // Add each slot to cart
+      selectedSlots.forEach((slot) => {
+        const pricePerHour = 450; // Default price
+        const duration = slot.duration || 2;
+        
+        addToCart({
+          facilityId,
+          facilityName,
+          zoneId: slot.zoneId,
+          date: slot.date,
+          timeSlot: slot.timeSlot,
+          duration,
+          pricePerHour,
+          purpose: formData.purpose || 'Generell booking',
+          expectedAttendees: formData.attendees,
+          organizationType: formData.actorType as any,
+          additionalServices: [],
+          timeSlots: [slot],
+          pricing: {
+            baseFacilityPrice: pricePerHour * duration,
+            servicesPrice: 0,
+            discounts: 0,
+            vatAmount: 0,
+            totalPrice: pricePerHour * duration
+          }
+        });
+      });
+
       toast({
         title: "Lagt til i handlekurv",
         description: result.message,
@@ -131,52 +161,68 @@ export function BookingForm({
   const handleCompleteBooking = async () => {
     console.log('BookingForm: handleCompleteBooking called');
 
-    // Instead of completing booking, add to cart and navigate to checkout
-    const result = await BookingService.addToCart({
-      selectedSlots,
-      facilityId,
-      facilityName,
-      zones,
-      formData
-    });
-
-    if (result.success) {
-      toast({
-        title: "Lagt til i handlekurv",
-        description: "Sender deg til kassen...",
-      });
-
-      // Clear conflicts and slots after successful addition
-      setConflicts([]);
-      if (onSlotsCleared) {
-        onSlotsCleared();
-      }
-
-      // Navigate to checkout immediately
-      setTimeout(() => {
-        navigate('/checkout');
-      }, 500);
-
-      if (onCompleteBooking) {
-        onCompleteBooking({
-          selectedSlots,
-          facilityId,
-          facilityName,
-          formData
-        });
-      }
-    } else {
-      // Handle conflicts
-      if (result.conflicts) {
-        setConflicts(result.conflicts);
-      }
-      
+    if (!isFormValid()) {
       toast({
         title: "Feil",
-        description: result.message,
+        description: "Vennligst fyll ut alle påkrevde felter og aksepter vilkårene.",
         variant: "destructive",
       });
+      return;
     }
+
+    // Add each slot to cart
+    selectedSlots.forEach((slot) => {
+      const pricePerHour = 450; // Default price
+      const duration = slot.duration || 2;
+      
+      addToCart({
+        facilityId,
+        facilityName,
+        zoneId: slot.zoneId,
+        date: slot.date,
+        timeSlot: slot.timeSlot,
+        duration,
+        pricePerHour,
+        purpose: formData.purpose || 'Generell booking',
+        expectedAttendees: formData.attendees,
+        organizationType: formData.actorType as any,
+        additionalServices: [],
+        timeSlots: [slot],
+        pricing: {
+          baseFacilityPrice: pricePerHour * duration,
+          servicesPrice: 0,
+          discounts: 0,
+          vatAmount: 0,
+          totalPrice: pricePerHour * duration
+        }
+      });
+    });
+
+    toast({
+      title: "Lagt til i handlekurv",
+      description: "Sender deg til kassen...",
+    });
+
+    // Clear conflicts and slots after successful addition
+    setConflicts([]);
+    if (onSlotsCleared) {
+      onSlotsCleared();
+    }
+
+    // Call parent callback if provided
+    if (onCompleteBooking) {
+      onCompleteBooking({
+        selectedSlots,
+        facilityId,
+        facilityName,
+        formData
+      });
+    }
+
+    // Navigate to checkout immediately
+    setTimeout(() => {
+      navigate('/checkout');
+    }, 500);
   };
 
   if (selectedSlots.length === 0) {
