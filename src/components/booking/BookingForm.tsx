@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { SelectedTimeSlot } from '@/utils/recurrenceEngine';
 import { Zone } from './types';
@@ -54,6 +53,11 @@ export function BookingForm({
   });
 
   const [conflicts, setConflicts] = useState<any[]>([]);
+
+  // Reset actorType to empty when component mounts
+  useEffect(() => {
+    setFormData(prev => ({ ...prev, actorType: '' as ActorType }));
+  }, []);
 
   const updateFormData = (updates: Partial<BookingFormData>) => {
     setFormData(prev => ({ ...prev, ...updates }));
