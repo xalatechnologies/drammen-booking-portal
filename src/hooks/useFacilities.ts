@@ -42,8 +42,8 @@ export function useFacilities({
       if (error) throw new Error(error.message);
 
       // Transform data to match expected Facility interface
-      const facilities = (data || []).map((location: any) => ({
-        id: location.id,
+      const facilities = (data || []).map((location: any, index: number) => ({
+        id: index + 1, // Generate numeric ID for interface compatibility
         name: typeof location.name === 'object' ? location.name[language] || location.name.NO || location.name.EN || 'Unknown' : location.name,
         description: typeof location.description === 'object' ? location.description[language] || location.description.NO || location.description.EN || '' : location.description,
         address: location.address,
@@ -61,23 +61,23 @@ export function useFacilities({
         type: 'facility',
         status: 'active' as const,
         image_url: null,
-        capacity: 30,
+        capacity: location.capacity || 30,
         area: 'unknown',
         next_available: null,
         rating: null,
         review_count: null,
         price_per_hour: 450,
         has_auto_approval: false,
-        amenities: [],
+        amenities: location.facilities || [],
         time_slot_duration: 60,
         accessibility_features: [],
-        equipment: [],
-        allowed_booking_types: ['engangs'],
+        equipment: location.facilities || [],
+        allowed_booking_types: ['engangs'] as ('engangs' | 'fastlan' | 'rammetid' | 'strotimer')[],
         season_from: null,
         season_to: null,
         contact_name: null,
-        contact_email: null,
-        contact_phone: null,
+        contact_email: location.contact_email,
+        contact_phone: location.contact_phone,
         booking_lead_time_hours: 24,
         max_advance_booking_days: 90,
         cancellation_deadline_hours: 48,

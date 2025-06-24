@@ -6,7 +6,7 @@ import { useFacilityStore } from "@/stores/useFacilityStore";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 export function useFacility(id: number | string) {
-  const facilityId = typeof id === 'string' ? parseInt(id, 10) : id;
+  const facilityId = typeof id === 'string' ? id : id.toString();
   const { setCurrentFacility, currentFacility, setLoading, setError } = useFacilityStore();
   const { language } = useLanguage();
 
@@ -48,7 +48,7 @@ export function useFacility(id: number | string) {
 
       // Transform data to match expected Facility interface
       const facility = {
-        id: data.id,
+        id: parseInt(facilityId), // Convert back to number for the interface
         name: getName(data.name),
         description: getDescription(data.description),
         address: data.address,
@@ -66,23 +66,23 @@ export function useFacility(id: number | string) {
         type: 'facility',
         status: 'active' as const,
         image_url: null,
-        capacity: 30,
+        capacity: data.capacity || 30,
         area: 'unknown',
         next_available: null,
         rating: null,
         review_count: null,
         price_per_hour: 450,
         has_auto_approval: false,
-        amenities: [],
+        amenities: data.facilities || [],
         time_slot_duration: 60,
         accessibility_features: [],
-        equipment: [],
+        equipment: data.facilities || [],
         allowed_booking_types: ['engangs'] as const,
         season_from: null,
         season_to: null,
         contact_name: null,
-        contact_email: null,
-        contact_phone: null,
+        contact_email: data.contact_email,
+        contact_phone: data.contact_phone,
         booking_lead_time_hours: 24,
         max_advance_booking_days: 90,
         cancellation_deadline_hours: 48,
@@ -111,7 +111,7 @@ export function useFacility(id: number | string) {
         data: facility
       };
     },
-    enabled: !isNaN(facilityId) && facilityId > 0,
+    enabled: !!facilityId,
     staleTime: 0,
     gcTime: 30 * 1000,
   });

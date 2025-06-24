@@ -53,8 +53,11 @@ export type Database = {
           contact_info: Json | null
           created_at: string | null
           id: string
+          is_paraply: boolean | null
           metadata: Json | null
           name: Json
+          org_number: string | null
+          parent_actor_id: string | null
           type: string
           updated_at: string | null
         }
@@ -62,8 +65,11 @@ export type Database = {
           contact_info?: Json | null
           created_at?: string | null
           id?: string
+          is_paraply?: boolean | null
           metadata?: Json | null
           name: Json
+          org_number?: string | null
+          parent_actor_id?: string | null
           type: string
           updated_at?: string | null
         }
@@ -71,12 +77,55 @@ export type Database = {
           contact_info?: Json | null
           created_at?: string | null
           id?: string
+          is_paraply?: boolean | null
           metadata?: Json | null
           name?: Json
+          org_number?: string | null
+          parent_actor_id?: string | null
           type?: string
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "app_actors_parent_actor_id_fkey"
+            columns: ["parent_actor_id"]
+            isOneToOne: false
+            referencedRelation: "app_actors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      app_audit_logs: {
+        Row: {
+          action: string
+          details: string | null
+          id: string
+          timestamp: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          details?: string | null
+          id?: string
+          timestamp?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          details?: string | null
+          id?: string
+          timestamp?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "app_audit_logs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "app_users"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       app_availability_rules: {
         Row: {
@@ -129,12 +178,18 @@ export type Database = {
       app_bookings: {
         Row: {
           actor_id: string | null
+          block_id: string | null
+          booking_status: Database["public"]["Enums"]["booking_status"] | null
+          booking_type: Database["public"]["Enums"]["booking_type"] | null
+          comment: string | null
           created_at: string | null
           end_date_time: string
           id: string
           location_id: string | null
           metadata: Json | null
           price: number | null
+          signed: boolean | null
+          signed_at: string | null
           start_date_time: string
           status: string | null
           type: string
@@ -144,12 +199,18 @@ export type Database = {
         }
         Insert: {
           actor_id?: string | null
+          block_id?: string | null
+          booking_status?: Database["public"]["Enums"]["booking_status"] | null
+          booking_type?: Database["public"]["Enums"]["booking_type"] | null
+          comment?: string | null
           created_at?: string | null
           end_date_time: string
           id?: string
           location_id?: string | null
           metadata?: Json | null
           price?: number | null
+          signed?: boolean | null
+          signed_at?: string | null
           start_date_time: string
           status?: string | null
           type: string
@@ -159,12 +220,18 @@ export type Database = {
         }
         Update: {
           actor_id?: string | null
+          block_id?: string | null
+          booking_status?: Database["public"]["Enums"]["booking_status"] | null
+          booking_type?: Database["public"]["Enums"]["booking_type"] | null
+          comment?: string | null
           created_at?: string | null
           end_date_time?: string
           id?: string
           location_id?: string | null
           metadata?: Json | null
           price?: number | null
+          signed?: boolean | null
+          signed_at?: string | null
           start_date_time?: string
           status?: string | null
           type?: string
@@ -178,6 +245,13 @@ export type Database = {
             columns: ["actor_id"]
             isOneToOne: false
             referencedRelation: "app_actors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "app_bookings_block_id_fkey"
+            columns: ["block_id"]
+            isOneToOne: false
+            referencedRelation: "app_calendar_blocks"
             referencedColumns: ["id"]
           },
           {
@@ -199,6 +273,92 @@ export type Database = {
             columns: ["zone_id"]
             isOneToOne: false
             referencedRelation: "app_zones"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      app_calendar_blocks: {
+        Row: {
+          block_type: Database["public"]["Enums"]["block_type"]
+          booking_id: string | null
+          calendar_id: string
+          created_at: string | null
+          end_time: string
+          id: string
+          is_available: boolean | null
+          start_time: string
+          updated_at: string | null
+        }
+        Insert: {
+          block_type: Database["public"]["Enums"]["block_type"]
+          booking_id?: string | null
+          calendar_id: string
+          created_at?: string | null
+          end_time: string
+          id?: string
+          is_available?: boolean | null
+          start_time: string
+          updated_at?: string | null
+        }
+        Update: {
+          block_type?: Database["public"]["Enums"]["block_type"]
+          booking_id?: string | null
+          calendar_id?: string
+          created_at?: string | null
+          end_time?: string
+          id?: string
+          is_available?: boolean | null
+          start_time?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "app_calendar_blocks_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "app_bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "app_calendar_blocks_calendar_id_fkey"
+            columns: ["calendar_id"]
+            isOneToOne: false
+            referencedRelation: "app_calendars"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      app_calendars: {
+        Row: {
+          created_at: string | null
+          date: string
+          id: string
+          location_id: string
+          slot_length: number
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          date: string
+          id?: string
+          location_id: string
+          slot_length?: number
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          date?: string
+          id?: string
+          location_id?: string
+          slot_length?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "app_calendars_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "app_locations"
             referencedColumns: ["id"]
           },
         ]
@@ -345,6 +505,42 @@ export type Database = {
           },
         ]
       }
+      app_location_caseworkers: {
+        Row: {
+          created_at: string | null
+          id: string
+          location_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          location_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          location_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "app_location_caseworkers_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "app_locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "app_location_caseworkers_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "app_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       app_location_images: {
         Row: {
           alt_text: string | null
@@ -408,11 +604,17 @@ export type Database = {
       app_locations: {
         Row: {
           address: string
+          capacity: number | null
           code: string
+          contact_email: string | null
+          contact_phone: string | null
           created_at: string | null
           description: Json | null
+          facilities: string[] | null
           id: string
+          is_published: boolean | null
           latitude: number | null
+          location_type: string | null
           longitude: number | null
           metadata: Json | null
           name: Json
@@ -420,11 +622,17 @@ export type Database = {
         }
         Insert: {
           address: string
+          capacity?: number | null
           code: string
+          contact_email?: string | null
+          contact_phone?: string | null
           created_at?: string | null
           description?: Json | null
+          facilities?: string[] | null
           id?: string
+          is_published?: boolean | null
           latitude?: number | null
+          location_type?: string | null
           longitude?: number | null
           metadata?: Json | null
           name: Json
@@ -432,11 +640,17 @@ export type Database = {
         }
         Update: {
           address?: string
+          capacity?: number | null
           code?: string
+          contact_email?: string | null
+          contact_phone?: string | null
           created_at?: string | null
           description?: Json | null
+          facilities?: string[] | null
           id?: string
+          is_published?: boolean | null
           latitude?: number | null
+          location_type?: string | null
           longitude?: number | null
           metadata?: Json | null
           name?: Json
@@ -716,7 +930,9 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      block_type: "STROTIME" | "FASTLÅN" | "RAMMETID" | "SPERRET"
+      booking_status: "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED"
+      booking_type: "ENGANG" | "FAST"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -831,6 +1047,10 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      block_type: ["STROTIME", "FASTLÅN", "RAMMETID", "SPERRET"],
+      booking_status: ["PENDING", "APPROVED", "REJECTED", "CANCELLED"],
+      booking_type: ["ENGANG", "FAST"],
+    },
   },
 } as const

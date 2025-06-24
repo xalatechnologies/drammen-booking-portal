@@ -8,3 +8,9 @@ export interface TranslationKey {
   defaultValue?: string;
   params?: TranslationParams;
 }
+
+export type Language = 'NO' | 'EN';
+
+export interface TranslationFunction {
+  (key: string, params?: TranslationParams): string;
+}
