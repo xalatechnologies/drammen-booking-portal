@@ -21,9 +21,11 @@ export interface StrotimeSlot {
   created_at: string;
 }
 
-export function useStrotimeSlots(facilityId?: number, date?: string) {
+export function useStrotimeSlots(facilityId?: number | string, date?: string) {
+  const numericFacilityId = typeof facilityId === 'string' ? parseInt(facilityId, 10) : facilityId;
+  
   return useQuery({
-    queryKey: ['strotime-slots', facilityId, date],
+    queryKey: ['strotime-slots', numericFacilityId, date],
     queryFn: async () => {
       let query = supabase
         .from('strotime_slots')
@@ -32,8 +34,8 @@ export function useStrotimeSlots(facilityId?: number, date?: string) {
         .order('slot_date', { ascending: true })
         .order('start_time', { ascending: true });
 
-      if (facilityId) {
-        query = query.eq('facility_id', facilityId);
+      if (numericFacilityId) {
+        query = query.eq('facility_id', numericFacilityId);
       }
 
       if (date) {
@@ -53,6 +55,6 @@ export function useStrotimeSlots(facilityId?: number, date?: string) {
   });
 }
 
-export function useStrotimeSlotsByFacility(facilityId: number) {
+export function useStrotimeSlotsByFacility(facilityId: number | string) {
   return useStrotimeSlots(facilityId);
 }

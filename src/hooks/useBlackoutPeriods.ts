@@ -13,17 +13,19 @@ export interface BlackoutPeriod {
   created_at: string;
 }
 
-export function useBlackoutPeriods(facilityId?: number) {
+export function useBlackoutPeriods(facilityId?: number | string) {
+  const numericFacilityId = typeof facilityId === 'string' ? parseInt(facilityId, 10) : facilityId;
+  
   return useQuery({
-    queryKey: ['blackout-periods', facilityId],
+    queryKey: ['blackout-periods', numericFacilityId],
     queryFn: async () => {
       let query = supabase
         .from('facility_blackout_periods')
         .select('*')
         .order('start_date');
 
-      if (facilityId) {
-        query = query.eq('facility_id', facilityId);
+      if (numericFacilityId) {
+        query = query.eq('facility_id', numericFacilityId);
       }
 
       const { data, error } = await query;
@@ -39,6 +41,6 @@ export function useBlackoutPeriods(facilityId?: number) {
   });
 }
 
-export function useBlackoutPeriodsByFacility(facilityId: number) {
+export function useBlackoutPeriodsByFacility(facilityId: number | string) {
   return useBlackoutPeriods(facilityId);
 }
