@@ -37,6 +37,16 @@ const getLocalizedText = (value: any, fallback: string = 'Unknown'): string => {
   return fallback;
 };
 
+const normalizeStatus = (status: string): 'active' | 'maintenance' | 'inactive' => {
+  const validStatuses: ('active' | 'maintenance' | 'inactive')[] = ['active', 'maintenance', 'inactive'];
+  return validStatuses.includes(status as any) ? status as any : 'active';
+};
+
+const normalizeBookingTypes = (types: string[]): ('engangs' | 'fastlan' | 'rammetid' | 'strotimer')[] => {
+  const validTypes: ('engangs' | 'fastlan' | 'rammetid' | 'strotimer')[] = ['engangs', 'fastlan', 'rammetid', 'strotimer'];
+  return types.filter(type => validTypes.includes(type as any)) as any[] || ['engangs'];
+};
+
 export class FacilityRepository extends SupabaseRepository<Facility> {
   protected tableName = 'app_locations';
 
@@ -55,7 +65,10 @@ export class FacilityRepository extends SupabaseRepository<Facility> {
             id,
             image_url,
             alt_text,
-            is_featured
+            is_featured,
+            display_order,
+            uploaded_at,
+            created_at
           )
         `, { count: 'exact' })
         .eq('is_published', true);
@@ -94,7 +107,7 @@ export class FacilityRepository extends SupabaseRepository<Facility> {
         address_postal_code: '',
         address_country: 'Norway',
         type: location.location_type || 'facility',
-        status: location.status || 'active',
+        status: normalizeStatus(location.status || 'active'),
         image_url: location.app_location_images?.[0]?.image_url || null,
         capacity: location.capacity || 0,
         area: location.address || '',
@@ -110,7 +123,7 @@ export class FacilityRepository extends SupabaseRepository<Facility> {
         longitude: location.longitude || null,
         accessibility_features: location.accessibility_features || [],
         equipment: location.equipment || [],
-        allowed_booking_types: location.allowed_booking_types || ['engangs'],
+        allowed_booking_types: normalizeBookingTypes(location.allowed_booking_types || ['engangs']),
         season_from: location.season_from || null,
         season_to: location.season_to || null,
         contact_name: location.contact_name || null,
@@ -123,7 +136,7 @@ export class FacilityRepository extends SupabaseRepository<Facility> {
         created_at: location.created_at,
         updated_at: location.updated_at,
         area_sqm: location.area_sqm || null,
-        // Computed/derived fields for backwards compatibility
+        // Computed/derived fields for backwards compatibility - all required to avoid conflicts
         address: location.address || '',
         image: location.app_location_images?.[0]?.image_url || '',
         pricePerHour: location.price_per_hour || 450,
@@ -133,8 +146,26 @@ export class FacilityRepository extends SupabaseRepository<Facility> {
         nextAvailable: location.next_available || '',
         openingHours: [],
         zones: [],
-        featuredImage: location.app_location_images?.find((img: any) => img.is_featured) || undefined,
-        images: location.app_location_images || [],
+        featuredImage: location.app_location_images?.find((img: any) => img.is_featured) ? {
+          id: location.app_location_images.find((img: any) => img.is_featured).id,
+          facility_id: parseInt(location.id),
+          image_url: location.app_location_images.find((img: any) => img.is_featured).image_url,
+          alt_text: location.app_location_images.find((img: any) => img.is_featured).alt_text || '',
+          display_order: location.app_location_images.find((img: any) => img.is_featured).display_order || 0,
+          is_featured: true,
+          uploaded_at: location.app_location_images.find((img: any) => img.is_featured).uploaded_at || location.created_at,
+          created_at: location.app_location_images.find((img: any) => img.is_featured).created_at || location.created_at
+        } : undefined,
+        images: (location.app_location_images || []).map((img: any) => ({
+          id: img.id,
+          facility_id: parseInt(location.id),
+          image_url: img.image_url,
+          alt_text: img.alt_text || '',
+          display_order: img.display_order || 0,
+          is_featured: img.is_featured || false,
+          uploaded_at: img.uploaded_at || location.created_at,
+          created_at: img.created_at || location.created_at
+        })),
         timeSlotDuration: location.time_slot_duration === 60 ? 1 : 2,
         availableTimes: [],
         season: {
@@ -180,7 +211,10 @@ export class FacilityRepository extends SupabaseRepository<Facility> {
             id,
             image_url,
             alt_text,
-            is_featured
+            is_featured,
+            display_order,
+            uploaded_at,
+            created_at
           )
         `)
         .eq('id', id)
@@ -205,7 +239,7 @@ export class FacilityRepository extends SupabaseRepository<Facility> {
         address_postal_code: '',
         address_country: 'Norway',
         type: data.location_type || 'facility',
-        status: data.status || 'active',
+        status: normalizeStatus(data.status || 'active'),
         image_url: data.app_location_images?.[0]?.image_url || null,
         capacity: data.capacity || 0,
         area: data.address || '',
@@ -221,7 +255,7 @@ export class FacilityRepository extends SupabaseRepository<Facility> {
         longitude: data.longitude || null,
         accessibility_features: data.accessibility_features || [],
         equipment: data.equipment || [],
-        allowed_booking_types: data.allowed_booking_types || ['engangs'],
+        allowed_booking_types: normalizeBookingTypes(data.allowed_booking_types || ['engangs']),
         season_from: data.season_from || null,
         season_to: data.season_to || null,
         contact_name: data.contact_name || null,
@@ -234,7 +268,7 @@ export class FacilityRepository extends SupabaseRepository<Facility> {
         created_at: data.created_at,
         updated_at: data.updated_at,
         area_sqm: data.area_sqm || null,
-        // Computed/derived fields for backwards compatibility
+        // Computed/derived fields for backwards compatibility - all required to avoid conflicts
         address: data.address || '',
         image: data.app_location_images?.[0]?.image_url || '',
         pricePerHour: data.price_per_hour || 450,
@@ -244,8 +278,26 @@ export class FacilityRepository extends SupabaseRepository<Facility> {
         nextAvailable: data.next_available || '',
         openingHours: [],
         zones: [],
-        featuredImage: data.app_location_images?.find((img: any) => img.is_featured) || undefined,
-        images: data.app_location_images || [],
+        featuredImage: data.app_location_images?.find((img: any) => img.is_featured) ? {
+          id: data.app_location_images.find((img: any) => img.is_featured).id,
+          facility_id: parseInt(data.id),
+          image_url: data.app_location_images.find((img: any) => img.is_featured).image_url,
+          alt_text: data.app_location_images.find((img: any) => img.is_featured).alt_text || '',
+          display_order: data.app_location_images.find((img: any) => img.is_featured).display_order || 0,
+          is_featured: true,
+          uploaded_at: data.app_location_images.find((img: any) => img.is_featured).uploaded_at || data.created_at,
+          created_at: data.app_location_images.find((img: any) => img.is_featured).created_at || data.created_at
+        } : undefined,
+        images: (data.app_location_images || []).map((img: any) => ({
+          id: img.id,
+          facility_id: parseInt(data.id),
+          image_url: img.image_url,
+          alt_text: img.alt_text || '',
+          display_order: img.display_order || 0,
+          is_featured: img.is_featured || false,
+          uploaded_at: img.uploaded_at || data.created_at,
+          created_at: img.created_at || data.created_at
+        })),
         timeSlotDuration: data.time_slot_duration === 60 ? 1 : 2,
         availableTimes: [],
         season: {

@@ -39,11 +39,11 @@ export const FacilityManagementTabs: React.FC<FacilityManagementTabsProps> = ({
         </TabsContent>
 
         <TabsContent value="zones" className="space-y-4">
-          <ZoneManagementView selectedFacilityId={selectedFacilityId} />
+          <ZoneManagementView selectedFacilityId={selectedFacilityId?.toString()} />
         </TabsContent>
 
         <TabsContent value="hours" className="space-y-4">
-          <OpeningHoursManagement selectedFacilityId={selectedFacilityId} />
+          <OpeningHoursManagement selectedFacilityId={selectedFacilityId?.toString()} />
         </TabsContent>
 
         <TabsContent value="blackouts" className="space-y-4">
@@ -53,11 +53,11 @@ export const FacilityManagementTabs: React.FC<FacilityManagementTabsProps> = ({
         </TabsContent>
 
         <TabsContent value="pricing" className="space-y-4">
-          <PricingRulesManagement selectedFacilityId={selectedFacilityId} />
+          <PricingRulesManagement selectedFacilityId={selectedFacilityId?.toString()} />
         </TabsContent>
 
         <TabsContent value="analytics" className="space-y-4">
-          <FacilityAnalyticsDashboard selectedFacilityId={selectedFacilityId} />
+          <FacilityAnalyticsDashboard selectedFacilityId={selectedFacilityId?.toString()} />
         </TabsContent>
 
         <TabsContent value="settings" className="space-y-4">
