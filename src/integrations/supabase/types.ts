@@ -9,1080 +9,596 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      additional_services: {
+      app_actor_memberships: {
         Row: {
-          advance_booking_hours: number | null
-          advance_booking_required: boolean
-          availability_schedule: Json | null
-          base_price: number
-          booking_notes: string | null
-          cancellation_policy: string | null
-          category: Database["public"]["Enums"]["service_category"]
-          created_at: string
-          description: string | null
-          equipment_required: string[] | null
-          external_provider: string | null
+          actor_id: string | null
+          created_at: string | null
           id: string
-          is_active: boolean
-          maximum_quantity: number | null
-          minimum_quantity: number | null
-          name: string
-          pricing_model: string
-          staff_required: boolean
-          unit: string | null
-          updated_at: string
+          role: string | null
+          user_id: string | null
         }
         Insert: {
-          advance_booking_hours?: number | null
-          advance_booking_required?: boolean
-          availability_schedule?: Json | null
-          base_price?: number
-          booking_notes?: string | null
-          cancellation_policy?: string | null
-          category: Database["public"]["Enums"]["service_category"]
-          created_at?: string
-          description?: string | null
-          equipment_required?: string[] | null
-          external_provider?: string | null
+          actor_id?: string | null
+          created_at?: string | null
           id?: string
-          is_active?: boolean
-          maximum_quantity?: number | null
-          minimum_quantity?: number | null
-          name: string
-          pricing_model?: string
-          staff_required?: boolean
-          unit?: string | null
-          updated_at?: string
+          role?: string | null
+          user_id?: string | null
         }
         Update: {
-          advance_booking_hours?: number | null
-          advance_booking_required?: boolean
-          availability_schedule?: Json | null
-          base_price?: number
-          booking_notes?: string | null
-          cancellation_policy?: string | null
-          category?: Database["public"]["Enums"]["service_category"]
-          created_at?: string
-          description?: string | null
-          equipment_required?: string[] | null
-          external_provider?: string | null
+          actor_id?: string | null
+          created_at?: string | null
           id?: string
-          is_active?: boolean
-          maximum_quantity?: number | null
-          minimum_quantity?: number | null
-          name?: string
-          pricing_model?: string
-          staff_required?: boolean
-          unit?: string | null
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      approval_decisions: {
-        Row: {
-          approval_request_id: string
-          approver_id: string
-          comments: string | null
-          deadline: string | null
-          decided_at: string
-          decision: string
-          id: string
-          step_number: number
-        }
-        Insert: {
-          approval_request_id: string
-          approver_id: string
-          comments?: string | null
-          deadline?: string | null
-          decided_at?: string
-          decision: string
-          id?: string
-          step_number: number
-        }
-        Update: {
-          approval_request_id?: string
-          approver_id?: string
-          comments?: string | null
-          deadline?: string | null
-          decided_at?: string
-          decision?: string
-          id?: string
-          step_number?: number
+          role?: string | null
+          user_id?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "approval_decisions_approval_request_id_fkey"
-            columns: ["approval_request_id"]
+            foreignKeyName: "app_actor_memberships_actor_id_fkey"
+            columns: ["actor_id"]
             isOneToOne: false
-            referencedRelation: "approval_requests"
+            referencedRelation: "app_actors"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "approval_decisions_approver_id_fkey"
-            columns: ["approver_id"]
+            foreignKeyName: "app_actor_memberships_user_id_fkey"
+            columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: "profiles"
+            referencedRelation: "app_users"
             referencedColumns: ["id"]
           },
         ]
       }
-      approval_requests: {
+      app_actors: {
         Row: {
-          booking_id: string
-          completed_at: string | null
-          current_step: number
-          escalated_at: string | null
+          contact_info: Json | null
+          created_at: string | null
           id: string
-          notes: string | null
-          priority: Database["public"]["Enums"]["approval_priority"]
-          requested_at: string
-          requested_by: string
-          status: Database["public"]["Enums"]["approval_status"]
-          workflow_id: string
+          is_paraply: boolean | null
+          metadata: Json | null
+          name: Json
+          org_number: string | null
+          parent_actor_id: string | null
+          type: string
+          updated_at: string | null
         }
         Insert: {
-          booking_id: string
-          completed_at?: string | null
-          current_step?: number
-          escalated_at?: string | null
+          contact_info?: Json | null
+          created_at?: string | null
           id?: string
-          notes?: string | null
-          priority?: Database["public"]["Enums"]["approval_priority"]
-          requested_at?: string
-          requested_by: string
-          status?: Database["public"]["Enums"]["approval_status"]
-          workflow_id: string
+          is_paraply?: boolean | null
+          metadata?: Json | null
+          name: Json
+          org_number?: string | null
+          parent_actor_id?: string | null
+          type: string
+          updated_at?: string | null
         }
         Update: {
-          booking_id?: string
-          completed_at?: string | null
-          current_step?: number
-          escalated_at?: string | null
+          contact_info?: Json | null
+          created_at?: string | null
           id?: string
-          notes?: string | null
-          priority?: Database["public"]["Enums"]["approval_priority"]
-          requested_at?: string
-          requested_by?: string
-          status?: Database["public"]["Enums"]["approval_status"]
-          workflow_id?: string
+          is_paraply?: boolean | null
+          metadata?: Json | null
+          name?: Json
+          org_number?: string | null
+          parent_actor_id?: string | null
+          type?: string
+          updated_at?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "approval_requests_booking_id_fkey"
-            columns: ["booking_id"]
+            foreignKeyName: "app_actors_parent_actor_id_fkey"
+            columns: ["parent_actor_id"]
             isOneToOne: false
-            referencedRelation: "bookings"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "approval_requests_requested_by_fkey"
-            columns: ["requested_by"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "approval_requests_workflow_id_fkey"
-            columns: ["workflow_id"]
-            isOneToOne: false
-            referencedRelation: "approval_workflows"
+            referencedRelation: "app_actors"
             referencedColumns: ["id"]
           },
         ]
       }
-      approval_workflow_steps: {
-        Row: {
-          approver_role: Database["public"]["Enums"]["user_role"] | null
-          approver_user_id: string | null
-          auto_approve_conditions: Json | null
-          created_at: string
-          deadline_hours: number | null
-          escalate_to_role: Database["public"]["Enums"]["user_role"] | null
-          escalate_to_user_id: string | null
-          escalation_hours: number | null
-          id: string
-          is_required: boolean
-          step_name: string
-          step_number: number
-          workflow_id: string
-        }
-        Insert: {
-          approver_role?: Database["public"]["Enums"]["user_role"] | null
-          approver_user_id?: string | null
-          auto_approve_conditions?: Json | null
-          created_at?: string
-          deadline_hours?: number | null
-          escalate_to_role?: Database["public"]["Enums"]["user_role"] | null
-          escalate_to_user_id?: string | null
-          escalation_hours?: number | null
-          id?: string
-          is_required?: boolean
-          step_name: string
-          step_number: number
-          workflow_id: string
-        }
-        Update: {
-          approver_role?: Database["public"]["Enums"]["user_role"] | null
-          approver_user_id?: string | null
-          auto_approve_conditions?: Json | null
-          created_at?: string
-          deadline_hours?: number | null
-          escalate_to_role?: Database["public"]["Enums"]["user_role"] | null
-          escalate_to_user_id?: string | null
-          escalation_hours?: number | null
-          id?: string
-          is_required?: boolean
-          step_name?: string
-          step_number?: number
-          workflow_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "approval_workflow_steps_approver_user_id_fkey"
-            columns: ["approver_user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "approval_workflow_steps_escalate_to_user_id_fkey"
-            columns: ["escalate_to_user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "approval_workflow_steps_workflow_id_fkey"
-            columns: ["workflow_id"]
-            isOneToOne: false
-            referencedRelation: "approval_workflows"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      approval_workflows: {
-        Row: {
-          created_at: string
-          created_by: string
-          description: string | null
-          id: string
-          is_active: boolean
-          is_default: boolean
-          name: string
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          created_by: string
-          description?: string | null
-          id?: string
-          is_active?: boolean
-          is_default?: boolean
-          name: string
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          created_by?: string
-          description?: string | null
-          id?: string
-          is_active?: boolean
-          is_default?: boolean
-          name?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "approval_workflows_created_by_fkey"
-            columns: ["created_by"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      audit_logs: {
+      app_audit_logs: {
         Row: {
           action: string
-          created_at: string
+          details: string | null
           id: string
-          ip_address: unknown | null
-          new_values: Json | null
-          old_values: Json | null
-          record_id: string | null
-          session_id: string | null
-          table_name: string
-          user_agent: string | null
+          timestamp: string | null
           user_id: string | null
         }
         Insert: {
           action: string
-          created_at?: string
+          details?: string | null
           id?: string
-          ip_address?: unknown | null
-          new_values?: Json | null
-          old_values?: Json | null
-          record_id?: string | null
-          session_id?: string | null
-          table_name: string
-          user_agent?: string | null
+          timestamp?: string | null
           user_id?: string | null
         }
         Update: {
           action?: string
-          created_at?: string
+          details?: string | null
           id?: string
-          ip_address?: unknown | null
-          new_values?: Json | null
-          old_values?: Json | null
-          record_id?: string | null
-          session_id?: string | null
-          table_name?: string
-          user_agent?: string | null
+          timestamp?: string | null
           user_id?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "audit_logs_user_id_fkey"
+            foreignKeyName: "app_audit_logs_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: "profiles"
+            referencedRelation: "app_users"
             referencedColumns: ["id"]
           },
         ]
       }
-      auto_approval_rules: {
+      app_availability_rules: {
         Row: {
-          action: string
-          conditions: Json
-          created_at: string
+          config: Json
+          created_at: string | null
+          created_by_id: string | null
+          end_date_time: string | null
           id: string
-          is_active: boolean
-          rule_name: string
-          workflow_id: string
+          location_id: string | null
+          start_date_time: string | null
+          type: string
         }
         Insert: {
-          action: string
-          conditions: Json
-          created_at?: string
+          config: Json
+          created_at?: string | null
+          created_by_id?: string | null
+          end_date_time?: string | null
           id?: string
-          is_active?: boolean
-          rule_name: string
-          workflow_id: string
+          location_id?: string | null
+          start_date_time?: string | null
+          type: string
         }
         Update: {
-          action?: string
-          conditions?: Json
-          created_at?: string
+          config?: Json
+          created_at?: string | null
+          created_by_id?: string | null
+          end_date_time?: string | null
           id?: string
-          is_active?: boolean
-          rule_name?: string
-          workflow_id?: string
+          location_id?: string | null
+          start_date_time?: string | null
+          type?: string
         }
         Relationships: [
           {
-            foreignKeyName: "auto_approval_rules_workflow_id_fkey"
-            columns: ["workflow_id"]
+            foreignKeyName: "app_availability_rules_created_by_id_fkey"
+            columns: ["created_by_id"]
             isOneToOne: false
-            referencedRelation: "approval_workflows"
+            referencedRelation: "app_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "app_availability_rules_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "app_locations"
             referencedColumns: ["id"]
           },
         ]
       }
-      booking_attachments: {
+      app_booking_services: {
         Row: {
           booking_id: string
-          file_name: string
-          file_size: number
-          file_url: string
-          id: string
-          mime_type: string
-          uploaded_at: string
-          uploaded_by: string
-        }
-        Insert: {
-          booking_id: string
-          file_name: string
-          file_size: number
-          file_url: string
-          id?: string
-          mime_type: string
-          uploaded_at?: string
-          uploaded_by: string
-        }
-        Update: {
-          booking_id?: string
-          file_name?: string
-          file_size?: number
-          file_url?: string
-          id?: string
-          mime_type?: string
-          uploaded_at?: string
-          uploaded_by?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "booking_attachments_booking_id_fkey"
-            columns: ["booking_id"]
-            isOneToOne: false
-            referencedRelation: "bookings"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "booking_attachments_uploaded_by_fkey"
-            columns: ["uploaded_by"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      booking_conflicts: {
-        Row: {
-          booking_id: string
-          conflict_description: string | null
-          conflict_severity: string
-          conflict_type: string
-          conflicting_booking_id: string | null
-          created_at: string
-          id: string
-          resolution_notes: string | null
-          resolved: boolean
-          resolved_at: string | null
-          resolved_by: string | null
-        }
-        Insert: {
-          booking_id: string
-          conflict_description?: string | null
-          conflict_severity?: string
-          conflict_type: string
-          conflicting_booking_id?: string | null
-          created_at?: string
-          id?: string
-          resolution_notes?: string | null
-          resolved?: boolean
-          resolved_at?: string | null
-          resolved_by?: string | null
-        }
-        Update: {
-          booking_id?: string
-          conflict_description?: string | null
-          conflict_severity?: string
-          conflict_type?: string
-          conflicting_booking_id?: string | null
-          created_at?: string
-          id?: string
-          resolution_notes?: string | null
-          resolved?: boolean
-          resolved_at?: string | null
-          resolved_by?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "booking_conflicts_booking_id_fkey"
-            columns: ["booking_id"]
-            isOneToOne: false
-            referencedRelation: "bookings"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "booking_conflicts_conflicting_booking_id_fkey"
-            columns: ["conflicting_booking_id"]
-            isOneToOne: false
-            referencedRelation: "bookings"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "booking_conflicts_resolved_by_fkey"
-            columns: ["resolved_by"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      booking_notes: {
-        Row: {
-          booking_id: string
-          content: string
-          created_at: string
-          id: string
-          is_important: boolean
-          is_internal: boolean
-          user_id: string
-        }
-        Insert: {
-          booking_id: string
-          content: string
-          created_at?: string
-          id?: string
-          is_important?: boolean
-          is_internal?: boolean
-          user_id: string
-        }
-        Update: {
-          booking_id?: string
-          content?: string
-          created_at?: string
-          id?: string
-          is_important?: boolean
-          is_internal?: boolean
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "booking_notes_booking_id_fkey"
-            columns: ["booking_id"]
-            isOneToOne: false
-            referencedRelation: "bookings"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "booking_notes_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      booking_recurrence_exceptions: {
-        Row: {
-          booking_id: string
-          created_at: string
-          exception_date: string
-          exception_type: string
-          id: string
-          new_end_time: string | null
-          new_start_time: string | null
-          new_zone_id: string | null
-          reason: string | null
-        }
-        Insert: {
-          booking_id: string
-          created_at?: string
-          exception_date: string
-          exception_type: string
-          id?: string
-          new_end_time?: string | null
-          new_start_time?: string | null
-          new_zone_id?: string | null
-          reason?: string | null
-        }
-        Update: {
-          booking_id?: string
-          created_at?: string
-          exception_date?: string
-          exception_type?: string
-          id?: string
-          new_end_time?: string | null
-          new_start_time?: string | null
-          new_zone_id?: string | null
-          reason?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "booking_recurrence_exceptions_booking_id_fkey"
-            columns: ["booking_id"]
-            isOneToOne: false
-            referencedRelation: "bookings"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "booking_recurrence_exceptions_new_zone_id_fkey"
-            columns: ["new_zone_id"]
-            isOneToOne: false
-            referencedRelation: "zones"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      booking_recurrence_patterns: {
-        Row: {
-          booking_id: string
-          created_at: string
-          day_of_month: number | null
-          days_of_week: number[] | null
-          end_date: string | null
-          frequency: string
-          id: string
-          interval_value: number
-          max_occurrences: number | null
-          month_of_year: number | null
-          week_of_month: number | null
-        }
-        Insert: {
-          booking_id: string
-          created_at?: string
-          day_of_month?: number | null
-          days_of_week?: number[] | null
-          end_date?: string | null
-          frequency: string
-          id?: string
-          interval_value?: number
-          max_occurrences?: number | null
-          month_of_year?: number | null
-          week_of_month?: number | null
-        }
-        Update: {
-          booking_id?: string
-          created_at?: string
-          day_of_month?: number | null
-          days_of_week?: number[] | null
-          end_date?: string | null
-          frequency?: string
-          id?: string
-          interval_value?: number
-          max_occurrences?: number | null
-          month_of_year?: number | null
-          week_of_month?: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "booking_recurrence_patterns_booking_id_fkey"
-            columns: ["booking_id"]
-            isOneToOne: false
-            referencedRelation: "bookings"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      bookings: {
-        Row: {
-          actor_type: Database["public"]["Enums"]["actor_type"]
-          age_group: Database["public"]["Enums"]["age_group"]
-          approval_status: Database["public"]["Enums"]["approval_status"]
-          approved_at: string | null
-          approved_by: string | null
-          base_price: number
-          booking_reference: string
-          cancellation_reason: string | null
-          cancelled_at: string | null
-          contact_email: string
-          contact_name: string
-          contact_phone: string | null
-          created_at: string
-          description: string | null
-          duration_minutes: number
-          end_date: string
-          event_type: Database["public"]["Enums"]["event_type"]
-          expected_attendees: number
-          facility_id: number
-          id: string
-          internal_notes: string | null
-          no_show_at: string | null
-          organization_id: string | null
-          payment_due_date: string | null
-          payment_status: string
-          purpose: string
-          recurrence_end_date: string | null
-          recurrence_rule: string | null
-          rejection_reason: string | null
-          requires_approval: boolean
-          services_price: number
-          special_requirements: string | null
-          start_date: string
-          status: Database["public"]["Enums"]["booking_status"]
+          created_at: string | null
+          metadata: Json | null
+          quantity: number
+          service_id: string
           total_price: number
-          type: Database["public"]["Enums"]["booking_type"]
-          updated_at: string
-          user_id: string
+          unit_price: number
+        }
+        Insert: {
+          booking_id: string
+          created_at?: string | null
+          metadata?: Json | null
+          quantity?: number
+          service_id: string
+          total_price: number
+          unit_price: number
+        }
+        Update: {
+          booking_id?: string
+          created_at?: string | null
+          metadata?: Json | null
+          quantity?: number
+          service_id?: string
+          total_price?: number
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "app_booking_services_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "app_bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "app_booking_services_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "app_services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      app_bookings: {
+        Row: {
+          actor_id: string | null
+          block_id: string | null
+          booking_status: Database["public"]["Enums"]["booking_status"] | null
+          booking_type: Database["public"]["Enums"]["booking_type"] | null
+          comment: string | null
+          created_at: string | null
+          end_date_time: string
+          id: string
+          location_id: string | null
+          metadata: Json | null
+          price: number | null
+          signed: boolean | null
+          signed_at: string | null
+          start_date_time: string
+          status: string | null
+          type: string
+          updated_at: string | null
+          user_id: string | null
           zone_id: string | null
         }
         Insert: {
-          actor_type: Database["public"]["Enums"]["actor_type"]
-          age_group?: Database["public"]["Enums"]["age_group"]
-          approval_status?: Database["public"]["Enums"]["approval_status"]
-          approved_at?: string | null
-          approved_by?: string | null
-          base_price?: number
-          booking_reference: string
-          cancellation_reason?: string | null
-          cancelled_at?: string | null
-          contact_email: string
-          contact_name: string
-          contact_phone?: string | null
-          created_at?: string
-          description?: string | null
-          duration_minutes: number
-          end_date: string
-          event_type?: Database["public"]["Enums"]["event_type"]
-          expected_attendees?: number
-          facility_id: number
+          actor_id?: string | null
+          block_id?: string | null
+          booking_status?: Database["public"]["Enums"]["booking_status"] | null
+          booking_type?: Database["public"]["Enums"]["booking_type"] | null
+          comment?: string | null
+          created_at?: string | null
+          end_date_time: string
           id?: string
-          internal_notes?: string | null
-          no_show_at?: string | null
-          organization_id?: string | null
-          payment_due_date?: string | null
-          payment_status?: string
-          purpose: string
-          recurrence_end_date?: string | null
-          recurrence_rule?: string | null
-          rejection_reason?: string | null
-          requires_approval?: boolean
-          services_price?: number
-          special_requirements?: string | null
-          start_date: string
-          status?: Database["public"]["Enums"]["booking_status"]
-          total_price?: number
-          type?: Database["public"]["Enums"]["booking_type"]
-          updated_at?: string
-          user_id: string
+          location_id?: string | null
+          metadata?: Json | null
+          price?: number | null
+          signed?: boolean | null
+          signed_at?: string | null
+          start_date_time: string
+          status?: string | null
+          type: string
+          updated_at?: string | null
+          user_id?: string | null
           zone_id?: string | null
         }
         Update: {
-          actor_type?: Database["public"]["Enums"]["actor_type"]
-          age_group?: Database["public"]["Enums"]["age_group"]
-          approval_status?: Database["public"]["Enums"]["approval_status"]
-          approved_at?: string | null
-          approved_by?: string | null
-          base_price?: number
-          booking_reference?: string
-          cancellation_reason?: string | null
-          cancelled_at?: string | null
-          contact_email?: string
-          contact_name?: string
-          contact_phone?: string | null
-          created_at?: string
-          description?: string | null
-          duration_minutes?: number
-          end_date?: string
-          event_type?: Database["public"]["Enums"]["event_type"]
-          expected_attendees?: number
-          facility_id?: number
+          actor_id?: string | null
+          block_id?: string | null
+          booking_status?: Database["public"]["Enums"]["booking_status"] | null
+          booking_type?: Database["public"]["Enums"]["booking_type"] | null
+          comment?: string | null
+          created_at?: string | null
+          end_date_time?: string
           id?: string
-          internal_notes?: string | null
-          no_show_at?: string | null
-          organization_id?: string | null
-          payment_due_date?: string | null
-          payment_status?: string
-          purpose?: string
-          recurrence_end_date?: string | null
-          recurrence_rule?: string | null
-          rejection_reason?: string | null
-          requires_approval?: boolean
-          services_price?: number
-          special_requirements?: string | null
-          start_date?: string
-          status?: Database["public"]["Enums"]["booking_status"]
-          total_price?: number
-          type?: Database["public"]["Enums"]["booking_type"]
-          updated_at?: string
-          user_id?: string
+          location_id?: string | null
+          metadata?: Json | null
+          price?: number | null
+          signed?: boolean | null
+          signed_at?: string | null
+          start_date_time?: string
+          status?: string | null
+          type?: string
+          updated_at?: string | null
+          user_id?: string | null
           zone_id?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "bookings_approved_by_fkey"
-            columns: ["approved_by"]
+            foreignKeyName: "app_bookings_actor_id_fkey"
+            columns: ["actor_id"]
             isOneToOne: false
-            referencedRelation: "profiles"
+            referencedRelation: "app_actors"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "bookings_facility_id_fkey"
-            columns: ["facility_id"]
+            foreignKeyName: "app_bookings_block_id_fkey"
+            columns: ["block_id"]
             isOneToOne: false
-            referencedRelation: "facilities"
+            referencedRelation: "app_calendar_blocks"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "bookings_organization_id_fkey"
-            columns: ["organization_id"]
+            foreignKeyName: "app_bookings_location_id_fkey"
+            columns: ["location_id"]
             isOneToOne: false
-            referencedRelation: "organizations"
+            referencedRelation: "app_locations"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "bookings_user_id_fkey"
+            foreignKeyName: "app_bookings_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: "profiles"
+            referencedRelation: "app_users"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "bookings_zone_id_fkey"
+            foreignKeyName: "app_bookings_zone_id_fkey"
             columns: ["zone_id"]
             isOneToOne: false
-            referencedRelation: "zones"
+            referencedRelation: "app_zones"
             referencedColumns: ["id"]
           },
         ]
       }
-      enum_categories: {
+      app_calendar_blocks: {
         Row: {
-          description: string | null
-          display_order: number
-          enum_types: string[]
-          id: string
-          is_active: boolean
-          name: string
-        }
-        Insert: {
-          description?: string | null
-          display_order?: number
-          enum_types: string[]
-          id?: string
-          is_active?: boolean
-          name: string
-        }
-        Update: {
-          description?: string | null
-          display_order?: number
-          enum_types?: string[]
-          id?: string
-          is_active?: boolean
-          name?: string
-        }
-        Relationships: []
-      }
-      enum_translations: {
-        Row: {
-          created_at: string
-          description: string | null
-          enum_id: string
-          id: string
-          label: string
-          language_code: Database["public"]["Enums"]["language_code"]
-          short_label: string | null
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          description?: string | null
-          enum_id: string
-          id?: string
-          label: string
-          language_code: Database["public"]["Enums"]["language_code"]
-          short_label?: string | null
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          description?: string | null
-          enum_id?: string
-          id?: string
-          label?: string
-          language_code?: Database["public"]["Enums"]["language_code"]
-          short_label?: string | null
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "enum_translations_enum_id_fkey"
-            columns: ["enum_id"]
-            isOneToOne: false
-            referencedRelation: "system_enums"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      facilities: {
-        Row: {
-          accessibility_features: string[] | null
-          address_city: string
-          address_country: string
-          address_postal_code: string
-          address_street: string
-          allowed_booking_types: Database["public"]["Enums"]["booking_type"][]
-          amenities: string[] | null
-          area: string
-          area_sqm: number | null
-          booking_lead_time_hours: number
-          cancellation_deadline_hours: number
-          capacity: number
-          contact_email: string | null
-          contact_name: string | null
-          contact_phone: string | null
-          created_at: string
-          description: string | null
-          equipment: string[] | null
-          has_auto_approval: boolean
-          id: number
-          is_featured: boolean
-          latitude: number | null
-          longitude: number | null
-          max_advance_booking_days: number
-          name: string
-          next_available: string | null
-          price_per_hour: number
-          rating: number | null
-          review_count: number | null
-          season_from: string | null
-          season_to: string | null
-          status: Database["public"]["Enums"]["facility_status"]
-          time_slot_duration: number
-          type: string
-          updated_at: string
-        }
-        Insert: {
-          accessibility_features?: string[] | null
-          address_city: string
-          address_country?: string
-          address_postal_code: string
-          address_street: string
-          allowed_booking_types?: Database["public"]["Enums"]["booking_type"][]
-          amenities?: string[] | null
-          area: string
-          area_sqm?: number | null
-          booking_lead_time_hours?: number
-          cancellation_deadline_hours?: number
-          capacity?: number
-          contact_email?: string | null
-          contact_name?: string | null
-          contact_phone?: string | null
-          created_at?: string
-          description?: string | null
-          equipment?: string[] | null
-          has_auto_approval?: boolean
-          id?: number
-          is_featured?: boolean
-          latitude?: number | null
-          longitude?: number | null
-          max_advance_booking_days?: number
-          name: string
-          next_available?: string | null
-          price_per_hour?: number
-          rating?: number | null
-          review_count?: number | null
-          season_from?: string | null
-          season_to?: string | null
-          status?: Database["public"]["Enums"]["facility_status"]
-          time_slot_duration?: number
-          type: string
-          updated_at?: string
-        }
-        Update: {
-          accessibility_features?: string[] | null
-          address_city?: string
-          address_country?: string
-          address_postal_code?: string
-          address_street?: string
-          allowed_booking_types?: Database["public"]["Enums"]["booking_type"][]
-          amenities?: string[] | null
-          area?: string
-          area_sqm?: number | null
-          booking_lead_time_hours?: number
-          cancellation_deadline_hours?: number
-          capacity?: number
-          contact_email?: string | null
-          contact_name?: string | null
-          contact_phone?: string | null
-          created_at?: string
-          description?: string | null
-          equipment?: string[] | null
-          has_auto_approval?: boolean
-          id?: number
-          is_featured?: boolean
-          latitude?: number | null
-          longitude?: number | null
-          max_advance_booking_days?: number
-          name?: string
-          next_available?: string | null
-          price_per_hour?: number
-          rating?: number | null
-          review_count?: number | null
-          season_from?: string | null
-          season_to?: string | null
-          status?: Database["public"]["Enums"]["facility_status"]
-          time_slot_duration?: number
-          type?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      facility_blackout_periods: {
-        Row: {
-          created_at: string
-          created_by: string
-          end_date: string
-          facility_id: number
-          id: string
-          reason: string
-          start_date: string
-          type: string
-        }
-        Insert: {
-          created_at?: string
-          created_by: string
-          end_date: string
-          facility_id: number
-          id?: string
-          reason: string
-          start_date: string
-          type?: string
-        }
-        Update: {
-          created_at?: string
-          created_by?: string
-          end_date?: string
-          facility_id?: number
-          id?: string
-          reason?: string
-          start_date?: string
-          type?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "facility_blackout_periods_created_by_fkey"
-            columns: ["created_by"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "facility_blackout_periods_facility_id_fkey"
-            columns: ["facility_id"]
-            isOneToOne: false
-            referencedRelation: "facilities"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      facility_content_keys: {
-        Row: {
-          content_key: string
-          content_type: string
+          block_type: Database["public"]["Enums"]["block_type"]
+          booking_id: string | null
+          calendar_id: string
           created_at: string | null
-          facility_id: number
+          end_time: string
           id: string
+          is_available: boolean | null
+          start_time: string
+          updated_at: string | null
         }
         Insert: {
-          content_key: string
-          content_type: string
+          block_type: Database["public"]["Enums"]["block_type"]
+          booking_id?: string | null
+          calendar_id: string
           created_at?: string | null
-          facility_id: number
+          end_time: string
           id?: string
+          is_available?: boolean | null
+          start_time: string
+          updated_at?: string | null
         }
         Update: {
-          content_key?: string
-          content_type?: string
+          block_type?: Database["public"]["Enums"]["block_type"]
+          booking_id?: string | null
+          calendar_id?: string
           created_at?: string | null
-          facility_id?: number
+          end_time?: string
           id?: string
+          is_available?: boolean | null
+          start_time?: string
+          updated_at?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "facility_content_keys_facility_id_fkey"
-            columns: ["facility_id"]
+            foreignKeyName: "app_calendar_blocks_booking_id_fkey"
+            columns: ["booking_id"]
             isOneToOne: false
-            referencedRelation: "facilities"
+            referencedRelation: "app_bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "app_calendar_blocks_calendar_id_fkey"
+            columns: ["calendar_id"]
+            isOneToOne: false
+            referencedRelation: "app_calendars"
             referencedColumns: ["id"]
           },
         ]
       }
-      facility_images: {
+      app_calendars: {
+        Row: {
+          created_at: string | null
+          date: string
+          id: string
+          location_id: string
+          slot_length: number
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          date: string
+          id?: string
+          location_id: string
+          slot_length?: number
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          date?: string
+          id?: string
+          location_id?: string
+          slot_length?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "app_calendars_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "app_locations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      app_cart_items: {
+        Row: {
+          actor_id: string | null
+          cart_id: string | null
+          created_at: string | null
+          end_date_time: string
+          id: string
+          location_id: string | null
+          metadata: Json | null
+          price: number | null
+          start_date_time: string
+          type: string
+          zone_id: string | null
+        }
+        Insert: {
+          actor_id?: string | null
+          cart_id?: string | null
+          created_at?: string | null
+          end_date_time: string
+          id?: string
+          location_id?: string | null
+          metadata?: Json | null
+          price?: number | null
+          start_date_time: string
+          type: string
+          zone_id?: string | null
+        }
+        Update: {
+          actor_id?: string | null
+          cart_id?: string | null
+          created_at?: string | null
+          end_date_time?: string
+          id?: string
+          location_id?: string | null
+          metadata?: Json | null
+          price?: number | null
+          start_date_time?: string
+          type?: string
+          zone_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "app_cart_items_actor_id_fkey"
+            columns: ["actor_id"]
+            isOneToOne: false
+            referencedRelation: "app_actors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "app_cart_items_cart_id_fkey"
+            columns: ["cart_id"]
+            isOneToOne: false
+            referencedRelation: "app_carts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "app_cart_items_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "app_locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "app_cart_items_zone_id_fkey"
+            columns: ["zone_id"]
+            isOneToOne: false
+            referencedRelation: "app_zones"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      app_carts: {
+        Row: {
+          created_at: string | null
+          id: string
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "app_carts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "app_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      app_feedbacks: {
+        Row: {
+          comment: string | null
+          created_at: string | null
+          id: string
+          location_id: string | null
+          rating: number | null
+          user_id: string | null
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string | null
+          id?: string
+          location_id?: string | null
+          rating?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string | null
+          id?: string
+          location_id?: string | null
+          rating?: number | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "app_feedbacks_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "app_locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "app_feedbacks_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "app_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      app_location_caseworkers: {
+        Row: {
+          created_at: string | null
+          id: string
+          location_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          location_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          location_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "app_location_caseworkers_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "app_locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "app_location_caseworkers_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "app_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      app_location_images: {
         Row: {
           alt_text: string | null
           caption: string | null
           created_at: string
           display_order: number
-          facility_id: number
           file_size: number | null
           id: string
           image_url: string
           is_featured: boolean
-          uploaded_at: string
+          location_id: string
+          updated_at: string
+          uploaded_at: string | null
           uploaded_by: string | null
         }
         Insert: {
@@ -1090,12 +606,13 @@ export type Database = {
           caption?: string | null
           created_at?: string
           display_order?: number
-          facility_id: number
           file_size?: number | null
           id?: string
           image_url: string
           is_featured?: boolean
-          uploaded_at?: string
+          location_id: string
+          updated_at?: string
+          uploaded_at?: string | null
           uploaded_by?: string | null
         }
         Update: {
@@ -1103,1783 +620,391 @@ export type Database = {
           caption?: string | null
           created_at?: string
           display_order?: number
-          facility_id?: number
           file_size?: number | null
           id?: string
           image_url?: string
           is_featured?: boolean
-          uploaded_at?: string
+          location_id?: string
+          updated_at?: string
+          uploaded_at?: string | null
           uploaded_by?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "facility_images_facility_id_fkey"
-            columns: ["facility_id"]
+            foreignKeyName: "app_location_images_location_id_fkey"
+            columns: ["location_id"]
             isOneToOne: false
-            referencedRelation: "facilities"
+            referencedRelation: "app_locations"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "facility_images_uploaded_by_fkey"
+            foreignKeyName: "app_location_images_uploaded_by_fkey"
             columns: ["uploaded_by"]
             isOneToOne: false
-            referencedRelation: "profiles"
+            referencedRelation: "app_users"
             referencedColumns: ["id"]
           },
         ]
       }
-      facility_opening_hours: {
+      app_locations: {
         Row: {
-          close_time: string
-          created_at: string
-          day_of_week: number
-          facility_id: number
-          id: string
-          is_open: boolean
-          open_time: string
-          valid_from: string | null
-          valid_to: string | null
-        }
-        Insert: {
-          close_time: string
-          created_at?: string
-          day_of_week: number
-          facility_id: number
-          id?: string
-          is_open?: boolean
-          open_time: string
-          valid_from?: string | null
-          valid_to?: string | null
-        }
-        Update: {
-          close_time?: string
-          created_at?: string
-          day_of_week?: number
-          facility_id?: number
-          id?: string
-          is_open?: boolean
-          open_time?: string
-          valid_from?: string | null
-          valid_to?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "facility_opening_hours_facility_id_fkey"
-            columns: ["facility_id"]
-            isOneToOne: false
-            referencedRelation: "facilities"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      facility_suitable_activities: {
-        Row: {
-          activity_name: string
-          created_at: string | null
-          facility_id: number
-          id: string
-          language_code: Database["public"]["Enums"]["language_code"]
-        }
-        Insert: {
-          activity_name: string
-          created_at?: string | null
-          facility_id: number
-          id?: string
-          language_code?: Database["public"]["Enums"]["language_code"]
-        }
-        Update: {
-          activity_name?: string
-          created_at?: string | null
-          facility_id?: number
-          id?: string
-          language_code?: Database["public"]["Enums"]["language_code"]
-        }
-        Relationships: [
-          {
-            foreignKeyName: "facility_suitable_activities_facility_id_fkey"
-            columns: ["facility_id"]
-            isOneToOne: false
-            referencedRelation: "facilities"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      facility_translations: {
-        Row: {
-          created_at: string
-          description: string | null
-          directions: string | null
-          facility_id: number
-          id: string
-          language_code: Database["public"]["Enums"]["language_code"]
-          name: string
-          rules: string | null
-          short_description: string | null
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          description?: string | null
-          directions?: string | null
-          facility_id: number
-          id?: string
-          language_code: Database["public"]["Enums"]["language_code"]
-          name: string
-          rules?: string | null
-          short_description?: string | null
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          description?: string | null
-          directions?: string | null
-          facility_id?: number
-          id?: string
-          language_code?: Database["public"]["Enums"]["language_code"]
-          name?: string
-          rules?: string | null
-          short_description?: string | null
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "facility_translations_facility_id_fkey"
-            columns: ["facility_id"]
-            isOneToOne: false
-            referencedRelation: "facilities"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      notification_logs: {
-        Row: {
-          body: string
-          booking_id: string | null
-          channel: string
-          delivered_at: string | null
-          error_message: string | null
-          id: string
-          metadata: Json | null
-          recipient: string
-          sent_at: string
-          status: string
-          subject: string | null
-          template_id: string | null
-          type: Database["public"]["Enums"]["notification_type"]
-          user_id: string
-        }
-        Insert: {
-          body: string
-          booking_id?: string | null
-          channel: string
-          delivered_at?: string | null
-          error_message?: string | null
-          id?: string
-          metadata?: Json | null
-          recipient: string
-          sent_at?: string
-          status?: string
-          subject?: string | null
-          template_id?: string | null
-          type: Database["public"]["Enums"]["notification_type"]
-          user_id: string
-        }
-        Update: {
-          body?: string
-          booking_id?: string | null
-          channel?: string
-          delivered_at?: string | null
-          error_message?: string | null
-          id?: string
-          metadata?: Json | null
-          recipient?: string
-          sent_at?: string
-          status?: string
-          subject?: string | null
-          template_id?: string | null
-          type?: Database["public"]["Enums"]["notification_type"]
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "notification_logs_booking_id_fkey"
-            columns: ["booking_id"]
-            isOneToOne: false
-            referencedRelation: "bookings"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "notification_logs_template_id_fkey"
-            columns: ["template_id"]
-            isOneToOne: false
-            referencedRelation: "notification_templates"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "notification_logs_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      notification_templates: {
-        Row: {
-          body_template: string
-          created_at: string
-          id: string
-          is_active: boolean
-          is_email: boolean
-          is_push: boolean
-          is_sms: boolean
-          language_code: Database["public"]["Enums"]["language_code"]
-          name: string
-          subject_template: string
-          type: Database["public"]["Enums"]["notification_type"]
-          updated_at: string
-          variables: Json | null
-        }
-        Insert: {
-          body_template: string
-          created_at?: string
-          id?: string
-          is_active?: boolean
-          is_email?: boolean
-          is_push?: boolean
-          is_sms?: boolean
-          language_code?: Database["public"]["Enums"]["language_code"]
-          name: string
-          subject_template: string
-          type: Database["public"]["Enums"]["notification_type"]
-          updated_at?: string
-          variables?: Json | null
-        }
-        Update: {
-          body_template?: string
-          created_at?: string
-          id?: string
-          is_active?: boolean
-          is_email?: boolean
-          is_push?: boolean
-          is_sms?: boolean
-          language_code?: Database["public"]["Enums"]["language_code"]
-          name?: string
-          subject_template?: string
-          type?: Database["public"]["Enums"]["notification_type"]
-          updated_at?: string
-          variables?: Json | null
-        }
-        Relationships: []
-      }
-      organization_contacts: {
-        Row: {
-          can_approve_bookings: boolean
-          can_make_bookings: boolean
-          can_manage_members: boolean
-          created_at: string
-          id: string
-          is_primary: boolean
-          organization_id: string
-          role: string
-          user_id: string
-        }
-        Insert: {
-          can_approve_bookings?: boolean
-          can_make_bookings?: boolean
-          can_manage_members?: boolean
-          created_at?: string
-          id?: string
-          is_primary?: boolean
-          organization_id: string
-          role?: string
-          user_id: string
-        }
-        Update: {
-          can_approve_bookings?: boolean
-          can_make_bookings?: boolean
-          can_manage_members?: boolean
-          created_at?: string
-          id?: string
-          is_primary?: boolean
-          organization_id?: string
-          role?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "organization_contacts_organization_id_fkey"
-            columns: ["organization_id"]
-            isOneToOne: false
-            referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "organization_contacts_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      organization_verification_documents: {
-        Row: {
-          created_at: string
-          document_type: string
-          file_name: string
-          file_size: number
-          file_url: string
-          id: string
-          is_verified: boolean
-          notes: string | null
-          organization_id: string
-          uploaded_by: string
-          verified_at: string | null
-          verified_by: string | null
-        }
-        Insert: {
-          created_at?: string
-          document_type: string
-          file_name: string
-          file_size: number
-          file_url: string
-          id?: string
-          is_verified?: boolean
-          notes?: string | null
-          organization_id: string
-          uploaded_by: string
-          verified_at?: string | null
-          verified_by?: string | null
-        }
-        Update: {
-          created_at?: string
-          document_type?: string
-          file_name?: string
-          file_size?: number
-          file_url?: string
-          id?: string
-          is_verified?: boolean
-          notes?: string | null
-          organization_id?: string
-          uploaded_by?: string
-          verified_at?: string | null
-          verified_by?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "organization_verification_documents_organization_id_fkey"
-            columns: ["organization_id"]
-            isOneToOne: false
-            referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "organization_verification_documents_uploaded_by_fkey"
-            columns: ["uploaded_by"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "organization_verification_documents_verified_by_fkey"
-            columns: ["verified_by"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      organizations: {
-        Row: {
-          address_city: string
-          address_country: string
-          address_postal_code: string
-          address_street: string
-          bank_account: string | null
-          contact_email: string
+          address: string
+          capacity: number | null
+          code: string
+          contact_email: string | null
           contact_phone: string | null
-          created_at: string
-          description: string | null
-          founded_year: number | null
+          created_at: string | null
+          description: Json | null
+          facilities: string[] | null
           id: string
-          is_active: boolean
-          member_count: number | null
-          name: string
-          org_number: string | null
-          parent_organization_id: string | null
-          status: Database["public"]["Enums"]["organization_status"]
-          type: Database["public"]["Enums"]["organization_type"]
-          updated_at: string
-          vat_number: string | null
-          verification_level: Database["public"]["Enums"]["verification_level"]
-          website: string | null
+          is_published: boolean | null
+          latitude: number | null
+          location_type: string | null
+          longitude: number | null
+          metadata: Json | null
+          name: Json
+          updated_at: string | null
         }
         Insert: {
-          address_city: string
-          address_country?: string
-          address_postal_code: string
-          address_street: string
-          bank_account?: string | null
-          contact_email: string
+          address: string
+          capacity?: number | null
+          code: string
+          contact_email?: string | null
           contact_phone?: string | null
-          created_at?: string
-          description?: string | null
-          founded_year?: number | null
+          created_at?: string | null
+          description?: Json | null
+          facilities?: string[] | null
           id?: string
-          is_active?: boolean
-          member_count?: number | null
-          name: string
-          org_number?: string | null
-          parent_organization_id?: string | null
-          status?: Database["public"]["Enums"]["organization_status"]
-          type: Database["public"]["Enums"]["organization_type"]
-          updated_at?: string
-          vat_number?: string | null
-          verification_level?: Database["public"]["Enums"]["verification_level"]
-          website?: string | null
+          is_published?: boolean | null
+          latitude?: number | null
+          location_type?: string | null
+          longitude?: number | null
+          metadata?: Json | null
+          name: Json
+          updated_at?: string | null
         }
         Update: {
-          address_city?: string
-          address_country?: string
-          address_postal_code?: string
-          address_street?: string
-          bank_account?: string | null
-          contact_email?: string
+          address?: string
+          capacity?: number | null
+          code?: string
+          contact_email?: string | null
           contact_phone?: string | null
-          created_at?: string
-          description?: string | null
-          founded_year?: number | null
+          created_at?: string | null
+          description?: Json | null
+          facilities?: string[] | null
           id?: string
-          is_active?: boolean
-          member_count?: number | null
-          name?: string
-          org_number?: string | null
-          parent_organization_id?: string | null
-          status?: Database["public"]["Enums"]["organization_status"]
-          type?: Database["public"]["Enums"]["organization_type"]
-          updated_at?: string
-          vat_number?: string | null
-          verification_level?: Database["public"]["Enums"]["verification_level"]
-          website?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "organizations_parent_organization_id_fkey"
-            columns: ["parent_organization_id"]
-            isOneToOne: false
-            referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      pricing_calculations: {
-        Row: {
-          actor_type: Database["public"]["Enums"]["actor_type"]
-          actor_type_multiplier: number
-          base_price: number
-          booking_id: string | null
-          calculated_by: string | null
-          calculation_date: string
-          currency: string
-          day_type_multiplier: number
-          discount_amount: number
-          final_price: number
-          id: string
-          subtotal: number
-          surcharge_amount: number
-          time_slot_multiplier: number
-          total_hours: number
-        }
-        Insert: {
-          actor_type: Database["public"]["Enums"]["actor_type"]
-          actor_type_multiplier?: number
-          base_price: number
-          booking_id?: string | null
-          calculated_by?: string | null
-          calculation_date?: string
-          currency?: string
-          day_type_multiplier?: number
-          discount_amount?: number
-          final_price: number
-          id?: string
-          subtotal: number
-          surcharge_amount?: number
-          time_slot_multiplier?: number
-          total_hours: number
-        }
-        Update: {
-          actor_type?: Database["public"]["Enums"]["actor_type"]
-          actor_type_multiplier?: number
-          base_price?: number
-          booking_id?: string | null
-          calculated_by?: string | null
-          calculation_date?: string
-          currency?: string
-          day_type_multiplier?: number
-          discount_amount?: number
-          final_price?: number
-          id?: string
-          subtotal?: number
-          surcharge_amount?: number
-          time_slot_multiplier?: number
-          total_hours?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "pricing_calculations_calculated_by_fkey"
-            columns: ["calculated_by"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      pricing_rules: {
-        Row: {
-          actor_type: Database["public"]["Enums"]["actor_type"]
-          base_price: number
-          booking_type: Database["public"]["Enums"]["booking_type"]
-          created_at: string
-          day_type: Database["public"]["Enums"]["day_type"] | null
-          description: string | null
-          facility_id: number | null
-          fixed_price: number | null
-          id: string
-          is_active: boolean
-          maximum_duration: number | null
-          minimum_duration: number | null
-          multiplier: number
-          time_slot_category:
-            | Database["public"]["Enums"]["time_slot_category"]
-            | null
-          updated_at: string
-          valid_from: string
-          valid_to: string | null
-          zone_id: string | null
-        }
-        Insert: {
-          actor_type: Database["public"]["Enums"]["actor_type"]
-          base_price: number
-          booking_type?: Database["public"]["Enums"]["booking_type"]
-          created_at?: string
-          day_type?: Database["public"]["Enums"]["day_type"] | null
-          description?: string | null
-          facility_id?: number | null
-          fixed_price?: number | null
-          id?: string
-          is_active?: boolean
-          maximum_duration?: number | null
-          minimum_duration?: number | null
-          multiplier?: number
-          time_slot_category?:
-            | Database["public"]["Enums"]["time_slot_category"]
-            | null
-          updated_at?: string
-          valid_from?: string
-          valid_to?: string | null
-          zone_id?: string | null
-        }
-        Update: {
-          actor_type?: Database["public"]["Enums"]["actor_type"]
-          base_price?: number
-          booking_type?: Database["public"]["Enums"]["booking_type"]
-          created_at?: string
-          day_type?: Database["public"]["Enums"]["day_type"] | null
-          description?: string | null
-          facility_id?: number | null
-          fixed_price?: number | null
-          id?: string
-          is_active?: boolean
-          maximum_duration?: number | null
-          minimum_duration?: number | null
-          multiplier?: number
-          time_slot_category?:
-            | Database["public"]["Enums"]["time_slot_category"]
-            | null
-          updated_at?: string
-          valid_from?: string
-          valid_to?: string | null
-          zone_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "pricing_rules_facility_id_fkey"
-            columns: ["facility_id"]
-            isOneToOne: false
-            referencedRelation: "facilities"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "pricing_rules_zone_id_fkey"
-            columns: ["zone_id"]
-            isOneToOne: false
-            referencedRelation: "zones"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      profiles: {
-        Row: {
-          address_city: string | null
-          address_country: string | null
-          address_postal_code: string | null
-          address_street: string | null
-          avatar_url: string | null
-          bio: string | null
-          created_at: string
-          date_of_birth: string | null
-          emergency_contact_name: string | null
-          emergency_contact_phone: string | null
-          first_name: string
-          id: string
-          is_active: boolean
-          last_login_at: string | null
-          last_name: string
-          phone: string | null
-          preferred_language: Database["public"]["Enums"]["language_code"]
-          updated_at: string
-        }
-        Insert: {
-          address_city?: string | null
-          address_country?: string | null
-          address_postal_code?: string | null
-          address_street?: string | null
-          avatar_url?: string | null
-          bio?: string | null
-          created_at?: string
-          date_of_birth?: string | null
-          emergency_contact_name?: string | null
-          emergency_contact_phone?: string | null
-          first_name: string
-          id: string
-          is_active?: boolean
-          last_login_at?: string | null
-          last_name: string
-          phone?: string | null
-          preferred_language?: Database["public"]["Enums"]["language_code"]
-          updated_at?: string
-        }
-        Update: {
-          address_city?: string | null
-          address_country?: string | null
-          address_postal_code?: string | null
-          address_street?: string | null
-          avatar_url?: string | null
-          bio?: string | null
-          created_at?: string
-          date_of_birth?: string | null
-          emergency_contact_name?: string | null
-          emergency_contact_phone?: string | null
-          first_name?: string
-          id?: string
-          is_active?: boolean
-          last_login_at?: string | null
-          last_name?: string
-          phone?: string | null
-          preferred_language?: Database["public"]["Enums"]["language_code"]
-          updated_at?: string
+          is_published?: boolean | null
+          latitude?: number | null
+          location_type?: string | null
+          longitude?: number | null
+          metadata?: Json | null
+          name?: Json
+          updated_at?: string | null
         }
         Relationships: []
       }
-      rammetid_allocations: {
+      app_notifications: {
         Row: {
-          allocated_by: string
-          allocation_notes: string | null
-          auto_release_hours_before: number | null
-          can_release_as_strotime: boolean
-          created_at: string
-          day_of_week: number
-          end_time: string
-          facility_id: number
+          booking_id: string | null
+          created_at: string | null
           id: string
-          is_active: boolean
-          organization_id: string
-          start_time: string
-          valid_from: string
-          valid_to: string
-          zone_id: string | null
-        }
-        Insert: {
-          allocated_by: string
-          allocation_notes?: string | null
-          auto_release_hours_before?: number | null
-          can_release_as_strotime?: boolean
-          created_at?: string
-          day_of_week: number
-          end_time: string
-          facility_id: number
-          id?: string
-          is_active?: boolean
-          organization_id: string
-          start_time: string
-          valid_from: string
-          valid_to: string
-          zone_id?: string | null
-        }
-        Update: {
-          allocated_by?: string
-          allocation_notes?: string | null
-          auto_release_hours_before?: number | null
-          can_release_as_strotime?: boolean
-          created_at?: string
-          day_of_week?: number
-          end_time?: string
-          facility_id?: number
-          id?: string
-          is_active?: boolean
-          organization_id?: string
-          start_time?: string
-          valid_from?: string
-          valid_to?: string
-          zone_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "rammetid_allocations_allocated_by_fkey"
-            columns: ["allocated_by"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rammetid_allocations_facility_id_fkey"
-            columns: ["facility_id"]
-            isOneToOne: false
-            referencedRelation: "facilities"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rammetid_allocations_organization_id_fkey"
-            columns: ["organization_id"]
-            isOneToOne: false
-            referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rammetid_allocations_zone_id_fkey"
-            columns: ["zone_id"]
-            isOneToOne: false
-            referencedRelation: "zones"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      rammetid_releases: {
-        Row: {
-          auto_released: boolean
-          id: string
-          rammetid_allocation_id: string
-          release_date: string
-          release_reason: string | null
-          release_time_end: string
-          release_time_start: string
-          released_at: string
-          released_by: string
-          strotime_price: number
-          strotime_slot_duration: number
-        }
-        Insert: {
-          auto_released?: boolean
-          id?: string
-          rammetid_allocation_id: string
-          release_date: string
-          release_reason?: string | null
-          release_time_end: string
-          release_time_start: string
-          released_at?: string
-          released_by: string
-          strotime_price?: number
-          strotime_slot_duration?: number
-        }
-        Update: {
-          auto_released?: boolean
-          id?: string
-          rammetid_allocation_id?: string
-          release_date?: string
-          release_reason?: string | null
-          release_time_end?: string
-          release_time_start?: string
-          released_at?: string
-          released_by?: string
-          strotime_price?: number
-          strotime_slot_duration?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "rammetid_releases_rammetid_allocation_id_fkey"
-            columns: ["rammetid_allocation_id"]
-            isOneToOne: false
-            referencedRelation: "rammetid_allocations"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "rammetid_releases_released_by_fkey"
-            columns: ["released_by"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      seasonal_pricing: {
-        Row: {
-          created_at: string
-          end_date: string
-          id: string
-          is_active: boolean
-          multiplier: number
-          pricing_rule_id: string
-          season_name: string
-          start_date: string
-        }
-        Insert: {
-          created_at?: string
-          end_date: string
-          id?: string
-          is_active?: boolean
-          multiplier?: number
-          pricing_rule_id: string
-          season_name: string
-          start_date: string
-        }
-        Update: {
-          created_at?: string
-          end_date?: string
-          id?: string
-          is_active?: boolean
-          multiplier?: number
-          pricing_rule_id?: string
-          season_name?: string
-          start_date?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "seasonal_pricing_pricing_rule_id_fkey"
-            columns: ["pricing_rule_id"]
-            isOneToOne: false
-            referencedRelation: "pricing_rules"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      service_availability: {
-        Row: {
-          created_at: string
-          day_of_week: number | null
-          end_time: string | null
-          facility_id: number | null
-          id: string
-          is_available: boolean
-          max_concurrent_bookings: number | null
-          service_id: string
-          start_time: string | null
-          zone_id: string | null
-        }
-        Insert: {
-          created_at?: string
-          day_of_week?: number | null
-          end_time?: string | null
-          facility_id?: number | null
-          id?: string
-          is_available?: boolean
-          max_concurrent_bookings?: number | null
-          service_id: string
-          start_time?: string | null
-          zone_id?: string | null
-        }
-        Update: {
-          created_at?: string
-          day_of_week?: number | null
-          end_time?: string | null
-          facility_id?: number | null
-          id?: string
-          is_available?: boolean
-          max_concurrent_bookings?: number | null
-          service_id?: string
-          start_time?: string | null
-          zone_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "service_availability_facility_id_fkey"
-            columns: ["facility_id"]
-            isOneToOne: false
-            referencedRelation: "facilities"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "service_availability_service_id_fkey"
-            columns: ["service_id"]
-            isOneToOne: false
-            referencedRelation: "additional_services"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "service_availability_zone_id_fkey"
-            columns: ["zone_id"]
-            isOneToOne: false
-            referencedRelation: "zones"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      service_bookings: {
-        Row: {
-          booking_id: string
-          created_at: string
-          end_time: string | null
-          id: string
-          quantity: number
-          service_id: string
-          special_instructions: string | null
-          start_time: string | null
-          status: string
-          total_price: number
-          unit_price: number
-        }
-        Insert: {
-          booking_id: string
-          created_at?: string
-          end_time?: string | null
-          id?: string
-          quantity?: number
-          service_id: string
-          special_instructions?: string | null
-          start_time?: string | null
-          status?: string
-          total_price: number
-          unit_price: number
-        }
-        Update: {
-          booking_id?: string
-          created_at?: string
-          end_time?: string | null
-          id?: string
-          quantity?: number
-          service_id?: string
-          special_instructions?: string | null
-          start_time?: string | null
-          status?: string
-          total_price?: number
-          unit_price?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "service_bookings_booking_id_fkey"
-            columns: ["booking_id"]
-            isOneToOne: false
-            referencedRelation: "bookings"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "service_bookings_service_id_fkey"
-            columns: ["service_id"]
-            isOneToOne: false
-            referencedRelation: "additional_services"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      service_translations: {
-        Row: {
-          booking_notes: string | null
-          cancellation_policy: string | null
-          created_at: string
-          description: string | null
-          id: string
-          language_code: Database["public"]["Enums"]["language_code"]
-          name: string
-          service_id: string
-          unit: string | null
-          updated_at: string
-        }
-        Insert: {
-          booking_notes?: string | null
-          cancellation_policy?: string | null
-          created_at?: string
-          description?: string | null
-          id?: string
-          language_code: Database["public"]["Enums"]["language_code"]
-          name: string
-          service_id: string
-          unit?: string | null
-          updated_at?: string
-        }
-        Update: {
-          booking_notes?: string | null
-          cancellation_policy?: string | null
-          created_at?: string
-          description?: string | null
-          id?: string
-          language_code?: Database["public"]["Enums"]["language_code"]
-          name?: string
-          service_id?: string
-          unit?: string | null
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "service_translations_service_id_fkey"
-            columns: ["service_id"]
-            isOneToOne: false
-            referencedRelation: "additional_services"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      strotime_bookings: {
-        Row: {
-          booked_at: string
-          cancellation_reason: string | null
-          cancelled_at: string | null
-          contact_email: string
-          contact_name: string
-          contact_phone: string
-          id: string
-          participants: number
-          payment_status: string
-          special_requirements: string | null
-          status: string
-          strotime_slot_id: string
-          total_price: number
+          message: string
+          read_at: string | null
+          type: string
           user_id: string | null
         }
         Insert: {
-          booked_at?: string
-          cancellation_reason?: string | null
-          cancelled_at?: string | null
-          contact_email: string
-          contact_name: string
-          contact_phone: string
+          booking_id?: string | null
+          created_at?: string | null
           id?: string
-          participants?: number
-          payment_status?: string
-          special_requirements?: string | null
-          status?: string
-          strotime_slot_id: string
-          total_price: number
+          message: string
+          read_at?: string | null
+          type: string
           user_id?: string | null
         }
         Update: {
-          booked_at?: string
-          cancellation_reason?: string | null
-          cancelled_at?: string | null
-          contact_email?: string
-          contact_name?: string
-          contact_phone?: string
+          booking_id?: string | null
+          created_at?: string | null
           id?: string
-          participants?: number
-          payment_status?: string
-          special_requirements?: string | null
-          status?: string
-          strotime_slot_id?: string
-          total_price?: number
+          message?: string
+          read_at?: string | null
+          type?: string
           user_id?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "strotime_bookings_strotime_slot_id_fkey"
-            columns: ["strotime_slot_id"]
-            isOneToOne: false
-            referencedRelation: "strotime_slots"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "strotime_bookings_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      strotime_slots: {
-        Row: {
-          created_at: string
-          current_participants: number
-          duration_minutes: number
-          end_time: string
-          facility_id: number
-          id: string
-          is_available: boolean
-          max_participants: number
-          original_booking_id: string | null
-          price_per_slot: number
-          published_at: string
-          published_by: string
-          released_from_rammetid: boolean
-          slot_date: string
-          start_time: string
-          zone_id: string
-        }
-        Insert: {
-          created_at?: string
-          current_participants?: number
-          duration_minutes: number
-          end_time: string
-          facility_id: number
-          id?: string
-          is_available?: boolean
-          max_participants?: number
-          original_booking_id?: string | null
-          price_per_slot: number
-          published_at?: string
-          published_by: string
-          released_from_rammetid?: boolean
-          slot_date: string
-          start_time: string
-          zone_id: string
-        }
-        Update: {
-          created_at?: string
-          current_participants?: number
-          duration_minutes?: number
-          end_time?: string
-          facility_id?: number
-          id?: string
-          is_available?: boolean
-          max_participants?: number
-          original_booking_id?: string | null
-          price_per_slot?: number
-          published_at?: string
-          published_by?: string
-          released_from_rammetid?: boolean
-          slot_date?: string
-          start_time?: string
-          zone_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "strotime_slots_facility_id_fkey"
-            columns: ["facility_id"]
-            isOneToOne: false
-            referencedRelation: "facilities"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "strotime_slots_original_booking_id_fkey"
-            columns: ["original_booking_id"]
-            isOneToOne: false
-            referencedRelation: "bookings"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "strotime_slots_published_by_fkey"
-            columns: ["published_by"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "strotime_slots_zone_id_fkey"
-            columns: ["zone_id"]
-            isOneToOne: false
-            referencedRelation: "zones"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      support_tickets: {
-        Row: {
-          assigned_to: string | null
-          booking_id: string | null
-          category: string
-          created_at: string
-          description: string
-          id: string
-          priority: string
-          resolution_notes: string | null
-          resolved_at: string | null
-          status: string
-          subject: string
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          assigned_to?: string | null
-          booking_id?: string | null
-          category?: string
-          created_at?: string
-          description: string
-          id?: string
-          priority?: string
-          resolution_notes?: string | null
-          resolved_at?: string | null
-          status?: string
-          subject: string
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          assigned_to?: string | null
-          booking_id?: string | null
-          category?: string
-          created_at?: string
-          description?: string
-          id?: string
-          priority?: string
-          resolution_notes?: string | null
-          resolved_at?: string | null
-          status?: string
-          subject?: string
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "support_tickets_assigned_to_fkey"
-            columns: ["assigned_to"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "support_tickets_booking_id_fkey"
+            foreignKeyName: "app_notifications_booking_id_fkey"
             columns: ["booking_id"]
             isOneToOne: false
-            referencedRelation: "bookings"
+            referencedRelation: "app_bookings"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "support_tickets_user_id_fkey"
+            foreignKeyName: "app_notifications_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: "profiles"
+            referencedRelation: "app_users"
             referencedColumns: ["id"]
           },
         ]
       }
-      system_configurations: {
+      app_price_rules: {
         Row: {
-          description: string | null
+          actor_type: string
+          config: Json | null
+          created_at: string | null
           id: string
-          is_public: boolean
-          key: string
-          updated_at: string
-          updated_by: string
-          value: Json
+          location_id: string | null
+          price: number
+          priority: number | null
+          type: string
         }
         Insert: {
-          description?: string | null
+          actor_type: string
+          config?: Json | null
+          created_at?: string | null
           id?: string
-          is_public?: boolean
-          key: string
-          updated_at?: string
-          updated_by: string
-          value: Json
+          location_id?: string | null
+          price: number
+          priority?: number | null
+          type: string
         }
         Update: {
-          description?: string | null
+          actor_type?: string
+          config?: Json | null
+          created_at?: string | null
           id?: string
-          is_public?: boolean
-          key?: string
-          updated_at?: string
-          updated_by?: string
-          value?: Json
+          location_id?: string | null
+          price?: number
+          priority?: number | null
+          type?: string
         }
         Relationships: [
           {
-            foreignKeyName: "system_configurations_updated_by_fkey"
-            columns: ["updated_by"]
+            foreignKeyName: "app_price_rules_location_id_fkey"
+            columns: ["location_id"]
             isOneToOne: false
-            referencedRelation: "profiles"
+            referencedRelation: "app_locations"
             referencedColumns: ["id"]
           },
         ]
       }
-      system_enums: {
+      app_roles: {
         Row: {
-          created_at: string
-          display_order: number
-          enum_key: string
-          enum_type: string
+          created_at: string | null
+          description: string | null
+          id: string
+          name: string
+          permissions: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          permissions?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          permissions?: Json | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      app_services: {
+        Row: {
+          base_price: number
+          category: string | null
+          code: string
+          created_at: string | null
+          description: Json | null
           id: string
           is_active: boolean
           metadata: Json | null
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          display_order?: number
-          enum_key: string
-          enum_type: string
-          id?: string
-          is_active?: boolean
-          metadata?: Json | null
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          display_order?: number
-          enum_key?: string
-          enum_type?: string
-          id?: string
-          is_active?: boolean
-          metadata?: Json | null
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      translation_keys: {
-        Row: {
-          created_at: string | null
-          description: string | null
-          id: string
-          key_path: string
-          namespace: string
+          name: Json
+          unit: string
           updated_at: string | null
         }
         Insert: {
+          base_price: number
+          category?: string | null
+          code: string
           created_at?: string | null
-          description?: string | null
+          description?: Json | null
           id?: string
-          key_path: string
-          namespace: string
+          is_active?: boolean
+          metadata?: Json | null
+          name: Json
+          unit: string
           updated_at?: string | null
         }
         Update: {
+          base_price?: number
+          category?: string | null
+          code?: string
           created_at?: string | null
-          description?: string | null
+          description?: Json | null
           id?: string
-          key_path?: string
-          namespace?: string
+          is_active?: boolean
+          metadata?: Json | null
+          name?: Json
+          unit?: string
           updated_at?: string | null
         }
         Relationships: []
       }
-      translations: {
+      app_templates: {
+        Row: {
+          content: Json
+          created_at: string | null
+          created_by_id: string | null
+          id: string
+          name: string
+          slug: string
+          type: string
+          updated_at: string | null
+          visibility: string | null
+        }
+        Insert: {
+          content: Json
+          created_at?: string | null
+          created_by_id?: string | null
+          id?: string
+          name: string
+          slug: string
+          type: string
+          updated_at?: string | null
+          visibility?: string | null
+        }
+        Update: {
+          content?: Json
+          created_at?: string | null
+          created_by_id?: string | null
+          id?: string
+          name?: string
+          slug?: string
+          type?: string
+          updated_at?: string | null
+          visibility?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "app_templates_created_by_id_fkey"
+            columns: ["created_by_id"]
+            isOneToOne: false
+            referencedRelation: "app_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      app_user_roles: {
         Row: {
           created_at: string | null
           id: string
-          is_active: boolean | null
-          language_code: Database["public"]["Enums"]["language_code"]
-          translation_key_id: string
+          role_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          role_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          role_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "app_user_roles_role_id_fkey"
+            columns: ["role_id"]
+            isOneToOne: false
+            referencedRelation: "app_roles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "app_user_roles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "app_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      app_users: {
+        Row: {
+          created_at: string | null
+          email: string
+          id: string
+          locale: string | null
+          name: string
           updated_at: string | null
-          value: string
         }
         Insert: {
           created_at?: string | null
+          email: string
           id?: string
-          is_active?: boolean | null
-          language_code: Database["public"]["Enums"]["language_code"]
-          translation_key_id: string
+          locale?: string | null
+          name: string
           updated_at?: string | null
-          value: string
         }
         Update: {
           created_at?: string | null
+          email?: string
           id?: string
-          is_active?: boolean | null
-          language_code?: Database["public"]["Enums"]["language_code"]
-          translation_key_id?: string
+          locale?: string | null
+          name?: string
           updated_at?: string | null
-          value?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "translations_translation_key_id_fkey"
-            columns: ["translation_key_id"]
-            isOneToOne: false
-            referencedRelation: "translation_keys"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
-      user_booking_preferences: {
+      app_zones: {
         Row: {
-          auto_rebook: boolean
-          created_at: string
-          default_duration: number
-          frequent_facilities: number[] | null
+          capacity: number | null
+          code: string
+          created_at: string | null
           id: string
-          preferred_time_slots: string[] | null
-          updated_at: string
-          user_id: string
+          interval: string | null
+          location_id: string | null
+          metadata: Json | null
+          name: Json
+          updated_at: string | null
         }
         Insert: {
-          auto_rebook?: boolean
-          created_at?: string
-          default_duration?: number
-          frequent_facilities?: number[] | null
+          capacity?: number | null
+          code: string
+          created_at?: string | null
           id?: string
-          preferred_time_slots?: string[] | null
-          updated_at?: string
-          user_id: string
+          interval?: string | null
+          location_id?: string | null
+          metadata?: Json | null
+          name: Json
+          updated_at?: string | null
         }
         Update: {
-          auto_rebook?: boolean
-          created_at?: string
-          default_duration?: number
-          frequent_facilities?: number[] | null
+          capacity?: number | null
+          code?: string
+          created_at?: string | null
           id?: string
-          preferred_time_slots?: string[] | null
-          updated_at?: string
-          user_id?: string
+          interval?: string | null
+          location_id?: string | null
+          metadata?: Json | null
+          name?: Json
+          updated_at?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "user_booking_preferences_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: true
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      user_notification_preferences: {
-        Row: {
-          approval_updates: boolean
-          booking_reminders: boolean
-          created_at: string
-          email_enabled: boolean
-          id: string
-          marketing_emails: boolean
-          push_enabled: boolean
-          reminder_hours_before: number
-          sms_enabled: boolean
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          approval_updates?: boolean
-          booking_reminders?: boolean
-          created_at?: string
-          email_enabled?: boolean
-          id?: string
-          marketing_emails?: boolean
-          push_enabled?: boolean
-          reminder_hours_before?: number
-          sms_enabled?: boolean
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          approval_updates?: boolean
-          booking_reminders?: boolean
-          created_at?: string
-          email_enabled?: boolean
-          id?: string
-          marketing_emails?: boolean
-          push_enabled?: boolean
-          reminder_hours_before?: number
-          sms_enabled?: boolean
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "user_notification_preferences_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: true
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      user_permissions: {
-        Row: {
-          action: string
-          expires_at: string | null
-          granted_at: string
-          granted_by: string | null
-          id: string
-          is_active: boolean
-          resource: string
-          scope: string | null
-          user_id: string
-        }
-        Insert: {
-          action: string
-          expires_at?: string | null
-          granted_at?: string
-          granted_by?: string | null
-          id?: string
-          is_active?: boolean
-          resource: string
-          scope?: string | null
-          user_id: string
-        }
-        Update: {
-          action?: string
-          expires_at?: string | null
-          granted_at?: string
-          granted_by?: string | null
-          id?: string
-          is_active?: boolean
-          resource?: string
-          scope?: string | null
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "user_permissions_granted_by_fkey"
-            columns: ["granted_by"]
+            foreignKeyName: "app_zones_location_id_fkey"
+            columns: ["location_id"]
             isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "user_permissions_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      user_roles: {
-        Row: {
-          expires_at: string | null
-          granted_at: string
-          granted_by: string | null
-          id: string
-          is_active: boolean
-          role: Database["public"]["Enums"]["user_role"]
-          user_id: string
-        }
-        Insert: {
-          expires_at?: string | null
-          granted_at?: string
-          granted_by?: string | null
-          id?: string
-          is_active?: boolean
-          role: Database["public"]["Enums"]["user_role"]
-          user_id: string
-        }
-        Update: {
-          expires_at?: string | null
-          granted_at?: string
-          granted_by?: string | null
-          id?: string
-          is_active?: boolean
-          role?: Database["public"]["Enums"]["user_role"]
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "user_roles_granted_by_fkey"
-            columns: ["granted_by"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "user_roles_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      zone_conflict_rules: {
-        Row: {
-          conflict_type: string
-          conflicting_zone_id: string
-          created_at: string
-          description: string | null
-          id: string
-          is_active: boolean
-          zone_id: string
-        }
-        Insert: {
-          conflict_type?: string
-          conflicting_zone_id: string
-          created_at?: string
-          description?: string | null
-          id?: string
-          is_active?: boolean
-          zone_id: string
-        }
-        Update: {
-          conflict_type?: string
-          conflicting_zone_id?: string
-          created_at?: string
-          description?: string | null
-          id?: string
-          is_active?: boolean
-          zone_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "zone_conflict_rules_conflicting_zone_id_fkey"
-            columns: ["conflicting_zone_id"]
-            isOneToOne: false
-            referencedRelation: "zones"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "zone_conflict_rules_zone_id_fkey"
-            columns: ["zone_id"]
-            isOneToOne: false
-            referencedRelation: "zones"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      zone_opening_hours: {
-        Row: {
-          close_time: string
-          created_at: string
-          day_of_week: number
-          id: string
-          is_open: boolean
-          open_time: string
-          valid_from: string | null
-          valid_to: string | null
-          zone_id: string
-        }
-        Insert: {
-          close_time: string
-          created_at?: string
-          day_of_week: number
-          id?: string
-          is_open?: boolean
-          open_time: string
-          valid_from?: string | null
-          valid_to?: string | null
-          zone_id: string
-        }
-        Update: {
-          close_time?: string
-          created_at?: string
-          day_of_week?: number
-          id?: string
-          is_open?: boolean
-          open_time?: string
-          valid_from?: string | null
-          valid_to?: string | null
-          zone_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "zone_opening_hours_zone_id_fkey"
-            columns: ["zone_id"]
-            isOneToOne: false
-            referencedRelation: "zones"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      zone_translations: {
-        Row: {
-          created_at: string
-          description: string | null
-          id: string
-          language_code: Database["public"]["Enums"]["language_code"]
-          name: string
-          updated_at: string
-          zone_id: string
-        }
-        Insert: {
-          created_at?: string
-          description?: string | null
-          id?: string
-          language_code: Database["public"]["Enums"]["language_code"]
-          name: string
-          updated_at?: string
-          zone_id: string
-        }
-        Update: {
-          created_at?: string
-          description?: string | null
-          id?: string
-          language_code?: Database["public"]["Enums"]["language_code"]
-          name?: string
-          updated_at?: string
-          zone_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "zone_translations_zone_id_fkey"
-            columns: ["zone_id"]
-            isOneToOne: false
-            referencedRelation: "zones"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      zones: {
-        Row: {
-          accessibility_features: string[] | null
-          area_sqm: number | null
-          bookable_independently: boolean
-          capacity: number
-          coordinates_height: number | null
-          coordinates_width: number | null
-          coordinates_x: number | null
-          coordinates_y: number | null
-          created_at: string
-          description: string | null
-          equipment: string[] | null
-          facility_id: number
-          floor: string | null
-          id: string
-          is_main_zone: boolean
-          name: string
-          parent_zone_id: string | null
-          status: Database["public"]["Enums"]["facility_status"]
-          type: Database["public"]["Enums"]["zone_type"]
-          updated_at: string
-        }
-        Insert: {
-          accessibility_features?: string[] | null
-          area_sqm?: number | null
-          bookable_independently?: boolean
-          capacity?: number
-          coordinates_height?: number | null
-          coordinates_width?: number | null
-          coordinates_x?: number | null
-          coordinates_y?: number | null
-          created_at?: string
-          description?: string | null
-          equipment?: string[] | null
-          facility_id: number
-          floor?: string | null
-          id?: string
-          is_main_zone?: boolean
-          name: string
-          parent_zone_id?: string | null
-          status?: Database["public"]["Enums"]["facility_status"]
-          type?: Database["public"]["Enums"]["zone_type"]
-          updated_at?: string
-        }
-        Update: {
-          accessibility_features?: string[] | null
-          area_sqm?: number | null
-          bookable_independently?: boolean
-          capacity?: number
-          coordinates_height?: number | null
-          coordinates_width?: number | null
-          coordinates_x?: number | null
-          coordinates_y?: number | null
-          created_at?: string
-          description?: string | null
-          equipment?: string[] | null
-          facility_id?: number
-          floor?: string | null
-          id?: string
-          is_main_zone?: boolean
-          name?: string
-          parent_zone_id?: string | null
-          status?: Database["public"]["Enums"]["facility_status"]
-          type?: Database["public"]["Enums"]["zone_type"]
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "zones_facility_id_fkey"
-            columns: ["facility_id"]
-            isOneToOne: false
-            referencedRelation: "facilities"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "zones_parent_zone_id_fkey"
-            columns: ["parent_zone_id"]
-            isOneToOne: false
-            referencedRelation: "zones"
+            referencedRelation: "app_locations"
             referencedColumns: ["id"]
           },
         ]
@@ -2892,102 +1017,9 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      actor_type:
-        | "lag-foreninger"
-        | "paraply"
-        | "private-firma"
-        | "kommunale-enheter"
-        | "private-person"
-      age_group:
-        | "children"
-        | "youth"
-        | "adults"
-        | "seniors"
-        | "mixed"
-        | "family"
-      approval_priority: "low" | "normal" | "high" | "urgent"
-      approval_status:
-        | "not-required"
-        | "pending"
-        | "in-review"
-        | "approved"
-        | "rejected"
-        | "escalated"
-      booking_status:
-        | "draft"
-        | "pending-approval"
-        | "approved"
-        | "confirmed"
-        | "in-progress"
-        | "completed"
-        | "cancelled"
-        | "rejected"
-        | "no-show"
-      booking_type: "engangs" | "fastlan" | "rammetid" | "strotimer"
-      day_type: "weekday" | "weekend" | "holiday"
-      event_type:
-        | "training"
-        | "competition"
-        | "meeting"
-        | "celebration"
-        | "course"
-        | "conference"
-        | "performance"
-        | "exhibition"
-        | "drop-in"
-        | "other"
-      facility_status: "active" | "maintenance" | "inactive"
-      language_code: "NO" | "EN"
-      notification_type:
-        | "booking-confirmation"
-        | "booking-reminder"
-        | "approval-request"
-        | "approval-decision"
-        | "cancellation"
-        | "modification"
-        | "payment-due"
-        | "system-maintenance"
-      organization_status:
-        | "active"
-        | "pending-verification"
-        | "suspended"
-        | "inactive"
-      organization_type:
-        | "lag-foreninger"
-        | "paraply"
-        | "private-firma"
-        | "kommunale-enheter"
-        | "utdanning"
-        | "helse"
-        | "kultur"
-        | "frivillig"
-      service_category:
-        | "cleaning"
-        | "parking"
-        | "personnel"
-        | "equipment"
-        | "catering"
-        | "security"
-        | "technical"
-        | "decoration"
-        | "transport"
-        | "wellness"
-      time_slot_category: "morning" | "day" | "evening" | "night"
-      user_role:
-        | "system-admin"
-        | "facility-manager"
-        | "caseworker"
-        | "municipal-staff"
-        | "organization-rep"
-        | "regular-user"
-        | "support"
-        | "paraply-rep"
-      verification_level:
-        | "unverified"
-        | "email-verified"
-        | "document-verified"
-        | "fully-verified"
-      zone_type: "court" | "room" | "area" | "section" | "field"
+      block_type: "STROTIME" | "FASTLÅN" | "RAMMETID" | "SPERRET"
+      booking_status: "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED"
+      booking_type: "ENGANG" | "FAST"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -3103,106 +1135,9 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      actor_type: [
-        "lag-foreninger",
-        "paraply",
-        "private-firma",
-        "kommunale-enheter",
-        "private-person",
-      ],
-      age_group: ["children", "youth", "adults", "seniors", "mixed", "family"],
-      approval_priority: ["low", "normal", "high", "urgent"],
-      approval_status: [
-        "not-required",
-        "pending",
-        "in-review",
-        "approved",
-        "rejected",
-        "escalated",
-      ],
-      booking_status: [
-        "draft",
-        "pending-approval",
-        "approved",
-        "confirmed",
-        "in-progress",
-        "completed",
-        "cancelled",
-        "rejected",
-        "no-show",
-      ],
-      booking_type: ["engangs", "fastlan", "rammetid", "strotimer"],
-      day_type: ["weekday", "weekend", "holiday"],
-      event_type: [
-        "training",
-        "competition",
-        "meeting",
-        "celebration",
-        "course",
-        "conference",
-        "performance",
-        "exhibition",
-        "drop-in",
-        "other",
-      ],
-      facility_status: ["active", "maintenance", "inactive"],
-      language_code: ["NO", "EN"],
-      notification_type: [
-        "booking-confirmation",
-        "booking-reminder",
-        "approval-request",
-        "approval-decision",
-        "cancellation",
-        "modification",
-        "payment-due",
-        "system-maintenance",
-      ],
-      organization_status: [
-        "active",
-        "pending-verification",
-        "suspended",
-        "inactive",
-      ],
-      organization_type: [
-        "lag-foreninger",
-        "paraply",
-        "private-firma",
-        "kommunale-enheter",
-        "utdanning",
-        "helse",
-        "kultur",
-        "frivillig",
-      ],
-      service_category: [
-        "cleaning",
-        "parking",
-        "personnel",
-        "equipment",
-        "catering",
-        "security",
-        "technical",
-        "decoration",
-        "transport",
-        "wellness",
-      ],
-      time_slot_category: ["morning", "day", "evening", "night"],
-      user_role: [
-        "system-admin",
-        "facility-manager",
-        "caseworker",
-        "municipal-staff",
-        "organization-rep",
-        "regular-user",
-        "support",
-        "paraply-rep",
-      ],
-      verification_level: [
-        "unverified",
-        "email-verified",
-        "document-verified",
-        "fully-verified",
-      ],
-      zone_type: ["court", "room", "area", "section", "field"],
+      block_type: ["STROTIME", "FASTLÅN", "RAMMETID", "SPERRET"],
+      booking_status: ["PENDING", "APPROVED", "REJECTED", "CANCELLED"],
+      booking_type: ["ENGANG", "FAST"],
     },
   },
 } as const

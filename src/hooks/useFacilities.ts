@@ -1,73 +1,121 @@
 
-import { useQuery } from "@tanstack/react-query";
-import { FacilityService } from "@/services/facilityService";
-import { FacilityFilters, FacilitySortOptions } from "@/types/facility";
-import { PaginationParams } from "@/types/api";
-import { useLanguage } from "@/contexts/LanguageContext";
-import { useState, useCallback } from "react";
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
-interface UseFacilitiesParams {
-  pagination: PaginationParams;
-  filters?: FacilityFilters;
-  sort?: FacilitySortOptions;
+export interface Facility {
+  id: number;
+  name: string;
+  type: string;
+  area: string;
+  description?: string;
+  capacity: number;
+  price_per_hour: number;
+  address_street?: string;
+  address_city?: string;
+  address_postal_code?: string;
+  equipment?: string[];
+  amenities?: string[];
+  accessibility_features?: string[];
+  is_featured: boolean;
+  status: string;
+  facility_images?: Array<{
+    id: number;
+    image_url: string;
+    alt_text?: string;
+    is_featured: boolean;
+  }>;
 }
 
-export function useFacilities({
-  pagination,
-  filters,
-  sort
-}: UseFacilitiesParams) {
-  // Get current language to include in query key
-  const { language } = useLanguage();
+export const useFacilities = () => {
+  return useQuery({
+    queryKey: ['facilities'],
+    queryFn: async (): Promise<Facility[]> => {
+      try {
+        // Try the edge function first
+        const { data, error } = await supabase.functions.invoke('facilities');
+        
+        if (error) {
+          console.error('Edge function error:', error);
+          // Fallback to direct database query
+          const { data: facilities, error: dbError } = await supabase
+            .from('facilities')
+            .select(`
+              *,
+              facility_images (
+                id,
+                image_url,
+                alt_text,
+                is_featured
+              )
+            `)
+            .eq('status', 'active')
+            .order('name');
 
-  const {
-    data: response,
-    isLoading,
-    error,
-    refetch
-  } = useQuery({
-    queryKey: ['facilities', language, pagination, filters, sort],
-    queryFn: () => FacilityService.getFacilities(pagination, filters, sort),
-    staleTime: 0, // No cache - always fetch fresh data
-    gcTime: 30 * 1000, // Keep in memory for 30 seconds only
+          if (dbError) {
+            console.error('Database error:', dbError);
+            return [];
+          }
+
+          return facilities || [];
+        }
+
+        return data?.data || [];
+      } catch (error) {
+        console.error('Facilities fetch error:', error);
+        return [];
+      }
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    retry: false // Don't retry on errors to avoid spam
   });
+};
 
-  // Handle response properly - check if it's a direct array or wrapped response
-  const facilities = response?.success ? response.data?.data || [] : [];
-  const paginationInfo = response?.success ? {
-    page: response.data?.pagination?.page || pagination.page,
-    limit: response.data?.pagination?.limit || pagination.limit,
-    total: response.data?.pagination?.total || 0,
-    totalPages: response.data?.pagination?.totalPages || 0,
-    hasNext: response.data?.pagination?.hasNext || false,
-    hasPrev: response.data?.pagination?.hasPrev || false
-  } : null;
+export const useFacility = (id: string) => {
+  return useQuery({
+    queryKey: ['facility', id],
+    queryFn: async (): Promise<Facility | null> => {
+      if (!id) return null;
+      
+      try {
+        // Try the edge function first
+        const { data, error } = await supabase.functions.invoke('facilities', {
+          body: { id: parseInt(id) }
+        });
+        
+        if (error) {
+          console.error('Edge function error:', error);
+          // Fallback to direct database query
+          const { data: facility, error: dbError } = await supabase
+            .from('facilities')
+            .select(`
+              *,
+              facility_images (
+                id,
+                image_url,
+                alt_text,
+                is_featured
+              )
+            `)
+            .eq('id', parseInt(id))
+            .eq('status', 'active')
+            .single();
 
-  return {
-    facilities: facilities || [],
-    pagination: paginationInfo,
-    isLoading,
-    error: response?.success === false ? response.error : error,
-    refetch,
-  };
-}
+          if (dbError) {
+            console.error('Database error:', dbError);
+            return null;
+          }
 
-// Export pagination helper function with proper navigation methods
-export function useFacilitiesPagination(initialPage: number, initialLimit: number) {
-  const [page, setPage] = useState(initialPage);
-  const [limit] = useState(initialLimit);
+          return facility;
+        }
 
-  const nextPage = useCallback(() => {
-    setPage(prev => prev + 1);
-  }, []);
-
-  const goToPage = useCallback((newPage: number) => {
-    setPage(newPage);
-  }, []);
-
-  return {
-    pagination: { page, limit },
-    nextPage,
-    goToPage
-  };
-}
+        return data?.data || null;
+      } catch (error) {
+        console.error('Facility fetch error:', error);
+        return null;
+      }
+    },
+    enabled: !!id,
+    staleTime: 5 * 60 * 1000,
+    retry: false
+  });
+};
