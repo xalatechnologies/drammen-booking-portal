@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { SelectedTimeSlot } from '@/utils/recurrenceEngine';
@@ -43,6 +44,7 @@ export function BookingForm({
   const navigate = useNavigate();
   const { addToCart } = useCart();
 
+  // Fresh form data every time - no persistence
   const [formData, setFormData] = useState<BookingFormData>({
     purpose: '',
     attendees: 1,
@@ -53,11 +55,6 @@ export function BookingForm({
   });
 
   const [conflicts, setConflicts] = useState<any[]>([]);
-
-  // Reset actorType to empty when component mounts
-  useEffect(() => {
-    setFormData(prev => ({ ...prev, actorType: '' as ActorType }));
-  }, []);
 
   const updateFormData = (updates: Partial<BookingFormData>) => {
     setFormData(prev => ({ ...prev, ...updates }));
