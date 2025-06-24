@@ -76,6 +76,10 @@ export function EnhancedPriceCalculationCard({
     };
   };
 
+  if (selectedSlots.length === 0) {
+    return ();
+  }
+
   const priceBreakdown = calculateMockPrice();
 
   return (
