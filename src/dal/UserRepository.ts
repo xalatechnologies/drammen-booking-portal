@@ -9,8 +9,8 @@ export class UserRepository {
         .select(`
           *,
           app_user_roles (
-            role,
-            is_active
+            role_id,
+            created_at
           )
         `)
         .order('created_at', { ascending: false });
@@ -34,8 +34,8 @@ export class UserRepository {
         .select(`
           *,
           app_user_roles (
-            role,
-            is_active
+            role_id,
+            created_at
           )
         `)
         .eq('id', id)
@@ -58,8 +58,7 @@ export class UserRepository {
       const { data, error } = await supabase
         .from('app_user_roles')
         .select('*')
-        .eq('user_id', userId)
-        .eq('is_active', true);
+        .eq('user_id', userId);
 
       if (error) {
         console.error('Error fetching user roles:', error);

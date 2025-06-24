@@ -6,7 +6,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { useFacilities } from '@/hooks/useFacilities';
 
 export const LocalizationTestComprehensive: React.FC = () => {
-  const { tSync, currentLanguage } = useTranslation();
+  const { tSync, language } = useTranslation();
   const { data: allFacilities, isLoading } = useFacilities();
 
   const testFacilities = (allFacilities || []).slice(0, 3);
@@ -19,7 +19,7 @@ export const LocalizationTestComprehensive: React.FC = () => {
             {tSync('localization.test.title', 'Localization Test')}
           </CardTitle>
           <Badge variant="outline">
-            {tSync('localization.currentLanguage', 'Current Language')}: {currentLanguage}
+            {tSync('localization.currentLanguage', 'Current Language')}: {language}
           </Badge>
         </CardHeader>
         <CardContent className="space-y-4">

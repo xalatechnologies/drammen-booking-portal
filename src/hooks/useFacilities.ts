@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
 export interface Facility {
-  id: number;
+  id: string;
   name: string;
   type: string;
   area: string;
@@ -19,7 +19,7 @@ export interface Facility {
   is_featured: boolean;
   status: string;
   facility_images?: Array<{
-    id: number;
+    id: string;
     image_url: string;
     alt_text?: string;
     is_featured: boolean;
@@ -54,10 +54,14 @@ export const useFacilities = () => {
         // Transform the data to match the expected Facility interface
         const facilities = (data || []).map((location: any) => ({
           id: location.id,
-          name: typeof location.name === 'string' ? location.name : location.name?.en || 'Unknown',
+          name: typeof location.name === 'string' ? location.name : 
+                (typeof location.name === 'object' && location.name?.no) ? location.name.no : 
+                (typeof location.name === 'object' && location.name?.en) ? location.name.en : 'Unknown',
           type: location.location_type || 'facility',
           area: location.address || '',
-          description: typeof location.description === 'string' ? location.description : location.description?.en || '',
+          description: typeof location.description === 'string' ? location.description : 
+                      (typeof location.description === 'object' && location.description?.no) ? location.description.no :
+                      (typeof location.description === 'object' && location.description?.en) ? location.description.en : '',
           capacity: location.capacity || 0,
           price_per_hour: 450, // Default price
           address_street: location.address || '',
@@ -112,10 +116,14 @@ export const useFacility = (id: string) => {
         // Transform the data to match the expected Facility interface
         const facility = {
           id: data.id,
-          name: typeof data.name === 'string' ? data.name : data.name?.en || 'Unknown',
+          name: typeof data.name === 'string' ? data.name : 
+                (typeof data.name === 'object' && data.name?.no) ? data.name.no : 
+                (typeof data.name === 'object' && data.name?.en) ? data.name.en : 'Unknown',
           type: data.location_type || 'facility',
           area: data.address || '',
-          description: typeof data.description === 'string' ? data.description : data.description?.en || '',
+          description: typeof data.description === 'string' ? data.description : 
+                      (typeof data.description === 'object' && data.description?.no) ? data.description.no :
+                      (typeof data.description === 'object' && data.description?.en) ? data.description.en : '',
           capacity: data.capacity || 0,
           price_per_hour: 450, // Default price
           address_street: data.address || '',
