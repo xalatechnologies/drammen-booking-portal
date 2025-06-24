@@ -224,13 +224,12 @@ export function BookingForm({
           onUpdateFormData={updateFormData}
         />
 
-        {/* Enhanced Price Calculation - WITHOUT PricingModeSelector */}
+        {/* Enhanced Price Calculation */}
         <EnhancedPriceCalculationCard
           selectedSlots={selectedSlots}
           facilityId={facilityId}
           actorType={formData.actorType}
           activityType={formData.activityType}
-          hidePricingModeSelector={true}
         />
 
         {/* Terms and Action Buttons */}

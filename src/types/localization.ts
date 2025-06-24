@@ -9,3 +9,11 @@ export interface LocalizedFacility extends Facility {
     shortDescription?: string;
   };
 }
+
+export interface LocalizedContent {
+  [key: string]: string;
+}
+
+export interface LocalizationHelper {
+  getLocalizedContent: (key: string, fallback?: string) => string;
+}
