@@ -1,7 +1,6 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
+import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -53,75 +52,59 @@ const activityTypeOptions = [
 export function BookingFormFields({ formData, onUpdateFormData }: BookingFormFieldsProps) {
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Booking informasjon</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-3 p-4">
         {/* Purpose Selection */}
-        <div>
-          <Label htmlFor="purpose">Formål med booking *</Label>
-          <Select 
-            value={formData.purpose} 
-            onValueChange={(value) => onUpdateFormData({ purpose: value })}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Velg formål med bookingen" />
-            </SelectTrigger>
-            <SelectContent>
-              {purposeOptions.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        <Select 
+          value={formData.purpose} 
+          onValueChange={(value) => onUpdateFormData({ purpose: value })}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Velg formål med bookingen" />
+          </SelectTrigger>
+          <SelectContent>
+            {purposeOptions.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
 
         {/* Activity Type Selection */}
-        <div>
-          <Label htmlFor="activityType">Type aktivitet</Label>
-          <Select 
-            value={formData.activityType} 
-            onValueChange={(value) => onUpdateFormData({ activityType: value })}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Velg type aktivitet" />
-            </SelectTrigger>
-            <SelectContent>
-              {activityTypeOptions.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        <Select 
+          value={formData.activityType} 
+          onValueChange={(value) => onUpdateFormData({ activityType: value })}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Velg type aktivitet" />
+          </SelectTrigger>
+          <SelectContent>
+            {activityTypeOptions.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
 
         {/* Number of Attendees */}
-        <div>
-          <Label htmlFor="attendees">Antall deltakere *</Label>
-          <Input
-            id="attendees"
-            type="number"
-            min="1"
-            value={formData.attendees}
-            onChange={(e) => onUpdateFormData({ attendees: parseInt(e.target.value) || 1 })}
-            className="w-full"
-          />
-        </div>
+        <Input
+          type="number"
+          min="1"
+          value={formData.attendees}
+          onChange={(e) => onUpdateFormData({ attendees: parseInt(e.target.value) || 1 })}
+          placeholder="Antall deltakere"
+          className="w-full"
+        />
 
         {/* Additional Information */}
-        <div>
-          <Label htmlFor="additionalInfo">Tilleggsinformasjon</Label>
-          <Textarea
-            id="additionalInfo"
-            value={formData.additionalInfo}
-            onChange={(e) => onUpdateFormData({ additionalInfo: e.target.value })}
-            placeholder="Spesielle behov, utstyr som trengs, etc."
-            rows={3}
-            className="w-full"
-          />
-        </div>
+        <Textarea
+          value={formData.additionalInfo}
+          onChange={(e) => onUpdateFormData({ additionalInfo: e.target.value })}
+          placeholder="Tilleggsinformasjon (spesielle behov, utstyr som trengs, etc.)"
+          rows={2}
+          className="w-full"
+        />
       </CardContent>
     </Card>
   );

@@ -196,7 +196,7 @@ export function BookingForm({
 
   return (
     <Card className="w-full">
-      <CardContent className="space-y-5 p-5">
+      <CardContent className="space-y-4 p-4">
         {/* Conflict Warning */}
         {conflicts.length > 0 && (
           <Alert variant="destructive">
@@ -237,6 +237,7 @@ export function BookingForm({
           facilityId={facilityId}
           actorType={formData.actorType}
           activityType={formData.activityType}
+          hidePricingModeSelector={true}
         />
 
         {/* Terms and Action Buttons */}
