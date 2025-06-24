@@ -139,6 +139,27 @@ const Index = () => {
   };
   
   console.log("Index.tsx - Created filters:", filters);
+
+  // Handle filter changes from SearchFilter component
+  const handleFilter = (filterData: any) => {
+    console.log("Received filters from SearchFilter:", filterData);
+    // Update local state based on filter data
+    if (filterData.type !== undefined) {
+      setFacilityType(filterData.type || "all");
+    }
+    if (filterData.area !== undefined) {
+      setLocation(filterData.area || "all");
+    }
+    if (filterData.accessibility !== undefined) {
+      setAccessibility(filterData.accessibility?.length > 0 ? filterData.accessibility[0] : "all");
+    }
+  };
+
+  // Handle search changes from SearchFilter component
+  const handleSearch = (query: string) => {
+    console.log("Received search query:", query);
+    setSearchTerm(query);
+  };
   
   const renderContent = () => {
     switch (viewMode) {
@@ -179,32 +200,8 @@ const Index = () => {
         {/* Fixed Search Filter attached to header */}
         <div className="fixed top-20 left-0 right-0 z-40 w-full">
           <SearchFilter 
-            date={date} 
-            setDate={setDate} 
-            facilityType={facilityType} 
-            setFacilityType={setFacilityType} 
-            location={location} 
-            setLocation={setLocation} 
-            viewMode={viewMode} 
-            setViewMode={setViewMode} 
-            accessibility={accessibility} 
-            setAccessibility={setAccessibility} 
-            capacity={capacity} 
-            setCapacity={setCapacity} 
-            searchTerm={searchTerm} 
-            setSearchTerm={setSearchTerm} 
-            priceRange={priceRange} 
-            setPriceRange={setPriceRange} 
-            availableNow={availableNow} 
-            setAvailableNow={setAvailableNow} 
-            hasEquipment={hasEquipment} 
-            setHasEquipment={setHasEquipment} 
-            hasParking={hasParking} 
-            setHasParking={setHasParking} 
-            hasWifi={hasWifi} 
-            setHasWifi={setHasWifi} 
-            allowsPhotography={allowsPhotography} 
-            setAllowsPhotography={setAllowsPhotography} 
+            onFilter={handleFilter}
+            onSearch={handleSearch}
           />
         </div>
 
