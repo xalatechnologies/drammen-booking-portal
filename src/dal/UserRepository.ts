@@ -5,17 +5,15 @@ import { RepositoryResponse } from '@/types/api';
 import { supabase } from '@/integrations/supabase/client';
 
 export class UserRepository extends SupabaseRepository<User> {
-  protected tableName = 'profiles';
-
   constructor() {
-    super();
+    super('app_users');
   }
 
   // User-specific methods
   async findByEmail(email: string): Promise<RepositoryResponse<User | null>> {
     try {
       const { data, error } = await supabase
-        .from(this.tableName as any)
+        .from('app_users')
         .select('*')
         .eq('email', email.toLowerCase())
         .maybeSingle();
@@ -42,13 +40,12 @@ export class UserRepository extends SupabaseRepository<User> {
   async findByRole(role: string): Promise<RepositoryResponse<User[]>> {
     try {
       const { data, error } = await supabase
-        .from('user_roles')
+        .from('app_user_roles')
         .select(`
           *,
-          profiles (*)
+          app_users (*)
         `)
-        .eq('role', role as any)
-        .eq('is_active', true);
+        .eq('role_id', role as any);
 
       if (error) {
         return {
@@ -58,7 +55,7 @@ export class UserRepository extends SupabaseRepository<User> {
       }
 
       return {
-        data: (data?.map((item: any) => item.profiles).filter(Boolean) as User[]) || [],
+        data: (data?.map((item: any) => item.app_users).filter(Boolean) as User[]) || [],
         error: null
       };
     } catch (error: any) {
@@ -72,9 +69,9 @@ export class UserRepository extends SupabaseRepository<User> {
   async updateLastLogin(id: string): Promise<RepositoryResponse<User | null>> {
     try {
       const { data, error } = await supabase
-        .from(this.tableName as any)
+        .from('app_users')
         .update({
-          last_login_at: new Date().toISOString()
+          updated_at: new Date().toISOString()
         })
         .eq('id', id)
         .select()
