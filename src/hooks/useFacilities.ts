@@ -68,15 +68,15 @@ export const useFacilities = () => {
           area: location.address || '',
           description: getLocalizedText(location.description, ''),
           capacity: location.capacity || 0,
-          price_per_hour: 450,
+          price_per_hour: location.price_per_hour || 450,
           address_street: location.address || '',
           address_city: '',
           address_postal_code: '',
-          equipment: location.facilities || [],
-          amenities: [],
-          accessibility_features: [],
-          is_featured: false,
-          status: 'active',
+          equipment: location.equipment || [],
+          amenities: location.amenities || [],
+          accessibility_features: location.accessibility_features || [],
+          is_featured: location.is_featured || false,
+          status: location.status || 'active',
           facility_images: location.app_location_images || []
         }));
 
@@ -125,15 +125,15 @@ export const useFacility = (id: string) => {
           area: data.address || '',
           description: getLocalizedText(data.description, ''),
           capacity: data.capacity || 0,
-          price_per_hour: 450,
+          price_per_hour: data.price_per_hour || 450,
           address_street: data.address || '',
           address_city: '',
           address_postal_code: '',
-          equipment: data.facilities || [],
-          amenities: [],
-          accessibility_features: [],
-          is_featured: false,
-          status: 'active',
+          equipment: data.equipment || [],
+          amenities: data.amenities || [],
+          accessibility_features: data.accessibility_features || [],
+          is_featured: data.is_featured || false,
+          status: data.status || 'active',
           facility_images: data.app_location_images || []
         };
 
@@ -150,10 +150,11 @@ export const useFacility = (id: string) => {
 };
 
 export const useFacilitiesPagination = (page: number = 1, limit: number = 12) => {
+  const { data: facilities = [] } = useFacilities();
+  
   return useQuery({
-    queryKey: ['facilities-paginated', page, limit],
+    queryKey: ['facilities-paginated', page, limit, facilities.length],
     queryFn: async () => {
-      const { data: facilities } = await useFacilities().queryFn();
       const total = facilities.length;
       const start = (page - 1) * limit;
       const paginatedFacilities = facilities.slice(start, start + limit);
@@ -170,6 +171,7 @@ export const useFacilitiesPagination = (page: number = 1, limit: number = 12) =>
         }
       };
     },
+    enabled: facilities.length > 0,
     staleTime: 5 * 60 * 1000
   });
 };

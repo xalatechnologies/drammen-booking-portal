@@ -1,13 +1,11 @@
 
 import React, { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { DateRange } from "react-day-picker";
 import GlobalHeader from "@/components/GlobalHeader";
 import SearchFilter from "@/components/SearchFilter";
 import FacilityList from "@/components/FacilityList";
 import MapView from "@/components/MapView";
 import CalendarView from "@/components/CalendarView";
-import { useFacilitiesPagination } from "@/hooks/useFacilities";
 import { FacilityFilters } from "@/types/facility";
 
 const Index = () => {
@@ -36,6 +34,7 @@ const Index = () => {
     const urlCapacity = searchParams.get('capacity');
     const urlViewMode = searchParams.get('viewMode');
     const urlSearchTerm = searchParams.get('searchTerm');
+    
     if (urlFacilityType) setFacilityType(urlFacilityType);
     if (urlLocation) setLocation(urlLocation);
     if (urlAccessibility) setAccessibility(urlAccessibility);
@@ -55,7 +54,12 @@ const Index = () => {
   }, [searchParams, setSearchParams]);
 
   // Create amenities array from individual boolean states
-  const amenities = [...(hasEquipment ? ['av-equipment'] : []), ...(hasParking ? ['parking'] : []), ...(hasWifi ? ['wifi'] : []), ...(allowsPhotography ? ['photography'] : [])];
+  const amenities = [
+    ...(hasEquipment ? ['av-equipment'] : []), 
+    ...(hasParking ? ['parking'] : []), 
+    ...(hasWifi ? ['wifi'] : []), 
+    ...(allowsPhotography ? ['photography'] : [])
+  ];
 
   // Create filters object with proper handling
   const filters: FacilityFilters = {
@@ -90,14 +94,13 @@ const Index = () => {
       amenities
     } : {})
   };
-  console.log("Index.tsx - Created filters:", filters);
   
   const renderContent = () => {
     switch (viewMode) {
       case "map":
-        return <MapView facilityType={facilityType} location={location} viewMode={viewMode} setViewMode={setViewMode} />;
+        return <MapView />;
       case "calendar":
-        return <CalendarView date={date} facilityType={facilityType} location={location} accessibility={accessibility} capacity={capacity} viewMode={viewMode} setViewMode={setViewMode} />;
+        return <CalendarView />;
       case "list":
       case "grid":
         return (
