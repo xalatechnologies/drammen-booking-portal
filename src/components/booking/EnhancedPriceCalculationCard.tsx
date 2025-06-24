@@ -104,19 +104,9 @@ export function EnhancedPriceCalculationCard({
       )}
       
       <Card>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 pt-5">
           {/* Price Breakdown */}
           <div className="space-y-3">
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-600">Grunnpris per time</span>
-              <span className="font-medium">{priceBreakdown.basePrice} NOK</span>
-            </div>
-            
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-600">Totalt antall timer</span>
-              <span className="font-medium">{priceBreakdown.totalHours}</span>
-            </div>
-            
             <div className="flex justify-between items-center">
               <span className="text-sm text-gray-600">Subtotal</span>
               <span className="font-medium">{priceBreakdown.subtotal} NOK</span>
