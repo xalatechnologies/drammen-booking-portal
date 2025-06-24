@@ -130,7 +130,8 @@ export function BookingForm({
   const handleCompleteBooking = async () => {
     console.log('BookingForm: handleCompleteBooking called');
 
-    const result = await BookingService.completeBooking({
+    // Instead of completing booking, add to cart and navigate to checkout
+    const result = await BookingService.addToCart({
       selectedSlots,
       facilityId,
       facilityName,
@@ -140,13 +141,20 @@ export function BookingForm({
 
     if (result.success) {
       toast({
-        title: "Reservasjon opprettet",
-        description: result.message,
+        title: "Lagt til i handlekurv",
+        description: "Sender deg til kassen...",
       });
 
+      // Clear conflicts and slots after successful addition
+      setConflicts([]);
+      if (onSlotsCleared) {
+        onSlotsCleared();
+      }
+
+      // Navigate to checkout immediately
       setTimeout(() => {
         navigate('/checkout');
-      }, 1000);
+      }, 500);
 
       if (onCompleteBooking) {
         onCompleteBooking({
@@ -216,12 +224,13 @@ export function BookingForm({
           onUpdateFormData={updateFormData}
         />
 
-        {/* Enhanced Price Calculation */}
+        {/* Enhanced Price Calculation - WITHOUT PricingModeSelector */}
         <EnhancedPriceCalculationCard
           selectedSlots={selectedSlots}
           facilityId={facilityId}
           actorType={formData.actorType}
           activityType={formData.activityType}
+          hidePricingModeSelector={true}
         />
 
         {/* Terms and Action Buttons */}

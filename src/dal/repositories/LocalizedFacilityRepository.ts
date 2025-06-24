@@ -1,249 +1,134 @@
+import { BaseRepository } from '@/dal/BaseRepository';
+import { Language } from '@/i18n/types';
+import { LocalizedFacility, Zone } from '@/types/facility';
+import { RepositoryResponse, PaginationParams, PaginatedResponse } from '@/types/api';
 
-import { SupabaseRepository } from '../SupabaseRepository';
-import { LocalizedFacility } from '@/types/localization';
-import { Zone } from '@/types/zone';
-import { FacilityFilters } from '@/types/facility';
-import { PaginationParams, PaginatedResponse, RepositoryResponse } from '@/types/api';
-import { supabase } from '@/integrations/supabase/client';
+export class LocalizedFacilityRepository extends BaseRepository<LocalizedFacility> {
+  private currentLanguage: Language = 'NO';
+  private facilitiesData: Record<string, LocalizedFacility[]> = {
+    'NO': [],
+    'EN': []
+  };
 
-// Define local filters interface that matches the actual usage
-interface LocalFacilityFilters {
-  facilityType?: string;
-  location?: string;
-  searchTerm?: string;
-}
-
-export class LocalizedFacilityRepository extends SupabaseRepository<LocalizedFacility> {
-  protected tableName = 'facilities';
-
-  constructor() {
-    super();
+  setLanguage(language: Language) {
+    this.currentLanguage = language;
   }
 
-  async findAllRaw(
-    pagination: PaginationParams,
-    filters?: FacilityFilters,
-    orderBy?: string,
-    orderDirection: 'asc' | 'desc' = 'asc'
-  ): Promise<RepositoryResponse<PaginatedResponse<LocalizedFacility>>> {
-    try {
-      let query = supabase
-        .from('facilities')
-        .select(`
-          *,
-          facility_translations(*),
-          facility_images(*)
-        `, { count: 'exact' });
+  protected getId(item: LocalizedFacility): string {
+    return item.id;
+  }
 
-      // Apply filters based on standard FacilityFilters
-      if (filters?.facilityType) {
-        query = query.eq('type', filters.facilityType);
+  protected applyFilters(items: LocalizedFacility[], filters: any): LocalizedFacility[] {
+    if (!filters) return items;
+    
+    return items.filter(item => {
+      if (filters.type && item.type !== filters.type) return false;
+      if (filters.area && item.area !== filters.area) return false;
+      if (filters.searchTerm) {
+        const searchLower = filters.searchTerm.toLowerCase();
+        return item.name.toLowerCase().includes(searchLower) ||
+               item.description.toLowerCase().includes(searchLower);
       }
-      if (filters?.location) {
-        query = query.or(`address_city.ilike.%${filters.location}%,area.ilike.%${filters.location}%`);
-      }
-      if (filters?.searchTerm) {
-        query = query.or(`name.ilike.%${filters.searchTerm}%,description.ilike.%${filters.searchTerm}%`);
-      }
+      return true;
+    });
+  }
 
-      // Apply sorting
-      if (orderBy) {
-        query = query.order(orderBy, { ascending: orderDirection === 'asc' });
-      }
-
-      // Apply pagination
-      const from = (pagination.page - 1) * pagination.limit;
-      const to = from + pagination.limit - 1;
-      query = query.range(from, to);
-
-      const { data, error, count } = await query;
-
-      if (error) {
-        return {
-          data: {
-            data: [],
-            pagination: {
-              page: pagination.page,
-              limit: pagination.limit,
-              total: 0,
-              totalPages: 0,
-              hasNext: false,
-              hasPrev: false
-            }
-          },
-          error: error.message
-        };
-      }
-
-      const totalPages = Math.ceil((count || 0) / pagination.limit);
-
-      return {
-        data: {
-          data: (data as unknown as LocalizedFacility[]) || [],
-          pagination: {
-            page: pagination.page,
-            limit: pagination.limit,
-            total: count || 0,
-            totalPages,
-            hasNext: pagination.page < totalPages,
-            hasPrev: pagination.page > 1
-          }
+  protected createEntity(data: Partial<LocalizedFacility>): LocalizedFacility {
+    return {
+      id: data.id || this.generateId(),
+      name: data.name || '',
+      description: data.description || '',
+      type: data.type || 'other',
+      area: data.area || 'unknown',
+      address: data.address || '',
+      capacity: data.capacity || 0,
+      amenities: data.amenities || [],
+      images: data.images || [],
+      openingHours: data.openingHours || [],
+      contactInfo: data.contactInfo || {
+        email: '',
+        phone: ''
+      },
+      pricing: data.pricing || {
+        basePrice: 0,
+        currency: 'NOK',
+        pricingType: 'hourly',
+        actorTypeMultipliers: {
+          'private-person': 1,
+          'lag-foreninger': 1,
+          'paraply': 1,
+          'private-firma': 1,
+          'kommunale-enheter': 1
         }
-      };
-    } catch (error: any) {
-      return {
-        data: {
-          data: [],
-          pagination: {
-            page: pagination.page,
-            limit: pagination.limit,
-            total: 0,
-            totalPages: 0,
-            hasNext: false,
-            hasPrev: false
-          }
-        },
-        error: error.message
-      };
-    }
+      },
+      zones: data.zones || [],
+      metadata: data.metadata || { tags: [] },
+      createdAt: data.createdAt || new Date(),
+      updatedAt: data.updatedAt || new Date()
+    };
   }
 
-  async findByIdRaw(id: string): Promise<RepositoryResponse<LocalizedFacility | null>> {
-    try {
-      const { data, error } = await supabase
-        .from('facilities')
-        .select(`
-          *,
-          facility_translations(*),
-          facility_images(*)
-        `)
-        .eq('id', parseInt(id))
-        .maybeSingle();
-
-      if (error) {
-        return {
-          data: null,
-          error: error.message
-        };
-      }
-
-      return {
-        data: data as unknown as LocalizedFacility | null
-      };
-    } catch (error: any) {
-      return {
-        data: null,
-        error: error.message
-      };
-    }
+  protected updateEntity(existing: LocalizedFacility, updates: Partial<LocalizedFacility>): LocalizedFacility {
+    return { 
+      ...existing, 
+      ...updates, 
+      updatedAt: new Date() 
+    };
   }
 
-  async getZonesByFacilityId(facilityId: string): Promise<RepositoryResponse<Zone[]>> {
-    try {
-      const { data, error } = await supabase
-        .from('zones')
-        .select('*')
-        .eq('facility_id', parseInt(facilityId));
-
-      if (error) {
-        return {
-          data: [],
-          error: error.message
-        };
-      }
-
-      return {
-        data: (data as unknown as Zone[]) || []
-      };
-    } catch (error: any) {
-      return {
+  async findAllWithPagination(
+    pagination: PaginationParams,
+    searchTerm?: string,
+    filters?: any
+  ): Promise<RepositoryResponse<PaginatedResponse<LocalizedFacility>>> {
+    return {
+      data: {
         data: [],
-        error: error.message
-      };
-    }
+        pagination: {
+          page: pagination.page,
+          limit: pagination.limit,
+          total: 0,
+          totalPages: 0,
+          hasNext: false,
+          hasPrev: false
+        }
+      },
+      error: "LocalizedFacilityRepository methods not implemented - use hooks instead"
+    };
   }
 
-  async getZoneById(zoneId: string): Promise<RepositoryResponse<Zone | null>> {
-    try {
-      const { data, error } = await supabase
-        .from('zones')
-        .select('*')
-        .eq('id', zoneId)
-        .maybeSingle();
-
-      if (error) {
-        return {
-          data: null,
-          error: error.message
-        };
-      }
-
-      return {
-        data: data as unknown as Zone | null
-      };
-    } catch (error: any) {
-      return {
-        data: null,
-        error: error.message
-      };
-    }
+  async findById(id: string): Promise<RepositoryResponse<LocalizedFacility>> {
+    return {
+      data: null,
+      error: "LocalizedFacilityRepository methods not implemented - use hooks instead"
+    };
   }
 
-  async getRawFacilitiesByType(type: string): Promise<RepositoryResponse<LocalizedFacility[]>> {
-    try {
-      const { data, error } = await supabase
-        .from('facilities')
-        .select(`
-          *,
-          facility_translations(*),
-          facility_images(*)
-        `)
-        .eq('type', type);
-
-      if (error) {
-        return {
-          data: [],
-          error: error.message
-        };
-      }
-
-      return {
-        data: (data as unknown as LocalizedFacility[]) || []
-      };
-    } catch (error: any) {
-      return {
-        data: [],
-        error: error.message
-      };
-    }
+  async getZonesByFacilityId(facilityId: number): Promise<RepositoryResponse<Zone[]>> {
+    return {
+      data: [],
+      error: "LocalizedFacilityRepository methods not implemented - use hooks instead"
+    };
   }
 
-  async getRawFacilitiesByArea(area: string): Promise<RepositoryResponse<LocalizedFacility[]>> {
-    try {
-      const { data, error } = await supabase
-        .from('facilities')
-        .select(`
-          *,
-          facility_translations(*),
-          facility_images(*)
-        `)
-        .eq('area', area);
+  async getZoneById(facilityId: number, zoneId: string): Promise<RepositoryResponse<Zone>> {
+    return {
+      data: null,
+      error: "LocalizedFacilityRepository methods not implemented - use hooks instead"
+    };
+  }
 
-      if (error) {
-        return {
-          data: [],
-          error: error.message
-        };
-      }
+  async getFacilitiesByType(type: string): Promise<RepositoryResponse<LocalizedFacility[]>> {
+    return {
+      data: [],
+      error: "LocalizedFacilityRepository methods not implemented - use hooks instead"
+    };
+  }
 
-      return {
-        data: (data as unknown as LocalizedFacility[]) || []
-      };
-    } catch (error: any) {
-      return {
-        data: [],
-        error: error.message
-      };
-    }
+  async getFacilitiesByArea(area: string): Promise<RepositoryResponse<LocalizedFacility[]>> {
+    return {
+      data: [],
+      error: "LocalizedFacilityRepository methods not implemented - use hooks instead"
+    };
   }
 }
