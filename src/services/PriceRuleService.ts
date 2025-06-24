@@ -1,24 +1,11 @@
 
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from "@/integrations/supabase/client";
+import { ActorType, PriceRuleType } from "@/types/pricing";
 
-export enum PriceRuleType {
-  BASE = 'BASE',
-  SURCHARGE = 'SURCHARGE', 
-  DISCOUNT = 'DISCOUNT',
-  OVERRIDE = 'OVERRIDE'
-}
-
-export enum ActorType {
-  INDIVIDUAL = 'INDIVIDUAL',
-  ORGANIZATION = 'ORGANIZATION', 
-  PARAPLY = 'PARAPLY'
-}
-
-export interface PriceRule {
+interface PriceRule {
   id: string;
-  locationId?: string;
-  zoneId?: string;
-  actorType?: ActorType;
+  locationId: string;
+  actorType: ActorType;
   type: PriceRuleType;
   priority: number;
   config: {
@@ -34,89 +21,71 @@ export interface PriceRule {
 }
 
 export class PriceRuleService {
-  static async getPriceRules(locationId?: string, zoneId?: string): Promise<PriceRule[]> {
-    let query = supabase
-      .from('app_price_rules')
-      .select('*')
-      .eq('is_active', true);
+  static async getPriceRules(locationId?: string): Promise<PriceRule[]> {
+    try {
+      let query = supabase
+        .from('app_price_rules')
+        .select('*')
+        .order('priority', { ascending: true });
 
-    if (locationId) {
-      query = query.eq('location_id', locationId);
+      if (locationId) {
+        query = query.eq('location_id', locationId);
+      }
+
+      const { data, error } = await query;
+
+      if (error) throw new Error(error.message);
+
+      return (data || []).map(rule => ({
+        id: rule.id,
+        locationId: rule.location_id || '',
+        actorType: rule.actor_type as ActorType,
+        type: rule.type as PriceRuleType,
+        priority: rule.priority || 1,
+        config: typeof rule.config === 'object' ? rule.config as any : {},
+        price: rule.price,
+        isActive: true, // Default since this field doesn't exist in schema
+        createdAt: rule.created_at || '',
+        updatedAt: rule.created_at || '' // Use created_at since updated_at doesn't exist
+      }));
+    } catch (error) {
+      console.error('Error fetching price rules:', error);
+      return [];
     }
-    if (zoneId) {
-      query = query.eq('zone_id', zoneId);
-    }
-
-    const { data, error } = await query.order('priority', { ascending: true });
-
-    if (error) throw new Error(error.message);
-    
-    return (data || []).map(rule => ({
-      id: rule.id,
-      locationId: rule.location_id,
-      zoneId: rule.zone_id,
-      actorType: rule.actor_type as ActorType,
-      type: rule.type as PriceRuleType,
-      priority: rule.priority,
-      config: rule.config || {},
-      price: parseFloat(rule.price.toString()),
-      isActive: rule.is_active,
-      createdAt: rule.created_at,
-      updatedAt: rule.updated_at
-    }));
   }
 
-  static calculateUnitPrice(
-    rules: PriceRule[],
-    bookingDate: Date,
-    actorType: ActorType
-  ): number {
-    const applicable = rules
-      .filter(r => r.isActive && this.isRuleApplicable(r, bookingDate, actorType))
-      .sort((a, b) => a.priority - b.priority);
+  static async createPriceRule(rule: Omit<PriceRule, 'id' | 'createdAt' | 'updatedAt'>): Promise<PriceRule | null> {
+    try {
+      const { data, error } = await supabase
+        .from('app_price_rules')
+        .insert({
+          location_id: rule.locationId,
+          actor_type: rule.actorType,
+          type: rule.type,
+          priority: rule.priority,
+          config: rule.config,
+          price: rule.price
+        })
+        .select()
+        .single();
 
-    let price = 0;
-    for (const rule of applicable) {
-      switch (rule.type) {
-        case PriceRuleType.BASE:
-          price = rule.price;
-          break;
-        case PriceRuleType.SURCHARGE:
-          price = price * (1 + (rule.config.percent ?? 0) / 100);
-          break;
-        case PriceRuleType.DISCOUNT:
-          price = price * (1 - (rule.config.percent ?? 0) / 100);
-          break;
-        case PriceRuleType.OVERRIDE:
-          price = rule.price;
-          break;
-      }
+      if (error) throw new Error(error.message);
+
+      return {
+        id: data.id,
+        locationId: data.location_id || '',
+        actorType: data.actor_type as ActorType,
+        type: data.type as PriceRuleType,
+        priority: data.priority || 1,
+        config: typeof data.config === 'object' ? data.config as any : {},
+        price: data.price,
+        isActive: true,
+        createdAt: data.created_at || '',
+        updatedAt: data.created_at || ''
+      };
+    } catch (error) {
+      console.error('Error creating price rule:', error);
+      return null;
     }
-    return price;
-  }
-
-  private static isRuleApplicable(rule: PriceRule, date: Date, actorType: ActorType): boolean {
-    // Check actor type match
-    if (rule.actorType && rule.actorType !== actorType) {
-      return false;
-    }
-
-    // Check day of week
-    if (rule.config.daysOfWeek && rule.config.daysOfWeek.length > 0) {
-      const dayOfWeek = date.getDay(); // 0 = Sunday, 1 = Monday, etc.
-      if (!rule.config.daysOfWeek.includes(dayOfWeek)) {
-        return false;
-      }
-    }
-
-    // Check time of day (simplified - would need more complex logic for real implementation)
-    if (rule.config.startTime && rule.config.endTime) {
-      const timeStr = date.toTimeString().substring(0, 5); // "HH:MM"
-      if (timeStr < rule.config.startTime || timeStr > rule.config.endTime) {
-        return false;
-      }
-    }
-
-    return true;
   }
 }

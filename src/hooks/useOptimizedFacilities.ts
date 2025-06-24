@@ -1,64 +1,37 @@
 
 import { useQuery } from "@tanstack/react-query";
-import { OptimizedLocalizedFacilityService } from "@/services/OptimizedLocalizedFacilityService";
-import { FacilityFilters, FacilitySortOptions } from "@/types/facility";
-import { PaginationParams } from "@/types/api";
-import { useLocalization } from "@/contexts/LocalizationContext";
-import { useMemo } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useLanguage } from "@/contexts/LanguageContext";
 
-interface UseFacilitiesParams {
-  pagination: PaginationParams;
-  filters?: FacilityFilters;
-  sort?: FacilitySortOptions;
-}
+export function useOptimizedFacilities() {
+  const { language } = useLanguage();
 
-export function useOptimizedFacilities({
-  pagination,
-  filters,
-  sort
-}: UseFacilitiesParams) {
-  const { getLocalizedFacility, language } = useLocalization();
+  return useQuery({
+    queryKey: ['optimized-facilities', language],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('app_locations')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-  const {
-    data: response,
-    isLoading,
-    error,
-    refetch
-  } = useQuery({
-    queryKey: ['optimized-facilities', pagination, filters, sort],
-    queryFn: () => OptimizedLocalizedFacilityService.getRawFacilities(pagination, filters, sort),
-    staleTime: 0, // No cache - always fetch fresh data
-    gcTime: 30 * 1000, // Keep in memory for 30 seconds only
+      if (error) throw new Error(error.message);
+
+      // Transform and optimize data
+      const facilities = (data || []).map((location: any) => ({
+        id: location.id,
+        name: typeof location.name === 'object' 
+          ? location.name[language] || location.name['NO'] || location.name['EN'] || location.code
+          : location.name || location.code,
+        code: location.code,
+        address: location.address,
+        capacity: location.capacity,
+        latitude: location.latitude,
+        longitude: location.longitude,
+        created_at: location.created_at
+      }));
+
+      return facilities;
+    },
+    staleTime: 30000, // Cache for 30 seconds for optimization
   });
-
-  // Transform the data based on current language (memoized)
-  const facilities = useMemo(() => {
-    if (!response?.data?.data) return [];
-    const transformed = response.data.data.map(facility => getLocalizedFacility(facility));
-    
-    // Debug logging to see actual facility types and areas
-    console.log("useOptimizedFacilities - Sample facility types:", 
-      transformed.slice(0, 3).map(f => ({ id: f.id, type: f.type, area: f.area }))
-    );
-    console.log("useOptimizedFacilities - Applied filters:", filters);
-    
-    return transformed;
-  }, [response, getLocalizedFacility]);
-
-  const paginationInfo = response?.data ? {
-    page: response.data.pagination.page,
-    limit: response.data.pagination.limit,
-    total: response.data.pagination.total,
-    totalPages: response.data.pagination.totalPages,
-    hasNext: response.data.pagination.hasNext,
-    hasPrev: response.data.pagination.hasPrev
-  } : null;
-
-  return {
-    facilities,
-    pagination: paginationInfo,
-    isLoading,
-    error: response?.error || error,
-    refetch,
-  };
 }

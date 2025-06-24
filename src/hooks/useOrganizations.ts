@@ -1,102 +1,74 @@
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { OrganizationService, Organization } from '@/services/OrganizationService';
-import { PaginationParams } from '@/types/api';
-import { toast } from 'sonner';
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useLanguage } from "@/contexts/LanguageContext";
 
-interface OrganizationFilters {
-  type?: string;
-  status?: string;
-  search?: string;
-}
+export function useOrganizations() {
+  const { language } = useLanguage();
 
-export function useOrganizations(
-  pagination?: PaginationParams,
-  filters?: OrganizationFilters
-) {
   return useQuery({
-    queryKey: ['organizations', pagination, filters],
+    queryKey: ['organizations', language],
     queryFn: async () => {
-      const result = await OrganizationService.getOrganizations(pagination, filters);
-      if (!result.success) {
-        throw new Error(result.error.message);
-      }
-      return result.data;
+      const { data, error } = await supabase
+        .from('app_actors')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw new Error(error.message);
+
+      // Transform data to include localized names
+      const organizations = (data || []).map((actor: any) => ({
+        id: actor.id,
+        name: typeof actor.name === 'object' 
+          ? actor.name[language] || actor.name['NO'] || actor.name['EN'] || 'Unknown'
+          : actor.name || 'Unknown',
+        type: actor.type,
+        orgNumber: actor.org_number,
+        isParaply: actor.is_paraply || false,
+        contactInfo: actor.contact_info || {},
+        metadata: actor.metadata || {},
+        parentActorId: actor.parent_actor_id,
+        created_at: actor.created_at,
+        updated_at: actor.updated_at
+      }));
+
+      return organizations;
     },
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 0,
   });
 }
 
-export function useOrganization(id: string) {
+export function useOrganization(organizationId: string) {
+  const { language } = useLanguage();
+
   return useQuery({
-    queryKey: ['organization', id],
+    queryKey: ['organization', organizationId, language],
     queryFn: async () => {
-      const result = await OrganizationService.getOrganizationById(id);
-      if (!result.success) {
-        throw new Error(result.error.message);
-      }
-      return result.data;
-    },
-    enabled: !!id,
-    staleTime: 1000 * 60 * 5, // 5 minutes
-  });
-}
+      const { data, error } = await supabase
+        .from('app_actors')
+        .select('*')
+        .eq('id', organizationId)
+        .maybeSingle();
 
-export function useUserOrganizations(userId?: string) {
-  return useQuery({
-    queryKey: ['user-organizations', userId],
-    queryFn: async () => {
-      const result = await OrganizationService.getUserOrganizations(userId);
-      if (!result.success) {
-        throw new Error(result.error.message);
-      }
-      return result.data;
-    },
-    staleTime: 1000 * 60 * 5, // 5 minutes
-  });
-}
+      if (error) throw new Error(error.message);
+      if (!data) return null;
 
-export function useCreateOrganization() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (organizationData: Omit<Organization, 'id' | 'created_at' | 'updated_at' | 'status' | 'verification_level' | 'is_active'>) => {
-      const result = await OrganizationService.createOrganization(organizationData);
-      if (!result.success) {
-        throw new Error(result.error.message);
-      }
-      return result.data;
+      return {
+        id: data.id,
+        name: typeof data.name === 'object' 
+          ? data.name[language] || data.name['NO'] || data.name['EN'] || 'Unknown'
+          : data.name || 'Unknown',
+        type: data.type,
+        orgNumber: data.org_number,
+        isParaply: data.is_paraply || false,
+        contactInfo: data.contact_info || {},
+        metadata: data.metadata || {},
+        parentActorId: data.parent_actor_id,
+        created_at: data.created_at,
+        updated_at: data.updated_at
+      };
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['organizations'] });
-      queryClient.invalidateQueries({ queryKey: ['user-organizations'] });
-      toast.success('Organization created successfully');
-    },
-    onError: (error: Error) => {
-      toast.error(`Failed to create organization: ${error.message}`);
-    },
-  });
-}
-
-export function useUpdateOrganization() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async ({ id, updates }: { id: string; updates: Partial<Organization> }) => {
-      const result = await OrganizationService.updateOrganization(id, updates);
-      if (!result.success) {
-        throw new Error(result.error.message);
-      }
-      return result.data;
-    },
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['organizations'] });
-      queryClient.invalidateQueries({ queryKey: ['organization', data.id] });
-      queryClient.invalidateQueries({ queryKey: ['user-organizations'] });
-      toast.success('Organization updated successfully');
-    },
-    onError: (error: Error) => {
-      toast.error(`Failed to update organization: ${error.message}`);
-    },
+    enabled: !!organizationId,
+    staleTime: 0,
   });
 }

@@ -1,190 +1,82 @@
 
-import { supabase } from '@/integrations/supabase/client';
-import { ApiResponse } from '@/types/api';
+import { supabase } from "@/integrations/supabase/client";
 
-export interface Profile {
+interface Profile {
   id: string;
-  first_name: string;
-  last_name: string;
-  phone?: string;
-  avatar_url?: string;
-  bio?: string;
-  preferred_language: 'NO' | 'EN';
-  date_of_birth?: string;
-  address_street?: string;
-  address_city?: string;
-  address_postal_code?: string;
-  address_country?: string;
-  emergency_contact_name?: string;
-  emergency_contact_phone?: string;
-  is_active: boolean;
+  name: string;
+  email: string;
+  locale: string;
   created_at: string;
-  updated_at: string;
-}
-
-export interface UserRole {
-  id: string;
-  user_id: string;
-  role: string;
-  granted_at: string;
-  expires_at?: string;
-  is_active: boolean;
 }
 
 export class ProfileService {
-  static async getCurrentProfile(): Promise<ApiResponse<Profile>> {
+  static async getProfile(userId: string): Promise<Profile | null> {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        return {
-          success: false,
-          error: {
-            message: 'User not authenticated'
-          }
-        };
-      }
-
       const { data, error } = await supabase
-        .from('profiles')
+        .from('app_users')
         .select('*')
-        .eq('id', user.id)
-        .single();
+        .eq('id', userId)
+        .maybeSingle();
 
-      if (error) {
-        return {
-          success: false,
-          error: {
-            message: 'Failed to fetch profile',
-            details: error
-          }
-        };
-      }
+      if (error) throw new Error(error.message);
+      if (!data) return null;
 
       return {
-        success: true,
-        data
+        id: data.id,
+        name: data.name,
+        email: data.email,
+        locale: data.locale || 'NO',
+        created_at: data.created_at || ''
       };
     } catch (error) {
-      return {
-        success: false,
-        error: {
-          message: 'Failed to fetch profile',
-          details: error
-        }
-      };
+      console.error('Error fetching profile:', error);
+      return null;
     }
   }
 
-  static async updateProfile(updates: Partial<Profile>): Promise<ApiResponse<Profile>> {
+  static async updateProfile(userId: string, updates: Partial<Profile>): Promise<Profile | null> {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        return {
-          success: false,
-          error: {
-            message: 'User not authenticated'
-          }
-        };
-      }
-
       const { data, error } = await supabase
-        .from('profiles')
+        .from('app_users')
         .update({
-          ...updates,
-          updated_at: new Date().toISOString()
+          name: updates.name,
+          email: updates.email,
+          locale: updates.locale
         })
-        .eq('id', user.id)
+        .eq('id', userId)
         .select()
         .single();
 
-      if (error) {
-        return {
-          success: false,
-          error: {
-            message: 'Failed to update profile',
-            details: error
-          }
-        };
-      }
+      if (error) throw new Error(error.message);
 
       return {
-        success: true,
-        data
+        id: data.id,
+        name: data.name,
+        email: data.email,
+        locale: data.locale || 'NO',
+        created_at: data.created_at || ''
       };
     } catch (error) {
-      return {
-        success: false,
-        error: {
-          message: 'Failed to update profile',
-          details: error
-        }
-      };
+      console.error('Error updating profile:', error);
+      return null;
     }
   }
 
-  static async getUserRoles(userId?: string): Promise<ApiResponse<UserRole[]>> {
+  static async getUserRoles(userId: string): Promise<string[]> {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      const targetUserId = userId || user?.id;
-      
-      if (!targetUserId) {
-        return {
-          success: false,
-          error: {
-            message: 'User ID required'
-          }
-        };
-      }
-
       const { data, error } = await supabase
-        .from('user_roles')
-        .select('*')
-        .eq('user_id', targetUserId)
-        .eq('is_active', true);
+        .from('app_user_roles')
+        .select(`
+          role:app_roles(name)
+        `)
+        .eq('user_id', userId);
 
-      if (error) {
-        return {
-          success: false,
-          error: {
-            message: 'Failed to fetch user roles',
-            details: error
-          }
-        };
-      }
+      if (error) throw new Error(error.message);
 
-      return {
-        success: true,
-        data
-      };
+      return (data || []).map((item: any) => item.role?.name).filter(Boolean);
     } catch (error) {
-      return {
-        success: false,
-        error: {
-          message: 'Failed to fetch user roles',
-          details: error
-        }
-      };
-    }
-  }
-
-  static async hasRole(role: string, userId?: string): Promise<boolean> {
-    try {
-      const rolesResult = await this.getUserRoles(userId);
-      
-      if (!rolesResult.success) {
-        return false;
-      }
-
-      return rolesResult.data.some(userRole => 
-        userRole.role === role && 
-        userRole.is_active &&
-        (!userRole.expires_at || new Date(userRole.expires_at) > new Date())
-      );
-    } catch (error) {
-      console.error('Error checking user role:', error);
-      return false;
+      console.error('Error fetching user roles:', error);
+      return [];
     }
   }
 }
