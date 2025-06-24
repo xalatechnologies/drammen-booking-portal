@@ -3,7 +3,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import { DateRange } from "react-day-picker";
 import GlobalHeader from "@/components/GlobalHeader";
-import SearchFilter from "@/components/SearchFilter";
+import { SearchFilter } from "@/components/SearchFilter";
 import FacilityList from "@/components/FacilityList";
 import MapView from "@/components/MapView";
 import CalendarView from "@/components/CalendarView";
