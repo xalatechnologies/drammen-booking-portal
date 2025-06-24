@@ -39,11 +39,11 @@ export const FacilityManagementTabs: React.FC<FacilityManagementTabsProps> = ({
         </TabsContent>
 
         <TabsContent value="zones" className="space-y-4">
-          <ZoneManagementView selectedFacilityId={selectedFacilityId?.toString()} />
+          <ZoneManagementView selectedFacilityId={selectedFacilityId} />
         </TabsContent>
 
         <TabsContent value="hours" className="space-y-4">
-          <OpeningHoursManagement selectedFacilityId={selectedFacilityId?.toString()} />
+          <OpeningHoursManagement selectedFacilityId={selectedFacilityId} />
         </TabsContent>
 
         <TabsContent value="blackouts" className="space-y-4">
