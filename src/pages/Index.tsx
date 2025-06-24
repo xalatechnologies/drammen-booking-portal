@@ -1,218 +1,140 @@
 
-import React, { useState, useEffect, useMemo } from "react";
-import { useSearchParams } from "react-router-dom";
-import { DateRange } from "react-day-picker";
-import GlobalHeader from "@/components/GlobalHeader";
-import SearchFilter from "@/components/SearchFilter";
-import FacilityList from "@/components/FacilityList";
-import MapView from "@/components/MapView";
-import CalendarView from "@/components/CalendarView";
-// Import mock data instead of using the hook
-import { getFilteredMockFacilities } from "@/mocks/facilityMockData";
-import { Facility, FacilityFilters } from "@/types/facility";
-import { useJsonTranslation } from "@/hooks/useJsonTranslation";
+import React, { useState, useMemo } from 'react';
+import { SearchFilter } from '@/components/SearchFilter';
+import FacilityGrid from '@/components/FacilityGrid';
+import MapView from '@/components/MapView';
+import CalendarView from '@/components/CalendarView';
+import HeroBanner from '@/components/HeroBanner';
+import { Button } from '@/components/ui/button';
+import { Calendar, Grid, Map } from 'lucide-react';
+import { useFacilities } from '@/hooks/useFacilities';
+
+type ViewMode = 'grid' | 'map' | 'calendar';
 
 const Index = () => {
-  const { tSync } = useJsonTranslation();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [date, setDate] = useState<Date>();
-  const [facilityType, setFacilityType] = useState<string>("all");
-  const [location, setLocation] = useState<string>("all");
-  const [viewMode, setViewMode] = useState<"grid" | "map" | "calendar" | "list">("grid");
-  const [accessibility, setAccessibility] = useState<string>("all");
-  const [capacity, setCapacity] = useState<number[]>([0, 200]);
-  const [searchTerm, setSearchTerm] = useState<string>("");
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [viewMode, setViewMode] = useState<ViewMode>('grid');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [facilityType, setFacilityType] = useState('all');
+  const [location, setLocation] = useState('all');
+  const [accessibility, setAccessibility] = useState('all');
+  const [capacity, setCapacity] = useState<[number, number]>([0, 200]);
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>();
 
-  // Advanced filter states
-  const [priceRange, setPriceRange] = useState<number[]>([0, 5000]);
-  const [availableNow, setAvailableNow] = useState<boolean>(false);
-  const [hasEquipment, setHasEquipment] = useState<boolean>(false);
-  const [hasParking, setHasParking] = useState<boolean>(false);
-  const [hasWifi, setHasWifi] = useState<boolean>(false);
-  const [allowsPhotography, setAllowsPhotography] = useState<boolean>(false);
-  
-  // Get filtered facilities based on all filters
-  const facilities = useMemo(() => {
-    return getFilteredMockFacilities({
-      searchTerm,
-      facilityType,
-      location,
-      capacity,
-      accessibility,
-      priceRange,
-      availableNow,
-      hasEquipment,
-      hasParking,
-      hasWifi,
-      allowsPhotography
-    });
-  }, [
-    searchTerm,
-    facilityType,
-    location,
-    capacity,
-    accessibility,
-    priceRange,
-    availableNow,
-    hasEquipment,
-    hasParking,
-    hasWifi,
-    allowsPhotography
-  ]);
-
-  // Initialize state from URL parameters
-  useEffect(() => {
-    const urlFacilityType = searchParams.get('facilityType');
-    const urlLocation = searchParams.get('location');
-    const urlAccessibility = searchParams.get('accessibility');
-    const urlCapacity = searchParams.get('capacity');
-    const urlViewMode = searchParams.get('viewMode');
-    const urlSearchTerm = searchParams.get('searchTerm');
-    
-    if (urlFacilityType) setFacilityType(urlFacilityType);
-    if (urlLocation) setLocation(urlLocation);
-    if (urlAccessibility) setAccessibility(urlAccessibility);
-    if (urlCapacity) {
-      const capacityArray = urlCapacity.split(',').map(Number);
-      if (capacityArray.length === 2) setCapacity(capacityArray);
+  // Use the simplified hook
+  const { facilities, isLoading, error } = useFacilities({
+    pagination: { page: 1, limit: 50 },
+    filters: {
+      facilityType: facilityType !== 'all' ? facilityType : undefined,
+      location: location !== 'all' ? location : undefined,
+      accessibility: accessibility !== 'all' ? accessibility : undefined,
+      capacity: capacity && (capacity[0] > 0 || capacity[1] < 200) ? capacity : undefined,
+      date: selectedDate,
     }
-    if (urlViewMode && ['grid', 'map', 'calendar', 'list'].includes(urlViewMode)) {
-      setViewMode(urlViewMode as "grid" | "map" | "calendar" | "list");
-    }
-    if (urlSearchTerm) setSearchTerm(urlSearchTerm);
+  });
 
-    // Clear URL parameters after setting state
-    if (searchParams.toString()) {
-      setSearchParams({});
-    }
+  // Client-side search filtering
+  const filteredFacilities = useMemo(() => {
+    if (!searchTerm) return facilities;
+    return facilities.filter(facility => 
+      facility.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      facility.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      facility.address.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [facilities, searchTerm]);
 
-    // Simulate loading delay for a more realistic experience
-    setIsLoading(true);
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 800);
-    
-    return () => clearTimeout(timer);
-  }, [searchParams, setSearchParams]);
-
-  // Create amenities array from individual boolean states
-  const amenities = [
-    ...(hasEquipment ? ['av-equipment'] : []), 
-    ...(hasParking ? ['parking'] : []), 
-    ...(hasWifi ? ['wifi'] : []), 
-    ...(allowsPhotography ? ['photography'] : [])
-  ];
-
-  // Create filters object with proper handling
-  const filters: FacilityFilters = {
-    ...(searchTerm && searchTerm.trim() !== "" ? {
-      searchTerm: searchTerm.trim()
-    } : {}),
-    ...(facilityType && facilityType !== "all" ? {
-      facilityType
-    } : {}),
-    ...(location && location !== "all" ? {
-      location
-    } : {}),
-    ...(accessibility && accessibility !== "all" ? {
-      accessibility
-    } : {}),
-    ...(capacity && (capacity[0] > 0 || capacity[1] < 200) ? {
-      capacity
-    } : {}),
-    ...(date ? {
-      date
-    } : {}),
-    ...(priceRange && (priceRange[0] > 0 || priceRange[1] < 5000) ? {
-      priceRange: {
-        min: priceRange[0],
-        max: priceRange[1]
-      }
-    } : {}),
-    ...(availableNow ? {
-      availableNow
-    } : {}),
-    ...(amenities.length > 0 ? {
-      amenities
-    } : {})
-  };
-  
-  console.log("Index.tsx - Created filters:", filters);
-  
   const renderContent = () => {
+    if (isLoading) {
+      return <div className="text-center py-8">Laster inn...</div>;
+    }
+
+    if (error) {
+      return <div className="text-center py-8 text-red-500">Feil ved lasting av data</div>;
+    }
+
     switch (viewMode) {
-      case "map":
-        return <MapView facilityType={facilityType} location={location} viewMode={viewMode} setViewMode={setViewMode} />;
-      case "calendar":
-        return <CalendarView date={date} facilityType={facilityType} location={location} accessibility={accessibility} capacity={capacity} viewMode={viewMode} setViewMode={setViewMode} />;
-      case "list":
-      case "grid":
+      case 'map':
+        return <MapView facilities={filteredFacilities} />;
+      case 'calendar':
         return (
-          <div className="max-w-7xl mx-auto px-4 my-[12px]">
-            <FacilityList filters={filters} viewMode={viewMode} setViewMode={setViewMode} />
-          </div>
+          <CalendarView 
+            date={selectedDate}
+            facilityType={facilityType}
+            location={location}
+            accessibility={accessibility}
+            capacity={capacity}
+          />
         );
       default:
-        return (
-          <div className="max-w-7xl mx-auto px-4 my-[12px]">
-            <FacilityList filters={filters} viewMode="grid" setViewMode={setViewMode} />
-          </div>
-        );
+        return <FacilityGrid facilities={filteredFacilities} />;
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex flex-col w-full">
-      {/* Skip to main content link for screen readers */}
-      <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-0 focus:left-0 bg-blue-600 text-white p-2 z-50 rounded-br-md focus:outline-none focus:ring-2 focus:ring-blue-500" tabIndex={0}>
-        Hopp til hovedinnhold
-      </a>
-
-      {/* Fixed Global Header */}
-      <div className="fixed top-0 left-0 right-0 z-50 bg-white shadow-md">
-        <GlobalHeader />
-      </div>
-
-      {/* Main content with top padding to account for fixed header */}
-      <main id="main-content" className="flex-1 w-full pt-20">
-        {/* Fixed Search Filter attached to header */}
-        <div className="fixed top-20 left-0 right-0 z-40 w-full">
-          <SearchFilter 
-            date={date} 
-            setDate={setDate} 
-            facilityType={facilityType} 
-            setFacilityType={setFacilityType} 
-            location={location} 
-            setLocation={setLocation} 
-            viewMode={viewMode} 
-            setViewMode={setViewMode} 
-            accessibility={accessibility} 
-            setAccessibility={setAccessibility} 
-            capacity={capacity} 
-            setCapacity={setCapacity} 
-            searchTerm={searchTerm} 
-            setSearchTerm={setSearchTerm} 
-            priceRange={priceRange} 
-            setPriceRange={setPriceRange} 
-            availableNow={availableNow} 
-            setAvailableNow={setAvailableNow} 
-            hasEquipment={hasEquipment} 
-            setHasEquipment={setHasEquipment} 
-            hasParking={hasParking} 
-            setHasParking={setHasParking} 
-            hasWifi={hasWifi} 
-            setHasWifi={setHasWifi} 
-            allowsPhotography={allowsPhotography} 
-            setAllowsPhotography={setAllowsPhotography} 
+    <div className="min-h-screen bg-gray-50">
+      <HeroBanner />
+      
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Search and Filters */}
+        <div className="mb-8">
+          <SearchFilter
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            facilityType={facilityType}
+            onFacilityTypeChange={setFacilityType}
+            location={location}
+            onLocationChange={setLocation}
+            accessibility={accessibility}
+            onAccessibilityChange={setAccessibility}
+            capacity={capacity}
+            onCapacityChange={setCapacity}
+            selectedDate={selectedDate}
+            onDateChange={setSelectedDate}
           />
         </div>
 
-        {/* Scrollable Content Area with reduced top padding */}
-        <div className="pt-40">
-          {renderContent()}
+        {/* View Mode Toggle */}
+        <div className="flex justify-center mb-6">
+          <div className="flex bg-white rounded-lg shadow-sm border p-1">
+            <Button
+              variant={viewMode === 'grid' ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => setViewMode('grid')}
+              className="flex items-center space-x-2"
+            >
+              <Grid className="h-4 w-4" />
+              <span>Rutenett</span>
+            </Button>
+            <Button
+              variant={viewMode === 'map' ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => setViewMode('map')}
+              className="flex items-center space-x-2"
+            >
+              <Map className="h-4 w-4" />
+              <span>Kart</span>
+            </Button>
+            <Button
+              variant={viewMode === 'calendar' ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => setViewMode('calendar')}
+              className="flex items-center space-x-2"
+            >
+              <Calendar className="h-4 w-4" />
+              <span>Kalender</span>
+            </Button>
+          </div>
         </div>
-      </main>
+
+        {/* Results Count */}
+        <div className="mb-4">
+          <p className="text-sm text-gray-600">
+            Viser {filteredFacilities.length} av {facilities.length} lokaler
+          </p>
+        </div>
+
+        {/* Content */}
+        {renderContent()}
+      </div>
     </div>
   );
 };

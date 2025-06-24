@@ -2,10 +2,13 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Zone } from '@/types/facility';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export const useZones = (facilityId?: string) => {
+  const { language } = useLanguage();
+
   return useQuery({
-    queryKey: ['zones', facilityId],
+    queryKey: ['zones', facilityId, language],
     queryFn: async () => {
       console.log('useZones - Fetching zones for facility:', facilityId);
       
@@ -15,14 +18,10 @@ export const useZones = (facilityId?: string) => {
       }
 
       try {
-        let query = (supabase as any).from('app_zones').select('*');
-        
-        // Filter by facility ID if provided
-        if (facilityId) {
-          query = query.eq('location_id', facilityId);
-        }
-        
-        const { data, error } = await query;
+        const { data, error } = await supabase
+          .from('app_zones')
+          .select('*')
+          .eq('location_id', facilityId);
         
         if (error) {
           console.error('useZones - Error fetching zones:', error);
@@ -34,15 +33,14 @@ export const useZones = (facilityId?: string) => {
         // Transform the data to match the expected Zone interface
         const zones: Zone[] = (data || []).map((zone: any) => ({
           id: zone.id,
-          name: typeof zone.name === 'object' ? zone.name.NO || zone.name.EN || 'Unknown Zone' : zone.name,
-          description: typeof zone.name === 'object' ? zone.name.NO || zone.name.EN || '' : '',
+          name: typeof zone.name === 'object' ? zone.name[language] || zone.name.NO || zone.name.EN || 'Unknown Zone' : zone.name,
+          description: typeof zone.name === 'object' ? zone.name[language] || zone.name.NO || zone.name.EN || '' : '',
           capacity: zone.capacity || 1,
           facilityId: zone.location_id,
           isActive: true,
           equipment: [],
           amenities: [],
           pricePerHour: 0,
-          // Add any other required fields with defaults
         }));
 
         console.log('useZones - Transformed zones:', zones);
@@ -61,7 +59,7 @@ export const useCreateZone = () => {
   
   return useMutation({
     mutationFn: async (zoneData: Partial<Zone>) => {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('app_zones')
         .insert({
           location_id: zoneData.facilityId,
@@ -96,7 +94,7 @@ export const useUpdateZone = () => {
         updateData.capacity = data.capacity;
       }
       
-      const { data: result, error } = await (supabase as any)
+      const { data: result, error } = await supabase
         .from('app_zones')
         .update(updateData)
         .eq('id', id)
@@ -117,7 +115,7 @@ export const useDeleteZone = () => {
   
   return useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from('app_zones')
         .delete()
         .eq('id', id);

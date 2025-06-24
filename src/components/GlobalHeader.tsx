@@ -1,146 +1,122 @@
 
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React from 'react';
 import { Button } from "@/components/ui/button";
-import { Menu, Clock, Shield } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import Logo from "@/components/header/Logo";
-import LanguageToggle from "@/components/header/LanguageToggle";
-import ProfileMenu from "@/components/header/ProfileMenu";
-import MobileMenu from "@/components/header/MobileMenu";
+import { MapPin, Calendar, ShoppingCart, User, Menu } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import { GlobalSearch } from "@/components/header/GlobalSearch";
-import { CartDropdown } from "@/components/header/CartDropdown";
-import { useLanguage } from "@/contexts/LanguageContext";
-import { useCart } from "@/contexts/CartContext";
-import { useAuth } from "@/contexts/AuthContext";
+import { useCartStore } from "@/stores/useCartStore";
+import { Badge } from "@/components/ui/badge";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 const GlobalHeader = () => {
   const navigate = useNavigate();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [cartOpen, setCartOpen] = useState(false);
-  const [privacyOpen, setPrivacyOpen] = useState(false);
-  const { language, toggleLanguage } = useLanguage();
-  const { getItemCount } = useCart();
-  const { isAuthenticated, logout } = useAuth();
-
-  // Function to handle login navigation
-  const handleLogin = () => {
-    navigate("/login-selection");
-  };
-
-  // Function to handle logout
-  const handleLogout = () => {
-    logout();
-  };
-
-  const itemCount = getItemCount();
+  const { items } = useCartStore();
+  const cartItemCount = items.length;
 
   return (
-    <header className="bg-white dark:bg-gray-900 py-3 shadow-md sticky top-0 z-10 border-b border-gray-200 dark:border-gray-700 w-full">
-      <div className="container mx-auto px-4 max-w-7xl">
-        <div className="flex justify-between items-center gap-4">
-          {/* Logo (left) */}
-          <div className="flex items-center flex-shrink-0">
-            <Logo />
+    <header className="bg-white shadow-sm border-b">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16">
+          {/* Logo */}
+          <div className="flex items-center">
+            <Link to="/" className="flex items-center space-x-2">
+              <MapPin className="h-8 w-8 text-blue-600" />
+              <span className="text-xl font-bold text-gray-900">BookingApp</span>
+            </Link>
           </div>
 
-          {/* Global Search (center) - Hidden on mobile */}
-          <div className="hidden md:flex flex-1 justify-center max-w-lg">
+          {/* Search - Hidden on mobile */}
+          <div className="hidden md:flex flex-1 max-w-lg mx-8">
             <GlobalSearch />
           </div>
 
-          {/* Mobile Menu Button */}
-          <Button 
-            variant="ghost" 
-            className="md:hidden p-2" 
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          >
-            <Menu className="h-6 w-6" />
-          </Button>
-
-          {/* Right side: Privacy, Cart, Language toggle & Login/Profile */}
-          <div className="hidden md:flex items-center space-x-2 flex-shrink-0">
-            {/* Privacy/GDPR Menu */}
-            <DropdownMenu open={privacyOpen} onOpenChange={setPrivacyOpen}>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="hover:bg-gray-100">
-                  <Shield className="h-6 w-6" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuItem onClick={() => navigate('/personvern')}>
-                  Personvern
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate('/cookies')}>
-                  Cookies
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate('/tilgjengelighet')}>
-                  Tilgjengelighet
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-            {/* Selected Times Icon with Dropdown */}
-            <Popover open={cartOpen} onOpenChange={setCartOpen}>
-              <PopoverTrigger asChild>
-                <Button variant="ghost" className="relative hover:bg-gray-100">
-                  <Clock className="h-6 w-6" />
-                  {itemCount > 0 && (
-                    <Badge 
-                      className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center text-xs bg-red-500 text-white rounded-full animate-pulse"
-                    >
-                      {itemCount > 99 ? '99+' : itemCount}
-                    </Badge>
-                  )}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-96 p-0 z-50" align="end">
-                <CartDropdown onClose={() => setCartOpen(false)} />
-              </PopoverContent>
-            </Popover>
+          {/* Navigation - Desktop */}
+          <nav className="hidden md:flex items-center space-x-4">
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => navigate('/')}
+              className="flex items-center space-x-1"
+            >
+              <Calendar className="h-4 w-4" />
+              <span>Kalender</span>
+            </Button>
             
-            {/* Language toggle */}
-            <LanguageToggle 
-              language={language} 
-              toggleLanguage={toggleLanguage} 
-            />
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => navigate('/checkout')}
+              className="flex items-center space-x-1 relative"
+            >
+              <ShoppingCart className="h-4 w-4" />
+              <span>Handlekurv</span>
+              {cartItemCount > 0 && (
+                <Badge variant="destructive" className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 text-xs">
+                  {cartItemCount}
+                </Badge>
+              )}
+            </Button>
             
-            {/* Profile menu (login button or dropdown) */}
-            <ProfileMenu 
-              isLoggedIn={isAuthenticated} 
-              handleLogin={handleLogin} 
-              handleLogout={handleLogout}
-            />
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => navigate('/profile')}
+              className="flex items-center space-x-1"
+            >
+              <User className="h-4 w-4" />
+              <span>Profil</span>
+            </Button>
+          </nav>
+
+          {/* Mobile menu */}
+          <div className="md:hidden">
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="sm">
+                  <Menu className="h-5 w-5" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+                <div className="flex flex-col space-y-4 mt-8">
+                  <GlobalSearch />
+                  
+                  <Button 
+                    variant="ghost" 
+                    className="justify-start"
+                    onClick={() => navigate('/')}
+                  >
+                    <Calendar className="h-4 w-4 mr-2" />
+                    Kalender
+                  </Button>
+                  
+                  <Button 
+                    variant="ghost" 
+                    className="justify-start relative"
+                    onClick={() => navigate('/checkout')}
+                  >
+                    <ShoppingCart className="h-4 w-4 mr-2" />
+                    Handlekurv
+                    {cartItemCount > 0 && (
+                      <Badge variant="destructive" className="ml-auto">
+                        {cartItemCount}
+                      </Badge>
+                    )}
+                  </Button>
+                  
+                  <Button 
+                    variant="ghost" 
+                    className="justify-start"
+                    onClick={() => navigate('/profile')}
+                  >
+                    <User className="h-4 w-4 mr-2" />
+                    Profil
+                  </Button>
+                </div>
+              </SheetContent>
+            </Sheet>
           </div>
         </div>
-
-        {/* Mobile Search Bar - Shown only on mobile */}
-        <div className="md:hidden mt-3">
-          <GlobalSearch />
-        </div>
       </div>
-
-      {/* Mobile Menu */}
-      <MobileMenu 
-        isOpen={mobileMenuOpen}
-        isLoggedIn={isAuthenticated}
-        setLanguage={(lang) => {
-          if (lang === 'NO' || lang === 'EN') {
-            const event = new CustomEvent('setLanguage', { detail: lang });
-            window.dispatchEvent(event);
-          }
-        }}
-        handleLogin={handleLogin}
-        handleLogout={handleLogout}
-        closeMobileMenu={() => setMobileMenuOpen(false)}
-      />
     </header>
   );
 };
