@@ -61,7 +61,7 @@ export function OrderSummary({ items, customerType }: OrderSummaryProps) {
         <div className="text-xs text-gray-500 space-y-2 pt-4 border-t">
           <h4 className="font-medium text-gray-700">Inkludert i prisen:</h4>
           <ul className="space-y-1">
-            <li>• Tilgang til Lokalen i valgte tidsrom</li>
+            <li>• Tilgang til fasiliteten i valgte tidsrom</li>
             <li>• Grunnleggende utstyr og inventar</li>
             <li>• Rengjøring etter bruk</li>
             <li>• Teknisk support ved behov</li>

@@ -11,15 +11,6 @@ interface SimplifiedZoneManagementProps {
   facilityId: number;
 }
 
-interface Zone {
-  id: string;
-  name: string;
-  type: string;
-  status: string;
-  capacity: number;
-  description?: string;
-}
-
 export const SimplifiedZoneManagement: React.FC<SimplifiedZoneManagementProps> = ({
   facilityId
 }) => {
@@ -49,7 +40,7 @@ export const SimplifiedZoneManagement: React.FC<SimplifiedZoneManagementProps> =
     },
   });
 
-  const zones: Zone[] = zonesResponse?.success ? zonesResponse.data || [] : [];
+  const zones = zonesResponse?.success ? zonesResponse.data || [] : [];
 
   const handleDelete = (id: string) => {
     if (confirm("Are you sure you want to delete this zone?")) {
@@ -90,7 +81,7 @@ export const SimplifiedZoneManagement: React.FC<SimplifiedZoneManagementProps> =
         </div>
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {zones.map((zone) => (
+          {zones.map((zone: any) => (
             <div key={zone.id} className="border rounded-lg p-4 space-y-3">
               <div className="flex justify-between items-start">
                 <div>

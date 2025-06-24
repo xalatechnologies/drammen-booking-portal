@@ -1,43 +1,37 @@
 
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { useLanguage } from "@/contexts/LanguageContext";
+import { OptimizedLocalizedFacilityService } from "@/services/OptimizedLocalizedFacilityService";
+import { useLocalization } from "@/contexts/LocalizationContext";
+import { useMemo } from "react";
 
-export function useOptimizedFacility(facilityId: string) {
-  const { language } = useLanguage();
+export function useOptimizedFacility(id: number | string) {
+  const facilityId = typeof id === 'string' ? parseInt(id, 10) : id;
+  const { getLocalizedFacility } = useLocalization();
 
-  return useQuery({
-    queryKey: ['optimized-facility', facilityId, language],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('app_locations')
-        .select('*')
-        .eq('id', facilityId)
-        .maybeSingle();
-
-      if (error) throw new Error(error.message);
-      if (!data) return null;
-
-      // Transform and optimize data
-      return {
-        id: data.id,
-        name: typeof data.name === 'object' 
-          ? data.name[language] || data.name['NO'] || data.name['EN'] || data.code
-          : data.name || data.code,
-        code: data.code,
-        address: data.address,
-        capacity: data.capacity,
-        latitude: data.latitude,
-        longitude: data.longitude,
-        description: typeof data.description === 'object'
-          ? data.description[language] || data.description['NO'] || data.description['EN'] || ''
-          : data.description || '',
-        facilities: data.facilities || [],
-        metadata: data.metadata || {},
-        created_at: data.created_at
-      };
-    },
-    enabled: !!facilityId,
-    staleTime: 30000,
+  const {
+    data: response,
+    isLoading,
+    error,
+    refetch
+  } = useQuery({
+    queryKey: ['optimized-facility', facilityId],
+    queryFn: () => OptimizedLocalizedFacilityService.getRawFacilityById(facilityId),
+    enabled: !isNaN(facilityId) && facilityId > 0,
+    staleTime: 0, // No cache - always fetch fresh data
+    gcTime: 30 * 1000, // Keep in memory for 30 seconds only
   });
+
+  // Transform the facility based on current language (memoized)
+  const facility = useMemo(() => {
+    if (!response?.data) return null;
+    return getLocalizedFacility(response.data);
+  }, [response, getLocalizedFacility]);
+
+  return {
+    facility,
+    isLoading,
+    error: response?.error || error,
+    notFound: response?.error?.includes('NOT_FOUND'),
+    refetch,
+  };
 }

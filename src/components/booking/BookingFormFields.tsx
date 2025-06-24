@@ -1,9 +1,9 @@
 
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Plus, Minus, Users } from 'lucide-react';
 import { ActorType } from '@/types/pricing';
 
 interface BookingFormData {
@@ -11,8 +11,7 @@ interface BookingFormData {
   attendees: number;
   activityType: string;
   additionalInfo: string;
-  actorType: ActorType;
-  termsAccepted: boolean;
+  actorType: ActorType | '';
 }
 
 interface BookingFormFieldsProps {
@@ -20,92 +19,143 @@ interface BookingFormFieldsProps {
   onUpdateFormData: (updates: Partial<BookingFormData>) => void;
 }
 
-// Separate data for purpose (formål) and activity type (aktivitet)
 const purposeOptions = [
-  { value: 'sport', label: 'Sport og trening' },
-  { value: 'meeting', label: 'Møte' },
-  { value: 'course', label: 'Kurs/opplæring' },
-  { value: 'event', label: 'Arrangement/fest' },
-  { value: 'conference', label: 'Konferanse' },
-  { value: 'workshop', label: 'Workshop' },
-  { value: 'seminar', label: 'Seminar' },
-  { value: 'presentation', label: 'Presentasjon' },
-  { value: 'other', label: 'Annet' }
+  'Møte',
+  'Konferanse',
+  'Workshop',
+  'Trening',
+  'Sosial aktivitet',
+  'Kurs',
+  'Presentasjon',
+  'Idrett og fysisk aktivitet',
+  'Kulturarrangement',
+  'Annet'
 ];
 
-const activityTypeOptions = [
-  { value: 'fotball', label: 'Fotball' },
-  { value: 'basketball', label: 'Basketball' },
-  { value: 'volleyball', label: 'Volleyball' },
-  { value: 'handball', label: 'Håndball' },
-  { value: 'badminton', label: 'Badminton' },
-  { value: 'tennis', label: 'Tennis' },
-  { value: 'dans', label: 'Dans' },
-  { value: 'yoga', label: 'Yoga' },
-  { value: 'aerobic', label: 'Aerobic' },
-  { value: 'styrketrening', label: 'Styrketrening' },
-  { value: 'kampsport', label: 'Kampsport' },
-  { value: 'gymnastikk', label: 'Gymnastikk' },
-  { value: 'annet-sport', label: 'Annen sport' }
+const activityTypes = [
+  'Møte',
+  'Konferanse', 
+  'Workshop',
+  'Trening',
+  'Sosial aktivitet',
+  'Kurs',
+  'Presentasjon',
+  'Idrettsaktivitet',
+  'Kulturaktivitet',
+  'Annet'
 ];
 
-export function BookingFormFields({ formData, onUpdateFormData }: BookingFormFieldsProps) {
+const actorTypes = [
+  { value: 'private-person', label: 'Privatperson' },
+  { value: 'lag-foreninger', label: 'Lag og foreninger' },
+  { value: 'paraply', label: 'Paraplyorganisasjoner' },
+  { value: 'private-firma', label: 'Private firma' },
+  { value: 'kommunale-enheter', label: 'Kommunale enheter' }
+];
+
+export function BookingFormFields({
+  formData,
+  onUpdateFormData
+}: BookingFormFieldsProps) {
+  const handleAttendeesChange = (change: number) => {
+    const newValue = Math.max(1, formData.attendees + change);
+    onUpdateFormData({ attendees: newValue });
+  };
+
   return (
-    <Card>
-      <CardContent className="space-y-3 p-4">
-        {/* Purpose Selection */}
-        <Select 
-          value={formData.purpose} 
-          onValueChange={(value) => onUpdateFormData({ purpose: value })}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Velg formål med bookingen" />
-          </SelectTrigger>
-          <SelectContent>
-            {purposeOptions.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+    <div className="space-y-4">
+      {/* Purpose Dropdown */}
+      <Select
+        value={formData.purpose}
+        onValueChange={(value) => onUpdateFormData({ purpose: value })}
+      >
+        <SelectTrigger>
+          <SelectValue placeholder="Velg formål med reservasjonen *" />
+        </SelectTrigger>
+        <SelectContent>
+          {purposeOptions.map((purpose) => (
+            <SelectItem key={purpose} value={purpose}>
+              {purpose}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
 
-        {/* Activity Type Selection */}
-        <Select 
-          value={formData.activityType} 
-          onValueChange={(value) => onUpdateFormData({ activityType: value })}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Velg type aktivitet" />
-          </SelectTrigger>
-          <SelectContent>
-            {activityTypeOptions.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+      {/* Activity Type */}
+      <Select
+        value={formData.activityType}
+        onValueChange={(value) => onUpdateFormData({ activityType: value })}
+      >
+        <SelectTrigger>
+          <SelectValue placeholder="Velg type aktivitet *" />
+        </SelectTrigger>
+        <SelectContent>
+          {activityTypes.map((type) => (
+            <SelectItem key={type} value={type}>
+              {type}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
 
-        {/* Number of Attendees */}
-        <Input
-          type="number"
-          min="1"
-          value={formData.attendees}
-          onChange={(e) => onUpdateFormData({ attendees: parseInt(e.target.value) || 1 })}
-          placeholder="Antall deltakere"
-          className="w-full"
-        />
+      {/* Number of Attendees - Special Design */}
+      <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Users className="h-5 w-5 text-gray-600" />
+            <span className="font-medium text-gray-700">Antall deltakere</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => handleAttendeesChange(-1)}
+              disabled={formData.attendees <= 1}
+              className="h-8 w-8 p-0 rounded-full"
+            >
+              <Minus className="h-4 w-4" />
+            </Button>
+            <div className="bg-white border border-gray-300 rounded-lg px-4 py-2 min-w-[60px] text-center font-semibold text-lg">
+              {formData.attendees}
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => handleAttendeesChange(1)}
+              className="h-8 w-8 p-0 rounded-full"
+            >
+              <Plus className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      </div>
 
-        {/* Additional Information */}
-        <Textarea
-          value={formData.additionalInfo}
-          onChange={(e) => onUpdateFormData({ additionalInfo: e.target.value })}
-          placeholder="Tilleggsinformasjon (spesielle behov, utstyr som trengs, etc.)"
-          rows={2}
-          className="w-full"
-        />
-      </CardContent>
-    </Card>
+      {/* Description - Combined field */}
+      <Textarea
+        placeholder="Beskrivelse av formål og tilleggsopplysninger..."
+        value={formData.additionalInfo}
+        onChange={(e) => onUpdateFormData({ additionalInfo: e.target.value })}
+        className="min-h-[80px] resize-none"
+      />
+
+      {/* Actor Type */}
+      <Select
+        value={formData.actorType}
+        onValueChange={(value: ActorType) => onUpdateFormData({ actorType: value })}
+      >
+        <SelectTrigger>
+          <SelectValue placeholder="Velg aktør type *" />
+        </SelectTrigger>
+        <SelectContent>
+          {actorTypes.map((type) => (
+            <SelectItem key={type.value} value={type.value}>
+              {type.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
   );
 }

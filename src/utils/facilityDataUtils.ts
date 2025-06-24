@@ -32,12 +32,10 @@ export class FacilityDataUtils {
     
     console.log('FacilityDataUtils.getImageUrl - Selected image:', imageToUse);
     
-    if (!imageToUse?.image_url) {
-      console.log('FacilityDataUtils.getImageUrl - No image URL, using fallback');
-      return fallbackImage;
-    }
+    const imageUrl = imageToUse?.image_url || fallbackImage;
+    console.log('FacilityDataUtils.getImageUrl - Final image URL:', imageUrl);
     
-    return imageToUse.image_url;
+    return imageUrl;
   }
 
   /**
@@ -139,23 +137,5 @@ export class FacilityDataUtils {
         height: 3
       } : undefined
     }));
-  }
-
-  /**
-   * Gets fallback image URL for facilities without images - using local images
-   */
-  static getFallbackImageUrl(index: number = 0): string {
-    const fallbackImages = [
-      '/bilder/Ankerskogen_svoemmehall1.jpg',
-      '/bilder/Bergsjöns_kulturhus_sett_från_Bergsjöns_centrum.jpg',
-      '/bilder/Elverum_svømmehall.jpg',
-      '/bilder/Hamar_kulturhus_I.jpg',
-      '/bilder/Mollebakken-skole.jpg',
-      '/bilder/Nesøya_skole_og_idrettshall_Asker.jpg',
-      '/bilder/standard_compressed_Kulturhuset_1200px.jpg',
-      '/bilder/standard_compressed_drammensbadet_71.jpg'
-    ];
-    
-    return fallbackImages[index % fallbackImages.length];
   }
 }

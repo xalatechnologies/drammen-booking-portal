@@ -1,103 +1,133 @@
-import React from 'react';
-import { Facility } from '@/types/facility';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Eye, Calendar, Edit } from 'lucide-react';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { useJsonTranslation } from '@/hooks/useJsonTranslation';
+
+import React from "react";
+import { Eye, Calendar, Settings, MapPin } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface FacilityTableViewProps {
-  facilities: Facility[];
-  onView: (facility: Facility) => void;
-  onCalendar: (facility: Facility) => void;
-  onEdit: (facility: Facility) => void;
-  isLoading?: boolean;
+  facilities: any[];
+  onView: (facility: any) => void;
+  onCalendar: (facility: any) => void;
+  onEdit: (facility: any) => void;
 }
 
-export const FacilityTableView: React.FC<FacilityTableViewProps> = ({ facilities, onView, onCalendar, onEdit, isLoading }) => {
-  const { tSync } = useJsonTranslation();
+export const FacilityTableView: React.FC<FacilityTableViewProps> = ({
+  facilities,
+  onView,
+  onCalendar,
+  onEdit
+}) => {
+  const { tSync } = useTranslation();
 
-  // Skeleton loader
-  if (isLoading) {
-    return (
-      <div className="w-full mt-4 mb-6 bg-white rounded-lg shadow-sm overflow-x-auto px-4 sm:px-6 lg:px-8 animate-pulse">
-        <div className="h-12 bg-gray-100 rounded mb-2" />
-        {[...Array(6)].map((_, i) => (
-          <div key={i} className="h-10 bg-gray-50 rounded mb-2" />
-        ))}
-      </div>
-    );
-  }
-
-  // Empty state
-  if (!facilities.length) {
-    return (
-      <div className="w-full mt-4 mb-6 bg-white rounded-lg shadow-sm px-4 sm:px-6 lg:px-8 text-center py-12 text-gray-500">
-        {tSync('admin.facilities.search.noResults', 'No facilities found.')}
-      </div>
-    );
-  }
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'active':
+        return 'bg-green-100 text-green-800';
+      case 'maintenance':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'inactive':
+        return 'bg-red-100 text-red-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
 
   return (
-    <table className="w-full min-w-full divide-y divide-gray-200 text-base mt-0">
-      <thead className="bg-gray-50 sticky top-0 z-10">
-        <tr>
-          <th className="px-3 py-3 text-left font-semibold text-gray-800 uppercase tracking-wider whitespace-nowrap">{tSync('admin.facilities.table.name', 'Name')}</th>
-          <th className="px-3 py-3 text-left font-semibold text-gray-800 uppercase tracking-wider whitespace-nowrap">{tSync('admin.facilities.table.type', 'Type')}</th>
-          <th className="px-3 py-3 text-left font-semibold text-gray-800 uppercase tracking-wider whitespace-nowrap">{tSync('admin.facilities.table.area', 'Area')}</th>
-          <th className="px-3 py-3 text-left font-semibold text-gray-800 uppercase tracking-wider whitespace-nowrap">{tSync('admin.facilities.table.status', 'Status')}</th>
-          <th className="px-3 py-3 text-center font-semibold text-gray-800 uppercase tracking-wider whitespace-nowrap">{tSync('admin.facilities.table.actions', 'Actions')}</th>
-        </tr>
-      </thead>
-      <tbody>
-        {facilities.map((facility, idx) => (
-          <tr
-            key={facility.id}
-            className={`transition-colors cursor-pointer ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50`}
-            tabIndex={0}
-            aria-label={tSync('admin.facilities.table.viewDetails', 'View facility details')}
-            onClick={() => onView(facility)}
-            onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') onView(facility); }}
-          >
-            <td className="px-3 py-3 whitespace-nowrap font-medium">{facility.name}</td>
-            <td className="px-3 py-3 whitespace-nowrap">{facility.type}</td>
-            <td className="px-3 py-3 whitespace-nowrap">{facility.area}</td>
-            <td className="px-3 py-3 whitespace-nowrap">
-              <Badge variant={facility.status === 'active' ? 'default' : 'secondary'} className={facility.status === 'active' ? 'bg-green-100 text-green-700 border-green-200' : 'bg-gray-100 text-gray-500 border-gray-200'}>
-                {facility.status}
-              </Badge>
-            </td>
-            <td className="px-3 py-3 whitespace-nowrap flex gap-2 justify-center" onClick={e => e.stopPropagation()}>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button size="icon" variant="ghost" aria-label={tSync('admin.facilities.actions.view', 'View')} onClick={() => onView(facility)}>
-                      <Eye className="h-5 w-5" />
+    <Card>
+      <CardContent className="p-0">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="text-base font-semibold">
+                {tSync("admin.facilities.table.name", "Name")}
+              </TableHead>
+              <TableHead className="text-base font-semibold">
+                {tSync("admin.facilities.details.type", "Type:")}
+              </TableHead>
+              <TableHead className="text-base font-semibold">
+                {tSync("admin.facilities.details.capacity", "Kapasitet:")}
+              </TableHead>
+              <TableHead className="text-base font-semibold">
+                {tSync("admin.facilities.table.location", "Location")}
+              </TableHead>
+              <TableHead className="text-base font-semibold">
+                {tSync("admin.facilities.table.status", "Status")}
+              </TableHead>
+              <TableHead className="text-base font-semibold text-right">
+                {tSync("admin.facilities.table.actions", "Actions")}
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {facilities.map((facility) => (
+              <TableRow key={facility.id} className="hover:bg-gray-50">
+                <TableCell className="font-medium text-base">
+                  <div className="flex flex-col">
+                    <span className="font-semibold">{facility.name}</span>
+                    <span className="text-sm text-gray-500">{facility.area}</span>
+                  </div>
+                </TableCell>
+                <TableCell className="text-base">
+                  <Badge variant="outline" className="text-sm">
+                    {tSync(`admin.facilities.types.${facility.type}`, facility.type)}
+                  </Badge>
+                </TableCell>
+                <TableCell className="text-base">
+                  {facility.capacity} {tSync("admin.facilities.details.people", "personer")}
+                </TableCell>
+                <TableCell className="text-base">
+                  <div className="flex items-center gap-1 text-gray-600">
+                    <MapPin className="h-4 w-4" />
+                    <span className="text-sm">
+                      {facility.address_city || tSync("admin.facilities.details.notAvailable", "Ikke tilgjengelig")}
+                    </span>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <Badge className={`text-sm ${getStatusColor(facility.status)}`}>
+                    {tSync(`admin.facilities.status.${facility.status}`, facility.status)}
+                  </Badge>
+                </TableCell>
+                <TableCell className="text-right">
+                  <div className="flex justify-end gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onView(facility)}
+                      className="h-8 px-2"
+                      aria-label={tSync("admin.facilities.actions.view_details", "Se detaljer om lokalet")}
+                    >
+                      <Eye className="h-4 w-4" />
+                      <span className="sr-only">{tSync("admin.facilities.actions.view", "Vis")}</span>
                     </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>{tSync('admin.facilities.actions.view', 'View')}</TooltipContent>
-                </Tooltip>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button size="icon" variant="ghost" aria-label={tSync('admin.facilities.actions.calendar', 'Calendar')} onClick={() => onCalendar(facility)}>
-                      <Calendar className="h-5 w-5" />
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onCalendar(facility)}
+                      className="h-8 px-2"
+                      aria-label={tSync("admin.facilities.actions.view_calendar", "Se kalender")}
+                    >
+                      <Calendar className="h-4 w-4" />
                     </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>{tSync('admin.facilities.actions.calendar', 'Calendar')}</TooltipContent>
-                </Tooltip>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button size="icon" variant="ghost" aria-label={tSync('admin.facilities.actions.edit', 'Edit')} onClick={() => onEdit(facility)}>
-                      <Edit className="h-5 w-5" />
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onEdit(facility)}
+                      className="h-8 px-2"
+                      aria-label={tSync("admin.facilities.actions.edit_settings", "Rediger lokale innstillinger")}
+                    >
+                      <Settings className="h-4 w-4" />
                     </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>{tSync('admin.facilities.actions.edit', 'Edit')}</TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
   );
 };

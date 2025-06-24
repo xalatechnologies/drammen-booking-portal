@@ -1,134 +1,64 @@
 
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { useLanguage } from "@/contexts/LanguageContext";
+import { useQuery } from '@tanstack/react-query';
+import { Zone } from '@/types/zone';
+import { FacilityService } from '@/services/facilityService';
 
-export interface Zone {
-  id: string;
-  code: string;
-  name: any;
-  capacity: number;
-  interval: string;
-  location_id: string;
-  metadata?: any;
-  created_at?: string;
-  updated_at?: string;
-  displayName?: string;
-}
-
-export function useZones(facilityId?: string) {
-  const { language } = useLanguage();
+export const useZones = (facilityId?: string) => {
+  console.log('useZones - Fetching zones for facility ID:', facilityId);
 
   return useQuery({
-    queryKey: ['zones', facilityId, language],
+    queryKey: ['zones', facilityId],
     queryFn: async () => {
-      let query = supabase
-        .from('app_zones')
-        .select('*')
-        .order('code');
-
-      if (facilityId) {
-        query = query.eq('location_id', facilityId);
+      if (!facilityId) {
+        console.log('useZones - No facility ID provided, returning empty array');
+        return [];
       }
-
-      const { data, error } = await query;
-
-      if (error) throw new Error(error.message);
-
-      const zones = data?.map(zone => ({
-        ...zone,
-        displayName: typeof zone.name === 'object' && zone.name 
-          ? zone.name[language] || zone.name['NO'] || zone.name['EN'] || zone.code
-          : zone.code
-      })) || [];
-
+      
+      console.log('useZones - Calling FacilityService.getZonesByFacilityId with:', facilityId);
+      const response = await FacilityService.getZonesByFacilityId(facilityId);
+      console.log('useZones - FacilityService response:', response);
+      
+      if (!response.success) {
+        console.warn('useZones - Failed to fetch zones:', response.error);
+        throw new Error(response.error?.message || 'Failed to fetch zones');
+      }
+      
+      const zones = response.data || [];
+      console.log('useZones - Final zones data:', zones);
       return zones;
     },
-    enabled: true,
-    staleTime: 0,
+    enabled: !!facilityId,
+    staleTime: 0, // No cache - always fetch fresh data
+    gcTime: 30 * 1000, // Keep in memory for 30 seconds only
   });
-}
+};
 
-export function useCreateZone() {
-  const queryClient = useQueryClient();
+export const useZone = (zoneId?: string) => {
+  console.log('useZone - Fetching zone with ID:', zoneId);
 
-  return useMutation({
-    mutationFn: async (zoneData: {
-      code: string;
-      name: any;
-      capacity: number;
-      interval: string;
-      location_id: string;
-      metadata?: any;
-    }) => {
-      // Ensure location_id is a string
-      const dataToInsert = {
-        ...zoneData,
-        location_id: String(zoneData.location_id)
-      };
-
-      const { data, error } = await supabase
-        .from('app_zones')
-        .insert([dataToInsert])
-        .select()
-        .single();
-
-      if (error) throw new Error(error.message);
-
-      return data;
+  return useQuery({
+    queryKey: ['zone', zoneId],
+    queryFn: async () => {
+      if (!zoneId) {
+        console.log('useZone - No zone ID provided, returning null');
+        return null;
+      }
+      
+      console.log('useZone - Calling FacilityService.getZoneById with:', zoneId);
+      const response = await FacilityService.getZoneById(zoneId);
+      console.log('useZone - FacilityService response:', response);
+      
+      if (!response.success) {
+        console.warn('useZone - Failed to fetch zone:', response.error);
+        throw new Error(response.error?.message || 'Failed to fetch zone');
+      }
+      
+      const zone = response.success && 'data' in response ? response.data || null : null;
+      console.log('useZone - Final zone data:', zone);
+      return zone;
     },
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['zones'] });
-      queryClient.invalidateQueries({ queryKey: ['zones', data.location_id] });
-    },
+    enabled: !!zoneId,
+    staleTime: 0, // No cache - always fetch fresh data
+    gcTime: 30 * 1000, // Keep in memory for 30 seconds only
   });
-}
-
-export function useUpdateZone() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async ({ 
-      id, 
-      updates 
-    }: { 
-      id: string; 
-      updates: Partial<Zone> 
-    }) => {
-      const { data, error } = await supabase
-        .from('app_zones')
-        .update(updates)
-        .eq('id', id)
-        .select()
-        .single();
-
-      if (error) throw new Error(error.message);
-
-      return data;
-    },
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['zones'] });
-      queryClient.invalidateQueries({ queryKey: ['zones', data.location_id] });
-    },
-  });
-}
-
-export function useDeleteZone() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from('app_zones')
-        .delete()
-        .eq('id', id);
-
-      if (error) throw new Error(error.message);
-
-      return id;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['zones'] });
-    },
-  });
-}
+};

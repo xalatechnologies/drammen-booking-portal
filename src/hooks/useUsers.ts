@@ -1,98 +1,89 @@
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { useQuery } from '@tanstack/react-query';
+import { userRepository } from '@/dal/UserRepository';
+import { PaginationParams } from '@/types/api';
 
-export function useUsers() {
-  return useQuery({
-    queryKey: ['users'],
+export function useUsers(pagination: PaginationParams) {
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey: ['users', pagination],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('app_users')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw new Error(error.message);
-      return data || [];
-    },
+      const result = await userRepository.findAll(pagination);
+      if (result.error) {
+        throw new Error(result.error);
+      }
+      return {
+        data: result.data,
+        pagination: {
+          page: pagination.page,
+          limit: pagination.limit,
+          total: result.data.length,
+          totalPages: Math.ceil(result.data.length / pagination.limit),
+          hasNext: pagination.page * pagination.limit < result.data.length,
+          hasPrev: pagination.page > 1
+        }
+      };
+    }
   });
+
+  return {
+    users: data?.data || [],
+    pagination: data?.pagination,
+    isLoading,
+    error,
+    refetch
+  };
 }
 
 export function useUser(id: string) {
-  return useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['user', id],
     queryFn: async () => {
-      if (!id) return null;
-      
-      const { data, error } = await supabase
-        .from('app_users')
-        .select('*')
-        .eq('id', id)
-        .maybeSingle();
-
-      if (error) throw new Error(error.message);
-      return data;
+      const result = await userRepository.findById(id);
+      if (result.error) {
+        throw new Error(result.error);
+      }
+      return result.data;
     },
-    enabled: !!id,
+    enabled: !!id
   });
+
+  return {
+    user: data,
+    isLoading,
+    error,
+    refetch
+  };
 }
 
-export function useCreateUser() {
-  const queryClient = useQueryClient();
-  
-  return useMutation({
-    mutationFn: async (userData: any) => {
-      const { data, error } = await supabase
-        .from('app_users')
-        .insert(userData)
-        .select()
-        .single();
-
-      if (error) throw new Error(error.message);
-      return data;
+export function useUsersByRole(role: string) {
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey: ['users', 'role', role],
+    queryFn: async () => {
+      const result = await userRepository.findByRole(role);
+      if (result.error) {
+        throw new Error(result.error);
+      }
+      return result.data;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['users'] });
-    },
+    enabled: !!role
   });
+
+  return {
+    users: data || [],
+    isLoading,
+    error,
+    refetch
+  };
 }
 
 export function useUpdateUser() {
-  const queryClient = useQueryClient();
-  
-  return useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: any }) => {
-      const { data: result, error } = await supabase
-        .from('app_users')
-        .update(data)
-        .eq('id', id)
-        .select()
-        .single();
-
-      if (error) throw new Error(error.message);
-      return result;
-    },
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['users'] });
-      queryClient.invalidateQueries({ queryKey: ['user', variables.id] });
-    },
-  });
-}
-
-export function useDeleteUser() {
-  const queryClient = useQueryClient();
-  
-  return useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from('app_users')
-        .delete()
-        .eq('id', id);
-
-      if (error) throw new Error(error.message);
-      return id;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['users'] });
-    },
-  });
+  return {
+    updateUser: async (id: string, data: any) => {
+      const result = await userRepository.update(id, data);
+      if (result.error) {
+        throw new Error(result.error);
+      }
+      return result.data;
+    }
+  };
 }

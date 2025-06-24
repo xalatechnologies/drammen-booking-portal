@@ -36,8 +36,10 @@ export const FacilityFormTabs: React.FC<FacilityFormTabsProps> = ({
     e.preventDefault();
     
     try {
+      // First submit the main form
       await onSubmit(e);
       
+      // Then save all sections if they exist
       const savePromises = [];
       
       if (featuresRef.current) {
@@ -117,7 +119,6 @@ export const FacilityFormTabs: React.FC<FacilityFormTabsProps> = ({
           <FacilityPricingSection 
             ref={pricingRef}
             form={form}
-            facilityId={facilityId}
           />
         </TabsContent>
 
@@ -141,4 +142,3 @@ export const FacilityFormTabs: React.FC<FacilityFormTabsProps> = ({
     </form>
   );
 };
-

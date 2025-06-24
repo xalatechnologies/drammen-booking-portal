@@ -1,25 +1,8 @@
 
 import { create } from 'zustand';
-import { serviceCategories } from '@/data/additionalServices/serviceCategories';
-
-interface AdditionalService {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  unit: string;
-  category: string;
-}
-
-interface ServiceFilters {
-  category?: string;
-  priceRange?: [number, number];
-}
-
-interface PaginationParams {
-  page: number;
-  limit: number;
-}
+import { AdditionalService, ServiceFilters } from '@/types/additionalServices';
+import { PaginationParams, ApiResponse, PaginatedResponse } from '@/types/api';
+import { additionalServiceRepository } from '@/dal/repositories/AdditionalServiceRepository';
 
 interface AdditionalServicesState {
   services: AdditionalService[];
@@ -36,6 +19,9 @@ interface AdditionalServicesState {
   // Actions
   fetchServices: (pagination?: PaginationParams, filters?: ServiceFilters) => Promise<void>;
   fetchServiceById: (id: string) => Promise<void>;
+  createService: (serviceData: Omit<AdditionalService, 'id' | 'created_at' | 'updated_at'>) => Promise<void>;
+  updateService: (id: string, serviceData: Partial<AdditionalService>) => Promise<void>;
+  deleteService: (id: string) => Promise<void>;
   setSelectedService: (service: AdditionalService | null) => void;
   clearError: () => void;
 }
@@ -56,40 +42,25 @@ export const useAdditionalServicesStore = create<AdditionalServicesState>((set, 
     set({ loading: true, error: null });
     
     try {
-      // Transform serviceCategories data to flat services array
-      const allServices = serviceCategories.flatMap(category => 
-        category.items.map(item => ({
-          id: item.id,
-          name: item.name,
-          description: item.description,
-          price: item.basePrice,
-          unit: item.unit,
-          category: category.id
-        }))
-      );
-
-      // Apply filters if provided
-      let filteredServices = allServices;
+      const result = await additionalServiceRepository.findAllWithFilters(pagination, filters);
       
-      if (filters?.category) {
-        filteredServices = filteredServices.filter(service => service.category === filters.category);
-      }
-      
-      if (filters?.priceRange) {
-        const [min, max] = filters.priceRange;
-        filteredServices = filteredServices.filter(service => 
-          service.price >= min && service.price <= max
-        );
+      if (result.error) {
+        const errorMessage = typeof result.error === 'string' ? result.error : result.error;
+        set({ 
+          error: errorMessage,
+          loading: false 
+        });
+        return;
       }
 
       set({
-        services: filteredServices,
+        services: result.data || [],
         loading: false,
         pagination: {
           page: pagination?.page || 1,
           limit: pagination?.limit || 10,
-          total: filteredServices.length,
-          totalPages: Math.ceil(filteredServices.length / (pagination?.limit || 10)),
+          total: result.data?.length || 0,
+          totalPages: 1,
         }
       });
     } catch (error) {
@@ -104,30 +75,108 @@ export const useAdditionalServicesStore = create<AdditionalServicesState>((set, 
     set({ loading: true, error: null });
     
     try {
-      // Find service across all categories
-      let foundService = null;
-      for (const category of serviceCategories) {
-        const item = category.items.find(item => item.id === id);
-        if (item) {
-          foundService = {
-            id: item.id,
-            name: item.name,
-            description: item.description,
-            price: item.basePrice,
-            unit: item.unit,
-            category: category.id
-          };
-          break;
-        }
+      const result = await additionalServiceRepository.findById(id);
+      
+      if (result.error) {
+        const errorMessage = typeof result.error === 'string' ? result.error : result.error;
+        set({ 
+          error: errorMessage,
+          loading: false 
+        });
+        return;
       }
 
       set({
-        selectedService: foundService,
+        selectedService: result.data || null,
         loading: false
       });
     } catch (error) {
       set({ 
         error: 'Failed to fetch service',
+        loading: false 
+      });
+    }
+  },
+
+  createService: async (serviceData) => {
+    set({ loading: true, error: null });
+    
+    try {
+      const dataWithTimestamps = {
+        ...serviceData,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+
+      const result = await additionalServiceRepository.create(dataWithTimestamps);
+      
+      if (result.error) {
+        const errorMessage = typeof result.error === 'string' ? result.error : result.error;
+        set({ 
+          error: errorMessage,
+          loading: false 
+        });
+        return;
+      }
+
+      // Refresh services list
+      await get().fetchServices();
+    } catch (error) {
+      set({ 
+        error: 'Failed to create service',
+        loading: false 
+      });
+    }
+  },
+
+  updateService: async (id, serviceData) => {
+    set({ loading: true, error: null });
+    
+    try {
+      const result = await additionalServiceRepository.update(id, {
+        ...serviceData,
+        updatedAt: new Date(), // Use Date object instead of string
+      });
+      
+      if (result.error) {
+        const errorMessage = typeof result.error === 'string' ? result.error : result.error;
+        set({ 
+          error: errorMessage,
+          loading: false 
+        });
+        return;
+      }
+
+      // Refresh services list
+      await get().fetchServices();
+    } catch (error) {
+      set({ 
+        error: 'Failed to update service',
+        loading: false 
+      });
+    }
+  },
+
+  deleteService: async (id) => {
+    set({ loading: true, error: null });
+    
+    try {
+      const result = await additionalServiceRepository.delete(id);
+      
+      if (result.error) {
+        const errorMessage = typeof result.error === 'string' ? result.error : result.error;
+        set({ 
+          error: errorMessage,
+          loading: false 
+        });
+        return;
+      }
+
+      // Refresh services list
+      await get().fetchServices();
+    } catch (error) {
+      set({ 
+        error: 'Failed to delete service',
         loading: false 
       });
     }

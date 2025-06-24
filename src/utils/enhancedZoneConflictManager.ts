@@ -1,4 +1,3 @@
-
 import { ZoneConflictManager } from "./zoneConflictManager";
 import { Zone } from "@/components/booking/types";
 import { BookingService } from "@/services/BookingService";
@@ -56,17 +55,14 @@ export class EnhancedZoneConflictManager extends ZoneConflictManager {
       const conflictResponse = await BookingService.getConflictingBookings(
         zoneId,
         startDate,
-        endDate.toISOString()
+        endDate
       );
 
       if (!conflictResponse.success) {
-        throw new Error('Failed to check conflicts');
+        throw new Error(conflictResponse.error?.message || 'Failed to check conflicts');
       }
 
-      const conflictData = conflictResponse.data || [];
-      const hasConflict = conflictData.length > 0;
-      const conflictingBookings = conflictData;
-      const availableAlternatives: any[] = [];
+      const { hasConflict, conflictingBookings, availableAlternatives = [] } = conflictResponse.data!;
 
       // Generate intelligent recommendations
       const recommendations = this.generateRecommendations(
@@ -169,11 +165,21 @@ export class EnhancedZoneConflictManager extends ZoneConflictManager {
       const dateKey = currentDate.toISOString().split('T')[0];
       
       try {
-        // Since checkAvailability doesn't return detailed data, we'll mock this
-        heatmap[dateKey] = timeSlots.reduce((acc, slot) => {
-          acc[slot] = true; // Default to available
-          return acc;
-        }, {} as Record<string, boolean>);
+        const availabilityResponse = await BookingService.checkAvailability(
+          zoneId,
+          currentDate,
+          timeSlots
+        );
+
+        if (availabilityResponse.success && availabilityResponse.data) {
+          heatmap[dateKey] = availabilityResponse.data;
+        } else {
+          // Default to unavailable if check fails
+          heatmap[dateKey] = timeSlots.reduce((acc, slot) => {
+            acc[slot] = false;
+            return acc;
+          }, {} as Record<string, boolean>);
+        }
       } catch (error) {
         console.error(`Failed to check availability for ${dateKey}:`, error);
         heatmap[dateKey] = timeSlots.reduce((acc, slot) => {

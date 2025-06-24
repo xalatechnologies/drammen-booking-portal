@@ -1,55 +1,113 @@
 
 import { supabase } from "@/integrations/supabase/client";
+import { FacilityImage } from "@/types/facility";
 
-export interface FacilityImage {
-  id: string;
-  location_id: string;
-  image_url: string;
-  alt_text?: string;
-  caption?: string;
-  display_order: number;
-  is_featured: boolean;
-  file_size?: number;
-  uploaded_by?: string;
-  uploaded_at: string;
-  created_at: string;
-  updated_at: string;
-}
-
-export class FacilityImageService {
-  static async getFacilityImages(facilityId: string | number): Promise<FacilityImage[]> {
+export const FacilityImageService = {
+  async getFacilityImages(facilityId: number): Promise<FacilityImage[]> {
     const { data, error } = await supabase
-      .from('app_location_images')
+      .from('facility_images')
       .select('*')
-      .eq('location_id', String(facilityId))
+      .eq('facility_id', facilityId)
       .order('display_order', { ascending: true });
-
-    if (error) throw new Error(error.message);
+    
+    if (error) throw error;
     return data || [];
-  }
+  },
 
-  static async getFeaturedImage(facilityId: string | number): Promise<FacilityImage | null> {
+  async getFeaturedImage(facilityId: number): Promise<FacilityImage | null> {
     const { data, error } = await supabase
-      .from('app_location_images')
+      .from('facility_images')
       .select('*')
-      .eq('location_id', String(facilityId))
+      .eq('facility_id', facilityId)
       .eq('is_featured', true)
       .maybeSingle();
-
-    if (error) throw new Error(error.message);
+    
+    if (error) throw error;
     return data;
-  }
+  },
 
-  static async getFirstImage(facilityId: string | number): Promise<FacilityImage | null> {
+  async getFirstImage(facilityId: number): Promise<FacilityImage | null> {
     const { data, error } = await supabase
-      .from('app_location_images')
+      .from('facility_images')
       .select('*')
-      .eq('location_id', String(facilityId))
+      .eq('facility_id', facilityId)
       .order('display_order', { ascending: true })
       .limit(1)
       .maybeSingle();
-
-    if (error) throw new Error(error.message);
+    
+    if (error) throw error;
     return data;
+  },
+
+  async uploadImage(file: File, facilityId: number): Promise<FacilityImage> {
+    // Upload to Supabase Storage
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Date.now()}-${Math.random()}.${fileExt}`;
+    const filePath = `facility-images/${fileName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('facility-images')
+      .upload(filePath, file);
+
+    if (uploadError) throw uploadError;
+
+    // Get public URL
+    const { data } = supabase.storage
+      .from('facility-images')
+      .getPublicUrl(filePath);
+
+    // Save to database
+    const { data: imageRecord, error: dbError } = await supabase
+      .from('facility_images')
+      .insert({
+        facility_id: facilityId,
+        image_url: data.publicUrl,
+        alt_text: file.name,
+        display_order: 0, // Will be updated by the calling code
+        is_featured: false,
+        file_size: file.size,
+      })
+      .select()
+      .single();
+
+    if (dbError) throw dbError;
+    return imageRecord;
+  },
+
+  async deleteImage(imageId: string): Promise<void> {
+    const { error } = await supabase
+      .from('facility_images')
+      .delete()
+      .eq('id', imageId);
+    
+    if (error) throw error;
+  },
+
+  async updateImage(imageId: string, updates: Partial<FacilityImage>): Promise<FacilityImage> {
+    const { data, error } = await supabase
+      .from('facility_images')
+      .update(updates)
+      .eq('id', imageId)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
+  },
+
+  async setFeaturedImage(facilityId: number, imageId: string): Promise<void> {
+    // First, remove featured status from all images for this facility
+    await supabase
+      .from('facility_images')
+      .update({ is_featured: false })
+      .eq('facility_id', facilityId);
+    
+    // Then set the selected image as featured
+    const { error } = await supabase
+      .from('facility_images')
+      .update({ is_featured: true })
+      .eq('id', imageId);
+    
+    if (error) throw error;
   }
-}
+};

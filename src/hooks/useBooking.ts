@@ -1,6 +1,8 @@
 
 import { useState } from 'react';
 import { BookingService, BookingServiceParams } from '@/services/BookingService';
+import { SelectedTimeSlot } from '@/utils/recurrenceEngine';
+import { Zone } from '@/components/booking/types';
 
 export function useBooking() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -14,7 +16,7 @@ export function useBooking() {
       const result = await BookingService.addToCart(params);
       
       if (!result.success) {
-        setErrors([result.message || 'Unknown error']);
+        setErrors([result.message]);
       }
       
       return result;
@@ -35,7 +37,7 @@ export function useBooking() {
       const result = await BookingService.completeBooking(params);
       
       if (!result.success) {
-        setErrors([result.message || 'Unknown error']);
+        setErrors([result.message]);
       }
       
       return result;
@@ -52,8 +54,8 @@ export function useBooking() {
     return BookingService.validateBookingData(params);
   };
 
-  const calculatePricing = async (bookingData: any) => {
-    return BookingService.calculateTotalPricing(bookingData);
+  const calculatePricing = (selectedSlots: SelectedTimeSlot[], zones: Zone[] = []) => {
+    return BookingService.calculateTotalPricing(selectedSlots, zones);
   };
 
   return {

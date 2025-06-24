@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,7 +12,7 @@ export const TranslationMigrationTool: React.FC = () => {
   const handleMigration = async () => {
     setIsMigrating(true);
     try {
-      // await facilityMigrationHelper.migrateAllCoreFacilities();
+      await facilityMigrationHelper.migrateAllCoreFacilities();
       toast({
         title: "Migration Successful",
         description: "All facilities have been migrated to the database translation system.",

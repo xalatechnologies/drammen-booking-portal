@@ -1,22 +1,18 @@
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import { Plus, Upload, Calendar, Map } from "lucide-react";
+import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PageHeader, FiltersBar, ViewToggle } from "@/components/layouts";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Facility } from "@/types/facility";
-import { useJsonTranslation } from "@/hooks/useJsonTranslation";
-import { useFacilityStore } from "@/stores/useEntityStore";
-import { FacilityDataUtils } from "@/utils/facilityDataUtils";
-
-// Import the components we created
-import FacilityTableView from "./FacilityTableView";
-import FacilityGridView from "./FacilityGridView";
-import FacilityListViewDisplay from "./FacilityListViewDisplay";
-import FacilityMapViewComponent from "./FacilityMapViewComponent";
-import FacilityCalendarViewComponent from "./FacilityCalendarViewComponent";
-import FacilityDetailViewComponent from "./FacilityDetailViewComponent";
+import { FacilityService } from "@/services/facilityService";
+import { FacilityCalendarView } from "./calendar/FacilityCalendarView";
+import { FacilityDetailView } from "./detail/FacilityDetailView";
+import { FacilityGridView } from "./views/FacilityGridView";
+import { FacilityListViewDisplay } from "./views/FacilityListViewDisplay";
+import { FacilityTableView } from "./views/FacilityTableView";
+import { FacilityMapView } from "./views/FacilityMapView";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface FacilityListViewProps {
   selectedFacilityId?: number;
@@ -31,108 +27,60 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
   onFacilitySelect
 }) => {
   const navigate = useNavigate();
-  const [viewMode, setLocalViewMode] = React.useState<ViewMode>('list');
-  const [selectedFacility, setSelectedFacility] = useState<Facility | null>(null);
-  const { tSync } = useJsonTranslation();
+  const [viewMode, setViewMode] = useState<ViewMode>('list');
+  const [displayMode, setDisplayMode] = useState<DisplayMode>('table');
+  const [selectedFacility, setSelectedFacility] = useState<any>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterType, setFilterType] = useState("all");
+  const [filterStatus, setFilterStatus] = useState("all");
 
-  // Use the generic entity store for facilities
-  const {
-    entities: facilities,
-    isLoading,
-    error,
-    fetchAll,
-  } = useFacilityStore();
+  const { tSync } = useTranslation();
 
-  // Local state for filters
-  const [searchFilter, setSearchFilter] = useState<string>('');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const { data: facilitiesResponse, isLoading, refetch } = useQuery({
+    queryKey: ['facilities'],
+    queryFn: () => FacilityService.getFacilities({
+      page: 1,
+      limit: 50
+    }, {}, {})
+  });
 
-  // Local display mode
-  const [displayMode, setDisplayMode] = React.useState<DisplayMode>('list');
+  const facilities = facilitiesResponse?.success ? facilitiesResponse.data?.data || [] : [];
 
-  // Load facilities on component mount
-  useEffect(() => {
-    console.log('FacilityListView - Loading facilities using generic store');
-    fetchAll();
-  }, [fetchAll]);
-
-  // Transform facilities to ensure they have proper images using FacilityDataUtils
-  const transformedFacilities = React.useMemo(() => {
-    if (!facilities || facilities.length === 0) {
-      console.log('FacilityListView - No facilities to transform');
-      return [];
-    }
-
-    console.log('FacilityListView - Transforming facilities:', facilities.length);
-    return facilities.map((facility, index) => {
-      const transformed = {
-        ...facility,
-        image: FacilityDataUtils.getImageUrl(facility.images),
-        address: FacilityDataUtils.computeAddress(facility),
-        openingHours: FacilityDataUtils.transformOpeningHours(facility.openingHours),
-        zones: FacilityDataUtils.transformZones(facility.zones),
-        // Ensure these properties exist with defaults
-        nextAvailable: facility.nextAvailable || 'Available now',
-        accessibility: facility.accessibility || [],
-        suitableFor: facility.suitableFor || [],
-        equipment: facility.equipment || [],
-        availableTimes: facility.availableTimes || []
-      };
-      
-      // Use fallback image if no image is available
-      if (!transformed.image || transformed.image.includes('unsplash')) {
-        transformed.image = FacilityDataUtils.getFallbackImageUrl(index);
-      }
-      
-      return transformed;
-    });
-  }, [facilities]);
-
-  // Filter facilities based on current filters
-  const filteredFacilities = React.useMemo(() => {
-    if (!transformedFacilities || transformedFacilities.length === 0) {
-      return [];
-    }
-
-    return transformedFacilities.filter(facility => {
-      const matchesSearch = !searchFilter || 
-                           facility.name?.toLowerCase().includes(searchFilter.toLowerCase()) || 
-                           facility.address?.toLowerCase().includes(searchFilter.toLowerCase());
-      const matchesStatus = statusFilter === 'all' || !statusFilter || facility.status === statusFilter;
-      const matchesCategory = categoryFilter === 'all' || !categoryFilter || facility.type === categoryFilter;
-      return matchesSearch && matchesStatus && matchesCategory;
-    });
-  }, [transformedFacilities, searchFilter, statusFilter, categoryFilter]);
+  const filteredFacilities = facilities.filter(facility => {
+    const matchesSearch = facility.name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                         facility.area?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesType = filterType === "all" || facility.type === filterType;
+    const matchesStatus = filterStatus === "all" || facility.status === filterStatus;
+    return matchesSearch && matchesType && matchesStatus;
+  });
 
   const handleAddNew = () => {
     navigate('/admin/facilities/new');
   };
 
-  const handleEdit = (facility: Facility) => {
+  const handleEdit = (facility: any) => {
     navigate(`/admin/facilities/${facility.id}`);
   };
 
-  const handleFacilitySelect = (facility: Facility) => {
+  const handleView = (facility: any) => {
     setSelectedFacility(facility);
-    setLocalViewMode('detail');
+    setViewMode('detail');
     if (onFacilitySelect) {
       onFacilitySelect(facility.id);
     }
   };
 
-  const handleCalendar = (facility: Facility) => {
+  const handleCalendar = (facility: any) => {
     setSelectedFacility(facility);
-    setLocalViewMode('calendar');
+    setViewMode('calendar');
   };
 
   const handleBack = () => {
-    setLocalViewMode('list');
+    setViewMode('list');
     setSelectedFacility(null);
   };
 
   const handleViewModeChange = (viewId: string) => {
-    setLocalViewMode(viewId as ViewMode);
     setDisplayMode(viewId as DisplayMode);
   };
 
@@ -145,30 +93,25 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
 
   const filterOptions = [
     {
-      id: 'status',
-      label: tSync("admin.facilities.filters.status", "Status"),
-      value: statusFilter,
-      onChange: (val: string) => setStatusFilter(val),
+      id: 'type',
+      label: tSync("admin.facilities.filters.type", "Type"),
+      value: filterType,
+      onChange: setFilterType,
       options: [
-        { value: 'all', label: tSync("admin.facilities.filters.allStatuses", "All Status") },
-        { value: 'active', label: tSync("admin.facilities.status.active", "Active") },
-        { value: 'inactive', label: tSync("admin.facilities.status.inactive", "Inactive") },
-        { value: 'maintenance', label: tSync("admin.facilities.status.maintenance", "Maintenance") }
+        { value: 'all', label: tSync("admin.facilities.filters.allTypes", "All Types") },
+        { value: 'sports', label: tSync("admin.facilities.filters.sports", "Sports") },
+        { value: 'meeting', label: tSync("admin.facilities.filters.meeting", "Meeting") }
       ]
     },
     {
-      id: 'category',
-      label: tSync("admin.facilities.filters.type", "Type"),
-      value: categoryFilter,
-      onChange: (val: string) => setCategoryFilter(val),
+      id: 'status',
+      label: tSync("admin.facilities.filters.status", "Status"),
+      value: filterStatus,
+      onChange: setFilterStatus,
       options: [
-        { value: 'all', label: tSync("admin.facilities.filters.allTypes", "All Types") },
-        { value: 'Gymsal', label: 'Gymsal' },
-        { value: 'Aktivitetshall', label: 'Aktivitetshall' },
-        { value: 'Auditorium', label: 'Auditorium' },
-        { value: 'Møterom', label: 'Møterom' },
-        { value: 'Svømmehall', label: 'Svømmehall' },
-        { value: 'Fotballhall', label: 'Fotballhall' }
+        { value: 'all', label: tSync("admin.facilities.filters.allStatuses", "All Statuses") },
+        { value: 'active', label: tSync("admin.facilities.filters.active", "Active") },
+        { value: 'inactive', label: tSync("admin.facilities.filters.inactive", "Inactive") }
       ]
     }
   ];
@@ -181,44 +124,22 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
         </div>
       );
     }
-    
-    if (error) {
-      return (
-        <div className="text-center py-8 text-red-500">
-          <p>Error loading facilities: {error}</p>
-          <Button onClick={() => fetchAll()} className="mt-4">
-            Try Again
-          </Button>
-        </div>
-      );
-    }
-    
+
     if (filteredFacilities.length === 0) {
-      if (transformedFacilities.length === 0) {
-        return (
-          <div className="text-center py-8 text-gray-500">
-            <p>{tSync("admin.facilities.search.noFacilities", "No facilities found in database")}</p>
-            <Button onClick={handleAddNew} className="mt-4">
-              <Plus className="h-4 w-4 mr-2" />
-              Add First Facility
-            </Button>
-          </div>
-        );
-      }
       return (
         <div className="text-center py-8 text-gray-500">
-          {tSync("admin.facilities.search.noResults", "No facilities match your search criteria")}
+          {tSync("admin.facilities.search.noResults", "No facilities found matching your criteria.")}
         </div>
       );
     }
-    
+
     const commonProps = {
       facilities: filteredFacilities,
-      onView: handleFacilitySelect,
+      onView: handleView,
       onCalendar: handleCalendar,
       onEdit: handleEdit
     };
-    
+
     switch (displayMode) {
       case 'table':
         return <FacilityTableView {...commonProps} />;
@@ -227,7 +148,7 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
       case 'list':
         return <FacilityListViewDisplay {...commonProps} />;
       case 'map':
-        return <FacilityMapViewComponent facilities={filteredFacilities} isLoading={isLoading} />;
+        return <FacilityMapView facilities={filteredFacilities} isLoading={isLoading} />;
       default:
         return <FacilityTableView {...commonProps} />;
     }
@@ -235,16 +156,16 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
 
   if (viewMode === 'calendar' && selectedFacility) {
     return (
-      <FacilityCalendarViewComponent 
+      <FacilityCalendarView 
         facility={selectedFacility} 
         onBack={handleBack} 
       />
     );
   }
-  
+
   if (viewMode === 'detail' && selectedFacility) {
     return (
-      <FacilityDetailViewComponent 
+      <FacilityDetailView 
         facility={selectedFacility} 
         onBack={handleBack} 
         onEdit={() => handleEdit(selectedFacility)}
@@ -252,44 +173,34 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
       />
     );
   }
-  
+
   return (
-    <div className="w-full px-4 sm:px-6 lg:px-8 space-y-4">
-      <div className="bg-white border-b border-gray-200 px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between shadow-sm rounded-t-lg">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 leading-tight">
-            {tSync("admin.facilities.management", "Facility Management")}
-          </h1>
-          <p className="text-gray-500 text-sm mt-1">
-            {tSync("admin.facilities.pageDescription", "Manage facilities and their configurations")}
-          </p>
-        </div>
-        <Button onClick={handleAddNew} size="sm" className="mt-3 sm:mt-0 flex items-center gap-2">
-          <Plus className="h-4 w-4" />
-          {tSync("admin.facilities.addNew", "Add New Facility")}
-        </Button>
-      </div>
-      
-      <Card>
-        <CardHeader>
-          <FiltersBar
-            searchTerm={searchFilter}
-            onSearchChange={(value) => setSearchFilter(value)}
-            searchPlaceholder={tSync("admin.facilities.search.placeholder", "Search facilities...")}
-            selectFilters={filterOptions}
-            className="flex-1"
-          >
-            <ViewToggle
-              views={viewOptions}
-              activeView={displayMode}
-              onViewChange={handleViewModeChange}
-            />
-          </FiltersBar>
-        </CardHeader>
-        <CardContent>
-          {renderFacilityContent()}
-        </CardContent>
-      </Card>
+    <div className="space-y-6">
+      <PageHeader
+        title={tSync("admin.facilities.management", "Facilities Management")}
+        description={tSync("admin.facilities.pageDescription", "Manage facility information, availability and settings")}
+        actions={
+          <Button onClick={handleAddNew} className="flex items-center gap-2">
+            <Plus className="h-4 w-4" />
+            {tSync("admin.facilities.addNew", "Add New Facility")}
+          </Button>
+        }
+      />
+
+      <FiltersBar
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        searchPlaceholder={tSync("admin.facilities.search.placeholder", "Search facilities...")}
+        selectFilters={filterOptions}
+      >
+        <ViewToggle
+          views={viewOptions}
+          activeView={displayMode}
+          onViewChange={handleViewModeChange}
+        />
+      </FiltersBar>
+
+      {renderFacilityContent()}
     </div>
   );
 };

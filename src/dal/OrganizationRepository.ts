@@ -1,108 +1,148 @@
+import { SupabaseRepository } from './SupabaseRepository';
+import { Organization, OrganizationType, OrganizationStatus, VerificationLevel } from '@/types/organization';
+import { RepositoryResponse } from '@/types/api';
+import { supabase } from '@/integrations/supabase/client';
 
-import { supabase } from "@/integrations/supabase/client";
-
-export interface Organization {
-  id: string;
+interface OrganizationCreateRequest {
   name: string;
-  type: string;
-  verification_level: string;
-  contact_info: any;
-  metadata: any;
-  created_at: string;
-  updated_at: string;
+  type: OrganizationType;
+  contact_email: string;
+  contact_phone?: string;
+  address_street: string;
+  address_city: string;
+  address_postal_code: string;
+  address_country?: string;
+  org_number?: string;
 }
 
-export type VerificationLevel = 'unverified' | 'pending' | 'verified' | 'rejected';
+interface OrganizationUpdateRequest extends Partial<OrganizationCreateRequest> {
+  status?: OrganizationStatus;
+  verification_level?: VerificationLevel;
+  is_active?: boolean;
+  description?: string;
+}
 
-export class OrganizationRepository {
-  static async getAll(): Promise<Organization[]> {
-    const { data, error } = await supabase
-      .from('app_actors')
-      .select('*')
-      .order('created_at', { ascending: false });
+export class OrganizationRepository extends SupabaseRepository<Organization> {
+  protected tableName = 'organizations';
 
-    if (error) throw error;
-
-    return (data || []).map(actor => ({
-      id: actor.id,
-      name: this.extractLocalizedName(actor.name),
-      type: actor.type,
-      verification_level: 'verified',
-      contact_info: actor.contact_info || {},
-      metadata: actor.metadata || {},
-      created_at: actor.created_at,
-      updated_at: actor.updated_at
-    }));
+  constructor() {
+    super();
   }
 
-  static async getById(id: string): Promise<Organization | null> {
-    const { data, error } = await supabase
-      .from('app_actors')
-      .select('*')
-      .eq('id', id)
-      .single();
+  // Organization-specific methods
+  async findByOrgNumber(orgNumber: string): Promise<RepositoryResponse<Organization | null>> {
+    try {
+      const { data, error } = await supabase
+        .from('organizations')
+        .select('*')
+        .eq('org_number', orgNumber)
+        .maybeSingle();
 
-    if (error) return null;
-    if (!data) return null;
+      if (error) {
+        return {
+          data: null,
+          error: error.message
+        };
+      }
 
-    return {
-      id: data.id,
-      name: this.extractLocalizedName(data.name),
-      type: data.type,
-      verification_level: 'verified',
-      contact_info: data.contact_info || {},
-      metadata: data.metadata || {},
-      created_at: data.created_at,
-      updated_at: data.updated_at
-    };
-  }
-
-  static async updateVerificationLevel(id: string, level: VerificationLevel): Promise<void> {
-    const { error } = await supabase
-      .from('app_actors')
-      .update({ 
-        metadata: { verification_level: level },
-        updated_at: new Date().toISOString() 
-      })
-      .eq('id', id);
-
-    if (error) throw error;
-  }
-
-  static async create(organization: Partial<Organization>): Promise<Organization> {
-    const { data, error } = await supabase
-      .from('app_actors')
-      .insert({
-        type: organization.type || 'private-firma',
-        name: { NO: organization.name || 'New Organization' },
-        contact_info: organization.contact_info || {},
-        metadata: { 
-          verification_level: organization.verification_level || 'unverified',
-          ...organization.metadata 
-        }
-      })
-      .select()
-      .single();
-
-    if (error) throw error;
-
-    return {
-      id: data.id,
-      name: this.extractLocalizedName(data.name),
-      type: data.type,
-      verification_level: (data.metadata as any)?.verification_level || 'unverified',
-      contact_info: data.contact_info || {},
-      metadata: data.metadata || {},
-      created_at: data.created_at,
-      updated_at: data.updated_at
-    };
-  }
-
-  private static extractLocalizedName(nameObj: any): string {
-    if (typeof nameObj === 'string') return nameObj;
-    if (typeof nameObj === 'object' && nameObj !== null) {
-      return (nameObj as any).NO || (nameObj as any).EN || 'Unknown';
+      return {
+        data: data ? this.mapToOrganization(data) : null
+      };
+    } catch (error: any) {
+      return {
+        data: null,
+        error: error.message
+      };
     }
-    return 'Unknown';
+  }
+
+  async findVerified(): Promise<RepositoryResponse<Organization[]>> {
+    try {
+      const { data, error } = await supabase
+        .from('organizations')
+        .select('*')
+        .in('verification_level', ['document-verified', 'fully-verified']);
+
+      if (error) {
+        return {
+          data: [],
+          error: error.message
+        };
+      }
+
+      return {
+        data: data ? data.map(item => this.mapToOrganization(item)) : []
+      };
+    } catch (error: any) {
+      return {
+        data: [],
+        error: error.message
+      };
+    }
+  }
+
+  async updateVerificationLevel(id: string, level: VerificationLevel): Promise<RepositoryResponse<Organization | null>> {
+    try {
+      const { data, error } = await supabase
+        .from('organizations')
+        .update({
+          verification_level: level,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', id)
+        .select()
+        .maybeSingle();
+
+      if (error) {
+        return {
+          data: null,
+          error: error.message
+        };
+      }
+
+      return {
+        data: data ? this.mapToOrganization(data) : null
+      };
+    } catch (error: any) {
+      return {
+        data: null,
+        error: error.message
+      };
+    }
+  }
+
+  private mapToOrganization(dbRow: any): Organization {
+    return {
+      id: dbRow.id,
+      name: dbRow.name,
+      type: dbRow.type,
+      orgNumber: dbRow.org_number,
+      contactEmail: dbRow.contact_email,
+      contactPhone: dbRow.contact_phone,
+      address: {
+        street: dbRow.address_street,
+        city: dbRow.address_city,
+        postalCode: dbRow.address_postal_code,
+        country: dbRow.address_country
+      },
+      status: dbRow.status,
+      verificationLevel: dbRow.verification_level,
+      parentOrganizationId: dbRow.parent_organization_id,
+      isActive: dbRow.is_active,
+      metadata: {
+        website: dbRow.website,
+        description: dbRow.description,
+        foundedYear: dbRow.founded_year,
+        memberCount: dbRow.member_count,
+        vatNumber: dbRow.vat_number,
+        bankAccount: dbRow.bank_account
+      },
+      contacts: [], // This would need to be fetched separately or joined
+      createdAt: new Date(dbRow.created_at),
+      updatedAt: new Date(dbRow.updated_at)
+    };
   }
 }
+
+// Export singleton instance
+export const organizationRepository = new OrganizationRepository();

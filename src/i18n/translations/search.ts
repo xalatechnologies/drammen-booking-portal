@@ -1,3 +1,4 @@
+
 export const searchTranslations = {
   NO: {
     labels: {
@@ -50,6 +51,59 @@ export const searchTranslations = {
       list: "Liste",
       map: "Kart",
       calendar: "Kalender"
+    }
+  },
+  EN: {
+    labels: {
+      searchFacilities: "Search facilities",
+      selectPeriod: "Select period",
+      facilityType: "Facility type",
+      location: "Location",
+      accessibility: "Accessibility",
+      capacity: "Capacity",
+      priceRange: "Price range",
+      advancedFilters: "Advanced filters"
+    },
+    placeholders: {
+      searchText: "Search by name, type or location...",
+      selectDate: "Select date",
+      selectPeriod: "Select period",
+      allTypes: "All types",
+      allLocations: "All locations",
+      anyAccessibility: "Any accessibility"
+    },
+    filters: {
+      availableNow: "Available now",
+      hasEquipment: "Has equipment",
+      hasParking: "Has parking",
+      hasWifi: "Has WiFi",
+      allowsPhotography: "Allows photography",
+      wheelchairAccessible: "Wheelchair accessible",
+      hearingLoop: "Hearing loop",
+      visualGuidance: "Visual guidance"
+    },
+    actions: {
+      search: "Search",
+      clearFilters: "Clear all filters",
+      moreFilters: "More filters",
+      applyFilters: "Apply filters",
+      showResults: "Show results"
+    },
+    results: {
+      noResultsFound: "No results found",
+      resultCount: "{count} facilities found",
+      showingResults: "Showing {start}-{end} of {total} results",
+      sortBy: "Sort by",
+      sortRelevance: "Relevance",
+      sortPrice: "Price",
+      sortCapacity: "Capacity",
+      sortDistance: "Distance"
+    },
+    viewModes: {
+      grid: "Grid",
+      list: "List",
+      map: "Map",
+      calendar: "Calendar"
     }
   }
 };

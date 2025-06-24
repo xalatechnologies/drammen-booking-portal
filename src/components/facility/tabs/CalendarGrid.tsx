@@ -109,7 +109,7 @@ export function CalendarGrid({
     
     const cell = (
       <button
-        className={`w-full h-10 rounded border transition-all duration-200 text-sm select-none ${statusStyle} ${
+        className={`w-full h-8 rounded border transition-all duration-200 text-sm select-none ${statusStyle} ${
           status === 'available' ? 'transform hover:scale-105' : ''
         }`}
         disabled={status !== 'available'}
@@ -183,7 +183,7 @@ export function CalendarGrid({
           </div>
 
           {/* Time Slots Grid */}
-          <div className="space-y-2">
+          <div className="space-y-1">
             {timeSlots.map((timeSlot) => (
               <div key={timeSlot} className="grid grid-cols-7 gap-2">
                 {weekDays.map((day, dayIndex) => (

@@ -41,7 +41,7 @@ export function FacilityInfoTabs({
     NO: {
       general: "Generell info",
       zones: "Soner",
-      facilities: "Lokaler", 
+      facilities: "Fasiliteter", 
       rules: "Regler",
       faq: "FAQ"
     },

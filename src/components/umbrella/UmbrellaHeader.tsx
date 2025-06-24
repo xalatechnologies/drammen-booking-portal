@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Search, Bell, Circle } from "lucide-react";
@@ -14,7 +13,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useTranslation } from "@/i18n/hooks/useTranslation";
 
 type Notification = {
     id: string;
@@ -24,27 +22,13 @@ type Notification = {
     read: boolean;
 };
 
+const initialNotifications: Notification[] = [
+    { id: "1", title: "Ny tid tildelt", description: "Drammen Håndballklubb har fått 10 nye timer.", timestamp: "5 minutter siden", read: false },
+    { id: "2", title: "Bruker har blitt lagt til", description: "Geir Gulliksen er nå en del av din organisasjon.", timestamp: "2 timer siden", read: true },
+];
+
 const UmbrellaHeader = () => {
     const [language, setLanguage] = useState("NO");
-    const { t } = useTranslation();
-    
-    const initialNotifications: Notification[] = [
-        { 
-            id: "1", 
-            title: t("umbrella.messages.newNotification", {}, "Nytt varsel"), 
-            description: t("umbrella.messages.newNotificationDescription", {}, "Drammen Håndballklubb har fått 10 nye timer."), 
-            timestamp: t("umbrella.messages.timeAgo.minutes", {}, "5 minutter siden"), 
-            read: false 
-        },
-        { 
-            id: "2", 
-            title: t("umbrella.messages.userAdded", {}, "Bruker har blitt lagt til"), 
-            description: t("umbrella.messages.userAddedDescription", {}, "Geir Gulliksen er nå en del av din organisasjon."), 
-            timestamp: t("umbrella.messages.timeAgo.hours", {}, "2 timer siden"), 
-            read: true 
-        },
-    ];
-
     const [notifications, setNotifications] = useState<Notification[]>(initialNotifications);
 
     const unreadCount = notifications.filter(n => !n.read).length;
@@ -75,7 +59,7 @@ const UmbrellaHeader = () => {
                     <div className="relative w-full max-w-lg">
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                         <Input
-                            placeholder={t("umbrella.header.searchPlaceholder", {}, "Søk i din organisasjon...")}
+                            placeholder="Søk i din organisasjon..."
                             className="pl-10 h-10 text-base bg-gray-50 border-gray-200 focus:bg-white"
                         />
                     </div>
@@ -107,10 +91,10 @@ const UmbrellaHeader = () => {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-80">
                             <div className="flex justify-between items-center px-2 py-2">
-                                <DropdownMenuLabel className="p-0">{t("umbrella.header.notifications", {}, "Varsler")}</DropdownMenuLabel>
+                                <DropdownMenuLabel className="p-0">Varsler</DropdownMenuLabel>
                                 {unreadCount > 0 && (
                                 <Button variant="link" size="sm" className="h-auto p-0 text-xs" onClick={handleMarkAllAsRead}>
-                                    {t("umbrella.header.markAllAsRead", {}, "Marker alle som lest")}
+                                    Marker alle som lest
                                 </Button>
                                 )}
                             </div>
@@ -135,7 +119,7 @@ const UmbrellaHeader = () => {
                                 </DropdownMenuItem>
                                 ))
                             ) : (
-                                <p className="text-center text-sm text-gray-500 py-4">{t("umbrella.header.noNewNotifications", {}, "Ingen nye varsler")}</p>
+                                <p className="text-center text-sm text-gray-500 py-4">Ingen nye varsler</p>
                             )}
                         </DropdownMenuContent>
                     </DropdownMenu>
@@ -144,20 +128,20 @@ const UmbrellaHeader = () => {
                         <DropdownMenuTrigger asChild>
                             <button className="flex items-center gap-3 rounded-full p-1 transition-colors hover:bg-gray-100">
                                 <Avatar className="h-9 w-9">
-                                    <AvatarImage src="https://github.com/shadcn.png" alt={t("umbrella.header.umbrellaAdmin", {}, "Paraplyadministrator")} />
+                                    <AvatarImage src="https://github.com/shadcn.png" alt="Paraplyadministrator" />
                                     <AvatarFallback>PA</AvatarFallback>
                                 </Avatar>
                                 <div className="hidden md:flex flex-col items-start">
-                                    <p className="font-semibold text-sm">{t("umbrella.header.umbrellaAdmin", {}, "Paraply Admin")}</p>
+                                    <p className="font-semibold text-sm">Paraply Admin</p>
                                     <p className="text-xs text-gray-500">Drammen FK</p>
                                 </div>
                             </button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>{t("umbrella.header.myAccount", {}, "Min Konto")}</DropdownMenuLabel>
+                            <DropdownMenuLabel>Min Konto</DropdownMenuLabel>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem>{t("umbrella.header.settings", {}, "Innstillinger")}</DropdownMenuItem>
-                            <DropdownMenuItem>{t("umbrella.header.logout", {}, "Logg ut")}</DropdownMenuItem>
+                            <DropdownMenuItem>Innstillinger</DropdownMenuItem>
+                            <DropdownMenuItem>Logg ut</DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </div>
@@ -166,5 +150,4 @@ const UmbrellaHeader = () => {
     )
 }
 
-export default UmbrellaHeader;
-
+export default UmbrellaHeader; 

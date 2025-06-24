@@ -1,87 +1,39 @@
 
-import { supabase } from "@/integrations/supabase/client";
+import { facilityBlackoutRepository } from '@/dal/repositories/FacilityBlackoutRepository';
+import { PaginationParams } from '@/types/api';
 
-export interface FacilityBlackout {
-  id?: string;
-  facility_id: number | string;
-  type: string;
-  reason: string;
-  start_date: Date | string;
-  end_date: Date | string;
-  created_by: string;
-  created_at?: string;
-}
-
-export class FacilityBlackoutService {
-  static async getBlackoutsByFacility(facilityId: number | string) {
-    try {
-      // Since we don't have a blackout table, return empty for now
-      return {
-        data: [],
-        error: null
-      };
-    } catch (error: any) {
-      return {
-        data: null,
-        error: error.message
-      };
-    }
+export const FacilityBlackoutService = {
+  getBlackouts: async (pagination?: PaginationParams, filters?: any) => {
+    console.log('FacilityBlackoutService.getBlackouts - Called with:', { pagination, filters });
+    const result = await facilityBlackoutRepository.findAllWithFilters(pagination, filters);
+    console.log('FacilityBlackoutService.getBlackouts - Repository result:', result);
+    return result;
+  },
+  
+  getBlackoutById: async (id: string) => {
+    console.log('FacilityBlackoutService.getBlackoutById - Called with ID:', id);
+    const result = await facilityBlackoutRepository.findById(id);
+    console.log('FacilityBlackoutService.getBlackoutById - Repository result:', result);
+    return result;
+  },
+  
+  createBlackout: async (blackoutData: any) => {
+    console.log('FacilityBlackoutService.createBlackout - Called with:', blackoutData);
+    return await facilityBlackoutRepository.create(blackoutData);
+  },
+  
+  updateBlackout: async (id: string, blackoutData: any) => {
+    console.log('FacilityBlackoutService.updateBlackout - Called with:', { id, blackoutData });
+    return await facilityBlackoutRepository.update(id, blackoutData);
+  },
+  
+  deleteBlackout: async (id: string) => {
+    console.log('FacilityBlackoutService.deleteBlackout - Called with ID:', id);
+    return await facilityBlackoutRepository.delete(id);
+  },
+  
+  getBlackoutsByFacility: async (facilityId: number) => {
+    console.log('FacilityBlackoutService.getBlackoutsByFacility - Called with facility ID:', facilityId);
+    return await facilityBlackoutRepository.getBlackoutsByFacility(facilityId.toString());
   }
-
-  static async createBlackout(blackoutData: FacilityBlackout) {
-    try {
-      // Mock implementation since table doesn't exist
-      const mockData = {
-        id: `blackout_${Date.now()}`,
-        ...blackoutData,
-        created_at: new Date().toISOString()
-      };
-      
-      return {
-        data: mockData,
-        error: null
-      };
-    } catch (error: any) {
-      return {
-        data: null,
-        error: error.message
-      };
-    }
-  }
-
-  static async updateBlackout(id: string, updates: Partial<FacilityBlackout>) {
-    try {
-      // Mock implementation since table doesn't exist
-      const mockData = {
-        id,
-        ...updates,
-        created_at: new Date().toISOString()
-      };
-      
-      return {
-        data: mockData,
-        error: null
-      };
-    } catch (error: any) {
-      return {
-        data: null,
-        error: error.message
-      };
-    }
-  }
-
-  static async deleteBlackout(id: string) {
-    try {
-      // Mock implementation since table doesn't exist
-      return {
-        data: { success: true },
-        error: null
-      };
-    } catch (error: any) {
-      return {
-        data: null,
-        error: error.message
-      };
-    }
-  }
-}
+};

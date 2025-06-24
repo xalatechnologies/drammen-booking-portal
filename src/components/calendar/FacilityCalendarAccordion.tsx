@@ -3,7 +3,6 @@ import React from "react";
 import { Accordion } from "@/components/ui/accordion";
 import { FacilityAccordionItem } from "./FacilityAccordionItem";
 import { SelectedTimeSlot } from "@/utils/recurrenceEngine";
-import { Facility } from "@/types/facility";
 
 // Simplified Zone interface for calendar view
 interface CalendarZone {
@@ -14,8 +13,19 @@ interface CalendarZone {
   description: string;
 }
 
+interface FacilityWithZones {
+  id: number;
+  name: string;
+  address: string;
+  capacity: number;
+  accessibility: string[];
+  suitableFor: string[];
+  image?: string;
+  zones: CalendarZone[];
+}
+
 interface FacilityCalendarAccordionProps {
-  facilities: Facility[];
+  facilities: FacilityWithZones[];
   currentWeekStart: Date;
   onFacilitySelect?: (facilityId: string) => void;
   onSlotSelection?: (facilityId: string, slots: SelectedTimeSlot[]) => void;
@@ -78,18 +88,12 @@ export const FacilityCalendarAccordion: React.FC<FacilityCalendarAccordionProps>
     }
   };
 
-  const handleBookNow = (facility: Facility) => {
-    // Navigate to facility booking page
-    window.location.href = `/facilities/${facility.id}`;
-  };
-
   return (
     <Accordion type="multiple" className="w-full">
       {facilities.map((facility) => (
         <FacilityAccordionItem
           key={facility.id}
           facility={facility}
-          onBookNow={handleBookNow}
           currentWeekStart={currentWeekStart}
           timeSlots={timeSlots}
           getAvailabilityStatus={getAvailabilityStatus}

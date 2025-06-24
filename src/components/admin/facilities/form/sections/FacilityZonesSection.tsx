@@ -1,4 +1,4 @@
-import React, { useState, forwardRef, useImperativeHandle, useEffect } from "react";
+import React, { useState, forwardRef, useImperativeHandle } from "react";
 import { UseFormReturn } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,10 +7,10 @@ import { FacilityFormData } from "../FacilityFormSchema";
 import { useTranslation } from "@/hooks/useTranslation";
 import { Plus, Grid3X3, Move, Edit, Trash2 } from "lucide-react";
 import { ZoneEditor } from "./zones/ZoneEditor";
-import { ZoneService } from '@/services/ZoneService';
 
 interface FacilityZonesSectionProps {
-  facilityId: number;
+  form: UseFormReturn<FacilityFormData>;
+  facilityId?: number;
 }
 
 interface FacilityZonesSectionRef {
@@ -34,62 +34,51 @@ interface Zone {
   maxBookingDuration: number;
 }
 
-export const FacilityZonesSection = forwardRef<FacilityZonesSectionRef, FacilityZonesSectionProps>(({ facilityId }, ref) => {
+export const FacilityZonesSection = forwardRef<FacilityZonesSectionRef, FacilityZonesSectionProps>(({ form, facilityId }, ref) => {
   const { tSync } = useTranslation();
   const [zones, setZones] = useState<Zone[]>([]);
   const [isAddingZone, setIsAddingZone] = useState(false);
   const [editingZone, setEditingZone] = useState<Zone | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [deletedZoneIds, setDeletedZoneIds] = useState<string[]>([]);
-
-  // Load zones from Supabase
-  useEffect(() => {
-    if (!facilityId) return;
-    setLoading(true);
-    setError(null);
-    ZoneService.getZonesByFacilityId(facilityId)
-      .then(res => {
-        if (res.success && res.data) {
-          setZones(res.data.map(dbZoneToUIZone));
-        } else {
-          setError(res.error?.message || 'Failed to load zones');
-        }
-      })
-      .catch(e => setError(e.message))
-      .finally(() => setLoading(false));
-  }, [facilityId]);
 
   // Expose save function to parent via ref
   useImperativeHandle(ref, () => ({
     saveData: async () => {
-      if (!facilityId) return true;
-      setLoading(true);
-      setError(null);
-      try {
-        // Save or update zones
-        const promises = zones.map(zone => {
-          if (zone.id && zone.id.length > 10) {
-            // Existing zone, update
-            return ZoneService.updateZone(zone.id, uiZoneToDBZone(zone, facilityId));
-          } else {
-            // New zone, create
-            return ZoneService.createZone(uiZoneToDBZone(zone, facilityId));
-          }
-        });
-        // Delete removed zones
-        const deletePromises = deletedZoneIds.map(id => ZoneService.deleteZone(id));
-        await Promise.all([...promises, ...deletePromises]);
-        setDeletedZoneIds([]);
+      console.log('Saving zones:', zones);
+      
+      if (!facilityId) {
+        console.log('No facility ID, skipping zones save');
         return true;
-      } catch (error: any) {
-        setError(error.message || 'Failed to save zones');
+      }
+
+      try {
+        // Here you would implement the actual API call to save zones
+        console.log('Zones would be saved:', {
+          facilityId,
+          zones: zones.map(zone => ({
+            facility_id: facilityId,
+            name: zone.name,
+            type: zone.type,
+            capacity: zone.capacity,
+            description: zone.description,
+            is_main_zone: zone.isMainZone,
+            bookable_independently: zone.bookableIndependently,
+            area_sqm: zone.areaSqm,
+            floor: zone.floor,
+            equipment: zone.equipment,
+            status: zone.status,
+            price_multiplier: zone.priceMultiplier,
+            min_booking_duration: zone.minBookingDuration,
+            max_booking_duration: zone.maxBookingDuration
+          }))
+        });
+        
+        return true;
+      } catch (error) {
+        console.error('Failed to save zones:', error);
         return false;
-      } finally {
-        setLoading(false);
       }
     }
-  }), [zones, facilityId, deletedZoneIds]);
+  }), [zones, facilityId]);
 
   const handleSaveZone = (zone: Zone) => {
     if (editingZone) {
@@ -103,42 +92,7 @@ export const FacilityZonesSection = forwardRef<FacilityZonesSectionRef, Facility
 
   const handleDeleteZone = (id: string) => {
     setZones(zones.filter(zone => zone.id !== id));
-    if (id && id.length > 10) setDeletedZoneIds([...deletedZoneIds, id]);
   };
-
-  // Map DB Zone to UI Zone
-  function dbZoneToUIZone(db: any): Zone {
-    return {
-      id: db.id,
-      name: db.name,
-      type: db.type,
-      capacity: db.capacity,
-      description: db.description || '',
-      isMainZone: db.is_main_zone,
-      bookableIndependently: db.bookable_independently,
-      areaSqm: db.area_sqm || 0,
-      floor: db.floor || '',
-      equipment: db.equipment || [],
-      status: db.status,
-      priceMultiplier: db.price_multiplier || 1,
-      minBookingDuration: db.min_booking_duration || 60,
-      maxBookingDuration: db.max_booking_duration || 480,
-    };
-  }
-
-  // Map UI Zone to DB Zone
-  function uiZoneToDBZone(ui: Zone, facilityId: number) {
-    return {
-      ...ui,
-      facility_id: facilityId,
-      is_main_zone: ui.isMainZone,
-      bookable_independently: ui.bookableIndependently,
-      area_sqm: ui.areaSqm,
-      price_multiplier: ui.priceMultiplier,
-      min_booking_duration: ui.minBookingDuration,
-      max_booking_duration: ui.maxBookingDuration,
-    };
-  }
 
   const getZoneTypeLabel = (type: string) => {
     const labels = {

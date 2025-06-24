@@ -318,7 +318,7 @@ export function ReservationAccordion({
                         <ul className="space-y-3">
                           <li className="flex items-center gap-3 text-gray-700">
                             <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
-                            <span>Tilgang til Lokalen</span>
+                            <span>Tilgang til fasiliteten</span>
                           </li>
                           <li className="flex items-center gap-3 text-gray-700">
                             <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />

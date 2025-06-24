@@ -1,11 +1,10 @@
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { useFacilities, useFacilitiesPagination } from '@/hooks/useFacilities';
 import { FacilityCard } from './facility/FacilityCard';
 import FacilityListItem from './facility/FacilityListItem';
 import ViewHeader from './search/ViewHeader';
 import { FacilityFilters } from '@/types/facility';
-import { useFacilities } from '@/hooks/useFacilities';
-import { Button } from '@/components/ui/button';
 
 interface InfiniteScrollFacilitiesProps {
   filters: FacilityFilters;
@@ -13,187 +12,165 @@ interface InfiniteScrollFacilitiesProps {
   setViewMode?: (mode: "grid" | "map" | "calendar" | "list") => void;
 }
 
-// Fallback images from public/bilder directory
-const FALLBACK_IMAGES = [
-  '/bilder/Ankerskogen_svoemmehall1.jpg',
-  '/bilder/Bergsjöns_kulturhus_sett_från_Bergsjöns_centrum.jpg',
-  '/bilder/Elverum_svømmehall.jpg',
-  '/bilder/Hamar_kulturhus_I.jpg',
-  '/bilder/Mollebakken-skole.jpg',
-  '/bilder/Nesøya_skole_og_idrettshall_Asker.jpg',
-  '/bilder/standard_compressed_Kulturhuset_1200px.jpg',
-  '/bilder/standard_compressed_drammensbadet_71.jpg'
-];
-
 export const InfiniteScrollFacilities: React.FC<InfiniteScrollFacilitiesProps> = ({
   filters,
   viewMode,
   setViewMode
 }) => {
-  const [currentPage, setCurrentPage] = useState<number>(1);
+  const { pagination, nextPage, goToPage } = useFacilitiesPagination(1, 6);
   const [allFacilities, setAllFacilities] = useState<any[]>([]);
-  const ITEMS_PER_PAGE = 12;
 
   console.log('InfiniteScrollFacilities - Rendering with filters:', filters);
   console.log('InfiniteScrollFacilities - Current viewMode:', viewMode);
+  console.log('InfiniteScrollFacilities - allFacilities count:', allFacilities.length);
 
-  // Use the DAL layer to fetch facilities
-  const { facilities: rawFacilities, isLoading, pagination } = useFacilities({
-    pagination: { page: currentPage, limit: ITEMS_PER_PAGE },
+  const { facilities, isLoading, pagination: paginationInfo } = useFacilities({
+    pagination,
     filters,
   });
 
-  // Transform facilities to ensure they have the right structure
-  const transformedFacilities = useMemo(() => {
-    return rawFacilities.map((facility, index) => {
-      // Use local fallback image if no image_url
-      const fallbackImage = FALLBACK_IMAGES[index % FALLBACK_IMAGES.length];
-      const imageUrl = facility.image_url || fallbackImage;
-
-      // Ensure we have all required properties
-      return {
-        ...facility,
-        image: imageUrl,
-        openingHours: facility.openingHours || [],
-        address: facility.address || 'Address not available',
-        nextAvailable: facility.nextAvailable || 'Available now',
-        accessibility: facility.accessibility || [],
-        suitableFor: facility.suitableFor || [],
-        equipment: facility.equipment || [],
-        availableTimes: facility.availableTimes || []
-      };
-    });
-  }, [rawFacilities]);
-
+  // Memoize the filter string to detect changes
   const filterString = useMemo(() => JSON.stringify(filters), [filters]);
 
-  // Reset when filters change
+  // Reset when filters change - but only when we actually have a change
   useEffect(() => {
-    console.log('Filters changed, resetting facilities and page');
-    setCurrentPage(1);
+    console.log('InfiniteScrollFacilities - Filters changed, resetting to page 1');
     setAllFacilities([]);
-  }, [filterString]);
+    if (pagination.page !== 1) {
+      goToPage(1);
+    }
+  }, [filterString]); // Remove goToPage from dependencies to avoid loop
 
-  // Accumulate facilities when new data comes in
+  // Handle facility data updates - separate effect without filter dependencies
   useEffect(() => {
-    if (transformedFacilities.length > 0) {
-      if (currentPage === 1) {
-        // First page - replace all facilities
-        console.log('Setting new facilities for page 1:', transformedFacilities.length);
-        setAllFacilities(transformedFacilities);
-      } else {
-        // Subsequent pages - append to existing
-        console.log('Appending facilities for page', currentPage, ':', transformedFacilities.length);
-        setAllFacilities(prev => {
-          const existingIds = new Set(prev.map(f => f.id));
-          const newFacilities = transformedFacilities.filter(f => !existingIds.has(f.id));
-          return [...prev, ...newFacilities];
-        });
-      }
-    }
-  }, [transformedFacilities, currentPage]);
+    if (!isLoading && facilities && Array.isArray(facilities)) {
+      console.log('InfiniteScrollFacilities - Processing facilities data', {
+        page: pagination.page,
+        facilitiesLength: facilities.length,
+        allFacilitiesLength: allFacilities.length
+      });
 
+      setAllFacilities(prev => {
+        if (pagination.page === 1) {
+          // For page 1, replace all facilities
+          console.log('InfiniteScrollFacilities - Setting facilities for page 1:', facilities.length);
+          return [...facilities];
+        } else {
+          // For subsequent pages, append new facilities
+          const newFacilities = facilities.filter(facility => 
+            !prev.some(existing => existing.id === facility.id)
+          );
+          const updated = [...prev, ...newFacilities];
+          console.log('InfiniteScrollFacilities - Appended facilities for page', pagination.page, ':', newFacilities.length);
+          return updated;
+        }
+      });
+    }
+  }, [facilities, isLoading, pagination.page]); // Only depend on data-related values
+
+  // Calculate hasMore based on pagination info
   const hasMore = useMemo(() => {
-    return pagination?.hasNext || false;
-  }, [pagination]);
+    return paginationInfo?.hasNext || false;
+  }, [paginationInfo]);
 
-  const loadMore = () => {
+  const loadMore = useCallback(() => {
     if (!isLoading && hasMore) {
-      console.log('Loading more, moving to page:', currentPage + 1);
-      setCurrentPage(prev => prev + 1);
+      console.log('InfiniteScrollFacilities - Loading more, current page:', pagination.page);
+      nextPage();
     }
-  };
+  }, [isLoading, hasMore, pagination.page, nextPage]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (
+        window.innerHeight + document.documentElement.scrollTop
+        >= document.documentElement.offsetHeight - 1000
+      ) {
+        loadMore();
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [loadMore]);
 
   const handleAddressClick = (e: React.MouseEvent, facility: any) => {
-    e.preventDefault();
     e.stopPropagation();
-    console.log("Address clicked for facility:", facility.name);
+    console.log('Address clicked for facility:', facility.name);
   };
 
-  const totalFacilities = pagination?.total || 0;
-
-  console.log('Render state:', {
+  console.log('InfiniteScrollFacilities - Render state:', {
     allFacilitiesCount: allFacilities.length,
     isLoading,
     hasMore,
-    currentPage,
-    viewMode,
-    totalFacilities
+    currentPage: pagination.page,
+    facilitiesFromAPI: facilities?.length || 0,
+    paginationTotal: paginationInfo?.total,
+    viewMode
   });
 
+  // Get total count from pagination info or fall back to current facilities count
+  const facilityCount = paginationInfo?.total || allFacilities.length;
+
   return (
-    <div className="w-full">
+    <div>
+      {/* ViewHeader component */}
       <ViewHeader 
-        facilityCount={totalFacilities} 
-        viewMode={viewMode} 
-        setViewMode={setViewMode}
-        isLoading={isLoading && currentPage === 1}
+        facilityCount={facilityCount}
+        isLoading={isLoading}
+        viewMode={viewMode}
+        setViewMode={setViewMode || (() => {})}
       />
 
-      {isLoading && allFacilities.length === 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-          {Array.from({ length: 6 }).map((_, index) => (
-            <div 
-              key={`skeleton-${index}`} 
-              className="bg-white rounded-lg shadow-md p-4 h-80 animate-pulse"
-            >
-              <div className="bg-gray-200 h-40 rounded-md mb-4"></div>
-              <div className="bg-gray-200 h-6 rounded-md mb-2 w-3/4"></div>
-              <div className="bg-gray-200 h-4 rounded-md mb-2 w-1/2"></div>
-              <div className="bg-gray-200 h-4 rounded-md mb-2 w-2/3"></div>
-              <div className="bg-gray-200 h-4 rounded-md w-1/4"></div>
-            </div>
-          ))}
+      {/* Loading state for first load */}
+      {isLoading && allFacilities.length === 0 && (
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
         </div>
-      ) : viewMode === "grid" ? (
+      )}
+
+      {/* No results state */}
+      {!isLoading && allFacilities.length === 0 && (
+        <div className="text-center py-8 text-gray-500">
+          No facilities found matching your criteria
+        </div>
+      )}
+
+      {/* Facilities list */}
+      {allFacilities.length > 0 && (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-            {allFacilities.map((facility) => (
-              <FacilityCard 
-                key={facility.id} 
-                facility={facility} 
-                onAddressClick={(e) => handleAddressClick(e, facility)}
-              />
-            ))}
-          </div>
-          
-          {hasMore && (
-            <div className="flex justify-center mt-8">
-              <Button 
-                onClick={loadMore}
-                disabled={isLoading}
-                variant="outline"
-                size="lg"
-              >
-                {isLoading ? 'Loading...' : 'Load More Facilities'}
-              </Button>
+          {viewMode === "grid" ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {allFacilities.map((facility) => (
+                <FacilityCard 
+                  key={facility.id} 
+                  facility={facility} 
+                  onAddressClick={handleAddressClick}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {allFacilities.map((facility) => (
+                <FacilityListItem key={facility.id} facility={facility} />
+              ))}
             </div>
           )}
         </>
-      ) : (
-        <>
-          <div className="flex flex-col gap-4 mt-6">
-            {allFacilities.map((facility) => (
-              <FacilityListItem 
-                key={facility.id} 
-                facility={facility}
-              />
-            ))}
-          </div>
-          
-          {hasMore && (
-            <div className="flex justify-center mt-8">
-              <Button 
-                onClick={loadMore}
-                disabled={isLoading}
-                variant="outline"
-                size="lg"
-              >
-                {isLoading ? 'Loading...' : 'Load More Facilities'}
-              </Button>
-            </div>
-          )}
-        </>
+      )}
+      
+      {/* Loading indicator for pagination */}
+      {isLoading && allFacilities.length > 0 && (
+        <div className="flex justify-center items-center h-16 mt-4">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        </div>
+      )}
+      
+      {/* End of list indicator */}
+      {!hasMore && allFacilities.length > 0 && (
+        <div className="text-center py-4 text-gray-500">
+          No more facilities to load
+        </div>
       )}
     </div>
   );

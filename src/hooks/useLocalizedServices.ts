@@ -1,17 +1,22 @@
 
 import { useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { LocalizedFacilityService } from '@/services/LocalizedFacilityService';
+import { LocalizedAdditionalServiceRepository } from '@/dal/repositories/LocalizedAdditionalServiceRepository';
 
-// Simplified - no longer using complex service layers
+// Create singleton instance for additional services
+const localizedAdditionalServiceRepository = new LocalizedAdditionalServiceRepository();
+
 export function useLocalizedServices() {
   const { language } = useLanguage();
 
   useEffect(() => {
-    console.log('Language changed to:', language);
+    // Update language for localized services when language changes
+    localizedAdditionalServiceRepository.setLanguage(language);
   }, [language]);
 
   return {
-    // Return simple language context for now
-    language
+    facilityService: LocalizedFacilityService,
+    additionalServiceRepository: localizedAdditionalServiceRepository
   };
 }

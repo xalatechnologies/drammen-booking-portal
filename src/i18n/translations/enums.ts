@@ -1,9 +1,10 @@
 
 import { Language } from '../types';
 
+// Flat structure for direct key-value enum translations
 export const enumTranslations: Record<Language, Record<string, string>> = {
   NO: {
-    // User roles
+    // User Roles
     'system-admin': 'Systemadministrator',
     'facility-manager': 'Anleggsansvarlig',
     'caseworker': 'Saksbehandler',
@@ -11,44 +12,45 @@ export const enumTranslations: Record<Language, Record<string, string>> = {
     'organization-rep': 'Organisasjonsrepresentant',
     'regular-user': 'Vanlig bruker',
 
-    // Booking status
+    // Booking Status
     'draft': 'Utkast',
-    'pending-approval': 'Venter på godkjenning',
+    'pending-approval': 'Venter godkjenning',
     'approved': 'Godkjent',
-    'rejected': 'Avvist',
     'confirmed': 'Bekreftet',
-    'cancelled': 'Avlyst',
+    'in-progress': 'Pågår',
     'completed': 'Fullført',
-    'no-show': 'Møtte ikke opp',
+    'cancelled': 'Avlyst',
+    'rejected': 'Avvist',
+    'no-show': 'Ikke møtt',
 
-    // Facility status
-    'active': 'Aktiv',
-    'maintenance': 'Under vedlikehold',
-    'inactive': 'Inaktiv',
-
-    // Booking types
-    'engangs': 'Engangsbooking',
-    'fastlan': 'Fast leie',
-    'rammetid': 'Rammetid',
-    'strotimer': 'Strøtimer',
-
-    // Actor types
-    'lag-foreninger': 'Lag og foreninger',
-    'paraply': 'Paraplyorganisasjon',
-    'private-firma': 'Private firma',
+    // Actor Types
+    'lag-foreninger': 'Lag og foreninger (frivillige)',
+    'paraply': 'Paraplyorganisasjoner',
+    'private-firma': 'Private firmaer',
     'kommunale-enheter': 'Kommunale enheter',
-    'private-person': 'Privatperson',
+    'private-person': 'Private personer',
 
-    // Age groups
+    // Event Types
+    'training': 'Trening',
+    'competition': 'Konkurranse',
+    'meeting': 'Møte',
+    'celebration': 'Feiring',
+    'course': 'Kurs',
+    'conference': 'Konferanse',
+    'performance': 'Forestilling',
+    'exhibition': 'Utstilling',
+    'other': 'Annet',
+
+    // Age Groups
     'children': 'Barn',
     'youth': 'Ungdom',
     'adults': 'Voksne',
     'seniors': 'Seniorer',
     'mixed': 'Blandet',
-    'family': 'Familie',
+    'family': 'Familie'
   },
   EN: {
-    // User roles
+    // User Roles
     'system-admin': 'System Administrator',
     'facility-manager': 'Facility Manager',
     'caseworker': 'Caseworker',
@@ -56,41 +58,41 @@ export const enumTranslations: Record<Language, Record<string, string>> = {
     'organization-rep': 'Organization Representative',
     'regular-user': 'Regular User',
 
-    // Booking status
+    // Booking Status
     'draft': 'Draft',
     'pending-approval': 'Pending Approval',
     'approved': 'Approved',
-    'rejected': 'Rejected',
     'confirmed': 'Confirmed',
-    'cancelled': 'Cancelled',
+    'in-progress': 'In Progress',
     'completed': 'Completed',
+    'cancelled': 'Cancelled',
+    'rejected': 'Rejected',
     'no-show': 'No Show',
 
-    // Facility status
-    'active': 'Active',
-    'maintenance': 'Under Maintenance',
-    'inactive': 'Inactive',
-
-    // Booking types
-    'engangs': 'One-time Booking',
-    'fastlan': 'Regular Rental',
-    'rammetid': 'Allocated Time',
-    'strotimer': 'Drop-in Hours',
-
-    // Actor types
-    'lag-foreninger': 'Teams and Associations',
-    'paraply': 'Umbrella Organization',
-    'private-firma': 'Private Company',
+    // Actor Types
+    'lag-foreninger': 'Teams and Associations (Voluntary)',
+    'paraply': 'Umbrella Organizations',
+    'private-firma': 'Private Companies',
     'kommunale-enheter': 'Municipal Units',
-    'private-person': 'Private Person',
+    'private-person': 'Private Persons',
 
-    // Age groups
+    // Event Types
+    'training': 'Training',
+    'competition': 'Competition',
+    'meeting': 'Meeting',
+    'celebration': 'Celebration',
+    'course': 'Course',
+    'conference': 'Conference',
+    'performance': 'Performance',
+    'exhibition': 'Exhibition',
+    'other': 'Other',
+
+    // Age Groups
     'children': 'Children',
     'youth': 'Youth',
     'adults': 'Adults',
     'seniors': 'Seniors',
     'mixed': 'Mixed',
-    'family': 'Family',
+    'family': 'Family'
   }
 };
-

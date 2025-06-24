@@ -1,8 +1,8 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { FacilityTranslationService } from '@/services/FacilityTranslationService';
-import { TranslationService } from '@/services/TranslationService';
-// import { coreFacilities } from '@/data/coreFacilities';
+import { facilityTranslationService } from '@/services/FacilityTranslationService';
+import { translationService } from '@/services/TranslationService';
+import { coreFacilities } from '@/data/coreFacilities';
 import { Language } from '@/i18n/types';
 
 export class FacilityMigrationHelper {
@@ -11,42 +11,40 @@ export class FacilityMigrationHelper {
 
     // 1. Insert the core facility data if it doesn't exist
     const { data: existingFacility } = await supabase
-      .from('app_locations')
+      .from('facilities')
       .select('id')
       .eq('id', facilityData.id)
       .single();
 
     if (!existingFacility) {
       const { error: facilityError } = await supabase
-        .from('app_locations')
+        .from('facilities')
         .insert({
           id: facilityData.id,
-          name: facilityData.name.EN || facilityData.name.NO || { NO: `Facility ${facilityData.id}`, EN: `Facility ${facilityData.id}` },
-          address: facilityData.address_street,
-          code: facilityData.code || `FACILITY_${facilityData.id}`,
-          location_type: facilityData.type,
+          name: facilityData.name.EN || facilityData.name.NO || `Facility ${facilityData.id}`,
+          address_street: facilityData.address_street,
+          address_city: facilityData.address_city,
+          address_postal_code: facilityData.address_postal_code,
+          address_country: facilityData.address_country,
+          type: facilityData.type,
+          area: facilityData.area,
+          status: facilityData.status,
           capacity: facilityData.capacity,
+          price_per_hour: facilityData.price_per_hour,
+          has_auto_approval: facilityData.has_auto_approval,
+          time_slot_duration: facilityData.time_slot_duration,
           latitude: facilityData.latitude,
           longitude: facilityData.longitude,
-          contact_email: facilityData.contact_email,
-          contact_phone: facilityData.contact_phone,
-          facilities: facilityData.amenities || [],
-          description: facilityData.description || { NO: '', EN: '' },
-          is_published: facilityData.is_featured || false,
-          metadata: {
-            price_per_hour: facilityData.price_per_hour,
-            has_auto_approval: facilityData.has_auto_approval,
-            time_slot_duration: facilityData.time_slot_duration,
-            rating: facilityData.rating,
-            review_count: facilityData.review_count,
-            accessibility_features: facilityData.accessibility_features,
-            allowed_booking_types: facilityData.allowed_booking_types,
-            season_from: facilityData.season_from,
-            season_to: facilityData.season_to,
-            booking_lead_time_hours: facilityData.booking_lead_time_hours,
-            max_advance_booking_days: facilityData.max_advance_booking_days,
-            cancellation_deadline_hours: facilityData.cancellation_deadline_hours
-          }
+          rating: facilityData.rating,
+          review_count: facilityData.review_count,
+          accessibility_features: facilityData.accessibility_features,
+          allowed_booking_types: facilityData.allowed_booking_types,
+          season_from: facilityData.season_from,
+          season_to: facilityData.season_to,
+          booking_lead_time_hours: facilityData.booking_lead_time_hours,
+          max_advance_booking_days: facilityData.max_advance_booking_days,
+          cancellation_deadline_hours: facilityData.cancellation_deadline_hours,
+          is_featured: facilityData.is_featured
         });
 
       if (facilityError) {
@@ -68,11 +66,11 @@ export class FacilityMigrationHelper {
     for (const contentType of contentTypes) {
       const contentKey = `facility.${facilityId}.${contentType}`;
 
-      // Set the facility content key using static method
-      await FacilityTranslationService.setFacilityContentKey(facilityId, contentType, contentKey);
+      // Set the facility content key
+      await facilityTranslationService.setFacilityContentKey(facilityId, contentType, contentKey);
 
       // Add translation key
-      await TranslationService.createTranslationKey(contentKey, {});
+      await translationService.addTranslationKey(contentKey, 'facility', `${contentType} for facility ${facilityId}`);
 
       // Add translations for each language
       const languages: Language[] = ['NO', 'EN'];
@@ -99,21 +97,21 @@ export class FacilityMigrationHelper {
         }
 
         if (value) {
-          await TranslationService.setTranslation(contentKey, lang, value);
+          await translationService.setTranslation(contentKey, lang, value);
         }
       }
     }
   }
 
-  // async migrateAllCoreFacilities() {
-  //   console.log('Starting migration of all core facilities...');
-  //   
-  //   for (const facility of coreFacilities) {
-  //     await this.migrateFacilityToDatabase(facility);
-  //   }
-  //   
-  //   console.log('Migration completed!');
-  // }
+  async migrateAllCoreFacilities() {
+    console.log('Starting migration of all core facilities...');
+    
+    for (const facility of coreFacilities) {
+      await this.migrateFacilityToDatabase(facility);
+    }
+    
+    console.log('Migration completed!');
+  }
 }
 
 export const facilityMigrationHelper = new FacilityMigrationHelper();

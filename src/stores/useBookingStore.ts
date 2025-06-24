@@ -1,5 +1,6 @@
 
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 import { SelectedTimeSlot } from '@/utils/recurrenceEngine';
 import { ActorType } from '@/types/pricing';
 
@@ -17,7 +18,7 @@ interface BookingFormData {
 }
 
 interface BookingState {
-  // State - selectedSlots are now temporary and not persisted
+  // State
   selectedSlots: SelectedTimeSlot[];
   formData: BookingFormData;
   currentStep: 'selection' | 'activity' | 'pricing' | 'details';
@@ -63,124 +64,137 @@ const ensureDate = (date: Date | string): Date => {
   return date instanceof Date ? date : new Date(date);
 };
 
-export const useBookingStore = create<BookingState>()((set, get) => ({
-  // Initial state - selectedSlots are NOT persisted
-  selectedSlots: [],
-  formData: initialFormData,
-  currentStep: 'selection',
-  isSubmitting: false,
-  errors: [],
-  currentFacilityId: '',
-  currentFacilityName: '',
-
-  // Slot management actions - these work in memory only
-  setSelectedSlots: (slots) => {
-    // Ensure all dates are Date objects
-    const normalizedSlots = slots.map(slot => ({
-      ...slot,
-      date: ensureDate(slot.date)
-    }));
-    set({ selectedSlots: normalizedSlots });
-  },
-
-  addSlot: (slot) => {
-    const { selectedSlots } = get();
-    const normalizedSlot = {
-      ...slot,
-      date: ensureDate(slot.date)
-    };
-    
-    const exists = selectedSlots.some(s => {
-      const sDate = ensureDate(s.date);
-      return s.zoneId === normalizedSlot.zoneId &&
-        sDate.toDateString() === normalizedSlot.date.toDateString() &&
-        s.timeSlot === normalizedSlot.timeSlot;
-    });
-    
-    if (!exists) {
-      set({ selectedSlots: [...selectedSlots, normalizedSlot] });
-    }
-  },
-
-  removeSlot: (zoneId, date, timeSlot) => {
-    const { selectedSlots } = get();
-    const targetDate = ensureDate(date);
-    
-    const filtered = selectedSlots.filter(slot => {
-      const slotDate = ensureDate(slot.date);
-      return !(slot.zoneId === zoneId &&
-        slotDate.toDateString() === targetDate.toDateString() &&
-        slot.timeSlot === timeSlot);
-    });
-    set({ selectedSlots: filtered });
-  },
-
-  clearSlots: () => {
-    set({ selectedSlots: [] });
-  },
-
-  bulkAddSlots: (slots) => {
-    const { selectedSlots } = get();
-    const normalizedNewSlots = slots.map(slot => ({
-      ...slot,
-      date: ensureDate(slot.date)
-    }));
-    
-    const newSlots = normalizedNewSlots.filter(newSlot => 
-      !selectedSlots.some(existingSlot => {
-        const existingDate = ensureDate(existingSlot.date);
-        return existingSlot.zoneId === newSlot.zoneId &&
-          existingDate.toDateString() === newSlot.date.toDateString() &&
-          existingSlot.timeSlot === newSlot.timeSlot;
-      })
-    );
-    
-    if (newSlots.length > 0) {
-      set({ selectedSlots: [...selectedSlots, ...newSlots] });
-    }
-  },
-
-  // Form management actions
-  updateFormData: (data) => {
-    set(state => ({
-      formData: { ...state.formData, ...data }
-    }));
-  },
-
-  setCurrentStep: (step) => {
-    set({ currentStep: step });
-  },
-
-  setSubmitting: (submitting) => {
-    set({ isSubmitting: submitting });
-  },
-
-  addError: (error) => {
-    set(state => ({
-      errors: [...state.errors, error]
-    }));
-  },
-
-  clearErrors: () => {
-    set({ errors: [] });
-  },
-
-  setFacilityContext: (facilityId, facilityName) => {
-    set({ 
-      currentFacilityId: facilityId, 
-      currentFacilityName: facilityName 
-    });
-  },
-
-  resetBooking: () => {
-    set({
+export const useBookingStore = create<BookingState>()(
+  persist(
+    (set, get) => ({
+      // Initial state
       selectedSlots: [],
       formData: initialFormData,
       currentStep: 'selection',
       isSubmitting: false,
       errors: [],
       currentFacilityId: '',
-      currentFacilityName: ''
-    });
-  }
-}));
+      currentFacilityName: '',
+
+      // Slot management actions
+      setSelectedSlots: (slots) => {
+        // Ensure all dates are Date objects
+        const normalizedSlots = slots.map(slot => ({
+          ...slot,
+          date: ensureDate(slot.date)
+        }));
+        set({ selectedSlots: normalizedSlots });
+      },
+
+      addSlot: (slot) => {
+        const { selectedSlots } = get();
+        const normalizedSlot = {
+          ...slot,
+          date: ensureDate(slot.date)
+        };
+        
+        const exists = selectedSlots.some(s => {
+          const sDate = ensureDate(s.date);
+          return s.zoneId === normalizedSlot.zoneId &&
+            sDate.toDateString() === normalizedSlot.date.toDateString() &&
+            s.timeSlot === normalizedSlot.timeSlot;
+        });
+        
+        if (!exists) {
+          set({ selectedSlots: [...selectedSlots, normalizedSlot] });
+        }
+      },
+
+      removeSlot: (zoneId, date, timeSlot) => {
+        const { selectedSlots } = get();
+        const targetDate = ensureDate(date);
+        
+        const filtered = selectedSlots.filter(slot => {
+          const slotDate = ensureDate(slot.date);
+          return !(slot.zoneId === zoneId &&
+            slotDate.toDateString() === targetDate.toDateString() &&
+            slot.timeSlot === timeSlot);
+        });
+        set({ selectedSlots: filtered });
+      },
+
+      clearSlots: () => {
+        set({ selectedSlots: [] });
+      },
+
+      bulkAddSlots: (slots) => {
+        const { selectedSlots } = get();
+        const normalizedNewSlots = slots.map(slot => ({
+          ...slot,
+          date: ensureDate(slot.date)
+        }));
+        
+        const newSlots = normalizedNewSlots.filter(newSlot => 
+          !selectedSlots.some(existingSlot => {
+            const existingDate = ensureDate(existingSlot.date);
+            return existingSlot.zoneId === newSlot.zoneId &&
+              existingDate.toDateString() === newSlot.date.toDateString() &&
+              existingSlot.timeSlot === newSlot.timeSlot;
+          })
+        );
+        
+        if (newSlots.length > 0) {
+          set({ selectedSlots: [...selectedSlots, ...newSlots] });
+        }
+      },
+
+      // Form management actions
+      updateFormData: (data) => {
+        set(state => ({
+          formData: { ...state.formData, ...data }
+        }));
+      },
+
+      setCurrentStep: (step) => {
+        set({ currentStep: step });
+      },
+
+      setSubmitting: (submitting) => {
+        set({ isSubmitting: submitting });
+      },
+
+      addError: (error) => {
+        set(state => ({
+          errors: [...state.errors, error]
+        }));
+      },
+
+      clearErrors: () => {
+        set({ errors: [] });
+      },
+
+      setFacilityContext: (facilityId, facilityName) => {
+        set({ 
+          currentFacilityId: facilityId, 
+          currentFacilityName: facilityName 
+        });
+      },
+
+      resetBooking: () => {
+        set({
+          selectedSlots: [],
+          formData: initialFormData,
+          currentStep: 'selection',
+          isSubmitting: false,
+          errors: [],
+          currentFacilityId: '',
+          currentFacilityName: ''
+        });
+      }
+    }),
+    {
+      name: 'booking-storage',
+      partialize: (state) => ({
+        selectedSlots: state.selectedSlots,
+        formData: state.formData,
+        currentFacilityId: state.currentFacilityId,
+        currentFacilityName: state.currentFacilityName
+      }),
+    }
+  )
+);

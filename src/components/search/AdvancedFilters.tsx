@@ -122,7 +122,7 @@ const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
       {/* Equipment & Amenities */}
       <div className="space-y-4">
         <Label className="text-base font-semibold text-slate-900">
-          {t('search.labels.equipment', {}, 'Utstyr og Lokaler')}
+          {t('search.labels.equipment', {}, 'Utstyr og fasiliteter')}
         </Label>
         <div className="space-y-3">
           <div className="flex items-center space-x-3">

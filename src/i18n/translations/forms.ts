@@ -1,3 +1,4 @@
+
 export const formsTranslations = {
   NO: {
     labels: {
@@ -77,6 +78,88 @@ export const formsTranslations = {
       range1: "0-20",
       range2: "20-50", 
       range3: "50-100",
+      range4: "100-200",
+      range5: "200+"
+    }
+  },
+  EN: {
+    labels: {
+      name: "Name",
+      email: "Email",
+      phone: "Phone",
+      organization: "Organization",
+      purpose: "Purpose of booking",
+      notes: "Notes",
+      activityType: "Activity type",
+      attendees: "Number of people",
+      actorType: "Actor type",
+      contactPerson: "Contact person",
+      additionalInfo: "Additional information"
+    },
+    descriptions: {
+      contactInfo: "This information is used for confirmations and important updates about your reservation. All fields marked with an asterisk (*) are required and must be filled out.",
+      activityType: "Select what type of activity will be conducted",
+      actorType: "Select which type of actor you represent. This affects pricing and approval process.",
+      approvalProcess: "This booking requires approval from the municipality due to actor type or special conditions. You will receive a confirmation when the booking has been processed."
+    },
+    placeholders: {
+      name: "Enter your full name",
+      email: "your@email.com",
+      phone: "Phone number",
+      organization: "Organization name (optional)",
+      purpose: "Briefly describe what the facility will be used for...",
+      notes: "Any special requests or notes...",
+      selectActivityType: "Select activity type",
+      attendees: "Number of participants",
+      selectActorType: "Select actor type"
+    },
+    buttons: {
+      submit: "Submit application",
+      cancel: "Cancel",
+      back: "Back",
+      continue: "Continue",
+      save: "Save",
+      submitForApproval: "Submit for approval",
+      continueToContact: "Continue to contact details"
+    },
+    messages: {
+      required: "This field is required",
+      requiresApproval: "Requires approval",
+      success: "Form submitted",
+      error: "Something went wrong"
+    },
+    headings: {
+      contactInformation: "Contact information",
+      bookingDetails: "Booking details",
+      activityDetails: "Activity details",
+      additionalServices: "Additional services"
+    },
+    facilityTypes: {
+      all: "All types",
+      sportsHall: "Sports hall",
+      meetingRoom: "Meeting room",
+      conferenceRoom: "Conference room",
+      auditorium: "Auditorium",
+      gym: "Gym"
+    },
+    locations: {
+      all: "All areas",
+      drammenSentrum: "Drammen Center",
+      bragernes: "Bragernes",
+      stromsø: "Strømsø",
+      konnerud: "Konnerud",
+      åssiden: "Åssiden"
+    },
+    accessibility: {
+      all: "All",
+      wheelchair: "Wheelchair accessible",
+      hearingLoop: "Hearing loop",
+      visualAids: "Visual aids"
+    },
+    capacity: {
+      range1: "0-20",
+      range2: "20-50",
+      range3: "50-100", 
       range4: "100-200",
       range5: "200+"
     }
