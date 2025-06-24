@@ -22,10 +22,30 @@ export default function FacilityDetailPage() {
   // Convert database zones to booking zones format
   const bookingZones = zones.map(convertDatabaseZoneToBookingZone);
 
+  const handleShare = () => {
+    if (navigator.share) {
+      navigator.share({
+        title: facility.name,
+        text: facility.description,
+        url: window.location.href,
+      });
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+    }
+  };
+
+  const handleToggleFavorite = () => {
+    // Implementation for favoriting/unfavoriting
+    console.log('Toggle favorite for facility:', facility.id);
+  };
+
   return (
     <FacilityDetailLayout 
       facility={facility} 
-      zones={bookingZones} 
+      zones={bookingZones}
+      onShare={handleShare}
+      isFavorited={false}
+      onToggleFavorite={handleToggleFavorite}
     />
   );
 }

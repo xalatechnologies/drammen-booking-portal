@@ -1,3 +1,4 @@
+
 import { FacilityImage } from '@/types/facility';
 
 // Mock service for facility images - using app_location_images instead
@@ -33,3 +34,6 @@ export const facilityImageService = {
     console.log('Mock: Setting featured image', facilityId, imageId);
   }
 };
+
+// Export for backward compatibility
+export const FacilityImageService = facilityImageService;

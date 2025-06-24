@@ -658,6 +658,7 @@ export type Database = {
           capacity: number | null
           code: string
           contact_email: string | null
+          contact_name: string | null
           contact_phone: string | null
           created_at: string | null
           description: Json | null
@@ -694,6 +695,7 @@ export type Database = {
           capacity?: number | null
           code: string
           contact_email?: string | null
+          contact_name?: string | null
           contact_phone?: string | null
           created_at?: string | null
           description?: Json | null
@@ -730,6 +732,7 @@ export type Database = {
           capacity?: number | null
           code?: string
           contact_email?: string | null
+          contact_name?: string | null
           contact_phone?: string | null
           created_at?: string | null
           description?: Json | null

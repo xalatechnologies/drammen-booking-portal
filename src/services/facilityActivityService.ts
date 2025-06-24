@@ -38,3 +38,6 @@ export const facilityActivityService = {
     console.log('Mock: Removing facility activity', facilityId, activityId);
   }
 };
+
+// Export for backward compatibility
+export const FacilityActivityService = facilityActivityService;
