@@ -57,36 +57,23 @@ export const FacilityZonesSection: React.FC<FacilityZonesSectionProps> = ({ faci
             <Card key={zone.id}>
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
-                  <CardTitle className="text-lg">{zone.name}</CardTitle>
-                  <Badge variant={zone.status === 'active' ? 'default' : 'secondary'}>
-                    {zone.status}
-                  </Badge>
+                  <CardTitle className="text-lg">{zone.displayName || zone.code}</CardTitle>
+                  <Badge variant="default">active</Badge>
                 </div>
-                {zone.description && (
-                  <p className="text-sm text-gray-600">{zone.description}</p>
-                )}
               </CardHeader>
               <CardContent className="pt-0">
                 <div className="space-y-2 mb-4">
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Type:</span>
-                    <span className="font-medium">{zone.type}</span>
+                    <span className="text-gray-600">Code:</span>
+                    <span className="font-medium">{zone.code}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600">Capacity:</span>
                     <span className="font-medium">{zone.capacity} people</span>
                   </div>
-                  {zone.area_sqm && (
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Area:</span>
-                      <span className="font-medium">{zone.area_sqm} m²</span>
-                    </div>
-                  )}
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Bookable:</span>
-                    <Badge variant={zone.bookable_independently ? "default" : "secondary"} className="text-xs">
-                      {zone.bookable_independently ? "Yes" : "No"}
-                    </Badge>
+                    <span className="text-gray-600">Interval:</span>
+                    <span className="font-medium">{zone.interval}</span>
                   </div>
                 </div>
                 <div className="flex gap-2">

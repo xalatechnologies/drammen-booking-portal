@@ -13,6 +13,7 @@ export interface Zone {
   metadata?: any;
   created_at?: string;
   updated_at?: string;
+  displayName?: string;
 }
 
 export function useZones(facilityId?: string) {
@@ -41,7 +42,7 @@ export function useZones(facilityId?: string) {
           : zone.code
       })) || [];
 
-      return { data: zones, error: null };
+      return zones;
     },
     enabled: true,
     staleTime: 0,

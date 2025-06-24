@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import GlobalHeader from "@/components/GlobalHeader";
@@ -144,7 +143,16 @@ const FacilityDetail = () => {
           <FacilityDetailLayout 
             facility={facility}
             zones={displayZones}
-            onShare={handleShare}
+            onShare={() => {
+              if (navigator.share) {
+                navigator.share({
+                  title: facility?.name,
+                  url: window.location.href
+                });
+              } else {
+                navigator.clipboard.writeText(window.location.href);
+              }
+            }}
             isFavorited={isFavorited}
             onToggleFavorite={() => setIsFavorited(!isFavorited)}
           />
@@ -156,7 +164,7 @@ const FacilityDetail = () => {
             facilityName={facility.name}
             currentPattern={currentPattern}
             onPatternChange={setCurrentPattern}
-            onPatternApply={handlePatternApply}
+            onPatternApply={(pattern: any) => setCurrentPattern(pattern)}
             timeSlotDuration={facility.timeSlotDuration || 1}
           />
         </div>
@@ -167,7 +175,7 @@ const FacilityDetail = () => {
           facilityId={id || ""} 
           capacity={facility.capacity} 
           area={facility.area} 
-          openingHours={formatOpeningHours(facility.openingHours)} 
+          openingHours="Se detaljer"
         />
       </div>
     </CartProvider>

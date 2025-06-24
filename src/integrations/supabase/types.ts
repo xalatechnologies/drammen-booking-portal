@@ -175,6 +175,51 @@ export type Database = {
           },
         ]
       }
+      app_booking_services: {
+        Row: {
+          booking_id: string
+          created_at: string | null
+          metadata: Json | null
+          quantity: number
+          service_id: string
+          total_price: number
+          unit_price: number
+        }
+        Insert: {
+          booking_id: string
+          created_at?: string | null
+          metadata?: Json | null
+          quantity?: number
+          service_id: string
+          total_price: number
+          unit_price: number
+        }
+        Update: {
+          booking_id?: string
+          created_at?: string | null
+          metadata?: Json | null
+          quantity?: number
+          service_id?: string
+          total_price?: number
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "app_booking_services_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "app_bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "app_booking_services_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "app_services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       app_bookings: {
         Row: {
           actor_id: string | null
@@ -767,6 +812,48 @@ export type Database = {
           id?: string
           name?: string
           permissions?: Json | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      app_services: {
+        Row: {
+          base_price: number
+          category: string | null
+          code: string
+          created_at: string | null
+          description: Json | null
+          id: string
+          is_active: boolean
+          metadata: Json | null
+          name: Json
+          unit: string
+          updated_at: string | null
+        }
+        Insert: {
+          base_price: number
+          category?: string | null
+          code: string
+          created_at?: string | null
+          description?: Json | null
+          id?: string
+          is_active?: boolean
+          metadata?: Json | null
+          name: Json
+          unit: string
+          updated_at?: string | null
+        }
+        Update: {
+          base_price?: number
+          category?: string | null
+          code?: string
+          created_at?: string | null
+          description?: Json | null
+          id?: string
+          is_active?: boolean
+          metadata?: Json | null
+          name?: Json
+          unit?: string
           updated_at?: string | null
         }
         Relationships: []
