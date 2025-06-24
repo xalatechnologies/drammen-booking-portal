@@ -1,114 +1,79 @@
 
-import React from "react";
-import { CalendarViewProps } from "./types";
-import ViewHeader from "../search/ViewHeader";
-import { useCalendarView } from "@/hooks/useCalendarView";
-import { CalendarLoadingState } from "./components/CalendarLoadingState";
-import { CalendarErrorState } from "./components/CalendarErrorState";
-import { CalendarEmptyState } from "./components/CalendarEmptyState";
-import { useSlotSelection } from "@/hooks/useSlotSelection";
-import { useCalendarCart } from "@/hooks/useCalendarCart";
-import { Accordion } from "@/components/ui/accordion";
-import { FacilityAccordionContent } from "./FacilityAccordionContent";
+import React, { useState } from 'react';
+import { Calendar, momentLocalizer } from 'react-big-calendar';
+import moment from 'moment';
+import 'react-big-calendar/lib/css/react-big-calendar.css';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useFacilities } from '@/hooks/useFacilities';
 
-interface CalendarViewWithToggleProps extends CalendarViewProps {
-  viewMode: "grid" | "map" | "calendar" | "list";
-  setViewMode: (mode: "grid" | "map" | "calendar" | "list") => void;
+const localizer = momentLocalizer(moment);
+
+interface CalendarEvent {
+  id: string;
+  title: string;
+  start: Date;
+  end: Date;
+  resource?: any;
 }
 
-const CalendarView: React.FC<CalendarViewWithToggleProps> = ({
-  date,
-  facilityType,
-  location,
-  accessibility,
-  capacity,
-  viewMode,
-  setViewMode,
-}) => {
-  // Fix the capacity type issue by ensuring it's properly typed as a tuple
-  const capacityRange: [number, number] | undefined = capacity && Array.isArray(capacity) && capacity.length === 2 
-    ? [capacity[0], capacity[1]] 
-    : undefined;
+export const CalendarView: React.FC = () => {
+  const { data: facilities = [], isLoading, error } = useFacilities();
+  const [selectedDate, setSelectedDate] = useState(new Date());
 
-  const {
-    facilitiesWithZones,
-    isLoading,
-    error,
-    allZones,
-    navigate
-  } = useCalendarView({
-    date,
-    facilityType,
-    location,
-    accessibility,
-    capacity: capacityRange
-  });
-
-  // Use slot selection hook for managing selected slots
-  const {
-    selectedSlots,
-    handleSlotClick,
-    handleBulkSlotSelection,
-    clearSelection
-  } = useSlotSelection();
-
-  // Use cart hook for handling cart operations
-  const { handleAddToCart } = useCalendarCart();
-
-  const handleRemoveSlot = (zoneId: string, date: Date, timeSlot: string) => {
-    handleSlotClick(zoneId, date, timeSlot, 'available');
-  };
-
-  const handleCartAdd = (bookingData: any) => {
-    handleAddToCart(bookingData, allZones, clearSelection);
-  };
-
-  const handleCompleteBooking = (bookingData: any) => {
-    console.log('CalendarView: Complete booking:', bookingData);
-    // Navigate to checkout or booking flow
-    navigate('/checkout');
-  };
+  // Mock events for demonstration
+  const events: CalendarEvent[] = [
+    {
+      id: '1',
+      title: 'Football Training',
+      start: new Date(2024, 0, 15, 10, 0),
+      end: new Date(2024, 0, 15, 12, 0),
+    },
+    {
+      id: '2',
+      title: 'Basketball Game',
+      start: new Date(2024, 0, 16, 14, 0),
+      end: new Date(2024, 0, 16, 16, 0),
+    },
+  ];
 
   if (isLoading) {
-    return <CalendarLoadingState viewMode={viewMode} setViewMode={setViewMode} />;
+    return (
+      <div className="flex items-center justify-center h-96">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      </div>
+    );
   }
 
   if (error) {
-    return <CalendarErrorState viewMode={viewMode} setViewMode={setViewMode} />;
+    return (
+      <Card>
+        <CardContent className="p-6">
+          <p className="text-red-600">Error loading calendar data</p>
+        </CardContent>
+      </Card>
+    );
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 my-[12px]">
-      <ViewHeader 
-        facilityCount={facilitiesWithZones.length}
-        isLoading={isLoading}
-        viewMode={viewMode}
-        setViewMode={setViewMode}
-      />
-
-      {facilitiesWithZones.length === 0 ? (
-        <CalendarEmptyState />
-      ) : (
-        <Accordion 
-          type="multiple" 
-          defaultValue={[`facility-${facilitiesWithZones[0]?.id}`]} 
-          className="w-full space-y-4"
-        >
-          {facilitiesWithZones.map((facility) => (
-            <FacilityAccordionContent
-              key={facility.id}
-              facility={facility}
-              selectedSlots={selectedSlots}
-              onSlotClick={handleSlotClick}
-              onBulkSlotSelection={handleBulkSlotSelection}
-              onClearSlots={clearSelection}
-              onRemoveSlot={handleRemoveSlot}
-            />
-          ))}
-        </Accordion>
-      )}
-    </div>
+    <Card>
+      <CardHeader>
+        <CardTitle>Facility Calendar</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="h-96">
+          <Calendar
+            localizer={localizer}
+            events={events}
+            startAccessor="start"
+            endAccessor="end"
+            onSelectEvent={(event) => console.log('Selected event:', event)}
+            onSelectSlot={(slotInfo) => console.log('Selected slot:', slotInfo)}
+            selectable
+            views={['month', 'week', 'day']}
+            defaultView="month"
+          />
+        </div>
+      </CardContent>
+    </Card>
   );
 };
-
-export default CalendarView;

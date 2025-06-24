@@ -6,7 +6,7 @@ import { MapPin, Users, Clock } from "lucide-react";
 import { useFacilities } from "@/hooks/useFacilities";
 
 interface SimilarFacilitiesSliderProps {
-  currentFacilityId: number;
+  currentFacilityId: string; // Changed from number to string
   facilityType?: string;
 }
 

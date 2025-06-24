@@ -1,71 +1,38 @@
 
 import { useQuery } from '@tanstack/react-query';
-import { userRepository } from '@/dal/UserRepository';
-import { PaginationParams } from '@/types/api';
+import { supabase } from '@/integrations/supabase/client';
 
-export function useUsers(pagination: PaginationParams) {
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  locale: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export function useUsers() {
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ['users', pagination],
+    queryKey: ['users'],
     queryFn: async () => {
-      const result = await userRepository.findAll(pagination);
-      if (result.error) {
-        throw new Error(result.error);
+      const { data, error } = await supabase
+        .from('app_users')
+        .select(`
+          *,
+          app_user_roles (
+            role_id,
+            created_at
+          )
+        `)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching users:', error);
+        throw new Error(error.message);
       }
-      return {
-        data: result.data,
-        pagination: {
-          page: pagination.page,
-          limit: pagination.limit,
-          total: result.data.length,
-          totalPages: Math.ceil(result.data.length / pagination.limit),
-          hasNext: pagination.page * pagination.limit < result.data.length,
-          hasPrev: pagination.page > 1
-        }
-      };
+
+      return data || [];
     }
-  });
-
-  return {
-    users: data?.data || [],
-    pagination: data?.pagination,
-    isLoading,
-    error,
-    refetch
-  };
-}
-
-export function useUser(id: string) {
-  const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ['user', id],
-    queryFn: async () => {
-      const result = await userRepository.findById(id);
-      if (result.error) {
-        throw new Error(result.error);
-      }
-      return result.data;
-    },
-    enabled: !!id
-  });
-
-  return {
-    user: data,
-    isLoading,
-    error,
-    refetch
-  };
-}
-
-export function useUsersByRole(role: string) {
-  const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ['users', 'role', role],
-    queryFn: async () => {
-      const result = await userRepository.findByRole(role);
-      if (result.error) {
-        throw new Error(result.error);
-      }
-      return result.data;
-    },
-    enabled: !!role
   });
 
   return {
@@ -76,14 +43,36 @@ export function useUsersByRole(role: string) {
   };
 }
 
-export function useUpdateUser() {
-  return {
-    updateUser: async (id: string, data: any) => {
-      const result = await userRepository.update(id, data);
-      if (result.error) {
-        throw new Error(result.error);
+export function useUser(id: string) {
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey: ['user', id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('app_users')
+        .select(`
+          *,
+          app_user_roles (
+            role_id,
+            created_at
+          )
+        `)
+        .eq('id', id)
+        .single();
+
+      if (error) {
+        console.error('Error fetching user:', error);
+        throw new Error(error.message);
       }
-      return result.data;
-    }
+
+      return data;
+    },
+    enabled: !!id
+  });
+
+  return {
+    user: data,
+    isLoading,
+    error,
+    refetch
   };
 }

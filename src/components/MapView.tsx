@@ -1,106 +1,149 @@
 
-import React, { useState } from 'react';
-import { Card } from './ui/card';
-import { MapContainer } from './map/MapContainer';
-import { MapMarkers } from './map/MapMarkers';
-import { MapInfoOverlay } from './map/MapInfoOverlay';
-import { MapLoadingState } from './map/MapLoadingState';
-import { MapErrorState } from './map/MapErrorState';
+import React, { useEffect, useRef, useState } from 'react';
+import { Loader } from '@googlemaps/js-api-loader';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { MapPin, Users, Clock } from 'lucide-react';
 import { useFacilities } from '@/hooks/useFacilities';
-import ViewHeader from './search/ViewHeader';
-import mapboxgl from 'mapbox-gl';
 
-// Default token provided by user
-const DEFAULT_MAPBOX_TOKEN = 'pk.eyJ1IjoieGFsYXRlY2hub2xvZ2llc2FzIiwiYSI6ImNtYmh0anh6NTAweDEycXF6cm9xbDFtb2IifQ.81xizRmOh6TLUEsG0EVSEg';
-
-interface MapViewProps {
-  facilityType: string;
-  location: string;
-  viewMode: "grid" | "map" | "calendar" | "list";
-  setViewMode: (mode: "grid" | "map" | "calendar" | "list") => void;
+interface FacilityLocation {
+  id: string; // Changed from number to string
+  name: string;
+  address: string;
+  lat: number;
+  lng: number;
+  image: string;
+  type: string;
+  capacity: number;
+  nextAvailable: string;
 }
 
-const MapView: React.FC<MapViewProps> = ({ facilityType, location, viewMode, setViewMode }) => {
-  const [map, setMap] = useState<mapboxgl.Map | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string>('');
-  const [isInitialized, setIsInitialized] = useState<boolean>(false);
+const MapView: React.FC = () => {
+  const mapRef = useRef<HTMLDivElement>(null);
+  const [map, setMap] = useState<google.maps.Map | null>(null);
+  const [selectedFacility, setSelectedFacility] = useState<FacilityLocation | null>(null);
+  const { data: facilities = [], isLoading } = useFacilities();
 
-  // Use the centralized facilities service
-  const { data: facilities, isLoading: facilitiesLoading, error: facilitiesError } = useFacilities();
-
-  // Ensure facilities is always an array
-  const facilitiesArray = Array.isArray(facilities) ? facilities : (facilities ? [facilities] : []);
-
-  // Apply client-side filtering
-  const filteredFacilities = facilitiesArray.filter(facility => {
-    if (facilityType !== "all" && facility.type !== facilityType) return false;
-    if (location !== "all" && !facility.area.includes(location)) return false;
-    return true;
-  });
-
-  // Convert facilities to map format with enhanced data
-  const facilityLocations = filteredFacilities.map(facility => ({
-    id: facility.id,
+  // Convert facilities to map locations
+  const mapLocations: FacilityLocation[] = facilities.map(facility => ({
+    id: facility.id, // Already a string
     name: facility.name,
-    address: facility.address_street || facility.area,
-    lat: 59.7440 + (Math.random() - 0.5) * 0.02, // Spread around Drammen
-    lng: 10.2052 + (Math.random() - 0.5) * 0.02,
-    image: facility.facility_images?.[0]?.image_url || '',
+    address: facility.area,
+    lat: 59.9139, // Default Oslo coordinates
+    lng: 10.7522,
+    image: facility.facility_images?.[0]?.image_url || '/placeholder.svg',
     type: facility.type,
     capacity: facility.capacity,
-    nextAvailable: "Available now"
+    nextAvailable: 'Available now'
   }));
 
-  const handleMapLoad = (mapInstance: mapboxgl.Map) => {
-    setMap(mapInstance);
-    setIsInitialized(true);
-  };
+  useEffect(() => {
+    const initMap = async () => {
+      if (!mapRef.current) return;
 
-  const handleMapError = (errorMessage: string) => {
-    setError(errorMessage);
-    setIsInitialized(false);
-  };
+      const loader = new Loader({
+        apiKey: process.env.GOOGLE_MAPS_API_KEY || '',
+        version: 'weekly',
+      });
 
-  const handleRetry = () => {
-    setError('');
-    setIsInitialized(false);
-    window.location.reload();
-  };
+      try {
+        await loader.load();
+        
+        const mapInstance = new google.maps.Map(mapRef.current, {
+          center: { lat: 59.9139, lng: 10.7522 }, // Oslo center
+          zoom: 11,
+          styles: [
+            {
+              featureType: 'poi',
+              elementType: 'labels',
+              stylers: [{ visibility: 'off' }]
+            }
+          ]
+        });
+
+        setMap(mapInstance);
+
+        // Add markers for each facility
+        mapLocations.forEach((facility) => {
+          const marker = new google.maps.Marker({
+            position: { lat: facility.lat, lng: facility.lng },
+            map: mapInstance,
+            title: facility.name,
+            icon: {
+              url: '/map-marker.svg',
+              scaledSize: new google.maps.Size(40, 40),
+            },
+          });
+
+          marker.addListener('click', () => {
+            setSelectedFacility(facility);
+          });
+        });
+
+      } catch (error) {
+        console.error('Error loading Google Maps:', error);
+      }
+    };
+
+    if (!isLoading) {
+      initMap();
+    }
+  }, [isLoading, mapLocations]);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 my-[12px]">
-      {/* Reusable Header with consistent positioning */}
-      <ViewHeader 
-        facilityCount={filteredFacilities.length}
-        isLoading={facilitiesLoading}
-        viewMode={viewMode}
-        setViewMode={setViewMode}
-      />
-
-      {/* Map Content - Made much taller */}
-      <Card className="min-h-[900px] relative overflow-hidden">
-        <MapLoadingState isLoading={isLoading || facilitiesLoading} />
-        
-        <MapErrorState 
-          error={error || (facilitiesError ? 'Failed to load facilities' : '')} 
-          isLoading={isLoading || facilitiesLoading} 
-          onRetry={handleRetry} 
-        />
-        
-        <MapContainer
-          onMapLoad={handleMapLoad}
-          onMapError={handleMapError}
-          onLoadingChange={setIsLoading}
-          mapboxToken={DEFAULT_MAPBOX_TOKEN}
-        />
-        
-        <MapMarkers map={map} facilities={facilityLocations} />
-        
-        {!error && !isLoading && !facilitiesLoading && (
-          <MapInfoOverlay facilities={facilityLocations} />
-        )}
-      </Card>
+    <div className="relative h-96 w-full">
+      <div ref={mapRef} className="w-full h-full rounded-lg" />
+      
+      {selectedFacility && (
+        <Card className="absolute bottom-4 left-4 right-4 max-w-sm mx-auto">
+          <CardContent className="p-4">
+            <div className="flex space-x-4">
+              <img 
+                src={selectedFacility.image} 
+                alt={selectedFacility.name}
+                className="w-16 h-16 rounded-lg object-cover"
+              />
+              <div className="flex-1 space-y-2">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-semibold text-sm">{selectedFacility.name}</h3>
+                  <Badge variant="secondary" className="text-xs">
+                    {selectedFacility.type}
+                  </Badge>
+                </div>
+                
+                <div className="flex items-center text-xs text-gray-600">
+                  <MapPin className="w-3 h-3 mr-1" />
+                  <span className="truncate">{selectedFacility.address}</span>
+                </div>
+                
+                <div className="flex items-center justify-between text-xs">
+                  <div className="flex items-center text-gray-600">
+                    <Users className="w-3 h-3 mr-1" />
+                    <span>{selectedFacility.capacity}</span>
+                  </div>
+                  <div className="flex items-center text-green-600">
+                    <Clock className="w-3 h-3 mr-1" />
+                    <span>{selectedFacility.nextAvailable}</span>
+                  </div>
+                </div>
+                
+                <Button size="sm" className="w-full text-xs">
+                  View Details
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };

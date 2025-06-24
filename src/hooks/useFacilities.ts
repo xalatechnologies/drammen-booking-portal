@@ -26,12 +26,22 @@ export interface Facility {
   }>;
 }
 
+const getLocalizedText = (value: any, fallback: string = 'Unknown'): string => {
+  if (typeof value === 'string') {
+    return value;
+  }
+  if (typeof value === 'object' && value !== null) {
+    // Try different language codes
+    return value.no || value.en || value.nb || fallback;
+  }
+  return fallback;
+};
+
 export const useFacilities = () => {
   return useQuery({
     queryKey: ['facilities'],
     queryFn: async (): Promise<Facility[]> => {
       try {
-        // Use app_locations table since that's what exists in the database
         const { data, error } = await supabase
           .from('app_locations')
           .select(`
@@ -51,19 +61,14 @@ export const useFacilities = () => {
           return [];
         }
 
-        // Transform the data to match the expected Facility interface
         const facilities = (data || []).map((location: any) => ({
           id: location.id,
-          name: typeof location.name === 'string' ? location.name : 
-                (typeof location.name === 'object' && location.name?.no) ? location.name.no : 
-                (typeof location.name === 'object' && location.name?.en) ? location.name.en : 'Unknown',
+          name: getLocalizedText(location.name, 'Unknown Facility'),
           type: location.location_type || 'facility',
           area: location.address || '',
-          description: typeof location.description === 'string' ? location.description : 
-                      (typeof location.description === 'object' && location.description?.no) ? location.description.no :
-                      (typeof location.description === 'object' && location.description?.en) ? location.description.en : '',
+          description: getLocalizedText(location.description, ''),
           capacity: location.capacity || 0,
-          price_per_hour: 450, // Default price
+          price_per_hour: 450,
           address_street: location.address || '',
           address_city: '',
           address_postal_code: '',
@@ -81,8 +86,8 @@ export const useFacilities = () => {
         return [];
       }
     },
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    retry: false // Don't retry on errors to avoid spam
+    staleTime: 5 * 60 * 1000,
+    retry: false
   });
 };
 
@@ -113,19 +118,14 @@ export const useFacility = (id: string) => {
           return null;
         }
 
-        // Transform the data to match the expected Facility interface
         const facility = {
           id: data.id,
-          name: typeof data.name === 'string' ? data.name : 
-                (typeof data.name === 'object' && data.name?.no) ? data.name.no : 
-                (typeof data.name === 'object' && data.name?.en) ? data.name.en : 'Unknown',
+          name: getLocalizedText(data.name, 'Unknown Facility'),
           type: data.location_type || 'facility',
           area: data.address || '',
-          description: typeof data.description === 'string' ? data.description : 
-                      (typeof data.description === 'object' && data.description?.no) ? data.description.no :
-                      (typeof data.description === 'object' && data.description?.en) ? data.description.en : '',
+          description: getLocalizedText(data.description, ''),
           capacity: data.capacity || 0,
-          price_per_hour: 450, // Default price
+          price_per_hour: 450,
           address_street: data.address || '',
           address_city: '',
           address_postal_code: '',
@@ -146,5 +146,30 @@ export const useFacility = (id: string) => {
     enabled: !!id,
     staleTime: 5 * 60 * 1000,
     retry: false
+  });
+};
+
+export const useFacilitiesPagination = (page: number = 1, limit: number = 12) => {
+  return useQuery({
+    queryKey: ['facilities-paginated', page, limit],
+    queryFn: async () => {
+      const { data: facilities } = await useFacilities().queryFn();
+      const total = facilities.length;
+      const start = (page - 1) * limit;
+      const paginatedFacilities = facilities.slice(start, start + limit);
+      
+      return {
+        data: paginatedFacilities,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages: Math.ceil(total / limit),
+          hasNext: page < Math.ceil(total / limit),
+          hasPrev: page > 1
+        }
+      };
+    },
+    staleTime: 5 * 60 * 1000
   });
 };
