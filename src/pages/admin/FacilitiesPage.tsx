@@ -4,7 +4,7 @@ import { PageLayout } from "@/components/layouts";
 import { FacilityListView } from "@/components/admin/facilities/FacilityListView";
 
 const FacilitiesPage = () => {
-  const [selectedFacilityId, setSelectedFacilityId] = useState<number | undefined>();
+  const [selectedFacilityId, setSelectedFacilityId] = useState<string | undefined>();
 
   return (
     <PageLayout>

@@ -10,8 +10,8 @@ import { PricingRulesManagement } from "./PricingRulesManagement";
 import { FacilityAnalyticsDashboard } from "./FacilityAnalyticsDashboard";
 
 interface FacilityManagementTabsProps {
-  selectedFacilityId?: number;
-  onFacilitySelect?: (id: number) => void;
+  selectedFacilityId?: string;
+  onFacilitySelect?: (id: string) => void;
 }
 
 export const FacilityManagementTabs: React.FC<FacilityManagementTabsProps> = ({
@@ -48,7 +48,7 @@ export const FacilityManagementTabs: React.FC<FacilityManagementTabsProps> = ({
 
         <TabsContent value="blackouts" className="space-y-4">
           {selectedFacilityId && (
-            <BlackoutPeriodsManagement facilityId={selectedFacilityId.toString()} />
+            <BlackoutPeriodsManagement facilityId={selectedFacilityId} />
           )}
         </TabsContent>
 

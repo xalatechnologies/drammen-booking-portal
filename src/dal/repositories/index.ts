@@ -1,7 +1,6 @@
 
 export { facilityRepository } from './FacilityRepository';
 export { zoneRepository } from './ZoneRepository';
-export { supabaseFacilityRepository } from './SupabaseFacilityRepository';
 export { facilityBlackoutRepository } from './FacilityBlackoutRepository';
 
 // Export repository classes and singleton instances

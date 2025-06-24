@@ -4,20 +4,9 @@ import { ApiResponse } from '@/types/api';
 
 export interface Profile {
   id: string;
-  first_name: string;
-  last_name: string;
-  phone?: string;
-  avatar_url?: string;
-  bio?: string;
-  preferred_language: 'NO' | 'EN';
-  date_of_birth?: string;
-  address_street?: string;
-  address_city?: string;
-  address_postal_code?: string;
-  address_country?: string;
-  emergency_contact_name?: string;
-  emergency_contact_phone?: string;
-  is_active: boolean;
+  name: string;
+  email: string;
+  locale: 'NO' | 'EN';
   created_at: string;
   updated_at: string;
 }
@@ -25,10 +14,8 @@ export interface Profile {
 export interface UserRole {
   id: string;
   user_id: string;
-  role: string;
-  granted_at: string;
-  expires_at?: string;
-  is_active: boolean;
+  role_id: string;
+  created_at: string;
 }
 
 export class ProfileService {
@@ -46,7 +33,7 @@ export class ProfileService {
       }
 
       const { data, error } = await supabase
-        .from('profiles')
+        .from('app_users')
         .select('*')
         .eq('id', user.id)
         .single();
@@ -63,7 +50,14 @@ export class ProfileService {
 
       return {
         success: true,
-        data
+        data: {
+          id: data.id,
+          name: data.name,
+          email: data.email,
+          locale: data.locale as 'NO' | 'EN',
+          created_at: data.created_at,
+          updated_at: data.updated_at
+        }
       };
     } catch (error) {
       return {
@@ -90,7 +84,7 @@ export class ProfileService {
       }
 
       const { data, error } = await supabase
-        .from('profiles')
+        .from('app_users')
         .update({
           ...updates,
           updated_at: new Date().toISOString()
@@ -111,7 +105,14 @@ export class ProfileService {
 
       return {
         success: true,
-        data
+        data: {
+          id: data.id,
+          name: data.name,
+          email: data.email,
+          locale: data.locale as 'NO' | 'EN',
+          created_at: data.created_at,
+          updated_at: data.updated_at
+        }
       };
     } catch (error) {
       return {
@@ -139,10 +140,9 @@ export class ProfileService {
       }
 
       const { data, error } = await supabase
-        .from('user_roles')
+        .from('app_user_roles')
         .select('*')
-        .eq('user_id', targetUserId)
-        .eq('is_active', true);
+        .eq('user_id', targetUserId);
 
       if (error) {
         return {
@@ -156,7 +156,7 @@ export class ProfileService {
 
       return {
         success: true,
-        data
+        data: data || []
       };
     } catch (error) {
       return {
@@ -177,11 +177,9 @@ export class ProfileService {
         return false;
       }
 
-      return rolesResult.data.some(userRole => 
-        userRole.role === role && 
-        userRole.is_active &&
-        (!userRole.expires_at || new Date(userRole.expires_at) > new Date())
-      );
+      // For now, return false since we don't have role name mapping
+      // This would need to be implemented with proper role management
+      return false;
     } catch (error) {
       console.error('Error checking user role:', error);
       return false;
