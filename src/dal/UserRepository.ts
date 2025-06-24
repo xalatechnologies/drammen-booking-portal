@@ -1,5 +1,5 @@
 
-import { SupabaseRepository } from './SupabaseRepository';
+import { SimpleRepository } from './repositories/SimpleRepository';
 import { supabase } from '@/integrations/supabase/client';
 
 interface User {
@@ -11,7 +11,7 @@ interface User {
   updated_at?: string;
 }
 
-export class UserRepository extends SupabaseRepository<User> {
+export class UserRepository extends SimpleRepository {
   constructor() {
     super('app_users');
   }

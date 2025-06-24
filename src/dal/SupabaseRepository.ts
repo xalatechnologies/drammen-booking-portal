@@ -7,30 +7,9 @@ export class SupabaseRepository<T = any> implements BaseRepository<T> {
 
   async getAll(options?: QueryOptions): Promise<ApiResponse<T[]>> {
     try {
-      let query = supabase.from(this.tableName).select('*');
-      
-      if (options?.filters) {
-        Object.entries(options.filters).forEach(([key, value]) => {
-          if (value !== undefined && value !== null) {
-            query = query.eq(key, value);
-          }
-        });
-      }
-      
-      if (options?.sortBy) {
-        query = query.order(options.sortBy, { 
-          ascending: options.sortOrder === 'asc'
-        });
-      }
-      
-      if (options?.pagination) {
-        const { page, limit } = options.pagination;
-        const from = (page - 1) * limit;
-        const to = from + limit - 1;
-        query = query.range(from, to);
-      }
-
-      const { data, error, count } = await query;
+      const { data, error } = await supabase
+        .from(this.tableName)
+        .select('*');
       
       if (error) {
         return { success: false, error: { message: error.message, code: error.code } };
@@ -38,7 +17,7 @@ export class SupabaseRepository<T = any> implements BaseRepository<T> {
 
       return {
         success: true,
-        data: (data || []) as T[]
+        data: data as T[]
       };
     } catch (error) {
       return {
