@@ -96,7 +96,7 @@ export function BookingForm({
   const handleAddToCart = async () => {
     console.log('BookingForm: handleAddToCart called');
 
-    if (!formData.actorType || formData.actorType === '') {
+    if (!formData.actorType) {
       toast({
         title: "Feil",
         description: "Vennligst velg aktørtype først.",
