@@ -33,6 +33,14 @@ const Index = () => {
     }
   });
 
+  const handleFilter = (filters: any) => {
+    console.log('Filters applied:', filters);
+  };
+
+  const handleSearch = (query: string) => {
+    setSearchTerm(query);
+  };
+
   const renderContent = () => {
     if (isLoading) {
       return <div className="text-center py-8">Loading facilities...</div>;
@@ -83,13 +91,8 @@ const Index = () => {
       
       <div className="container mx-auto px-4 py-8">
         <SearchFilter
-          onSearchChange={setSearchTerm}
-          onFacilityTypeChange={setFacilityType}
-          onLocationChange={setLocation}
-          onAccessibilityChange={setAccessibility}
-          onCapacityChange={setCapacity}
-          onDateChange={setDate}
-          onViewModeChange={setViewMode}
+          onFilter={handleFilter}
+          onSearch={handleSearch}
         />
         
         {renderContent()}

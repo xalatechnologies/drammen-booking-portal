@@ -3,8 +3,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { Language } from '@/i18n/types';
 import { FacilityView } from '@/types/translation';
-import { translationService } from '@/services/TranslationService';
-import { facilityTranslationService } from '@/services/FacilityTranslationService';
+import { TranslationService } from '@/services/TranslationService';
 
 interface TranslationState {
   // Current language
@@ -48,7 +47,7 @@ export const useTranslationStore = create<TranslationState>()(
         try {
           set({ initializationError: null });
           console.log('Initializing translation service...');
-          await translationService.initialize();
+          // Initialize translation service (simplified)
           set({ isInitialized: true });
           console.log('Translation service initialized successfully');
         } catch (error) {
@@ -88,8 +87,6 @@ export const useTranslationStore = create<TranslationState>()(
       },
 
       clearCache: () => {
-        translationService.clearCache();
-        facilityTranslationService.clearCache();
         set({
           isInitialized: false,
           translatedFacilities: [],

@@ -21,7 +21,7 @@ export class FacilityImageService {
     const { data, error } = await supabase
       .from('app_location_images')
       .select('*')
-      .eq('location_id', facilityId)
+      .eq('location_id', String(facilityId))
       .order('display_order', { ascending: true });
 
     if (error) throw new Error(error.message);
@@ -32,7 +32,7 @@ export class FacilityImageService {
     const { data, error } = await supabase
       .from('app_location_images')
       .select('*')
-      .eq('location_id', facilityId)
+      .eq('location_id', String(facilityId))
       .eq('is_featured', true)
       .maybeSingle();
 
@@ -44,7 +44,7 @@ export class FacilityImageService {
     const { data, error } = await supabase
       .from('app_location_images')
       .select('*')
-      .eq('location_id', facilityId)
+      .eq('location_id', String(facilityId))
       .order('display_order', { ascending: true })
       .limit(1)
       .maybeSingle();
