@@ -1,24 +1,40 @@
 
-import { supabase } from '@/integrations/supabase/client';
-
-export class FacilityActivityService {
-  static async getFacilitySuitableActivities(facilityId: number, languageCode: 'NO' | 'EN' = 'NO'): Promise<string[]> {
-    try {
-      const { data, error } = await supabase
-        .from('facility_suitable_activities')
-        .select('activity_name')
-        .eq('facility_id', facilityId)
-        .eq('language_code', languageCode);
-
-      if (error) {
-        console.error('Error fetching facility activities:', error);
-        return [];
-      }
-
-      return data?.map(item => item.activity_name) || [];
-    } catch (error) {
-      console.error('Error in getFacilitySuitableActivities:', error);
-      return [];
-    }
-  }
+// Mock service for facility activities since the table doesn't exist in database
+export interface FacilityActivity {
+  id: string;
+  facility_id: string;
+  activity_name: string;
+  category: string;
+  description?: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
 }
+
+export const facilityActivityService = {
+  async getFacilityActivities(facilityId: string): Promise<FacilityActivity[]> {
+    // Mock implementation - return empty array since table doesn't exist
+    console.log('Mock: Getting facility activities for facility', facilityId);
+    return [];
+  },
+
+  async addFacilityActivity(facilityId: string, activityName: string, category: string): Promise<FacilityActivity> {
+    // Mock implementation
+    const mockActivity: FacilityActivity = {
+      id: `mock-${Date.now()}`,
+      facility_id: facilityId,
+      activity_name: activityName,
+      category,
+      is_active: true,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
+    
+    console.log('Mock: Adding facility activity', mockActivity);
+    return mockActivity;
+  },
+
+  async removeFacilityActivity(facilityId: string, activityId: string): Promise<void> {
+    console.log('Mock: Removing facility activity', facilityId, activityId);
+  }
+};

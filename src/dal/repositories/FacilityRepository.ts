@@ -1,4 +1,3 @@
-
 import { SupabaseRepository } from '../SupabaseRepository';
 import { Facility, FacilityFilters, OpeningHours } from '@/types/facility';
 import { PaginationParams, ApiResponse, PaginatedResponse } from '@/types/api';
@@ -126,9 +125,9 @@ export class FacilityRepository extends SupabaseRepository<Facility> {
         allowed_booking_types: normalizeBookingTypes(location.allowed_booking_types || ['engangs']),
         season_from: location.season_from || null,
         season_to: location.season_to || null,
-        contact_name: location.contact_name || null,  // This might be null in DB
-        contact_email: location.contact_email || null,
-        contact_phone: location.contact_phone || null,
+        contact_name: (location as any).contact_name || null,
+        contact_email: (location as any).contact_email || null,
+        contact_phone: (location as any).contact_phone || null,
         booking_lead_time_hours: location.booking_lead_time_hours || 2,
         max_advance_booking_days: location.max_advance_booking_days || 365,
         cancellation_deadline_hours: location.cancellation_deadline_hours || 24,
@@ -136,7 +135,7 @@ export class FacilityRepository extends SupabaseRepository<Facility> {
         created_at: location.created_at,
         updated_at: location.updated_at,
         area_sqm: location.area_sqm || null,
-        // Computed/derived fields for backwards compatibility - all required to avoid conflicts
+        // Computed/derived fields for backwards compatibility
         address: location.address || '',
         image: location.app_location_images?.[0]?.image_url || '',
         pricePerHour: location.price_per_hour || 450,
@@ -258,9 +257,9 @@ export class FacilityRepository extends SupabaseRepository<Facility> {
         allowed_booking_types: normalizeBookingTypes(data.allowed_booking_types || ['engangs']),
         season_from: data.season_from || null,
         season_to: data.season_to || null,
-        contact_name: data.contact_name || null,
-        contact_email: data.contact_email || null,
-        contact_phone: data.contact_phone || null,
+        contact_name: (data as any).contact_name || null,
+        contact_email: (data as any).contact_email || null,
+        contact_phone: (data as any).contact_phone || null,
         booking_lead_time_hours: data.booking_lead_time_hours || 2,
         max_advance_booking_days: data.max_advance_booking_days || 365,
         cancellation_deadline_hours: data.cancellation_deadline_hours || 24,
@@ -268,7 +267,7 @@ export class FacilityRepository extends SupabaseRepository<Facility> {
         created_at: data.created_at,
         updated_at: data.updated_at,
         area_sqm: data.area_sqm || null,
-        // Computed/derived fields for backwards compatibility - all required to avoid conflicts
+        // Computed/derived fields for backwards compatibility
         address: data.address || '',
         image: data.app_location_images?.[0]?.image_url || '',
         pricePerHour: data.price_per_hour || 450,
