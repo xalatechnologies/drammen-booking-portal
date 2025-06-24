@@ -1,0 +1,45 @@
+
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Plus, MapPin } from 'lucide-react';
+
+interface FacilityZonesSectionProps {
+  facilityId?: number;
+}
+
+export function FacilityZonesSection({ facilityId }: FacilityZonesSectionProps) {
+  const handleAddZone = () => {
+    console.log('Add zone for facility:', facilityId);
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <MapPin className="h-5 w-5" />
+            Facility Zones
+          </div>
+          <Button onClick={handleAddZone} size="sm">
+            <Plus className="h-4 w-4 mr-2" />
+            Add Zone
+          </Button>
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        {!facilityId ? (
+          <p className="text-gray-500">Save the facility first to manage zones</p>
+        ) : (
+          <div className="text-center py-8">
+            <MapPin className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+            <p className="text-gray-500 mb-2">No zones configured</p>
+            <p className="text-sm text-gray-400">
+              Add zones to divide the facility into bookable areas
+            </p>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}

@@ -2,25 +2,27 @@
 import React from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { FacilityCard } from '@/components/facility/FacilityCard';
-import { Facility } from '@/types/facility';
+import { useFacilities } from '@/hooks/useFacilities';
+import { transformFacilitiesForUI } from '@/utils/facilityTransforms';
 
 interface InfiniteScrollFacilitiesProps {
-  facilities: Facility[];
-  hasMore: boolean;
-  fetchMore: () => void;
+  filters?: any;
+  viewMode: "grid" | "list";
+  setViewMode: (mode: "grid" | "map" | "calendar" | "list") => void;
   className?: string;
 }
 
 export function InfiniteScrollFacilities({
-  facilities = [],
-  hasMore,
-  fetchMore,
+  filters,
+  viewMode,
+  setViewMode,
   className = ''
 }: InfiniteScrollFacilitiesProps) {
-  const handleAddressClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    console.log('Address clicked');
-  };
+  const { data: rawFacilities = [], isLoading } = useFacilities();
+  
+  const facilities = transformFacilitiesForUI(rawFacilities);
+  const hasMore = false; // Simplified - no pagination
+  const fetchMore = () => {}; // Simplified - no pagination
 
   return (
     <InfiniteScroll

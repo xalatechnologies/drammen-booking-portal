@@ -75,11 +75,12 @@ export function BookingPricingStep({
   const handleAddToCart = () => {
     selectedSlots.forEach(slot => {
       const cartItem = {
+        id: crypto.randomUUID(),
         facilityId,
         facilityName,
         zoneId: slot.zoneId,
-        startTime: slot.date,
-        endTime: new Date(slot.date.getTime() + (60 * 60 * 1000)), // 1 hour later
+        startTime: slot.date.toISOString(),
+        endTime: new Date(slot.date.getTime() + (60 * 60 * 1000)).toISOString(), // 1 hour later
         price: 450,
         duration: 60,
         purpose: 'General booking',

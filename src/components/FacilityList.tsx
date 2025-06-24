@@ -1,10 +1,11 @@
 
 import React from "react";
-import { InfiniteScrollFacilities } from "./InfiniteScrollFacilities";
-import { FacilityFilters } from "@/types/facility";
+import { useFacilities } from "@/hooks/useFacilities";
+import { FacilityGrid } from "./FacilityGrid";
+import { transformFacilitiesForUI } from "@/utils/facilityTransforms";
 
 interface FacilityListProps {
-  filters: FacilityFilters;
+  filters?: any;
   viewMode: "grid" | "list";
   setViewMode: (mode: "grid" | "map" | "calendar" | "list") => void;
 }
@@ -14,12 +15,16 @@ const FacilityList: React.FC<FacilityListProps> = ({
   viewMode,
   setViewMode
 }) => {
+  const { data: rawFacilities = [], isLoading } = useFacilities();
+  
+  if (isLoading) {
+    return <div className="text-center py-8">Loading facilities...</div>;
+  }
+
+  const facilities = transformFacilitiesForUI(rawFacilities);
+
   return (
-    <InfiniteScrollFacilities 
-      filters={filters} 
-      viewMode={viewMode}
-      setViewMode={setViewMode}
-    />
+    <FacilityGrid facilities={facilities} />
   );
 };
 

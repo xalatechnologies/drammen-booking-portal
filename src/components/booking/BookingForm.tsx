@@ -160,7 +160,6 @@ export function BookingForm({
       <EnhancedPriceCalculationCard
         selectedSlots={selectedSlots}
         actorType={formData.actorType}
-        totalPrice={calculateTotalPrice()}
       />
 
       <BookingActionButtons

@@ -10,7 +10,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { FacilityCard } from "@/components/facility/FacilityCard";
-import { useTranslation } from "@/i18n/hooks/useTranslation";
+import { useTranslation } from "@/hooks/useTranslation";
 import { useFacilities } from "@/hooks/useFacilities";
 import { transformFacilitiesForUI } from "@/utils/facilityTransforms";
 
@@ -27,16 +27,14 @@ export function SimilarFacilitiesSlider({ currentFacilityId }: SimilarFacilities
 
   // Transform and filter facilities
   const similarFacilities = React.useMemo(() => {
+    if (!Array.isArray(rawFacilities)) {
+      return [];
+    }
     const transformed = transformFacilitiesForUI(rawFacilities);
     return transformed
       .filter(facility => facility.id.toString() !== currentFacilityId)
       .slice(0, 5);
   }, [rawFacilities, currentFacilityId]);
-
-  const handleAddressClick = (e: React.MouseEvent, facility: any) => {
-    e.stopPropagation();
-    console.log('Show map for:', facility.address);
-  };
 
   if (similarFacilities.length === 0) {
     return null;
@@ -45,9 +43,9 @@ export function SimilarFacilitiesSlider({ currentFacilityId }: SimilarFacilities
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-900">{t('facility.similar.title')}</h2>
+        <h2 className="text-2xl font-bold text-gray-900">{t('facility.similar.title', {}, 'Similar Facilities')}</h2>
         <Button variant="outline" onClick={() => navigate("/")}>
-          {t('facility.similar.viewAll')}
+          {t('facility.similar.viewAll', {}, 'View All')}
         </Button>
       </div>
       
@@ -55,10 +53,7 @@ export function SimilarFacilitiesSlider({ currentFacilityId }: SimilarFacilities
         <CarouselContent className="-ml-2 md:-ml-4">
           {similarFacilities.map((facility) => (
             <CarouselItem key={facility.id} className="pl-2 md:pl-4 basis-full sm:basis-1/2 lg:basis-1/3">
-              <FacilityCard 
-                facility={facility}
-                onAddressClick={handleAddressClick}
-              />
+              <FacilityCard facility={facility} />
             </CarouselItem>
           ))}
         </CarouselContent>
