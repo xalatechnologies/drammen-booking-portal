@@ -10,8 +10,8 @@ import { PricingRulesManagement } from "./PricingRulesManagement";
 import { FacilityAnalyticsDashboard } from "./FacilityAnalyticsDashboard";
 
 interface FacilityManagementTabsProps {
-  selectedFacilityId?: string;
-  onFacilitySelect?: (id: string) => void;
+  selectedFacilityId?: number;
+  onFacilitySelect?: (id: number) => void;
 }
 
 export const FacilityManagementTabs: React.FC<FacilityManagementTabsProps> = ({
