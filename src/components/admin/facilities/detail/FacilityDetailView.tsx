@@ -16,11 +16,11 @@ interface FacilityDetailViewProps {
 export function FacilityDetailView({ facility }: FacilityDetailViewProps) {
   // Transform facility opening hours to match expected interface
   const transformedOpeningHours = facility.openingHours?.map(hour => ({
-    id: hour.id || `${hour.day_of_week}-${hour.open_time}`,
-    dayOfWeek: hour.day_of_week || 0,
-    openTime: hour.open_time || '09:00',
-    closeTime: hour.close_time || '17:00',
-    isOpen: hour.is_open ?? true
+    id: `${facility.id}-${hour.dayOfWeek}`,
+    dayOfWeek: hour.dayOfWeek || 0,
+    openTime: hour.opens || '09:00',
+    closeTime: hour.closes || '17:00',
+    isOpen: hour.isOpen ?? true
   })) || [];
 
   return (

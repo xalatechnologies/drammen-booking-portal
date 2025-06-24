@@ -12,11 +12,12 @@ export const facilityUtils = {
     return data || [];
   },
 
-  getFacilityById: async (id: string) => {
+  getFacilityById: async (id: string | number) => {
+    const facilityId = typeof id === 'string' ? parseInt(id, 10) : id;
     const { data, error } = await supabase
       .from('facilities')
       .select('*')
-      .eq('id', id)
+      .eq('id', facilityId)
       .single();
     
     if (error) throw error;
@@ -34,11 +35,12 @@ export const facilityUtils = {
     return data;
   },
 
-  updateFacility: async (id: string, updates: any) => {
+  updateFacility: async (id: string | number, updates: any) => {
+    const facilityId = typeof id === 'string' ? parseInt(id, 10) : id;
     const { data, error } = await supabase
       .from('facilities')
       .update(updates)
-      .eq('id', id)
+      .eq('id', facilityId)
       .select()
       .single();
     
@@ -46,11 +48,12 @@ export const facilityUtils = {
     return data;
   },
 
-  deleteFacility: async (id: string) => {
+  deleteFacility: async (id: string | number) => {
+    const facilityId = typeof id === 'string' ? parseInt(id, 10) : id;
     const { error } = await supabase
       .from('facilities')
       .delete()
-      .eq('id', id);
+      .eq('id', facilityId);
     
     if (error) throw error;
   }

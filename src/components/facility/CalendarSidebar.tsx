@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { BookingStepsAccordion } from './sidebar/BookingStepsAccordion';
-import { SelectedTimeSlot } from '@/utils/recurrenceEngine';
+import { SelectedTimeSlot, RecurrencePattern } from '@/utils/recurrenceEngine';
 import { Zone } from '@/components/booking/types';
 
 interface CalendarSidebarProps {
@@ -10,7 +10,11 @@ interface CalendarSidebarProps {
   facilityName: string;
   zones: Zone[];
   onRemoveSlot: (zoneId: string, date: Date, timeSlot: string) => void;
-  onClearAll: () => void;
+  onClearAll?: () => void;
+  onClearSlots?: () => void;
+  currentPattern?: RecurrencePattern;
+  onPatternChange?: (pattern: RecurrencePattern) => void;
+  onPatternApply?: (pattern: RecurrencePattern) => void;
 }
 
 export function CalendarSidebar({
@@ -19,8 +23,15 @@ export function CalendarSidebar({
   facilityName,
   zones,
   onRemoveSlot,
-  onClearAll
+  onClearAll,
+  onClearSlots,
+  currentPattern,
+  onPatternChange,
+  onPatternApply
 }: CalendarSidebarProps) {
+  // Use either onClearAll or onClearSlots
+  const handleClear = onClearAll || onClearSlots || (() => {});
+
   return (
     <div className="w-80 p-4 bg-white border-l border-gray-200">
       <BookingStepsAccordion
@@ -29,7 +40,7 @@ export function CalendarSidebar({
         facilityName={facilityName}
         zones={zones}
         onRemoveSlot={onRemoveSlot}
-        onClearAll={onClearAll}
+        onClearAll={handleClear}
       />
     </div>
   );

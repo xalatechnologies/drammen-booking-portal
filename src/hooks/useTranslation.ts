@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 // Simple translation hook without service dependency
 export function useTranslation() {
   const [language, setLanguage] = useState('no');
+  const [isInitialized, setIsInitialized] = useState(true);
 
   const t = (key: string, variables?: Record<string, any>, fallback?: string) => {
     // Simple fallback translation - just return the fallback or key
@@ -22,6 +23,7 @@ export function useTranslation() {
   return {
     t,
     tSync,
+    isInitialized,
     i18n: {
       language,
       changeLanguage
