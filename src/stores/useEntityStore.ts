@@ -11,25 +11,13 @@ import { Blackout } from '@/types/blackout';
  */
 
 // Facility store - simplified to avoid relation errors
-export const useFacilityStore = createGenericEntityStore<Facility>('facilities', {
-  idField: 'id',
-  statusField: 'status',
-  activeValue: 'active'
-});
+export const useFacilityStore = createGenericEntityStore<Facility>('facilities');
 
 // Zone store
-export const useZoneStore = createGenericEntityStore<Zone>('zones', {
-  idField: 'id',
-  statusField: 'status',
-  activeValue: 'active'
-});
+export const useZoneStore = createGenericEntityStore<Zone>('zones');
 
 // Opening Hours store
-export const useOpeningHoursStore = createGenericEntityStore<OpeningHours>('facility_opening_hours', {
-  idField: 'id'
-});
+export const useOpeningHoursStore = createGenericEntityStore<OpeningHours>('facility_opening_hours');
 
 // Blackout store
-export const useBlackoutStore = createGenericEntityStore<Blackout>('facility_blackout_periods', {
-  idField: 'id'
-});
+export const useBlackoutStore = createGenericEntityStore<Blackout>('facility_blackout_periods');

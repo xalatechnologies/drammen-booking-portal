@@ -20,13 +20,10 @@ const BookingsOverviewPage = () => {
 
   const { data: bookingsResponse, isLoading, refetch } = useQuery({
     queryKey: ['bookings'],
-    queryFn: () => BookingService.getBookings({
-      page: 1,
-      limit: 50
-    })
+    queryFn: () => BookingService.getBookings()
   });
 
-  const bookings = bookingsResponse?.success ? bookingsResponse.data?.items || [] : [];
+  const bookings = bookingsResponse?.success ? bookingsResponse.data || [] : [];
 
   const filteredBookings = bookings.filter(booking => {
     const matchesSearch = booking.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||

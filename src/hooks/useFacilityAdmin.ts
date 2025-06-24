@@ -72,18 +72,15 @@ export function useFacilityAdmin() {
       }
     });
     
-    return fetchAll(undefined, queryParams);
+    return fetchAll();
   };
   
   const createFacility = async (data: Partial<Facility>) => {
     try {
-      const result = await createEntity(data);
-      if (result) {
-        toast.success('Facility created successfully');
-        closeForm();
-        return result;
-      }
-      return null;
+      await createEntity(data);
+      toast.success('Facility created successfully');
+      closeForm();
+      return true;
     } catch (error: any) {
       toast.error(`Error creating facility: ${error.message}`);
       throw error;
@@ -92,13 +89,10 @@ export function useFacilityAdmin() {
   
   const updateFacility = async (id: string, data: Partial<Facility>) => {
     try {
-      const result = await updateEntity(id, data);
-      if (result) {
-        toast.success('Facility updated successfully');
-        closeForm();
-        return result;
-      }
-      return null;
+      await updateEntity(id, data);
+      toast.success('Facility updated successfully');
+      closeForm();
+      return true;
     } catch (error: any) {
       toast.error(`Error updating facility: ${error.message}`);
       throw error;
@@ -107,13 +101,10 @@ export function useFacilityAdmin() {
   
   const deleteFacility = async (id: string) => {
     try {
-      const result = await deleteEntity(id);
-      if (result) {
-        toast.success('Facility deleted successfully');
-        closeForm();
-        return true;
-      }
-      return false;
+      await deleteEntity(id);
+      toast.success('Facility deleted successfully');
+      closeForm();
+      return true;
     } catch (error: any) {
       toast.error(`Error deleting facility: ${error.message}`);
       throw error;
