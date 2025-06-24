@@ -94,24 +94,6 @@ export function EnhancedPriceCalculationCard({
     );
   }
 
-  if (!actorType) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Calculator className="h-5 w-5" />
-            Prisberegning
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-gray-600 text-center py-4">
-            Velg aktør for å se pris
-          </p>
-        </CardContent>
-      </Card>
-    );
-  }
-
   const priceBreakdown = calculateMockPrice();
 
   return (
