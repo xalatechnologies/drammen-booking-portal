@@ -5,6 +5,7 @@ import { Zone } from './types';
 import { ActorType } from '@/types/pricing';
 import { SelectedSlotsAccordion } from './SelectedSlotsAccordion';
 import { BookingFormFields } from './BookingFormFields';
+import { ActorTypeCard } from './ActorTypeCard';
 import { EnhancedPriceCalculationCard } from './EnhancedPriceCalculationCard';
 import { BookingActionButtons } from './BookingActionButtons';
 import { BookingService, BookingFormData } from '@/services/BookingService';
@@ -222,6 +223,12 @@ export function BookingForm({
         <BookingFormFields
           formData={formData}
           onUpdateFormData={updateFormData}
+        />
+
+        {/* Actor Type Selection */}
+        <ActorTypeCard
+          value={formData.actorType}
+          onChange={(actorType) => updateFormData({ actorType })}
         />
 
         {/* Enhanced Price Calculation */}

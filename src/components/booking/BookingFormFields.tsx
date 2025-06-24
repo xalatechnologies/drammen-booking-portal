@@ -5,8 +5,6 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { User, Building, Users } from 'lucide-react';
 import { ActorType } from '@/types/pricing';
 
 interface BookingFormData {
@@ -59,52 +57,6 @@ export function BookingFormFields({ formData, onUpdateFormData }: BookingFormFie
         <CardTitle>Booking informasjon</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        {/* Actor Type Selection */}
-        <div>
-          <Label className="text-sm font-medium mb-3 block">Hvem booker? *</Label>
-          <RadioGroup
-            value={formData.actorType}
-            onValueChange={(value: ActorType) => onUpdateFormData({ actorType: value })}
-            className="space-y-2"
-          >
-            <div className="flex items-center space-x-2 p-3 border rounded-lg">
-              <RadioGroupItem value="private-person" id="private-person" />
-              <Label htmlFor="private-person" className="flex items-center gap-2 cursor-pointer flex-1">
-                <User className="h-4 w-4" />
-                Privatperson
-              </Label>
-            </div>
-            <div className="flex items-center space-x-2 p-3 border rounded-lg">
-              <RadioGroupItem value="private-firma" id="private-firma" />
-              <Label htmlFor="private-firma" className="flex items-center gap-2 cursor-pointer flex-1">
-                <Building className="h-4 w-4" />
-                Privat firma
-              </Label>
-            </div>
-            <div className="flex items-center space-x-2 p-3 border rounded-lg">
-              <RadioGroupItem value="lag-foreninger" id="lag-foreninger" />
-              <Label htmlFor="lag-foreninger" className="flex items-center gap-2 cursor-pointer flex-1">
-                <Users className="h-4 w-4" />
-                Lag/Foreninger
-              </Label>
-            </div>
-            <div className="flex items-center space-x-2 p-3 border rounded-lg">
-              <RadioGroupItem value="paraply" id="paraply" />
-              <Label htmlFor="paraply" className="flex items-center gap-2 cursor-pointer flex-1">
-                <Users className="h-4 w-4" />
-                Paraplyorganisasjon
-              </Label>
-            </div>
-            <div className="flex items-center space-x-2 p-3 border rounded-lg">
-              <RadioGroupItem value="kommunale-enheter" id="kommunale-enheter" />
-              <Label htmlFor="kommunale-enheter" className="flex items-center gap-2 cursor-pointer flex-1">
-                <Building className="h-4 w-4" />
-                Kommunale enheter
-              </Label>
-            </div>
-          </RadioGroup>
-        </div>
-
         {/* Purpose Selection */}
         <div>
           <Label htmlFor="purpose">Formål med booking *</Label>
