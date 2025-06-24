@@ -345,6 +345,66 @@ export type Database = {
           },
         ]
       }
+      app_location_images: {
+        Row: {
+          alt_text: string | null
+          caption: string | null
+          created_at: string
+          display_order: number
+          file_size: number | null
+          id: string
+          image_url: string
+          is_featured: boolean
+          location_id: string
+          updated_at: string
+          uploaded_at: string | null
+          uploaded_by: string | null
+        }
+        Insert: {
+          alt_text?: string | null
+          caption?: string | null
+          created_at?: string
+          display_order?: number
+          file_size?: number | null
+          id?: string
+          image_url: string
+          is_featured?: boolean
+          location_id: string
+          updated_at?: string
+          uploaded_at?: string | null
+          uploaded_by?: string | null
+        }
+        Update: {
+          alt_text?: string | null
+          caption?: string | null
+          created_at?: string
+          display_order?: number
+          file_size?: number | null
+          id?: string
+          image_url?: string
+          is_featured?: boolean
+          location_id?: string
+          updated_at?: string
+          uploaded_at?: string | null
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "app_location_images_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "app_locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "app_location_images_uploaded_by_fkey"
+            columns: ["uploaded_by"]
+            isOneToOne: false
+            referencedRelation: "app_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       app_locations: {
         Row: {
           address: string

@@ -31,17 +31,44 @@ export const useZones = (facilityId?: string) => {
         console.log('useZones - Raw zones data:', data);
 
         // Transform the data to match the expected Zone interface
-        const zones: Zone[] = (data || []).map((zone: any) => ({
-          id: zone.id,
-          name: typeof zone.name === 'object' ? zone.name[language] || zone.name.NO || zone.name.EN || 'Unknown Zone' : zone.name,
-          description: typeof zone.name === 'object' ? zone.name[language] || zone.name.NO || zone.name.EN || '' : '',
-          capacity: zone.capacity || 1,
-          facilityId: zone.location_id,
-          isActive: true,
-          equipment: [],
-          amenities: [],
-          pricePerHour: 0,
-        }));
+        const zones: Zone[] = (data || []).map((zone: any) => {
+          const getName = (nameObj: any) => {
+            if (typeof nameObj === 'string') return nameObj;
+            if (typeof nameObj === 'object' && nameObj) {
+              return nameObj[language] || nameObj['NO'] || nameObj['EN'] || 'Unknown Zone';
+            }
+            return 'Unknown Zone';
+          };
+
+          return {
+            id: zone.id,
+            name: getName(zone.name),
+            facility_id: zone.location_id,
+            type: 'room',
+            capacity: zone.capacity || 1,
+            description: getName(zone.name),
+            is_main_zone: false,
+            parent_zone_id: null,
+            bookable_independently: true,
+            area_sqm: null,
+            floor: null,
+            coordinates_x: null,
+            coordinates_y: null,
+            coordinates_width: null,
+            coordinates_height: null,
+            equipment: [],
+            accessibility_features: [],
+            status: 'active',
+            created_at: zone.created_at,
+            updated_at: zone.updated_at,
+            // Legacy fields
+            facilityId: zone.location_id,
+            isActive: true,
+            amenities: [],
+            pricePerHour: 0,
+            bookableIndependently: true
+          };
+        });
 
         console.log('useZones - Transformed zones:', zones);
         return zones;
@@ -62,7 +89,7 @@ export const useCreateZone = () => {
       const { data, error } = await supabase
         .from('app_zones')
         .insert({
-          location_id: zoneData.facilityId,
+          location_id: zoneData.facilityId || zoneData.facility_id,
           name: { NO: zoneData.name, EN: zoneData.name },
           capacity: zoneData.capacity || 1,
           code: zoneData.name?.toLowerCase().replace(/\s+/g, '-') || 'zone',
@@ -75,7 +102,7 @@ export const useCreateZone = () => {
       return data;
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['zones', variables.facilityId] });
+      queryClient.invalidateQueries({ queryKey: ['zones', variables.facilityId || variables.facility_id] });
     },
   });
 };

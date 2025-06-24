@@ -306,11 +306,9 @@ export const useCreateRecurringBooking = () => {
       queryClient.invalidateQueries({ queryKey: ['availability'] });
       queryClient.invalidateQueries({ queryKey: ['conflicts'] });
       
-      if (data && data.length > 0) {
-        const facility_id = data[0].facilityId;
-        const zone_id = data[0].zoneId;
-        queryClient.invalidateQueries({ queryKey: ['bookings', 'facility', facility_id] });
-        queryClient.invalidateQueries({ queryKey: ['bookings', 'zone', zone_id] });
+      if (data) {
+        queryClient.invalidateQueries({ queryKey: ['bookings', 'facility', data.location_id] });
+        queryClient.invalidateQueries({ queryKey: ['bookings', 'zone', data.zone_id] });
       }
     },
   });

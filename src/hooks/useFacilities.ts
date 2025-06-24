@@ -1,3 +1,4 @@
+
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { FacilityFilters, FacilitySortOptions } from "@/types/facility";
@@ -46,20 +47,58 @@ export function useFacilities({
         name: typeof location.name === 'object' ? location.name[language] || location.name.NO || location.name.EN || 'Unknown' : location.name,
         description: typeof location.description === 'object' ? location.description[language] || location.description.NO || location.description.EN || '' : location.description,
         address: location.address,
+        address_street: location.address || '',
+        address_city: 'Unknown City',
+        address_postal_code: '0000',
+        address_country: 'NO',
         code: location.code,
         latitude: location.latitude,
         longitude: location.longitude,
         metadata: location.metadata || {},
         created_at: location.created_at,
         updated_at: location.updated_at,
-        // Add default values for missing fields
+        // Required fields from Facility interface
         type: 'facility',
+        status: 'active' as const,
+        image_url: null,
+        capacity: 30,
         area: 'unknown',
-        capacity: 1,
-        pricePerHour: 0,
-        images: [],
+        next_available: null,
+        rating: null,
+        review_count: null,
+        price_per_hour: 450,
+        has_auto_approval: false,
         amenities: [],
-        isActive: true
+        time_slot_duration: 60,
+        accessibility_features: [],
+        equipment: [],
+        allowed_booking_types: ['engangs'],
+        season_from: null,
+        season_to: null,
+        contact_name: null,
+        contact_email: null,
+        contact_phone: null,
+        booking_lead_time_hours: 24,
+        max_advance_booking_days: 90,
+        cancellation_deadline_hours: 48,
+        is_featured: false,
+        area_sqm: null,
+        // Computed fields for backwards compatibility
+        image: null,
+        pricePerHour: 450,
+        accessibility: [],
+        suitableFor: [],
+        hasAutoApproval: false,
+        nextAvailable: 'Available now',
+        openingHours: [],
+        zones: [],
+        timeSlotDuration: 1 as const,
+        season: {
+          from: '',
+          to: ''
+        },
+        images: [],
+        availableTimes: []
       }));
 
       return {
@@ -88,7 +127,7 @@ export function useFacilities({
     facilities,
     pagination: paginationInfo,
     isLoading,
-    error: response?.success === false ? response.error : error,
+    error: error?.message || null,
     refetch,
   };
 }

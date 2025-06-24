@@ -29,26 +29,81 @@ export function useFacility(id: number | string) {
       if (error) throw new Error(error.message);
       if (!data) throw new Error('Facility not found');
 
+      // Safely extract localized strings
+      const getName = (nameObj: any) => {
+        if (typeof nameObj === 'string') return nameObj;
+        if (typeof nameObj === 'object' && nameObj) {
+          return nameObj[language] || nameObj['NO'] || nameObj['EN'] || 'Unknown';
+        }
+        return 'Unknown';
+      };
+
+      const getDescription = (descObj: any) => {
+        if (typeof descObj === 'string') return descObj;
+        if (typeof descObj === 'object' && descObj) {
+          return descObj[language] || descObj['NO'] || descObj['EN'] || '';
+        }
+        return '';
+      };
+
       // Transform data to match expected Facility interface
       const facility = {
         id: data.id,
-        name: typeof data.name === 'object' ? data.name[language] || data.name.NO || data.name.EN || 'Unknown' : data.name,
-        description: typeof data.description === 'object' ? data.description[language] || data.description.NO || data.description.EN || '' : data.description,
+        name: getName(data.name),
+        description: getDescription(data.description),
         address: data.address,
+        address_street: data.address || '',
+        address_city: 'Unknown City',
+        address_postal_code: '0000',
+        address_country: 'NO',
         code: data.code,
         latitude: data.latitude,
         longitude: data.longitude,
         metadata: data.metadata || {},
         created_at: data.created_at,
         updated_at: data.updated_at,
-        // Add default values for missing fields
+        // Required fields from Facility interface
         type: 'facility',
+        status: 'active' as const,
+        image_url: null,
+        capacity: 30,
         area: 'unknown',
-        capacity: 1,
-        pricePerHour: 0,
-        images: [],
+        next_available: null,
+        rating: null,
+        review_count: null,
+        price_per_hour: 450,
+        has_auto_approval: false,
         amenities: [],
-        isActive: true
+        time_slot_duration: 60,
+        accessibility_features: [],
+        equipment: [],
+        allowed_booking_types: ['engangs'] as const,
+        season_from: null,
+        season_to: null,
+        contact_name: null,
+        contact_email: null,
+        contact_phone: null,
+        booking_lead_time_hours: 24,
+        max_advance_booking_days: 90,
+        cancellation_deadline_hours: 48,
+        is_featured: false,
+        area_sqm: null,
+        // Computed fields for backwards compatibility
+        image: null,
+        pricePerHour: 450,
+        accessibility: [],
+        suitableFor: [],
+        hasAutoApproval: false,
+        nextAvailable: 'Available now',
+        openingHours: [],
+        zones: [],
+        timeSlotDuration: 1 as const,
+        season: {
+          from: '',
+          to: ''
+        },
+        images: [],
+        availableTimes: []
       };
 
       return {
@@ -65,7 +120,7 @@ export function useFacility(id: number | string) {
   useEffect(() => {
     if (response?.success && response.data) {
       setCurrentFacility(response.data);
-    } else if (response?.success === false) {
+    } else if (response && !response.success) {
       setError('Failed to fetch facility');
       setCurrentFacility(null);
     }
@@ -81,8 +136,8 @@ export function useFacility(id: number | string) {
   return {
     facility,
     isLoading,
-    error: response?.success === false ? response.error : error,
-    notFound: response?.success === false && error?.message?.includes('not found'),
+    error: error?.message || null,
+    notFound: error?.message?.includes('not found'),
     refetch,
   };
 }

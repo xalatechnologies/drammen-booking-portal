@@ -1,17 +1,10 @@
 
-export type Language = 'NO' | 'EN';
-
-export interface LocalizedContent {
-  NO: string;
-  EN?: string;
+export interface TranslationParams {
+  [key: string]: string | number;
 }
 
-export interface TranslationNamespace {
-  [key: string]: string | TranslationNamespace;
-}
-
-export interface TranslationStore {
-  [language: string]: {
-    [namespace: string]: TranslationNamespace;
-  };
+export interface TranslationKey {
+  key: string;
+  defaultValue?: string;
+  params?: TranslationParams;
 }
