@@ -1,11 +1,9 @@
-
 import React, { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PageHeader, FiltersBar, ViewToggle } from "@/components/layouts";
-import { FacilityService } from "@/services/facilityService";
+import { useUnifiedFacilities } from "@/hooks/useUnifiedFacilities";
 import { FacilityCalendarView } from "./calendar/FacilityCalendarView";
 import { FacilityDetailView } from "./detail/FacilityDetailView";
 import { FacilityGridView } from "./views/FacilityGridView";
@@ -36,15 +34,8 @@ export const FacilityListView: React.FC<FacilityListViewProps> = ({
 
   const { tSync } = useTranslation();
 
-  const { data: facilitiesResponse, isLoading, refetch } = useQuery({
-    queryKey: ['facilities'],
-    queryFn: () => FacilityService.getFacilities({
-      page: 1,
-      limit: 50
-    }, {}, {})
-  });
-
-  const facilities = facilitiesResponse?.success ? facilitiesResponse.data?.data || [] : [];
+  // Use unified hook with includeUnpublished=true for admin view
+  const { data: facilities = [], isLoading, refetch } = useUnifiedFacilities(true);
 
   const filteredFacilities = facilities.filter(facility => {
     const matchesSearch = facility.name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
