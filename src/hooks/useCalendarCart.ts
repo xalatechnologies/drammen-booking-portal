@@ -3,7 +3,7 @@ import { useCartStore } from '@/stores/useCartStore';
 import { useUIStore } from '@/stores/useUIStore';
 
 export const useCalendarCart = () => {
-  const { items: cartItems, addToCart } = useCartStore();
+  const { items: cartItems, addItem } = useCartStore();
   const { addNotification } = useUIStore();
 
   const addSlotToCart = (slotData: any) => {
@@ -17,8 +17,6 @@ export const useCalendarCart = () => {
       duration: slotData.duration || 60,
       purpose: slotData.purpose || '',
       expectedAttendees: slotData.expectedAttendees || 1,
-      organizationType: slotData.organizationType || 'private-person',
-      additionalServices: [],
       actorType: slotData.actorType || 'private-person',
       eventType: slotData.eventType || 'other',
       ageGroup: slotData.ageGroup || 'mixed',
@@ -27,20 +25,12 @@ export const useCalendarCart = () => {
       contactPhone: slotData.contactPhone || '',
     };
     
-    addToCart(cartItem);
+    addItem(cartItem);
     addNotification({
       type: 'success',
       title: 'Added to cart',
       message: 'Slot added to cart successfully'
     });
-  };
-
-  const removeSlotFromCart = (slotId: string) => {
-    // Implementation for removing from cart
-  };
-
-  const isSlotInCart = (slotId: string) => {
-    return false; // Mock implementation
   };
 
   const handleAddToCart = (bookingData: any, allZones: any[] = [], clearSelection: () => void = () => {}) => {
@@ -51,8 +41,6 @@ export const useCalendarCart = () => {
   return {
     cartItems,
     addSlotToCart,
-    removeSlotFromCart,
-    isSlotInCart,
     handleAddToCart
   };
 };

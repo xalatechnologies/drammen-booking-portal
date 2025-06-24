@@ -1,28 +1,24 @@
-import React, { useState } from 'react';
-import { ArrowLeft, User, LogIn } from 'lucide-react';
+
+import React from 'react';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { SelectedTimeSlot } from '@/utils/recurrenceEngine';
+import { Zone } from '@/components/booking/types';
 import { ActorType as PricingActorType, BookingType } from '@/types/pricing';
 import { ActorType as CartActorType } from '@/types/cart';
-import { Zone } from '@/components/booking/types';
-import { BookingOverviewCard } from './BookingOverviewCard';
-import { CustomerTypeSection } from './CustomerTypeSection';
-import { IntegratedPriceCalculation } from '@/components/booking/IntegratedPriceCalculation';
-import { LoginSelectionModal } from '@/components/auth/LoginSelectionModal';
-import { useTranslation } from '@/i18n/hooks/useTranslation';
 import { useCartStore } from '@/stores/useCartStore';
-import { useToast } from '@/hooks/use-toast';
-import { useNavigate } from 'react-router-dom';
-import { useAuthStore } from '@/stores/useAuthStore';
-import { useBookingStore } from '@/stores/useBookingStore';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Clock, Users, MapPin, Calculator, ShoppingCart } from 'lucide-react';
+import { format } from 'date-fns';
 
 interface BookingPricingStepProps {
   selectedSlots: SelectedTimeSlot[];
   facilityId: string;
   facilityName: string;
-  zones: Zone[];
+  zones?: Zone[];
   actorType: PricingActorType;
-  onActorTypeChange: (type: PricingActorType) => void;
+  onActorTypeChange: (actorType: PricingActorType) => void;
   bookingType: BookingType;
   onBack: () => void;
   onComplete: () => void;
@@ -45,7 +41,7 @@ export function BookingPricingStep({
   selectedSlots,
   facilityId,
   facilityName,
-  zones,
+  zones = [],
   actorType,
   onActorTypeChange,
   bookingType,
@@ -53,194 +49,167 @@ export function BookingPricingStep({
   onComplete,
   onAddToCart
 }: BookingPricingStepProps) {
-  const { t } = useTranslation();
-  const { addToCart } = useCartStore();
-  const { toast } = useToast();
-  const navigate = useNavigate();
-  const { isAuthenticated } = useAuthStore();
-  const { setFacilityContext } = useBookingStore();
-  const [showLoginModal, setShowLoginModal] = useState(false);
+  const { addItem } = useCartStore();
 
-  // Check if booking requires approval
-  const requiresApproval = ['lag-foreninger', 'paraply'].includes(actorType);
+  const calculateBasePrice = () => {
+    return selectedSlots.length * 450; // Base price per slot
+  };
+
+  const getActorTypeMultiplier = (actor: PricingActorType) => {
+    switch (actor) {
+      case 'private-person': return 1.0;
+      case 'lag-foreninger': return 0.7;
+      case 'paraply': return 0.5;
+      case 'private-firma': return 1.2;
+      case 'kommunale-enheter': return 0.8;
+      default: return 1.0;
+    }
+  };
+
+  const calculateFinalPrice = () => {
+    const basePrice = calculateBasePrice();
+    const multiplier = getActorTypeMultiplier(actorType);
+    return Math.round(basePrice * multiplier);
+  };
 
   const handleAddToCart = () => {
-    try {
-      console.log('BookingPricingStep: Adding to cart, selectedSlots:', selectedSlots);
+    selectedSlots.forEach(slot => {
+      const cartItem = {
+        facilityId,
+        facilityName,
+        zoneId: slot.zoneId,
+        startTime: slot.date,
+        endTime: new Date(slot.date.getTime() + (60 * 60 * 1000)), // 1 hour later
+        price: 450,
+        duration: 60,
+        purpose: 'General booking',
+        expectedAttendees: 1,
+        actorType: convertActorType(actorType),
+        eventType: 'other',
+        ageGroup: 'mixed',
+        contactName: '',
+        contactEmail: '',
+        contactPhone: '',
+      };
       
-      // Set facility context in booking store
-      setFacilityContext(facilityId, facilityName);
-      
-      // Convert actor type for cart
-      const cartActorType = convertActorType(actorType);
-
-      // Add selected slots to cart with complete cart item structure
-      selectedSlots.forEach(slot => {
-        const zone = zones.find(z => z.id === slot.zoneId);
-        const pricePerHour = zone?.pricePerHour || 450;
-        const duration = slot.duration || 2;
-        
-        console.log('BookingPricingStep: Adding slot to cart:', {
-          facilityId,
-          facilityName,
-          slot,
-          pricePerHour,
-          duration,
-          cartActorType
-        });
-        
-        addToCart({
-          facilityId,
-          facilityName,
-          zoneId: slot.zoneId,
-          date: slot.date,
-          timeSlot: slot.timeSlot,
-          duration,
-          pricePerHour,
-          purpose: 'Generell booking',
-          expectedAttendees: 1,
-          organizationType: cartActorType,
-          additionalServices: [],
-          timeSlots: [slot],
-          customerInfo: {
-            name: '',
-            email: '',
-            phone: ''
-          },
-          pricing: {
-            baseFacilityPrice: pricePerHour * duration,
-            servicesPrice: 0,
-            discounts: 0,
-            vatAmount: 0,
-            totalPrice: pricePerHour * duration
-          }
-        });
-      });
-
-      toast({
-        title: "Lagt til i handlekurv",
-        description: `${selectedSlots.length} tidspunkt er lagt til i handlekurven`,
-      });
-
-      // Call the parent's onAddToCart to reset state ONLY after successful addition
-      onAddToCart();
-    } catch (error) {
-      console.error('BookingPricingStep: Error adding to cart:', error);
-      toast({
-        title: "Feil",
-        description: "Kunne ikke legge til i handlekurv. Prøv igjen.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleComplete = () => {
-    console.log('BookingPricingStep: handleComplete called, isAuthenticated:', isAuthenticated);
-    
-    if (!isAuthenticated) {
-      console.log('BookingPricingStep: User not authenticated, showing login modal');
-      setShowLoginModal(true);
-      return;
-    }
-
-    console.log('BookingPricingStep: User authenticated, proceeding with booking completion');
-    // User is logged in, proceed with booking completion
-    onComplete();
-  };
-
-  const handleLoginMethodSelect = (method: 'id-porten' | 'feide' | 'municipal') => {
-    console.log('BookingPricingStep: Login method selected:', method);
-    setShowLoginModal(false);
-    
-    // Store current booking state for post-login redirect
-    const bookingState = {
-      selectedSlots,
-      facilityId,
-      facilityName,
-      actorType: convertActorType(actorType),
-      bookingType
-    };
-    
-    console.log('BookingPricingStep: Storing booking state:', bookingState);
-    sessionStorage.setItem('pending_booking', JSON.stringify(bookingState));
-    
-    // For now, simulate login by showing a toast and then completing the booking
-    // In a real app, this would redirect to the actual login provider
-    toast({
-      title: "Simulert innlogging",
-      description: `Simulerer innlogging med ${method}. I en ekte app ville dette redirecte til innloggingsleverandøren.`,
+      addItem(cartItem);
     });
 
-    // Simulate successful login after a short delay
-    setTimeout(() => {
-      // In a real app, this would be handled by the login callback
-      toast({
-        title: "Innlogging vellykket",
-        description: "Du kan nå fullføre bookingen.",
-      });
-      
-      // Complete the booking after simulated login
-      onComplete();
-    }, 1500);
+    onAddToCart();
   };
 
+  const requiresApproval = ['lag-foreninger', 'paraply'].includes(actorType);
+
   return (
-    <>
-      <div className="flex items-center gap-2 mb-4">
-        <Button variant="ghost" size="sm" onClick={onBack} className="p-2">
-          <ArrowLeft className="h-4 w-4" />
-        </Button>
-        <h2 className="text-lg font-semibold">Aktørtype og pris</h2>
+    <div className="space-y-6">
+      <div>
+        <h3 className="text-xl font-semibold text-gray-900 mb-2">
+          Pris og betingelser
+        </h3>
+        <p className="text-gray-600">
+          Velg aktørtype og se endelig pris for reservasjonen
+        </p>
       </div>
 
-      <BookingOverviewCard selectedSlots={selectedSlots} facilityName={facilityName} zones={zones} />
-
-      <CustomerTypeSection value={actorType} onChange={onActorTypeChange} />
-
-      <IntegratedPriceCalculation 
-        selectedSlots={selectedSlots} 
-        facilityId={facilityId}
-        actorType={actorType} 
-        bookingType={bookingType} 
-      />
-
-      <div className="flex gap-3">
-        <Button 
-          onClick={handleAddToCart} 
-          variant="outline"
-          className="flex-1 text-lg py-6" 
-          size="lg"
-        >
-          {t('forms.buttons.addToCart', {}, 'Legg til handlekurv')}
-        </Button>
-        
-        <Button 
-          onClick={handleComplete} 
-          className="flex-1 text-lg py-6" 
-          size="lg"
-        >
-          {!isAuthenticated ? (
-            <>
-              <LogIn className="h-4 w-4 mr-2" />
-              Logg inn og fullfør
-            </>
-          ) : requiresApproval ? (
-            <>
-              <User className="h-4 w-4 mr-2" />
-              Send til godkjenning
-            </>
-          ) : (
-            t('forms.buttons.complete', {}, 'Fullfør')
+      {/* Actor Type Selection */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Aktørtype</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Select value={actorType} onValueChange={onActorTypeChange}>
+            <SelectTrigger>
+              <SelectValue placeholder="Velg aktørtype" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="private-person">Privatperson</SelectItem>
+              <SelectItem value="lag-foreninger">Lag og foreninger</SelectItem>
+              <SelectItem value="paraply">Paraplyorganisasjon</SelectItem>
+              <SelectItem value="private-firma">Privat firma</SelectItem>
+              <SelectItem value="kommunale-enheter">Kommunale enheter</SelectItem>
+            </SelectContent>
+          </Select>
+          
+          {requiresApproval && (
+            <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <div className="flex items-center gap-2">
+                <Badge variant="secondary">Krever godkjenning</Badge>
+              </div>
+              <p className="text-sm text-blue-700 mt-1">
+                Denne reservasjonen må godkjennes før den blir aktiv.
+              </p>
+            </div>
           )}
+        </CardContent>
+      </Card>
+
+      {/* Selected Slots Summary */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Valgte tidspunkt</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            {selectedSlots.map((slot, index) => (
+              <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-1 text-sm text-gray-600">
+                    <MapPin className="h-4 w-4" />
+                    <span>{slot.zoneId === 'whole-facility' ? 'Hele lokalet' : `Sone ${slot.zoneId}`}</span>
+                  </div>
+                  <div className="flex items-center gap-1 text-sm text-gray-600">
+                    <Clock className="h-4 w-4" />
+                    <span>{format(slot.date, 'dd.MM.yyyy')} - {slot.timeSlot}</span>
+                  </div>
+                </div>
+                <Badge variant="outline">450 kr</Badge>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Price Calculation */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Calculator className="h-5 w-5" />
+            Prisberegning
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            <div className="flex justify-between">
+              <span>Grunnpris ({selectedSlots.length} × 450 kr)</span>
+              <span>{calculateBasePrice()} kr</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Aktørtype-rabatt ({Math.round((1 - getActorTypeMultiplier(actorType)) * 100)}%)</span>
+              <span>-{calculateBasePrice() - calculateFinalPrice()} kr</span>
+            </div>
+            <div className="border-t pt-2">
+              <div className="flex justify-between font-bold text-lg">
+                <span>Totalt</span>
+                <span>{calculateFinalPrice()} kr</span>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Action Buttons */}
+      <div className="flex gap-3">
+        <Button variant="outline" onClick={onBack} className="flex-1">
+          Tilbake
+        </Button>
+        <Button onClick={handleAddToCart} variant="outline" className="flex-1">
+          <ShoppingCart className="h-4 w-4 mr-2" />
+          Legg i kurv
+        </Button>
+        <Button onClick={onComplete} className="flex-1">
+          {requiresApproval ? 'Send forespørsel' : 'Fullfør reservasjon'}
         </Button>
       </div>
-
-      {/* Login Selection Modal */}
-      <LoginSelectionModal
-        isOpen={showLoginModal}
-        onClose={() => setShowLoginModal(false)}
-        onLoginMethodSelect={handleLoginMethodSelect}
-      />
-    </>
+    </div>
   );
 }

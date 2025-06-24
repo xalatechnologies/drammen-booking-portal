@@ -1,60 +1,29 @@
 
-import { BookingState } from './types';
-import { BookingSessionService } from '@/services/BookingSessionService';
-
-export const saveToStorage = (state: BookingState): void => {
-  try {
-    const dataToSave = {
-      formData: state.formData,
-      selectedSlots: state.selectedSlots.map(slot => ({
-        ...slot,
-        date: slot.date.toISOString() // Serialize dates
-      })),
-      currentStep: state.currentStep
-    };
-    localStorage.setItem('bookingState', JSON.stringify(dataToSave));
-    BookingSessionService.saveSessionData({
-      customerType: state.formData.customerType,
-      contactName: state.formData.contactName,
-      contactEmail: state.formData.contactEmail,
-      contactPhone: state.formData.contactPhone,
-      organization: state.formData.organization
-    });
-  } catch (error) {
-    console.warn('Failed to save booking state:', error);
-  }
-};
-
-export const loadFromStorage = (): Partial<BookingState> | null => {
-  try {
-    const saved = localStorage.getItem('bookingState');
-    const sessionData = BookingSessionService.getSessionData();
-    
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      return {
-        ...parsed,
-        selectedSlots: parsed.selectedSlots?.map((slot: any) => ({
-          ...slot,
-          date: new Date(slot.date) // Deserialize dates
-        })) || []
-      };
-    } else if (sessionData) {
-      // Load only contact info from session
-      return {
-        formData: {
-          customerType: sessionData.customerType as any,
-          contactName: sessionData.contactName,
-          contactEmail: sessionData.contactEmail,
-          contactPhone: sessionData.contactPhone,
-          organization: sessionData.organization
-        }
-      };
+// Simple session storage utilities
+export const bookingStorage = {
+  save: (data: any) => {
+    try {
+      sessionStorage.setItem('booking_session', JSON.stringify(data));
+    } catch (error) {
+      console.error('Failed to save booking session:', error);
     }
-    
-    return null;
-  } catch (error) {
-    console.warn('Failed to load booking state:', error);
-    return null;
+  },
+  
+  load: () => {
+    try {
+      const data = sessionStorage.getItem('booking_session');
+      return data ? JSON.parse(data) : null;
+    } catch (error) {
+      console.error('Failed to load booking session:', error);
+      return null;
+    }
+  },
+  
+  clear: () => {
+    try {
+      sessionStorage.removeItem('booking_session');
+    } catch (error) {
+      console.error('Failed to clear booking session:', error);
+    }
   }
 };

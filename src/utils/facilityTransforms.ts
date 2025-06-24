@@ -64,42 +64,14 @@ export const transformZoneForUI = (zone: any) => {
     accessibilityFeatures: zone.accessibility_features || [],
     bookableIndependently: zone.bookable_independently || true,
     pricePerHour: 450, // Default price
-    pricing: {
-      basePrice: 450,
-      currency: 'NOK',
-      priceRules: [],
-      minimumBookingDuration: 60,
-      maximumBookingDuration: 480,
-      cancellationPolicy: {
-        freeUntilHours: 24,
-        partialRefundUntilHours: 12,
-        partialRefundPercentage: 50,
-        noRefundAfterHours: 2
-      }
-    },
-    availability: {
-      openingHours: [],
-      blackoutPeriods: [],
-      maintenanceSchedule: [],
-      recurringUnavailability: []
-    },
-    restrictions: {
-      requiresSupervision: false,
-      allowedActivities: [],
-      prohibitedActivities: [],
-      requiresTraining: false,
-      alcoholPermitted: false,
-      smokingPermitted: false,
-      petsAllowed: false,
-      cateringAllowed: true,
-      decorationsAllowed: true,
-      amplifiedSoundAllowed: false,
-      commercialUseAllowed: true
-    },
     isActive: zone.status === 'active',
     createdAt: new Date(zone.created_at),
     updatedAt: new Date(zone.updated_at),
     equipment: zone.equipment || [],
     features: zone.features || []
   };
+};
+
+export const transformZonesResponse = (zones: any[]) => {
+  return zones.map(transformZoneForUI);
 };

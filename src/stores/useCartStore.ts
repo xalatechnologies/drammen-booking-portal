@@ -6,48 +6,25 @@ export interface CartItem {
   id: string;
   facilityId: string;
   facilityName: string;
-  zoneName?: string;
   zoneId?: string;
-  date?: Date;
-  timeSlot?: string;
   startTime: Date;
   endTime: Date;
   price: number;
-  pricePerHour?: number;
   duration: number;
   purpose: string;
   expectedAttendees: number;
-  organizationType: string;
-  additionalServices: any[];
   actorType: string;
   eventType: string;
   ageGroup: string;
-  specialRequirements?: string;
   contactName: string;
   contactEmail: string;
   contactPhone: string;
-  timeSlots?: any[];
-  pricing?: {
-    totalPrice: number;
-    baseFacilityPrice: number;
-    servicesPrice: number;
-    discounts: number;
-    vatAmount: number;
-  };
-  customerInfo?: {
-    name: string;
-    email: string;
-    phone: string;
-  };
 }
 
 interface CartStore {
   items: CartItem[];
-  totalPrice: number;
-  itemCount: number;
-  addToCart: (item: Omit<CartItem, 'id'>) => void;
-  removeFromCart: (itemId: string) => void;
-  updateItem: (itemId: string, updates: Partial<CartItem>) => void;
+  addItem: (item: Omit<CartItem, 'id'>) => void;
+  removeItem: (itemId: string) => void;
   clearCart: () => void;
   getTotalPrice: () => number;
   getItemCount: () => number;
@@ -57,52 +34,24 @@ export const useCartStore = create<CartStore>()(
   persist(
     (set, get) => ({
       items: [],
-      totalPrice: 0,
-      itemCount: 0,
 
-      addToCart: (item) => {
+      addItem: (item) => {
         const id = `${item.facilityId}-${item.startTime.getTime()}`;
         const newItem = { ...item, id };
         
-        set((state) => {
-          const newItems = [...state.items, newItem];
-          const totalPrice = newItems.reduce((sum, item) => sum + item.price, 0);
-          return {
-            items: newItems,
-            totalPrice,
-            itemCount: newItems.length
-          };
-        });
+        set((state) => ({
+          items: [...state.items, newItem]
+        }));
       },
 
-      removeFromCart: (itemId) => {
-        set((state) => {
-          const newItems = state.items.filter(item => item.id !== itemId);
-          const totalPrice = newItems.reduce((sum, item) => sum + item.price, 0);
-          return {
-            items: newItems,
-            totalPrice,
-            itemCount: newItems.length
-          };
-        });
-      },
-
-      updateItem: (itemId, updates) => {
-        set((state) => {
-          const newItems = state.items.map(item =>
-            item.id === itemId ? { ...item, ...updates } : item
-          );
-          const totalPrice = newItems.reduce((sum, item) => sum + item.price, 0);
-          return {
-            items: newItems,
-            totalPrice,
-            itemCount: newItems.length
-          };
-        });
+      removeItem: (itemId) => {
+        set((state) => ({
+          items: state.items.filter(item => item.id !== itemId)
+        }));
       },
 
       clearCart: () => {
-        set({ items: [], totalPrice: 0, itemCount: 0 });
+        set({ items: [] });
       },
 
       getTotalPrice: () => {
