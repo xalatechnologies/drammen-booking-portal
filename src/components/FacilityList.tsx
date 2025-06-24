@@ -21,7 +21,9 @@ const FacilityList: React.FC<FacilityListProps> = ({
     return <div className="text-center py-8">Loading facilities...</div>;
   }
 
-  const facilities = transformFacilitiesForUI(rawFacilities);
+  // Ensure rawFacilities is an array before transforming
+  const facilitiesArray = Array.isArray(rawFacilities) ? rawFacilities : [];
+  const facilities = transformFacilitiesForUI(facilitiesArray);
 
   return (
     <FacilityGrid facilities={facilities} />

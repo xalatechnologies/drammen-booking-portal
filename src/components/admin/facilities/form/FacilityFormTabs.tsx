@@ -115,8 +115,6 @@ export const FacilityFormTabs: React.FC<FacilityFormTabsProps> = ({
 
         <TabsContent value="pricing" className="space-y-6">
           <FacilityPricingSection 
-            ref={pricingRef}
-            form={form}
             facilityId={facilityId}
           />
         </TabsContent>
@@ -130,9 +128,7 @@ export const FacilityFormTabs: React.FC<FacilityFormTabsProps> = ({
 
         <TabsContent value="blackouts" className="space-y-6">
           <FacilityBlackoutSection 
-            ref={blackoutRef}
             facilityId={facilityId}
-            form={form}
           />
         </TabsContent>
       </Tabs>
@@ -141,4 +137,3 @@ export const FacilityFormTabs: React.FC<FacilityFormTabsProps> = ({
     </form>
   );
 };
-

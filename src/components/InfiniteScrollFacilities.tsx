@@ -20,7 +20,9 @@ export function InfiniteScrollFacilities({
 }: InfiniteScrollFacilitiesProps) {
   const { data: rawFacilities = [], isLoading } = useFacilities();
   
-  const facilities = transformFacilitiesForUI(rawFacilities);
+  // Ensure rawFacilities is an array before transforming
+  const facilitiesArray = Array.isArray(rawFacilities) ? rawFacilities : [];
+  const facilities = transformFacilitiesForUI(facilitiesArray);
   const hasMore = false; // Simplified - no pagination
   const fetchMore = () => {}; // Simplified - no pagination
 

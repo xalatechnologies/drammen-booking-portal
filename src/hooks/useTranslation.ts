@@ -10,12 +10,18 @@ export function useTranslation() {
     return fallback || key;
   };
 
+  const tSync = (key: string, fallback?: string) => {
+    // Simple synchronous translation
+    return fallback || key;
+  };
+
   const changeLanguage = (lang: string) => {
     setLanguage(lang);
   };
 
   return {
     t,
+    tSync,
     i18n: {
       language,
       changeLanguage
