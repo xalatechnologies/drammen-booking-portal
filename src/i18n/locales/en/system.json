@@ -1,0 +1,73 @@
+
+{
+  "actors": {
+    "types": {
+      "private-person": "Private person",
+      "lag-foreninger": "Clubs and associations",
+      "paraply": "Umbrella organization",
+      "private-firma": "Private company",
+      "kommunale-enheter": "Municipal units",
+      "utdanning": "Education",
+      "helse": "Health",
+      "kultur": "Culture",
+      "frivillig": "Voluntary organization"
+    }
+  },
+  "bookings": {
+    "types": {
+      "engangs": "One-time booking",
+      "fastlan": "Fixed loan",
+      "rammetid": "Frame time",
+      "strotimer": "Drop-in hours"
+    },
+    "status": {
+      "draft": "Draft",
+      "pending-approval": "Pending approval",
+      "approved": "Approved",
+      "confirmed": "Confirmed",
+      "in-progress": "In progress",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "rejected": "Rejected",
+      "no-show": "No show"
+    }
+  },
+  "locations": {
+    "fields": {
+      "name": "Name",
+      "description": "Description",
+      "address": "Address",
+      "capacity": "Capacity"
+    }
+  },
+  "zones": {
+    "intervals": {
+      "30min": "30 minutes",
+      "60min": "1 hour",
+      "120min": "2 hours",
+      "240min": "4 hours"
+    }
+  },
+  "notifications": {
+    "types": {
+      "booking-confirmation": "Booking confirmation",
+      "booking-reminder": "Booking reminder",
+      "booking-cancellation": "Booking cancellation",
+      "payment-due": "Payment due",
+      "system-announcement": "System announcement"
+    }
+  },
+  "roles": {
+    "system-admin": "System administrator",
+    "facility-manager": "Facility manager",
+    "caseworker": "Caseworker",
+    "regular-user": "Regular user"
+  },
+  "permissions": {
+    "create-booking": "Create booking",
+    "approve-booking": "Approve booking",
+    "manage-facility": "Manage facility",
+    "manage-users": "Manage users",
+    "view-reports": "View reports"
+  }
+}
