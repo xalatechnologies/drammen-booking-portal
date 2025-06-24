@@ -104,12 +104,6 @@ export function EnhancedPriceCalculationCard({
       )}
       
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Calculator className="h-5 w-5" />
-            Prisberegning
-          </CardTitle>
-        </CardHeader>
         <CardContent className="space-y-4">
           {/* Price Breakdown */}
           <div className="space-y-3">
@@ -141,30 +135,11 @@ export function EnhancedPriceCalculationCard({
             
             <div className="flex justify-between items-center text-lg font-bold">
               <span className="flex items-center gap-2">
-                <DollarSign className="h-5 w-5" />
                 Totalt å betale
               </span>
               <span className="text-navy-600">{Math.round(priceBreakdown.finalPrice)} NOK</span>
             </div>
-          </div>
-          
-          {/* Actor Type Info */}
-          <div className="mt-4 p-3 bg-gray-50 rounded-lg">
-            <div className="text-sm">
-              <span className="font-medium text-gray-700">Aktørtype: </span>
-              <Badge variant="outline">
-                {actorType === 'private-person' && 'Privatperson'}
-                {actorType === 'lag-foreninger' && 'Organisasjon'}
-                {actorType === 'private-firma' && 'Kommersiell'}
-              </Badge>
-            </div>
-            {activityType && (
-              <div className="text-sm mt-1">
-                <span className="font-medium text-gray-700">Aktivitet: </span>
-                <span className="text-gray-600">{activityType}</span>
-              </div>
-            )}
-          </div>
+          </div>          
         </CardContent>
       </Card>
     </div>
