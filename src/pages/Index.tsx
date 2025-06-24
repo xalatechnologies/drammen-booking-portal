@@ -22,7 +22,7 @@ const Index = () => {
   const [date, setDate] = useState<Date>(new Date());
 
   // Fetch facilities with pagination
-  const { data, isLoading } = useOptimizedFacilities({
+  const { data: facilities = [], isLoading } = useOptimizedFacilities({
     pagination: { page: 1, limit: 20 },
     filters: {
       searchTerm,
@@ -33,8 +33,6 @@ const Index = () => {
     }
   });
 
-  const facilities = data?.facilities || [];
-
   const renderContent = () => {
     if (isLoading) {
       return <div className="text-center py-8">Loading facilities...</div>;
@@ -42,7 +40,14 @@ const Index = () => {
 
     switch (viewMode) {
       case "map":
-        return <MapView />;
+        return (
+          <MapView 
+            facilityType={facilityType}
+            location={location}
+            viewMode={viewMode}
+            setViewMode={setViewMode}
+          />
+        );
       case "calendar":
         return (
           <CalendarView
@@ -78,19 +83,12 @@ const Index = () => {
       
       <div className="container mx-auto px-4 py-8">
         <SearchFilter
-          searchTerm={searchTerm}
           onSearchChange={setSearchTerm}
-          facilityType={facilityType}
           onFacilityTypeChange={setFacilityType}
-          location={location}
           onLocationChange={setLocation}
-          accessibility={accessibility}
           onAccessibilityChange={setAccessibility}
-          capacity={capacity}
           onCapacityChange={setCapacity}
-          date={date}
           onDateChange={setDate}
-          viewMode={viewMode}
           onViewModeChange={setViewMode}
         />
         
