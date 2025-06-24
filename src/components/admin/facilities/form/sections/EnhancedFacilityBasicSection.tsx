@@ -2,7 +2,6 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Building } from 'lucide-react';
-import { FacilityBasicFields } from '../FacilityBasicFields';
 import { UseFormReturn } from 'react-hook-form';
 import { FacilityFormData } from '../FacilityFormSchema';
 
@@ -20,7 +19,41 @@ export function EnhancedFacilityBasicSection({ form }: EnhancedFacilityBasicSect
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <FacilityBasicFields form={form} />
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">Facility Name</label>
+            <input 
+              {...form.register('name')} 
+              className="w-full p-2 border rounded-md"
+              placeholder="Enter facility name"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Type</label>
+            <input 
+              {...form.register('type')} 
+              className="w-full p-2 border rounded-md"
+              placeholder="Enter facility type"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Area</label>
+            <input 
+              {...form.register('area')} 
+              className="w-full p-2 border rounded-md"
+              placeholder="Enter area description"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Description</label>
+            <textarea 
+              {...form.register('description')} 
+              className="w-full p-2 border rounded-md"
+              rows={3}
+              placeholder="Enter facility description"
+            />
+          </div>
+        </div>
       </CardContent>
     </Card>
   );

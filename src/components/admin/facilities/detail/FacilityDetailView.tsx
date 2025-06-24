@@ -39,15 +39,15 @@ export function FacilityDetailView({ facility }: FacilityDetailViewProps) {
         </TabsContent>
 
         <TabsContent value="hours" className="space-y-6">
-          <FacilityOpeningHours facilityId={facility.id} openingHours={facility.openingHours} />
+          <FacilityOpeningHours facility={{ id: facility.id, openingHours: facility.openingHours }} />
         </TabsContent>
 
         <TabsContent value="zones" className="space-y-6">
-          <FacilityZonesSection facilityId={facility.id} zones={facility.zones} />
+          <FacilityZonesSection facility={{ id: facility.id, zones: facility.zones }} />
         </TabsContent>
 
         <TabsContent value="analytics" className="space-y-6">
-          <FacilityAnalytics facilityId={facility.id} />
+          <FacilityAnalytics facility={{ id: facility.id }} />
         </TabsContent>
 
         <TabsContent value="settings" className="space-y-6">

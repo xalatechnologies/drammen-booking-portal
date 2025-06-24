@@ -23,7 +23,7 @@ export interface CartItem {
 
 interface CartState {
   items: CartItem[];
-  addItem: (item: CartItem) => void;
+  addItem: (item: Omit<CartItem, 'id'>) => void;
   removeItem: (itemId: string) => void;
   clearCart: () => void;
   getTotalPrice: () => number;
@@ -36,7 +36,7 @@ export const useCartStore = create<CartState>()(
       items: [],
       
       addItem: (item) => set((state) => ({
-        items: [...state.items, { ...item, id: item.id || crypto.randomUUID() }]
+        items: [...state.items, { ...item, id: crypto.randomUUID() }]
       })),
       
       removeItem: (itemId) => set((state) => ({

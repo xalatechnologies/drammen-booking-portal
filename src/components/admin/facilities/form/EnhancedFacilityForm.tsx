@@ -2,8 +2,8 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FacilityBasicSection } from "./sections/FacilityBasicSection";
-import { FacilityAddressSection } from "./sections/FacilityAddressSection";
+import { EnhancedFacilityBasicSection } from "./sections/EnhancedFacilityBasicSection";
+import { EnhancedFacilityAddressSection } from "./sections/EnhancedFacilityAddressSection";
 import { FacilityContactSection } from "./sections/FacilityContactSection";
 import { FacilityConfigSection } from "./sections/FacilityConfigSection";
 import { FacilityFeaturesSection } from "./sections/FacilityFeaturesSection";
@@ -58,6 +58,8 @@ export function EnhancedFacilityForm({ facilityId, onSuccess }: EnhancedFacility
     }
   };
 
+  const watchedValues = form.watch();
+
   return (
     <Card>
       <CardHeader>
@@ -70,14 +72,19 @@ export function EnhancedFacilityForm({ facilityId, onSuccess }: EnhancedFacility
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               <div className="space-y-6">
-                <FacilityBasicSection form={form} />
-                <FacilityAddressSection form={form} />
+                <EnhancedFacilityBasicSection form={form} />
+                <EnhancedFacilityAddressSection form={form} />
                 <FacilityContactSection form={form} />
               </div>
               
               <div className="space-y-6">
                 <FacilityConfigSection form={form} />
-                <FacilityFeaturesSection form={form} />
+                <FacilityFeaturesSection 
+                  form={form} 
+                  equipment={watchedValues.equipment || []}
+                  amenities={watchedValues.amenities || []}
+                  capacity={watchedValues.capacity || 1}
+                />
               </div>
             </div>
 
