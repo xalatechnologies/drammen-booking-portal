@@ -109,7 +109,7 @@ export function CalendarGrid({
     
     const cell = (
       <button
-        className={`w-full h-12 rounded border transition-all duration-200 text-sm select-none ${statusStyle} ${
+        className={`w-full h-10 rounded border transition-all duration-200 text-sm select-none ${statusStyle} ${
           status === 'available' ? 'transform hover:scale-105' : ''
         }`}
         disabled={status !== 'available'}
