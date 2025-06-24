@@ -16,7 +16,6 @@ export type VerificationLevel = 'unverified' | 'pending' | 'verified' | 'rejecte
 
 export class OrganizationRepository {
   static async getAll(): Promise<Organization[]> {
-    // Use the new app_actors table instead of organizations
     const { data, error } = await supabase
       .from('app_actors')
       .select('*')
@@ -24,12 +23,11 @@ export class OrganizationRepository {
 
     if (error) throw error;
 
-    // Transform app_actors to match Organization interface
     return (data || []).map(actor => ({
       id: actor.id,
-      name: typeof actor.name === 'object' ? actor.name.NO || actor.name.EN || 'Unknown' : String(actor.name),
+      name: this.extractLocalizedName(actor.name),
       type: actor.type,
-      verification_level: 'verified', // Default for now
+      verification_level: 'verified',
       contact_info: actor.contact_info || {},
       metadata: actor.metadata || {},
       created_at: actor.created_at,
@@ -49,9 +47,9 @@ export class OrganizationRepository {
 
     return {
       id: data.id,
-      name: typeof data.name === 'object' ? data.name.NO || data.name.EN || 'Unknown' : String(data.name),
+      name: this.extractLocalizedName(data.name),
       type: data.type,
-      verification_level: 'verified', // Default for now
+      verification_level: 'verified',
       contact_info: data.contact_info || {},
       metadata: data.metadata || {},
       created_at: data.created_at,
@@ -60,7 +58,6 @@ export class OrganizationRepository {
   }
 
   static async updateVerificationLevel(id: string, level: VerificationLevel): Promise<void> {
-    // For now, we'll update the metadata to store verification level
     const { error } = await supabase
       .from('app_actors')
       .update({ 
@@ -91,13 +88,21 @@ export class OrganizationRepository {
 
     return {
       id: data.id,
-      name: typeof data.name === 'object' ? data.name.NO || data.name.EN || 'Unknown' : String(data.name),
+      name: this.extractLocalizedName(data.name),
       type: data.type,
-      verification_level: data.metadata?.verification_level || 'unverified',
+      verification_level: (data.metadata as any)?.verification_level || 'unverified',
       contact_info: data.contact_info || {},
       metadata: data.metadata || {},
       created_at: data.created_at,
       updated_at: data.updated_at
     };
+  }
+
+  private static extractLocalizedName(nameObj: any): string {
+    if (typeof nameObj === 'string') return nameObj;
+    if (typeof nameObj === 'object' && nameObj !== null) {
+      return (nameObj as any).NO || (nameObj as any).EN || 'Unknown';
+    }
+    return 'Unknown';
   }
 }

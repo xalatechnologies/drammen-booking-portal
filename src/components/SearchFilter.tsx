@@ -25,12 +25,18 @@ export function SearchFilter({ onFilter, onSearch }: SearchFilterProps) {
   // Extract unique types and areas from locations
   const uniqueTypes = React.useMemo(() => {
     if (!locations) return [];
-    return [...new Set(locations.map(loc => loc.metadata?.type).filter(Boolean))];
+    return [...new Set(locations.map(loc => {
+      const metadata = loc.metadata as any;
+      return metadata?.type;
+    }).filter(Boolean))];
   }, [locations]);
 
   const uniqueAreas = React.useMemo(() => {
     if (!locations) return [];
-    return [...new Set(locations.map(loc => loc.metadata?.area).filter(Boolean))];
+    return [...new Set(locations.map(loc => {
+      const metadata = loc.metadata as any;
+      return metadata?.area;
+    }).filter(Boolean))];
   }, [locations]);
 
   const handleSearch = (query: string) => {
@@ -130,8 +136,8 @@ export function SearchFilter({ onFilter, onSearch }: SearchFilterProps) {
                   </SelectTrigger>
                   <SelectContent>
                     {uniqueTypes.map((type) => (
-                      <SelectItem key={type} value={type}>
-                        {type}
+                      <SelectItem key={String(type)} value={String(type)}>
+                        {String(type)}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -149,8 +155,8 @@ export function SearchFilter({ onFilter, onSearch }: SearchFilterProps) {
                   </SelectTrigger>
                   <SelectContent>
                     {uniqueAreas.map((area) => (
-                      <SelectItem key={area} value={area}>
-                        {area}
+                      <SelectItem key={String(area)} value={String(area)}>
+                        {String(area)}
                       </SelectItem>
                     ))}
                   </SelectContent>

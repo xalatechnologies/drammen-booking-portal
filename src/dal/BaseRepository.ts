@@ -1,43 +1,38 @@
 
-import { PaginationParams, RepositoryResponse } from '@/types/api';
+export interface PaginationParams {
+  page: number;
+  limit: number;
+}
 
-export abstract class BaseRepository<T extends Record<string, any>> {
-  
-  async findAll(
-    pagination?: PaginationParams,
-    orderBy?: string,
-    orderDirection: 'asc' | 'desc' = 'asc'
-  ): Promise<RepositoryResponse<T[]>> {
-    // This method should be overridden by concrete implementations
-    throw new Error('findAll method must be implemented by concrete repository');
-  }
+export interface QueryOptions {
+  filters?: Record<string, any>;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+  pagination?: PaginationParams;
+}
 
-  async findById(id: string): Promise<RepositoryResponse<T | null>> {
-    // This method should be overridden by concrete implementations
-    throw new Error('findById method must be implemented by concrete repository');
-  }
+export interface ApiError {
+  message: string;
+  code?: string;
+}
 
-  async create(data: Omit<T, 'id' | 'created_at' | 'updated_at'>): Promise<RepositoryResponse<T | null>> {
-    // This method should be overridden by concrete implementations
-    throw new Error('create method must be implemented by concrete repository');
-  }
+export interface PaginationInfo extends PaginationParams {
+  total: number;
+  totalPages: number;
+  hasNext: boolean;
+  hasPrev: boolean;
+}
 
-  async update(id: string, data: Partial<Omit<T, 'id' | 'created_at'>>): Promise<RepositoryResponse<T | null>> {
-    // This method should be overridden by concrete implementations
-    throw new Error('update method must be implemented by concrete repository');
-  }
+export interface ApiResponse<T> {
+  success: boolean;
+  data?: T extends any[] ? { data: T; pagination?: PaginationInfo } : T;
+  error?: ApiError;
+}
 
-  async delete(id: string): Promise<RepositoryResponse<boolean>> {
-    // This method should be overridden by concrete implementations
-    throw new Error('delete method must be implemented by concrete repository');
-  }
-
-  // Utility methods for subclasses
-  protected generateId(): string {
-    return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-  }
-
-  protected getCurrentTimestamp(): Date {
-    return new Date();
-  }
+export interface BaseRepository<T = any> {
+  getAll(options?: QueryOptions): Promise<ApiResponse<T[]>>;
+  getById(id: string): Promise<ApiResponse<T>>;
+  create(data: Partial<T>): Promise<ApiResponse<T>>;
+  update(id: string, data: Partial<T>): Promise<ApiResponse<T>>;
+  delete(id: string): Promise<ApiResponse<void>>;
 }
