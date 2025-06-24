@@ -1,4 +1,3 @@
-
 export interface Facility {
   id: number;
   name: string;
@@ -41,8 +40,8 @@ export interface Facility {
   address: string; // Computed from address_street, address_city - REQUIRED
   image: string; // Alias for image_url - REQUIRED
   pricePerHour: number; // Alias for price_per_hour
-  accessibility: string[]; // Alias for accessibility_features
-  suitableFor: string[];
+  accessibility: string[]; // Alias for accessibility_features - REQUIRED
+  suitableFor: string[]; // REQUIRED
   hasAutoApproval: boolean; // Alias for has_auto_approval
   nextAvailable: string; // Alias for next_available - REQUIRED
   openingHours: OpeningHours[];
@@ -139,6 +138,18 @@ export interface Zone {
     width: number;
     length: number;
     height?: number;
+  };
+  // Computed/derived fields for backwards compatibility
+  pricePerHour: number;
+  availableTimes: any[];
+  openingHours: any[];
+  bookingRules: {
+    minBookingDuration: number;
+    maxBookingDuration: number;
+    allowedTimeSlots: string[];
+    bookingTypes: string[];
+    advanceBookingDays: number;
+    cancellationHours: number;
   };
 }
 
