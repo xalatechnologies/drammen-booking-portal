@@ -22,7 +22,7 @@ interface PriceBreakdown {
 interface EnhancedPriceCalculationCardProps {
   selectedSlots: SelectedTimeSlot[];
   facilityId: string;
-  actorType: ActorType;
+  actorType: ActorType | '';
   activityType?: string;
   hidePricingModeSelector?: boolean;
 }
@@ -42,16 +42,18 @@ export function EnhancedPriceCalculationCard({
     
     // Apply multipliers based on actor type
     let actorTypeMultiplier = 1.0;
-    switch (actorType) {
-      case 'private-person':
-        actorTypeMultiplier = 1.0;
-        break;
-      case 'lag-foreninger':
-        actorTypeMultiplier = 0.8;
-        break;
-      case 'private-firma':
-        actorTypeMultiplier = 1.5;
-        break;
+    if (actorType) {
+      switch (actorType) {
+        case 'private-person':
+          actorTypeMultiplier = 1.0;
+          break;
+        case 'lag-foreninger':
+          actorTypeMultiplier = 0.8;
+          break;
+        case 'private-firma':
+          actorTypeMultiplier = 1.5;
+          break;
+      }
     }
     
     const timeSlotMultiplier = 1.0; // Normal hours
@@ -74,8 +76,6 @@ export function EnhancedPriceCalculationCard({
     };
   };
 
-  const priceBreakdown = calculateMockPrice();
-
   if (selectedSlots.length === 0) {
     return (
       <Card>
@@ -94,49 +94,60 @@ export function EnhancedPriceCalculationCard({
     );
   }
 
-  return (
-    <div className="space-y-4">
-      {!hidePricingModeSelector && (
-        <PricingModeSelector 
-          selectedMode="hourly"
-          onModeChange={() => {}}
-        />
-      )}
-      
+  if (!actorType) {
+    return (
       <Card>
-        <CardContent className="space-y-4 pt-5">
-          {/* Price Breakdown */}
-          <div className="space-y-3">
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-600">Grunnpris</span>
-              <span className="font-medium">{priceBreakdown.basePrice} NOK</span>
-            </div>
-            
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-600">Subtotal</span>
-              <span className="font-medium">{priceBreakdown.subtotal} NOK</span>
-            </div>
-            
-            {priceBreakdown.actorTypeMultiplier !== 1.0 && (
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">Aktørtype justering</span>
-                <Badge variant={priceBreakdown.actorTypeMultiplier < 1.0 ? "default" : "secondary"}>
-                  {priceBreakdown.actorTypeMultiplier < 1.0 ? '-' : '+'}{Math.abs((1 - priceBreakdown.actorTypeMultiplier) * 100).toFixed(0)}%
-                </Badge>
-              </div>
-            )}
-            
-            <hr className="my-3" />
-            
-            <div className="flex justify-between items-center text-lg font-bold">
-              <span className="flex items-center gap-2">
-                Totalt å betale
-              </span>
-              <span className="text-navy-600">{Math.round(priceBreakdown.finalPrice)} NOK</span>
-            </div>
-          </div>          
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Calculator className="h-5 w-5" />
+            Prisberegning
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-gray-600 text-center py-4">
+            Velg aktør for å se pris
+          </p>
         </CardContent>
       </Card>
-    </div>
+    );
+  }
+
+  const priceBreakdown = calculateMockPrice();
+
+  return (
+    <Card>
+      <CardContent className="space-y-4 pt-5">
+        {/* Price Breakdown */}
+        <div className="space-y-3">
+          <div className="flex justify-between items-center">
+            <span className="text-sm text-gray-600">Grunnpris</span>
+            <span className="font-medium">{priceBreakdown.basePrice} NOK</span>
+          </div>
+          
+          <div className="flex justify-between items-center">
+            <span className="text-sm text-gray-600">Subtotal</span>
+            <span className="font-medium">{priceBreakdown.subtotal} NOK</span>
+          </div>
+          
+          {priceBreakdown.actorTypeMultiplier !== 1.0 && (
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-gray-600">Aktørtype justering</span>
+              <Badge variant={priceBreakdown.actorTypeMultiplier < 1.0 ? "default" : "secondary"}>
+                {priceBreakdown.actorTypeMultiplier < 1.0 ? '-' : '+'}{Math.abs((1 - priceBreakdown.actorTypeMultiplier) * 100).toFixed(0)}%
+              </Badge>
+            </div>
+          )}
+          
+          <hr className="my-3" />
+          
+          <div className="flex justify-between items-center text-lg font-bold">
+            <span className="flex items-center gap-2">
+              Totalt å betale
+            </span>
+            <span className="text-navy-600">{Math.round(priceBreakdown.finalPrice)} NOK</span>
+          </div>
+        </div>          
+      </CardContent>
+    </Card>
   );
 }

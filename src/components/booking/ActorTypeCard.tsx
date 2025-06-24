@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { ActorType } from '@/types/pricing';
 
 interface ActorTypeCardProps {
-  value: ActorType;
+  value: ActorType | '';
   onChange: (value: ActorType) => void;
 }
 
@@ -23,7 +23,7 @@ export function ActorTypeCard({ value, onChange }: ActorTypeCardProps) {
       <CardContent className="p-4">
         <Select value={value} onValueChange={onChange}>
           <SelectTrigger>
-            <SelectValue placeholder="Hvem booker?" />
+            <SelectValue placeholder="Velg aktør" />
           </SelectTrigger>
           <SelectContent>
             {actorTypes.map((type) => (

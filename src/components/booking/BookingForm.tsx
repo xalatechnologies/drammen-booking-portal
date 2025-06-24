@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { SelectedTimeSlot } from '@/utils/recurrenceEngine';
@@ -48,7 +49,7 @@ export function BookingForm({
     attendees: 1,
     activityType: '',
     additionalInfo: '',
-    actorType: 'private-person' as ActorType,
+    actorType: '' as ActorType,
     termsAccepted: false
   });
 
@@ -74,12 +75,20 @@ export function BookingForm({
   };
 
   const isFormValid = () => {
+    // Check if actor type is selected and not empty string
+    if (!formData.actorType || formData.actorType === '') {
+      return false;
+    }
+    
     const validation = BookingService.validateBookingData({
       selectedSlots,
       facilityId,
       facilityName,
       zones,
-      formData
+      formData: {
+        ...formData,
+        actorType: formData.actorType as ActorType
+      }
     });
     return validation.isValid;
   };
@@ -87,12 +96,24 @@ export function BookingForm({
   const handleAddToCart = async () => {
     console.log('BookingForm: handleAddToCart called');
 
+    if (!formData.actorType || formData.actorType === '') {
+      toast({
+        title: "Feil",
+        description: "Vennligst velg aktørtype først.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const result = await BookingService.addToCart({
       selectedSlots,
       facilityId,
       facilityName,
       zones,
-      formData
+      formData: {
+        ...formData,
+        actorType: formData.actorType as ActorType
+      }
     });
 
     if (result.success) {
