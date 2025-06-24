@@ -23,8 +23,8 @@ export interface Zone {
   status: string;
   created_at: string;
   updated_at: string;
-  // Add compatibility fields for existing components
-  facilityId: number;
+  // Add compatibility fields for existing components - ensuring all required fields are present
+  facilityId: string; // Changed to string to match booking Zone interface
   pricePerHour: number;
   area: string;
   isMainZone: boolean;
@@ -35,6 +35,7 @@ export interface Zone {
   layout?: any;
   accessibility?: string[];
   features?: string[];
+  amenities: string[]; // Added required amenities field
   isActive: boolean;
 }
 
@@ -64,7 +65,7 @@ export function useZones(facilityId?: number | string) {
       // Transform the data to include compatibility fields
       const transformedData = (data || []).map(zone => ({
         ...zone,
-        facilityId: zone.facility_id,
+        facilityId: zone.facility_id.toString(), // Convert to string
         pricePerHour: 450, // Default price
         area: zone.area_sqm ? `${zone.area_sqm} m²` : "N/A",
         isMainZone: zone.is_main_zone,
@@ -95,6 +96,7 @@ export function useZones(facilityId?: number | string) {
         },
         accessibility: zone.accessibility_features || [],
         features: zone.equipment || [],
+        amenities: zone.accessibility_features || [], // Map accessibility_features to amenities
         isActive: zone.status === 'active'
       }));
 

@@ -2,21 +2,21 @@
 import { Zone as FacilityZone } from '@/types/facility';
 import { Zone as BookingZone } from '@/components/booking/types';
 
-export function convertZoneToBookingZone(facilityZone: FacilityZone): BookingZone {
+export function convertZoneToBookingZone(facilityZone: any): BookingZone {
   return {
     id: facilityZone.id,
     name: facilityZone.name,
-    facilityId: facilityZone.facility_id?.toString() || '', 
+    facilityId: typeof facilityZone.facilityId === 'string' ? facilityZone.facilityId : (facilityZone.facility_id?.toString() || ''), 
     capacity: facilityZone.capacity,
-    pricePerHour: 250, // Default price
+    pricePerHour: facilityZone.pricePerHour || 250, // Use existing or default price
     description: facilityZone.description || '',
-    area: facilityZone.area_sqm ? `${facilityZone.area_sqm} m²` : "100 m²",
-    isMainZone: facilityZone.is_main_zone || false,
-    parentZoneId: facilityZone.parent_zone_id || undefined,
-    subZones: [],
-    equipment: facilityZone.equipment || [],
-    amenities: facilityZone.accessibility_features || [], // Map accessibility_features to amenities
-    bookingRules: {
+    area: facilityZone.area || (facilityZone.area_sqm ? `${facilityZone.area_sqm} m²` : "100 m²"),
+    isMainZone: facilityZone.isMainZone || facilityZone.is_main_zone || false,
+    parentZoneId: facilityZone.parentZoneId || facilityZone.parent_zone_id || undefined,
+    subZones: facilityZone.subZones || [],
+    equipment: facilityZone.equipment || facilityZone.features || [],
+    amenities: facilityZone.amenities || facilityZone.accessibility_features || [], // Ensure amenities field exists
+    bookingRules: facilityZone.bookingRules || {
       minBookingDuration: 1,
       maxBookingDuration: 8,
       allowedTimeSlots: ["08:00-10:00", "10:00-12:00", "12:00-14:00", "14:00-16:00", "16:00-18:00", "18:00-20:00"],
@@ -24,13 +24,13 @@ export function convertZoneToBookingZone(facilityZone: FacilityZone): BookingZon
       advanceBookingDays: 90,
       cancellationHours: 24
     },
-    adminInfo: {
+    adminInfo: facilityZone.adminInfo || {
       contactPersonName: "Zone Manager",
       contactPersonEmail: "zone@drammen.kommune.no",
       specialInstructions: facilityZone.description || '',
       maintenanceSchedule: []
     },
-    layout: {
+    layout: facilityZone.layout || {
       coordinates: {
         x: facilityZone.coordinates_x || 0,
         y: facilityZone.coordinates_y || 0,
@@ -39,8 +39,8 @@ export function convertZoneToBookingZone(facilityZone: FacilityZone): BookingZon
       },
       entryPoints: ["Hovedinngang"]
     },
-    accessibility: facilityZone.accessibility_features || [],
-    features: facilityZone.equipment || [],
-    isActive: facilityZone.status === 'active'
+    accessibility: facilityZone.accessibility || facilityZone.accessibility_features || [],
+    features: facilityZone.features || facilityZone.equipment || [],
+    isActive: facilityZone.isActive !== undefined ? facilityZone.isActive : (facilityZone.status === 'active')
   };
 }
