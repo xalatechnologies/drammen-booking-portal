@@ -6,8 +6,6 @@ import { Badge } from '@/components/ui/badge';
 import { ShoppingCart, Trash2, Calendar, Clock, MapPin } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 import { useNavigate } from 'react-router-dom';
-import { format } from 'date-fns';
-import { nb } from 'date-fns/locale';
 
 export function CartDropdown() {
   const { items, removeFromCart, clearCart, getTotalPrice } = useCart();
@@ -82,11 +80,11 @@ export function CartDropdown() {
             <div className="flex items-center justify-between text-xs">
               <div className="flex items-center gap-1 text-gray-600">
                 <Calendar className="h-3 w-3" />
-                <span>{format(new Date(item.startTime), 'dd.MM.yyyy', { locale: nb })}</span>
+                <span>Valgt tidspunkt</span>
               </div>
               <div className="flex items-center gap-1 text-gray-600">
                 <Clock className="h-3 w-3" />
-                <span>{format(new Date(item.startTime), 'HH:mm')} - {format(new Date(item.endTime), 'HH:mm')}</span>
+                <span>{item.duration} min</span>
               </div>
             </div>
             

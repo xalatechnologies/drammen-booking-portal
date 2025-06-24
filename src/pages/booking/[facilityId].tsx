@@ -8,7 +8,8 @@ import { convertZoneToBookingZone } from '@/utils/zoneConverter';
 
 export default function BookingPage() {
   const { facilityId } = useParams();
-  const { facility, isLoading, error } = useFacility(Number(facilityId));
+  const facilityIdNum = facilityId ? parseInt(facilityId, 10) : 0;
+  const { facility, isLoading, error } = useFacility(facilityIdNum);
   const { data: zones = [], isLoading: zonesLoading } = useZones(facilityId);
 
   const isLoadingAny = isLoading || zonesLoading;

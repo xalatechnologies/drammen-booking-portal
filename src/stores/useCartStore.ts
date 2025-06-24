@@ -6,9 +6,9 @@ export interface CartItem {
   id: string;
   facilityId: string;
   facilityName: string;
-  zoneId?: string;
-  startTime: Date;
-  endTime: Date;
+  zoneId: string;
+  startTime: string;
+  endTime: string;
   price: number;
   duration: number;
   purpose: string;
@@ -21,46 +21,39 @@ export interface CartItem {
   contactPhone: string;
 }
 
-interface CartStore {
+interface CartState {
   items: CartItem[];
-  addItem: (item: Omit<CartItem, 'id'>) => void;
+  addItem: (item: CartItem) => void;
   removeItem: (itemId: string) => void;
   clearCart: () => void;
   getTotalPrice: () => number;
   getItemCount: () => number;
 }
 
-export const useCartStore = create<CartStore>()(
+export const useCartStore = create<CartState>()(
   persist(
     (set, get) => ({
       items: [],
-
-      addItem: (item) => {
-        const id = `${item.facilityId}-${item.startTime.getTime()}`;
-        const newItem = { ...item, id };
-        
-        set((state) => ({
-          items: [...state.items, newItem]
-        }));
-      },
-
-      removeItem: (itemId) => {
-        set((state) => ({
-          items: state.items.filter(item => item.id !== itemId)
-        }));
-      },
-
-      clearCart: () => {
-        set({ items: [] });
-      },
-
+      
+      addItem: (item) => set((state) => ({
+        items: [...state.items, { ...item, id: item.id || crypto.randomUUID() }]
+      })),
+      
+      removeItem: (itemId) => set((state) => ({
+        items: state.items.filter((item) => item.id !== itemId)
+      })),
+      
+      clearCart: () => set({ items: [] }),
+      
       getTotalPrice: () => {
-        return get().items.reduce((sum, item) => sum + item.price, 0);
+        const { items } = get();
+        return items.reduce((total, item) => total + item.price, 0);
       },
-
+      
       getItemCount: () => {
-        return get().items.length;
-      },
+        const { items } = get();
+        return items.length;
+      }
     }),
     {
       name: 'cart-storage',
