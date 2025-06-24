@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -49,8 +50,8 @@ export function BookingStepsAccordion({
   const calculateTotalPrice = () => {
     return selectedSlots.reduce((total, slot) => {
       const zone = zones.find(z => z.id === slot.zoneId);
-      const basePrice = zone?.pricePerHour || 225;
-      const duration = slot.duration || 2;
+      const basePrice = zone?.pricePerHour || 450;
+      const duration = slot.duration || 1;
       let price = basePrice * duration;
       
       // Apply customer type discounts
@@ -80,8 +81,8 @@ export function BookingStepsAccordion({
 
     selectedSlots.forEach(slot => {
       const zone = zones.find(z => z.id === slot.zoneId);
-      const basePrice = zone?.pricePerHour || 225;
-      const duration = slot.duration || 2;
+      const basePrice = zone?.pricePerHour || 450;
+      const duration = slot.duration || 1;
       let finalPrice = basePrice * duration;
       
       // Apply discounts
@@ -97,36 +98,19 @@ export function BookingStepsAccordion({
       addToCart({
         facilityId,
         facilityName,
-        date: slot.date,
-        timeSlot: slot.timeSlot,
+        startTime: slot.date,
+        endTime: new Date(slot.date.getTime() + (duration * 60 * 60 * 1000)),
         zoneId: slot.zoneId,
-        pricePerHour: basePrice,
-        duration: duration,
-        organizationType: formData.customerType as any,
-        customerInfo: {
-          name: formData.contactName,
-          email: formData.contactEmail,
-          phone: formData.contactPhone,
-          organization: formData.organization
-        },
-        specialRequirements: formData.notes,
-        // Required fields for CartItem
+        price: finalPrice,
+        duration: duration * 60, // Convert to minutes
         purpose: formData.purpose,
         expectedAttendees: formData.attendees ? parseInt(formData.attendees) : 1,
-        additionalServices: [],
-        timeSlots: [{
-          date: slot.date,
-          timeSlot: slot.timeSlot,
-          zoneId: slot.zoneId,
-          duration: duration
-        }],
-        pricing: {
-          baseFacilityPrice: basePrice * duration,
-          servicesPrice: 0,
-          discounts: 0,
-          vatAmount: 0,
-          totalPrice: finalPrice
-        }
+        actorType: formData.customerType,
+        eventType: formData.eventType || 'other',
+        ageGroup: 'mixed',
+        contactName: formData.contactName,
+        contactEmail: formData.contactEmail,
+        contactPhone: formData.contactPhone
       });
     });
   };
@@ -304,7 +288,7 @@ export function BookingStepsAccordion({
                         </div>
                         <div className="text-right">
                           <div className="font-medium">
-                            {Math.round((zones.find(z => z.id === slot.zoneId)?.pricePerHour || 225) * (slot.duration || 2) * 
+                            {Math.round((zones.find(z => z.id === slot.zoneId)?.pricePerHour || 450) * (slot.duration || 1) * 
                               (formData.customerType === 'organization' ? 0.8 : 
                                formData.customerType === 'business' ? 0.9 : 1))} kr
                           </div>

@@ -1,86 +1,80 @@
 
-import React, { createContext, useContext, useReducer, useEffect, ReactNode } from 'react';
-import { SelectedTimeSlot } from '@/utils/recurrenceEngine';
-import { useCart } from '@/contexts/CartContext';
-import { BookingFormData, BookingValidationErrors, BookingState } from './booking/types';
-import { bookingReducer, initialState } from './booking/reducer';
-import { createActions } from './booking/actions';
-import { createBusinessLogic } from './booking/businessLogic';
-import { saveToStorage, loadFromStorage } from './booking/storage';
+import React, { createContext, useContext, useReducer, useEffect } from 'react';
+import { bookingActions } from './booking/actions';
+import { bookingStorage } from './booking/storage';
 
-interface BookingContextType {
-  state: BookingState;
-  actions: {
-    setSelectedSlots: (slots: SelectedTimeSlot[]) => void;
-    addSelectedSlot: (slot: SelectedTimeSlot) => void;
-    removeSelectedSlot: (zoneId: string, date: Date, timeSlot: string) => void;
-    clearSelectedSlots: () => void;
-    updateFormData: (data: Partial<BookingFormData>) => void;
-    setCurrentStep: (step: 'selection' | 'booking' | 'cart') => void;
-    setBookingInProgress: (inProgress: boolean) => void;
-    addBookingError: (error: string) => void;
-    clearBookingErrors: () => void;
-    validateAndContinue: () => boolean;
-    resetBookingState: () => void;
-    saveToStorage: () => void;
-    loadFromStorage: () => void;
-    addToCartAndContinue: (facilityId: string, facilityName: string) => boolean;
+interface BookingState {
+  contactInfo: {
+    name: string;
+    email: string;
+    phone: string;
   };
-  businessLogic: {
-    isFormValid: () => boolean;
-    canProceedToNextStep: () => boolean;
-    requiresApproval: () => boolean;
-    calculateTotalPrice: () => number;
-  };
+  bookingDetails: any;
+  step: 'contact' | 'details' | 'confirmation';
 }
 
-const BookingContext = createContext<BookingContextType | undefined>(undefined);
-
-export const useBookingState = () => {
-  const context = useContext(BookingContext);
-  if (!context) {
-    throw new Error('useBookingState must be used within a BookingStateProvider');
-  }
-  return context;
+const initialState: BookingState = {
+  contactInfo: {
+    name: '',
+    email: '',
+    phone: ''
+  },
+  bookingDetails: null,
+  step: 'contact'
 };
 
-interface BookingStateProviderProps {
-  children: ReactNode;
+function bookingReducer(state: BookingState, action: any): BookingState {
+  switch (action.type) {
+    case 'UPDATE_CONTACT_INFO':
+      return {
+        ...state,
+        contactInfo: { ...state.contactInfo, ...action.payload }
+      };
+    case 'UPDATE_BOOKING_DETAILS':
+      return {
+        ...state,
+        bookingDetails: action.payload
+      };
+    case 'CLEAR_BOOKING':
+      return initialState;
+    default:
+      return state;
+  }
 }
 
-export const BookingStateProvider: React.FC<BookingStateProviderProps> = ({ children }) => {
+const BookingStateContext = createContext<{
+  state: BookingState;
+  dispatch: React.Dispatch<any>;
+}>({
+  state: initialState,
+  dispatch: () => {}
+});
+
+export const BookingStateProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [state, dispatch] = useReducer(bookingReducer, initialState);
-  const { addToCart } = useCart();
 
-  // Auto-save to localStorage when state changes
   useEffect(() => {
-    if (state.isDirty) {
-      const timer = setTimeout(() => {
-        saveToStorage(state);
-        dispatch({ type: 'MARK_SAVED' });
-      }, 1000); // Debounce saves by 1 second
-
-      return () => clearTimeout(timer);
-    }
-  }, [state.isDirty, state.formData, state.selectedSlots]);
-
-  // Load from storage on mount
-  useEffect(() => {
-    const savedData = loadFromStorage();
-    if (savedData) {
-      dispatch({ type: 'LOAD_FROM_STORAGE', payload: savedData });
+    const savedState = bookingStorage.load();
+    if (savedState) {
+      dispatch({ type: 'RESTORE_STATE', payload: savedState });
     }
   }, []);
 
-  const actions = createActions(dispatch, state, addToCart);
-  const businessLogic = createBusinessLogic(state);
+  useEffect(() => {
+    bookingStorage.save(state);
+  }, [state]);
 
   return (
-    <BookingContext.Provider value={{ state, actions, businessLogic }}>
+    <BookingStateContext.Provider value={{ state, dispatch }}>
       {children}
-    </BookingContext.Provider>
+    </BookingStateContext.Provider>
   );
 };
 
-// Re-export types for backward compatibility
-export type { BookingFormData, BookingValidationErrors, BookingState };
+export const useBookingState = () => {
+  const context = useContext(BookingStateContext);
+  if (!context) {
+    throw new Error('useBookingState must be used within BookingStateProvider');
+  }
+  return context;
+};

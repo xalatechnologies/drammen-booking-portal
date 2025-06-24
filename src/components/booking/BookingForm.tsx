@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { SelectedTimeSlot } from '@/utils/recurrenceEngine';
@@ -9,7 +10,6 @@ import { EnhancedPriceCalculationCard } from './EnhancedPriceCalculationCard';
 import { BookingActionButtons } from './BookingActionButtons';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
 
 interface BookingFormData {
   purpose: string;
@@ -41,9 +41,6 @@ export function BookingForm({
   onSlotsCleared,
   onRemoveSlot
 }: BookingFormProps) {
-  console.log('BookingForm: Rendering with selectedSlots:', selectedSlots);
-  console.log('BookingForm: facilityId:', facilityId, 'facilityName:', facilityName);
-  
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -61,14 +58,12 @@ export function BookingForm({
   };
 
   const handleRemoveSlot = (slot: SelectedTimeSlot) => {
-    console.log('BookingForm: handleRemoveSlot called:', slot);
     if (onRemoveSlot) {
       onRemoveSlot(slot.zoneId, slot.date, slot.timeSlot);
     }
   };
 
   const handleClearAll = () => {
-    console.log('BookingForm: handleClearAll called');
     if (onSlotsCleared) {
       onSlotsCleared();
     }
@@ -79,8 +74,6 @@ export function BookingForm({
   };
 
   const handleAddToCart = async () => {
-    console.log('BookingForm: handleAddToCart called');
-
     try {
       toast({
         title: "Lagt til i handlekurv",
@@ -91,7 +84,6 @@ export function BookingForm({
         onSlotsCleared();
       }
 
-      // Call parent callback if provided
       if (onAddToCart) {
         onAddToCart({
           selectedSlots,
@@ -110,8 +102,6 @@ export function BookingForm({
   };
 
   const handleCompleteBooking = async () => {
-    console.log('BookingForm: handleCompleteBooking called');
-
     try {
       toast({
         title: "Reservasjon opprettet",
@@ -140,7 +130,7 @@ export function BookingForm({
   };
 
   const calculateTotalPrice = () => {
-    return selectedSlots.length * 450; // Simple calculation
+    return selectedSlots.length * 450;
   };
 
   if (selectedSlots.length === 0) {
@@ -157,7 +147,6 @@ export function BookingForm({
     <div className="space-y-6">
       <SelectedSlotsAccordion
         selectedSlots={selectedSlots}
-        facilityName={facilityName}
         zones={zones}
         onRemoveSlot={handleRemoveSlot}
         onClearAll={handleClearAll}
@@ -165,21 +154,21 @@ export function BookingForm({
 
       <BookingFormFields
         formData={formData}
-        updateFormData={updateFormData}
+        onUpdateFormData={updateFormData}
       />
 
       <EnhancedPriceCalculationCard
         selectedSlots={selectedSlots}
         actorType={formData.actorType}
-        zones={zones}
         totalPrice={calculateTotalPrice()}
       />
 
       <BookingActionButtons
-        isValid={isFormValid()}
+        termsAccepted={formData.termsAccepted}
+        onTermsAcceptedChange={(accepted) => setFormData(prev => ({ ...prev, termsAccepted: accepted }))}
         onAddToCart={handleAddToCart}
         onCompleteBooking={handleCompleteBooking}
-        totalPrice={calculateTotalPrice()}
+        isFormValid={isFormValid()}
       />
     </div>
   );

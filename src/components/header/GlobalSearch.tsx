@@ -7,7 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 
-export function GlobalSearch() {
+export default function GlobalSearch() {
   const [query, setQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
 
@@ -32,7 +32,6 @@ export function GlobalSearch() {
     e.preventDefault();
     if (query.trim()) {
       setIsSearching(true);
-      // Handle search navigation
       window.location.href = `/search?q=${encodeURIComponent(query)}`;
     }
   };
@@ -55,7 +54,6 @@ export function GlobalSearch() {
         </Button>
       </form>
 
-      {/* Search Results Dropdown */}
       {query.trim().length > 2 && searchResults.length > 0 && (
         <Card className="absolute top-full left-0 right-0 mt-2 z-50 max-h-96 overflow-y-auto">
           <CardContent className="p-0">
