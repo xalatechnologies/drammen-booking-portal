@@ -1,115 +1,74 @@
 
-import { useState, useEffect } from 'react';
-import { PriceCalculation, ActorType, BookingType } from '@/types/pricing';
-import { pricingEngine } from '@/utils/pricingEngine';
+import { useQuery } from '@tanstack/react-query';
+import { PriceRuleService, ActorType as PriceActorType } from '@/services/PriceRuleService';
+import { ActorType } from '@/types/pricing';
 
-interface UsePriceCalculationProps {
-  facilityId?: string;
+interface PriceCalculationParams {
+  facilityId: string;
   zoneId?: string;
   startDate?: Date;
-  endDate?: Date;
+  customerType: ActorType;
   timeSlot?: string;
-  customerType?: ActorType;
-  bookingMode?: 'one-time' | 'date-range' | 'recurring';
-  eventType?: string;
-  ageGroup?: string;
+  bookingMode?: 'one-time' | 'recurring';
 }
+
+// Convert between ActorType formats
+const convertActorType = (actorType: ActorType): PriceActorType => {
+  switch (actorType) {
+    case 'private-person': return PriceActorType.INDIVIDUAL;
+    case 'lag-foreninger': return PriceActorType.ORGANIZATION;
+    case 'paraply': return PriceActorType.PARAPLY;
+    case 'private-firma': return PriceActorType.ORGANIZATION;
+    case 'kommunale-enheter': return PriceActorType.ORGANIZATION;
+    default: return PriceActorType.INDIVIDUAL;
+  }
+};
 
 export function usePriceCalculation({
   facilityId,
   zoneId,
   startDate,
-  endDate,
+  customerType,
   timeSlot,
-  customerType = 'private-person',
-  bookingMode = 'one-time',
-  eventType,
-  ageGroup
-}: UsePriceCalculationProps) {
-  const [calculation, setCalculation] = useState<PriceCalculation | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  bookingMode = 'one-time'
+}: PriceCalculationParams) {
+  return useQuery({
+    queryKey: ['price-calculation', facilityId, zoneId, startDate?.toISOString(), customerType, timeSlot, bookingMode],
+    queryFn: async () => {
+      if (!facilityId || !startDate) {
+        return null;
+      }
 
-  useEffect(() => {
-    console.log('usePriceCalculation effect triggered with params:', {
-      facilityId,
-      zoneId,
-      startDate,
-      endDate,
-      timeSlot,
-      customerType,
-      bookingMode,
-      eventType,
-      ageGroup
-    });
-
-    // Check if we have the minimum required information for pricing
-    if (!facilityId || !zoneId || !startDate || !customerType) {
-      console.log('Missing required parameters for price calculation. Details:', {
-        facilityId: facilityId || 'MISSING',
-        zoneId: zoneId || 'MISSING',
-        startDate: startDate || 'MISSING',
-        customerType: customerType || 'MISSING'
-      });
-      setCalculation(null);
-      setIsLoading(false);
-      return;
-    }
-
-    setIsLoading(true);
-    
-    try {
-      const finalEndDate = endDate || new Date(startDate.getTime() + 2 * 60 * 60 * 1000);
+      const rules = await PriceRuleService.getPriceRules(facilityId, zoneId);
+      const priceActorType = convertActorType(customerType);
+      const unitPrice = PriceRuleService.calculateUnitPrice(rules, startDate, priceActorType);
       
-      // Use the actual timeSlot if provided, otherwise use default for estimate
-      const calculationTimeSlot = timeSlot || '09:00-11:00';
-      
-      // Map bookingMode to BookingType
-      const bookingType: BookingType = bookingMode === 'recurring' ? 'fastlan' : 'engangs';
-      
-      console.log('Calling pricingEngine.calculatePrice with:', {
-        facilityId,
-        zoneId,
-        startDate,
-        finalEndDate,
-        customerType,
-        timeSlot: calculationTimeSlot,
-        bookingType,
-        eventType,
-        ageGroup
-      });
-
-      const result = pricingEngine.calculatePrice(
-        facilityId,
-        zoneId,
-        startDate,
-        finalEndDate,
-        customerType,
-        calculationTimeSlot,
-        bookingType,
-        eventType,
-        ageGroup
-      );
-      
-      console.log('pricingEngine.calculatePrice returned:', result);
-      setCalculation(result);
-    } catch (error) {
-      console.error('Error calculating price:', error);
-      setCalculation(null);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [facilityId, zoneId, startDate, endDate, timeSlot, customerType, bookingMode, eventType, ageGroup]);
-
-  const applyOverride = (amount: number, reason: string) => {
-    if (calculation) {
-      const updated = pricingEngine.applyOverride(calculation, amount, reason);
-      setCalculation(updated);
-    }
-  };
-
-  return {
-    calculation,
-    isLoading,
-    applyOverride
-  };
+      // Basic calculation structure
+      return {
+        basePrice: unitPrice,
+        totalHours: 2, // Default
+        totalDays: 1,
+        actorTypeDiscount: 0,
+        timeSlotMultiplier: 1,
+        bookingTypeDiscount: 0,
+        weekendSurcharge: 0,
+        subtotal: unitPrice,
+        finalPrice: unitPrice,
+        requiresApproval: ['lag-foreninger', 'paraply'].includes(customerType),
+        breakdown: [
+          {
+            description: 'Base price',
+            amount: unitPrice,
+            type: 'base' as const
+          }
+        ],
+        discounts: [],
+        surcharges: [],
+        totalPrice: unitPrice,
+        currency: 'NOK'
+      };
+    },
+    enabled: !!facilityId && !!startDate,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
 }

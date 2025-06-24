@@ -10,6 +10,13 @@ export interface FacilityAnalytics {
   occupancyRate: number;
 }
 
+export interface FacilityUsageStats {
+  totalHours: number;
+  peakHours: string[];
+  averageBookingDuration: number;
+  mostPopularDays: string[];
+}
+
 export class FacilityAnalyticsService {
   static async getFacilityAnalytics(facilityId: string): Promise<FacilityAnalytics> {
     try {
@@ -47,6 +54,30 @@ export class FacilityAnalyticsService {
       return analytics;
     } catch (error) {
       console.error('Error fetching facility analytics:', error);
+      throw error;
+    }
+  }
+
+  static async getFacilityUsageStats(facilityId: string): Promise<FacilityUsageStats> {
+    try {
+      const { data: bookings, error } = await supabase
+        .from('app_bookings')
+        .select('*')
+        .eq('location_id', facilityId);
+
+      if (error) throw error;
+
+      // Mock calculation for usage stats
+      const stats: FacilityUsageStats = {
+        totalHours: (bookings?.length || 0) * 2, // Assume 2 hour average
+        peakHours: ['14:00-16:00', '18:00-20:00'],
+        averageBookingDuration: 2.5,
+        mostPopularDays: ['Tuesday', 'Wednesday', 'Thursday']
+      };
+
+      return stats;
+    } catch (error) {
+      console.error('Error fetching facility usage stats:', error);
       throw error;
     }
   }

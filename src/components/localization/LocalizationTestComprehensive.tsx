@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { useTranslation } from '@/i18n';
+import { useTranslation } from '@/i18n/hooks/useTranslation';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 export const LocalizationTestComprehensive: React.FC = () => {
@@ -77,7 +77,7 @@ export const LocalizationTestComprehensive: React.FC = () => {
                     }`}>
                       {translation}
                     </div>
-                    <Badge size="sm" variant={isTranslated ? 'default' : 'destructive'}>
+                    <Badge variant={isTranslated ? 'default' : 'destructive'}>
                       {isTranslated ? 'Translated' : 'Missing'}
                     </Badge>
                   </div>

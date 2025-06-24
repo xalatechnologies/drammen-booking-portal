@@ -8,6 +8,15 @@ export class AdditionalServicesService {
     return serviceCategories;
   }
 
+  static async getServices(): Promise<AdditionalService[]> {
+    // Flatten all services from all categories
+    const allServices = serviceCategories.reduce((acc, category) => {
+      return acc.concat(category.services);
+    }, [] as AdditionalService[]);
+    
+    return allServices;
+  }
+
   static async getServicesByCategory(categoryId: string): Promise<AdditionalService[]> {
     const category = serviceCategories.find(c => c.id === categoryId);
     return category?.services || [];
